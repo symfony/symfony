@@ -230,7 +230,7 @@ class FlattenExceptionTest extends TestCase
         );
     }
 
-    public function flattenDataProvider()
+    public static function flattenDataProvider()
     {
         return [
             [new \Exception('test', 123), 'Exception'],

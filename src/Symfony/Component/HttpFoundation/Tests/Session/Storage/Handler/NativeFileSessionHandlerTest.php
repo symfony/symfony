@@ -47,7 +47,7 @@ class NativeFileSessionHandlerTest extends TestCase
         rmdir($path);
     }
 
-    public function savePathDataProvider()
+    public static function savePathDataProvider()
     {
         $base = sys_get_temp_dir();
 

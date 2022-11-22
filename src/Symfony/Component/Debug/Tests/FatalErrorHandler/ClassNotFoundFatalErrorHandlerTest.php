@@ -75,7 +75,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
         $this->assertSame($error['line'], $exception->getLine());
     }
 
-    public function provideClassNotFoundData()
+    public static function provideClassNotFoundData()
     {
         $autoloader = new ComposerClassLoader();
         $autoloader->add('Symfony\Component\Debug\Exception\\', realpath(__DIR__.'/../../Exception'));

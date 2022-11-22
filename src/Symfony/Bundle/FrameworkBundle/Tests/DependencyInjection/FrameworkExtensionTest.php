@@ -1468,7 +1468,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(EventDispatcherInterface::class, $container->get('foo')->dispatcher);
     }
 
-    public function testCacheDefaultRedisProvider()
+    public static function testCacheDefaultRedisProvider()
     {
         $container = $this->createContainerFromFile('cache');
 
@@ -1672,7 +1672,7 @@ abstract class FrameworkExtensionTest extends TestCase
         ], $defaultOptions['peer_fingerprint']);
     }
 
-    public function provideMailer(): array
+    public static function provideMailer(): array
     {
         return [
             ['mailer_with_dsn', ['main' => 'smtp://example.com']],

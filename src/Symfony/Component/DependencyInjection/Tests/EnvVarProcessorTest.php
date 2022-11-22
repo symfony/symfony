@@ -733,7 +733,7 @@ CSV;
         })['path']);
     }
 
-    public function provideGetEnvUrlPath()
+    public static function provideGetEnvUrlPath()
     {
         return [
             ['', 'https://symfony.com'],

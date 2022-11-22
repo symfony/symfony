@@ -179,7 +179,7 @@ class LogoutListenerTest extends TestCase
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
-    public function provideInvalidCsrfTokens(): array
+    public static function provideInvalidCsrfTokens(): array
     {
         return [
             ['invalid'],

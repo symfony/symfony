@@ -51,7 +51,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
         $this->assertSame($expected, $this->resourceChecker->isFresh($this->resource, time()));
     }
 
-    public function isFreshProvider()
+    public static function isFreshProvider()
     {
         yield 'not fresh on missing parameter' => [function (MockObject $container) {
             $container->method('hasParameter')->with('locales')->willReturn(false);

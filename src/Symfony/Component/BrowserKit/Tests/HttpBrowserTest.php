@@ -191,7 +191,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser->request('GET', $requestPath);
     }
 
-    public function forwardSlashesRequestPathProvider()
+    public static function forwardSlashesRequestPathProvider()
     {
         return [
             'one slash' => ['/'],

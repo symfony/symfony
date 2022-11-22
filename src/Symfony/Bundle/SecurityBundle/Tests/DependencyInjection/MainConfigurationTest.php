@@ -34,7 +34,7 @@ class MainConfigurationTest extends TestCase
         ],
     ];
 
-    public function testNoConfigForProvider()
+    public static function testNoConfigForProvider()
     {
         $this->expectException(InvalidConfigurationException::class);
         $config = [
@@ -48,7 +48,7 @@ class MainConfigurationTest extends TestCase
         $processor->processConfiguration($configuration, [$config]);
     }
 
-    public function testManyConfigForProvider()
+    public static function testManyConfigForProvider()
     {
         $this->expectException(InvalidConfigurationException::class);
         $config = [

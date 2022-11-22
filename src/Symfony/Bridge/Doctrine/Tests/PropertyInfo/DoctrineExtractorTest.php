@@ -190,7 +190,7 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom', []));
     }
 
-    public function typesProvider()
+    public static function typesProvider()
     {
         $provider = [
             ['id', [new Type(Type::BUILTIN_TYPE_INT)]],

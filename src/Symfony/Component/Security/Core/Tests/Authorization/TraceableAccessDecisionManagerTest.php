@@ -53,7 +53,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
         $this->assertEquals($expectedLog, $adm->getDecisionLog());
     }
 
-    public function provideObjectsAndLogs(): \Generator
+    public static function provideObjectsAndLogs(): \Generator
     {
         $voter1 = $this->getMockForAbstractClass(VoterInterface::class);
         $voter2 = $this->getMockForAbstractClass(VoterInterface::class);

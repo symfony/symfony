@@ -328,7 +328,7 @@ class CachingFactoryDecoratorTest extends TestCase
         $this->assertEquals(new ChoiceListView(), $view2);
     }
 
-    public function provideSameChoices()
+    public static function provideSameChoices()
     {
         $object = (object) ['foo' => 'bar'];
 
@@ -341,7 +341,7 @@ class CachingFactoryDecoratorTest extends TestCase
         ];
     }
 
-    public function provideDistinguishedChoices()
+    public static function provideDistinguishedChoices()
     {
         return [
             [0, false],
@@ -359,7 +359,7 @@ class CachingFactoryDecoratorTest extends TestCase
         ];
     }
 
-    public function provideSameKeyChoices()
+    public static function provideSameKeyChoices()
     {
         // Only test types here that can be used as array keys
         return [
@@ -370,7 +370,7 @@ class CachingFactoryDecoratorTest extends TestCase
         ];
     }
 
-    public function provideDistinguishedKeyChoices()
+    public static function provideDistinguishedKeyChoices()
     {
         // Only test types here that can be used as array keys
         return [

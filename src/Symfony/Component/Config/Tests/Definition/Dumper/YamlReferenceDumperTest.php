@@ -26,7 +26,7 @@ class YamlReferenceDumperTest extends TestCase
         $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 
-    public function provideDumpAtPath(): array
+    public static function provideDumpAtPath(): array
     {
         return [
             'Regular node' => ['scalar_true', <<<EOL

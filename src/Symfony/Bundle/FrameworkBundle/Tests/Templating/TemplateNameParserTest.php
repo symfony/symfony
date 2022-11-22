@@ -58,7 +58,7 @@ class TemplateNameParserTest extends TestCase
         $this->assertSame($path, $template->getPath());
     }
 
-    public function parseProvider()
+    public static function parseProvider()
     {
         return [
             ['FooBundle:Post:index.html.php', 'FooBundle:Post:index.html.php', '@FooBundle/Resources/views/Post/index.html.php', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'php')],

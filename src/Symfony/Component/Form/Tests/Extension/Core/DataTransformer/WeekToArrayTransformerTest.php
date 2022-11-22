@@ -43,7 +43,7 @@ class WeekToArrayTransformerTest extends TestCase
         $transformer->transform($input);
     }
 
-    public function transformationFailuresProvider(): array
+    public static function transformationFailuresProvider(): array
     {
         return [
             'malformed string' => ['lorem', 'Given data does not follow the date format "Y-\WW".'],
@@ -101,7 +101,7 @@ class WeekToArrayTransformerTest extends TestCase
         $transformer->reverseTransform($input);
     }
 
-    public function reverseTransformationFailuresProvider(): array
+    public static function reverseTransformationFailuresProvider(): array
     {
         return [
             'missing year' => [['week' => 1], 'Key "year" is missing.'],

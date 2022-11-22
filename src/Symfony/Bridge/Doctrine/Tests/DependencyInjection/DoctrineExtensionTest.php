@@ -170,7 +170,7 @@ class DoctrineExtensionTest extends TestCase
         ], $expectedEm2));
     }
 
-    public function providerBasicDrivers()
+    public static function providerBasicDrivers()
     {
         return [
             ['doctrine.orm.cache.apc.class',       ['type' => 'apc']],

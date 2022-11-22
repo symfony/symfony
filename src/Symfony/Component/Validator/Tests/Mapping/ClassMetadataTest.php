@@ -304,14 +304,14 @@ class ClassMetadataTest extends TestCase
         $metadata->setGroupSequenceProvider(true);
     }
 
-    public function testGroupSequenceProvider()
+    public static function testGroupSequenceProvider()
     {
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
         $this->assertTrue($metadata->isGroupSequenceProvider());
     }
 
-    public function testMergeConstraintsMergesGroupSequenceProvider()
+    public static function testMergeConstraintsMergesGroupSequenceProvider()
     {
         $parent = new ClassMetadata(self::PROVIDERCLASS);
         $parent->setGroupSequenceProvider(true);

@@ -423,7 +423,7 @@ class ApplicationTest extends TestCase
         $application->find($abbreviation);
     }
 
-    public function provideAmbiguousAbbreviations()
+    public static function provideAmbiguousAbbreviations()
     {
         return [
             ['f', 'Command "f" is not defined.'],
@@ -501,12 +501,12 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
         $this->assertSame('
-                                                          
-  There are no commands defined in the "foos" namespace.  
-                                                          
-  Did you mean this?                                      
-      foo                                                 
-                                                          
+
+  There are no commands defined in the "foos" namespace.
+
+  Did you mean this?
+      foo
+
 
 ', $tester->getDisplay(true));
     }
@@ -539,7 +539,7 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
     }
 
-    public function provideInvalidCommandNamesSingle()
+    public static function provideInvalidCommandNamesSingle()
     {
         return [
             ['foo3:barr'],
@@ -748,7 +748,7 @@ class ApplicationTest extends TestCase
         $application->find($name);
     }
 
-    public function provideAbbreviationsForHiddenCommands()
+    public static function provideAbbreviationsForHiddenCommands()
     {
         return [
             ['foo:hidde'],

@@ -74,7 +74,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0date"]);
     }
 
-    public function provideDateTimes()
+    public static function provideDateTimes()
     {
         return [
             ['2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)', 1493503200, 'Sunday, April 30, 2017%Afrom now%ADST On'],
@@ -206,7 +206,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0interval"]);
     }
 
-    public function provideIntervals()
+    public static function provideIntervals()
     {
         return [
             ['PT0S', 0, 0, '0s', '0s'],
@@ -305,7 +305,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0timezone"]);
     }
 
-    public function provideTimeZones()
+    public static function provideTimeZones()
     {
         $xRegion = \extension_loaded('intl') ? '%s' : '';
 
@@ -382,7 +382,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0period"]);
     }
 
-    public function providePeriods()
+    public static function providePeriods()
     {
         $periods = [
             ['2017-01-01', 'P1D', '2017-01-03', 0, 'every + 1d, from [2017-01-01 00:00:00.0 to 2017-01-03 00:00:00.0[', '1) 2017-01-01%a2) 2017-01-02'],

@@ -59,7 +59,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $this->assertCount(0, $transport->get());
     }
 
-    public function provideDSN(): array
+    public static function provideDSN(): array
     {
         return [
             'Supported' => ['in-memory://foo'],

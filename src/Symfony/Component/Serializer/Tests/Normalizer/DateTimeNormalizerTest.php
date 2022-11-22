@@ -97,7 +97,7 @@ class DateTimeNormalizerTest extends TestCase
         ]));
     }
 
-    public function normalizeUsingTimeZonePassedInContextProvider()
+    public static function normalizeUsingTimeZonePassedInContextProvider()
     {
         yield ['2016-12-01T00:00:00+00:00', new \DateTime('2016/12/01', new \DateTimeZone('UTC')), null];
         yield ['2016-12-01T00:00:00+09:00', new \DateTime('2016/12/01', new \DateTimeZone('Japan')), new \DateTimeZone('Japan')];
@@ -123,7 +123,7 @@ class DateTimeNormalizerTest extends TestCase
         );
     }
 
-    public function normalizeUsingTimeZonePassedInContextAndExpectedFormatWithMicrosecondsProvider()
+    public static function normalizeUsingTimeZonePassedInContextAndExpectedFormatWithMicrosecondsProvider()
     {
         yield [
             '2018-12-01T18:03:06.067634',
@@ -245,7 +245,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function denormalizeUsingTimezonePassedInContextProvider()
+    public static function denormalizeUsingTimezonePassedInContextProvider()
     {
         yield 'with timezone' => [
             '2016/12/01 17:35:00',

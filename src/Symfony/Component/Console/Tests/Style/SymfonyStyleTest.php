@@ -67,14 +67,14 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
-    public function inputInteractiveCommandToOutputFilesProvider()
+    public static function inputInteractiveCommandToOutputFilesProvider()
     {
         $baseDir = __DIR__.'/../Fixtures/Style/SymfonyStyle';
 
         return array_map(null, glob($baseDir.'/command/interactive_command_*.php'), glob($baseDir.'/output/interactive_output_*.txt'));
     }
 
-    public function inputCommandToOutputFilesProvider()
+    public static function inputCommandToOutputFilesProvider()
     {
         $baseDir = __DIR__.'/../Fixtures/Style/SymfonyStyle';
 

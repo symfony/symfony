@@ -491,7 +491,7 @@ class RequestTest extends TestCase
         $this->assertEquals('custom', $request->getFormat('application/vnd.foo.api;myversion=2.3'));
     }
 
-    public function getFormatToMimeTypeMapProvider()
+    public static function getFormatToMimeTypeMapProvider()
     {
         return [
             ['txt', ['text/plain']],
@@ -1015,7 +1015,7 @@ class RequestTest extends TestCase
         $this->assertEquals($expected, $request->getClientIps());
     }
 
-    public function getClientIpsForwardedProvider()
+    public static function getClientIpsForwardedProvider()
     {
         //              $expected                                  $remoteAddr  $httpForwarded                                       $trustedProxies
         return [
@@ -1028,7 +1028,7 @@ class RequestTest extends TestCase
         ];
     }
 
-    public function getClientIpsProvider()
+    public static function getClientIpsProvider()
     {
         //        $expected                          $remoteAddr                 $httpForwardedFor            $trustedProxies
         return [
@@ -1124,7 +1124,7 @@ class RequestTest extends TestCase
         $this->assertSame(array_reverse(explode(',', $httpXForwardedFor)), $request->getClientIps());
     }
 
-    public function getClientIpsWithConflictingHeadersProvider()
+    public static function getClientIpsWithConflictingHeadersProvider()
     {
         //        $httpForwarded                   $httpXForwardedFor
         return [
@@ -1158,7 +1158,7 @@ class RequestTest extends TestCase
         $this->assertSame($expectedIps, $clientIps);
     }
 
-    public function getClientIpsWithAgreeingHeadersProvider()
+    public static function getClientIpsWithAgreeingHeadersProvider()
     {
         //        $httpForwarded                               $httpXForwardedFor
         return [
@@ -1207,7 +1207,7 @@ class RequestTest extends TestCase
         $this->assertEquals('My other content', $req->getContent());
     }
 
-    public function getContentCantBeCalledTwiceWithResourcesProvider()
+    public static function getContentCantBeCalledTwiceWithResourcesProvider()
     {
         return [
             'Resource then fetch' => [true, false],
@@ -1235,7 +1235,7 @@ class RequestTest extends TestCase
         $this->assertSame($a, $b);
     }
 
-    public function getContentCanBeCalledTwiceWithResourcesProvider()
+    public static function getContentCanBeCalledTwiceWithResourcesProvider()
     {
         return [
             'Fetch then fetch' => [false, false],
@@ -1245,7 +1245,7 @@ class RequestTest extends TestCase
         ];
     }
 
-    public function provideOverloadedMethods()
+    public static function provideOverloadedMethods()
     {
         return [
             ['PUT'],
@@ -2010,7 +2010,7 @@ class RequestTest extends TestCase
         $this->assertEquals($subRequestUri, $subRequest->getRequestUri(), '->getRequestUri() is correct in sub request');
     }
 
-    public function iisRequestUriProvider()
+    public static function iisRequestUriProvider()
     {
         return [
             [
@@ -2164,7 +2164,7 @@ class RequestTest extends TestCase
         $this->assertEquals($idempotent, $request->isMethodIdempotent());
     }
 
-    public function methodIdempotentProvider()
+    public static function methodIdempotentProvider()
     {
         return [
             ['HEAD', true],
@@ -2190,7 +2190,7 @@ class RequestTest extends TestCase
         $this->assertEquals($safe, $request->isMethodSafe());
     }
 
-    public function methodSafeProvider()
+    public static function methodSafeProvider()
     {
         return [
             ['HEAD', true],
@@ -2216,7 +2216,7 @@ class RequestTest extends TestCase
         $this->assertEquals($cacheable, $request->isMethodCacheable());
     }
 
-    public function methodCacheableProvider()
+    public static function methodCacheableProvider()
     {
         return [
             ['HEAD', true],
@@ -2252,7 +2252,7 @@ class RequestTest extends TestCase
         $this->assertSame($expected, $request->getProtocolVersion());
     }
 
-    public function protocolVersionProvider()
+    public static function protocolVersionProvider()
     {
         return [
             'untrusted with empty via' => ['HTTP/2.0', false, '', 'HTTP/2.0'],

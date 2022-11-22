@@ -1102,7 +1102,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($expectedPath, $path);
     }
 
-    public function providePathsForMakePathRelative()
+    public static function providePathsForMakePathRelative()
     {
         $paths = [
             ['/var/lib/symfony/src/Symfony/', '/var/lib/symfony/src/Symfony/Component', '../'],
@@ -1390,7 +1390,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function providePathsForIsAbsolutePath()
+    public static function providePathsForIsAbsolutePath()
     {
         return [
             ['/var/lib', true],

@@ -45,7 +45,7 @@ class DsnTest extends TestCase
         Dsn::fromString($dsn);
     }
 
-    public function fromStringProvider(): iterable
+    public static function fromStringProvider(): iterable
     {
         yield 'simple smtp without user and pass' => [
             'smtp://example.com',
@@ -88,7 +88,7 @@ class DsnTest extends TestCase
         ];
     }
 
-    public function invalidDsnProvider(): iterable
+    public static function invalidDsnProvider(): iterable
     {
         yield [
             'some://',

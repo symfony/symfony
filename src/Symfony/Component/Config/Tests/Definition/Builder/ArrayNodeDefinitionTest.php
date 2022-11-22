@@ -52,7 +52,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode();
     }
 
-    public function providePrototypeNodeSpecificCalls(): array
+    public static function providePrototypeNodeSpecificCalls(): array
     {
         return [
             ['defaultValue', [[]]],
@@ -134,7 +134,7 @@ class ArrayNodeDefinitionTest extends TestCase
         }
     }
 
-    public function providePrototypedArrayNodeDefaults(): array
+    public static function providePrototypedArrayNodeDefaults(): array
     {
         return [
             [null, true, false, [[]]],

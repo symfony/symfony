@@ -72,7 +72,7 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @see \Symfony\Component\Validator\GroupSequenceProviderInterface
      */
-    public function isGroupSequenceProvider();
+    public static function isGroupSequenceProvider();
 
     /**
      * Check if there's any metadata attached to the given named property.

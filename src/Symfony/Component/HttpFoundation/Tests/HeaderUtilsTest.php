@@ -24,7 +24,7 @@ class HeaderUtilsTest extends TestCase
         $this->assertSame($expected, HeaderUtils::split($header, $separator));
     }
 
-    public function provideHeaderToSplit(): array
+    public static function provideHeaderToSplit(): array
     {
         return [
             [['foo=123', 'bar'], 'foo=123,bar', ','],
@@ -111,7 +111,7 @@ class HeaderUtilsTest extends TestCase
         $this->assertEquals($expected, HeaderUtils::makeDisposition($disposition, $filename, $filenameFallback));
     }
 
-    public function provideMakeDisposition()
+    public static function provideMakeDisposition()
     {
         return [
             ['attachment', 'foo.html', 'foo.html', 'attachment; filename=foo.html'],
@@ -132,7 +132,7 @@ class HeaderUtilsTest extends TestCase
         HeaderUtils::makeDisposition($disposition, $filename);
     }
 
-    public function provideMakeDispositionFail()
+    public static function provideMakeDispositionFail()
     {
         return [
             ['attachment', 'foo%20bar.html'],

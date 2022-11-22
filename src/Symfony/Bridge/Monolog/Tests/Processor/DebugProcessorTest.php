@@ -32,7 +32,7 @@ class DebugProcessorTest extends TestCase
         self::assertSame($expectedTimestamp, $records[0]['timestamp']);
     }
 
-    public function providerDatetimeFormatTests(): array
+    public static function providerDatetimeFormatTests(): array
     {
         $record = $this->getRecord();
 

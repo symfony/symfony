@@ -95,7 +95,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertCount(3, $logger->getLogs('critical'));
     }
 
-    public function provider()
+    public static function provider()
     {
         if (!class_exists(Request::class)) {
             return [[null, null]];

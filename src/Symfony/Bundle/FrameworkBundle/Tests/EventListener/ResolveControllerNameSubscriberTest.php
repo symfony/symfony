@@ -63,7 +63,7 @@ class ResolveControllerNameSubscriberTest extends TestCase
         $this->assertEquals($controller, $request->attributes->get('_controller'));
     }
 
-    public function provideSkippedControllers()
+    public static function provideSkippedControllers()
     {
         yield ['Other:format'];
         yield [function () {}];

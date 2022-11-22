@@ -93,7 +93,7 @@ class GlobalVariablesTest extends TestCase
         $this->assertSame($expectedUser, $this->globals->getUser());
     }
 
-    public function getUserProvider()
+    public static function getUserProvider()
     {
         $user = $this->createMock(UserInterface::class);
         $std = new \stdClass();

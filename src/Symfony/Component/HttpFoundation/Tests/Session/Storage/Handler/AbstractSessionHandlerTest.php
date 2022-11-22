@@ -51,7 +51,7 @@ class AbstractSessionHandlerTest extends TestCase
         $this->assertStringEqualsFile(__DIR__.sprintf('/Fixtures/%s.expected', $fixture), $result);
     }
 
-    public function provideSession()
+    public static function provideSession()
     {
         foreach (glob(__DIR__.'/Fixtures/*.php') as $file) {
             yield [pathinfo($file, \PATHINFO_FILENAME)];

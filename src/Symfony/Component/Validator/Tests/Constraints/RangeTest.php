@@ -52,7 +52,7 @@ class RangeTest extends TestCase
         new Range('value');
     }
 
-    public function provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(): array
+    public static function provideDeprecationTriggeredIfMinMaxAndMinMessageOrMaxMessageSet(): array
     {
         return [
             [['min' => 1, 'max' => 10, 'minMessage' => 'my_min_message'], true, false],
@@ -73,7 +73,7 @@ class RangeTest extends TestCase
         $this->assertEquals($expectedDeprecatedMaxMessageSet, $sut->deprecatedMaxMessageSet);
     }
 
-    public function provideDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet(): array
+    public static function provideDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet(): array
     {
         return [
             [['min' => 1, 'minMessage' => 'my_min_message', 'maxMessage' => 'my_max_message']],

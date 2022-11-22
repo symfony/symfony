@@ -7,7 +7,7 @@ abstract class AbstractTwigTemplate extends Twig\Template
         return new \RuntimeException('Manually triggered error.');
     }
 
-    public function provideError()
+    public static function provideError()
     {
         return $this->createError();
     }

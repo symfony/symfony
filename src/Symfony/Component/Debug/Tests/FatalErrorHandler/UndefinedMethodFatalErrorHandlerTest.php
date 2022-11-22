@@ -36,7 +36,7 @@ class UndefinedMethodFatalErrorHandlerTest extends TestCase
         $this->assertSame($error['line'], $exception->getLine());
     }
 
-    public function provideUndefinedMethodData()
+    public static function provideUndefinedMethodData()
     {
         return [
             [

@@ -123,7 +123,7 @@ class CommandTest extends TestCase
         $command->setName($name);
     }
 
-    public function provideInvalidCommandNames()
+    public static function provideInvalidCommandNames()
     {
         return [
             [''],

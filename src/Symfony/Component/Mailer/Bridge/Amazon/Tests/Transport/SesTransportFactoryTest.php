@@ -26,7 +26,7 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         return new SesTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('ses+api', 'default'),
@@ -59,7 +59,7 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         $client = $this->getClient();
         $dispatcher = $this->getDispatcher();
@@ -116,7 +116,7 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('ses+foo', 'default', self::USER, self::PASSWORD),
@@ -124,7 +124,7 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('ses+smtp', 'default', self::USER)];
 

@@ -275,7 +275,7 @@ class TwigExtensionTest extends TestCase
         $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
     }
 
-    public function stopwatchExtensionAvailabilityProvider()
+    public static function stopwatchExtensionAvailabilityProvider()
     {
         return [
             'debug-and-stopwatch-enabled' => [true, true, true],

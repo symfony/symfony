@@ -129,7 +129,7 @@ class ConnectionTest extends TestCase
         Connection::fromDsn($dsn, [], $redis);
     }
 
-    public function provideAuthDsn(): \Generator
+    public static function provideAuthDsn(): \Generator
     {
         yield 'Password only' => ['password', 'redis://password@localhost/queue'];
         yield 'User and password' => [['user', 'password'], 'redis://user:password@localhost/queue'];

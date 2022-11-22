@@ -27,7 +27,7 @@ class TemplateTest extends TestCase
         $this->assertSame($template->getPath(), $path);
     }
 
-    public function getTemplateToPathProvider()
+    public static function getTemplateToPathProvider()
     {
         return [
             [new TemplateReference('FooBundle', 'Post', 'index', 'html', 'php'), '@FooBundle/Resources/views/Post/index.html.php'],

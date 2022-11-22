@@ -50,7 +50,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
         self::assertEmpty($crawler->filterXPath('//h1')->text(), '->addHtmlContent failed as expected');
     }
 
-    public function validHtml5Provider(): iterable
+    public static function validHtml5Provider(): iterable
     {
         $html = $this->getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
         $BOM = \chr(0xEF).\chr(0xBB).\chr(0xBF);
@@ -63,7 +63,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
         yield 'All together' => [$BOM.'  '.'<!--c-->'.$html];
     }
 
-    public function invalidHtml5Provider(): iterable
+    public static function invalidHtml5Provider(): iterable
     {
         $html = $this->getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
 

@@ -251,7 +251,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame(1, $listenerCalled);
     }
 
-    public function providerCollectDecisionLog(): \Generator
+    public static function providerCollectDecisionLog(): \Generator
     {
         $voter1 = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
         $voter2 = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
@@ -381,7 +381,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
-    public function provideRoles()
+    public static function provideRoles()
     {
         return [
             // Basic roles

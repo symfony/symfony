@@ -49,7 +49,7 @@ class ScopingHttpClientTest extends TestCase
         $this->assertSame($options[$regexp]['case'], $requestedOptions['case']);
     }
 
-    public function provideMatchingUrls()
+    public static function provideMatchingUrls()
     {
         $defaultOptions = [
             '.*/foo-bar' => ['case' => 1],

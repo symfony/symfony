@@ -357,7 +357,7 @@ class PropertyPathMapperTest extends TestCase
         $this->assertSame($publishedAtValue, $article['publishedAt']);
     }
 
-    public function provideDate()
+    public static function provideDate()
     {
         return [
             [new \DateTime()],

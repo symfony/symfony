@@ -50,7 +50,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->loadClassMetadata($metadata);
     }
 
-    public function provideInvalidYamlFiles()
+    public static function provideInvalidYamlFiles()
     {
         return [
             ['nonvalid-mapping.yml'],
@@ -137,7 +137,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testLoadGroupSequenceProvider()
+    public static function testLoadGroupSequenceProvider()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
         $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity');

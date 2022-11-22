@@ -69,7 +69,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         return $result;
     }
 
-    public function provideInvalidConstraintOptions()
+    public static function provideInvalidConstraintOptions()
     {
         return [
             [null],
@@ -112,7 +112,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->assertNoViolation();
     }
 
-    public function provideAllValidComparisons(): array
+    public static function provideAllValidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
@@ -166,9 +166,9 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->validator->validate(5, $constraint);
     }
 
-    abstract public function provideValidComparisons(): array;
+    abstract public static function provideValidComparisons(): array;
 
-    abstract public function provideValidComparisonsToPropertyPath(): array;
+    abstract public static function provideValidComparisonsToPropertyPath(): array;
 
     /**
      * @dataProvider provideAllInvalidComparisons
@@ -233,7 +233,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->validator->validate($value, $constraint);
     }
 
-    public function throwsOnInvalidStringDatesProvider(): array
+    public static function throwsOnInvalidStringDatesProvider(): array
     {
         $constraint = $this->createConstraint([
             'value' => 'foo',
@@ -273,7 +273,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         }
     }
 
-    public function provideAllInvalidComparisons(): array
+    public static function provideAllInvalidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
@@ -286,9 +286,9 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         return $comparisons;
     }
 
-    abstract public function provideInvalidComparisons(): array;
+    abstract public static function provideInvalidComparisons(): array;
 
-    abstract public function provideComparisonsToNullValueAtPropertyPath();
+    abstract public static function provideComparisonsToNullValueAtPropertyPath();
 
     /**
      * @param array|null $options Options for the constraint

@@ -331,7 +331,7 @@ class RouteTest extends TestCase
         $this->assertSame($expected, $route->getRequirement('_locale'));
     }
 
-    public function provideNonLocalizedRoutes()
+    public static function provideNonLocalizedRoutes()
     {
         return [
             [new Route('/foo')],
@@ -341,7 +341,7 @@ class RouteTest extends TestCase
         ];
     }
 
-    public function provideLocalizedRoutes()
+    public static function provideLocalizedRoutes()
     {
         return [
             [(new Route('/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'en')],

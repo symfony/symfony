@@ -158,7 +158,7 @@ class ProgressIndicatorTest extends TestCase
     /**
      * Provides each defined format.
      */
-    public function provideFormat(): array
+    public static function provideFormat(): array
     {
         return [
             ['normal'],

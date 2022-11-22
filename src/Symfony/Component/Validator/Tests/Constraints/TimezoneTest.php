@@ -57,7 +57,7 @@ class TimezoneTest extends TestCase
         new Timezone(['zone' => $zone]);
     }
 
-    public function provideInvalidZones(): iterable
+    public static function provideInvalidZones(): iterable
     {
         yield [-1];
         yield [0];

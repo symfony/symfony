@@ -24,7 +24,7 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
         return new EsmtpTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('smtp', 'example.com'),
@@ -42,7 +42,7 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         $eventDispatcher = $this->getDispatcher();
         $logger = $this->getLogger();

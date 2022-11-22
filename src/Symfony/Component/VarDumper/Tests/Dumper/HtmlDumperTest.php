@@ -180,7 +180,7 @@ EOTXT
         $this->assertStringContainsString($needle, $out);
     }
 
-    public function varToDumpProvider()
+    public static function varToDumpProvider()
     {
         return [
             [['dummy' => new ImgStub('dummy', 'img/png', '100em')], '<img src="data:img/png;base64,ZHVtbXk=" />'],

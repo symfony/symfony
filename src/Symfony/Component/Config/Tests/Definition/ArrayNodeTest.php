@@ -55,7 +55,7 @@ class ArrayNodeTest extends TestCase
         $node->normalize(['beta' => 'foo']);
     }
 
-    public function ignoreAndRemoveMatrixProvider(): array
+    public static function ignoreAndRemoveMatrixProvider(): array
     {
         $unrecognizedOptionException = new InvalidConfigurationException('Unrecognized option "foo" under "root"');
 

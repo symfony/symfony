@@ -915,7 +915,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     /**
      * Provides each defined format.
      */
-    public function provideFormat(): array
+    public static function provideFormat(): array
     {
         return [
             ['normal'],

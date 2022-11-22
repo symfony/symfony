@@ -769,7 +769,7 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_OBJECT));
     }
 
-    public function phpObjectTagWithEmptyValueProvider()
+    public static function phpObjectTagWithEmptyValueProvider()
     {
         return [
             [false, '!php/object'],
@@ -789,7 +789,7 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::parse($value, Yaml::PARSE_CONSTANT));
     }
 
-    public function phpConstTagWithEmptyValueProvider()
+    public static function phpConstTagWithEmptyValueProvider()
     {
         return [
             ['', '!php/const'],
@@ -835,7 +835,7 @@ class InlineTest extends TestCase
         Inline::parse($value);
     }
 
-    public function unquotedExclamationMarkThrowsProvider()
+    public static function unquotedExclamationMarkThrowsProvider()
     {
         return [
             ['!'],
@@ -867,7 +867,7 @@ class InlineTest extends TestCase
     }
 
     // This provider should stay consistent with unquotedExclamationMarkThrowsProvider
-    public function quotedExclamationMarkProvider()
+    public static function quotedExclamationMarkProvider()
     {
         return [
             ['!', '"!"'],
@@ -897,7 +897,7 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::parse($yaml));
     }
 
-    public function ideographicSpaceProvider(): array
+    public static function ideographicSpaceProvider(): array
     {
         return [
             ["\u{3000}", '　'],

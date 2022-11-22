@@ -25,7 +25,7 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         return new PostmarkTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('postmark+api', 'default'),
@@ -53,7 +53,7 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         $dispatcher = $this->getDispatcher();
         $logger = $this->getLogger();
@@ -84,7 +84,7 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('postmark+foo', 'default', self::USER),
@@ -92,7 +92,7 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('postmark+api', 'default')];
     }

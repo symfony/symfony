@@ -435,7 +435,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function resultTypesProvider()
+    public static function resultTypesProvider()
     {
         $entity = new SingleIntIdEntity(1, 'foo');
 

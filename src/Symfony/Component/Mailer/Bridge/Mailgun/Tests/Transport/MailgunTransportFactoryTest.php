@@ -26,7 +26,7 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
         return new MailgunTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('mailgun+api', 'default'),
@@ -59,7 +59,7 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         $client = $this->getClient();
         $dispatcher = $this->getDispatcher();
@@ -106,7 +106,7 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('mailgun+foo', 'default', self::USER, self::PASSWORD),
@@ -114,7 +114,7 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('mailgun+api', 'default', self::USER)];
 

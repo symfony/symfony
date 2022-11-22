@@ -96,7 +96,7 @@ EOF;
         $this->assertEquals($expectedCatalogue, $catalogue->all());
     }
 
-    public function resourcesProvider()
+    public static function resourcesProvider()
     {
         $directory = __DIR__.'/../fixtures/extractor/';
         $splFiles = [];

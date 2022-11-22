@@ -150,22 +150,22 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         parent::testFormatWithNonStandardTimezone();
     }
 
-    public function parseStandaloneAmPmProvider()
+    public static function parseStandaloneAmPmProvider()
     {
         return $this->notImplemented(parent::parseStandaloneAmPmProvider());
     }
 
-    public function parseDayOfWeekProvider()
+    public static function parseDayOfWeekProvider()
     {
         return $this->notImplemented(parent::parseDayOfWeekProvider());
     }
 
-    public function parseDayOfYearProvider()
+    public static function parseDayOfYearProvider()
     {
         return $this->notImplemented(parent::parseDayOfYearProvider());
     }
 
-    public function parseQuarterProvider()
+    public static function parseQuarterProvider()
     {
         return $this->notImplemented(parent::parseQuarterProvider());
     }

@@ -627,27 +627,27 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertFalse($accessDecisionManagerDefinition->getArgument(3));
     }
 
-    public function testFirewallUndefinedUserProvider()
+    public static function testFirewallUndefinedUserProvider()
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid firewall "main": user provider "undefined" not found.');
         $this->getContainer('firewall_undefined_provider');
     }
 
-    public function testFirewallListenerUndefinedProvider()
+    public static function testFirewallListenerUndefinedProvider()
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid firewall "main": user provider "undefined" not found.');
         $this->getContainer('listener_undefined_provider');
     }
 
-    public function testFirewallWithUserProvider()
+    public static function testFirewallWithUserProvider()
     {
         $this->getContainer('firewall_provider');
         $this->addToAssertionCount(1);
     }
 
-    public function testFirewallListenerWithProvider()
+    public static function testFirewallListenerWithProvider()
     {
         $this->getContainer('listener_provider');
         $this->addToAssertionCount(1);

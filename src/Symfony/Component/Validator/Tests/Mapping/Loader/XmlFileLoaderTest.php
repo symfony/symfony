@@ -96,7 +96,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertFalse($constraints[0]->match);
     }
 
-    public function testLoadGroupSequenceProvider()
+    public static function testLoadGroupSequenceProvider()
     {
         $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
         $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity');

@@ -96,7 +96,7 @@ class PdoStoreTest extends AbstractStoreTest
         }
     }
 
-    public function provideDsn()
+    public static function provideDsn()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
         yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];

@@ -35,7 +35,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return IdenticalTo::NOT_IDENTICAL_ERROR;
     }
 
-    public function provideAllValidComparisons(): array
+    public static function provideAllValidComparisons(): array
     {
         $this->setDefaultTimezone('UTC');
 
@@ -51,7 +51,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         $date = new \DateTime('2000-01-01');
         $object = new ComparisonTest_Class(2);
@@ -73,7 +73,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath(): array
+    public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [5],
@@ -83,7 +83,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [1, '1', 2, '2', 'integer'],
@@ -95,7 +95,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function provideComparisonsToNullValueAtPropertyPath()
+    public static function provideComparisonsToNullValueAtPropertyPath()
     {
         return [
             [5, '5', false],

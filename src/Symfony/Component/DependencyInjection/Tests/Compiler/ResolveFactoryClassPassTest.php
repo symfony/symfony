@@ -46,7 +46,7 @@ class ResolveFactoryClassPassTest extends TestCase
         $this->assertSame(['Baz\Qux', 'getInstance'], $factory->getFactory()[0]->getFactory());
     }
 
-    public function provideFulfilledFactories()
+    public static function provideFulfilledFactories()
     {
         return [
             [['Foo\Bar', 'create']],

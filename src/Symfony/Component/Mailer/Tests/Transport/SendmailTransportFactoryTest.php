@@ -24,7 +24,7 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
         return new SendmailTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('sendmail+smtp', 'default'),
@@ -32,7 +32,7 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             new Dsn('sendmail+smtp', 'default'),
@@ -40,7 +40,7 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('sendmail+http', 'default'),

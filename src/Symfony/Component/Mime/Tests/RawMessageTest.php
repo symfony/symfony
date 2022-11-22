@@ -29,7 +29,7 @@ class RawMessageTest extends TestCase
         $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
     }
 
-    public function provideMessages(): array
+    public static function provideMessages(): array
     {
         return [
             'string' => ['some string'],

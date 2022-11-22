@@ -89,7 +89,7 @@ class ConsoleHandlerTest extends TestCase
         $this->assertFalse($handler->handle($infoRecord), 'The handler finished handling the log.');
     }
 
-    public function provideVerbosityMappingTests()
+    public static function provideVerbosityMappingTests()
     {
         return [
             [OutputInterface::VERBOSITY_QUIET, Logger::ERROR, true],

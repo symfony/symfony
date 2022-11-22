@@ -53,7 +53,7 @@ class VarExporterTest extends TestCase
         }
     }
 
-    public function provideFailingSerialization()
+    public static function provideFailingSerialization()
     {
         yield [hash_init('md5')];
         yield [new \ReflectionClass(\stdClass::class)];
@@ -122,7 +122,7 @@ class VarExporterTest extends TestCase
         }
     }
 
-    public function provideExport()
+    public static function provideExport()
     {
         yield ['multiline-string', ["\0\0\r\nA" => "B\rC\n\n"], true];
         yield ['lf-ending-string', "'BOOM'\n.var_dump(123)//'", true];

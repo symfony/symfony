@@ -36,7 +36,7 @@ class SessionHandlerFactoryTest extends TestCase
         $this->assertEquals($expectedPath, \ini_get('session.save_path'));
     }
 
-    public function provideConnectionDSN(): array
+    public static function provideConnectionDSN(): array
     {
         $base = sys_get_temp_dir();
 

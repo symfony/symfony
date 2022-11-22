@@ -139,7 +139,7 @@ class FileLoaderTest extends TestCase
         $this->assertNotContains('baz.txt', $loadedFiles);
     }
 
-    public function excludeTrailingSlashConsistencyProvider(): iterable
+    public static function excludeTrailingSlashConsistencyProvider(): iterable
     {
         yield [__DIR__.'/../Fixtures/Exclude/ExcludeToo/'];
         yield [__DIR__.'/../Fixtures/Exclude/ExcludeToo'];

@@ -36,7 +36,7 @@ class StopWorkerOnMemoryLimitListenerTest extends TestCase
         $memoryLimitListener->onWorkerRunning($event);
     }
 
-    public function memoryProvider(): iterable
+    public static function memoryProvider(): iterable
     {
         yield [2048, 1024, true];
         yield [1024, 1024, false];

@@ -461,7 +461,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function isGroupSequenceProvider()
+    public static function isGroupSequenceProvider()
     {
         return $this->groupSequenceProvider;
     }

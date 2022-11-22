@@ -411,7 +411,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideCheckTypes()
+    public static function provideCheckTypes()
     {
         return [
             ['checkMX', Email::MX_CHECK_FAILED_ERROR],

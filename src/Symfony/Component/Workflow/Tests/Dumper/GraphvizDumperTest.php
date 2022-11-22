@@ -47,7 +47,7 @@ class GraphvizDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    public function provideWorkflowDefinitionWithMarking()
+    public static function provideWorkflowDefinitionWithMarking()
     {
         yield [
             $this->createComplexWorkflowDefinition(),
@@ -62,7 +62,7 @@ class GraphvizDumperTest extends TestCase
         ];
     }
 
-    public function provideWorkflowDefinitionWithoutMarking()
+    public static function provideWorkflowDefinitionWithoutMarking()
     {
         yield [$this->createComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking()];
         yield [$this->createSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking()];
@@ -126,7 +126,7 @@ class GraphvizDumperTest extends TestCase
 ';
     }
 
-    public function provideComplexWorkflowDumpWithoutMarking()
+    public static function provideComplexWorkflowDumpWithoutMarking()
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"
@@ -164,7 +164,7 @@ class GraphvizDumperTest extends TestCase
 ';
     }
 
-    public function provideSimpleWorkflowDumpWithoutMarking()
+    public static function provideSimpleWorkflowDumpWithoutMarking()
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"

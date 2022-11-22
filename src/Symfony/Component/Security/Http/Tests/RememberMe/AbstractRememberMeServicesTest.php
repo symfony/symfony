@@ -116,7 +116,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $this->assertSame($options['httponly'], $cookie->isHttpOnly());
     }
 
-    public function provideOptionsForLogout()
+    public static function provideOptionsForLogout()
     {
         return [
             [['name' => 'foo', 'path' => '/', 'domain' => null, 'secure' => false, 'httponly' => true]],

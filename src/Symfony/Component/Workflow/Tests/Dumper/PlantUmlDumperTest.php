@@ -33,7 +33,7 @@ class PlantUmlDumperTest extends TestCase
         $this->assertStringEqualsFile($file, $dump);
     }
 
-    public function provideWorkflowDefinitionWithoutMarking()
+    public static function provideWorkflowDefinitionWithoutMarking()
     {
         yield [$this->createSimpleWorkflowDefinition(), null, 'simple-workflow-nomarking', 'SimpleDiagram'];
         yield [$this->createComplexWorkflowDefinition(), null, 'complex-workflow-nomarking', 'ComplexDiagram'];
@@ -56,7 +56,7 @@ class PlantUmlDumperTest extends TestCase
         $this->assertStringEqualsFile($file, $dump);
     }
 
-    public function provideStateMachineDefinitionWithoutMarking()
+    public static function provideStateMachineDefinitionWithoutMarking()
     {
         yield [$this->createComplexStateMachineDefinition(), null, 'complex-state-machine-nomarking', 'SimpleDiagram'];
         $marking = new Marking(['c' => 1, 'e' => 1]);

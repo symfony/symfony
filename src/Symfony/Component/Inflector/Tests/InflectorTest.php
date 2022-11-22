@@ -16,7 +16,7 @@ use Symfony\Component\Inflector\Inflector;
 
 class InflectorTest extends TestCase
 {
-    public function singularizeProvider()
+    public static function singularizeProvider()
     {
         // see http://english-zone.com/spelling/plurals.html
         // see http://www.scribd.com/doc/3271143/List-of-100-Irregular-Plural-Nouns-in-English
@@ -165,7 +165,7 @@ class InflectorTest extends TestCase
         ];
     }
 
-    public function pluralizeProvider()
+    public static function pluralizeProvider()
     {
         // see http://english-zone.com/spelling/plurals.html
         // see http://www.scribd.com/doc/3271143/List-of-100-Irregular-Plural-Nouns-in-English

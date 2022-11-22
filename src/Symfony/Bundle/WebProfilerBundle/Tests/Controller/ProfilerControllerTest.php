@@ -354,7 +354,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('PHP License', $client->getResponse()->getContent());
     }
 
-    public function provideCspVariants()
+    public static function provideCspVariants()
     {
         return [
             [true],
@@ -416,7 +416,7 @@ class ProfilerControllerTest extends WebTestCase
             ->panelAction(new Request(), $profile->getToken());
     }
 
-    public function defaultPanelProvider(): \Generator
+    public static function defaultPanelProvider(): \Generator
     {
         // Test default behavior
         $profile = new Profile('xxxxxx');

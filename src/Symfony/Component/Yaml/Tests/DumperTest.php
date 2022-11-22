@@ -275,7 +275,7 @@ EOF;
         $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
-    public function objectAsMapProvider()
+    public static function objectAsMapProvider()
     {
         $tests = [];
 

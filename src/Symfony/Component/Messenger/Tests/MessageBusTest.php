@@ -148,7 +148,7 @@ class MessageBusTest extends TestCase
         $this->assertCount(2, $finalEnvelope->all());
     }
 
-    public function provideConstructorDataStucture(): iterable
+    public static function provideConstructorDataStucture(): iterable
     {
         yield 'iterator' => [new \ArrayObject([
             new SimpleMiddleware(),

@@ -37,7 +37,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, implode('', $url));
     }
 
-    public function providePrepareRequestUrl(): iterable
+    public static function providePrepareRequestUrl(): iterable
     {
         yield ['http://example.com/', 'http://example.com/'];
         yield ['http://example.com/?a=1&b=b', '.'];
@@ -57,7 +57,7 @@ class HttpClientTraitTest extends TestCase
     /**
      * From https://github.com/guzzle/psr7/blob/master/tests/UriResoverTest.php.
      */
-    public function provideResolveUrl(): array
+    public static function provideResolveUrl(): array
     {
         return [
             [self::RFC3986_BASE, 'http:h',        'http:h'],
@@ -145,7 +145,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, self::parseUrl($url, $query));
     }
 
-    public function provideParseUrl(): iterable
+    public static function provideParseUrl(): iterable
     {
         yield [['http:', '//example.com', null, null, null], 'http://Example.coM:80'];
         yield [['https:', '//xn--dj-kia8a.example.com:8000', '/', null, null], 'https://DÉjà.Example.com:8000/'];
@@ -172,7 +172,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, self::removeDotSegments($url));
     }
 
-    public function provideRemoveDotSegments()
+    public static function provideRemoveDotSegments()
     {
         yield ['', ''];
         yield ['', '.'];
@@ -221,7 +221,7 @@ class HttpClientTraitTest extends TestCase
         self::prepareRequest('POST', 'http://example.com', ['json' => ['foo' => 'bar'], 'body' => '<html/>'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    public function providePrepareAuthBasic()
+    public static function providePrepareAuthBasic()
     {
         yield ['foo:bar', 'Zm9vOmJhcg=='];
         yield [['foo', 'bar'], 'Zm9vOmJhcg=='];
@@ -238,7 +238,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame('Authorization: Basic '.$result, $options['normalized_headers']['authorization'][0]);
     }
 
-    public function provideFingerprints()
+    public static function provideFingerprints()
     {
         foreach (['md5', 'sha1', 'sha256'] as $algo) {
             $hash = hash($algo, $algo);

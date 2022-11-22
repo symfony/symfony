@@ -60,7 +60,7 @@ class AddAutoMappingConfigurationPassTest extends TestCase
         $this->assertCount(\count($services), $container->getDefinition('validator.builder')->getMethodCalls());
     }
 
-    public function mappingProvider(): array
+    public static function mappingProvider(): array
     {
         return [
             ['Foo\\', ['foo', 'baz'], '{^App\\\\|^Foo\\\\}'],

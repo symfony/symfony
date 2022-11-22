@@ -27,7 +27,7 @@ class MaxDepthTest extends TestCase
         new MaxDepth([]);
     }
 
-    public function provideInvalidValues()
+    public static function provideInvalidValues()
     {
         return [
             [''],

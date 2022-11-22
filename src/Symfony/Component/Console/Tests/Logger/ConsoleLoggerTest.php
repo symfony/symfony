@@ -69,7 +69,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($isOutput ? "[$logLevel] foo bar".\PHP_EOL : '', $logs);
     }
 
-    public function provideOutputMappingParams()
+    public static function provideOutputMappingParams()
     {
         $quietMap = [LogLevel::EMERGENCY => OutputInterface::VERBOSITY_QUIET];
 
@@ -123,7 +123,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($expected, $this->getLogs());
     }
 
-    public function provideLevelsAndMessages()
+    public static function provideLevelsAndMessages()
     {
         return [
             LogLevel::EMERGENCY => [LogLevel::EMERGENCY, 'message of level emergency with context: {user}'],

@@ -2122,7 +2122,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace, $form->getData());
     }
 
-    public function provideTrimCases()
+    public static function provideTrimCases()
     {
         return [
             'Simple' => [false, false],
@@ -2157,7 +2157,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame($expected, $form->isEmpty());
     }
 
-    public function expandedIsEmptyWhenNoRealChoiceIsSelectedProvider()
+    public static function expandedIsEmptyWhenNoRealChoiceIsSelectedProvider()
     {
         // Some invalid cases are voluntarily not tested:
         //   - multiple with placeholder

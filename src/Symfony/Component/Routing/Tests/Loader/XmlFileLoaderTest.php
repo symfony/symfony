@@ -465,7 +465,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
     }
 
-    public function provideFilesImportingRoutesWithControllers()
+    public static function provideFilesImportingRoutesWithControllers()
     {
         yield ['import_controller.xml'];
         yield ['import__controller.xml'];

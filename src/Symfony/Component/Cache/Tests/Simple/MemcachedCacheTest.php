@@ -94,7 +94,7 @@ class MemcachedCacheTest extends CacheTestCase
         MemcachedCache::createConnection([], [$name => $value]);
     }
 
-    public function provideBadOptions(): array
+    public static function provideBadOptions(): array
     {
         return [
             ['foo', 'bar'],
@@ -145,7 +145,7 @@ class MemcachedCacheTest extends CacheTestCase
         $this->assertSame([$expect], array_map($f, $client3->getServerList()));
     }
 
-    public function provideServersSetting(): iterable
+    public static function provideServersSetting(): iterable
     {
         yield [
             'memcached://127.0.0.1/50',

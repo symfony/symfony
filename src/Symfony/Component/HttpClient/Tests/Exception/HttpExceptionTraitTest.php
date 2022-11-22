@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class HttpExceptionTraitTest extends TestCase
 {
-    public function provideParseError(): iterable
+    public static function provideParseError(): iterable
     {
         $errorWithoutMessage = 'HTTP/1.1 400 Bad Request returned for "http://example.com".';
 

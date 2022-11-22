@@ -135,7 +135,7 @@ EOTXT;
         $this->assertDumpMatchesFormat($dump, $var);
     }
 
-    public function provideCastSplDoublyLinkedList()
+    public static function provideCastSplDoublyLinkedList()
     {
         return [
             [\SplDoublyLinkedList::IT_MODE_FIFO, 'IT_MODE_FIFO | IT_MODE_KEEP'],

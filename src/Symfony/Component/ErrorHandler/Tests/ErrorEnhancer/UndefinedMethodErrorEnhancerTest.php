@@ -33,7 +33,7 @@ class UndefinedMethodErrorEnhancerTest extends TestCase
         $this->assertSame($expectedLine, $error->getLine());
     }
 
-    public function provideUndefinedMethodData()
+    public static function provideUndefinedMethodData()
     {
         return [
             [

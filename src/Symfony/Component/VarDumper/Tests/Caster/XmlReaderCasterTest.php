@@ -64,7 +64,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $this->reader);
     }
 
-    public function provideNodes()
+    public static function provideNodes()
     {
         return [
             [0, <<<'EODUMP'
@@ -90,7 +90,7 @@ XMLReader {
   +depth: 1
   +value: """
     \n
-        
+
     """
   +baseURI: "%sxml_reader.xml"
    …9
@@ -178,7 +178,7 @@ XMLReader {
   +depth: 2
   +value: """
     \n
-            
+
     """
   +baseURI: "%sxml_reader.xml"
    …9
@@ -216,7 +216,7 @@ XMLReader {
   +depth: 2
   +value: """
     \n
-        
+
     """
   +baseURI: "%sxml_reader.xml"
    …9

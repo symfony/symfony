@@ -27,7 +27,7 @@ class SerializedNameTest extends TestCase
         new SerializedName([]);
     }
 
-    public function provideInvalidValues()
+    public static function provideInvalidValues()
     {
         return [
             [''],

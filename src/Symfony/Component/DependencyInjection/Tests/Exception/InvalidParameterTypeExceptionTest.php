@@ -26,7 +26,7 @@ final class InvalidParameterTypeExceptionTest extends TestCase
         self::assertSame($expectedMessage, $exception->getMessage());
     }
 
-    public function provideReflectionParameters(): iterable
+    public static function provideReflectionParameters(): iterable
     {
         yield 'static method' => [
             new \ReflectionParameter([MyClass::class, 'doSomething'], 0),

@@ -149,7 +149,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $this->assertEquals('foosecret', $returnedToken->getSecret());
     }
 
-    public function provideUsernamesForAutoLogin()
+    public static function provideUsernamesForAutoLogin()
     {
         return [
             ['foouser', 'Simple username'],

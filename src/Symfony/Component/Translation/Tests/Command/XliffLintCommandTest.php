@@ -196,7 +196,7 @@ XLIFF;
         rmdir(sys_get_temp_dir().'/translation-xliff-lint-test');
     }
 
-    public function provideStrictFilenames()
+    public static function provideStrictFilenames()
     {
         yield [false, 'messages.%locale%.xlf', 'en', false];
         yield [false, 'messages.%locale%.xlf', 'es', true];

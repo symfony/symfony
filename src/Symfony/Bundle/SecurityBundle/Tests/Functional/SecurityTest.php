@@ -34,7 +34,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame($token, $security->getToken());
     }
 
-    public function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
+    public static function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
     {
         return [
             [

@@ -100,7 +100,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
     }
 
-    public function isSelectedChoiceProvider()
+    public static function isSelectedChoiceProvider()
     {
         return [
             [true, '0', '0'],
@@ -150,7 +150,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
-    public function isRootFormProvider()
+    public static function isRootFormProvider()
     {
         return [
             [true, new FormView()],

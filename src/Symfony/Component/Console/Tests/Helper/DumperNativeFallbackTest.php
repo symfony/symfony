@@ -42,7 +42,7 @@ class DumperNativeFallbackTest extends TestCase
         $this->assertSame($primitiveString, $dumper($variable));
     }
 
-    public function provideVariables()
+    public static function provideVariables()
     {
         return [
             [null, 'null'],

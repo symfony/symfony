@@ -35,7 +35,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->addToAssertionCount(1);
     }
 
-    public function validResponseFactoryProvider()
+    public static function validResponseFactoryProvider()
     {
         return [
             [static function (): MockResponse { return new MockResponse(); }],
@@ -58,7 +58,7 @@ class MockHttpClientTest extends HttpClientTestCase
         (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
     }
 
-    public function invalidResponseFactoryProvider()
+    public static function invalidResponseFactoryProvider()
     {
         return [
             [static function (): \Generator { yield new MockResponse(); }, 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "Generator" given.'],

@@ -54,7 +54,7 @@ class CliDescriptorTest extends TestCase
         $this->assertStringMatchesFormat(trim($expectedOutput), str_replace(\PHP_EOL, "\n", trim($output->fetch())));
     }
 
-    public function provideContext()
+    public static function provideContext()
     {
         yield 'source' => [
             [
@@ -68,10 +68,10 @@ class CliDescriptorTest extends TestCase
 Received from client #1
 -----------------------
 
- -------- --------------------------------------------------------------------------------------------------- 
-  date     Fri, 14 Dec 2018 16:17:48 +0000                                                                    
-  source   CliDescriptorTest.php on line 30                                                                   
-  file     /Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php  
+ -------- ---------------------------------------------------------------------------------------------------
+  date     Fri, 14 Dec 2018 16:17:48 +0000
+  source   CliDescriptorTest.php on line 30
+  file     /Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php
  -------- ---------------------------------------------------------------------------------------------------
 TXT
         ];
@@ -91,11 +91,11 @@ TXT
 Received from client #1
 -----------------------
 
- -------- -------------------------------------------------------------------------------- 
-  date     Fri, 14 Dec 2018 16:17:48 +0000                                                 
-  source   CliDescriptorTest.php on line 30                                                
-  file     src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php  
- -------- -------------------------------------------------------------------------------- 
+ -------- --------------------------------------------------------------------------------
+  date     Fri, 14 Dec 2018 16:17:48 +0000
+  source   CliDescriptorTest.php on line 30
+  file     src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php
+ -------- --------------------------------------------------------------------------------
 
 TXT
                 :
@@ -103,11 +103,11 @@ TXT
 Received from client #1
 -----------------------
 
- -------- -------------------------------------------------------------------------------- 
-  date     Fri, 14 Dec 2018 16:17:48 +0000                                                 
-  source   CliDescriptorTest.php on line 30                                                
-  file     src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php  
- -------- -------------------------------------------------------------------------------- 
+ -------- --------------------------------------------------------------------------------
+  date     Fri, 14 Dec 2018 16:17:48 +0000
+  source   CliDescriptorTest.php on line 30
+  file     src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php
+ -------- --------------------------------------------------------------------------------
 
 Open source in your IDE/browser:
 phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30
@@ -144,8 +144,8 @@ TXT
 $ bin/phpunit
 -------------
 
- ------ --------------------------------- 
-  date   Fri, 14 Dec 2018 16:17:48 +0000  
+ ------ ---------------------------------
+  date   Fri, 14 Dec 2018 16:17:48 +0000
  ------ ---------------------------------
 TXT
         ];
@@ -163,10 +163,10 @@ TXT
 GET http://localhost/foo
 ------------------------
 
- ------------ --------------------------------- 
-  date         Fri, 14 Dec 2018 16:17:48 +0000  
-  controller   "FooController.php"              
- ------------ --------------------------------- 
+ ------------ ---------------------------------
+  date         Fri, 14 Dec 2018 16:17:48 +0000
+  controller   "FooController.php"
+ ------------ ---------------------------------
 TXT
         ];
     }

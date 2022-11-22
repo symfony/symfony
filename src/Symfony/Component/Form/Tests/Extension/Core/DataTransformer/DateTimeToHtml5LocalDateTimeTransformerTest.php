@@ -20,7 +20,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends BaseDateTimeTransforme
 {
     use DateTimeEqualsTrait;
 
-    public function transformProvider()
+    public static function transformProvider()
     {
         return [
             ['UTC', 'UTC', '2010-02-03 04:05:06 UTC', '2010-02-03T04:05:06'],
@@ -32,7 +32,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends BaseDateTimeTransforme
         ];
     }
 
-    public function reverseTransformProvider()
+    public static function reverseTransformProvider()
     {
         return [
             // format without seconds, as appears in some browsers

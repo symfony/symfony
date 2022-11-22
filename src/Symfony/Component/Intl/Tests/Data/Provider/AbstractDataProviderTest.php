@@ -753,7 +753,7 @@ abstract class AbstractDataProviderTest extends TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function provideLocales()
+    public static function provideLocales()
     {
         return array_map(
             function ($locale) { return [$locale]; },
@@ -761,7 +761,7 @@ abstract class AbstractDataProviderTest extends TestCase
         );
     }
 
-    public function provideLocaleAliases()
+    public static function provideLocaleAliases()
     {
         return array_map(
             function ($alias, $ofLocale) { return [$alias, $ofLocale]; },
@@ -770,7 +770,7 @@ abstract class AbstractDataProviderTest extends TestCase
         );
     }
 
-    public function provideRootLocales()
+    public static function provideRootLocales()
     {
         return array_map(
             function ($locale) { return [$locale]; },

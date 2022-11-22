@@ -23,7 +23,7 @@ class IconTest extends TestCase
         $this->assertMatchesRegularExpression('~<svg xmlns="http://www.w3.org/2000/svg" width="\d+" height="\d+" viewBox="0 0 \d+ \d+">.*</svg>~s', file_get_contents($iconFilePath), sprintf('The SVG metadata of the %s icon is different than expected (use the same as the other icons).', $iconFilePath));
     }
 
-    public function provideIconFilePaths()
+    public static function provideIconFilePaths()
     {
         return array_map(function ($filePath) { return (array) $filePath; }, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
     }

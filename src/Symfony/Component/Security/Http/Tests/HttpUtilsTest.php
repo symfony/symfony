@@ -175,7 +175,7 @@ class HttpUtilsTest extends TestCase
         $this->assertSame('foo', $subRequest->attributes->get($attribute));
     }
 
-    public function provideSecurityContextAttributes()
+    public static function provideSecurityContextAttributes()
     {
         return [
             [Security::AUTHENTICATION_ERROR],

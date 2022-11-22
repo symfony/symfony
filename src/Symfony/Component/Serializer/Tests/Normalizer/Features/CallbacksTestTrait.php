@@ -126,7 +126,7 @@ trait CallbacksTestTrait
         $normalizer->normalize($obj, null, ['callbacks' => $callbacks]);
     }
 
-    public function provideNormalizeCallbacks()
+    public static function provideNormalizeCallbacks()
     {
         return [
             'Change a string' => [
@@ -190,7 +190,7 @@ trait CallbacksTestTrait
         ];
     }
 
-    public function provideDenormalizeCallbacks(): array
+    public static function provideDenormalizeCallbacks(): array
     {
         return [
             'Change a string' => [
@@ -254,7 +254,7 @@ trait CallbacksTestTrait
         ];
     }
 
-    public function providerDenormalizeCallbacksWithTypedProperty(): array
+    public static function providerDenormalizeCallbacksWithTypedProperty(): array
     {
         return [
             'Change a typed string' => [
@@ -284,7 +284,7 @@ trait CallbacksTestTrait
         ];
     }
 
-    public function provideInvalidCallbacks()
+    public static function provideInvalidCallbacks()
     {
         return [
             [['bar' => null]],

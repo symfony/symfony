@@ -35,7 +35,7 @@ class InstantiatorTest extends TestCase
         Instantiator::instantiate($class);
     }
 
-    public function provideFailingInstantiation()
+    public static function provideFailingInstantiation()
     {
         yield ['ReflectionClass'];
         yield ['SplHeap'];

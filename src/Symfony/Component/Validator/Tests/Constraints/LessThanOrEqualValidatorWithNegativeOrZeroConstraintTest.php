@@ -29,7 +29,7 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [0, 0],
@@ -43,7 +43,7 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [2, '2', 0, '0', 'integer'],

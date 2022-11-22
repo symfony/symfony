@@ -1568,7 +1568,7 @@ EOT;
         $this->parser->parse($yaml);
     }
 
-    public function parserThrowsExceptionWithCorrectLineNumberProvider()
+    public static function parserThrowsExceptionWithCorrectLineNumberProvider()
     {
         return [
             [
@@ -1783,7 +1783,7 @@ YAML
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function multiLineDataProvider()
+    public static function multiLineDataProvider()
     {
         $tests = [];
 
@@ -1850,7 +1850,7 @@ EOF;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function inlineNotationSpanningMultipleLinesProvider(): array
+    public static function inlineNotationSpanningMultipleLinesProvider(): array
     {
         return [
             'mapping' => [
@@ -2239,7 +2239,7 @@ YAML;
         $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function taggedValuesProvider()
+    public static function taggedValuesProvider()
     {
         return [
             'scalars' => [
@@ -2663,7 +2663,7 @@ EOE;
         $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS);
     }
 
-    public function circularReferenceProvider()
+    public static function circularReferenceProvider()
     {
         $tests = [];
 

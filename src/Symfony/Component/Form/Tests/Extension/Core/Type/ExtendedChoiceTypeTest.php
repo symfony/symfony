@@ -58,7 +58,7 @@ class ExtendedChoiceTypeTest extends TestCase
         $this->assertSame('lazy_b', $choices[1]->value);
     }
 
-    public function provideTestedTypes()
+    public static function provideTestedTypes()
     {
         yield [CountryTypeTest::TESTED_TYPE];
         yield [CurrencyTypeTest::TESTED_TYPE];

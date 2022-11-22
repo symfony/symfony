@@ -384,7 +384,7 @@ class LockTest extends TestCase
         $this->assertSame($expected, $lock->isExpired());
     }
 
-    public function provideExpiredDates()
+    public static function provideExpiredDates()
     {
         yield [[-0.1], true];
         yield [[0.1, -0.1], true];

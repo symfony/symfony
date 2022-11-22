@@ -33,7 +33,7 @@ class NotFoundActivationStrategyTest extends TestCase
         $this->assertEquals($expected, $strategy->isHandlerActivated($record));
     }
 
-    public function isActivatedProvider()
+    public static function isActivatedProvider()
     {
         return [
             ['/test',      ['level' => Logger::DEBUG], false],

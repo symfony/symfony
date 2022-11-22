@@ -87,7 +87,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame($expected, $c->getController()->getValue(true), sprintf('Testing: %s', $name));
     }
 
-    public function provideControllerCallables()
+    public static function provideControllerCallables()
     {
         // make sure we always match the line number
         $r1 = new \ReflectionMethod($this, 'testControllerInspection');
@@ -350,7 +350,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame($expected, $c->isJsonRequest());
     }
 
-    public function provideJsonContentTypes()
+    public static function provideJsonContentTypes()
     {
         return [
             ['text/csv', false],
@@ -377,7 +377,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame($expected, $c->getPrettyJson());
     }
 
-    public function providePrettyJson()
+    public static function providePrettyJson()
     {
         return [
             ['null', 'null'],

@@ -84,7 +84,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         MemcachedAdapter::createConnection([], [$name => $value]);
     }
 
-    public function provideBadOptions(): array
+    public static function provideBadOptions(): array
     {
         return [
             ['foo', 'bar'],
@@ -136,7 +136,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame([$expect], array_map($f, $client3->getServerList()));
     }
 
-    public function provideServersSetting(): iterable
+    public static function provideServersSetting(): iterable
     {
         yield [
             'memcached://127.0.0.1/50',
@@ -186,7 +186,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         }
     }
 
-    public function provideDsnWithOptions(): iterable
+    public static function provideDsnWithOptions(): iterable
     {
         if (!class_exists(\Memcached::class)) {
             self::markTestSkipped('Extension memcached required.');

@@ -128,7 +128,7 @@ class TestSessionListenerTest extends TestCase
         $this->assertSame($expected, $response->headers->all()['set-cookie']);
     }
 
-    public function anotherCookieProvider()
+    public static function anotherCookieProvider()
     {
         return [
             'same' => ['MOCKSESSID=789; path=/', ['MOCKSESSID=789; path=/']],

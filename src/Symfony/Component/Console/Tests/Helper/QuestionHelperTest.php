@@ -533,7 +533,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertSame($expectedValue, $answer);
     }
 
-    public function simpleAnswerProvider()
+    public static function simpleAnswerProvider()
     {
         return [
             [0, 'My environment 1'],
@@ -599,7 +599,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertSame($expectedValue, $answer);
     }
 
-    public function mixedKeysChoiceListAnswerProvider()
+    public static function mixedKeysChoiceListAnswerProvider()
     {
         return [
             ['0', '0'],
@@ -653,7 +653,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("My environment\n")), $this->createOutputInterface(), $question);
     }
 
-    public function answerProvider()
+    public static function answerProvider()
     {
         return [
             ['env_1', 'env_1'],

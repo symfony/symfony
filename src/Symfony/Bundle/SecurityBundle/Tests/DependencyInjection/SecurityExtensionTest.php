@@ -70,7 +70,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testFirewallWithInvalidUserProvider()
+    public static function testFirewallWithInvalidUserProvider()
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Unable to create definition for "security.user.provider.concrete.my_foo" user provider');
@@ -169,7 +169,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->getDefinition('security.authentication.switchuser_listener.some_firewall')->getArgument(9));
     }
 
-    public function testPerListenerProvider()
+    public static function testPerListenerProvider()
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -371,7 +371,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($secure, $definition->getArgument(3)['secure']);
     }
 
-    public function sessionConfigurationProvider()
+    public static function sessionConfigurationProvider()
     {
         return [
             [

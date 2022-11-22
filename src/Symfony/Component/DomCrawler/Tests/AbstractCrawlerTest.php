@@ -910,7 +910,7 @@ HTML;
         }
     }
 
-    public function provideMatchTests()
+    public static function provideMatchTests()
     {
         yield ['#foo', true, '#foo'];
         yield ['#foo', true, '.foo'];

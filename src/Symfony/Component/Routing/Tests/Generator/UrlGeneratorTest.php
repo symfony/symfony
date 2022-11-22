@@ -723,7 +723,7 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame($expectedPath, UrlGenerator::getRelativePath($sourcePath, $targetPath));
     }
 
-    public function provideRelativePaths()
+    public static function provideRelativePaths()
     {
         return [
             [
@@ -865,7 +865,7 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame($expected, $this->getGenerator($routes)->generate('test', ['foo' => 'a/b', 'baz' => 'c/d/e']));
     }
 
-    public function provideLookAroundRequirementsInPath()
+    public static function provideLookAroundRequirementsInPath()
     {
         yield ['/app.php/a/b/b%28ar/c/d/e', '/{foo}/b(ar/{baz}', '.+(?=/b\\(ar/)'];
         yield ['/app.php/a/b/bar/c/d/e', '/{foo}/bar/{baz}', '.+(?!$)'];

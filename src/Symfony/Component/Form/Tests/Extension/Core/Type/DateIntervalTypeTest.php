@@ -440,7 +440,7 @@ class DateIntervalTypeTest extends BaseTypeTest
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function provideEmptyData()
+    public static function provideEmptyData()
     {
         $expectedData = new \DateInterval('P6Y4M');
 

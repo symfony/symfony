@@ -31,7 +31,7 @@ abstract class AbstractCollatorTest extends TestCase
         $this->assertSame($expected, $array);
     }
 
-    public function asortProvider()
+    public static function asortProvider()
     {
         return [
             /* array, sortFlag, expected */

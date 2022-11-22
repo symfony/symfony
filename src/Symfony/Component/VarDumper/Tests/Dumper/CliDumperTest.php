@@ -145,9 +145,9 @@ RuntimeException {
   trace: {
     %ACliDumperTest.php:%d {
       Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest->testDumpWithCommaFlagsAndExceptionCodeExcerpt()
-      › 
+      ›
       › $ex = new \RuntimeException('foo');
-      › 
+      ›
     }
     %A
   }
@@ -157,7 +157,7 @@ EOTXT
             , $dump);
     }
 
-    public function provideDumpWithCommaFlagTests()
+    public static function provideDumpWithCommaFlagTests()
     {
         $expected = <<<'EOTXT'
 array:3 [
@@ -388,7 +388,7 @@ stream resource {@{$ref}
         __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = [])
         › foo bar
         ›   twig source
-        › 
+        ›
       }
       %s%eTemplate.php:%d { …}
       %s%eTemplate.php:%d { …}
@@ -520,7 +520,7 @@ EOTXT
         );
     }
 
-    public function provideDumpArrayWithColor()
+    public static function provideDumpArrayWithColor()
     {
         yield [
             ['foo' => 'bar'],

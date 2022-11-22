@@ -329,7 +329,7 @@ class PdoSessionHandlerTest extends TestCase
         }
     }
 
-    public function provideUrlDsnPairs()
+    public static function provideUrlDsnPairs()
     {
         yield ['mysql://localhost/test', 'mysql:host=localhost;dbname=test;'];
         yield ['mysql://localhost:56/test', 'mysql:host=localhost;port=56;dbname=test;'];

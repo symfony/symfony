@@ -2762,7 +2762,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html, $xpath);
     }
 
-    public function submitFormNoValidateProvider()
+    public static function submitFormNoValidateProvider()
     {
         return [
             [false],

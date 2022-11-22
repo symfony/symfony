@@ -86,7 +86,7 @@ class SimpleFormTest extends TestCase
         $this->assertEquals($propertyPath, $form->getPropertyPath());
     }
 
-    public function provideFormNames()
+    public static function provideFormNames()
     {
         yield [null, null];
         yield ['', null];

@@ -63,7 +63,7 @@ class HtmlDescriptorTest extends TestCase
         $this->assertStringMatchesFormat(trim($expectedOutput), trim(preg_replace('@<style>.*</style><script>.*</script>@s', '', $output->fetch())));
     }
 
-    public function provideContext()
+    public static function provideContext()
     {
         yield 'source' => [
             [
@@ -82,7 +82,7 @@ class HtmlDescriptorTest extends TestCase
                 Fri, 14 Dec 2018 16:17:48 +0000
             </time>
         </div>
-        
+
     </header>
     <section class="body">
         <p class="text-small">
@@ -146,11 +146,11 @@ TXT
                 Fri, 14 Dec 2018 16:17:48 +0000
             </time>
         </div>
-        
+
     </header>
     <section class="body">
         <p class="text-small">
-            
+
         </p>
         [DUMPED]
     </section>
@@ -184,7 +184,7 @@ TXT
     </header>
     <section class="body">
         <p class="text-small">
-            
+
         </p>
         [DUMPED]
     </section>

@@ -136,7 +136,7 @@ TXT
         $this->assertStringContainsString(file_get_contents(__DIR__.'/Fixtures/describe_env_vars.txt'), $tester->getDisplay(true));
     }
 
-    public function provideIgnoreBackslashWhenFindingService()
+    public static function provideIgnoreBackslashWhenFindingService()
     {
         return [
             [BackslashClass::class],

@@ -26,7 +26,7 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         return new MandrillTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('mandrill', 'default'),
@@ -59,7 +59,7 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         $client = $this->getClient();
         $dispatcher = $this->getDispatcher();
@@ -101,7 +101,7 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('mandrill+foo', 'default', self::USER),
@@ -109,7 +109,7 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('mandrill+api', 'default')];
 

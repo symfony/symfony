@@ -74,7 +74,7 @@ final class FirewallConfig
         return $this->stateless;
     }
 
-    public static function getProvider(): ?string
+    public function getProvider(): ?string
     {
         return $this->provider;
     }

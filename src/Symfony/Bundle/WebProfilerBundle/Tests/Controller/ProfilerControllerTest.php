@@ -416,7 +416,7 @@ class ProfilerControllerTest extends WebTestCase
             ->panelAction(new Request(), $profile->getToken());
     }
 
-    public static function defaultPanelProvider(): \Generator
+    public function defaultPanelProvider(): \Generator
     {
         // Test default behavior
         $profile = new Profile('xxxxxx');

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-20T20:09:03Z
+
+Could you please add test case to avoid further regressions?
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2022-11-21T11:03:26Z
+
+> Could you please add test case to avoid further regressions?
+
+Added tests for test_mode
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-21T13:12:01Z
+
+And please make fabbot happy 😄
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2022-11-21T15:39:25Z
+
+> And please make fabbot happy 😄
+
+Fabbot happy too :D By the way, maybe I need to create for another branches changes to next up releases?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-21T17:43:36Z
+
+No, we will handle the upmerge of your PR into newer branches 👌🏻

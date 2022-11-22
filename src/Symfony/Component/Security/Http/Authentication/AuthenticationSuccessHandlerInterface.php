@@ -29,5 +29,5 @@ interface AuthenticationSuccessHandlerInterface
     /**
      * Usually called by AuthenticatorInterface::onAuthenticationSuccess() implementations.
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response;
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response;
 }

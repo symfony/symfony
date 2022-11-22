@@ -24,5 +24,5 @@ interface AccessTokenHandlerInterface
     /**
      * @throws AuthenticationException
      */
-    public function getUserIdentifierFrom(string $accessToken): string;
+    public function getUserIdentifierFrom(#[\SensitiveParameter] string $accessToken): string;
 }

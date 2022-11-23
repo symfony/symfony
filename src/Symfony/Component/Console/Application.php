@@ -998,15 +998,8 @@ class Application implements ResetInterface
                 foreach ($this->signalsToDispatchEvent as $signal) {
                     $event = new ConsoleSignalEvent($command, $input, $output, $signal);
 
-                    $this->signalRegistry->register($signal, function ($signal, $hasNext) use ($event) {
+                    $this->signalRegistry->register($signal, function () use ($event) {
                         $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
-
-                        // No more handlers, we try to simulate PHP default behavior
-                        if (!$hasNext) {
-                            if (!\in_array($signal, [\SIGUSR1, \SIGUSR2], true)) {
-                                exit(0);
-                            }
-                        }
                     });
                 }
             }

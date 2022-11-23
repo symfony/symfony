@@ -52,7 +52,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
      */
     public function testTestMode(int $expected, bool $testMode)
     {
-        $message = new SmsMessage('+37012345678',  'Hello World!');
+        $message = new SmsMessage('+37012345678', 'Hello World!');
 
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->atLeast(1))
@@ -62,7 +62,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('OK: 519545');
 
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $message, $testMode, $expected): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $message, $expected): ResponseInterface {
             $this->assertSame('GET', $method);
             $this->assertSame(sprintf(
                 'https://savitarna.smsbiuras.lt/api?uid=uid&apikey=api_key&message=%s&from=from&test=%s&to=%s',

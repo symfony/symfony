@@ -68,7 +68,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
                 'https://savitarna.smsbiuras.lt/api?uid=uid&apikey=api_key&message=%s&from=from&test=%s&to=%s',
                 rawurlencode($message->getSubject()),
                 $expected,
-                rawurlencode($message->getPhone()),
+                rawurlencode($message->getPhone())
             ), $url);
             $this->assertSame($expected, $options['query']['test']);
 

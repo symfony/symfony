@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
@@ -59,6 +60,9 @@ final class Mailer implements MailerInterface
         }
 
         try {
+            if ($message instanceof TemplatedEmail) {
+                $message->context([]);
+            }
             $this->bus->dispatch(new SendEmailMessage($message, $envelope), $stamps);
         } catch (HandlerFailedException $e) {
             foreach ($e->getNestedExceptions() as $nested) {

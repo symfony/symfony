@@ -67,8 +67,6 @@ final class BodyRenderer implements BodyRendererInterface
             $message->htmlTemplate(null);
         }
 
-        $message->context([]);
-
         // if text body is empty, compute one from the HTML body
         if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
             $text = $this->converter->convert(\is_resource($html) ? stream_get_contents($html) : $html, $message->getHtmlCharset());

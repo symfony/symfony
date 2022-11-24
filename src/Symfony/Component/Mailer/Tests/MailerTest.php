@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Mailer;
@@ -34,9 +35,9 @@ class MailerTest extends TestCase
         $transport->send(new RawMessage('Some raw email message'));
     }
 
-    public function testSendMessageToBus()
+    private static function createDumyMailerBus()
     {
-        $bus = new class() implements MessageBusInterface {
+        return new class() implements MessageBusInterface {
             public $messages = [];
             public $stamps = [];
 
@@ -48,9 +49,10 @@ class MailerTest extends TestCase
                 return new Envelope($message, $stamps);
             }
         };
+    }
 
-        $stamp = $this->createMock(StampInterface::class);
-
+    private function createMockDispatcher(StampInterface $stamp)
+    {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('dispatch')
@@ -61,6 +63,14 @@ class MailerTest extends TestCase
             }))
             ->willReturnArgument(0)
         ;
+        return $dispatcher;
+    }
+
+    public function testSendMessageToBus()
+    {
+        $bus = self::createDumyMailerBus();
+        $stamp = $this->createMock(StampInterface::class);
+        $dispatcher = $this->createMockDispatcher($stamp);
 
         $mailer = new Mailer(new NullTransport($dispatcher), $bus, $dispatcher);
 
@@ -77,5 +87,31 @@ class MailerTest extends TestCase
         self::assertSame($email, $bus->messages[0]->getMessage());
         self::assertCount(1, $bus->stamps);
         self::assertSame([$stamp], $bus->stamps);
+    }
+
+    public function testSendTemplatedEmailToBus()
+    {
+        $bus = self::createDumyMailerBus();
+        $stamp = $this->createMock(StampInterface::class);
+        $dispatcher = $this->createMockDispatcher($stamp);
+
+        $mailer = new Mailer(new NullTransport($dispatcher), $bus, $dispatcher);
+
+        $email = (new TemplatedEmail())
+            ->from('hello@example.com')
+            ->to('you@example.com')
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->context([
+                'unserializable' => new \DateTimeImmutable()
+            ]);
+
+        $mailer->send($email);
+
+        self::assertCount(1, $bus->messages);
+        $templatedEmail = $bus->messages[0]->getMessage();
+        self::assertInstanceOf(TemplatedEmail::class, $templatedEmail);
+        self::assertSame($email, $templatedEmail);
+        self::assertSame([], $templatedEmail->getContext());
     }
 }

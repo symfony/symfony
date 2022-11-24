@@ -55,16 +55,34 @@ class LazyObjectState
             $propertyScopes = Hydrator::$propertyScopes[$class];
             $propertyScopes[$k = "\0$propertyScope\0$propertyName"] ?? $propertyScopes[$k = "\0*\0$propertyName"] ?? $k = $propertyName;
 
-            if (!$initializer = $this->initializer[$k] ?? null) {
-                return self::STATUS_UNINITIALIZED_PARTIAL;
+            if ($initializer = $this->initializer[$k] ?? null) {
+                $value = $initializer(...[$instance, $propertyName, $propertyScope, LazyObjectRegistry::$defaultProperties[$class][$k] ?? null]);
+                $accessor = LazyObjectRegistry::$classAccessors[$propertyScope] ??= LazyObjectRegistry::getClassAccessors($propertyScope);
+                $accessor['set']($instance, $propertyName, $value);
+
+                return $this->status = self::STATUS_INITIALIZED_PARTIAL;
             }
 
-            $value = $initializer(...[$instance, $propertyName, $propertyScope, LazyObjectRegistry::$defaultProperties[$class][$k] ?? null]);
+            $status = self::STATUS_UNINITIALIZED_PARTIAL;
 
-            $accessor = LazyObjectRegistry::$classAccessors[$propertyScope] ??= LazyObjectRegistry::getClassAccessors($propertyScope);
-            $accessor['set']($instance, $propertyName, $value);
+            if ($initializer = $this->initializer["\0"] ?? null) {
+                if (!\is_array($values = $initializer($instance, LazyObjectRegistry::$defaultProperties[$class]))) {
+                    throw new \TypeError(sprintf('The lazy-initializer defined for instance of "%s" must return an array, got "%s".', $class, get_debug_type($values)));
+                }
+                $properties = (array) $instance;
+                foreach ($values as $key => $value) {
+                    if ($k === $key) {
+                        $status = self::STATUS_INITIALIZED_PARTIAL;
+                    }
+                    if (!\array_key_exists($key, $properties) && [$scope, $name, $readonlyScope] = $propertyScopes[$key] ?? null) {
+                        $scope = $readonlyScope ?? ('*' !== $scope ? $scope : $class);
+                        $accessor = LazyObjectRegistry::$classAccessors[$scope] ??= LazyObjectRegistry::getClassAccessors($scope);
+                        $accessor['set']($instance, $name, $value);
+                    }
+                }
+            }
 
-            return $this->status = self::STATUS_INITIALIZED_PARTIAL;
+            return $status;
         }
 
         $this->status = self::STATUS_INITIALIZED_FULL;

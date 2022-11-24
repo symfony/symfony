@@ -76,20 +76,18 @@ class RequestTest extends TestCase
     {
         $parameters = [
             'foo' => false,
-            'bar' => [
-                'baz' => true,
-            ],
+        ];
+
+        $expected = [
+            'foo' => '0',
         ];
 
         $notExpected = [
             'foo' => '',
-            'bar' => [
-                'baz' => '1',
-            ],
         ];
 
         $request = new Request('http://www.example.com/', 'get', $parameters);
-        $this->assertSame($parameters, $request->getParameters());
+        $this->assertSame($expected, $request->getParameters());
         $this->assertNotSame($notExpected, $request->getParameters());
     }
 }

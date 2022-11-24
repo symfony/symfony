@@ -39,7 +39,7 @@ class Request
         $this->method = $method;
 
         array_walk_recursive($parameters, static function (&$value) {
-            $value = (string) $value;
+            $value = is_bool($value) ? $value : (string) $value;
         });
 
         $this->parameters = $parameters;

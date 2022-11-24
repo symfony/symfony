@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-22T14:19:44Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-22T15:17:28Z
+
+The proposal here makes the UserProvider responsible for implementing all the token validation. To me, this risks encouraging bad implementations because the UserProvider is currently responsible for none of the validation.
+
+I'd rather have a specific interface to be implemented by the AccessTokenHandler to return a UserBadge directly instead of only the identifier (or something like that).
+Note that it might not even be a special interface. We could have `getUserIdentifierFrom(string $accessToken): string|UserBadge` allowing to return a UserBadge directly for the advanced case.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-22T15:20:43Z
+
+> Note that it might not even be a special interface. We could have getUserIdentifierFrom(string $accessToken): string|UserBadge allowing to return a UserBadge directly for the advanced case.
+
+Looks sensible to me.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-11-22T16:04:22Z
+
+I've changed it to use the `string|UserBadge` return types instead.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-22T16:31:26Z
+
+Widening the return type of the interface will be a BC break for consumers of the interface though. So if we delay that to 6.3, we'll have to use a separate method
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-11-22T16:34:10Z
+
+@stof I thought a `string` returntype in implementations of the interface would be covariant with `string|UserBadge`?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-22T16:46:11Z
+
+@Jeroeny yes, it's OK for implementations, but consumers have to take care of another type when calling the method - which would be a BC break.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-22T16:46:50Z
+
+@Jeroeny the BC break concerns consumers, not implementors. For implementors, the covariance rule indeed makes it BC. Btw, that's the reason why a child class is not allowed to widen a return type as it would break consumers.
+
+And also the main consumer is in the core and will be updated, any decorator class is both an implementation and a consumer and will be impacted by the widened type.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-22T16:49:29Z
+
+Since some on-going implementations already need this, I'd be fine merging this on 6.2 as a feature-freeze adjustment.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-11-22T16:53:25Z
+
+Ah or course, for consumers. Allowing it in 6.2 would be cool.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-11-23T13:51:44Z
+
+Should `private readonly UserProviderInterface $userProvider`  of `AccessTokenAuthenticator` become nullable? What `UserProviderInterface` would you inject when you are already retrieving the UserBadge from the `AccessTokenHandlerInterface` ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-23T14:02:12Z
+
+None indeed, can you make the change in this PR?
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2022-11-23T15:59:01Z
+
+@chalasr Added, I have 2 open questions about the consequences, see comments :).

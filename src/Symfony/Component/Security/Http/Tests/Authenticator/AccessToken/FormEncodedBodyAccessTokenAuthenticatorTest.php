@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Tests\Authenticator\InMemoryAccessTokenHandler;
 
@@ -34,7 +35,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->accessTokenHandler = new InMemoryAccessTokenHandler();
     }
 
-    public function testSupport(): void
+    public function testSupport()
     {
         $this->setUpAuthenticator();
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
@@ -44,7 +45,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->assertNull($this->authenticator->supports($request));
     }
 
-    public function testSupportsWithCustomParameter(): void
+    public function testSupportsWithCustomParameter()
     {
         $this->setUpAuthenticator('protection-token');
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
@@ -54,9 +55,9 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->assertNull($this->authenticator->supports($request));
     }
 
-    public function testAuthenticate(): void
+    public function testAuthenticate()
     {
-        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', 'foo');
+        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator();
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded'], 'access_token=VALID_ACCESS_TOKEN');
         $request->request->set('access_token', 'VALID_ACCESS_TOKEN');
@@ -66,9 +67,9 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
     }
 
-    public function testAuthenticateWithCustomParameter(): void
+    public function testAuthenticateWithCustomParameter()
     {
-        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', 'foo');
+        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator('protection-token');
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
         $request->request->set('protection-token', 'VALID_ACCESS_TOKEN');
@@ -81,7 +82,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
     /**
      * @dataProvider provideInvalidAuthenticateData
      */
-    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class): void
+    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
     {
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($errorMessage);
@@ -119,9 +120,9 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
     private function setUpAuthenticator(string $parameter = 'access_token'): void
     {
         $this->authenticator = new AccessTokenAuthenticator(
-            $this->userProvider,
             $this->accessTokenHandler,
-            new FormEncodedBodyExtractor($parameter)
+            new FormEncodedBodyExtractor($parameter),
+            $this->userProvider
         );
     }
 }

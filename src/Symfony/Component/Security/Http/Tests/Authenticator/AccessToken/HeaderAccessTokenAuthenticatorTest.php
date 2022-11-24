@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Tests\Authenticator\InMemoryAccessTokenHandler;
 
@@ -37,7 +38,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     /**
      * @dataProvider provideSupportData
      */
-    public function testSupport($request): void
+    public function testSupport($request)
     {
         $this->setUpAuthenticator();
 
@@ -53,7 +54,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     /**
      * @dataProvider provideSupportsWithCustomTokenTypeData
      */
-    public function testSupportsWithCustomTokenType($request, $result): void
+    public function testSupportsWithCustomTokenType($request, $result)
     {
         $this->setUpAuthenticator('Authorization', 'JWT');
 
@@ -71,7 +72,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     /**
      * @dataProvider provideSupportsWithCustomHeaderParameter
      */
-    public function testSupportsWithCustomHeaderParameter($request, $result): void
+    public function testSupportsWithCustomHeaderParameter($request, $result)
     {
         $this->setUpAuthenticator('X-FOO');
 
@@ -86,9 +87,9 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN']), false];
     }
 
-    public function testAuthenticate(): void
+    public function testAuthenticate()
     {
-        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', 'foo');
+        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator();
 
         $request = new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer VALID_ACCESS_TOKEN']);
@@ -96,9 +97,9 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
     }
 
-    public function testAuthenticateWithCustomTokenType(): void
+    public function testAuthenticateWithCustomTokenType()
     {
-        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', 'foo');
+        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator('Authorization', 'JWT');
 
         $request = new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'JWT VALID_ACCESS_TOKEN']);
@@ -109,7 +110,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     /**
      * @dataProvider provideInvalidAuthenticateData
      */
-    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class): void
+    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
     {
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($errorMessage);
@@ -143,9 +144,9 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     private function setUpAuthenticator(string $headerParameter = 'Authorization', string $tokenType = 'Bearer'): void
     {
         $this->authenticator = new AccessTokenAuthenticator(
-            $this->userProvider,
             $this->accessTokenHandler,
-            new HeaderAccessTokenExtractor($headerParameter, $tokenType)
+            new HeaderAccessTokenExtractor($headerParameter, $tokenType),
+            $this->userProvider
         );
     }
 }

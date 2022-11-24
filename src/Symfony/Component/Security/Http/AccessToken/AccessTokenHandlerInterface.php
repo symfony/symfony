@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\AccessToken;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 /**
  * The token handler retrieves the user identifier from the token.
@@ -24,5 +25,5 @@ interface AccessTokenHandlerInterface
     /**
      * @throws AuthenticationException
      */
-    public function getUserIdentifierFrom(#[\SensitiveParameter] string $accessToken): string;
+    public function getUserBadgeFrom(#[\SensitiveParameter] string $accessToken): UserBadge;
 }

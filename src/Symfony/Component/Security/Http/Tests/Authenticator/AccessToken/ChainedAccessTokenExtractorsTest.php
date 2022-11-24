@@ -22,6 +22,7 @@ use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Tests\Authenticator\InMemoryAccessTokenHandler;
 
@@ -40,7 +41,7 @@ class ChainedAccessTokenExtractorsTest extends TestCase
     /**
      * @dataProvider provideSupportData
      */
-    public function testSupport($request): void
+    public function testSupport($request)
     {
         $this->setUpAuthenticator();
 
@@ -53,9 +54,9 @@ class ChainedAccessTokenExtractorsTest extends TestCase
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN'])];
     }
 
-    public function testAuthenticate(): void
+    public function testAuthenticate()
     {
-        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', 'foo');
+        $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator();
 
         $request = new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer VALID_ACCESS_TOKEN']);
@@ -66,7 +67,7 @@ class ChainedAccessTokenExtractorsTest extends TestCase
     /**
      * @dataProvider provideInvalidAuthenticateData
      */
-    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class): void
+    public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
     {
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($errorMessage);
@@ -100,13 +101,13 @@ class ChainedAccessTokenExtractorsTest extends TestCase
     private function setUpAuthenticator(): void
     {
         $this->authenticator = new AccessTokenAuthenticator(
-            $this->userProvider,
             $this->accessTokenHandler,
             new ChainAccessTokenExtractor([
                 new FormEncodedBodyExtractor(),
                 new QueryAccessTokenExtractor(),
                 new HeaderAccessTokenExtractor(),
-            ])
+            ]),
+            $this->userProvider
         );
     }
 }

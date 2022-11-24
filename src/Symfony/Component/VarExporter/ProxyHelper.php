@@ -27,6 +27,9 @@ final class ProxyHelper
      */
     public static function generateLazyGhost(\ReflectionClass $class): string
     {
+        if (\PHP_VERSION_ID >= 80200 && $class->isReadOnly()) {
+            throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" is read-only.', $class->name));
+        }
         if ($class->isFinal()) {
             throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" is final.', $class->name));
         }
@@ -56,14 +59,11 @@ final class ProxyHelper
             }
         }
         $propertyScopes = self::exportPropertyScopes($class->name);
-        $readonly = \PHP_VERSION_ID >= 80200 && $class->isReadOnly() ? 'readonly ' : '';
 
         return <<<EOPHP
              extends \\{$class->name} implements \Symfony\Component\VarExporter\LazyObjectInterface
             {
                 use \Symfony\Component\VarExporter\LazyGhostTrait;
-
-                private {$readonly}int \$lazyObjectId;
 
                 private const LAZY_OBJECT_PROPERTY_SCOPES = {$propertyScopes};
             }
@@ -90,6 +90,9 @@ final class ProxyHelper
         }
         if ($class?->isFinal()) {
             throw new LogicException(sprintf('Cannot generate lazy proxy: class "%s" is final.', $class->name));
+        }
+        if (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly()) {
+            throw new LogicException(sprintf('Cannot generate lazy proxy: class "%s" is read-only.', $class->name));
         }
 
         $methodReflectors = [$class?->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) ?? []];
@@ -176,7 +179,6 @@ final class ProxyHelper
             $methods[$lcName] = "    {$signature}\n    {\n{$body}\n    }";
         }
 
-        $readonly = \PHP_VERSION_ID >= 80200 && $class?->isReadOnly() ? 'readonly ' : '';
         $types = $interfaces = array_unique(array_column($interfaces, 'name'));
         $interfaces[] = LazyObjectInterface::class;
         $interfaces = implode(', \\', $interfaces);
@@ -197,9 +199,6 @@ final class ProxyHelper
             {$parent} implements \\{$interfaces}
             {
                 use \Symfony\Component\VarExporter\LazyProxyTrait;
-
-                private {$readonly}int \$lazyObjectId;
-                private {$readonly}{$type} \$lazyObjectReal;
 
                 private const LAZY_OBJECT_PROPERTY_SCOPES = [
                     'lazyObjectReal' => [self::class, 'lazyObjectReal', null],

@@ -17,6 +17,4 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 class ChildStdClass extends \stdClass implements LazyObjectInterface
 {
     use LazyGhostTrait;
-
-    private int $lazyObjectId;
 }

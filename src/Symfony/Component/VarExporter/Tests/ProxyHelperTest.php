@@ -66,9 +66,6 @@ class ProxyHelperTest extends TestCase
         {
             use \Symfony\Component\VarExporter\LazyProxyTrait;
 
-            private int $lazyObjectId;
-            private parent $lazyObjectReal;
-
             private const LAZY_OBJECT_PROPERTY_SCOPES = [
                 'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
                 "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],
@@ -118,9 +115,6 @@ class ProxyHelperTest extends TestCase
          implements \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface1, \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2, \Symfony\Component\VarExporter\LazyObjectInterface
         {
             use \Symfony\Component\VarExporter\LazyProxyTrait;
-
-            private int $lazyObjectId;
-            private \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface1&\Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2 $lazyObjectReal;
 
             private const LAZY_OBJECT_PROPERTY_SCOPES = [
                 'lazyObjectReal' => [self::class, 'lazyObjectReal', null],

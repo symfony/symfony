@@ -75,8 +75,6 @@ class stdClass_5a8a5eb extends \stdClass implements \Symfony\Component\VarExport
 {
     use \Symfony\Component\VarExporter\LazyGhostTrait;
 
-    private int $lazyObjectId;
-
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 }
 

@@ -17,7 +17,6 @@ class TestClass extends NoMagicClass
 {
     use LazyGhostTrait;
 
-    private int $lazyObjectId;
     public int $public = 1;
     protected int $protected = 2;
     protected readonly int $protectedReadonly;

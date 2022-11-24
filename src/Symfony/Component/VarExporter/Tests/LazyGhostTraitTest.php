@@ -248,7 +248,7 @@ class LazyGhostTraitTest extends TestCase
         $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(123, $instance->public);
         $this->assertFalse($instance->isLazyObjectInitialized());
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId", 'public'], array_keys((array) $instance));
+        $this->assertSame(['public', "\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         $this->assertSame(1, $counter);
 
         $instance->initializeLazyObject();

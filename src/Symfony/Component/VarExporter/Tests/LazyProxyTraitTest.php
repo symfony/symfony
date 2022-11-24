@@ -249,9 +249,6 @@ class LazyProxyTraitTest extends TestCase
                 createLazyProxy as private;
             }
 
-            private int $lazyObjectId;
-            private parent $lazyObjectReal;
-
             public function __construct()
             {
                 self::createLazyProxy(fn () => new TestClass((object) ['foo' => 123]), $this);

@@ -29,9 +29,6 @@ class Redis5Proxy extends \Redis implements ResetInterface, LazyObjectInterface
         resetLazyObject as reset;
     }
 
-    private int $lazyObjectId;
-    private \Redis $lazyObjectReal;
-
     private const LAZY_OBJECT_PROPERTY_SCOPES = [
         'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
         "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],

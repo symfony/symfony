@@ -19,7 +19,6 @@ class LazyClass
         createLazyGhost as private;
     }
 
-    private int $lazyObjectId;
     public int $public;
 
     public function __construct(\Closure $initializer)

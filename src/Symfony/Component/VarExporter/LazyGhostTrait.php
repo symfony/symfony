@@ -15,11 +15,10 @@ use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry as Registry;
 use Symfony\Component\VarExporter\Internal\LazyObjectState;
 
-/**
- * @property int $lazyObjectId This property must be declared as private in classes using this trait
- */
 trait LazyGhostTrait
 {
+    private int $lazyObjectId;
+
     /**
      * Creates a lazy-loading ghost instance.
      *
@@ -30,6 +29,9 @@ trait LazyGhostTrait
      * properties and closures should accept 4 arguments: the instance to
      * initialize, the property to initialize, its write-scope, and its default
      * value. Each closure should return the value of the corresponding property.
+     *
+     * Properties should be indexed by their array-cast name, see
+     * https://php.net/manual/language.types.array#language.types.array.casting
      *
      * @param \Closure(static):void|array<string, \Closure(static, string, ?string, mixed):mixed> $initializer
      * @param array<string, true> $skippedProperties An array indexed by the properties to skip, aka the ones

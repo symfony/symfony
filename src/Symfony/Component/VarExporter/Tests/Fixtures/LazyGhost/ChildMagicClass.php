@@ -18,6 +18,5 @@ class ChildMagicClass extends MagicClass implements LazyObjectInterface
 {
     use LazyGhostTrait;
 
-    private int $lazyObjectId;
     private int $data = 123;
 }

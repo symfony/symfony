@@ -92,8 +92,6 @@ when accessing a property.
 class FooLazyGhost extends Foo
 {
     use LazyGhostTrait;
-
-    private int $lazyObjectId;
 }
 
 $foo = FooLazyGhost::createLazyGhost(initializer: function (Foo $instance): void {

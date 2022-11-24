@@ -16,13 +16,11 @@ use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry as Registry;
 use Symfony\Component\VarExporter\Internal\LazyObjectState;
 
-/**
- * @property int    $lazyObjectId   This property must be declared as private in classes using this trait
- * @property parent $lazyObjectReal This property must be declared as private in classes using this trait;
- *                                  its type should match the type of the proxied object
- */
 trait LazyProxyTrait
 {
+    private int $lazyObjectId;
+    private object $lazyObjectReal;
+
     /**
      * Creates a lazy-loading virtual proxy.
      *

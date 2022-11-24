@@ -45,8 +45,6 @@ class FooLazyClass_f814e3a extends \Bar\FooLazyClass implements \Symfony\Compone
 {
     use \Symfony\Component\VarExporter\LazyGhostTrait;
 
-    private int $lazyObjectId;
-
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 }
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-11-25T11:14:07Z
+
+FTR: https://ci.appveyor.com/project/fabpot/symfony/builds/45488468#L1657 (this is how it fails without the change)

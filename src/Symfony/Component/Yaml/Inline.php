@@ -77,7 +77,7 @@ class Inline
                 ++$i;
                 break;
             default:
-                $result = self::parseScalar($value, $flags, null, $i, null === $tag, $references);
+                $result = self::parseScalar($value, $flags, null, $i, true, $references);
         }
 
         // some comments are allowed at the end
@@ -639,7 +639,6 @@ class Inline
                 }
 
                 return octdec($value);
-            // Optimize for returning strings.
             case \in_array($scalar[0], ['+', '-', '.'], true) || is_numeric($scalar[0]):
                 if (Parser::preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar)) {
                     $scalar = str_replace('_', '', $scalar);

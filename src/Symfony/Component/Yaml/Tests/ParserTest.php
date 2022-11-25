@@ -54,8 +54,7 @@ class ParserTest extends TestCase
     {
         $yml = '!number 5';
         $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
-        // @todo Preserve the number, don't turn into string.
-        $expected = new TaggedValue('number', '5');
+        $expected = new TaggedValue('number', 5);
         $this->assertSameData($expected, $data);
     }
 
@@ -63,9 +62,8 @@ class ParserTest extends TestCase
     {
         $yml = '!tag null';
         $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
-        // @todo Preserve literal null, don't turn into string.
-        $expected = new TaggedValue('tag', 'null');
-        $this->assertSameData($expected, $data);
+
+        $this->assertSameData(new TaggedValue('tag', null), $data);
     }
 
     public function testTaggedValueTopLevelString()
@@ -1555,8 +1553,6 @@ EOT;
     }
 
     /**
-     * @param $lineNumber
-     * @param $yaml
      * @dataProvider parserThrowsExceptionWithCorrectLineNumberProvider
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
@@ -2310,7 +2306,7 @@ YAML
 
     public function testNonSpecificTagSupport()
     {
-        $this->assertSame('12', $this->parser->parse('! 12'));
+        $this->assertSame(12, $this->parser->parse('! 12'));
     }
 
     public function testCustomTagsDisabled()

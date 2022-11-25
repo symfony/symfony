@@ -741,6 +741,24 @@ class InlineTest extends TestCase
         $this->assertSame('', $value['foo']->getValue());
     }
 
+    public function testTagWithQuotedInteger()
+    {
+        $value = Inline::parse('!number "5"', Yaml::PARSE_CUSTOM_TAGS);
+
+        $this->assertInstanceOf(TaggedValue::class, $value);
+        $this->assertSame('number', $value->getTag());
+        $this->assertSame('5', $value->getValue());
+    }
+
+    public function testTagWithUnquotedInteger()
+    {
+        $value = Inline::parse('!number 5', Yaml::PARSE_CUSTOM_TAGS);
+
+        $this->assertInstanceOf(TaggedValue::class, $value);
+        $this->assertSame('number', $value->getTag());
+        $this->assertSame(5, $value->getValue());
+    }
+
     public function testUnfinishedInlineMap()
     {
         $this->expectException(ParseException::class);

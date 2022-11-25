@@ -7,6 +7,18 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.0-RC1 (2022-11-25)
+
+ * bug #48312 [VarExporter] Improve partial-initialization API for ghost objects (nicolas-grekas)
+ * bug #48285 [Security] Support loading UserBadge directly from accessToken (Jeroeny)
+ * bug #48262 [Notifier] [SMSBiuras] `true`/`false` mismatch for `test_mode` option (StaffNowa)
+ * bug #48273 [HttpKernel] Fix message for unresovable arguments of invokable controllers (fancyweb)
+ * bug #48251 [PropertyInfo] ignore const expressions read by phpdocumentor (xabbuh)
+ * bug #48224 [DependencyInjection] Process bindings in `ServiceLocatorTagPass` (MatTheCat)
+ * bug #48271 [WebProfilerBundle] Fix form panel when there are no view vars (nicolas-grekas)
+ * bug #48274 Add more #[\SensitiveParameter] (fancyweb)
+ * bug #48179 [Console] Support completion for bash functions (Chi-teck)
+
 * 6.2.0-BETA3 (2022-11-19)
 
  * bug #48217 [Console] Improve error message when shell is not detected in completion command (GromNaN)

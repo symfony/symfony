@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Clock;
 
+use Psr\Clock\ClockInterface as PsrClockInterface;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-interface ClockInterface
+interface ClockInterface extends PsrClockInterface
 {
-    public function now(): \DateTimeImmutable;
-
     public function sleep(float|int $seconds): void;
 
     public function withTimeZone(\DateTimeZone|string $timezone): static;

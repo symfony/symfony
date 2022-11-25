@@ -473,8 +473,6 @@ YAML;
 
 YAML;
         $this->assertSame($expected, $yaml);
-        // @todo Fix the parser, preserve numbers.
-        $data[2] = new TaggedValue('number', '5');
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -503,8 +501,6 @@ count: !number 5
 
 YAML;
         $this->assertSame($expected, $yaml);
-        // @todo Fix the parser, preserve numbers.
-        $data['count'] = new TaggedValue('number', '5');
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -558,9 +554,6 @@ foo: !bar null
 YAML;
 
         $this->assertSame($expected, $this->dumper->dump($data, 2));
-
-        // @todo Fix the parser, don't stringify null.
-        $data['foo'] = new TaggedValue('bar', 'null');
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT));
     }
 

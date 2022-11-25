@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Mailer;
@@ -22,6 +23,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
@@ -39,14 +41,16 @@ class MailerTest extends TestCase
     {
         return new class() implements MessageBusInterface {
             public $messages = [];
+            public $envelopes = [];
             public $stamps = [];
 
             public function dispatch($message, array $stamps = []): Envelope
             {
                 $this->messages[] = $message;
                 $this->stamps = $stamps;
-
-                return new Envelope($message, $stamps);
+                $envelope = new Envelope($message, $stamps);
+                $this->envelopes[] = $envelope;
+                return $envelope;
             }
         };
     }
@@ -103,7 +107,7 @@ class MailerTest extends TestCase
             ->subject('Time for Symfony Mailer!')
             ->text('Sending emails is fun again!')
             ->context([
-                'unserializable' => new \DateTimeImmutable()
+                'unserializable' => new File('/anything.jpg', false)
             ]);
 
         $mailer->send($email);
@@ -112,6 +116,10 @@ class MailerTest extends TestCase
         $templatedEmail = $bus->messages[0]->getMessage();
         self::assertInstanceOf(TemplatedEmail::class, $templatedEmail);
         self::assertSame($email, $templatedEmail);
+
+        $serializer = new PhpSerializer();
+        self::assertArrayHasKey('body', $serializer->encode($bus->envelopes[0]));
+
         self::assertSame([], $templatedEmail->getContext());
     }
 }

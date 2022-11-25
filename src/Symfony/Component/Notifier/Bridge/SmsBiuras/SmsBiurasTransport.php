@@ -85,7 +85,7 @@ final class SmsBiurasTransport extends AbstractTransport
                 'apikey' => $this->apiKey,
                 'message' => $message->getSubject(),
                 'from' => $this->from,
-                'test' => $this->testMode ? 0 : 1,
+                'test' => $this->testMode ? 1 : 0,
                 'to' => $message->getPhone(),
             ],
         ]);

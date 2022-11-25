@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Util;
 
 use phpDocumentor\Reflection\PseudoType;
+use phpDocumentor\Reflection\PseudoTypes\ConstExpression;
 use phpDocumentor\Reflection\PseudoTypes\List_;
 use phpDocumentor\Reflection\Type as DocType;
 use phpDocumentor\Reflection\Types\Array_;
@@ -42,6 +43,11 @@ final class PhpDocTypeHelper
      */
     public function getTypes(DocType $varType): array
     {
+        if ($varType instanceof ConstExpression) {
+            // It's safer to fall back to other extractors here, as resolving const types correctly is not easy at the moment
+            return [];
+        }
+
         $types = [];
         $nullable = false;
 
@@ -66,6 +72,11 @@ final class PhpDocTypeHelper
         $varTypes = [];
         for ($typeIndex = 0; $varType->has($typeIndex); ++$typeIndex) {
             $type = $varType->get($typeIndex);
+
+            if ($type instanceof ConstExpression) {
+                // It's safer to fall back to other extractors here, as resolving const types correctly is not easy at the moment
+                return [];
+            }
 
             // If null is present, all types are nullable
             if ($type instanceof Null_) {

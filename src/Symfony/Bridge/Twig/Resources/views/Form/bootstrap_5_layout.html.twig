@@ -24,7 +24,7 @@
     {%- endif -%}
 {%- endblock money_widget %}
 
-{% block date_widget -%}{{ ('http://' ~ app.request.host) | trans }}
+{% block date_widget -%}
     {%- if widget == 'single_text' -%}
         {{- block('form_widget_simple') -}}
     {%- else -%}

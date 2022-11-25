@@ -60,6 +60,8 @@ final class Mailer implements MailerInterface
         }
 
         try {
+            // Many users will have issues if they include unserializable items in their context of a TemplatedEmail
+            // Therefore to improve usability we will clear the context of this email which will have already been rendered
             if ($message instanceof TemplatedEmail) {
                 $message->context([]);
             }

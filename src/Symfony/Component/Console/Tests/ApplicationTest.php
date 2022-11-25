@@ -1945,6 +1945,10 @@ class ApplicationTest extends TestCase
      */
     public function testSetSignalsToDispatchEvent()
     {
+        if (!\defined('SIGUSR1')) {
+            $this->markTestSkipped('SIGUSR1 not available');
+        }
+
         $command = new BaseSignableCommand();
 
         $subscriber = new SignalEventSubscriber();
@@ -1977,6 +1981,10 @@ class ApplicationTest extends TestCase
 
     public function testSignalableCommandHandlerCalledAfterEventListener()
     {
+        if (!\defined('SIGUSR1')) {
+            $this->markTestSkipped('SIGUSR1 not available');
+        }
+
         $command = new SignableCommand();
 
         $subscriber = new SignalEventSubscriber();

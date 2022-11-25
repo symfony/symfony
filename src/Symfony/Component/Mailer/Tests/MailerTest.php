@@ -112,14 +112,15 @@ class MailerTest extends TestCase
 
         $mailer->send($email);
 
+        $serializer = new PhpSerializer();
+
         self::assertCount(1, $bus->messages);
+        self::assertCount(1, $bus->envelopes);
+
         $templatedEmail = $bus->messages[0]->getMessage();
         self::assertInstanceOf(TemplatedEmail::class, $templatedEmail);
         self::assertSame($email, $templatedEmail);
-
-        $serializer = new PhpSerializer();
         self::assertArrayHasKey('body', $serializer->encode($bus->envelopes[0]));
-
         self::assertSame([], $templatedEmail->getContext());
     }
 }

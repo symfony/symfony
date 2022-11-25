@@ -1981,6 +1981,10 @@ class ApplicationTest extends TestCase
 
     public function testSignalableCommandHandlerCalledAfterEventListener()
     {
+        if (!\defined('SIGUSR1')) {
+            $this->markTestSkipped('SIGUSR1 not available');
+        }
+
         $command = new SignableCommand();
 
         $subscriber = new SignalEventSubscriber();

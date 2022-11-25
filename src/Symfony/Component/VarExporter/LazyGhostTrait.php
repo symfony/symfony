@@ -29,16 +29,23 @@ trait LazyGhostTrait
      * properties and closures should accept 4 arguments: the instance to
      * initialize, the property to initialize, its write-scope, and its default
      * value. Each closure should return the value of the corresponding property.
+     * The special "\0" key can be used to define a closure that returns all
+     * properties at once when full-initialization is needed; it takes the
+     * instance and its default properties as arguments.
      *
      * Properties should be indexed by their array-cast name, see
      * https://php.net/manual/language.types.array#language.types.array.casting
      *
-     * @param \Closure(static):void|array<string, \Closure(static, string, ?string, mixed):mixed> $initializer
-     * @param array<string, true> $skippedProperties An array indexed by the properties to skip, aka the ones
-     *                                               that the initializer doesn't set when its a closure
+     * @param (\Closure(static):void
+     *        |array<string, \Closure(static, string, ?string, mixed):mixed>
+     *        |array{"\0": \Closure(static, array<string, mixed>):array<string, mixed>}) $initializer
+     * @param array<string, true>|null $skippedProperties An array indexed by the properties to skip, aka the ones
+     *                                                    that the initializer doesn't set when its a closure
      */
-    public static function createLazyGhost(\Closure|array $initializer, array $skippedProperties = [], self $instance = null): static
+    public static function createLazyGhost(\Closure|array $initializer, array $skippedProperties = null, self $instance = null): static
     {
+        $onlyProperties = null === $skippedProperties && \is_array($initializer) ? $initializer : null;
+
         if (self::class !== $class = $instance ? $instance::class : static::class) {
             $skippedProperties["\0".self::class."\0lazyObjectId"] = true;
         } elseif (\defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
@@ -48,8 +55,7 @@ trait LazyGhostTrait
         $instance ??= (Registry::$classReflectors[$class] ??= new \ReflectionClass($class))->newInstanceWithoutConstructor();
         Registry::$defaultProperties[$class] ??= (array) $instance;
         $instance->lazyObjectId = $id = spl_object_id($instance);
-        Registry::$states[$id] = new LazyObjectState($initializer, $skippedProperties);
-        $onlyProperties = \is_array($initializer) ? $initializer : null;
+        Registry::$states[$id] = new LazyObjectState($initializer, $skippedProperties ??= []);
 
         foreach (Registry::$classResetters[$class] ??= Registry::getClassResetters($class) as $reset) {
             $reset($instance, $skippedProperties, $onlyProperties);
@@ -60,8 +66,10 @@ trait LazyGhostTrait
 
     /**
      * Returns whether the object is initialized.
+     *
+     * @param $partial Whether partially initialized objects should be considered as initialized
      */
-    public function isLazyObjectInitialized(): bool
+    public function isLazyObjectInitialized(bool $partial = false): bool
     {
         if (!$state = Registry::$states[$this->lazyObjectId ?? ''] ?? null) {
             return true;
@@ -73,6 +81,11 @@ trait LazyGhostTrait
 
         $class = $this::class;
         $properties = (array) $this;
+
+        if ($partial) {
+            return (bool) array_intersect_key($state->initializer, $properties);
+        }
+
         $propertyScopes = Hydrator::$propertyScopes[$class] ??= Hydrator::getPropertyScopes($class);
         foreach ($state->initializer as $key => $initializer) {
             if (!\array_key_exists($key, $properties) && isset($propertyScopes[$key])) {
@@ -100,6 +113,8 @@ trait LazyGhostTrait
             return $this;
         }
 
+        $values = isset($state->initializer["\0"]) ? null : [];
+
         $class = $this::class;
         $properties = (array) $this;
         $propertyScopes = Hydrator::$propertyScopes[$class] ??= Hydrator::getPropertyScopes($class);
@@ -107,9 +122,25 @@ trait LazyGhostTrait
             if (\array_key_exists($key, $properties) || ![$scope, $name, $readonlyScope] = $propertyScopes[$key] ?? null) {
                 continue;
             }
+            $scope = $readonlyScope ?? ('*' !== $scope ? $scope : $class);
 
-            $state->initialize($this, $name, $readonlyScope ?? ('*' !== $scope ? $scope : null));
-            $properties = (array) $this;
+            if (null === $values) {
+                if (!\is_array($values = ($state->initializer["\0"])($this, Registry::$defaultProperties[$class]))) {
+                    throw new \TypeError(sprintf('The lazy-initializer defined for instance of "%s" must return an array, got "%s".', $class, get_debug_type($values)));
+                }
+
+                if (\array_key_exists($key, $properties = (array) $this)) {
+                    continue;
+                }
+            }
+
+            if (\array_key_exists($key, $values)) {
+                $accessor = Registry::$classAccessors[$scope] ??= Registry::getClassAccessors($scope);
+                $accessor['set']($this, $name, $properties[$key] = $values[$key]);
+            } else {
+                $state->initialize($this, $name, $scope);
+                $properties = (array) $this;
+            }
         }
 
         return $this;

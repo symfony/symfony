@@ -11,7 +11,7 @@
     {% set prepend = not (money_pattern starts with '{{') %}
     {% set append = not (money_pattern ends with '}}') %}
     {% if prepend or append %}
-        <div class="input-group{{ group_class|default('') }}">
+        <div class="input-group {{ group_class|default('') }}">
             {% if prepend %}
                 <span class="input-group-addon">{{ money_pattern|form_encode_currency }}</span>
             {% endif %}

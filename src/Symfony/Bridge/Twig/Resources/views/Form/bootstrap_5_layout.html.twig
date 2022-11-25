@@ -6,7 +6,7 @@
     {%- set prepend = not (money_pattern starts with '{{') -%}
     {%- set append = not (money_pattern ends with '}}') -%}
     {%- if prepend or append -%}
-        {<div class="input-group {{ group_class|default('') }}">
+        <div class="input-group {{ group_class|default('') }}">
             {%- if prepend -%}
                 <span class="input-group-text">{{ money_pattern|form_encode_currency }}</span>
             {%- endif -%}
@@ -62,7 +62,15 @@
         {%- if datetime is not defined or false == datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif -%}
-        {%- if label is not same as(false) -%}
+        {%- if label is not same as(false) -%}%- set inputClass = 'input-group' -%}
+10
+        {% if group_class | length > 0 %}
+11
+            {%- set inputClass = inputClass ~ ' ' ~ group_class -%}
+12
+        {% endif %}
+13
+        <div class="{{ inputClass }}">
             <div class="visually-hidden">
                 {{- form_label(form.hour) -}}
                 {%- if with_minutes -%}{{ form_label(form.minute) }}{%- endif -%}

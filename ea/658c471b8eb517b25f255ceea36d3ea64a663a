@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2022-11-25T09:22:47Z
+
+You loose no time 🕐 hahaha
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-25T09:40:51Z
+
+Shouldn't we require `psr/clock` in the root composer.json as well?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-25T09:41:43Z
+
+Is this for 6.2 or 6.3? The PR description says 6.2, but you're targeting the 6.3 branch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-25T09:44:30Z
+
+Right, target + composer.json updated.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2022-11-25T15:07:53Z
+
+1.0 is tagged! :tada: just restart the CI :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-25T15:23:22Z
+
+Rebased, ready !

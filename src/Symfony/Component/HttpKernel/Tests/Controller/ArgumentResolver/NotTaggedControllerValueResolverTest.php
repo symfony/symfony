@@ -108,6 +108,11 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
+    /**
+     * In Symfony 7, keep this test case but remove the call to supports().
+     *
+     * @group legacy
+     */
     public function testInvokableController()
     {
         $this->expectException(RuntimeException::class);

@@ -502,7 +502,13 @@ class Request
         $cookies = [];
 
         foreach ($this->cookies as $k => $v) {
-            $cookies[] = $k.'='.$v;
+            if (is_array($v)) {
+                foreach ($v as $_k => $_v) {
+                    $cookies[] = "{$k}[{$_k}]={$_v}";
+                }
+            } else {
+                $cookies[] = $k.'='.$v;
+            }
         }
 
         if (!empty($cookies)) {

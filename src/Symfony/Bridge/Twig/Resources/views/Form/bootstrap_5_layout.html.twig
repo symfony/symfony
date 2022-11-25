@@ -62,15 +62,7 @@
         {%- if datetime is not defined or false == datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif -%}
-        {%- if label is not same as(false) -%}%- set inputClass = 'input-group' -%}
-10
-        {% if group_class | length > 0 %}
-11
-            {%- set inputClass = inputClass ~ ' ' ~ group_class -%}
-12
-        {% endif %}
-13
-        <div class="{{ inputClass }}">
+        {%- if label is not same as(false) -%}
             <div class="visually-hidden">
                 {{- form_label(form.hour) -}}
                 {%- if with_minutes -%}{{ form_label(form.minute) }}{%- endif -%}

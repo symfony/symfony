@@ -93,7 +93,7 @@ class MailerTest extends TestCase
         self::assertSame([$stamp], $bus->stamps);
     }
 
-    public function testSendTemplatedEmailToBus()
+    public function testSendTemplatedEmailWithUnserializableContextToBus()
     {
         $bus = self::createDumyMailerBus();
         $stamp = $this->createMock(StampInterface::class);

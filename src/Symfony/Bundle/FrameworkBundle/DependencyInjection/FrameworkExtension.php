@@ -2587,7 +2587,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages, true) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, $parentPackages, true)) {
+        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages, true) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, $parentPackages, true) && \in_array(MercureBundle::class, $container->getParameter('kernel.bundles'), true)) {
             $container->getDefinition($classToServices[MercureTransportFactory::class])
                 ->replaceArgument('$registry', new Reference(HubRegistry::class));
         } elseif (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages, true)) {

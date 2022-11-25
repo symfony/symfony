@@ -42,8 +42,6 @@ final class TraceableValueResolver implements ArgumentValueResolverInterface, Va
             return true;
         }
 
-        @trigger_deprecation('symfony/http-kernel', '6.2', 'The "%s()" method is deprecated, use "resolve()" instead.', __METHOD__);
-
         $method = \get_class($this->inner).'::'.__FUNCTION__;
         $this->stopwatch->start($method, 'controller.argument_value_resolver');
 

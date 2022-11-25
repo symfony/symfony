@@ -214,6 +214,18 @@ class ServiceLocatorTagPassTest extends TestCase
 
         static::assertSame(['service-2', 'service-1'], array_keys($factories));
     }
+
+    public function testBindingsAreProcessed()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register('foo')
+            ->setBindings(['foo' => new ServiceLocatorArgument()]);
+
+        (new ServiceLocatorTagPass())->process($container);
+
+        $this->assertInstanceOf(Reference::class, $definition->getBindings()['foo']->getValues()[0]);
+    }
 }
 
 class Locator

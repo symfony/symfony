@@ -75,9 +75,6 @@ class Wither_94fa281 extends \Symfony\Component\DependencyInjection\Tests\Compil
 {
     use \Symfony\Component\VarExporter\LazyProxyTrait;
 
-    private int $lazyObjectId;
-    private parent $lazyObjectReal;
-
     private const LAZY_OBJECT_PROPERTY_SCOPES = [
         'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
         "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],

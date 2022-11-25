@@ -33,7 +33,7 @@ class CsrfTokenBadge implements BadgeInterface
      *                                 Using a different string for each authenticator improves its security.
      * @param string|null $csrfToken   The CSRF token presented in the request, if any
      */
-    public function __construct(string $csrfTokenId, ?string $csrfToken)
+    public function __construct(string $csrfTokenId, #[\SensitiveParameter] ?string $csrfToken)
     {
         $this->csrfTokenId = $csrfTokenId;
         $this->csrfToken = $csrfToken;

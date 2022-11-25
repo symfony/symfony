@@ -56,7 +56,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
         return (string) $session->get($this->namespace.'/'.$tokenId);
     }
 
-    public function setToken(string $tokenId, string $token)
+    public function setToken(string $tokenId, #[\SensitiveParameter] string $token)
     {
         $session = $this->getSession();
         if (!$session->isStarted()) {

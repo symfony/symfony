@@ -108,6 +108,22 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
+    /**
+     * In Symfony 7, keep this test case but remove the call to supports().
+     *
+     * @group legacy
+     */
+    public function testInvokableController()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::__invoke()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
+        $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
+        $request = $this->requestWithAttributes(['_controller' => 'App\Controller\Mine']);
+        $this->assertTrue($resolver->supports($request, $argument));
+        $resolver->resolve($request, $argument);
+    }
+
     private function requestWithAttributes(array $attributes)
     {
         $request = Request::create('/');

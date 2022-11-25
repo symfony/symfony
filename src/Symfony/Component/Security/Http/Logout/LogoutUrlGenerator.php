@@ -151,6 +151,10 @@ class LogoutUrlGenerator
             }
         }
 
-        throw new \InvalidArgumentException('Unable to find the current firewall LogoutListener, please provide the provider key manually.');
+        if (null === $this->currentFirewallName) {
+            throw new \InvalidArgumentException('This request is not behind a firewall, pass the firewall name manually to generate a logout URL.');
+        }
+
+        throw new \InvalidArgumentException('Unable to find logout in the current firewall, pass the firewall name manually to generate a logout URL.');
     }
 }

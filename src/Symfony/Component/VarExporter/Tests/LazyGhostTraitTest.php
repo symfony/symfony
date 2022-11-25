@@ -248,7 +248,8 @@ class LazyGhostTraitTest extends TestCase
         $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(123, $instance->public);
         $this->assertFalse($instance->isLazyObjectInitialized());
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId", 'public'], array_keys((array) $instance));
+        $this->assertTrue($instance->isLazyObjectInitialized(true));
+        $this->assertSame(['public', "\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
         $this->assertSame(1, $counter);
 
         $instance->initializeLazyObject();
@@ -329,5 +330,90 @@ class LazyGhostTraitTest extends TestCase
         $r = new \ReflectionProperty($obj, 'private');
 
         $this->assertSame(-3, $r->getValue($obj));
+    }
+
+    public function testFullPartialInitialization()
+    {
+        $counter = 0;
+        $initializer = static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
+            return 234;
+        };
+        $instance = ChildTestClass::createLazyGhost([
+            'public' => $initializer,
+            'publicReadonly' => $initializer,
+            "\0*\0protected" => $initializer,
+            "\0" => function ($obj, $defaults) use (&$instance, &$counter) {
+                $counter += 1000;
+                $this->assertSame($instance, $obj);
+
+                return [
+                    'public' => 345,
+                    'publicReadonly' => 456,
+                    "\0*\0protected" => 567,
+                ] + $defaults;
+            },
+        ]);
+
+        $this->assertSame($instance, $instance->initializeLazyObject());
+        $this->assertSame(345, $instance->public);
+        $this->assertSame(456, $instance->publicReadonly);
+        $this->assertSame(6, ((array) $instance)["\0".ChildTestClass::class."\0private"]);
+        $this->assertSame(3, ((array) $instance)["\0".TestClass::class."\0private"]);
+        $this->assertSame(1000, $counter);
+    }
+
+    public function testPartialInitializationFallback()
+    {
+        $counter = 0;
+        $instance = ChildTestClass::createLazyGhost([
+            "\0" => function ($obj) use (&$instance, &$counter) {
+                $counter += 1000;
+                $this->assertSame($instance, $obj);
+
+                return [
+                    'public' => 345,
+                    'publicReadonly' => 456,
+                    "\0*\0protected" => 567,
+                ];
+            },
+        ], []);
+
+        $this->assertSame(345, $instance->public);
+        $this->assertSame(456, $instance->publicReadonly);
+        $this->assertSame(567, ((array) $instance)["\0*\0protected"]);
+        $this->assertSame(1000, $counter);
+    }
+
+    public function testFullInitializationAfterPartialInitialization()
+    {
+        $counter = 0;
+        $initializer = static function (ChildTestClass $instance, string $property, ?string $scope, mixed $default) use (&$counter) {
+            ++$counter;
+
+            return 234;
+        };
+        $instance = ChildTestClass::createLazyGhost([
+            'public' => $initializer,
+            'publicReadonly' => $initializer,
+            "\0*\0protected" => $initializer,
+            "\0" => function ($obj, $defaults) use (&$instance, &$counter) {
+                $counter += 1000;
+                $this->assertSame($instance, $obj);
+
+                return [
+                    'public' => 345,
+                    'publicReadonly' => 456,
+                    "\0*\0protected" => 567,
+                ] + $defaults;
+            },
+        ]);
+
+        $this->assertSame(234, $instance->public);
+        $this->assertSame($instance, $instance->initializeLazyObject());
+        $this->assertSame(234, $instance->public);
+        $this->assertSame(456, $instance->publicReadonly);
+        $this->assertSame(6, ((array) $instance)["\0".ChildTestClass::class."\0private"]);
+        $this->assertSame(3, ((array) $instance)["\0".TestClass::class."\0private"]);
+        $this->assertSame(1001, $counter);
     }
 }

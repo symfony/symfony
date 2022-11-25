@@ -13,15 +13,16 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 class InMemoryAccessTokenHandler implements AccessTokenHandlerInterface
 {
     /**
-     * @var array<string, string>
+     * @var array<string, UserBadge>
      */
     private $accessTokens = [];
 
-    public function getUserIdentifierFrom(string $accessToken): string
+    public function getUserBadgeFrom(string $accessToken): UserBadge
     {
         if (!\array_key_exists($accessToken, $this->accessTokens)) {
             throw new BadCredentialsException('Invalid access token or invalid user.');
@@ -37,7 +38,7 @@ class InMemoryAccessTokenHandler implements AccessTokenHandlerInterface
         return $this;
     }
 
-    public function add(string $accessToken, string $user): self
+    public function add(string $accessToken, UserBadge $user): self
     {
         $this->accessTokens[$accessToken] = $user;
 

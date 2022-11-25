@@ -26,9 +26,9 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authenticator.access_token', AccessTokenAuthenticator::class)
             ->abstract()
             ->args([
-                abstract_arg('user provider'),
                 abstract_arg('access token handler'),
                 abstract_arg('access token extractor'),
+                null,
                 null,
                 null,
                 null,

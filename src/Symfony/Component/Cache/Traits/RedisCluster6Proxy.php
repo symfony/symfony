@@ -29,9 +29,6 @@ class RedisCluster6Proxy extends \RedisCluster implements ResetInterface, LazyOb
         resetLazyObject as reset;
     }
 
-    private int $lazyObjectId;
-    private \RedisCluster $lazyObjectReal;
-
     private const LAZY_OBJECT_PROPERTY_SCOPES = [
         'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
         "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],

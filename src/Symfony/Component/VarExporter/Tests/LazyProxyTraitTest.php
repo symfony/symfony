@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\FinalPublicClass;
@@ -237,9 +238,9 @@ class LazyProxyTraitTest extends TestCase
      */
     public function testReadOnlyClass()
     {
-        $proxy = $this->createLazyProxy(ReadOnlyClass::class, fn () => new ReadOnlyClass(123));
-
-        $this->assertSame(123, $proxy->foo);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot generate lazy proxy: class "Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\ReadOnlyClass" is read-only.');
+        $this->createLazyProxy(ReadOnlyClass::class, fn () => new ReadOnlyClass(123));
     }
 
     public function testLazyDecoratorClass()
@@ -248,9 +249,6 @@ class LazyProxyTraitTest extends TestCase
             use LazyProxyTrait {
                 createLazyProxy as private;
             }
-
-            private int $lazyObjectId;
-            private parent $lazyObjectReal;
 
             public function __construct()
             {

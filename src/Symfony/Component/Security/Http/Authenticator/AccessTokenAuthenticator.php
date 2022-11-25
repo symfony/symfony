@@ -21,7 +21,6 @@ use Symfony\Component\Security\Http\AccessToken\AccessTokenExtractorInterface;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
@@ -38,9 +37,9 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
     private ?TranslatorInterface $translator = null;
 
     public function __construct(
-        private readonly UserProviderInterface $userProvider,
         private readonly AccessTokenHandlerInterface $accessTokenHandler,
         private readonly AccessTokenExtractorInterface $accessTokenExtractor,
+        private readonly ?UserProviderInterface $userProvider = null,
         private readonly ?AuthenticationSuccessHandlerInterface $successHandler = null,
         private readonly ?AuthenticationFailureHandlerInterface $failureHandler = null,
         private readonly ?string $realm = null,
@@ -58,11 +57,13 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
         if (!$accessToken) {
             throw new BadCredentialsException('Invalid credentials.');
         }
-        $userIdentifier = $this->accessTokenHandler->getUserIdentifierFrom($accessToken);
 
-        return new SelfValidatingPassport(
-            new UserBadge($userIdentifier, $this->userProvider->loadUserByIdentifier(...))
-        );
+        $userBadge = $this->accessTokenHandler->getUserBadgeFrom($accessToken);
+        if (null === $userBadge->getUserLoader() && $this->userProvider) {
+            $userBadge->setUserLoader($this->userProvider->loadUserByIdentifier(...));
+        }
+
+        return new SelfValidatingPassport($userBadge);
     }
 
     public function createToken(Passport $passport, string $firewallName): TokenInterface

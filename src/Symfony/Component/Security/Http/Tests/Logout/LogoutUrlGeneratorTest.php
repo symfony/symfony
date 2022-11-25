@@ -88,11 +88,21 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    public function testUnableToGuessThrowsException()
+    public function testUnableToGuessWithoutCurrentFirewallThrowsException()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to find the current firewall LogoutListener, please provide the provider key manually');
+        $this->expectExceptionMessage('This request is not behind a firewall, pass the firewall name manually to generate a logout URL.');
         $this->generator->registerListener('secured_area', '/logout', null, null);
+
+        $this->generator->getLogoutPath();
+    }
+
+    public function testUnableToGuessWithCurrentFirewallThrowsException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to find logout in the current firewall, pass the firewall name manually to generate a logout URL.');
+        $this->generator->registerListener('secured_area', '/logout', null, null);
+        $this->generator->setCurrentFirewall('admin');
 
         $this->generator->getLogoutPath();
     }

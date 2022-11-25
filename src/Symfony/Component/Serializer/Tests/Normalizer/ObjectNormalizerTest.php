@@ -740,7 +740,7 @@ class ObjectNormalizerTest extends TestCase
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
         $this->assertSame('bar', $serializer->denormalize(['foo' => 'bar'], \get_class(new class() {
-            /** @var self::*|null */
+            /** @var self::*|?string */
             public $foo;
         }))->foo);
     }

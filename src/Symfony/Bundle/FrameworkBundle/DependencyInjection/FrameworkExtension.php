@@ -20,6 +20,7 @@ use phpDocumentor\Reflection\Types\ContextFactory;
 use PhpParser\Parser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Clock\ClockInterface as PsrClockInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -277,6 +278,7 @@ class FrameworkExtension extends Extension
         if (!ContainerBuilder::willBeAvailable('symfony/clock', ClockInterface::class, ['symfony/framework-bundle'])) {
             $container->removeDefinition('clock');
             $container->removeAlias(ClockInterface::class);
+            $container->removeAlias(PsrClockInterface::class);
         }
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);

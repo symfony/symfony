@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-21T17:22:05Z
+
+It'd be great fixing the "Remaining indirect deprecation" before merging.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-23T12:48:56Z
+
+I thought I had done that. I'll check again.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-25T19:03:18Z
+
+PR is ready. The remaining failures look unrelated to me.

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add a `placeholder_attr` option to `ChoiceType`
+
 6.2
 ---
 

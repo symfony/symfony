@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-26T11:56:15Z
+
+~Hmm, I'm a bit confused why the testsuite now shows the deprecations whereas it doesn't on 6.2...~
+
+Nvm, `PhpParser\Parser` is an interface :facepalm:

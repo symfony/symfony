@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-26T14:05:47Z
+
+Can you please give more insights about what's causing the bug at hand (e.g. which PR introduced it and why)?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-26T14:06:47Z
+
+Introducing deprecations is preferably avoided at this stage, we need a strong reason for doing so.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-11-26T14:15:48Z
+
+The issue stems from the token **manager** service ID configuration node being called <code>csrf_token_**generator**</code>. As such it has been wrongly assumed in #46580 (and in [the blog post](https://symfony.com/blog/new-in-symfony-6-2-security-improvements-part-2#simpler-logout-csrf-protection)) `security.csrf.token_generator` was a correct value, whereas `security.csrf.token_manager` should be used (this is reflected by [the documentation](https://symfony.com/doc/current/reference/configuration/security.html#csrf-token-generator)).
+
+> Introducing deprecations is preferably avoided at this stage, we need a strong reason for doing so.
+
+Okay so changing the default value only should be good. Do you think the configuration could be renamed on `6.3`?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-26T14:58:37Z
+
+Thank you. I'll let @wouterj answer your questions as I didn't follow this change.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-26T15:11:03Z
+
+This config option has been there since Symfony 2.4 (https://github.com/symfony/symfony/pull/9587), so this is not something we should rush for 6.2 imho.
+
+Also, this does not seem to be related to #48339 to me, as the issue talks about an error between 6.2.0-beta3 and 6.2.0-rc1. Nothing changed in relation to this config option between those releases.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-11-26T15:20:33Z
+
+> this is not something we should rush for 6.2 imho
+
+Okay, I’ll update this PR to only change the default value.
+
+> the issue talks about an error between 6.2.0-beta3 and 6.2.0-rc1. Nothing changed in relation to this config option between those releases.
+
+Indeed, but I was able to reproduce the issue against `6.2.0-BETA1` and the error really comes from the `csrf_token_generator` value set to `security.csrf.token_generator` when `enable_csrf` is true.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-11-26T16:07:53Z
+
+Yeah sorry I tend to do many things at once in my PRs :grimacing:
+
+Would a deprecation be ok for `6.3`?

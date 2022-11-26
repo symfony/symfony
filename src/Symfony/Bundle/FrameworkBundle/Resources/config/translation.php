@@ -153,6 +153,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('translation.dumper', ['alias' => 'res'])
 
         ->set('translation.extractor.php', PhpExtractor::class)
+            ->deprecate('symfony/framework-bundle', '6.2', 'The "%service_id%" service is deprecated, use "translation.extractor.php_ast" instead.')
             ->tag('translation.extractor', ['alias' => 'php'])
 
         ->set('translation.extractor.php_ast', PhpAstExtractor::class)

@@ -1306,9 +1306,8 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('translation.locale_switcher');
         }
 
-        if (ContainerBuilder::willBeAvailable('nikic/php-parser', Parser::class, ['symfony/translation'])
-            && ContainerBuilder::willBeAvailable('symfony/translation', PhpAstExtractor::class, ['symfony/framework-bundle'])
-        ) {
+        // don't use ContainerBuilder::willBeAvailable() as these are not needed in production
+        if (interface_exists(Parser::class) && class_exists(PhpAstExtractor::class)) {
             $container->removeDefinition('translation.extractor.php');
         } else {
             $container->removeDefinition('translation.extractor.php_ast');

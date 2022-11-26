@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Deprecate enabling bundle and not configuring it
+
 6.2
 ---
 

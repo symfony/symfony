@@ -69,6 +69,19 @@ class LogoutTest extends AbstractWebTestCase
         $this->assertNull($cookieJar->get('flavor'));
     }
 
+    public function testEnabledCsrf()
+    {
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_csrf_enabled.yml']);
+
+        $cookieJar = $client->getCookieJar();
+        $cookieJar->set(new Cookie('flavor', 'chocolate', strtotime('+1 day'), null, 'somedomain'));
+
+        $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
+        $client->request('GET', '/logout');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
     private function callInRequestContext(KernelBrowser $client, callable $callable): void
     {
         /** @var EventDispatcherInterface $eventDispatcher */

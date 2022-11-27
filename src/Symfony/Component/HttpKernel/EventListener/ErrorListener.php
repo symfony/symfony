@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\HttpStatus;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -70,6 +71,20 @@ class ErrorListener implements EventSubscriberInterface
                 $event->setThrowable($throwable);
             }
             break;
+        }
+
+        // There's no specific status code defined in the configuration for this exception
+        if (!$throwable instanceof HttpExceptionInterface) {
+            $class = new \ReflectionClass($throwable);
+            $attributes = $class->getAttributes(HttpStatus::class, \ReflectionAttribute::IS_INSTANCEOF);
+
+            if ($attributes) {
+                /** @var HttpStatus $instance */
+                $instance = $attributes[0]->newInstance();
+
+                $throwable = new HttpException($instance->statusCode, $throwable->getMessage(), $throwable, $instance->headers);
+                $event->setThrowable($throwable);
+            }
         }
 
         $e = FlattenException::createFromThrowable($throwable);

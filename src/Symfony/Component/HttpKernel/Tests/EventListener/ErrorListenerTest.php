@@ -17,6 +17,7 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\HttpStatus;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -115,6 +116,36 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals(0, $logger->countErrors());
         $this->assertCount(0, $logger->getLogs('critical'));
         $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
+    /**
+     * @dataProvider exceptionWithAttributeProvider
+     */
+    public function testHandleHttpAttribute(\Throwable $exception, int $expectedStatusCode, array $expectedHeaders)
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
+        $l = new ErrorListener('not used');
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', $expectedStatusCode, $expectedHeaders), $event->getResponse());
+    }
+
+    public function testHandleCustomConfigurationAndHttpAttribute()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WithGeneralAttribute());
+        $l = new ErrorListener('not used', null, false, [
+            WithGeneralAttribute::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', 401), $event->getResponse());
     }
 
     public function provider()
@@ -216,6 +247,12 @@ class ErrorListenerTest extends TestCase
             return new Response('OK: '.$exception->getMessage());
         }];
     }
+
+    public static function exceptionWithAttributeProvider()
+    {
+        yield [new WithCustomUserProvidedAttribute(), 208, ['name' => 'value']];
+        yield [new WithGeneralAttribute(), 412, ['some' => 'thing']];
+    }
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface
@@ -245,4 +282,33 @@ class TestKernelThatThrowsException implements HttpKernelInterface
     {
         throw new \RuntimeException('bar');
     }
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class UserProvidedHttpStatusCodeAttribute extends HttpStatus
+{
+    public function __construct(array $headers = [])
+    {
+        parent::__construct(
+            Response::HTTP_ALREADY_REPORTED,
+            $headers
+        );
+    }
+}
+
+#[UserProvidedHttpStatusCodeAttribute(headers: [
+    'name' => 'value',
+])]
+class WithCustomUserProvidedAttribute extends \Exception
+{
+}
+
+#[HttpStatus(
+    statusCode: Response::HTTP_PRECONDITION_FAILED,
+    headers: [
+        'some' => 'thing',
+    ]
+)]
+class WithGeneralAttribute extends \Exception
+{
 }

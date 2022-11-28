@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ImportMaps\ImportMapManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Yaml\Yaml;
@@ -131,6 +132,10 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('serializer')) {
             $container->getDefinition('twig.runtime.serializer')->addTag('twig.runtime');
             $container->getDefinition('twig.extension.serializer')->addTag('twig.extension');
+        }
+
+        if (!ContainerBuilder::willBeAvailable('symfony/import-maps', ImportMapManager::class, ['symfony/twig-bundle'])) {
+            $container->removeDefinition('twig.extension.import_maps');
         }
     }
 }

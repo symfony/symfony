@@ -23,6 +23,7 @@ use Symfony\Bridge\Twig\Extension\HtmlSanitizerExtension;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
+use Symfony\Bridge\Twig\Extension\ImportMapsExtension;
 use Symfony\Bridge\Twig\Extension\ProfilerExtension;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Bridge\Twig\Extension\SerializerExtension;
@@ -36,6 +37,7 @@ use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator;
 use Symfony\Bundle\TwigBundle\TemplateIterator;
+use Symfony\Component\ImportMaps\ImportMapManager;
 use Twig\Cache\FilesystemCache;
 use Twig\Environment;
 use Twig\Extension\CoreExtension;
@@ -176,5 +178,10 @@ return static function (ContainerConfigurator $container) {
         ->set('controller.template_attribute_listener', TemplateAttributeListener::class)
             ->args([service('twig')])
             ->tag('kernel.event_subscriber')
+
+        ->set('twig.extension.import_maps', ImportMapsExtension::class)
+            ->args([service(ImportMapManager::class)])
+            ->tag('twig.extension')
+
     ;
 };

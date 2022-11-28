@@ -1,0 +1,19 @@
+<!doctype html>
+<head>
+    {{ importmap() }}
+    <script src="/js/application.js" type="module"></script>
+</head>
+<body>
+<h1>Hello</h1>
+
+<div data-controller="hello">
+    <input data-hello-target="name" type="text">
+
+    <button data-action="click->hello#greet">
+        Greet
+    </button>
+
+    <span data-hello-target="output">
+  </span>
+</div>
+</body>

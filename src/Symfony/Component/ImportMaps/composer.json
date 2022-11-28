@@ -1,0 +1,44 @@
+{
+    "name": "symfony/import-maps",
+    "type": "library",
+    "description": "How to control the behavior of JavaScript imports",
+    "keywords": [
+        "import-maps",
+        "javascript",
+        "esm",
+        "jspm"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.dev"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\ImportMaps\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "require": {
+        "php": ">=8.1",
+        "symfony/console": "^6.1",
+        "symfony/filesystem": "^6.1",
+        "symfony/http-client": "^6.1",
+        "symfony/var-exporter": "^6.1"
+    },
+    "require-dev": {
+        "symfony/framework-bundle": "^6.1",
+        "symfony/twig-bundle": "^6.1",
+        "symfony/web-profiler-bundle": "^6.1",
+        "symfony/debug-bundle": "^6.1",
+        "symfony/asset": "^6.1"
+    },
+    "minimum-stability": "dev"
+}

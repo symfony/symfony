@@ -93,6 +93,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\ImportMaps\ImportMapManager;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -543,6 +544,10 @@ class FrameworkExtension extends Extension
 
         if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
             $loader->load('mime_type.php');
+        }
+
+        if (ContainerBuilder::willBeAvailable('symfony/import-maps', ImportMapManager::class, ['symfony/framework-bundle'])) {
+            $loader->load('import_maps.php');
         }
 
         $container->registerForAutoconfiguration(PackageInterface::class)

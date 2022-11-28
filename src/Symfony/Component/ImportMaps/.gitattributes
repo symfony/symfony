@@ -1,0 +1,8 @@
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.symfony.bundle.yaml export-ignore
+/phpunit.xml.dist export-ignore
+/phpstan.neon.dist export-ignore
+/assets/test export-ignore
+/assets/jest.config.js export-ignore
+/tests export-ignore

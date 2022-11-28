@@ -7,6 +7,22 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.49 (2022-11-28)
+
+ * bug #48273 [HttpKernel] Fix message for unresovable arguments of invokable controllers (fancyweb)
+ * bug #48224 [DependencyInjection] Process bindings in `ServiceLocatorTagPass` (MatTheCat)
+ * bug #48198 [Messenger] Fix time-limit check exception (alamirault)
+ * bug #48122 [PhpUnitBridge] Fix language deprecations incorrectly marked as direct (wouterj)
+ * bug #48085 [Messenger] Tell about messenger:consume invalid limit options (MatTheCat)
+ * bug #48120 [Messenger] Do not throw 'no handlers' exception when skipping handlers due to duplicate handling (wouterj)
+ * bug #48112 [HttpFoundation] Compare cookie with null value as empty string in ResponseCookieValueSame (fancyweb)
+ * bug #48119 [FrameworkBundle][Lock] Allow to disable lock without defining a resource (MatTheCat)
+ * bug #48093 [DependencyInjection] don't move locator tag for service subscriber (RobertMe)
+ * bug #48075 [Mailer] Stream timeout not detected fgets returns false (Sezil)
+ * bug #48092 Fix the notification email theme for asynchronously dispatched emails (krisbuist)
+ * bug #48103 [HttpClient] Do not set http_version instead of setting it to null (Tetragramat)
+ * bug #48050 [HttpFoundation] Check IPv6 is valid before comparing it (PhilETaylor)
+
 * 4.4.48 (2022-10-28)
 
  * bug #47907 [Console] Update Application.php (aleksandr-shevchenko)

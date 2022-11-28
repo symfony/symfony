@@ -7,6 +7,35 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.16 (2022-11-28)
+
+ * bug #48333 [Yaml] parse unquoted digits in tag values as integers (xabbuh)
+ * bug #48330 [FrameworkBundle] do not wire the MercureTransportFactory if the MercureBundle is not enabled (xabbuh)
+ * bug #48262 [Notifier] [SMSBiuras] `true`/`false` mismatch for `test_mode` option (StaffNowa)
+ * bug #48273 [HttpKernel] Fix message for unresovable arguments of invokable controllers (fancyweb)
+ * bug #48251 [PropertyInfo] ignore const expressions read by phpdocumentor (xabbuh)
+ * bug #48224 [DependencyInjection] Process bindings in `ServiceLocatorTagPass` (MatTheCat)
+ * bug #48179 [Console] Support completion for bash functions (Chi-teck)
+ * bug #48217 [Console] Improve error message when shell is not detected in completion command (GromNaN)
+ * bug #48222 [Translation] [Lokalize] Configure `replace_breaks` to prevent issues with multilines translations (Kocal)
+ * bug #48210 [Console]  Fix signal handlers called after event listeners and skip exit (GromNaN)
+ * bug #48198 [Messenger] Fix time-limit check exception (alamirault)
+ * bug #48122 [PhpUnitBridge] Fix language deprecations incorrectly marked as direct (wouterj)
+ * bug #47998 [Console] Fix console `ProgressBar::override()` after manual `ProgressBar::cleanup()` (maxbeckers)
+ * bug #48173 [HttpClient] Handle Amp HTTP client v5 incompatibility gracefully (fancyweb)
+ * bug #48172 [HttpKernel] Don’t try to wire Response argument with controller.service_arguments (MatTheCat)
+ * bug #48085 [Messenger] Tell about messenger:consume invalid limit options (MatTheCat)
+ * bug #48120 [Messenger] Do not throw 'no handlers' exception when skipping handlers due to duplicate handling (wouterj)
+ * bug #48112 [HttpFoundation] Compare cookie with null value as empty string in ResponseCookieValueSame (fancyweb)
+ * bug #48119 [FrameworkBundle][Lock] Allow to disable lock without defining a resource (MatTheCat)
+ * bug #48093 [DependencyInjection] don't move locator tag for service subscriber (RobertMe)
+ * bug #48075 [Mailer] Stream timeout not detected fgets returns false (Sezil)
+ * bug #48092 Fix the notification email theme for asynchronously dispatched emails (krisbuist)
+ * bug #48097 Fix search scope when performing fallback mapping driver detection (spideyfusion)
+ * bug #48103 [HttpClient] Do not set http_version instead of setting it to null (Tetragramat)
+ * bug #48027 [DependencyInjection] Don't autoconfigure tag when it's already set with attributes (nicolas-grekas)
+ * bug #48050 [HttpFoundation] Check IPv6 is valid before comparing it (PhilETaylor)
+
 * 5.4.15 (2022-10-28)
 
  * bug #47990 [HttpClient] Fix retrying requests when the content is used by the strategy (nicolas-grekas)

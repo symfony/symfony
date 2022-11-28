@@ -49,7 +49,7 @@ class VarDumper
     public static function setHandler(callable $callable = null): ?callable
     {
         if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/va-dumper', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+            trigger_deprecation('symfony/var-dumper', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
         }
         $prevHandler = self::$handler;
 

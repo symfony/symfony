@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-27T12:32:39Z
+
+> I'm not sure about the test part, I think I'd prefer not have it but I can't argue why :grimacing:
+
+Yeah, same. It doesn't feel very idiomatic Symfony to "force" something like this depending on the test mode. But on the other hand, I would like to argue that this is the only feature of the Clock component/service. Using this service implies you want to fix testability of your time-based logic and as such, I'm thinking this is sort of opt-in when deciding using the clock service?
+
+Anyway, we have to think about the practical side of the clock service and answer two questions before 6.2.0 stable (as that's our last chance to freely change behavior of this service):
+1. Do we want people to use `MockClock` in integration/application tests, or do we want to only recommend this in unit tests?
+2. If we want to, how would anyone use `MockClock` in integration tests of an application while using the `clock` service?
+
+If the answer of (1) is only unit tests, we can forget about this change and always use `NativeClock` in the service container.
+If we need to answer (2), I would say the current way is using a compiler pass - which isn't that great of a DX for application developers.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-27T16:54:15Z
+
+I tend to think we'd better only document the testing part for now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-27T17:10:56Z
+
+MockClock for unit testing LGTM. For integration, ppl can redefine the clock service under `when@test`, no need for a compiler pass, isn't it? They could also call `self::getContainer()->set()` if I'm not wrong (although @lyrixx has [a case](https://github.com/lyrixx/test/commit/f1c2344d169048a652ded03d5287c9aff01d00ec) where this doesn't work as smoothly as we might want?)

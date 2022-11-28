@@ -85,7 +85,7 @@ class CovertTest extends TestCase
             $this->assertEquals((array) $request->getParsedBody(), (array) $finalRequest->getParsedBody());
             $this->assertEquals($request->getQueryParams(), $finalRequest->getQueryParams());
             // PSR7 does not define a "withServerParams" so this is impossible to implement without knowing the PSR7 implementation.
-            //$this->assertEquals($request->getServerParams(), $finalRequest->getServerParams());
+            // $this->assertEquals($request->getServerParams(), $finalRequest->getServerParams());
             $this->assertEquals($request->getUploadedFiles(), $finalRequest->getUploadedFiles());
             $this->assertEquals($request->getMethod(), $finalRequest->getMethod());
             $this->assertEquals($request->getRequestTarget(), $finalRequest->getRequestTarget());

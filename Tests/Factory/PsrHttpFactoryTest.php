@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 
-use PHPUnit\Framework\TestCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;

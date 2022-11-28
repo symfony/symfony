@@ -20,6 +20,7 @@ use phpDocumentor\Reflection\Types\ContextFactory;
 use PhpParser\Parser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Clock\ClockInterface as PsrClockInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -277,6 +278,7 @@ class FrameworkExtension extends Extension
         if (!ContainerBuilder::willBeAvailable('symfony/clock', ClockInterface::class, ['symfony/framework-bundle'])) {
             $container->removeDefinition('clock');
             $container->removeAlias(ClockInterface::class);
+            $container->removeAlias(PsrClockInterface::class);
         }
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
@@ -1306,9 +1308,8 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('translation.locale_switcher');
         }
 
-        if (ContainerBuilder::willBeAvailable('nikic/php-parser', Parser::class, ['symfony/translation'])
-            && ContainerBuilder::willBeAvailable('symfony/translation', PhpAstExtractor::class, ['symfony/framework-bundle'])
-        ) {
+        // don't use ContainerBuilder::willBeAvailable() as these are not needed in production
+        if (interface_exists(Parser::class) && class_exists(PhpAstExtractor::class)) {
             $container->removeDefinition('translation.extractor.php');
         } else {
             $container->removeDefinition('translation.extractor.php_ast');

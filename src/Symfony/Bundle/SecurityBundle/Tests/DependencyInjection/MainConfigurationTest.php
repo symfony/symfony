@@ -122,7 +122,7 @@ class MainConfigurationTest extends TestCase
 
         $assertions = [
             'custom_token_generator' => [true, 'a_token_generator'],
-            'default_token_generator' => [true, 'security.csrf.token_generator'],
+            'default_token_generator' => [true, 'security.csrf.token_manager'],
             'disabled_csrf' => [false, null],
             'empty' => [false, null],
         ];

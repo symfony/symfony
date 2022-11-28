@@ -222,7 +222,7 @@ class MainConfiguration implements ConfigurationInterface
                         if (isset($v['csrf_token_generator'])) {
                             $v['enable_csrf'] = true;
                         } elseif ($v['enable_csrf']) {
-                            $v['csrf_token_generator'] = 'security.csrf.token_generator';
+                            $v['csrf_token_generator'] = 'security.csrf.token_manager';
                         }
 
                         return $v;

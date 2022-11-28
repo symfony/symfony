@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SerializerComponentInterface;
 
 class SerializerTest extends TestCase
@@ -228,6 +229,36 @@ class SerializerTest extends TestCase
                 'type' => DummyMessage::class,
                 'X-Message-Stamp-'.SerializerStamp::class => '[{}]',
             ],
+        ]);
+    }
+
+    public function testDecodingFailedInCustomNormalizer()
+    {
+        $serializer = new Serializer(
+            new SymfonySerializer(
+                [
+                    new class() implements SerializerComponent\Normalizer\DenormalizerInterface {
+                        public function denormalize($data, $type, string $format = null, array $context = [])
+                        {
+                            throw new \Exception('Error in custom denormalizer.');
+                        }
+
+                        public function supportsDenormalization($data, $type, string $format = null)
+                        {
+                            return true;
+                        }
+                    },
+                ],
+                [new SerializerComponent\Encoder\JsonEncoder()]
+            )
+        );
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage('Could not decode message: Error in custom denormalizer.');
+
+        $serializer->decode([
+            'body' => '{}',
+            'headers' => ['type' => \stdClass::class],
         ]);
     }
 }

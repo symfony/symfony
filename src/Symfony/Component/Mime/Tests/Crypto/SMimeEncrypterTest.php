@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Message;
 /**
  * @requires extension openssl
  */
-class SMimeEncryptorTest extends SMimeTestCase
+class SMimeEncrypterTest extends SMimeTestCase
 {
     public function testEncryptMessage()
     {

@@ -7,6 +7,15 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.0-RC2 (2022-11-28)
+
+ * bug #48366 [Mailer] Fix body renderer check (fabpot)
+ * bug #48347 [Clock] Autowire PSR interface (wouterj)
+ * bug #48341 [SecurityBundle] Fix `logout.csrf_token_generator` default value (MatTheCat)
+ * bug #48333 [Yaml] parse unquoted digits in tag values as integers (xabbuh)
+ * bug #48330 [FrameworkBundle] do not wire the MercureTransportFactory if the MercureBundle is not enabled (xabbuh)
+ * bug #48320 [Clock] Implement PSR-20 (nicolas-grekas)
+
 * 6.2.0-RC1 (2022-11-25)
 
  * bug #48312 [VarExporter] Improve partial-initialization API for ghost objects (nicolas-grekas)

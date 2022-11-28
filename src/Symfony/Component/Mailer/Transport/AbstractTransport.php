@@ -14,12 +14,15 @@ namespace Symfony\Component\Mailer\Transport;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\FailedMessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\SentMessageEvent;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\RawMessage;
 
 /**
@@ -72,6 +75,10 @@ abstract class AbstractTransport implements TransportInterface
             $this->dispatcher->dispatch($event);
             $envelope = $event->getEnvelope();
             $message = $event->getMessage();
+
+            if ($message instanceof TemplatedEmail && ($message->getTextTemplate() || $message->getHtmlTemplate())) {
+                throw new LogicException(sprintf('You must configure a "%s" when a "%s" instance has a text or HTML template set.', BodyRendererInterface::class, get_debug_type($message)));
+            }
 
             $sentMessage = new SentMessage($message, $envelope);
 

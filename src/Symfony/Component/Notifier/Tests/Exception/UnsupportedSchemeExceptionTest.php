@@ -177,6 +177,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['spothit', 'symfony/spot-hit-notifier'];
         yield ['telegram', 'symfony/telegram-notifier'];
         yield ['telnyx', 'symfony/telnyx-notifier'];
+        yield ['termii', 'symfony/termii-notifier'];
         yield ['turbosms', 'symfony/turbo-sms-notifier'];
         yield ['twilio', 'symfony/twilio-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];

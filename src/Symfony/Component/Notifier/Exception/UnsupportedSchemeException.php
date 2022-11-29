@@ -196,6 +196,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Telnyx\TelnyxTransportFactory::class,
             'package' => 'symfony/telnyx-notifier',
         ],
+        'termii' => [
+            'class' => Bridge\Termii\TermiiTransportFactory::class,
+            'package' => 'symfony/termii-notifier',
+        ],
         'turbosms' => [
             'class' => Bridge\TurboSms\TurboSmsTransportFactory::class,
             'package' => 'symfony/turbo-sms-notifier',

@@ -45,6 +45,7 @@ use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
+use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
@@ -304,6 +305,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.ring-central', RingCentralTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.plivo', PlivoTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

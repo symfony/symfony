@@ -144,6 +144,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',
         ],
+        'plivo' => [
+            'class' => Bridge\Plivo\PlivoTransportFactory::class,
+            'package' => 'symfony/plivo-notifier',
+        ],
         'ringcentral' => [
             'class' => Bridge\RingCentral\RingCentralTransportFactory::class,
             'package' => 'symfony/ring-central-notifier',

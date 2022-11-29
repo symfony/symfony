@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
@@ -74,6 +75,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         ClassExistsMock::withMockedClasses([
             AllMySmsTransportFactory::class => false,
             AmazonSnsTransportFactory::class => false,
+            BandwidthTransportFactory::class => false,
             ClickatellTransportFactory::class => false,
             ContactEveryoneTransportFactory::class => false,
             DiscordTransportFactory::class => false,
@@ -139,6 +141,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     {
         yield ['allmysms', 'symfony/all-my-sms-notifier'];
         yield ['sns', 'symfony/amazon-sns-notifier'];
+        yield ['bandwidth', 'symfony/bandwidth-notifier'];
         yield ['clickatell', 'symfony/clickatell-notifier'];
         yield ['contact-everyone', 'symfony/contact-everyone-notifier'];
         yield ['discord', 'symfony/discord-notifier'];

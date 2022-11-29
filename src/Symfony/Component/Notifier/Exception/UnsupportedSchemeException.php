@@ -24,6 +24,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\AllMySms\AllMySmsTransportFactory::class,
             'package' => 'symfony/all-my-sms-notifier',
         ],
+        'bandwidth' => [
+            'class' => Bridge\Bandwidth\BandwidthTransportFactory::class,
+            'package' => 'symfony/bandwidth-notifier',
+        ],
         'clickatell' => [
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
             'package' => 'symfony/clickatell-notifier',

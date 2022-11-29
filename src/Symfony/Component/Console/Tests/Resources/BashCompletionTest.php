@@ -47,7 +47,7 @@ class BashCompletionTest extends TestCase
                 $missing[] = $func;
             }
         }
-        $this->assertEmpty($missing);
+        $this->assertEquals([], $missing);
     }
 
     private function getPrerequisiteLoader(): string

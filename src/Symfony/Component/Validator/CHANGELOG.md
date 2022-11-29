@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `Uuid::TIME_BASED_VERSIONS` to match that a UUID being validated embeds a timestamp
+
 6.2
 ---
 

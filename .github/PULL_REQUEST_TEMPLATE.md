@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | 6.3 for features / 4.4, 5.4, 6.0, 6.1, or 6.2 for bug fixes <!-- see below -->
+| Branch?       | 6.3 for features / 5.4, 6.0, 6.1, or 6.2 for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->
@@ -16,7 +16,7 @@ Additionally (see https://symfony.com/releases):
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too).
  - Features and deprecations must be submitted against the latest branch.
- - For new features, provide some code snippets to help understand usage.  
+ - For new features, provide some code snippets to help understand usage.
  - Changelog entry should follow https://symfony.com/doc/current/contributing/code/conventions.html#writing-a-changelog-entry
  - Never break backward compatibility (see https://symfony.com/bc).
 -->

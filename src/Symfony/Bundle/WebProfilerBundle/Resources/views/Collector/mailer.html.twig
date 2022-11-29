@@ -41,11 +41,11 @@
 
 {% block panel %}
     {% set events = collector.events %}
-    <h2>Emails</h2>
+    <h2>E-mails</h2>
 
     {% if not events.messages|length %}
         <div class="empty empty-panel">
-            <p>No emails were sent.</p>
+            <p>No e-mails were sent.</p>
         </div>
     {% else %}
         <div class="metrics">
@@ -92,7 +92,7 @@
                                     <td>{{ loop.index }}</td>
                                     <td>{{ event.message.headers.get('subject').bodyAsString() ?? '(No subject)' }}</td>
                                     <td>{{ (event.message.headers.get('to').bodyAsString() ?? '(empty)')|replace({'To:': ''}) }}</td>
-                                    <td class="visually-hidden"><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View email details</button></td>
+                                    <td class="visually-hidden"><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View e-mail details</button></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -133,7 +133,7 @@
         {% else %}
             <div class="sf-tabs">
                 <div class="tab">
-                    <h3 class="tab-title">Email contents</h3>
+                    <h3 class="tab-title">E-mail contents</h3>
                     <div class="tab-content">
                         <div class="card-block">
                             <p class="mailer-message-subject">

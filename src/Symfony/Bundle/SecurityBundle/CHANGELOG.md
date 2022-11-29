@@ -9,6 +9,7 @@ CHANGELOG
  * Add `StatelessAuthenticatorFactoryInterface` for authenticators targeting `stateless` firewalls only and that don't require a user provider
  * Modify "icon.svg" to improve accessibility for blind/low vision users
  * Make `Security::login()` return the authenticator response
+ * Deprecate the `security.firewalls.logout.csrf_token_generator` config option, use `security.firewalls.logout.csrf_token_manager` instead
 
 6.2
 ---

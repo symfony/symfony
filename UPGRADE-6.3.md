@@ -60,4 +60,5 @@ SecurityBundle
 Validator
 --------------
 
-* Implementing the `ConstraintViolationInterface` without implementing the `getConstraint()` method is deprecated
+ * Implementing the `ConstraintViolationInterface` without implementing the `getConstraint()` method is deprecated
+ * Deprecate the `security.firewalls.logout.csrf_token_generator` config option, use `security.firewalls.logout.csrf_token_manager` instead

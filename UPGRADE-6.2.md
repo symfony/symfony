@@ -85,7 +85,7 @@ Security
 
  * Add maximum username length enforcement of 4096 characters in `UserBadge` to
    prevent [session storage flooding](https://symfony.com/blog/cve-2016-4423-large-username-storage-in-session)
- * Deprecate the `Symfony\Component\Security\Core\Security` class and service, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+ * Deprecate the `Symfony\Component\Security\Core\Security` class and service, use `Symfony\Bundle\SecurityBundle\Security` instead
  * Deprecate the `Symfony\Bundle\SecurityBundle\Security::ACCESS_DENIED_ERROR` property, use `Symfony\Component\Security\Http\SecurityRequestAttributes::ACCESS_DENIED_ERROR` instead
  * Deprecate the `Symfony\Bundle\SecurityBundle\Security::AUTHENTICATION_ERROR` property, use `Symfony\Component\Security\Http\SecurityRequestAttributes::AUTHENTICATION_ERROR` instead
  * Deprecate the `Symfony\Bundle\SecurityBundle\Security::LAST_USERNAME` property, use `Symfony\Component\Security\Http\SecurityRequestAttributes::LAST_USERNAME` instead

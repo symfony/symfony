@@ -36,14 +36,12 @@ final class AccessTokenFactory extends AbstractFactory
 
     public function addConfiguration(NodeDefinition $node): void
     {
-        $builder = $node->children();
+        parent::addConfiguration($node);
 
+        $builder = $node->children();
         $builder
             ->scalarNode('token_handler')->isRequired()->end()
-            ->scalarNode('user_provider')->defaultNull()->end()
             ->scalarNode('realm')->defaultNull()->end()
-            ->scalarNode('success_handler')->defaultNull()->end()
-            ->scalarNode('failure_handler')->defaultNull()->end()
             ->arrayNode('token_extractors')
                 ->fixXmlConfig('token_extractors')
                 ->beforeNormalization()
@@ -71,7 +69,6 @@ final class AccessTokenFactory extends AbstractFactory
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $userProvider = new Reference($config['user_provider'] ?? $userProviderId);
         $successHandler = isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)) : null;
         $failureHandler = isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null;
         $authenticatorId = sprintf('security.authenticator.access_token.%s', $firewallName);
@@ -81,7 +78,7 @@ final class AccessTokenFactory extends AbstractFactory
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.access_token'))
             ->replaceArgument(0, new Reference($config['token_handler']))
             ->replaceArgument(1, new Reference($extractorId))
-            ->replaceArgument(2, $userProvider)
+            ->replaceArgument(2, new Reference($userProviderId))
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])

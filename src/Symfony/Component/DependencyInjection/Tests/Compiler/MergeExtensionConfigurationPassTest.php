@@ -14,13 +14,16 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Extension\AbstractExtension;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -143,6 +146,41 @@ class MergeExtensionConfigurationPassTest extends TestCase
         (new MergeExtensionConfigurationPass())->process($container);
 
         $this->addToAssertionCount(1);
+    }
+
+    public function testGetExtensionConfigAfterProcessing()
+    {
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'kernel.environment' => 'test',
+            'kernel.build_dir' => 'test',
+        ]));
+
+        $container->registerExtension(new class() extends AbstractExtension {
+            public function configure(DefinitionConfigurator $definition): void
+            {
+                $definition->rootNode()
+                    ->children()
+                        ->scalarNode('bar')
+                            ->beforeNormalization()
+                                ->ifNull()
+                                ->then(static fn () => '')
+                            ->end()
+                        ->end()
+                    ->end()
+                ;
+            }
+
+            public function getAlias(): string
+            {
+                return 'foo';
+            }
+        });
+
+        $container->loadFromExtension('foo', ['bar' => null]);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        self::assertSame(['foo' => [['bar' => '']]], $container->getParameter('.extension.processed_configs'));
     }
 }
 

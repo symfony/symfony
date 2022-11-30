@@ -114,6 +114,10 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
         }
         $this->processedEnvPlaceholders = [];
 
+        $processedConfigs = $this->has('.extension.processed_configs') ? $this->get('.extension.processed_configs') : [];
+        $processedConfigs[$extension->getAlias()] = $config;
+        $this->set('.extension.processed_configs', $processedConfigs);
+
         // serialize config and container to catch env vars nested in object graphs
         $config = serialize($config).serialize($container->getDefinitions()).serialize($container->getAliases()).serialize($container->getParameterBag()->all());
 

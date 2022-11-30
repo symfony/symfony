@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add build parameter `.extension.processed_configs` to get any extension configs (already processed) during compiler time
+
 6.2
 ---
 

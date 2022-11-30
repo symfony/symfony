@@ -82,6 +82,10 @@ abstract class AbstractTransport implements TransportInterface
 
             $sentMessage = new SentMessage($message, $envelope);
 
+            if ($event->isRejected()) {
+                return $sentMessage;
+            }
+
             try {
                 $this->doSend($sentMessage);
             } catch (\Throwable $error) {

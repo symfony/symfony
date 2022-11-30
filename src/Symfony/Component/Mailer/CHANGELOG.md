@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `reject()` in `MessageEvent` to reject sending mail
+
 6.2
 ---
 

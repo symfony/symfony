@@ -7,6 +7,12 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.0 (2022-11-30)
+
+ * bug #48395 [String] Fix AsciiSlugger with emojis (fancyweb)
+ * bug #48385 [Security] Reuse `AbstractFactory`'s config tree in `AccessTokenFactory` (chalasr)
+ * bug #48292 [Security] [LoginLink] Throw InvalidLoginLinkException on missing parameter (MatTheCat)
+
 * 6.2.0-RC2 (2022-11-28)
 
  * bug #48366 [Mailer] Fix body renderer check (fabpot)

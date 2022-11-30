@@ -33,7 +33,7 @@ final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
             '_default' => ['Doctrine ORM', 'symfony/orm-pack'],
         ],
         'generate' => [
-            '_default' => ['SensioGeneratorBundle', 'sensio/generator-bundle'],
+            '_default' => ['MakerBundle', 'symfony/maker-bundle --dev'],
         ],
         'make' => [
             '_default' => ['MakerBundle', 'symfony/maker-bundle --dev'],

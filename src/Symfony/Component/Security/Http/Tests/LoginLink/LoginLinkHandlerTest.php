@@ -182,6 +182,30 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
+    public function testConsumeLoginLinkWithMissingHash()
+    {
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->createUser($user);
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $request = Request::create('/login/verify?user=weaverryan&expires=10000');
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkWithMissingExpiration()
+    {
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->createUser($user);
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $request = Request::create('/login/verify?user=weaverryan&hash=thehash');
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
     private function createSignatureHash(string $username, int $expires, array $extraFields): string
     {
         $fields = [base64_encode($username), $expires];

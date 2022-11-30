@@ -49,6 +49,7 @@ class AsciiSluggerTest extends TestCase
 
     /**
      * @dataProvider provideSlugEmojiTests
+     *
      * @requires extension intl
      */
     public function testSlugEmoji(string $expected, string $string, ?string $locale, string|bool $emoji = true)
@@ -93,6 +94,16 @@ class AsciiSluggerTest extends TestCase
             'a 😺, 🐈‍⬛, and a 🦁 go to 🏞️... 😍 🎉 💛',
             'en',
             'github',
+        ];
+        yield [
+            'un-chat-qui-sourit-chat-noir-et-un-tete-de-lion-vont-au-parc-national',
+            'un 😺, 🐈‍⬛, et un 🦁 vont au 🏞️',
+            'fr_XX', // Fallback on parent locale
+        ];
+        yield [
+            'un-et-un-vont-au',
+            'un 😺, 🐈‍⬛, et un 🦁 vont au 🏞️',
+            'undefined_locale', // Behaves the same as if emoji support is disabled
         ];
     }
 }

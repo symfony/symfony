@@ -113,10 +113,8 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
             $transliterator = (array) $this->createTransliterator($locale);
         }
 
-        if (\is_string($this->emoji)) {
-            $transliterator[] = EmojiTransliterator::create("emoji-{$this->emoji}");
-        } elseif ($this->emoji && null !== $locale) {
-            $transliterator[] = EmojiTransliterator::create("emoji-{$locale}");
+        if ($emojiTransliterator = $this->createEmojiTransliterator($locale)) {
+            $transliterator[] = $emojiTransliterator;
         }
 
         if ($this->symbolsMap instanceof \Closure) {
@@ -175,6 +173,25 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         }
 
         return $this->transliterators[$locale] = $this->transliterators[$parent] = $transliterator ?? null;
+    }
+
+    private function createEmojiTransliterator(?string $locale): ?EmojiTransliterator
+    {
+        if (\is_string($this->emoji)) {
+            $locale = $this->emoji;
+        } elseif (!$this->emoji) {
+            return null;
+        }
+
+        while (null !== $locale) {
+            try {
+                return EmojiTransliterator::create("emoji-$locale");
+            } catch (\IntlException) {
+                $locale = self::getParentLocale($locale);
+            }
+        }
+
+        return null;
     }
 
     private static function getParentLocale(?string $locale): ?string

@@ -86,6 +86,10 @@ Security
  * Add maximum username length enforcement of 4096 characters in `UserBadge` to
    prevent [session storage flooding](https://symfony.com/blog/cve-2016-4423-large-username-storage-in-session)
  * Deprecate the `Symfony\Component\Security\Core\Security` class and service, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+ * Deprecate the `Symfony\Bundle\SecurityBundle\Security\Security::ACCESS_DENIED_ERROR` property, use `Symfony\Component\Security\Http\SecurityRequestAttributes::ACCESS_DENIED_ERROR` instead
+ * Deprecate the `Symfony\Bundle\SecurityBundle\Security\Security::AUTHENTICATION_ERROR` property, use `Symfony\Component\Security\Http\SecurityRequestAttributes::AUTHENTICATION_ERROR` instead
+ * Deprecate the `Symfony\Bundle\SecurityBundle\Security\Security::LAST_USERNAME` property, use `Symfony\Component\Security\Http\SecurityRequestAttributes::LAST_USERNAME` instead
+ * Deprecate the `Symfony\Bundle\SecurityBundle\Security\Security::MAX_USERNAME_LENGTH` property, use `Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge::MAX_USERNAME_LENGTH` instead
  * Passing empty username or password parameter when using `JsonLoginAuthenticator` is not supported anymore
  * Add `$lifetime` parameter to `LoginLinkHandlerInterface::createLoginLink()`
  * Change the signature of `TokenStorageInterface::setToken()` to `setToken(?TokenInterface $token)`

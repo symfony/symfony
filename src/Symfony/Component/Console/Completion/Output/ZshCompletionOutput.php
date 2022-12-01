@@ -21,6 +21,7 @@ class ZshCompletionOutput implements CompletionOutputInterface
 {
     public function write(CompletionSuggestions $suggestions, OutputInterface $output): void
     {
+        $values = [];
         foreach ($suggestions->getValueSuggestions() as $value) {
             $values[] = $value->getValue().($value->getDescription() ? "\t".$value->getDescription() : '');
         }

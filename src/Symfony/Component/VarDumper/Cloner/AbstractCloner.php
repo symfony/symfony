@@ -28,6 +28,7 @@ abstract class AbstractCloner implements ClonerInterface
         'Symfony\Component\VarDumper\Caster\CutArrayStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castCutArray'],
         'Symfony\Component\VarDumper\Caster\ConstStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castStub'],
         'Symfony\Component\VarDumper\Caster\EnumStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castEnum'],
+        'Symfony\Component\VarDumper\Caster\ScalarStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castScalar'],
 
         'Fiber' => ['Symfony\Component\VarDumper\Caster\FiberCaster', 'castFiber'],
 

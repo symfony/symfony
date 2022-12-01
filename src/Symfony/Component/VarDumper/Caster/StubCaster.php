@@ -81,4 +81,12 @@ class StubCaster
 
         return $a;
     }
+
+    public static function castScalar(ScalarStub $scalarStub, array $a, Stub $stub)
+    {
+        $stub->type = Stub::TYPE_SCALAR;
+        $stub->attr['value'] = $scalarStub->value;
+
+        return $a;
+    }
 }

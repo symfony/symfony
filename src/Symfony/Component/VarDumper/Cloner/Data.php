@@ -211,6 +211,11 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $data;
     }
 
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
     /**
      * Seeks to a specific key in nested data structures.
      */
@@ -262,11 +267,12 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     {
         $refs = [0];
         $cursor = new Cursor();
+        $label = $this->context['label'] ?? '';
 
         if ($cursor->attr = $this->context[SourceContextProvider::class] ?? []) {
             $cursor->attr['if_links'] = true;
             $cursor->hashType = -1;
-            $dumper->dumpScalar($cursor, 'default', '^');
+            $dumper->dumpScalar($cursor, 'default', $label.'^');
             $cursor->attr = ['if_links' => true];
             $dumper->dumpScalar($cursor, 'default', ' ');
             $cursor->hashType = 0;
@@ -360,6 +366,10 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
                     }
                     $cursor->skipChildren = false;
                     $dumper->leaveHash($cursor, $item->type, $item->class, $withChildren, $cut);
+                    break;
+
+                case Stub::TYPE_SCALAR:
+                    $dumper->dumpScalar($cursor, 'default', $item->attr['value']);
                     break;
 
                 default:

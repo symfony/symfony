@@ -77,6 +77,7 @@ class IpUtilsTest extends TestCase
             [false, '0.0.0.0/8', '::1'],
             [false,  '::1', '127.0.0.1'],
             [false,  '::1', '0.0.0.0/8'],
+            [true, '::ffff:10.126.42.2', '::ffff:10.0.0.0/0'],
         ];
     }
 

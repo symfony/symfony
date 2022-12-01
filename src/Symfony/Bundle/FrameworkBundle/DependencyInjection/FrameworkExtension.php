@@ -389,7 +389,7 @@ class FrameworkExtension extends Extension
         if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
 
-            if (!class_exists(MailerTestCommand::class)) {
+            if (!class_exists(MailerTestCommand::class) || !$this->hasConsole()) {
                 $container->removeDefinition('console.command.mailer_test');
             }
         }

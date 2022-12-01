@@ -130,12 +130,15 @@ class PhpFileLoader extends FileLoader
                     }
                     // no break
                 default:
+                    $configBuilder = null;
                     try {
                         $configBuilder = $this->configBuilder($type);
+                        $configBuilders[] = $configBuilder;
                     } catch (InvalidArgumentException|\LogicException $e) {
-                        throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $type.' $'.$parameter->getName(), $path), 0, $e);
+                        if (!$reflectionType->allowsNull()) {
+                            throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $type.' $'.$parameter->getName(), $path), 0, $e);
+                        }
                     }
-                    $configBuilders[] = $configBuilder;
                     $arguments[] = $configBuilder;
             }
         }

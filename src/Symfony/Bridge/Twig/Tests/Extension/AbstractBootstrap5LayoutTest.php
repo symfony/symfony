@@ -1450,7 +1450,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
             '/div
-    [@class="input-group"]
+    [@class="input-group "]
     [
         ./span
             [@class="input-group-text"]

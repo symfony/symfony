@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by mogilvie at 2022-11-25T18:00:11Z
+
+Failing on:
+```
+Unsilenced deprecation notices (1)
+
+  1x: Legacy nullable type detected, please update your code as
+         you are using nullable types in a docblock. support will be removed in v2.0.0
+    1x in ObjectNormalizerTest::testDoesntHaveIssuesWithUnionConstTypes from Symfony\Component\Serializer\Tests\Normalizer
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-25T18:04:16Z
+
+As this is a bugfix, it should probably not target the 6.3 branch
+
+---------------------------------------------------------------------------
+
+by mogilvie at 2022-11-25T18:07:48Z
+
+They failing test looks like something with the ObjectNormalizer @dunglas. I won't even pretend to understand where the 'legacy nullable' type is.
+
+---------------------------------------------------------------------------
+
+by mogilvie at 2022-11-25T18:19:20Z
+
+Argh, fecked that up. I'm checking out for tonight. My apologies to everyone.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-11-30T15:08:47Z
+
+I haven't looked into the details of this ... but Bootstrap classes for money uses the `input-group-text` CSS class See https://getbootstrap.com/docs/5.2/forms/input-group/#multiple-addons
+
+So, the existing code (`<div class="input-group{{ group_class|default('') }}">`) could be correct if `group_class` is `-text` ... and the new code (`<div class="input-group {{ group_class|default('') }}">`) only would be correct if `group_class` is `input-group-text`
+
+---------------------------------------------------------------------------
+
+by mogilvie at 2022-12-01T11:52:15Z
+
+> I haven't looked into the details of this ... but Bootstrap classes for money uses the `input-group-text` CSS class See https://getbootstrap.com/docs/5.2/forms/input-group/#multiple-addons
+>
+> So, the existing code (`<div class="input-group{{ group_class|default('') }}">`) could be correct if `group_class` is `-text` ... and the new code (`<div class="input-group {{ group_class|default('') }}">`) only would be correct if `group_class` is `input-group-text`
+
+The inner span is input-group-text. The outer div wrapper is class input-group. The issue is the outer div.
+![image](https://user-images.githubusercontent.com/7894754/205045693-32d32e5c-043c-44a9-b354-1ece71aab83f.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-12-01T16:40:41Z
+
+Mark, thanks for the additional insights!

@@ -17,8 +17,6 @@ use Symfony\Component\Notifier\Bridge\Pusher\PusherOptions;
 /**
  * @author Yasmany Cubela Medina <yasmanycm@gmail.com>
  *
- * @internal
- *
  * @coversNothing
  */
 final class PusherOptionsTest extends TestCase

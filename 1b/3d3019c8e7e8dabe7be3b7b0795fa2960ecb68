@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-04T12:35:19Z
+
+`IsJsonRequestMatcher` is another one that could benefit from this. Maybe others?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-04T13:04:36Z
+
+Indeed, I've updated `IsJsonRequestMatcher`.

@@ -232,13 +232,13 @@ class AppVariableTest extends TestCase
     {
         $this->setRequestStack(new Request(attributes: ['_route' => 'some_route']));
 
-        $this->assertSame('some_route', $this->appVariable->getCurrent_Route());
+        $this->assertSame('some_route', $this->appVariable->getCurrent_route());
     }
 
     public function testGetCurrentRouteWithRequestStackNotSet()
     {
         $this->expectException(\RuntimeException::class);
-        $this->appVariable->getCurrent_Route();
+        $this->appVariable->getCurrent_route();
     }
 
     public function testGetCurrentRouteParameters()
@@ -246,20 +246,20 @@ class AppVariableTest extends TestCase
         $routeParams = ['some_param' => true];
         $this->setRequestStack(new Request(attributes: ['_route_params' => $routeParams]));
 
-        $this->assertSame($routeParams, $this->appVariable->getCurrent_Route_Parameters());
+        $this->assertSame($routeParams, $this->appVariable->getCurrent_route_parameters());
     }
 
     public function testGetCurrentRouteParametersWithoutAttribute()
     {
         $this->setRequestStack(new Request());
 
-        $this->assertSame([], $this->appVariable->getCurrent_Route_Parameters());
+        $this->assertSame([], $this->appVariable->getCurrent_route_parameters());
     }
 
     public function testGetCurrentRouteParametersWithRequestStackNotSet()
     {
         $this->expectException(\RuntimeException::class);
-        $this->appVariable->getCurrent_Route_Parameters();
+        $this->appVariable->getCurrent_route_parameters();
     }
 
     protected function setRequestStack($request)

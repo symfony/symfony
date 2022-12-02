@@ -159,7 +159,7 @@ class AppVariable
         return $result;
     }
 
-    public function getCurrent_Route(): ?string
+    public function getCurrent_route(): ?string
     {
         if (!isset($this->requestStack)) {
             throw new \RuntimeException('The "app.current_route" variable is not available.');
@@ -171,7 +171,7 @@ class AppVariable
     /**
      * @return array<string, mixed>
      */
-    public function getCurrent_Route_Parameters(): array
+    public function getCurrent_route_parameters(): array
     {
         if (!isset($this->requestStack)) {
             throw new \RuntimeException('The "app.current_route_parameters" variable is not available.');

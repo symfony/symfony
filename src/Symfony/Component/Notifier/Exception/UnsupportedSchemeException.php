@@ -88,6 +88,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Iqsms\IqsmsTransportFactory::class,
             'package' => 'symfony/iqsms-notifier',
         ],
+        'isendpro' => [
+            'class' => Bridge\Isendpro\IsendproTransportFactory::class,
+            'package' => 'symfony/isendpro-notifier',
+        ],
         'lightsms' => [
             'class' => Bridge\LightSms\LightSmsTransportFactory::class,
             'package' => 'symfony/light-sms-notifier',

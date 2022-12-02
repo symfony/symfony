@@ -101,7 +101,7 @@ class Serializer implements SerializerInterface
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 
-        $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
+        $headers = ['type' => $envelope->getMessage()::class] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
 
         return [
             'body' => $serializedMessageStamp

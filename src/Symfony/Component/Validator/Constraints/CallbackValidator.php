@@ -35,7 +35,7 @@ class CallbackValidator extends ConstraintValidator
         } elseif (\is_array($method)) {
             if (!\is_callable($method)) {
                 if (isset($method[0]) && \is_object($method[0])) {
-                    $method[0] = \get_class($method[0]);
+                    $method[0] = $method[0]::class;
                 }
                 throw new ConstraintDefinitionException(json_encode($method).' targeted by Callback constraint is not a valid callable.');
             }

@@ -122,7 +122,7 @@ EOF
                 $object = $resolvedType->getOptionsResolver();
 
                 if (!$object->isDefined($option)) {
-                    $message = sprintf('Option "%s" is not defined in "%s".', $option, \get_class($resolvedType->getInnerType()));
+                    $message = sprintf('Option "%s" is not defined in "%s".', $option, $resolvedType->getInnerType()::class);
 
                     if ($alternatives = $this->findAlternatives($option, $object->getDefinedOptions())) {
                         if (1 === \count($alternatives)) {

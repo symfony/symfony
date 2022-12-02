@@ -414,7 +414,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                     $lock = null;
                 } elseif (!is_file($cachePath) || !\is_object($this->container = include $cachePath)) {
                     $this->container = null;
-                } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
+                } elseif (!$oldContainer || $this->container::class !== $oldContainer->name) {
                     flock($lock, \LOCK_UN);
                     fclose($lock);
                     $this->container->set('kernel', $this);
@@ -504,7 +504,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->container = require $cachePath;
         $this->container->set('kernel', $this);
 
-        if ($oldContainer && \get_class($this->container) !== $oldContainer->name) {
+        if ($oldContainer && $this->container::class !== $oldContainer->name) {
             // Because concurrent requests might still be using them,
             // old container files are not removed immediately,
             // but on a next dump of the container.

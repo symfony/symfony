@@ -345,7 +345,7 @@ class MarkdownDescriptor extends Descriptor
 
             if (\is_object($callable[0])) {
                 $string .= "\n".sprintf('- Name: `%s`', $callable[1]);
-                $string .= "\n".sprintf('- Class: `%s`', \get_class($callable[0]));
+                $string .= "\n".sprintf('- Class: `%s`', $callable[0]::class);
             } else {
                 if (!str_starts_with($callable[1], 'parent::')) {
                     $string .= "\n".sprintf('- Name: `%s`', $callable[1]);

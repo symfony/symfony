@@ -98,7 +98,7 @@ class Profiler implements ResetInterface
         }
 
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warning('Unable to store the profiler information.', ['configured_storage' => \get_class($this->storage)]);
+            $this->logger->warning('Unable to store the profiler information.', ['configured_storage' => $this->storage::class]);
         }
 
         return $ret;

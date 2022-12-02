@@ -169,7 +169,7 @@ abstract class Descriptor implements DescriptorInterface
 
     private function getParentOptionsResolver(ResolvedFormTypeInterface $type): OptionsResolver
     {
-        $this->parents[$class = \get_class($type->getInnerType())] = [];
+        $this->parents[$class = $type->getInnerType()::class] = [];
 
         if (null !== $type->getParent()) {
             $optionsResolver = clone $this->getParentOptionsResolver($type->getParent());

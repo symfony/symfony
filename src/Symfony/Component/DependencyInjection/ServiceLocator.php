@@ -87,7 +87,7 @@ class ServiceLocator implements ServiceProviderInterface, \Countable
         }
 
         $class = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 4);
-        $class = isset($class[3]['object']) ? \get_class($class[3]['object']) : null;
+        $class = isset($class[3]['object']) ? $class[3]['object']::class : null;
         $externalId = $this->externalId ?: $class;
 
         $msg = [];

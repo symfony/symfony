@@ -135,7 +135,7 @@ class FormType extends BaseType
 
         // Derive "data_class" option from passed "data" object
         $dataClass = function (Options $options) {
-            return isset($options['data']) && \is_object($options['data']) ? \get_class($options['data']) : null;
+            return isset($options['data']) && \is_object($options['data']) ? $options['data']::class : null;
         };
 
         // Derive "empty_data" closure from "data_class" option

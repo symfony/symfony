@@ -134,12 +134,12 @@ final class CompleteCommand extends Command
                 $completionInput->bind($command->getDefinition());
 
                 if (CompletionInput::TYPE_OPTION_NAME === $completionInput->getCompletionType()) {
-                    $this->log('  Completing option names for the <comment>'.\get_class($command instanceof LazyCommand ? $command->getCommand() : $command).'</> command.');
+                    $this->log('  Completing option names for the <comment>'.($command instanceof LazyCommand ? $command->getCommand() : $command)::class.'</> command.');
 
                     $suggestions->suggestOptions($command->getDefinition()->getOptions());
                 } else {
                     $this->log([
-                        '  Completing using the <comment>'.\get_class($command instanceof LazyCommand ? $command->getCommand() : $command).'</> class.',
+                        '  Completing using the <comment>'.($command instanceof LazyCommand ? $command->getCommand() : $command)::class.'</> class.',
                         '  Completing <comment>'.$completionInput->getCompletionType().'</> for <comment>'.$completionInput->getCompletionName().'</>',
                     ]);
                     if (null !== $compval = $completionInput->getCompletionValue()) {

@@ -369,13 +369,17 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals([new IteratorArgument(['k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')]), new IteratorArgument([])], $lazyDefinition->getArguments(), '->load() parses lazy arguments');
     }
 
-    public function testParsesTags()
+    /**
+     * @testWith ["foo_tag"]
+     *           ["bar_tag"]
+     */
+    public function testParsesTags(string $tag)
     {
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services10.xml');
 
-        $services = $container->findTaggedServiceIds('foo_tag');
+        $services = $container->findTaggedServiceIds($tag);
         $this->assertCount(1, $services);
 
         foreach ($services as $id => $tagAttributes) {

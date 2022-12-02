@@ -184,10 +184,10 @@ class SplCaster
 
         $clone = clone $c;
         foreach ($clone as $obj) {
-            $storage[] = [
+            $storage[] = new EnumStub([
                 'object' => $obj,
                 'info' => $clone->getInfo(),
-             ];
+             ]);
         }
 
         $a += [
@@ -207,6 +207,24 @@ class SplCaster
     public static function castWeakReference(\WeakReference $c, array $a, Stub $stub, bool $isNested)
     {
         $a[Caster::PREFIX_VIRTUAL.'object'] = $c->get();
+
+        return $a;
+    }
+
+    public static function castWeakMap(\WeakMap $c, array $a, Stub $stub, bool $isNested)
+    {
+        $map = [];
+
+        foreach (clone $c as $obj => $data) {
+            $map[] = new EnumStub([
+                'object' => $obj,
+                'data' => $data,
+             ]);
+        }
+
+        $a += [
+            Caster::PREFIX_VIRTUAL.'map' => $map,
+        ];
 
         return $a;
     }

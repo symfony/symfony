@@ -18,8 +18,6 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 /**
  * @author Yasmany Cubela Medina <yasmanycm@gmail.com>
  *
- * @internal
- *
  * @coversNothing
  */
 final class PusherTransportFactoryTest extends TransportFactoryTestCase

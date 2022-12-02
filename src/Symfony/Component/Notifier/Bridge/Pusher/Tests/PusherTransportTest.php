@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Yasmany Cubela Medina <yasmanycm@gmail.com>
  *
- * @internal
- *
  * @coversNothing
  */
 final class PusherTransportTest extends TransportTestCase

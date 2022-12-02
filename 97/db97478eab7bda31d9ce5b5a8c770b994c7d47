@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-03T07:43:14Z
+
+Thank you all for the reviews. Comments addressed.
+
+---------------------------------------------------------------------------
+
+by gnito-org at 2022-11-17T22:01:36Z
+
+There is risk to providing this particular component, because it could lead to people inadvertently violating [Twitter's Developer Policy](https://developer.twitter.com/en/developer-terms/policy).
+
+The policy states:
+
+> You may not store Twitter passwords, or request that people provide their Twitter password, account credentials, or _developer application information (including consumer key)_ to you directly.
+
+It will be fine if the developer uses the component to publish tweets using his own app's consumer key, but the moment the developer writes an application where users can provide their own Twitter app credentials, then that developer will be in violation of Twitter's policies.
+
+This has been a long-standing policy and a thorn in the side of developers.
+
+---------------------------------------------------------------------------
+
+by gnito-org at 2022-11-18T11:46:17Z
+
+You might want to adapt this component to [Twitter API v2](https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/introduction), which uses OAuth 2.
+
+That means the component config only needs an OAuth access token, and not the Twitter app credentials such as the consumer key.
+
+https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-25T10:59:44Z
+
+> You might want to adapt this component to [Twitter API v2](https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/introduction), which uses OAuth 2.
+
+I don't think we can, because media uploading requires using API v1.1

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-30T14:12:15Z
+
+One minor and a test change, afterwards ready to merge from my side 👍
+
+---------------------------------------------------------------------------
+
+by gnito-org at 2022-11-30T15:13:36Z
+
+:face_exhaling: :face_with_head_bandage:
+
+This has been an extremely painful exercise. Not conducive to enthusiastic contribution.
+
+RUN AUTOMATED CODE FORMATTING DURING MERGE OR SOMETHING LIKE THAT, if you guys want to enforce a specific code formatting standard. I'm all for it, but don't burden the contributors with it.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-30T15:41:45Z
+
+> This has been an extremely painful exercise. Not conducive to enthusiastic contribution.
+
+I am very sorry, we don't have a very hard coding standard, the reason is, that sometimes we allow it. In this case it's more about "keep all the bridges nearly the same", it makes it much easier to maintain. Most of the stuff was copied from another bridge, which is totally fine, but the "code style" was not copied.
+
+In your case it was even harder, because you opened four PRs in parallel 🤷‍♂️
+
+One test is still failing, maybe you can have a look. Thanks

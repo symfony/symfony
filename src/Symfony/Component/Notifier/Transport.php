@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransportFactory;
 use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
@@ -79,6 +80,7 @@ final class Transport
     private const FACTORY_CLASSES = [
         AllMySmsTransportFactory::class,
         AmazonSnsTransportFactory::class,
+        BandwidthTransportFactory::class,
         ChatworkTransportFactory::class,
         ClickatellTransportFactory::class,
         ContactEveryoneTransportFactory::class,

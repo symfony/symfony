@@ -245,6 +245,51 @@ CSV;
         $this->assertEquals($csv, $this->encoder->encode($value, 'csv', $context));
     }
 
+    public function testEncodeCustomHeadersWithFilteringValuesByHeaders()
+    {
+        $context = [
+            CsvEncoder::HEADERS_KEY => [
+                'c',
+                'd',
+                'b',
+            ],
+            CsvEncoder::CSV_FILTER_VALUES_BY_HEADERS_KEY => true,
+        ];
+        $value = [
+            ['a' => 'foo', 'b' => 'bar', 'd' => 'hey ho'],
+        ];
+        $csv = <<<CSV
+c,d,b
+,"hey ho",bar
+
+CSV;
+
+        $this->assertEquals($csv, $this->encoder->encode($value, 'csv', $context));
+    }
+
+    public function testEncodeWithoutHeadersAndWithFilteringValuesByHeadersShouldIgnoreFiltering()
+    {
+        $this->assertSame(<<<'CSV'
+a,b
+c,d
+
+CSV
+            , $this->encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+                CsvEncoder::CSV_FILTER_VALUES_BY_HEADERS_KEY => true,
+            ]));
+        $encoder = new CsvEncoder([CsvEncoder::NO_HEADERS_KEY => true]);
+        $this->assertSame(<<<'CSV'
+a,b
+c,d
+
+CSV
+            , $encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+                CsvEncoder::CSV_FILTER_VALUES_BY_HEADERS_KEY => true,
+            ]));
+    }
+
     public function testEncodeFormulas()
     {
         $this->encoder = new CsvEncoder([CsvEncoder::ESCAPE_FORMULAS_KEY => true]);

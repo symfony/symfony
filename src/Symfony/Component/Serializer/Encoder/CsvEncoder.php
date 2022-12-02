@@ -28,6 +28,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public const ESCAPE_CHAR_KEY = 'csv_escape_char';
     public const KEY_SEPARATOR_KEY = 'csv_key_separator';
     public const HEADERS_KEY = 'csv_headers';
+    public const CSV_FILTER_VALUES_BY_HEADERS_KEY = 'csv_filter_values_by_headers';
     public const ESCAPE_FORMULAS_KEY = 'csv_escape_formulas';
     public const AS_COLLECTION_KEY = 'as_collection';
     public const NO_HEADERS_KEY = 'no_headers';
@@ -47,6 +48,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         self::HEADERS_KEY => [],
         self::KEY_SEPARATOR_KEY => '.',
         self::NO_HEADERS_KEY => false,
+        self::CSV_FILTER_VALUES_BY_HEADERS_KEY => false,
         self::AS_COLLECTION_KEY => true,
         self::OUTPUT_UTF8_BOM_KEY => false,
     ];
@@ -86,10 +88,17 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         unset($value);
 
-        $headers = array_merge(array_values($headers), array_diff($this->extractHeaders($data), $headers));
+        $noHeaders = $context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY];
+        $filterByHeaders = !$noHeaders ? $context[self::CSV_FILTER_VALUES_BY_HEADERS_KEY] ??
+            $this->defaultContext[self::CSV_FILTER_VALUES_BY_HEADERS_KEY] : false;
+
+        $headers = array_merge(
+            array_values($headers),
+            $filterByHeaders ? [] : array_diff($this->extractHeaders($data), $headers)
+        );
         $endOfLine = $context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE];
 
-        if (!($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY])) {
+        if (!$noHeaders) {
             fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
             if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
                 fwrite($handle, $endOfLine);
@@ -98,7 +107,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         $headers = array_fill_keys($headers, '');
         foreach ($data as $row) {
-            fputcsv($handle, array_replace($headers, $row), $delimiter, $enclosure, $escapeChar);
+            $fields = $filterByHeaders ? array_replace($headers, array_intersect_key($row, $headers)) :
+                array_replace($headers, $row);
+            fputcsv($handle, $fields, $delimiter, $enclosure, $escapeChar);
             if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
                 fwrite($handle, $endOfLine);
             }

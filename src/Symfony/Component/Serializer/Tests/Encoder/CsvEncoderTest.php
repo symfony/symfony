@@ -699,4 +699,18 @@ CSV;
         $encoder = new CsvEncoder([CsvEncoder::END_OF_LINE => "\r\n"]);
         $this->assertSame("foo,bar\r\nhello,test\r\n", $encoder->encode($value, 'csv'));
     }
+
+    public function testDecodeStringWithTwoWords() {
+        $value = ['foo' => 'hello world'];
+
+        $encoder = new CsvEncoder();
+        $this->assertSame("foo\n\"hello world\"\n", $encoder->encode($value, 'csv'));
+    }
+
+    public function testDecodeWithEmptyEnclosure() {
+        $value = ['foo' => 'hello world'];
+
+        $encoder = new CsvEncoder();
+        $this->assertSame("foo\nhello world\n", $encoder->encode($value, 'csv', [CsvEncoder::ENCLOSURE_KEY => '']));
+    }
 }

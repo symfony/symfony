@@ -89,6 +89,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $headers = array_merge(array_values($headers), array_diff($this->extractHeaders($data), $headers));
         $endOfLine = $context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE];
 
+        $isEmptyEnclosure = $enclosure === '';
+        $enclosure = ($isEmptyEnclosure) ? $this->defaultContext[self::ENCLOSURE_KEY] : $enclosure;
+
         if (!($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY])) {
             fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
             if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
@@ -106,6 +109,13 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         rewind($handle);
         $value = stream_get_contents($handle);
+
+        if ($isEmptyEnclosure) {
+            $value = str_replace($this->defaultContext[self::ENCLOSURE_KEY], '', $value);
+
+            fwrite($handle, $value, strlen($value));
+        }
+
         fclose($handle);
 
         if ($outputBom) {

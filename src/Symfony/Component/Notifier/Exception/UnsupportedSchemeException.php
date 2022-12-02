@@ -144,6 +144,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',
         ],
+        'ringcentral' => [
+            'class' => Bridge\RingCentral\RingCentralTransportFactory::class,
+            'package' => 'symfony/ring-central-notifier',
+        ],
         'rocketchat' => [
             'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
             'package' => 'symfony/rocket-chat-notifier',

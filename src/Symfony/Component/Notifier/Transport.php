@@ -38,6 +38,7 @@ use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
+use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
@@ -102,6 +103,7 @@ final class Transport
         OctopushTransportFactory::class,
         OrangeSmsTransportFactory::class,
         OvhCloudTransportFactory::class,
+        RingCentralTransportFactory::class,
         RocketChatTransportFactory::class,
         SendberryTransportFactory::class,
         SendinblueTransportFactory::class,

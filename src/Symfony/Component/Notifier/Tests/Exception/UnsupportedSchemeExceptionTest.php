@@ -169,6 +169,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['octopush', 'symfony/octopush-notifier'];
         yield ['onesignal', 'symfony/one-signal-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
+        yield ['ringcentral', 'symfony/ring-central-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendberry', 'symfony/sendberry-notifier'];
         yield ['sendinblue', 'symfony/sendinblue-notifier'];

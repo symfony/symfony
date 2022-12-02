@@ -51,6 +51,7 @@ use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskTransportFactory;
@@ -112,6 +113,7 @@ final class Transport
         TelnyxTransportFactory::class,
         TurboSmsTransportFactory::class,
         TwilioTransportFactory::class,
+        TwitterTransportFactory::class,
         VonageTransportFactory::class,
         YunpianTransportFactory::class,
         ZendeskTransportFactory::class,

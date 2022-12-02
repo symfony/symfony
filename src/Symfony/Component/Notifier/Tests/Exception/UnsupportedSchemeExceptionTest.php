@@ -56,6 +56,7 @@ use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskTransportFactory;
@@ -115,6 +116,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             TelnyxTransportFactory::class => false,
             TurboSmsTransportFactory::class => false,
             TwilioTransportFactory::class => false,
+            TwitterTransportFactory::class => false,
             VonageTransportFactory::class => false,
             YunpianTransportFactory::class => false,
             ZendeskTransportFactory::class => false,
@@ -179,6 +181,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['telnyx', 'symfony/telnyx-notifier'];
         yield ['turbosms', 'symfony/turbo-sms-notifier'];
         yield ['twilio', 'symfony/twilio-notifier'];
+        yield ['twitter', 'symfony/twitter-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];
     }

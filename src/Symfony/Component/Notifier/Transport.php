@@ -50,6 +50,7 @@ use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsFactor\SmsFactorTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
+use Symfony\Component\Notifier\Bridge\Termii\TermiiTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransportFactory;
@@ -113,6 +114,7 @@ final class Transport
         SmsFactorTransportFactory::class,
         TelegramTransportFactory::class,
         TelnyxTransportFactory::class,
+        TermiiTransportFactory::class,
         TurboSmsTransportFactory::class,
         TwilioTransportFactory::class,
         TwitterTransportFactory::class,

@@ -176,7 +176,7 @@ EOF
                 throw new \RuntimeException(sprintf('The message with id "%s" could not decoded, it can only be shown or removed.', $this->getMessageId($envelope) ?? '?'));
             }
 
-            $shouldHandle = $shouldForce || $io->confirm('Do you want to retry (yes) or delete this message (no)?');
+            $shouldHandle = $shouldForce || 'retry' === $io->choice('Please select an action', ['retry', 'delete'], 'retry');
 
             if ($shouldHandle) {
                 return;

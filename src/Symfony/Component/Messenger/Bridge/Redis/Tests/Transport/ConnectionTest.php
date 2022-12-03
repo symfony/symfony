@@ -12,17 +12,14 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
- * @requires extension redis >= 4.3.0
+ * @requires extension redis
  */
 class ConnectionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -34,67 +31,41 @@ class ConnectionTest extends TestCase
     public function testFromDsn()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue', 'delete_after_ack' => true], [
+            new Connection([
+                'stream' => 'queue',
                 'host' => 'localhost',
                 'port' => 6379,
-            ], [], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue?delete_after_ack=1', [], $this->createMock(\Redis::class))
+            ], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue?', [], $this->createMock(\Redis::class))
         );
     }
 
     public function testFromDsnOnUnixSocket()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue', 'delete_after_ack' => true], [
+            new Connection([
+                'stream' => 'queue',
                 'host' => '/var/run/redis/redis.sock',
                 'port' => 0,
-            ], [], $redis = $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis:///var/run/redis/redis.sock', ['stream' => 'queue', 'delete_after_ack' => true], $redis)
+            ], $redis = $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis:///var/run/redis/redis.sock', ['stream' => 'queue'], $redis)
         );
     }
 
     public function testFromDsnWithOptions()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2, 'delete_after_ack' => true], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0&delete_after_ack=1', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createMock(\Redis::class))
         );
     }
 
     public function testFromDsnWithOptionsAndTrailingSlash()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2, 'delete_after_ack' => true], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0&delete_after_ack=1', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0', [], $this->createMock(\Redis::class))
         );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testFromDsnWithTls()
-    {
-        $redis = $this->createMock(\Redis::class);
-        $redis->expects($this->once())
-            ->method('connect')
-            ->with('tls://127.0.0.1', 6379)
-            ->willReturn(true);
-
-        Connection::fromDsn('redis://127.0.0.1?tls=1', [], $redis);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testFromDsnWithTlsOption()
-    {
-        $redis = $this->createMock(\Redis::class);
-        $redis->expects($this->once())
-            ->method('connect')
-            ->with('tls://127.0.0.1', 6379)
-            ->willReturn(true);
-
-        Connection::fromDsn('redis://127.0.0.1', ['tls' => true], $redis);
     }
 
     public function testFromDsnWithRedissScheme()
@@ -105,48 +76,41 @@ class ConnectionTest extends TestCase
             ->with('tls://127.0.0.1', 6379)
             ->willReturn(true);
 
-        Connection::fromDsn('rediss://127.0.0.1?delete_after_ack=true', [], $redis);
+        Connection::fromDsn('rediss://127.0.0.1', [], $redis);
     }
 
     public function testFromDsnWithQueryOptions()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'delete_after_ack' => true], [
+            new Connection([
+                'stream' => 'queue',
+                'group' => 'group1',
+                'consumer' => 'consumer1',
                 'host' => 'localhost',
                 'port' => 6379,
-            ], [
                 'serializer' => 2,
             ], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&delete_after_ack=1', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2', [], $this->createMock(\Redis::class))
         );
     }
 
     public function testFromDsnWithMixDsnQueryOptions()
     {
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer', 'delete_after_ack' => true], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2&delete_after_ack=1', [], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer'], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2', [], $this->createMock(\Redis::class))
         );
 
         $this->assertEquals(
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer', 'delete_after_ack' => true], $this->createMock(\Redis::class)),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['delete_after_ack' => true], $this->createMock(\Redis::class))
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer'], $this->createMock(\Redis::class)),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1', [], $this->createMock(\Redis::class))
         );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDeprecationIfInvalidOptionIsPassedWithDsn()
-    {
-        $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated.');
-        Connection::fromDsn('redis://localhost/queue?foo=bar', [], $this->createMock(\Redis::class));
     }
 
     public function testRedisClusterInstanceIsSupported()
     {
         $redis = $this->createMock(\RedisCluster::class);
-        $this->assertInstanceOf(Connection::class, new Connection([], [], [], $redis));
+        $this->assertInstanceOf(Connection::class, new Connection([], $redis));
     }
 
     public function testKeepGettingPendingMessages()
@@ -157,18 +121,16 @@ class ConnectionTest extends TestCase
             ->with('symfony', 'consumer', ['queue' => 0], 1, null)
             ->willReturn(['queue' => [['message' => json_encode(['body' => 'Test', 'headers' => []])]]]);
 
-        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $this->assertNotNull($connection->get());
         $this->assertNotNull($connection->get());
         $this->assertNotNull($connection->get());
     }
 
     /**
-     * @param string|array $expected
-     *
      * @dataProvider provideAuthDsn
      */
-    public function testAuth($expected, string $dsn)
+    public function testAuth(string|array $expected, string $dsn)
     {
         $redis = $this->createMock(\Redis::class);
 
@@ -176,7 +138,7 @@ class ConnectionTest extends TestCase
             ->with($expected)
             ->willReturn(true);
 
-        Connection::fromDsn($dsn, ['delete_after_ack' => true], $redis);
+        Connection::fromDsn($dsn, [], $redis);
     }
 
     public function provideAuthDsn(): \Generator
@@ -196,7 +158,7 @@ class ConnectionTest extends TestCase
             ->with('password')
             ->willReturn(true);
 
-        Connection::fromDsn('redis://localhost/queue', ['auth' => 'password', 'delete_after_ack' => true], $redis);
+        Connection::fromDsn('redis://localhost/queue', ['auth' => 'password'], $redis);
     }
 
     public function testAuthFromOptionsAndDsn()
@@ -207,7 +169,7 @@ class ConnectionTest extends TestCase
             ->with('password2')
             ->willReturn(true);
 
-        Connection::fromDsn('redis://password1@localhost/queue', ['auth' => 'password2', 'delete_after_ack' => true], $redis);
+        Connection::fromDsn('redis://password1@localhost/queue', ['auth' => 'password2'], $redis);
     }
 
     public function testNoAuthWithEmptyPassword()
@@ -218,7 +180,7 @@ class ConnectionTest extends TestCase
             ->with('')
             ->willThrowException(new \RuntimeException());
 
-        Connection::fromDsn('redis://@localhost/queue', ['delete_after_ack' => true], $redis);
+        Connection::fromDsn('redis://@localhost/queue', [], $redis);
     }
 
     public function testAuthZeroPassword()
@@ -229,7 +191,7 @@ class ConnectionTest extends TestCase
             ->with('0')
             ->willReturn(true);
 
-        Connection::fromDsn('redis://0@localhost/queue', ['delete_after_ack' => true], $redis);
+        Connection::fromDsn('redis://0@localhost/queue', [], $redis);
     }
 
     public function testFailedAuth()
@@ -242,7 +204,7 @@ class ConnectionTest extends TestCase
             ->with('password')
             ->willReturn(false);
 
-        Connection::fromDsn('redis://password@localhost/queue', ['delete_after_ack' => true], $redis);
+        Connection::fromDsn('redis://password@localhost/queue', [], $redis);
     }
 
     public function testGetPendingMessageFirst()
@@ -253,7 +215,7 @@ class ConnectionTest extends TestCase
             ->with('symfony', 'consumer', ['queue' => '0'], 1, null)
             ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
 
-        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $message = $connection->get();
 
         $this->assertSame([
@@ -289,7 +251,7 @@ class ConnectionTest extends TestCase
             ->with('queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID'])
             ->willReturn([]);
 
-        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $connection->get();
     }
 
@@ -317,7 +279,7 @@ class ConnectionTest extends TestCase
             ->with('queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID'])
             ->willReturn([]);
 
-        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $connection->get();
     }
 
@@ -329,7 +291,7 @@ class ConnectionTest extends TestCase
         $redis->expects($this->once())->method('xreadgroup')->willReturn(false);
         $redis->expects($this->once())->method('getLastError')->willReturn('Redis error happens');
 
-        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false, 'delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
         $connection->get();
     }
 
@@ -341,7 +303,7 @@ class ConnectionTest extends TestCase
             ->with('queue', '*', ['message' => '{"body":"1","headers":[]}'], 20000, true)
             ->willReturn('1');
 
-        $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', [], $redis);
         $connection->add('1', []);
     }
 
@@ -356,18 +318,8 @@ class ConnectionTest extends TestCase
             ->with('queue', ['1'])
             ->willReturn(1);
 
-        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_ack=true', [], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $connection->ack('1');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyOmitDeleteAfterAck()
-    {
-        $this->expectDeprecation('Since symfony/redis-messenger 5.4: Not setting the "delete_after_ack" boolean option explicitly is deprecated, its default value will change to true in 6.0.');
-
-        Connection::fromDsn('redis://localhost/queue', [], $this->createMock(\Redis::class));
     }
 
     public function testDeleteAfterReject()
@@ -381,7 +333,7 @@ class ConnectionTest extends TestCase
             ->with('queue', ['1'])
             ->willReturn(1);
 
-        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', ['delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', [], $redis);
         $connection->reject('1');
     }
 
@@ -395,7 +347,7 @@ class ConnectionTest extends TestCase
         $redis->method('getLastError')->willReturnOnConsecutiveCalls('xadd error', 'xack error');
         $redis->expects($this->exactly(2))->method('clearLastError');
 
-        $connection = Connection::fromDsn('redis://localhost/messenger-clearlasterror', ['auto_setup' => false, 'delete_after_ack' => true], $redis);
+        $connection = Connection::fromDsn('redis://localhost/messenger-clearlasterror', ['auto_setup' => false], $redis);
 
         try {
             $connection->add('message', []);
@@ -410,5 +362,49 @@ class ConnectionTest extends TestCase
         }
 
         $this->assertSame('xack error', $e->getMessage());
+    }
+
+    /**
+     * @dataProvider provideIdPatterns
+     */
+    public function testAddReturnId(string $expected, \Redis $redis, int $delay = 0)
+    {
+        $id = Connection::fromDsn(dsn: 'redis://localhost/queue', redis: $redis)->add('body', [], $delay);
+
+        $this->assertMatchesRegularExpression($expected, $id);
+    }
+
+    public function provideIdPatterns(): \Generator
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->atLeastOnce())->method('xadd')->willReturn('THE_MESSAGE_ID');
+
+        yield 'No delay' => ['/^THE_MESSAGE_ID$/', $redis];
+
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->atLeastOnce())->method('rawCommand')->willReturn('1');
+        yield '100ms delay' => ['/^\w+\.\d+$/', $redis, 100];
+    }
+
+    public function testInvalidSentinelMasterName()
+    {
+        try {
+            Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], null);
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
+
+        if (!getenv('MESSENGER_REDIS_SENTINEL_MASTER')) {
+            self::markTestSkipped('Redis sentinel is not configured');
+        }
+
+        $master = getenv('MESSENGER_REDIS_DSN');
+        $uid = uniqid('sentinel_');
+
+        $exp = explode('://', $master, 2)[1];
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Failed to retrieve master information from master name "%s" and address "%s".', $uid, $exp));
+
+        Connection::fromDsn(sprintf('%s/messenger-clearlasterror', $master), ['delete_after_ack' => true, 'sentinel_master' => $uid], null);
     }
 }

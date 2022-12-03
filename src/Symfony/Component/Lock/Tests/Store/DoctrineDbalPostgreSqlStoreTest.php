@@ -40,9 +40,6 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
         return DriverManager::getConnection(['url' => 'pgsql://postgres:password@'.getenv('POSTGRES_HOST')]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         $conn = $this->createPostgreSqlConnection();

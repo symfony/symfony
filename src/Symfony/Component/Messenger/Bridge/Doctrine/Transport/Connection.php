@@ -33,7 +33,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @internal since Symfony 5.1
+ * @internal
  *
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -63,8 +63,8 @@ class Connection implements ResetInterface
     protected $configuration = [];
     protected $driverConnection;
     protected $queueEmptiedAt;
-    private $schemaSynchronizer;
-    private $autoSetup;
+    private ?SchemaSynchronizer $schemaSynchronizer;
+    private bool $autoSetup;
 
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
@@ -98,7 +98,7 @@ class Connection implements ResetInterface
         $configuration = ['connection' => $components['host']];
         $configuration += $query + $options + static::DEFAULT_OPTIONS;
 
-        $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
+        $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOL);
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
@@ -124,8 +124,8 @@ class Connection implements ResetInterface
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
-        $now = new \DateTime();
-        $availableAt = (clone $now)->modify(sprintf('+%d seconds', $delay / 1000));
+        $now = new \DateTimeImmutable();
+        $availableAt = $now->modify(sprintf('+%d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])
@@ -225,7 +225,7 @@ class Connection implements ResetInterface
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
                 ->where('id = ?');
-            $now = new \DateTime();
+            $now = new \DateTimeImmutable();
             $this->executeStatement($queryBuilder->getSQL(), [
                 $now,
                 $doctrineEnvelope['id'],
@@ -310,7 +310,7 @@ class Connection implements ResetInterface
         }, $data);
     }
 
-    public function find($id): ?array
+    public function find(mixed $id): ?array
     {
         $queryBuilder = $this->createQueryBuilder()
             ->where('m.id = ? and m.queue_name = ?');
@@ -348,8 +348,8 @@ class Connection implements ResetInterface
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
-        $now = new \DateTime();
-        $redeliverLimit = (clone $now)->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+        $now = new \DateTimeImmutable();
+        $redeliverLimit = $now->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()
             ->where('m.delivered_at is null OR m.delivered_at < ?')
@@ -501,8 +501,4 @@ class Connection implements ResetInterface
             ? $comparator->compareSchemas($from, $to)
             : $comparator->compare($from, $to);
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\Connection::class, false)) {
-    class_alias(Connection::class, \Symfony\Component\Messenger\Transport\Doctrine\Connection::class);
 }

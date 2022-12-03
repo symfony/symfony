@@ -135,6 +135,25 @@ class LexerTest extends TestCase
                 ],
                 'foo.not in [bar]',
             ],
+            [
+                [new Token('number', 0.787, 1)],
+                '0.787',
+            ],
+            [
+                [new Token('number', 0.1234, 1)],
+                '.1234',
+            ],
+            [
+                [new Token('number', 188165.1178, 1)],
+                '188_165.1_178',
+            ],
+            [
+                [
+                    new Token('operator', '-', 1),
+                    new Token('number', 7189000000.0, 2),
+                ],
+                '-.7_189e+10',
+            ],
         ];
     }
 }

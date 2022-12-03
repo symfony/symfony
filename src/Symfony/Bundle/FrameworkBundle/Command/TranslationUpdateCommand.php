@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -38,6 +39,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @final
  */
+#[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files.')]
 class TranslationUpdateCommand extends Command
 {
     private const ASC = 'asc';
@@ -48,18 +50,15 @@ class TranslationUpdateCommand extends Command
         'xlf20' => ['xlf', '2.0'],
     ];
 
-    protected static $defaultName = 'translation:extract|translation:update';
-    protected static $defaultDescription = 'Extract missing translations keys from code to translation files.';
-
-    private $writer;
-    private $reader;
-    private $extractor;
-    private $defaultLocale;
-    private $defaultTransPath;
-    private $defaultViewsPath;
-    private $transPaths;
-    private $codePaths;
-    private $enabledLocales;
+    private TranslationWriterInterface $writer;
+    private TranslationReaderInterface $reader;
+    private ExtractorInterface $extractor;
+    private string $defaultLocale;
+    private ?string $defaultTransPath;
+    private ?string $defaultViewsPath;
+    private array $transPaths;
+    private array $codePaths;
+    private array $enabledLocales;
 
     public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [], array $enabledLocales = [])
     {
@@ -76,9 +75,6 @@ class TranslationUpdateCommand extends Command
         $this->enabledLocales = $enabledLocales;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -86,17 +82,14 @@ class TranslationUpdateCommand extends Command
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
-                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format (deprecated)'),
                 new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf12'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to extract'),
-                new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version (deprecated)'),
                 new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
 of a given bundle or the default translations directory. It can display them or merge
@@ -130,9 +123,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -152,16 +142,8 @@ EOF
             return 1;
         }
 
-        $format = $input->getOption('output-format') ?: $input->getOption('format');
-        $xliffVersion = $input->getOption('xliff-version') ?? '1.2';
-
-        if ($input->getOption('xliff-version')) {
-            $errorIo->warning(sprintf('The "--xliff-version" option is deprecated since version 5.3, use "--format=xlf%d" instead.', 10 * $xliffVersion));
-        }
-
-        if ($input->getOption('output-format')) {
-            $errorIo->warning(sprintf('The "--output-format" option is deprecated since version 5.3, use "--format=xlf%d" instead.', 10 * $xliffVersion));
-        }
+        $format = $input->getOption('format');
+        $xliffVersion = '1.2';
 
         if (\in_array($format, array_keys(self::FORMATS), true)) {
             [$format, $xliffVersion] = self::FORMATS[$format];
@@ -198,7 +180,7 @@ EOF
                     $codePaths[] = $this->defaultViewsPath;
                 }
                 $currentName = $foundBundle->getName();
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // such a bundle does not exist, so treat the argument as path
                 $path = $input->getArgument('bundle');
 

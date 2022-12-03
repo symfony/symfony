@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Added `session_token` option to support short-lived AWS credentials
+
 5.3
 ---
 

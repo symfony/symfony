@@ -21,7 +21,6 @@ use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
@@ -31,16 +30,6 @@ use Symfony\Component\Workflow\WorkflowEvents;
 class WorkflowTest extends TestCase
 {
     use WorkflowBuilderTrait;
-
-    public function testGetMarkingWithInvalidStoreReturn()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
-        $subject = new Subject();
-        $workflow = new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class));
-
-        $workflow->getMarking($subject);
-    }
 
     public function testGetMarkingWithEmptyDefinition()
     {

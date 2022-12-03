@@ -25,7 +25,6 @@ class ArgvInputTest extends TestCase
         $input = new ArgvInput();
         $r = new \ReflectionObject($input);
         $p = $r->getProperty('tokens');
-        $p->setAccessible(true);
 
         $this->assertEquals(['foo'], $p->getValue($input), '__construct() automatically get its input from the argv server variable');
     }

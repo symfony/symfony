@@ -28,12 +28,12 @@ final class OpenUriAction implements ActionCardCompatibleActionInterface
         'windows',
     ];
 
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return $this
      */
-    public function name(string $name): self
+    public function name(string $name): static
     {
         $this->options['name'] = $name;
 
@@ -43,7 +43,7 @@ final class OpenUriAction implements ActionCardCompatibleActionInterface
     /**
      * @return $this
      */
-    public function target(string $uri, string $os = 'default'): self
+    public function target(string $uri, string $os = 'default'): static
     {
         if (!\in_array($os, self::OPERATING_SYSTEMS)) {
             throw new InvalidArgumentException(sprintf('Supported operating systems for "%s" method are: "%s".', __METHOD__, implode('", "', self::OPERATING_SYSTEMS)));

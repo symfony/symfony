@@ -24,15 +24,15 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  */
 class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $logger;
-    private $containerPathPrefix;
-    private $currentRequest;
-    private $requestStack;
-    private $processedLogs;
+    private DebugLoggerInterface $logger;
+    private ?string $containerPathPrefix;
+    private ?Request $currentRequest = null;
+    private ?RequestStack $requestStack;
+    private ?array $processedLogs = null;
 
     public function __construct(object $logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null)
     {
-        if (null !== $logger && $logger instanceof DebugLoggerInterface) {
+        if ($logger instanceof DebugLoggerInterface) {
             $this->logger = $logger;
         }
 
@@ -40,31 +40,22 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->currentRequest = $this->requestStack && $this->requestStack->getMainRequest() !== $request ? $request : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
-        if ($this->logger instanceof DebugLoggerInterface) {
+        if (isset($this->logger)) {
             $this->logger->clear();
         }
         $this->data = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lateCollect()
     {
-        if (null !== $this->logger) {
+        if (isset($this->logger)) {
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();
             $this->data = $this->computeErrorsCount($containerDeprecationLogs);
             // get compiler logs later (only when they are needed) to improve performance
@@ -187,9 +178,6 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->cloneVar($this->getContainerCompilerLogs($this->data['compiler_logs_filepath'] ?? null));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'logger';

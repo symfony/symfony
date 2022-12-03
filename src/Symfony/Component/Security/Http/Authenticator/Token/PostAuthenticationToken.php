@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PostAuthenticationToken extends AbstractToken
 {
-    private $firewallName;
+    private string $firewallName;
 
     /**
      * @param string[] $roles An array of roles
@@ -34,7 +34,7 @@ class PostAuthenticationToken extends AbstractToken
         $this->setUser($user);
         $this->firewallName = $firewallName;
 
-        // @deprecated since Symfony 5.4
+        // required for compatibility with Symfony 5.4
         if (method_exists($this, 'setAuthenticated')) {
             // this token is meant to be used after authentication success, so it is always authenticated
             $this->setAuthenticated(true, false);
@@ -44,10 +44,8 @@ class PostAuthenticationToken extends AbstractToken
     /**
      * This is meant to be only a token, where credentials
      * have already been used and are thus cleared.
-     *
-     * {@inheritdoc}
      */
-    public function getCredentials()
+    public function getCredentials(): mixed
     {
         return [];
     }
@@ -57,17 +55,11 @@ class PostAuthenticationToken extends AbstractToken
         return $this->firewallName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
         return [$this->firewallName, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $data): void
     {
         [$this->firewallName, $parentData] = $data;

@@ -1,6 +1,34 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Improve truecolor terminal detection in some cases
+ * Add support for 256 color terminals (conversion from Ansi24 to Ansi8 if terminal is capable of it)
+ * Deprecate calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()`, `Question::setAutocompleterCallback/setValidator()`without any arguments
+ * Change the signature of `OutputFormatterStyleInterface::setForeground/setBackground()` to `setForeground/setBackground(?string)`
+ * Change the signature of `HelperInterface::setHelperSet()` to `setHelperSet(?HelperSet)`
+
+6.1
+---
+
+ * Add support to display table vertically when calling setVertical()
+ * Add method `__toString()` to `InputInterface`
+ * Added `OutputWrapper` to prevent truncated URL in `SymfonyStyle::createBlock`.
+ * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Add suggested values for arguments and options in input definition, for input completion
+ * Add `$resumeAt` parameter to `ProgressBar#start()`, so that one can easily 'resume' progress on longer tasks, and still get accurate `getEstimate()` and `getRemaining()` results.
+
+6.0
+---
+
+ * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter and is final
+ * Remove `Helper::strlen()`, use `Helper::width()` instead
+ * Remove `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead
+ * `AddConsoleCommandPass` can not be configured anymore
+ * Remove `HelperSet::setCommand()` and `getCommand()` without replacement
+
 5.4
 ---
 

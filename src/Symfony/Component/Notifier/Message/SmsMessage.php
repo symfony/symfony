@@ -18,13 +18,14 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class SmsMessage implements MessageInterface
+class SmsMessage implements MessageInterface
 {
-    private $transport;
-    private $subject;
-    private $phone;
+    private ?string $transport = null;
+    private string $subject;
+    private string $phone;
+    private string $from;
 
-    public function __construct(string $phone, string $subject)
+    public function __construct(string $phone, string $subject, string $from = '')
     {
         if ('' === $phone) {
             throw new InvalidArgumentException(sprintf('"%s" needs a phone number, it cannot be empty.', __CLASS__));
@@ -32,6 +33,7 @@ final class SmsMessage implements MessageInterface
 
         $this->subject = $subject;
         $this->phone = $phone;
+        $this->from = $from;
     }
 
     public static function fromNotification(Notification $notification, SmsRecipientInterface $recipient): self
@@ -42,7 +44,7 @@ final class SmsMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function phone(string $phone): self
+    public function phone(string $phone): static
     {
         if ('' === $phone) {
             throw new InvalidArgumentException(sprintf('"%s" needs a phone number, it cannot be empty.', static::class));
@@ -66,7 +68,7 @@ final class SmsMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function subject(string $subject): self
+    public function subject(string $subject): static
     {
         $this->subject = $subject;
 
@@ -81,7 +83,7 @@ final class SmsMessage implements MessageInterface
     /**
      * @return $this
      */
-    public function transport(?string $transport): self
+    public function transport(?string $transport): static
     {
         $this->transport = $transport;
 
@@ -91,6 +93,21 @@ final class SmsMessage implements MessageInterface
     public function getTransport(): ?string
     {
         return $this->transport;
+    }
+
+    /**
+     * @return $this
+     */
+    public function from(string $from): static
+    {
+        $this->from = $from;
+
+        return $this;
+    }
+
+    public function getFrom(): string
+    {
+        return $this->from;
     }
 
     public function getOptions(): ?MessageOptionsInterface

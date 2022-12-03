@@ -26,6 +26,13 @@ class EmailTest extends TestCase
         $this->assertEquals(Email::VALIDATION_MODE_STRICT, $subject->mode);
     }
 
+    public function testConstructorHtml5AllowNoTld()
+    {
+        $subject = new Email(['mode' => Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD]);
+
+        $this->assertEquals(Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD, $subject->mode);
+    }
+
     public function testUnknownModesTriggerException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -54,9 +61,6 @@ class EmailTest extends TestCase
         new Email(['normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttribute()
     {
         $metadata = new ClassMetadata(EmailDummy::class);

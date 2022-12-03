@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IsFalseValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IsFalseValidator
     {
         return new IsFalseValidator();
     }
@@ -54,9 +54,6 @@ class IsFalseValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new IsFalse([
             'message' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named parameters' => [eval('return new \Symfony\Component\Validator\Constraints\IsFalse(message: "myMessage");')];
-        }
+        yield 'named parameters' => [new IsFalse(message: 'myMessage')];
     }
 }

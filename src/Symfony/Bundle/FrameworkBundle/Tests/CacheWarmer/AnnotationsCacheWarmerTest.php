@@ -160,10 +160,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertTrue(isset($data[0]['bar_hit']));
     }
 
-    /**
-     * @return MockObject&Reader
-     */
-    private function getReadOnlyReader(): Reader
+    private function getReadOnlyReader(): MockObject&Reader
     {
         $readerMock = $this->createMock(Reader::class);
         $readerMock->expects($this->exactly(0))->method('getClassAnnotations');

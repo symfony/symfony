@@ -930,10 +930,7 @@ XML;
         return $encoder;
     }
 
-    /**
-     * @return MockObject&NormalizerInterface
-     */
-    private function createMockDateTimeNormalizer(): NormalizerInterface
+    private function createMockDateTimeNormalizer(): MockObject&NormalizerInterface
     {
         $mock = $this->createMock(CustomNormalizer::class);
 

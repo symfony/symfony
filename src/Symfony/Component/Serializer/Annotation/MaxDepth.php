@@ -25,30 +25,11 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 class MaxDepth
 {
-    /**
-     * @var int
-     */
-    private $maxDepth;
-
-    /**
-     * @param int $maxDepth
-     */
-    public function __construct($maxDepth)
+    public function __construct(private int $maxDepth)
     {
-        if (\is_array($maxDepth)) {
-            trigger_deprecation('symfony/serializer', '5.3', 'Passing an array as first argument to "%s" is deprecated. Use named arguments instead.', __METHOD__);
-
-            if (!isset($maxDepth['value'])) {
-                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" should be set.', static::class));
-            }
-            $maxDepth = $maxDepth['value'];
-        }
-
-        if (!\is_int($maxDepth) || $maxDepth <= 0) {
+        if ($maxDepth <= 0) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a positive integer.', static::class));
         }
-
-        $this->maxDepth = $maxDepth;
     }
 
     public function getMaxDepth()

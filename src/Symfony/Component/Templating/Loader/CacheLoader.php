@@ -12,6 +12,7 @@
 namespace Symfony\Component\Templating\Loader;
 
 use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
@@ -37,10 +38,7 @@ class CacheLoader extends Loader
         $this->dir = $dir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): Storage|false
     {
         $key = hash('sha256', $template->getLogicalName());
         $dir = $this->dir.\DIRECTORY_SEPARATOR.substr($key, 0, 2);
@@ -48,9 +46,7 @@ class CacheLoader extends Loader
         $path = $dir.\DIRECTORY_SEPARATOR.$file;
 
         if (is_file($path)) {
-            if (null !== $this->logger) {
-                $this->logger->debug('Fetching template from cache.', ['name' => $template->get('name')]);
-            }
+            $this->logger?->debug('Fetching template from cache.', ['name' => $template->get('name')]);
 
             return new FileStorage($path);
         }
@@ -67,17 +63,12 @@ class CacheLoader extends Loader
 
         file_put_contents($path, $content);
 
-        if (null !== $this->logger) {
-            $this->logger->debug('Storing template in cache.', ['name' => $template->get('name')]);
-        }
+        $this->logger?->debug('Storing template in cache.', ['name' => $template->get('name')]);
 
         return new FileStorage($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFresh(TemplateReferenceInterface $template, int $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         return $this->loader->isFresh($template, $time);
     }

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LengthValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): LengthValidator
     {
         return new LengthValidator();
     }
@@ -26,16 +26,6 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Length(['value' => 6]));
-
-        $this->assertNoViolation();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAllowEmptyString()
-    {
-        $this->validator->validate('', new Length(['value' => 6, 'allowEmptyString' => true]));
 
         $this->assertNoViolation();
     }
@@ -188,12 +178,11 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getThreeOrLessCharacters
      */
     public function testInvalidValuesMinNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Length(min: 4, minMessage: "myMessage");');
+        $constraint = new Length(min: 4, minMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -228,12 +217,11 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getFiveOrMoreCharacters
      */
     public function testInvalidValuesMaxNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Length(max: 4, maxMessage: "myMessage");');
+        $constraint = new Length(max: 4, maxMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -269,12 +257,11 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getThreeOrLessCharacters
      */
     public function testInvalidValuesExactLessThanFourNamed($value)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Length(exactly: 4, exactMessage: "myMessage");');
+        $constraint = new Length(exactly: 4, exactMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 

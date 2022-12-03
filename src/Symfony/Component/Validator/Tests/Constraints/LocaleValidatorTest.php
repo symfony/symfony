@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LocaleValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): LocaleValidator
     {
         return new LocaleValidator();
     }
@@ -138,14 +138,11 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidLocaleWithoutCanonicalizationNamed()
     {
         $this->validator->validate(
             'en-US',
-            eval('return new \Symfony\Component\Validator\Constraints\Locale(message: "myMessage", canonicalize: false);')
+            new Locale(message: 'myMessage', canonicalize: false)
         );
 
         $this->buildViolation('myMessage')

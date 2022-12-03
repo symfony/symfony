@@ -245,7 +245,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5
         ./div[@class="col-sm-2" or @class="col-sm-10"]
         /following-sibling::div[@class="col-sm-2" or @class="col-sm-10"]
         [
-            ./p
+            ./div
                 [@class="form-text mb-0 help-text"]
                 [.="[trans]really helpful text[/trans]"]
         ]
@@ -266,7 +266,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5
         ./div[@class="col-sm-2" or @class="col-sm-10"]
         /following-sibling::div[@class="col-sm-2" or @class="col-sm-10"]
         [
-            ./p
+            ./div
                 [@class="form-text mb-0 help-text"]
                 [.="[trans]really helpful text[/trans]"]
         ]

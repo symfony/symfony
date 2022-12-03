@@ -22,9 +22,9 @@ use Symfony\Component\Messenger\Envelope;
  */
 class SingleMessageReceiver implements ReceiverInterface
 {
-    private $receiver;
-    private $envelope;
-    private $hasReceived = false;
+    private ReceiverInterface $receiver;
+    private Envelope $envelope;
+    private bool $hasReceived = false;
 
     public function __construct(ReceiverInterface $receiver, Envelope $envelope)
     {

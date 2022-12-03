@@ -1,0 +1,10 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: Bar\FooClass
+        tags:
+            - foo_tag: { foo: bar, bar: { foo: bar, bar: foo } }

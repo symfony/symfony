@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Middleware;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp as LegacyAmqpReceivedStamp;
 
 /**
  * Middleware that throws a RejectRedeliveredMessageException when a message is detected that has been redelivered by AMQP.
@@ -36,12 +35,6 @@ class RejectRedeliveredMessageMiddleware implements MiddlewareInterface
     {
         $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);
         if ($amqpReceivedStamp instanceof AmqpReceivedStamp && $amqpReceivedStamp->getAmqpEnvelope()->isRedelivery()) {
-            throw new RejectRedeliveredMessageException('Redelivered message from AMQP detected that will be rejected and trigger the retry logic.');
-        }
-
-        // Legacy code to support symfony/messenger < 5.1
-        $amqpReceivedStamp = $envelope->last(LegacyAmqpReceivedStamp::class);
-        if ($amqpReceivedStamp instanceof LegacyAmqpReceivedStamp && $amqpReceivedStamp->getAmqpEnvelope()->isRedelivery()) {
             throw new RejectRedeliveredMessageException('Redelivered message from AMQP detected that will be rejected and trigger the retry logic.');
         }
 

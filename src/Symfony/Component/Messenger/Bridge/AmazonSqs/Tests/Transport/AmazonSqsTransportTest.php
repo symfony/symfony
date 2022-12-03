@@ -169,8 +169,8 @@ class AmazonSqsTransportTest extends TestCase
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)
     {
-        $serializer = $serializer ?? $this->createMock(SerializerInterface::class);
-        $connection = $connection ?? $this->createMock(Connection::class);
+        $serializer ??= $this->createMock(SerializerInterface::class);
+        $connection ??= $this->createMock(Connection::class);
 
         return new AmazonSqsTransport($connection, $serializer);
     }

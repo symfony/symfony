@@ -20,23 +20,11 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
-    private $id;
-    private $rate;
-
-    /**
-     * @var int
-     */
-    private $tokens;
-
-    /**
-     * @var int
-     */
-    private $burstSize;
-
-    /**
-     * @var float
-     */
-    private $timer;
+    private string $id;
+    private Rate $rate;
+    private int $tokens;
+    private int $burstSize;
+    private float $timer;
 
     /**
      * @param string     $id            unique identifier for this bucket
@@ -115,20 +103,5 @@ final class TokenBucket implements LimiterStateInterface
         $this->rate = Rate::fromString($rate);
         $this->burstSize = unpack('Na', $pack)['a'];
         $this->id = substr($pack, 4);
-    }
-
-    public function __sleep(): array
-    {
-        $this->stringRate = (string) $this->rate;
-
-        return ['id', 'tokens', 'timer', 'burstSize', 'stringRate'];
-    }
-
-    public function __wakeup(): void
-    {
-        if (\is_string($rate = $this->stringRate ?? null)) {
-            $this->rate = Rate::fromString($rate);
-            unset($this->stringRate);
-        }
     }
 }

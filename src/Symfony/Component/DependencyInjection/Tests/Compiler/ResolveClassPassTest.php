@@ -56,7 +56,7 @@ class ResolveClassPassTest extends TestCase
     {
         yield [\stdClass::class];
         yield ['bar'];
-        yield [\DateTime::class];
+        yield [\DateTimeImmutable::class];
     }
 
     public function testNonFqcnChildDefinition()

@@ -21,9 +21,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureAttributed
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 
-/**
- * @requires PHP 8
- */
 class RegisterAutoconfigureAttributesPassTest extends TestCase
 {
     public function testProcess()

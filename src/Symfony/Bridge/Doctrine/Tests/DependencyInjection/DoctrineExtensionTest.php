@@ -79,7 +79,6 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('fixManagersAutoMappings');
-        $method->setAccessible(true);
 
         $method->invoke($this->extension, $emConfigs, $bundles);
     }
@@ -168,7 +167,6 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('fixManagersAutoMappings');
-        $method->setAccessible(true);
 
         $newEmConfigs = $method->invoke($this->extension, $emConfigs, $bundles);
 
@@ -186,7 +184,6 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('detectMappingType');
-        $method->setAccessible(true);
 
         // The ordinary fixtures contain annotation
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
@@ -194,7 +191,7 @@ class DoctrineExtensionTest extends TestCase
 
         // In the attribute folder, attributes are used
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
-        $this->assertSame($mappingType, \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute');
+        $this->assertSame($mappingType, 'attribute');
     }
 
     public function providerBasicDrivers()
@@ -280,10 +277,8 @@ class DoctrineExtensionTest extends TestCase
     {
         yield ['AnnotationsBundle', 'annotation', '/Entity'];
         yield ['FullEmbeddableAnnotationsBundle', 'annotation', '/Entity'];
-        if (\PHP_VERSION_ID >= 80000) {
-            yield ['AttributesBundle', 'attribute', '/Entity'];
-            yield ['FullEmbeddableAttributesBundle', 'attribute', '/Entity'];
-        }
+        yield ['AttributesBundle', 'attribute', '/Entity'];
+        yield ['FullEmbeddableAttributesBundle', 'attribute', '/Entity'];
         yield ['XmlBundle', 'xml', '/Resources/config/doctrine'];
         yield ['PhpBundle', 'php', '/Resources/config/doctrine'];
         yield ['YamlBundle', 'yml', '/Resources/config/doctrine'];
@@ -333,7 +328,6 @@ class DoctrineExtensionTest extends TestCase
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('getMappingDriverBundleConfigDefaults');
-        $method->setAccessible(true);
 
         $this->assertSame(
             [
@@ -350,8 +344,6 @@ class DoctrineExtensionTest extends TestCase
     protected function invokeLoadCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
     {
         $method = new \ReflectionMethod($this->extension, 'loadObjectManagerCacheDriver');
-
-        $method->setAccessible(true);
 
         $method->invokeArgs($this->extension, [$objectManager, $container, $cacheName]);
     }

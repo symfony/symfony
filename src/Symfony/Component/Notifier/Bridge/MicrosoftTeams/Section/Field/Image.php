@@ -19,12 +19,12 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field;
  */
 final class Image
 {
-    private $options = [];
+    private array $options = [];
 
     /**
      * @return $this
      */
-    public function image(string $imageUrl): self
+    public function image(string $imageUrl): static
     {
         $this->options['image'] = $imageUrl;
 
@@ -34,7 +34,7 @@ final class Image
     /**
      * @return $this
      */
-    public function title(string $title): self
+    public function title(string $title): static
     {
         $this->options['title'] = $title;
 

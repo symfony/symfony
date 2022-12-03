@@ -48,8 +48,9 @@ jobs:
         run: |
           git checkout composer.json
           git checkout -m ${{ github.base_ref }}
-          cat .github/psalm/stubs/SetUpTearDownTrait.php > src/Symfony/Bridge/PhpUnit/SetUpTearDownTrait.php
 
+          # to be removed when psalm adds support for intersection types
+          sed -i 's/Uuid&/Uuid|/' src/Symfony/Component/Uid/Factory/TimeBasedUuidFactory.php
           ./vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
           git checkout -m FETCH_HEAD
 

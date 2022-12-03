@@ -30,7 +30,7 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'instanceof';
 
-    private $path;
+    private ?string $path;
 
     public function __construct(ServicesConfigurator $parent, Definition $definition, string $id, string $path = null)
     {

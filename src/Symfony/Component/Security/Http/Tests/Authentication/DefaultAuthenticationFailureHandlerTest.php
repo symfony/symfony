@@ -20,9 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class DefaultAuthenticationFailureHandlerTest extends TestCase
 {
@@ -30,12 +30,17 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     private $httpUtils;
     private $logger;
     private $request;
+    private $response;
     private $session;
     private $exception;
 
     protected function setUp(): void
     {
+        $this->response = new Response();
         $this->httpKernel = $this->createMock(HttpKernelInterface::class);
+        $this->httpKernel->expects($this->any())
+            ->method('handle')->willReturn($this->response);
+
         $this->httpUtils = $this->createMock(HttpUtils::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -51,20 +56,15 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $subRequest = $this->getRequest();
         $subRequest->attributes->expects($this->once())
-            ->method('set')->with(Security::AUTHENTICATION_ERROR, $this->exception);
+            ->method('set')->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $this->exception);
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')
             ->willReturn($subRequest);
 
-        $response = new Response();
-        $this->httpKernel->expects($this->once())
-            ->method('handle')->with($subRequest, HttpKernelInterface::SUB_REQUEST)
-            ->willReturn($response);
-
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
-        $this->assertSame($response, $result);
+        $this->assertSame($this->response, $result);
     }
 
     public function testRedirect()
@@ -83,7 +83,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     public function testExceptionIsPersistedInSession()
     {
         $this->session->expects($this->once())
-            ->method('set')->with(Security::AUTHENTICATION_ERROR, $this->exception);
+            ->method('set')->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $this->exception);
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, [], $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -95,7 +95,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $subRequest = $this->getRequest();
         $subRequest->attributes->expects($this->once())
-            ->method('set')->with(Security::AUTHENTICATION_ERROR, $this->exception);
+            ->method('set')->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $this->exception);
 
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')

@@ -17,6 +17,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  * @author Franz Wilding <franz.wilding@me.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fred Cox <mcfedr@gmail.com>
+ *
+ * @extends BaseDateTimeTransformer<string>
  */
 class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
 {
@@ -29,21 +31,19 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
      * input is an RFC3339 date followed by 'T', followed by an RFC3339 time.
      * https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#valid-local-date-and-time-string
      *
-     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
-     *
-     * @return string
+     * @param \DateTimeInterface $dateTime
      *
      * @throws TransformationFailedException If the given value is not an
      *                                       instance of \DateTime or \DateTimeInterface
      */
-    public function transform($dateTime)
+    public function transform(mixed $dateTime): string
     {
         if (null === $dateTime) {
             return '';
         }
 
-        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
-            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
+        if (!$dateTime instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTimeInterface.');
         }
 
         if ($this->inputTimezone !== $this->outputTimezone) {
@@ -66,12 +66,10 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
      *
      * @param string $dateTimeLocal Formatted string
      *
-     * @return \DateTime|null
-     *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the value could not be transformed
      */
-    public function reverseTransform($dateTimeLocal)
+    public function reverseTransform(mixed $dateTimeLocal): ?\DateTime
     {
         if (!\is_string($dateTimeLocal)) {
             throw new TransformationFailedException('Expected a string.');

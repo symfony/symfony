@@ -12,7 +12,6 @@
 namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\Lock\NoLock;
 use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
@@ -35,17 +34,13 @@ final class SlidingWindowLimiter implements LimiterInterface
 {
     use ResetLimiterTrait;
 
-    private $limit;
-
-    /**
-     * @var int seconds
-     */
-    private $interval;
+    private int $limit;
+    private int $interval;
 
     public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
     {
         $this->storage = $storage;
-        $this->lock = $lock ?? new NoLock();
+        $this->lock = $lock;
         $this->id = $id;
         $this->limit = $limit;
         $this->interval = TimeUtil::dateIntervalToSeconds($interval);
@@ -56,12 +51,9 @@ final class SlidingWindowLimiter implements LimiterInterface
         throw new ReserveNotSupportedException(__CLASS__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(int $tokens = 1): RateLimit
     {
-        $this->lock->acquire(true);
+        $this->lock?->acquire(true);
 
         try {
             $window = $this->storage->fetch($this->id);
@@ -78,11 +70,14 @@ final class SlidingWindowLimiter implements LimiterInterface
             }
 
             $window->add($tokens);
-            $this->storage->save($window);
+
+            if (0 < $tokens) {
+                $this->storage->save($window);
+            }
 
             return new RateLimit($this->getAvailableTokens($window->getHitCount()), $window->getRetryAfter(), true, $this->limit);
         } finally {
-            $this->lock->release();
+            $this->lock?->release();
         }
     }
 

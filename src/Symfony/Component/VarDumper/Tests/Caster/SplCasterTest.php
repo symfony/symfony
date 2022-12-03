@@ -159,9 +159,9 @@ EOTXT;
     public function testCastObjectStorageDumpsInfo()
     {
         $var = new \SplObjectStorage();
-        $var->attach(new \stdClass(), new \DateTime());
+        $var->attach(new \stdClass(), new \DateTimeImmutable());
 
-        $this->assertDumpMatchesFormat('%ADateTime%A', $var);
+        $this->assertDumpMatchesFormat('%ADateTimeImmutable%A', $var);
     }
 
     public function testCastArrayObject()
@@ -182,9 +182,6 @@ ArrayObject@anonymous {
   iteratorClass: "ArrayIterator"
 }
 EOTXT;
-        if (\PHP_VERSION_ID < 70400) {
-            $expected = str_replace('-storage:', 'storage:', $expected);
-        }
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -202,9 +199,6 @@ Symfony\Component\VarDumper\Tests\Caster\MyArrayIterator {
   flag::ARRAY_AS_PROPS: false
 }
 EOTXT;
-        if (\PHP_VERSION_ID < 70400) {
-            $expected = str_replace('-storage:', 'storage:', $expected);
-        }
         $this->assertDumpEquals($expected, $var);
     }
 

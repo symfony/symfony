@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements DataTransformerInterface<Collection, array>
  */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
@@ -26,7 +28,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException
      */
-    public function transform($collection)
+    public function transform(mixed $collection): mixed
     {
         if (null === $collection) {
             return [];
@@ -47,10 +49,8 @@ class CollectionToArrayTransformer implements DataTransformerInterface
 
     /**
      * Transforms an array into a collection.
-     *
-     * @return Collection
      */
-    public function reverseTransform($array)
+    public function reverseTransform(mixed $array): Collection
     {
         if ('' === $array || null === $array) {
             $array = [];

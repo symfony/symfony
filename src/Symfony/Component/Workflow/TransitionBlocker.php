@@ -20,9 +20,9 @@ final class TransitionBlocker
     public const BLOCKED_BY_EXPRESSION_GUARD_LISTENER = '326a1e9c-0c12-11e8-ba89-0ed5f89f718b';
     public const UNKNOWN = 'e8b5bbb9-5913-4b98-bfa6-65dbd228a82a';
 
-    private $message;
-    private $code;
-    private $parameters;
+    private string $message;
+    private string $code;
+    private array $parameters;
 
     /**
      * @param string $code       Code is a machine-readable string, usually an UUID

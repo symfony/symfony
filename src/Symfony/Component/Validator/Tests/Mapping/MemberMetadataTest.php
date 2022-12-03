@@ -108,7 +108,7 @@ class MemberMetadataTest extends TestCase
 
 class TestMemberMetadata extends MemberMetadata
 {
-    public function getPropertyValue($object)
+    public function getPropertyValue($object): mixed
     {
     }
 

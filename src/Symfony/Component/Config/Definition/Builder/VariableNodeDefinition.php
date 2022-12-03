@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
+use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\VariableNode;
 
 /**
@@ -22,18 +23,13 @@ class VariableNodeDefinition extends NodeDefinition
 {
     /**
      * Instantiate a Node.
-     *
-     * @return VariableNode
      */
-    protected function instantiateNode()
+    protected function instantiateNode(): VariableNode
     {
         return new VariableNode($this->name, $this->parent, $this->pathSeparator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createNode()
+    protected function createNode(): NodeInterface
     {
         $node = $this->instantiateNode();
 

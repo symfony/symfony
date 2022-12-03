@@ -20,6 +20,7 @@ use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
@@ -37,19 +38,25 @@ class MailerTest extends TestCase
     {
         $bus = new class() implements MessageBusInterface {
             public $messages = [];
+            public $stamps = [];
 
             public function dispatch($message, array $stamps = []): Envelope
             {
                 $this->messages[] = $message;
+                $this->stamps = $stamps;
 
                 return new Envelope($message, $stamps);
             }
         };
 
+        $stamp = $this->createMock(StampInterface::class);
+
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(self::callback(static function (MessageEvent $event) {
+            ->with(self::callback(static function (MessageEvent $event) use ($stamp) {
+                $event->addStamp($stamp);
+
                 return 'Time for Symfony Mailer!' === $event->getMessage()->getSubject();
             }))
             ->willReturnArgument(0)
@@ -68,5 +75,7 @@ class MailerTest extends TestCase
 
         self::assertCount(1, $bus->messages);
         self::assertSame($email, $bus->messages[0]->getMessage());
+        self::assertCount(1, $bus->stamps);
+        self::assertSame([$stamp], $bus->stamps);
     }
 }

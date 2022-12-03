@@ -17,5 +17,7 @@ class Php82Dummy
 
     public false $false = false;
 
+    public true $true = true;
+
     public (\Traversable&\Countable)|null $someCollection = null;
 }

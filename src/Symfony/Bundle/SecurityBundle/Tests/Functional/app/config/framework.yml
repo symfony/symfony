@@ -1,4 +1,5 @@
 framework:
+    http_method_override: false
     secret: test
     router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml", utf8: true }
     validation: { enabled: true, enable_annotations: true }
@@ -6,7 +7,6 @@ framework:
     csrf_protection: true
     form:
         enabled: true
-        legacy_error_messages: false
     test: ~
     default_locale: en
     session:

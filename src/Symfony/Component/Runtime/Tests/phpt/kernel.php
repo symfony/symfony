@@ -24,7 +24,7 @@ class TestKernel implements HttpKernelInterface
         $this->var = $var;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         return new Response('OK Kernel '.$this->var);
     }

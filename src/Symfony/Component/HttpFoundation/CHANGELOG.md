@@ -1,6 +1,40 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * The HTTP cache store uses the `xxh128` algorithm
+ * Deprecate calling `JsonResponse::setCallback()`, `Response::setExpires/setLastModified/setEtag()`, `MockArraySessionStorage/NativeSessionStorage::setMetadataBag()`, `NativeSessionStorage::setSaveHandler()` without arguments
+ * Add request matchers under the `Symfony\Component\HttpFoundation\RequestMatcher` namespace
+ * Deprecate `RequestMatcher` in favor of `ChainRequestMatcher`
+ * Deprecate `Symfony\Component\HttpFoundation\ExpressionRequestMatcher` in favor of `Symfony\Component\HttpFoundation\RequestMatcher\ExpressionRequestMatcher`
+
+6.1
+---
+
+ * Add stale while revalidate and stale if error cache header
+ * Allow dynamic session "ttl" when using a remote storage
+ * Deprecate `Request::getContentType()`, use `Request::getContentTypeFormat()` instead
+
+6.0
+---
+
+ * Remove the `NamespacedAttributeBag` class
+ * Removed `Response::create()`, `JsonResponse::create()`,
+   `RedirectResponse::create()`, `StreamedResponse::create()` and
+   `BinaryFileResponse::create()` methods (use `__construct()` instead)
+ * Not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()` throws an `\InvalidArgumentException`; wrap your filter in a closure instead
+ * Not passing a `Closure` together with `FILTER_CALLBACK` to `InputBag::filter()` throws an `\InvalidArgumentException`; wrap your filter in a closure instead
+ * Removed the `Request::HEADER_X_FORWARDED_ALL` constant, use either `Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO` or `Request::HEADER_X_FORWARDED_AWS_ELB` or `Request::HEADER_X_FORWARDED_TRAEFIK`constants instead
+ * Rename `RequestStack::getMasterRequest()` to `getMainRequest()`
+ * Not passing `FILTER_REQUIRE_ARRAY` or `FILTER_FORCE_ARRAY` flags to `InputBag::filter()` when filtering an array will throw `BadRequestException`
+ * Removed the `Request::HEADER_X_FORWARDED_ALL` constant
+ * Retrieving non-scalar values using `InputBag::get()` will throw `BadRequestException` (use `InputBad::all()` instead to retrieve an array)
+ * Passing non-scalar default value as the second argument `InputBag::get()` will throw `\InvalidArgumentException`
+ * Passing non-scalar, non-array value as the second argument `InputBag::set()` will throw `\InvalidArgumentException`
+ * Passing `null` as `$requestIp` to `IpUtils::__checkIp()`, `IpUtils::__checkIp4()` or `IpUtils::__checkIp6()` is not supported anymore.
+
 5.4
 ---
 
@@ -70,7 +104,7 @@ CHANGELOG
    make sure to run `ALTER TABLE sessions MODIFY sess_lifetime INTEGER UNSIGNED NOT NULL` to
    update your database.
  * `PdoSessionHandler` now precalculates the expiry timestamp in the lifetime column,
-    make sure to run `CREATE INDEX EXPIRY ON sessions (sess_lifetime)` to update your database
+    make sure to run `CREATE INDEX expiry ON sessions (sess_lifetime)` to update your database
     to speed up garbage collection of expired sessions.
  * added `SessionHandlerFactory` to create session handlers with a DSN
  * added `IpUtils::anonymize()` to help with GDPR compliance.

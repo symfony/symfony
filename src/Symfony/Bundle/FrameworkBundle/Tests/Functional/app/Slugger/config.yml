@@ -3,6 +3,7 @@ imports:
     - { resource: services.yml }
 
 framework:
+    http_method_override: false
     secret: '%secret%'
     default_locale: '%env(LOCALE)%'
     enabled_locales: ['%env(LOCALE)%']

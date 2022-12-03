@@ -20,33 +20,18 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SwitchUserToken extends UsernamePasswordToken
 {
-    private $originalToken;
-    private $originatedFromUri;
+    private TokenInterface $originalToken;
+    private ?string $originatedFromUri = null;
 
     /**
-     * @param UserInterface $user
-     * @param string|null   $originatedFromUri The URI where was the user at the switch
+     * @param $user              The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
+     * @param $originatedFromUri The URI where was the user at the switch
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, /* string */ $firewallName, /* array */ $roles, /* TokenInterface */ $originalToken, /* string */ $originatedFromUri = null)
+    public function __construct(UserInterface $user, string $firewallName, array $roles, TokenInterface $originalToken, string $originatedFromUri = null)
     {
-        if (\is_string($roles)) {
-            // @deprecated since 5.4, deprecation is triggered by UsernamePasswordToken::__construct()
-            $credentials = $firewallName;
-            $firewallName = $roles;
-            $roles = $originalToken;
-            $originalToken = $originatedFromUri;
-            $originatedFromUri = \func_num_args() > 5 ? func_get_arg(5) : null;
-
-            parent::__construct($user, $credentials, $firewallName, $roles);
-        } else {
-            parent::__construct($user, $firewallName, $roles);
-        }
-
-        if (!$originalToken instanceof TokenInterface) {
-            throw new \TypeError(sprintf('Argument $originalToken of "%s" must be an instance of "%s", "%s" given.', __METHOD__, TokenInterface::class, get_debug_type($originalToken)));
-        }
+        parent::__construct($user, $firewallName, $roles);
 
         $this->originalToken = $originalToken;
         $this->originatedFromUri = $originatedFromUri;
@@ -62,17 +47,11 @@ class SwitchUserToken extends UsernamePasswordToken
         return $this->originatedFromUri;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
         return [$this->originalToken, $this->originatedFromUri, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $data): void
     {
         if (3 > \count($data)) {

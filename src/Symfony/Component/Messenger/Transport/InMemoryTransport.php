@@ -27,46 +27,36 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     /**
      * @var Envelope[]
      */
-    private $sent = [];
+    private array $sent = [];
 
     /**
      * @var Envelope[]
      */
-    private $acknowledged = [];
+    private array $acknowledged = [];
 
     /**
      * @var Envelope[]
      */
-    private $rejected = [];
+    private array $rejected = [];
 
     /**
      * @var Envelope[]
      */
-    private $queue = [];
+    private array $queue = [];
 
-    private $nextId = 1;
-
-    /**
-     * @var SerializerInterface|null
-     */
-    private $serializer;
+    private int $nextId = 1;
+    private ?SerializerInterface $serializer;
 
     public function __construct(SerializerInterface $serializer = null)
     {
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         return array_values($this->decode($this->queue));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         $this->acknowledged[] = $this->encode($envelope);
@@ -78,9 +68,6 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $this->rejected[] = $this->encode($envelope);
@@ -92,9 +79,6 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         unset($this->queue[$transportMessageIdStamp->getId()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         $id = $this->nextId++;
@@ -135,10 +119,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         return $this->decode($this->sent);
     }
 
-    /**
-     * @return Envelope|array
-     */
-    private function encode(Envelope $envelope)
+    private function encode(Envelope $envelope): Envelope|array
     {
         if (null === $this->serializer) {
             return $envelope;
@@ -158,9 +139,6 @@ class InMemoryTransport implements TransportInterface, ResetInterface
             return $messagesEncoded;
         }
 
-        return array_map(
-            [$this->serializer, 'decode'],
-            $messagesEncoded
-        );
+        return array_map($this->serializer->decode(...), $messagesEncoded);
     }
 }

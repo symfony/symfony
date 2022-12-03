@@ -42,10 +42,10 @@ abstract class AbstractBrowser
     protected $followRedirects = true;
     protected $followMetaRefresh = false;
 
-    private $maxRedirects = -1;
-    private $redirectCount = 0;
-    private $redirects = [];
-    private $isMainRequest = true;
+    private int $maxRedirects = -1;
+    private int $redirectCount = 0;
+    private array $redirects = [];
+    private bool $isMainRequest = true;
 
     /**
      * @param array $server The server parameters (equivalent of $_SERVER)
@@ -75,10 +75,8 @@ abstract class AbstractBrowser
 
     /**
      * Returns whether client automatically follows redirects or not.
-     *
-     * @return bool
      */
-    public function isFollowingRedirects()
+    public function isFollowingRedirects(): bool
     {
         return $this->followRedirects;
     }
@@ -89,15 +87,13 @@ abstract class AbstractBrowser
     public function setMaxRedirects(int $maxRedirects)
     {
         $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
-        $this->followRedirects = -1 != $this->maxRedirects;
+        $this->followRedirects = -1 !== $this->maxRedirects;
     }
 
     /**
      * Returns the maximum number of redirects that crawler can follow.
-     *
-     * @return int
      */
-    public function getMaxRedirects()
+    public function getMaxRedirects(): int
     {
         return $this->maxRedirects;
     }
@@ -136,12 +132,8 @@ abstract class AbstractBrowser
 
     /**
      * Gets single server parameter for specified key.
-     *
-     * @param mixed $default A default value when key is undefined
-     *
-     * @return mixed
      */
-    public function getServerParameter(string $key, $default = '')
+    public function getServerParameter(string $key, mixed $default = ''): mixed
     {
         return $this->server[$key] ?? $default;
     }
@@ -177,30 +169,24 @@ abstract class AbstractBrowser
 
     /**
      * Returns the History instance.
-     *
-     * @return History
      */
-    public function getHistory()
+    public function getHistory(): History
     {
         return $this->history;
     }
 
     /**
      * Returns the CookieJar instance.
-     *
-     * @return CookieJar
      */
-    public function getCookieJar()
+    public function getCookieJar(): CookieJar
     {
         return $this->cookieJar;
     }
 
     /**
      * Returns the current Crawler instance.
-     *
-     * @return Crawler
      */
-    public function getCrawler()
+    public function getCrawler(): Crawler
     {
         if (null === $this->crawler) {
             throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
@@ -211,10 +197,8 @@ abstract class AbstractBrowser
 
     /**
      * Returns the current BrowserKit Response instance.
-     *
-     * @return Response
      */
-    public function getInternalResponse()
+    public function getInternalResponse(): Response
     {
         if (null === $this->internalResponse) {
             throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
@@ -229,11 +213,9 @@ abstract class AbstractBrowser
      * The origin response is the response instance that is returned
      * by the code that handles requests.
      *
-     * @return object
-     *
      * @see doRequest()
      */
-    public function getResponse()
+    public function getResponse(): object
     {
         if (null === $this->response) {
             throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
@@ -244,10 +226,8 @@ abstract class AbstractBrowser
 
     /**
      * Returns the current BrowserKit Request instance.
-     *
-     * @return Request
      */
-    public function getInternalRequest()
+    public function getInternalRequest(): Request
     {
         if (null === $this->internalRequest) {
             throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
@@ -262,11 +242,9 @@ abstract class AbstractBrowser
      * The origin request is the request instance that is sent
      * to the code that handles requests.
      *
-     * @return object
-     *
      * @see doRequest()
      */
-    public function getRequest()
+    public function getRequest(): object
     {
         if (null === $this->request) {
             throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
@@ -277,10 +255,8 @@ abstract class AbstractBrowser
 
     /**
      * Clicks on a given link.
-     *
-     * @return Crawler
      */
-    public function click(Link $link)
+    public function click(Link $link): Crawler
     {
         if ($link instanceof Form) {
             return $this->submit($link);
@@ -308,10 +284,8 @@ abstract class AbstractBrowser
      *
      * @param array $values           An array of form field values
      * @param array $serverParameters An array of server parameters
-     *
-     * @return Crawler
      */
-    public function submit(Form $form, array $values = [], array $serverParameters = [])
+    public function submit(Form $form, array $values = [], array $serverParameters = []): Crawler
     {
         $form->setValues($values);
 
@@ -349,10 +323,8 @@ abstract class AbstractBrowser
      * @param array  $server        The server parameters (HTTP headers are referenced with an HTTP_ prefix as PHP does)
      * @param string $content       The raw body data
      * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
-     *
-     * @return Crawler
      */
-    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true)
+    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
     {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;
@@ -382,7 +354,7 @@ abstract class AbstractBrowser
             $server['HTTP_HOST'] = $this->extractHost($uri);
         }
 
-        $server['HTTPS'] = 'https' == parse_url($uri, \PHP_URL_SCHEME);
+        $server['HTTPS'] = 'https' === parse_url($uri, \PHP_URL_SCHEME);
 
         $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
 
@@ -506,10 +478,8 @@ abstract class AbstractBrowser
      * Creates a crawler.
      *
      * This method returns null if the DomCrawler component is not available.
-     *
-     * @return Crawler|null
      */
-    protected function createCrawlerFromContent(string $uri, string $content, string $type)
+    protected function createCrawlerFromContent(string $uri, string $content, string $type): ?Crawler
     {
         if (!class_exists(Crawler::class)) {
             return null;
@@ -523,10 +493,8 @@ abstract class AbstractBrowser
 
     /**
      * Goes back in the browser history.
-     *
-     * @return Crawler
      */
-    public function back()
+    public function back(): Crawler
     {
         do {
             $request = $this->history->back();
@@ -537,10 +505,8 @@ abstract class AbstractBrowser
 
     /**
      * Goes forward in the browser history.
-     *
-     * @return Crawler
      */
-    public function forward()
+    public function forward(): Crawler
     {
         do {
             $request = $this->history->forward();
@@ -551,10 +517,8 @@ abstract class AbstractBrowser
 
     /**
      * Reloads the current browser.
-     *
-     * @return Crawler
      */
-    public function reload()
+    public function reload(): Crawler
     {
         return $this->requestFromRequest($this->history->current(), false);
     }
@@ -562,11 +526,9 @@ abstract class AbstractBrowser
     /**
      * Follow redirects?
      *
-     * @return Crawler
-     *
      * @throws \LogicException If request was not a redirect
      */
-    public function followRedirect()
+    public function followRedirect(): Crawler
     {
         if (empty($this->redirect)) {
             throw new \LogicException('The request was not redirected.');
@@ -638,13 +600,11 @@ abstract class AbstractBrowser
 
     /**
      * Takes a URI and converts it to absolute if it is not already absolute.
-     *
-     * @return string
      */
-    protected function getAbsoluteUri(string $uri)
+    protected function getAbsoluteUri(string $uri): string
     {
         // already absolute?
-        if (0 === strpos($uri, 'http://') || 0 === strpos($uri, 'https://')) {
+        if (str_starts_with($uri, 'http://') || str_starts_with($uri, 'https://')) {
             return $uri;
         }
 
@@ -663,14 +623,14 @@ abstract class AbstractBrowser
         }
 
         // anchor or query string parameters?
-        if (!$uri || '#' == $uri[0] || '?' == $uri[0]) {
+        if (!$uri || '#' === $uri[0] || '?' === $uri[0]) {
             return preg_replace('/[#?].*?$/', '', $currentUri).$uri;
         }
 
         if ('/' !== $uri[0]) {
             $path = parse_url($currentUri, \PHP_URL_PATH);
 
-            if ('/' !== substr($path, -1)) {
+            if (!str_ends_with($path, '/')) {
                 $path = substr($path, 0, strrpos($path, '/') + 1);
             }
 
@@ -684,10 +644,8 @@ abstract class AbstractBrowser
      * Makes a request from a Request object directly.
      *
      * @param bool $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
-     *
-     * @return Crawler
      */
-    protected function requestFromRequest(Request $request, bool $changeHistory = true)
+    protected function requestFromRequest(Request $request, bool $changeHistory = true): Crawler
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
@@ -696,7 +654,7 @@ abstract class AbstractBrowser
     {
         $server['HTTP_HOST'] = $this->extractHost($uri);
         $scheme = parse_url($uri, \PHP_URL_SCHEME);
-        $server['HTTPS'] = null === $scheme ? $server['HTTPS'] : 'https' == $scheme;
+        $server['HTTPS'] = null === $scheme ? $server['HTTPS'] : 'https' === $scheme;
         unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
 
         return $server;

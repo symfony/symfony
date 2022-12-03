@@ -19,14 +19,17 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PortRequestMatcher;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
-use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
@@ -133,7 +136,7 @@ abstract class CompleteConfigurationTest extends TestCase
             [
                 'simple',
                 'security.user_checker',
-                '.security.request_matcher.xmi9dcw',
+                '.security.request_matcher.h5ibf38',
                 false,
                 false,
                 '',
@@ -142,6 +145,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 '',
                 '',
                 [],
+                null,
                 null,
             ],
             [
@@ -166,12 +170,22 @@ abstract class CompleteConfigurationTest extends TestCase
                 [
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                    'target_route' => null,
+                ],
+                [
+                    'csrf_parameter' => '_csrf_token',
+                    'csrf_token_id' => 'logout',
+                    'path' => '/logout',
+                    'target' => '/',
+                    'invalidate_session' => true,
+                    'delete_cookies' => [],
+                    'enable_csrf' => null,
                 ],
             ],
             [
                 'host',
                 'security.user_checker',
-                '.security.request_matcher.iw4hyjb',
+                '.security.request_matcher.bcmu4fb',
                 true,
                 false,
                 'security.user.provider.concrete.default',
@@ -182,6 +196,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 [
                     'http_basic',
                 ],
+                null,
                 null,
             ],
             [
@@ -198,6 +213,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 [
                     'http_basic',
                 ],
+                null,
                 null,
             ],
         ], $configs);
@@ -227,137 +243,6 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyFirewalls()
-    {
-        $container = $this->getContainer('legacy_container1');
-        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $listeners = [];
-        $configs = [];
-        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
-            $contextDef = $container->getDefinition($contextId);
-            $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments[0]->getValues());
-
-            $configDef = $container->getDefinition((string) $arguments[3]);
-            $configs[] = array_values($configDef->getArguments());
-        }
-
-        // the IDs of the services are case sensitive or insensitive depending on
-        // the Symfony version. Transform them to lowercase to simplify tests.
-        $configs[0][2] = strtolower($configs[0][2]);
-        $configs[2][2] = strtolower($configs[2][2]);
-
-        $this->assertEquals([
-            [
-                'simple',
-                'security.user_checker',
-                '.security.request_matcher.xmi9dcw',
-                false,
-                false,
-                '',
-                '',
-                '',
-                '',
-                '',
-                [],
-                null,
-            ],
-            [
-                'secure',
-                'security.user_checker',
-                null,
-                true,
-                true,
-                'security.user.provider.concrete.default',
-                null,
-                'security.authentication.form_entry_point.secure',
-                null,
-                null,
-                [
-                    'switch_user',
-                    'x509',
-                    'remote_user',
-                    'form_login',
-                    'http_basic',
-                    'remember_me',
-                    'anonymous',
-                ],
-                [
-                    'parameter' => '_switch_user',
-                    'role' => 'ROLE_ALLOWED_TO_SWITCH',
-                ],
-            ],
-            [
-                'host',
-                'security.user_checker',
-                '.security.request_matcher.iw4hyjb',
-                true,
-                false,
-                'security.user.provider.concrete.default',
-                'host',
-                'security.authentication.basic_entry_point.host',
-                null,
-                null,
-                [
-                    'http_basic',
-                    'anonymous',
-                ],
-                null,
-            ],
-            [
-                'with_user_checker',
-                'app.user_checker',
-                null,
-                true,
-                false,
-                'security.user.provider.concrete.default',
-                'with_user_checker',
-                'security.authentication.basic_entry_point.with_user_checker',
-                null,
-                null,
-                [
-                    'http_basic',
-                    'anonymous',
-                ],
-                null,
-            ],
-        ], $configs);
-
-        $this->assertEquals([
-            [],
-            [
-                'security.channel_listener',
-                'security.authentication.listener.x509.secure',
-                'security.authentication.listener.remote_user.secure',
-                'security.authentication.listener.form.secure',
-                'security.authentication.listener.basic.secure',
-                'security.authentication.listener.rememberme.secure',
-                'security.authentication.listener.anonymous.secure',
-                'security.authentication.switchuser_listener.secure',
-                'security.access_listener',
-            ],
-            [
-                'security.channel_listener',
-                'security.context_listener.0',
-                'security.authentication.listener.basic.host',
-                'security.authentication.listener.anonymous.host',
-                'security.access_listener',
-            ],
-            [
-                'security.channel_listener',
-                'security.context_listener.1',
-                'security.authentication.listener.basic.with_user_checker',
-                'security.authentication.listener.anonymous.with_user_checker',
-                'security.access_listener',
-            ],
-        ], $listeners);
-
-        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
-    }
-
     public function testFirewallRequestMatchers()
     {
         $container = $this->getContainer('container1');
@@ -368,20 +253,27 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach ($arguments[1]->getValues() as $reference) {
             if ($reference instanceof Reference) {
                 $definition = $container->getDefinition((string) $reference);
-                $matchers[] = $definition->getArguments();
+                $matchers[] = $definition->getArgument(0);
             }
         }
 
-        $this->assertEquals([
-            [
-                '/login',
-            ],
-            [
-                '/test',
-                'foo\\.example\\.org',
-                ['GET', 'POST'],
-            ],
-        ], $matchers);
+        $this->assertCount(2, $matchers);
+
+        $this->assertCount(1, $matchers[0]);
+        $def = $container->getDefinition((string) $matchers[0][0]);
+        $this->assertSame(PathRequestMatcher::class, $def->getClass());
+        $this->assertSame('/login', $def->getArgument(0));
+
+        $this->assertCount(3, $matchers[1]);
+        $def = $container->getDefinition((string) $matchers[1][0]);
+        $this->assertSame(MethodRequestMatcher::class, $def->getClass());
+        $this->assertSame(['GET', 'POST'], $def->getArgument(0));
+        $def = $container->getDefinition((string) $matchers[1][1]);
+        $this->assertSame(PathRequestMatcher::class, $def->getClass());
+        $this->assertSame('/test', $def->getArgument(0));
+        $def = $container->getDefinition((string) $matchers[1][2]);
+        $this->assertSame(HostRequestMatcher::class, $def->getClass());
+        $this->assertSame('foo\\.example\\.org', $def->getArgument(0));
     }
 
     public function testUserCheckerAliasIsRegistered()
@@ -414,23 +306,36 @@ abstract class CompleteConfigurationTest extends TestCase
             if (1 === $i) {
                 $this->assertEquals(['ROLE_USER'], $attributes);
                 $this->assertEquals('https', $channel);
-                $this->assertEquals(
-                    ['/blog/524', null, ['GET', 'POST'], [], [], null, 8000],
-                    $requestMatcher->getArguments()
-                );
+                $this->assertCount(3, $requestMatcher->getArgument(0));
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[0]);
+                $this->assertSame(MethodRequestMatcher::class, $def->getClass());
+                $this->assertSame(['GET', 'POST'], $def->getArgument(0));
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[1]);
+                $this->assertSame(PathRequestMatcher::class, $def->getClass());
+                $this->assertSame('/blog/524', $def->getArgument(0));
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[2]);
+                $this->assertSame(PortRequestMatcher::class, $def->getClass());
+                $this->assertSame(8000, $def->getArgument(0));
             } elseif (2 === $i) {
                 $this->assertEquals(['IS_AUTHENTICATED_ANONYMOUSLY'], $attributes);
                 $this->assertNull($channel);
-                $this->assertEquals(
-                    ['/blog/.*'],
-                    $requestMatcher->getArguments()
-                );
+                $this->assertCount(1, $requestMatcher->getArgument(0));
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[0]);
+                $this->assertSame(PathRequestMatcher::class, $def->getClass());
+                $this->assertSame('/blog/.*', $def->getArgument(0));
             } elseif (3 === $i) {
                 $this->assertEquals('IS_AUTHENTICATED_ANONYMOUSLY', $attributes[0]);
                 $expression = $container->getDefinition((string) $attributes[1])->getArgument(0);
                 $this->assertEquals("token.getUserIdentifier() matches '/^admin/'", $expression);
+            } elseif (4 === $i) {
+                $this->assertEquals(['ROLE_ADMIN'], $attributes);
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[0]);
+                $this->assertSame(AttributesRequestMatcher::class, $def->getClass());
+                $this->assertSame(['_controller' => 'AdminController::index', '_route' => 'admin'], $def->getArgument(0));
             }
         }
+
+        $this->assertCount(4, $matcherIds);
     }
 
     public function testMerge()
@@ -441,294 +346,6 @@ abstract class CompleteConfigurationTest extends TestCase
             'FOO' => ['MOO'],
             'ADMIN' => ['USER'],
         ], $container->getParameter('security.role_hierarchy.roles'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEncoders()
-    {
-        $container = $this->getContainer('legacy_encoders');
-
-        $this->assertEquals([[
-            'JMS\FooBundle\Entity\User1' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => [false],
-            ],
-            'JMS\FooBundle\Entity\User2' => [
-                'algorithm' => 'sha1',
-                'encode_as_base64' => false,
-                'iterations' => 5,
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User3' => [
-                'algorithm' => 'md5',
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'encode_as_base64' => true,
-                'iterations' => 5000,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
-            'JMS\FooBundle\Entity\User5' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => ['sha1', false, 5, 30],
-            ],
-            'JMS\FooBundle\Entity\User6' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
-                'arguments' => [8, 102400, 15],
-            ],
-            'JMS\FooBundle\Entity\User7' => [
-                'algorithm' => 'auto',
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'encode_as_base64' => true,
-                'iterations' => 5000,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEncodersWithLibsodium()
-    {
-        if (!SodiumPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
-        }
-
-        $container = $this->getContainer('sodium_encoder');
-
-        $this->assertEquals([[
-            'JMS\FooBundle\Entity\User1' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => [false],
-            ],
-            'JMS\FooBundle\Entity\User2' => [
-                'algorithm' => 'sha1',
-                'encode_as_base64' => false,
-                'iterations' => 5,
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User3' => [
-                'algorithm' => 'md5',
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'encode_as_base64' => true,
-                'iterations' => 5000,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
-            'JMS\FooBundle\Entity\User5' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => ['sha1', false, 5, 30],
-            ],
-            'JMS\FooBundle\Entity\User6' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
-                'arguments' => [8, 102400, 15],
-            ],
-            'JMS\FooBundle\Entity\User7' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder',
-                'arguments' => [8, 128 * 1024 * 1024],
-            ],
-        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEncodersWithArgon2i()
-    {
-        if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm is not supported.');
-        }
-
-        $container = $this->getContainer('argon2i_encoder');
-
-        $this->assertEquals([[
-            'JMS\FooBundle\Entity\User1' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => [false],
-            ],
-            'JMS\FooBundle\Entity\User2' => [
-                'algorithm' => 'sha1',
-                'encode_as_base64' => false,
-                'iterations' => 5,
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User3' => [
-                'algorithm' => 'md5',
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'encode_as_base64' => true,
-                'iterations' => 5000,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
-            'JMS\FooBundle\Entity\User5' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => ['sha1', false, 5, 30],
-            ],
-            'JMS\FooBundle\Entity\User6' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
-                'arguments' => [8, 102400, 15],
-            ],
-            'JMS\FooBundle\Entity\User7' => [
-                'class' => $sodium ? SodiumPasswordEncoder::class : NativePasswordEncoder::class,
-                'arguments' => $sodium ? [256, 1] : [1, 262144, null, \PASSWORD_ARGON2I],
-            ],
-        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testMigratingEncoder()
-    {
-        if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm is not supported.');
-        }
-
-        $container = $this->getContainer('migrating_encoder');
-
-        $this->assertEquals([[
-            'JMS\FooBundle\Entity\User1' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => [false],
-            ],
-            'JMS\FooBundle\Entity\User2' => [
-                'algorithm' => 'sha1',
-                'encode_as_base64' => false,
-                'iterations' => 5,
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User3' => [
-                'algorithm' => 'md5',
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'encode_as_base64' => true,
-                'iterations' => 5000,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
-            'JMS\FooBundle\Entity\User5' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => ['sha1', false, 5, 30],
-            ],
-            'JMS\FooBundle\Entity\User6' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
-                'arguments' => [8, 102400, 15],
-            ],
-            'JMS\FooBundle\Entity\User7' => [
-                'algorithm' => 'argon2i',
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'encode_as_base64' => true,
-                'iterations' => 5000,
-                'cost' => null,
-                'memory_cost' => 256,
-                'time_cost' => 1,
-                'migrate_from' => ['bcrypt'],
-            ],
-        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEncodersWithBCrypt()
-    {
-        $container = $this->getContainer('bcrypt_encoder');
-
-        $this->assertEquals([[
-            'JMS\FooBundle\Entity\User1' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => [false],
-            ],
-            'JMS\FooBundle\Entity\User2' => [
-                'algorithm' => 'sha1',
-                'encode_as_base64' => false,
-                'iterations' => 5,
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User3' => [
-                'algorithm' => 'md5',
-                'hash_algorithm' => 'sha512',
-                'key_length' => 40,
-                'ignore_case' => false,
-                'encode_as_base64' => true,
-                'iterations' => 5000,
-                'cost' => null,
-                'memory_cost' => null,
-                'time_cost' => null,
-                'migrate_from' => [],
-            ],
-            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
-            'JMS\FooBundle\Entity\User5' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => ['sha1', false, 5, 30],
-            ],
-            'JMS\FooBundle\Entity\User6' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
-                'arguments' => [8, 102400, 15],
-            ],
-            'JMS\FooBundle\Entity\User7' => [
-                'class' => NativePasswordEncoder::class,
-                'arguments' => [null, null, 15, \PASSWORD_BCRYPT],
-            ],
-        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     public function testHashers()
@@ -1002,26 +619,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => [null, null, 15, \PASSWORD_BCRYPT],
             ],
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyRememberMeThrowExceptionsDefault()
-    {
-        $container = $this->getContainer('legacy_container1');
-        $this->assertTrue($container->getDefinition('security.authentication.listener.rememberme.secure')->getArgument(5));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyRememberMeThrowExceptions()
-    {
-        $container = $this->getContainer('legacy_remember_me_options');
-        $service = $container->getDefinition('security.authentication.listener.rememberme.main');
-        $this->assertEquals('security.authentication.rememberme.services.persistent.main', $service->getArgument(1));
-        $this->assertFalse($service->getArgument(5));
     }
 
     public function testUserCheckerConfig()

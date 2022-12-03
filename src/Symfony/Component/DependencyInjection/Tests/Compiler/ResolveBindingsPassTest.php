@@ -68,9 +68,6 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testProcessEnum()
     {
         $container = new ContainerBuilder();
@@ -235,9 +232,6 @@ class ResolveBindingsPassTest extends TestCase
         spl_autoload_unregister($autoloader);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testBindWithTarget()
     {
         $container = new ContainerBuilder();

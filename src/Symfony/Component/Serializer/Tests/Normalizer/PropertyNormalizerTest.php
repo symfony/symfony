@@ -93,9 +93,6 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testNormalizeObjectWithUninitializedProperties()
     {
         $obj = new Php74Dummy();
@@ -122,6 +119,54 @@ class PropertyNormalizerTest extends TestCase
         $this->assertEquals(
             ['foo' => 123, 'bar' => null, 'camelCase' => null],
             $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
+    public function testNormalizeOnlyPublic()
+    {
+        $obj = new PropertyDummy();
+        $obj->foo = 'foo';
+        $obj->setBar('bar');
+        $obj->setCamelCase('camelcase');
+        $this->assertEquals(
+            ['foo' => 'foo'],
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PUBLIC])
+        );
+    }
+
+    public function testNormalizeOnlyProtected()
+    {
+        $obj = new PropertyDummy();
+        $obj->foo = 'foo';
+        $obj->setBar('bar');
+        $obj->setCamelCase('camelcase');
+        $this->assertEquals(
+            ['camelCase' => 'camelcase'],
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PROTECTED])
+        );
+    }
+
+    public function testNormalizeOnlyPrivate()
+    {
+        $obj = new PropertyDummy();
+        $obj->foo = 'foo';
+        $obj->setBar('bar');
+        $obj->setCamelCase('camelcase');
+        $this->assertEquals(
+            ['bar' => 'bar'],
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PRIVATE])
+        );
+    }
+
+    public function testNormalizePublicAndProtected()
+    {
+        $obj = new PropertyDummy();
+        $obj->foo = 'foo';
+        $obj->setBar('bar');
+        $obj->setCamelCase('camelcase');
+        $this->assertEquals(
+            ['foo' => 'foo', 'camelCase' => 'camelcase'],
+            $this->normalizer->normalize($obj, 'any', ['normalize_visibility' => PropertyNormalizer::NORMALIZE_PUBLIC | PropertyNormalizer::NORMALIZE_PROTECTED])
         );
     }
 
@@ -408,7 +453,7 @@ class PropertyNormalizerTest extends TestCase
             RootDummy::class,
             'any'
         );
-        $this->assertEquals(\get_class($root), RootDummy::class);
+        $this->assertEquals($root::class, RootDummy::class);
 
         // children (two dimension array)
         $this->assertCount(1, $root->children);

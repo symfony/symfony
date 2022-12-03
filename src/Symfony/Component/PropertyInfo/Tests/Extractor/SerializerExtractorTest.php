@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IgnorePropertyDummy;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
@@ -46,10 +45,6 @@ class SerializerExtractorTest extends TestCase
 
     public function testGetPropertiesWithIgnoredProperties()
     {
-        if (!class_exists(Ignore::class)) {
-            $this->markTestSkipped('Ignore annotation is not implemented in current symfony/serializer version');
-        }
-
         $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['a']]));
     }
 

@@ -25,9 +25,9 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
  */
 class ImpersonateUrlGenerator
 {
-    private $requestStack;
-    private $tokenStorage;
-    private $firewallMap;
+    private RequestStack $requestStack;
+    private TokenStorageInterface $tokenStorage;
+    private FirewallMap $firewallMap;
 
     public function __construct(RequestStack $requestStack, FirewallMap $firewallMap, TokenStorageInterface $tokenStorage)
     {
@@ -65,9 +65,7 @@ class ImpersonateUrlGenerator
             throw new \LogicException('Unable to generate the impersonate exit URL without a firewall configured for the user switch.');
         }
 
-        if (null === $targetUri) {
-            $targetUri = $request->getRequestUri();
-        }
+        $targetUri ??= $request->getRequestUri();
 
         $targetUri .= (parse_url($targetUri, \PHP_URL_QUERY) ? '&' : '?').http_build_query([$switchUserConfig['parameter'] => SwitchUserListener::EXIT_VALUE], '', '&');
 

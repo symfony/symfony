@@ -31,7 +31,7 @@ class Valid extends Constraint
         $this->traverse = $traverse ?? $this->traverse;
     }
 
-    public function __get(string $option)
+    public function __get(string $option): mixed
     {
         if ('groups' === $option) {
             // when this is reached, no groups have been configured
@@ -41,9 +41,6 @@ class Valid extends Constraint
         return parent::__get($option);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addImplicitGroupName(string $group)
     {
         if (null !== $this->groups) {

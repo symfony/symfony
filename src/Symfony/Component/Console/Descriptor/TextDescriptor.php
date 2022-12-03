@@ -28,9 +28,6 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class TextDescriptor extends Descriptor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
         if (null !== $argument->getDefault() && (!\is_array($argument->getDefault()) || \count($argument->getDefault()))) {
@@ -51,9 +48,6 @@ class TextDescriptor extends Descriptor
         ), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
         if ($option->acceptValue() && null !== $option->getDefault() && (!\is_array($option->getDefault()) || \count($option->getDefault()))) {
@@ -89,9 +83,6 @@ class TextDescriptor extends Descriptor
         ), $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         $totalWidth = $this->calculateTotalWidthForOptions($definition->getOptions());
@@ -131,9 +122,6 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeCommand(Command $command, array $options = [])
     {
         $command->mergeApplicationDefinition(false);
@@ -169,9 +157,6 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function describeApplication(Application $application, array $options = [])
     {
         $describedNamespace = $options['namespace'] ?? null;
@@ -245,9 +230,6 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function writeText(string $content, array $options = [])
     {
         $this->write(
@@ -273,10 +255,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * Formats input option/argument default value.
-     *
-     * @param mixed $default
      */
-    private function formatDefaultValue($default): string
+    private function formatDefaultValue(mixed $default): string
     {
         if (\INF === $default) {
             return 'INF';

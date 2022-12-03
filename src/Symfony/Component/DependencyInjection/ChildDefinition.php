@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  */
 class ChildDefinition extends Definition
 {
-    private $parent;
+    private string $parent;
 
     /**
      * @param string $parent The id of Definition instance to decorate
@@ -33,10 +33,8 @@ class ChildDefinition extends Definition
 
     /**
      * Returns the Definition to inherit from.
-     *
-     * @return string
      */
-    public function getParent()
+    public function getParent(): string
     {
         return $this->parent;
     }
@@ -46,7 +44,7 @@ class ChildDefinition extends Definition
      *
      * @return $this
      */
-    public function setParent(string $parent)
+    public function setParent(string $parent): static
     {
         $this->parent = $parent;
 
@@ -59,13 +57,9 @@ class ChildDefinition extends Definition
      * If replaceArgument() has been used to replace an argument, this method
      * will return the replacement value.
      *
-     * @param int|string $index
-     *
-     * @return mixed
-     *
      * @throws OutOfBoundsException When the argument does not exist
      */
-    public function getArgument($index)
+    public function getArgument(int|string $index): mixed
     {
         if (\array_key_exists('index_'.$index, $this->arguments)) {
             return $this->arguments['index_'.$index];
@@ -82,14 +76,11 @@ class ChildDefinition extends Definition
      * certain conventions when you want to overwrite the arguments of the
      * parent definition, otherwise your arguments will only be appended.
      *
-     * @param int|string $index
-     * @param mixed      $value
-     *
      * @return $this
      *
      * @throws InvalidArgumentException when $index isn't an integer
      */
-    public function replaceArgument($index, $value)
+    public function replaceArgument(int|string $index, mixed $value): static
     {
         if (\is_int($index)) {
             $this->arguments['index_'.$index] = $value;

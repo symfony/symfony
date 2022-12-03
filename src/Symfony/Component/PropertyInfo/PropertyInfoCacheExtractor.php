@@ -32,57 +32,36 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
         $this->cacheItemPool = $cacheItemPool;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isReadable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isReadable', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isWritable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isWritable', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract('getShortDescription', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract('getLongDescription', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProperties(string $class, array $context = []): ?array
     {
         return $this->extract('getProperties', [$class, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract('getTypes', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isInitializable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isInitializable', [$class, $property, $context]);
@@ -90,14 +69,12 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
 
     /**
      * Retrieves the cached data if applicable or delegates to the decorated extractor.
-     *
-     * @return mixed
      */
-    private function extract(string $method, array $arguments)
+    private function extract(string $method, array $arguments): mixed
     {
         try {
             $serializedArguments = serialize($arguments);
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // If arguments are not serializable, skip the cache
             return $this->propertyInfoExtractor->{$method}(...$arguments);
         }

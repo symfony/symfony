@@ -16,21 +16,20 @@
         }
     ],
     "provide": {
-        "psr/link-implementation": "1.0"
+        "psr/link-implementation": "1.0|2.0"
     },
     "require": {
-        "php": ">=7.2.5",
-        "psr/link": "^1.0",
-        "symfony/polyfill-php80": "^1.16"
+        "php": ">=8.1",
+        "psr/link": "^1.1|^2.0"
     },
     "suggest": {
         "symfony/http-kernel": ""
     },
     "require-dev": {
-        "symfony/http-kernel": "^5.3|^6.0"
+        "symfony/http-kernel": "^5.4|^6.0"
     },
     "conflict": {
-        "symfony/http-kernel": "<5.3"
+        "symfony/http-kernel": "<5.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\WebLink\\": "" },

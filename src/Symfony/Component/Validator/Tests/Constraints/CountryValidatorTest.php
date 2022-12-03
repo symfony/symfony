@@ -35,7 +35,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    protected function createValidator()
+    protected function createValidator(): CountryValidator
     {
         return new CountryValidator();
     }
@@ -153,14 +153,11 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidAlpha3CountryNamed()
     {
         $this->validator->validate(
             'DE',
-            eval('return new \Symfony\Component\Validator\Constraints\Country(alpha3: true, message: "myMessage");')
+            new Country(alpha3: true, message: 'myMessage')
         );
 
         $this->buildViolation('myMessage')

@@ -35,7 +35,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             return HttpClient::create();
         }
 
-        $chunkFilter = $chunkFilter ?? static function (ChunkInterface $chunk, AsyncContext $context) { yield $chunk; };
+        $chunkFilter ??= static function (ChunkInterface $chunk, AsyncContext $context) { yield $chunk; };
 
         return new class($decoratedClient ?? parent::getHttpClient($testCase), $chunkFilter) implements HttpClientInterface {
             use AsyncDecoratorTrait;

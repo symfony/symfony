@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\HttpClient\Internal\ClientState;
 
 /**
@@ -27,9 +29,9 @@ use Symfony\Component\HttpClient\Internal\ClientState;
  */
 trait TransportResponseTrait
 {
-    private $canary;
-    private $headers = [];
-    private $info = [
+    private Canary $canary;
+    private array $headers = [];
+    private array $info = [
         'response_headers' => [],
         'http_code' => 0,
         'error' => null,
@@ -38,15 +40,12 @@ trait TransportResponseTrait
 
     /** @var object|resource */
     private $handle;
-    private $id;
-    private $timeout = 0;
-    private $inflate;
-    private $finalInfo;
-    private $logger;
+    private int|string $id;
+    private ?float $timeout = 0;
+    private \InflateContext|bool|null $inflate = null;
+    private ?array $finalInfo = null;
+    private ?LoggerInterface $logger = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStatusCode(): int
     {
         if ($this->initializer) {
@@ -56,9 +55,6 @@ trait TransportResponseTrait
         return $this->info['http_code'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHeaders(bool $throw = true): array
     {
         if ($this->initializer) {
@@ -72,9 +68,6 @@ trait TransportResponseTrait
         return $this->headers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cancel(): void
     {
         $this->info['canceled'] = true;
@@ -129,7 +122,7 @@ trait TransportResponseTrait
     /**
      * Ensures the request is always sent and that the response code was checked.
      */
-    private function doDestruct()
+    private function doDestruct(): void
     {
         $this->shouldBuffer = true;
 
@@ -189,7 +182,7 @@ trait TransportResponseTrait
                         continue;
                     } elseif ($elapsedTimeout >= $timeoutMax) {
                         $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
-                        $multi->lastTimeout ?? $multi->lastTimeout = $lastActivity;
+                        $multi->lastTimeout ??= $lastActivity;
                     } else {
                         continue;
                     }

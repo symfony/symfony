@@ -137,10 +137,7 @@ class IbanValidator extends ConstraintValidator
         'YT' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // Mayotte
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Iban) {
             throw new UnexpectedTypeException($constraint, Iban::class);
@@ -150,7 +147,7 @@ class IbanValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 

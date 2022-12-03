@@ -27,17 +27,17 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {
-    private $decoratedFactory;
+    private ChoiceListFactoryInterface $decoratedFactory;
 
     /**
      * @var ChoiceListInterface[]
      */
-    private $lists = [];
+    private array $lists = [];
 
     /**
      * @var ChoiceListView[]
      */
-    private $views = [];
+    private array $views = [];
 
     /**
      * Generates a SHA-256 hash for the given value.
@@ -45,13 +45,11 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      * Optionally, a namespace string can be passed. Calling this method will
      * the same values, but different namespaces, will return different hashes.
      *
-     * @param mixed $value The value to hash
-     *
      * @return string The SHA-256 hash
      *
      * @internal
      */
-    public static function generateHash($value, string $namespace = ''): string
+    public static function generateHash(mixed $value, string $namespace = ''): string
     {
         if (\is_object($value)) {
             $value = spl_object_hash($value);
@@ -73,24 +71,14 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
 
     /**
      * Returns the decorated factory.
-     *
-     * @return ChoiceListFactoryInterface
      */
-    public function getDecoratedFactory()
+    public function getDecoratedFactory(): ChoiceListFactoryInterface
     {
         return $this->decoratedFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param mixed $value
-     * @param mixed $filter
-     */
-    public function createListFromChoices(iterable $choices, $value = null/* , $filter = null */)
+    public function createListFromChoices(iterable $choices, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }
@@ -122,16 +110,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->lists[$hash];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param mixed $value
-     * @param mixed $filter
-     */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null/* , $filter = null */)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, mixed $value = null, mixed $filter = null): ChoiceListInterface
     {
-        $filter = \func_num_args() > 2 ? func_get_arg(2) : null;
-
         $cache = true;
 
         if ($loader instanceof Cache\ChoiceLoader) {
@@ -165,19 +145,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->lists[$hash];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param mixed $preferredChoices
-     * @param mixed $label
-     * @param mixed $index
-     * @param mixed $groupBy
-     * @param mixed $attr
-     * @param mixed $labelTranslationParameters
-     */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/* , $labelTranslationParameters = [] */)
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = []): ChoiceListView
     {
-        $labelTranslationParameters = \func_num_args() > 6 ? func_get_arg(6) : [];
         $cache = true;
 
         if ($preferredChoices instanceof Cache\PreferredChoice) {

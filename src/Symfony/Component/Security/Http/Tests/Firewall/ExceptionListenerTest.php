@@ -75,8 +75,17 @@ class ExceptionListenerTest extends TestCase
         ];
     }
 
+    /**
+     * This test should be removed in Symfony 7.0 when adding native return types to AuthenticationEntryPointInterface::start().
+     *
+     * @group legacy
+     */
     public function testExceptionWhenEntryPointReturnsBadValue()
     {
+        if ((new \ReflectionMethod(AuthenticationEntryPointInterface::class, 'start'))->hasReturnType()) {
+            $this->markTestSkipped('Native return type found');
+        }
+
         $event = $this->createEvent(new AuthenticationException());
 
         $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
@@ -212,9 +221,7 @@ class ExceptionListenerTest extends TestCase
 
     private function createEvent(\Exception $exception, $kernel = null)
     {
-        if (null === $kernel) {
-            $kernel = $this->createMock(HttpKernelInterface::class);
-        }
+        $kernel ??= $this->createMock(HttpKernelInterface::class);
 
         return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
     }

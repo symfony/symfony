@@ -14,9 +14,6 @@ namespace Symfony\Component\Routing\Tests\Loader;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
 use Symfony\Component\Routing\Route;
 
-/**
- * @requires PHP 8
- */
 class AnnotationClassLoaderWithAttributesTest extends AnnotationClassLoaderTest
 {
     protected function setUp(string $env = null): void

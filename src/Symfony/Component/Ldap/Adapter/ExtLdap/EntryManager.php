@@ -23,16 +23,13 @@ use Symfony\Component\Ldap\Exception\UpdateOperationException;
  */
 class EntryManager implements EntryManagerInterface
 {
-    private $connection;
+    private Connection $connection;
 
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function add(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -44,9 +41,6 @@ class EntryManager implements EntryManagerInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -56,9 +50,6 @@ class EntryManager implements EntryManagerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -98,9 +89,6 @@ class EntryManager implements EntryManagerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true)
     {
         $con = $this->getConnectionResource();

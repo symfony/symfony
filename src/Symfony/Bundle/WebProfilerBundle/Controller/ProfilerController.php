@@ -71,9 +71,7 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
 
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
+        $this->cspHandler?->disableCsp();
 
         $panel = $request->query->get('panel');
         $page = $request->query->get('page', 'home');
@@ -115,7 +113,7 @@ class ProfilerController
             'request' => $request,
             'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
-            'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
+            'profiler_markup_version' => 3, // 1 = original profiler, 2 = Symfony 2.8+ profiler, 3 = Symfony 6.2+ profiler
         ]);
     }
 
@@ -148,7 +146,7 @@ class ProfilerController
         $url = null;
         try {
             $url = $this->generator->generate('_profiler', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // the profiler is not enabled
         }
 
@@ -159,7 +157,7 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getNames($profile),
             'profiler_url' => $url,
             'token' => $token,
-            'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar
+            'profiler_markup_version' => 3, // 1 = original toolbar, 2 = Symfony 2.8+ profiler, 3 = Symfony 6.2+ profiler
         ]);
     }
 
@@ -172,9 +170,7 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
 
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
+        $this->cspHandler?->disableCsp();
 
         if (!$request->hasSession()) {
             $ip =
@@ -209,6 +205,7 @@ class ProfilerController
                 'end' => $end,
                 'limit' => $limit,
                 'request' => $request,
+                'render_hidden_by_default' => false,
             ]),
             200,
             ['Content-Type' => 'text/html']
@@ -224,9 +221,7 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
 
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
+        $this->cspHandler?->disableCsp();
 
         $profile = $this->profiler->loadProfile($token);
 
@@ -312,15 +307,35 @@ class ProfilerController
     {
         $this->denyAccessIfProfilerDisabled();
 
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
+        $this->cspHandler?->disableCsp();
 
         ob_start();
         phpinfo();
         $phpinfo = ob_get_clean();
 
         return new Response($phpinfo, 200, ['Content-Type' => 'text/html']);
+    }
+
+    /**
+     * Displays the Xdebug info.
+     *
+     * @throws NotFoundHttpException
+     */
+    public function xdebugAction(): Response
+    {
+        $this->denyAccessIfProfilerDisabled();
+
+        if (!\function_exists('xdebug_info')) {
+            throw new NotFoundHttpException('Xdebug must be installed in version 3.');
+        }
+
+        $this->cspHandler?->disableCsp();
+
+        ob_start();
+        xdebug_info();
+        $xdebugInfo = ob_get_clean();
+
+        return new Response($xdebugInfo, 200, ['Content-Type' => 'text/html']);
     }
 
     /**
@@ -334,9 +349,7 @@ class ProfilerController
             throw new NotFoundHttpException('The base dir should be set.');
         }
 
-        if ($this->profiler) {
-            $this->profiler->disable();
-        }
+        $this->profiler?->disable();
 
         $file = $request->query->get('file');
         $line = $request->query->get('line');
@@ -348,22 +361,15 @@ class ProfilerController
         }
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/open.html.twig', [
-            'filename' => $filename,
+            'file_info' => new \SplFileInfo($filename),
             'file' => $file,
             'line' => $line,
         ]);
     }
 
-    /**
-     * Gets the Template Manager.
-     */
     protected function getTemplateManager(): TemplateManager
     {
-        if (null === $this->templateManager) {
-            $this->templateManager = new TemplateManager($this->profiler, $this->twig, $this->templates);
-        }
-
-        return $this->templateManager;
+        return $this->templateManager ??= new TemplateManager($this->profiler, $this->twig, $this->templates);
     }
 
     private function denyAccessIfProfilerDisabled()

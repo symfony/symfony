@@ -23,22 +23,22 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  */
 class EarlyExpirationDispatcher
 {
-    private $bus;
-    private $reverseContainer;
-    private $callbackWrapper;
+    private MessageBusInterface $bus;
+    private ReverseContainer $reverseContainer;
+    private ?\Closure $callbackWrapper;
 
     public function __construct(MessageBusInterface $bus, ReverseContainer $reverseContainer, callable $callbackWrapper = null)
     {
         $this->bus = $bus;
         $this->reverseContainer = $reverseContainer;
-        $this->callbackWrapper = $callbackWrapper;
+        $this->callbackWrapper = null === $callbackWrapper ? null : $callbackWrapper(...);
     }
 
     public function __invoke(callable $callback, CacheItem $item, bool &$save, AdapterInterface $pool, \Closure $setMetadata, LoggerInterface $logger = null)
     {
         if (!$item->isHit() || null === $message = EarlyExpirationMessage::create($this->reverseContainer, $callback, $item, $pool)) {
             // The item is stale or the callback cannot be reversed: we must compute the value now
-            $logger && $logger->info('Computing item "{key}" online: '.($item->isHit() ? 'callback cannot be reversed' : 'item is stale'), ['key' => $item->getKey()]);
+            $logger?->info('Computing item "{key}" online: '.($item->isHit() ? 'callback cannot be reversed' : 'item is stale'), ['key' => $item->getKey()]);
 
             return null !== $this->callbackWrapper ? ($this->callbackWrapper)($callback, $item, $save, $pool, $setMetadata, $logger) : $callback($item, $save);
         }

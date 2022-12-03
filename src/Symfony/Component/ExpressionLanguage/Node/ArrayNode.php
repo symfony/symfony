@@ -29,9 +29,7 @@ class ArrayNode extends Node
 
     public function addElement(Node $value, Node $key = null)
     {
-        if (null === $key) {
-            $key = new ConstantNode(++$this->index);
-        }
+        $key ??= new ConstantNode(++$this->index);
 
         array_push($this->nodes, $key, $value);
     }

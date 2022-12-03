@@ -25,7 +25,7 @@ _sf_{{ COMMAND_NAME }}() {
     local cur prev words cword
     _get_comp_words_by_ref -n := cur prev words cword
 
-    local completecmd=("$sf_cmd" "_complete" "--no-interaction" "-sbash" "-c$cword" "-S{{ VERSION }}")
+    local completecmd=("$sf_cmd" "_complete" "--no-interaction" "-sbash" "-c$cword" "-a{{ VERSION }}")
     for w in ${words[@]}; do
         w=$(printf -- '%b' "$w")
         # remove quotes from typed values

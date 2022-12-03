@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class PercentTypeTest extends TypeTestCase
 {
-    use ExpectDeprecationTrait;
-
     public const TESTED_TYPE = PercentType::class;
 
     private $defaultLocale;
@@ -83,36 +80,14 @@ class PercentTypeTest extends TypeTestCase
         $this->assertSame('number', $form->createView()->vars['type']);
     }
 
-    /**
-     * @group legacy
-     */
     public function testSubmitWithoutRoundingMode()
     {
-        $this->expectDeprecation('Since symfony/form 5.1: Not configuring the "rounding_mode" option is deprecated. It will default to "\NumberFormatter::ROUND_HALFUP" in Symfony 6.0.');
-
         $form = $this->factory->create(self::TESTED_TYPE, null, [
             'scale' => 2,
         ]);
 
         $form->submit('1.23456');
 
-        $this->assertEqualsWithDelta(0.0123456, $form->getData(), \PHP_FLOAT_EPSILON);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSubmitWithNullRoundingMode()
-    {
-        $this->expectDeprecation('Since symfony/form 5.1: Not configuring the "rounding_mode" option is deprecated. It will default to "\NumberFormatter::ROUND_HALFUP" in Symfony 6.0.');
-
-        $form = $this->factory->create(self::TESTED_TYPE, null, [
-            'rounding_mode' => null,
-            'scale' => 2,
-        ]);
-
-        $form->submit('1.23456');
-
-        $this->assertEqualsWithDelta(0.0123456, $form->getData(), \PHP_FLOAT_EPSILON);
+        $this->assertEquals(0.0123, $form->getData());
     }
 }

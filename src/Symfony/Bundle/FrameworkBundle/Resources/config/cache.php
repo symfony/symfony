@@ -16,7 +16,6 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
@@ -40,6 +39,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('cache.app.taggable', TagAwareAdapter::class)
             ->args([service('cache.app')])
+            ->tag('cache.taggable', ['pool' => 'cache.app'])
 
         ->set('cache.system')
             ->parent('cache.adapter.system')
@@ -94,22 +94,6 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])
             ->tag('monolog.logger', ['channel' => 'cache'])
-
-        ->set('cache.adapter.doctrine', DoctrineAdapter::class)
-            ->abstract()
-            ->args([
-                abstract_arg('Doctrine provider service'),
-                '', // namespace
-                0, // default lifetime
-            ])
-            ->call('setLogger', [service('logger')->ignoreOnInvalid()])
-            ->tag('cache.pool', [
-                'provider' => 'cache.default_doctrine_provider',
-                'clearer' => 'cache.default_clearer',
-                'reset' => 'reset',
-            ])
-            ->tag('monolog.logger', ['channel' => 'cache'])
-            ->deprecate('symfony/framework-bundle', '5.4', 'The "%service_id%" service inherits from "cache.adapter.doctrine" which is deprecated.')
 
         ->set('cache.adapter.filesystem', FilesystemAdapter::class)
             ->abstract()
@@ -256,9 +240,6 @@ return static function (ContainerConfigurator $container) {
             ->public()
 
         ->alias(CacheItemPoolInterface::class, 'cache.app')
-
-        ->alias(AdapterInterface::class, 'cache.app')
-            ->deprecate('symfony/framework-bundle', '5.4', sprintf('The "%%alias_id%%" alias is deprecated, use "%s" instead.', CacheItemPoolInterface::class))
 
         ->alias(CacheInterface::class, 'cache.app')
 

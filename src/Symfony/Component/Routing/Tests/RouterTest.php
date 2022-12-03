@@ -151,7 +151,6 @@ class RouterTest extends TestCase
         $matcher->expects($this->once())->method('match');
 
         $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setAccessible(true);
         $p->setValue($this->router, $matcher);
 
         $this->router->matchRequest(Request::create('/'));
@@ -163,7 +162,6 @@ class RouterTest extends TestCase
         $matcher->expects($this->once())->method('matchRequest');
 
         $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setAccessible(true);
         $p->setValue($this->router, $matcher);
 
         $this->router->matchRequest(Request::create('/'));
@@ -184,7 +182,6 @@ class RouterTest extends TestCase
         $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
 
         $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
 
         $this->assertSame('hr', $p->getValue($generator));
     }
@@ -204,7 +201,6 @@ class RouterTest extends TestCase
         $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
 
         $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
 
         $this->assertSame('hr', $p->getValue($generator));
     }

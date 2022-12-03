@@ -16,39 +16,28 @@ use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServic
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PublicService;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\UnusedPrivateService;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class TestServiceContainerTest extends AbstractWebTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testThatPrivateServicesAreUnavailableIfTestConfigIsDisabled()
+    public function testLogicExceptionIfTestConfigIsDisabled()
     {
         static::bootKernel(['test_case' => 'TestServiceContainer', 'root_config' => 'test_disabled.yml', 'environment' => 'test_disabled']);
 
-        $this->assertInstanceOf(ContainerInterface::class, static::$container);
-        $this->assertNotInstanceOf(TestContainer::class, static::$container);
-        $this->assertTrue(static::$container->has(PublicService::class));
-        $this->assertFalse(static::$container->has(NonPublicService::class));
-        $this->assertFalse(static::$container->has(PrivateService::class));
-        $this->assertFalse(static::$container->has('private_service'));
-        $this->assertFalse(static::$container->has(UnusedPrivateService::class));
+        $this->expectException(\LogicException::class);
+
+        static::getContainer();
     }
 
-    /**
-     * @group legacy
-     */
     public function testThatPrivateServicesAreAvailableIfTestConfigIsEnabled()
     {
         static::bootKernel(['test_case' => 'TestServiceContainer']);
 
-        $this->assertInstanceOf(TestContainer::class, static::$container);
-        $this->assertTrue(static::$container->has(PublicService::class));
-        $this->assertTrue(static::$container->has(NonPublicService::class));
-        $this->assertTrue(static::$container->has(PrivateService::class));
-        $this->assertTrue(static::$container->has('private_service'));
-        $this->assertFalse(static::$container->has(UnusedPrivateService::class));
+        $this->assertInstanceOf(TestContainer::class, static::getContainer());
+        $this->assertTrue(static::getContainer()->has(PublicService::class));
+        $this->assertTrue(static::getContainer()->has(NonPublicService::class));
+        $this->assertTrue(static::getContainer()->has(PrivateService::class));
+        $this->assertTrue(static::getContainer()->has('private_service'));
+        $this->assertFalse(static::getContainer()->has(UnusedPrivateService::class));
     }
 
     /**

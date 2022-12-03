@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Luhn;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
@@ -40,9 +41,11 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         '273CA8A2A78C9B2D724144F4FAF4D221C86:6', // ISO-8859-5 leaked password: мама
         '3686792BBC66A72D40D928ED15621124CFE:7',
         '36EEC709091B810AA240179A44317ED415C:2',
+        'EE6EB9C0DFA0F07098CEDB11ECC7AFF9D4E:0', // UTF-8 not leaked password: ]<0585"%sb^5aa$w6!b38",,72?dp3r4\45b28Hy
+        'FC9F37E51AACD6B692A62769267590D46B8:0', // ISO-8859-5 non leaked password: м<в0dp3r4\45b28Hy
     ];
 
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         // Pass HttpClient::create() instead of the mock to run the tests against the real API
         return new NotCompromisedPasswordValidator($this->createHttpClientStub());
@@ -65,7 +68,6 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidPasswordButDisabled()
     {
         $r = new \ReflectionProperty($this->validator, 'enabled');
-        $r->setAccessible(true);
         $r->setValue($this->validator, false);
 
         $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword());
@@ -106,10 +108,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function provideConstraintsWithThreshold(): iterable
     {
         yield 'Doctrine style' => [new NotCompromisedPassword(['threshold' => 10])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\NotCompromisedPassword(threshold: 10);')];
-        }
+        yield 'named arguments' => [new NotCompromisedPassword(threshold: 10)];
     }
 
     public function testValidPassword()
@@ -221,10 +220,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function provideErrorSkippingConstraints(): iterable
     {
         yield 'Doctrine style' => [new NotCompromisedPassword(['skipOnError' => true])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\NotCompromisedPassword(skipOnError: true);')];
-        }
+        yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];
     }
 
     private function createHttpClientStub(?string $returnValue = null): HttpClientInterface

@@ -292,10 +292,6 @@ EOTXT
      */
     public function testCompletionSuggestions(array $input, array $expectedSuggestions)
     {
-        if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
-        }
-
         $command = new UserPasswordHashCommand($this->createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);
         $tester = new CommandCompletionTester($command);
 

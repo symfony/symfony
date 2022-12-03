@@ -11,7 +11,7 @@
 
 use Symfony\Component\Runtime\SymfonyRuntime;
 
-$_SERVER['APP_RUNTIME_OPTIONS'] = $_SERVER['APP_RUNTIME_OPTIONS'] ?? [];
+$_SERVER['APP_RUNTIME_OPTIONS'] ??= [];
 $_SERVER['APP_RUNTIME_OPTIONS'] += [
     'project_dir' => __DIR__,
 ] + ($_SERVER['APP_RUNTIME_OPTIONS'] ?? []);

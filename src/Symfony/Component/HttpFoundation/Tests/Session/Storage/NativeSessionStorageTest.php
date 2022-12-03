@@ -175,11 +175,8 @@ class NativeSessionStorageTest extends TestCase
             'cookie_domain' => 'symfony.example.com',
             'cookie_secure' => true,
             'cookie_httponly' => false,
+            'cookie_samesite' => 'lax',
         ];
-
-        if (\PHP_VERSION_ID >= 70300) {
-            $options['cookie_samesite'] = 'lax';
-        }
 
         $this->getStorage($options);
         $temp = session_get_cookie_params();
@@ -209,8 +206,6 @@ class NativeSessionStorageTest extends TestCase
     {
         $this->iniSet('session.save_handler', 'files');
         $storage = $this->getStorage();
-        $storage->setSaveHandler();
-        $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
         $storage->setSaveHandler(null);
         $this->assertInstanceOf(SessionHandlerProxy::class, $storage->getSaveHandler());
         $storage->setSaveHandler(new SessionHandlerProxy(new NativeFileSessionHandler()));

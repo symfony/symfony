@@ -30,9 +30,9 @@ final class FakeSmsEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private $mailer;
-    private $to;
-    private $from;
+    private MailerInterface $mailer;
+    private string $to;
+    private string $from;
 
     public function __construct(MailerInterface $mailer, string $to, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -64,8 +64,10 @@ final class FakeSmsEmailTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $email = (new Email())
-            ->from($this->from)
+            ->from($from)
             ->to($this->to)
             ->subject(sprintf('New SMS on phone number: %s', $message->getPhone()))
             ->html($message->getSubject())

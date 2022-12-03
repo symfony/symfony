@@ -1,8 +1,8 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'messenger' => [
-        'reset_on_message' =>  true,
         'default_bus' => 'messenger.bus.commands',
         'buses' => [
             'messenger.bus.commands' => null,

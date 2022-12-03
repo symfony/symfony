@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -34,9 +35,9 @@ class Serializer implements SerializerInterface
     public const MESSENGER_SERIALIZATION_CONTEXT = 'messenger_serialization';
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
-    private $serializer;
-    private $format;
-    private $context;
+    private SymfonySerializerInterface $serializer;
+    private string $format;
+    private array $context;
 
     public function __construct(SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
     {
@@ -58,9 +59,6 @@ class Serializer implements SerializerInterface
         return new self($serializer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
@@ -72,6 +70,8 @@ class Serializer implements SerializerInterface
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);
+        $stamps[] = new SerializedMessageStamp($encodedEnvelope['body']);
+
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
         $context = $this->context;
@@ -88,9 +88,6 @@ class Serializer implements SerializerInterface
         return new Envelope($message, $stamps);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(Envelope $envelope): array
     {
         $context = $this->context;
@@ -99,12 +96,17 @@ class Serializer implements SerializerInterface
             $context = $serializerStamp->getContext() + $context;
         }
 
+        /** @var SerializedMessageStamp|null $serializedMessageStamp */
+        $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
+
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 
         $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
 
         return [
-            'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
+            'body' => $serializedMessageStamp
+                ? $serializedMessageStamp->getSerializedMessage()
+                : $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
             'headers' => $headers,
         ];
     }
@@ -167,18 +169,13 @@ class Serializer implements SerializerInterface
 
     private function getMimeTypeForFormat(): ?string
     {
-        switch ($this->format) {
-            case 'json':
-                return 'application/json';
-            case 'xml':
-                return 'application/xml';
-            case 'yml':
-            case 'yaml':
-                return 'application/x-yaml';
-            case 'csv':
-                return 'text/csv';
-        }
-
-        return null;
+        return match ($this->format) {
+            'json' => 'application/json',
+            'xml' => 'application/xml',
+            'yml',
+            'yaml' => 'application/x-yaml',
+            'csv' => 'text/csv',
+            default => null,
+        };
     }
 }

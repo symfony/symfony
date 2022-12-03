@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Uid\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,25 +19,20 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\MaxUuid;
+use Symfony\Component\Uid\NilUuid;
+use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Uid\UuidV1;
-use Symfony\Component\Uid\UuidV6;
 
+#[AsCommand(name: 'uuid:inspect', description: 'Inspect a UUID')]
 class InspectUuidCommand extends Command
 {
-    protected static $defaultName = 'uuid:inspect';
-    protected static $defaultDescription = 'Inspect a UUID';
-
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
             ->setDefinition([
                 new InputArgument('uuid', InputArgument::REQUIRED, 'The UUID to inspect'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays information about a UUID.
 
@@ -48,10 +44,7 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
@@ -64,10 +57,12 @@ EOF
             return 1;
         }
 
-        if (-1 === $version = uuid_type($uuid)) {
+        if (new NilUuid() == $uuid) {
             $version = 'nil';
-        } elseif (0 === $version || 2 === $version || 6 < $version) {
-            $version = 'unknown';
+        } elseif (new MaxUuid() == $uuid) {
+            $version = 'max';
+        } else {
+            $version = uuid_type($uuid);
         }
 
         $rows = [
@@ -75,9 +70,10 @@ EOF
             ['toRfc4122 (canonical)', (string) $uuid],
             ['toBase58', $uuid->toBase58()],
             ['toBase32', $uuid->toBase32()],
+            ['toHex', $uuid->toHex()],
         ];
 
-        if ($uuid instanceof UuidV1 || $uuid instanceof UuidV6) {
+        if ($uuid instanceof TimeBasedUidInterface) {
             $rows[] = new TableSeparator();
             $rows[] = ['Time', $uuid->getDateTime()->format('Y-m-d H:i:s.u \U\T\C')];
         }

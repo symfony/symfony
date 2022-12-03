@@ -23,34 +23,17 @@ abstract class Helper implements HelperInterface
 {
     protected $helperSet = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setHelperSet(HelperSet $helperSet = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/console', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         $this->helperSet = $helperSet;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getHelperSet()
+    public function getHelperSet(): ?HelperSet
     {
         return $this->helperSet;
-    }
-
-    /**
-     * Returns the length of a string, using mb_strwidth if it is available.
-     *
-     * @deprecated since Symfony 5.3
-     *
-     * @return int
-     */
-    public static function strlen(?string $string)
-    {
-        trigger_deprecation('symfony/console', '5.3', 'Method "%s()" is deprecated and will be removed in Symfony 6.0. Use Helper::width() or Helper::length() instead.', __METHOD__);
-
-        return self::width($string);
     }
 
     /**
@@ -59,7 +42,7 @@ abstract class Helper implements HelperInterface
      */
     public static function width(?string $string): int
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (preg_match('//u', $string)) {
             return (new UnicodeString($string))->width(false);
@@ -78,7 +61,7 @@ abstract class Helper implements HelperInterface
      */
     public static function length(?string $string): int
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (preg_match('//u', $string)) {
             return (new UnicodeString($string))->length();
@@ -93,12 +76,10 @@ abstract class Helper implements HelperInterface
 
     /**
      * Returns the subset of a string, using mb_substr if it is available.
-     *
-     * @return string
      */
-    public static function substr(?string $string, int $from, int $length = null)
+    public static function substr(?string $string, int $from, int $length = null): string
     {
-        $string ?? $string = '';
+        $string ??= '';
 
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);
@@ -107,7 +88,7 @@ abstract class Helper implements HelperInterface
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    public static function formatTime($secs)
+    public static function formatTime(int|float $secs)
     {
         static $timeFormats = [
             [0, '< 1 sec'],
@@ -151,16 +132,6 @@ abstract class Helper implements HelperInterface
         }
 
         return sprintf('%d B', $memory);
-    }
-
-    /**
-     * @deprecated since Symfony 5.3
-     */
-    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, ?string $string)
-    {
-        trigger_deprecation('symfony/console', '5.3', 'Method "%s()" is deprecated and will be removed in Symfony 6.0. Use Helper::removeDecoration() instead.', __METHOD__);
-
-        return self::width(self::removeDecoration($formatter, $string));
     }
 
     public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)

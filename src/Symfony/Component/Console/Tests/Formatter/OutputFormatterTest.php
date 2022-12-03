@@ -171,7 +171,6 @@ class OutputFormatterTest extends TestCase
         $styleString = substr($tag, 1, -1);
         $formatter = new OutputFormatter(true);
         $method = new \ReflectionMethod($formatter, 'createStyleFromString');
-        $method->setAccessible(true);
         $result = $method->invoke($formatter, $styleString);
         if (null === $expected) {
             $this->assertNull($result);

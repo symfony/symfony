@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -22,10 +23,10 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class RedisReceiver implements ReceiverInterface
+class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
 {
-    private $connection;
-    private $serializer;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -33,9 +34,6 @@ class RedisReceiver implements ReceiverInterface
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         $message = $this->connection->get();
@@ -68,20 +66,19 @@ class RedisReceiver implements ReceiverInterface
         return [$envelope->with(new RedisReceivedStamp($message['id']))];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         $this->connection->ack($this->findRedisReceivedStamp($envelope)->getId());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $this->connection->reject($this->findRedisReceivedStamp($envelope)->getId());
+    }
+
+    public function getMessageCount(): int
+    {
+        return $this->connection->getMessageCount();
     }
 
     private function findRedisReceivedStamp(Envelope $envelope): RedisReceivedStamp
@@ -95,8 +92,4 @@ class RedisReceiver implements ReceiverInterface
 
         return $redisReceivedStamp;
     }
-}
-
-if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisReceiver::class, false)) {
-    class_alias(RedisReceiver::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisReceiver::class);
 }

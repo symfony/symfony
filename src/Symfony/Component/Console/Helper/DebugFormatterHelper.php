@@ -21,15 +21,13 @@ namespace Symfony\Component\Console\Helper;
 class DebugFormatterHelper extends Helper
 {
     private const COLORS = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white', 'default'];
-    private $started = [];
-    private $count = -1;
+    private array $started = [];
+    private int $count = -1;
 
     /**
      * Starts a debug formatting session.
-     *
-     * @return string
      */
-    public function start(string $id, string $message, string $prefix = 'RUN')
+    public function start(string $id, string $message, string $prefix = 'RUN'): string
     {
         $this->started[$id] = ['border' => ++$this->count % \count(self::COLORS)];
 
@@ -38,10 +36,8 @@ class DebugFormatterHelper extends Helper
 
     /**
      * Adds progress to a formatting session.
-     *
-     * @return string
      */
-    public function progress(string $id, string $buffer, bool $error = false, string $prefix = 'OUT', string $errorPrefix = 'ERR')
+    public function progress(string $id, string $buffer, bool $error = false, string $prefix = 'OUT', string $errorPrefix = 'ERR'): string
     {
         $message = '';
 
@@ -74,10 +70,8 @@ class DebugFormatterHelper extends Helper
 
     /**
      * Stops a formatting session.
-     *
-     * @return string
      */
-    public function stop(string $id, string $message, bool $successful, string $prefix = 'RES')
+    public function stop(string $id, string $message, bool $successful, string $prefix = 'RES'): string
     {
         $trailingEOL = isset($this->started[$id]['out']) || isset($this->started[$id]['err']) ? "\n" : '';
 
@@ -97,10 +91,7 @@ class DebugFormatterHelper extends Helper
         return sprintf('<bg=%s> </>', self::COLORS[$this->started[$id]['border']]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'debug_formatter';
     }

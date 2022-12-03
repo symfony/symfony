@@ -20,11 +20,11 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
  */
 class CacheWarmerAggregate implements CacheWarmerInterface
 {
-    private $warmers;
-    private $debug;
-    private $deprecationLogsFilepath;
-    private $optionalsEnabled = false;
-    private $onlyOptionalsEnabled = false;
+    private iterable $warmers;
+    private bool $debug;
+    private ?string $deprecationLogsFilepath;
+    private bool $optionalsEnabled = false;
+    private bool $onlyOptionalsEnabled = false;
 
     /**
      * @param iterable<mixed, CacheWarmerInterface> $warmers
@@ -46,9 +46,6 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         $this->onlyOptionalsEnabled = $this->optionalsEnabled = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function warmUp(string $cacheDir): array
     {
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
@@ -116,9 +113,6 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         return array_values(array_unique(array_merge([], ...$preload)));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOptional(): bool
     {
         return false;

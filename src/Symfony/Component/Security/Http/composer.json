@@ -16,27 +16,27 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.1",
         "symfony/deprecation-contracts": "^2.1|^3",
-        "symfony/security-core": "^5.4|^6.0",
-        "symfony/http-foundation": "^5.3|^6.0",
-        "symfony/http-kernel": "^5.3|^6.0",
+        "symfony/security-core": "^6.0",
+        "symfony/http-foundation": "^5.4|^6.0",
+        "symfony/http-kernel": "^6.2",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php80": "^1.16",
-        "symfony/property-access": "^4.4|^5.0|^6.0"
+        "symfony/property-access": "^5.4|^6.0"
     },
     "require-dev": {
-        "symfony/cache": "^4.4|^5.0|^6.0",
-        "symfony/rate-limiter": "^5.2|^6.0",
-        "symfony/routing": "^4.4|^5.0|^6.0",
-        "symfony/security-csrf": "^4.4|^5.0|^6.0",
-        "symfony/translation": "^4.4|^5.0|^6.0",
+        "symfony/cache": "^5.4|^6.0",
+        "symfony/expression-language": "^5.4|^6.0",
+        "symfony/rate-limiter": "^5.4|^6.0",
+        "symfony/routing": "^5.4|^6.0",
+        "symfony/security-csrf": "^5.4|^6.0",
+        "symfony/translation": "^5.4|^6.0",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
-        "symfony/event-dispatcher": "<4.3",
-        "symfony/security-bundle": "<5.3",
-        "symfony/security-csrf": "<4.4"
+        "symfony/event-dispatcher": "<5.4.9|>=6,<6.0.9",
+        "symfony/security-bundle": "<5.4",
+        "symfony/security-csrf": "<5.4"
     },
     "suggest": {
         "symfony/security-csrf": "For using tokens to protect authentication/logout attempts",

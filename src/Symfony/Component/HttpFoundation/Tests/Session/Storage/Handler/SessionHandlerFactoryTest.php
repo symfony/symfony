@@ -67,11 +67,13 @@ class SessionHandlerFactoryTest extends TestCase
         $reflection = new \ReflectionObject($handler);
 
         $prefixProperty = $reflection->getProperty('prefix');
-        $prefixProperty->setAccessible(true);
         $this->assertSame('foo', $prefixProperty->getValue($handler));
 
         $ttlProperty = $reflection->getProperty('ttl');
-        $ttlProperty->setAccessible(true);
-        $this->assertSame('3600', $ttlProperty->getValue($handler));
+        $this->assertSame(3600, $ttlProperty->getValue($handler));
+
+        $handler = SessionHandlerFactory::createHandler('redis://localhost?prefix=foo&ttl=3600&ignored=bar', ['ttl' => function () { return 123; }]);
+
+        $this->assertInstanceOf(\Closure::class, $reflection->getProperty('ttl')->getValue($handler));
     }
 }

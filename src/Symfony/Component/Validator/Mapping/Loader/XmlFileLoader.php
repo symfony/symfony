@@ -30,10 +30,12 @@ class XmlFileLoader extends FileLoader
      */
     protected $classes;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function __construct(string $file)
+    {
+        $this->file = $file;
+    }
+
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (null === $this->classes) {
             $this->loadClassesFromXml();
@@ -55,7 +57,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return string[]
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
         if (null === $this->classes) {
             $this->loadClassesFromXml();
@@ -71,7 +73,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return Constraint[]
      */
-    protected function parseConstraints(\SimpleXMLElement $nodes)
+    protected function parseConstraints(\SimpleXMLElement $nodes): array
     {
         $constraints = [];
 
@@ -102,10 +104,8 @@ class XmlFileLoader extends FileLoader
      * Parses a collection of "value" XML nodes.
      *
      * @param \SimpleXMLElement $nodes The XML nodes
-     *
-     * @return array
      */
-    protected function parseValues(\SimpleXMLElement $nodes)
+    protected function parseValues(\SimpleXMLElement $nodes): array
     {
         $values = [];
 
@@ -136,10 +136,8 @@ class XmlFileLoader extends FileLoader
      * Parses a collection of "option" XML nodes.
      *
      * @param \SimpleXMLElement $nodes The XML nodes
-     *
-     * @return array
      */
-    protected function parseOptions(\SimpleXMLElement $nodes)
+    protected function parseOptions(\SimpleXMLElement $nodes): array
     {
         $options = [];
 
@@ -168,11 +166,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Loads the XML class descriptions from the given file.
      *
-     * @return \SimpleXMLElement
-     *
      * @throws MappingException If the file could not be loaded
      */
-    protected function parseFile(string $path)
+    protected function parseFile(string $path): \SimpleXMLElement
     {
         try {
             $dom = XmlUtils::loadFile($path, __DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd');
@@ -185,6 +181,8 @@ class XmlFileLoader extends FileLoader
 
     private function loadClassesFromXml()
     {
+        parent::__construct($this->file);
+
         // This method may throw an exception. Do not modify the class'
         // state before it completes
         $xml = $this->parseFile($this->file);

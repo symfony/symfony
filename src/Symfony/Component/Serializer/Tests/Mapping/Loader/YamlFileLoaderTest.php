@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -95,6 +96,16 @@ class YamlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+    }
+
+    public function testSerializedPath()
+    {
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals(new PropertyPath('[one][two]'), $attributesMetadata['three']->getSerializedPath());
+        $this->assertEquals(new PropertyPath('[three][four]'), $attributesMetadata['seven']->getSerializedPath());
     }
 
     public function testLoadDiscriminatorMap()

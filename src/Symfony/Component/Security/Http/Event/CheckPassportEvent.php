@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -27,18 +26,11 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CheckPassportEvent extends Event
 {
-    private $authenticator;
-    private $passport;
+    private AuthenticatorInterface $authenticator;
+    private Passport $passport;
 
-    /**
-     * @param Passport $passport
-     */
-    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport)
+    public function __construct(AuthenticatorInterface $authenticator, Passport $passport)
     {
-        if (!$passport instanceof Passport) {
-            trigger_deprecation('symfony/security-http', '5.4', 'Not passing an instance of "%s" as "$passport" argument of "%s()" is deprecated, "%s" given.', Passport::class, __METHOD__, get_debug_type($passport));
-        }
-
         $this->authenticator = $authenticator;
         $this->passport = $passport;
     }
@@ -48,7 +40,7 @@ class CheckPassportEvent extends Event
         return $this->authenticator;
     }
 
-    public function getPassport(): PassportInterface
+    public function getPassport(): Passport
     {
         return $this->passport;
     }

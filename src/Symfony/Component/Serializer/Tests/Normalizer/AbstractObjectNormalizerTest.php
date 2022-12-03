@@ -14,7 +14,10 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Annotation\SerializedPath;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -27,6 +30,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -100,6 +104,132 @@ class AbstractObjectNormalizerTest extends TestCase
             'any',
             ['allow_extra_attributes' => false]
         );
+    }
+
+    public function testDenormalizeWithDuplicateNestedAttributes()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Duplicate serialized path: "one,two,three" used for properties "foo" and "bar".');
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+        $normalizer->denormalize([], DuplicateValueNestedDummy::class, 'any');
+    }
+
+    public function testDenormalizeWithNestedAttributesWithoutMetadata()
+    {
+        $normalizer = new AbstractObjectNormalizerDummy();
+        $data = [
+            'one' => [
+                'two' => [
+                    'three' => 'foo',
+                ],
+                'four' => 'quux',
+            ],
+            'foo' => 'notfoo',
+            'baz' => 'baz',
+        ];
+        $test = $normalizer->denormalize($data, NestedDummy::class, 'any');
+        $this->assertSame('notfoo', $test->foo);
+        $this->assertSame('baz', $test->baz);
+        $this->assertNull($test->notfoo);
+    }
+
+    public function testDenormalizeWithNestedAttributes()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+        $data = [
+            'one' => [
+                'two' => [
+                    'three' => 'foo',
+                ],
+                'four' => 'quux',
+            ],
+            'foo' => 'notfoo',
+            'baz' => 'baz',
+        ];
+        $test = $normalizer->denormalize($data, NestedDummy::class, 'any');
+        $this->assertSame('baz', $test->baz);
+        $this->assertSame('foo', $test->foo);
+        $this->assertSame('quux', $test->quux);
+        $this->assertSame('notfoo', $test->notfoo);
+    }
+
+    public function testDenormalizeWithNestedAttributesDuplicateKeys()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Duplicate values for key "quux" found. One value is set via the SerializedPath annotation: "one->four", the other one is set via the SerializedName annotation: "notquux".');
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+        $data = [
+            'one' => [
+                'four' => 'quux',
+            ],
+            'quux' => 'notquux',
+        ];
+        $normalizer->denormalize($data, DuplicateKeyNestedDummy::class, 'any');
+    }
+
+    public function testNormalizeWithNestedAttributesMixingArrayTypes()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The element you are trying to set is already populated: "[one][two]"');
+        $foobar = new AlreadyPopulatedNestedDummy();
+        $foobar->foo = 'foo';
+        $foobar->bar = 'bar';
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $normalizer->normalize($foobar, 'any');
+    }
+
+    public function testNormalizeWithNestedAttributesElementAlreadySet()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The element you are trying to set is already populated: "[one][two][three]"');
+        $foobar = new DuplicateValueNestedDummy();
+        $foobar->foo = 'foo';
+        $foobar->bar = 'bar';
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $normalizer->normalize($foobar, 'any');
+    }
+
+    public function testNormalizeWithNestedAttributes()
+    {
+        $foobar = new NestedDummy();
+        $foobar->foo = 'foo';
+        $foobar->quux = 'quux';
+        $foobar->baz = 'baz';
+        $foobar->notfoo = 'notfoo';
+        $data = [
+            'one' => [
+                'two' => [
+                    'three' => 'foo',
+                ],
+                'four' => 'quux',
+            ],
+            'foo' => 'notfoo',
+            'baz' => 'baz',
+        ];
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $test = $normalizer->normalize($foobar, 'any');
+        $this->assertSame($data, $test);
+    }
+
+    public function testNormalizeWithNestedAttributesWithoutMetadata()
+    {
+        $foobar = new NestedDummy();
+        $foobar->foo = 'foo';
+        $foobar->quux = 'quux';
+        $foobar->baz = 'baz';
+        $foobar->notfoo = 'notfoo';
+        $data = [
+            'foo' => 'foo',
+            'quux' => 'quux',
+            'notfoo' => 'notfoo',
+            'baz' => 'baz',
+        ];
+        $normalizer = new ObjectNormalizer();
+        $test = $normalizer->normalize($foobar, 'any');
+        $this->assertSame($data, $test);
     }
 
     public function testDenormalizeCollectionDecodedFromXmlWithOneChild()
@@ -257,18 +387,15 @@ class AbstractObjectNormalizerTest extends TestCase
         $classDiscriminatorResolver = new class() implements ClassDiscriminatorResolverInterface {
             public function getMappingForClass(string $class): ?ClassDiscriminatorMapping
             {
-                switch ($class) {
-                    case AbstractDummy::class:
-                        return new ClassDiscriminatorMapping('type', [
-                            'foo' => AbstractDummyFirstChild::class,
-                        ]);
-                    case AbstractDummyFirstChild::class:
-                        return new ClassDiscriminatorMapping('nested_type', [
-                            'bar' => AbstractDummySecondChild::class,
-                        ]);
-                    default:
-                        return null;
-                }
+                return match ($class) {
+                    AbstractDummy::class => new ClassDiscriminatorMapping('type', [
+                        'foo' => AbstractDummyFirstChild::class,
+                    ]),
+                    AbstractDummyFirstChild::class => new ClassDiscriminatorMapping('nested_type', [
+                        'bar' => AbstractDummySecondChild::class,
+                    ]),
+                    default => null,
+                };
             }
 
             public function getMappingForMappedObject($object): ?ClassDiscriminatorMapping
@@ -387,6 +514,17 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizedData = $normalizer->normalize(new EmptyDummy(), 'any', ['preserve_empty_objects' => true]);
         $this->assertEquals(new \ArrayObject(), $normalizedData);
     }
+
+    public function testDenormalizeRecursiveWithObjectAttributeWithStringValue()
+    {
+        $extractor = new ReflectionExtractor();
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([$normalizer]);
+
+        $obj = $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
+
+        $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -396,7 +534,7 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
         return [];
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
     }
 
@@ -427,18 +565,80 @@ class EmptyDummy
 {
 }
 
+class AlreadyPopulatedNestedDummy
+{
+    /**
+     * @SerializedPath("[one][two][three]")
+     */
+    public $foo;
+
+    /**
+     * @SerializedPath("[one][two]")
+     */
+    public $bar;
+}
+
+class DuplicateValueNestedDummy
+{
+    /**
+     * @SerializedPath("[one][two][three]")
+     */
+    public $foo;
+
+    /**
+     * @SerializedPath("[one][two][three]")
+     */
+    public $bar;
+
+    public $baz;
+}
+
+class NestedDummy
+{
+    /**
+     * @SerializedPath("[one][two][three]")
+     */
+    public $foo;
+
+    /**
+     * @SerializedPath("[one][four]")
+     */
+    public $quux;
+
+    /**
+     * @SerializedPath("[foo]")
+     */
+    public $notfoo;
+
+    public $baz;
+}
+
+class DuplicateKeyNestedDummy
+{
+    /**
+     * @SerializedPath("[one][four]")
+     */
+    public $quux;
+
+    /**
+     * @SerializedName("quux")
+     */
+    public $notquux;
+}
+
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
 {
     public function __construct()
     {
-        parent::__construct(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        parent::__construct($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
     }
 
     protected function extractAttributes(object $object, string $format = null, array $context = []): array
     {
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
     }
 
@@ -520,11 +720,11 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
     {
     }
 
-    public function deserialize($data, string $type, string $format, array $context = [])
+    public function deserialize($data, string $type, string $format, array $context = []): mixed
     {
     }
 
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = []): mixed
     {
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
@@ -535,7 +735,7 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
         return null;
     }
 
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return true;
     }
@@ -547,7 +747,7 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
     {
     }
 
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
     {
     }
 
@@ -583,11 +783,9 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
     private $serializer;
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = []): mixed
     {
         $serializer = $this->serializer;
         $type = substr($type, 0, -2);
@@ -599,18 +797,12 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return str_ends_with($type, '[]')
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;

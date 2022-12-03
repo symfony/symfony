@@ -37,12 +37,13 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
 
     public const FACTORY = 'load';
 
-    private $loader;
-    private $resource;
-    private $excludes;
-    private $allowParent;
+    private PhpFileLoader $loader;
+    private string $resource;
+    private ?array $excludes = null;
+    private bool $allowParent;
+    private ?string $path;
 
-    public function __construct(ServicesConfigurator $parent, PhpFileLoader $loader, Definition $defaults, string $namespace, string $resource, bool $allowParent)
+    public function __construct(ServicesConfigurator $parent, PhpFileLoader $loader, Definition $defaults, string $namespace, string $resource, bool $allowParent, string $path = null)
     {
         $definition = new Definition();
         if (!$defaults->isPublic() || !$defaults->isPrivate()) {
@@ -57,6 +58,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
         $this->loader = $loader;
         $this->resource = $resource;
         $this->allowParent = $allowParent;
+        $this->path = $path;
 
         parent::__construct($parent, $definition, $namespace, $defaults->getTags());
     }
@@ -65,10 +67,10 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
     {
         parent::__destruct();
 
-        if ($this->loader) {
-            $this->loader->registerClasses($this->definition, $this->id, $this->resource, $this->excludes);
+        if (isset($this->loader)) {
+            $this->loader->registerClasses($this->definition, $this->id, $this->resource, $this->excludes, $this->path);
         }
-        $this->loader = null;
+        unset($this->loader);
     }
 
     /**
@@ -78,7 +80,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
      *
      * @return $this
      */
-    final public function exclude($excludes): self
+    final public function exclude(array|string $excludes): static
     {
         $this->excludes = (array) $excludes;
 

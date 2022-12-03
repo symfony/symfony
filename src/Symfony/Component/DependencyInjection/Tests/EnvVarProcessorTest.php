@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IntBackedEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 class EnvVarProcessorTest extends TestCase
 {
@@ -465,6 +467,78 @@ class EnvVarProcessorTest extends TestCase
     }
 
     /**
+     * @dataProvider provideGetEnvEnum
+     */
+    public function testGetEnvEnum(\BackedEnum $backedEnum)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('enum', $backedEnum::class.':foo', function (string $name) use ($backedEnum) {
+            $this->assertSame('foo', $name);
+
+            return $backedEnum->value;
+        });
+
+        $this->assertSame($backedEnum, $result);
+    }
+
+    public function provideGetEnvEnum(): iterable
+    {
+        return [
+            [StringBackedEnum::Bar],
+            [IntBackedEnum::Nine],
+        ];
+    }
+
+    public function testGetEnvEnumInvalidEnum()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid env "enum:foo": a "BackedEnum" class-string should be provided.');
+
+        $processor->getEnv('enum', 'foo', function () {
+            $this->fail('Should not get here');
+        });
+    }
+
+    public function testGetEnvEnumInvalidResolvedValue()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Resolved value of "foo" did not result in a string or int value.');
+
+        $processor->getEnv('enum', StringBackedEnum::class.':foo', function () {
+            return null;
+        });
+    }
+
+    public function testGetEnvEnumInvalidArg()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"bogus" is not a "BackedEnum".');
+
+        $processor->getEnv('enum', 'bogus:foo', function () {
+            return '';
+        });
+    }
+
+    public function testGetEnvEnumInvalidBackedValue()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Enum value "bogus" is not backed by "'.StringBackedEnum::class.'".');
+
+        $processor->getEnv('enum', StringBackedEnum::class.':foo', function () {
+            return 'bogus';
+        });
+    }
+
+    /**
      * @dataProvider validNullables
      */
     public function testGetEnvNullable($value, $processed)
@@ -589,7 +663,7 @@ class EnvVarProcessorTest extends TestCase
         $container->compile();
 
         $processor = new EnvVarProcessor($container);
-        $getEnv = \Closure::fromCallable([$processor, 'getEnv']);
+        $getEnv = $processor->getEnv(...);
 
         $result = $processor->getEnv('resolve', 'foo', function ($name) use ($getEnv) {
             return 'foo' === $name ? '%env(BAR)%' : $getEnv('string', $name, function () {});
@@ -607,7 +681,7 @@ class EnvVarProcessorTest extends TestCase
         $container->compile();
 
         $processor = new EnvVarProcessor($container);
-        $getEnv = \Closure::fromCallable([$processor, 'getEnv']);
+        $getEnv = $processor->getEnv(...);
 
         $result = $processor->getEnv('resolve', 'foo', function ($name) use ($getEnv) {
             return 'foo' === $name ? '%env(BAR)%' : $getEnv('string', $name, function () {});
@@ -634,6 +708,23 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
+    public function testGetEnvShuffle()
+    {
+        mt_srand(2);
+
+        $this->assertSame(
+            ['bar', 'foo'],
+            (new EnvVarProcessor(new Container()))->getEnv('shuffle', '', fn () => ['foo', 'bar']),
+        );
+    }
+
+    public function testGetEnvShuffleInvalid()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Env var "foo" cannot be shuffled, expected array, got "string".');
+        (new EnvVarProcessor(new Container()))->getEnv('shuffle', 'foo', fn () => 'bar');
+    }
+
     public function validCsv()
     {
         $complex = <<<'CSV'
@@ -646,7 +737,7 @@ CSV;
             ['1', ['1']],
             ['1,2," 3 "', ['1', '2', ' 3 ']],
             ['\\,\\\\', ['\\', '\\\\']],
-            [$complex, \PHP_VERSION_ID >= 70400 ? ['', '"', 'foo"', '\\"', '\\', 'foo\\'] : ['', '"', 'foo"', '\\"",\\,foo\\']],
+            [$complex, ['', '"', 'foo"', '\\"', '\\', 'foo\\']],
             [null, null],
         ];
     }

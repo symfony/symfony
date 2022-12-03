@@ -23,7 +23,7 @@ use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
  */
 final class HttplugPromise implements HttplugPromiseInterface
 {
-    private $promise;
+    private GuzzlePromiseInterface $promise;
 
     public function __construct(GuzzlePromiseInterface $promise)
     {
@@ -43,20 +43,15 @@ final class HttplugPromise implements HttplugPromiseInterface
         $this->promise->cancel();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getState(): string
     {
         return $this->promise->getState();
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return Psr7ResponseInterface|mixed
      */
-    public function wait($unwrap = true)
+    public function wait($unwrap = true): mixed
     {
         $result = $this->promise->wait($unwrap);
 

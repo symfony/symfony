@@ -22,17 +22,14 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class CheckArgumentsValidityPass extends AbstractRecursivePass
 {
-    private $throwExceptions;
+    private bool $throwExceptions;
 
     public function __construct(bool $throwExceptions = true)
     {
         $this->throwExceptions = $throwExceptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Definition) {
             return parent::processValue($value, $isRoot);
@@ -41,7 +38,7 @@ class CheckArgumentsValidityPass extends AbstractRecursivePass
         $i = 0;
         $hasNamedArgs = false;
         foreach ($value->getArguments() as $k => $v) {
-            if (\PHP_VERSION_ID >= 80000 && preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $k)) {
+            if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $k)) {
                 $hasNamedArgs = true;
                 continue;
             }
@@ -79,7 +76,7 @@ class CheckArgumentsValidityPass extends AbstractRecursivePass
             $i = 0;
             $hasNamedArgs = false;
             foreach ($methodCall[1] as $k => $v) {
-                if (\PHP_VERSION_ID >= 80000 && preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $k)) {
+                if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $k)) {
                     $hasNamedArgs = true;
                     continue;
                 }

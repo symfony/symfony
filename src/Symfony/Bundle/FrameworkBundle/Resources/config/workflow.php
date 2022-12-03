@@ -28,8 +28,6 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('events to dispatch'),
             ])
             ->abstract()
-            ->public()
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.3'])
         ->set('state_machine.abstract', StateMachine::class)
             ->args([
                 abstract_arg('workflow definition'),
@@ -39,12 +37,13 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('events to dispatch'),
             ])
             ->abstract()
-            ->public()
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.3'])
         ->set('workflow.marking_store.method', MethodMarkingStore::class)
             ->abstract()
-        ->set('workflow.registry', Registry::class)
-        ->alias(Registry::class, 'workflow.registry')
+        ->set('.workflow.registry', Registry::class)
+        ->alias(Registry::class, '.workflow.registry')
+            ->deprecate('symfony/workflow', '6.2', 'The "%alias_id%" alias is deprecated, inject the workflow directly.')
+        ->alias('workflow.registry', '.workflow.registry')
+            ->deprecate('symfony/workflow', '6.2', 'The "%alias_id%" alias is deprecated, inject the workflow directly.')
         ->set('workflow.security.expression_language', ExpressionLanguage::class)
     ;
 };

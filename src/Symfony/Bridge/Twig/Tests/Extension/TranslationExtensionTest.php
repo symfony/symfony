@@ -207,9 +207,7 @@ class TranslationExtensionTest extends TestCase
 
     private function getTemplate($template, TranslatorInterface $translator = null): TemplateWrapper
     {
-        if (null === $translator) {
-            $translator = new Translator('en');
-        }
+        $translator ??= new Translator('en');
 
         if (\is_array($template)) {
             $loader = new TwigArrayLoader($template);

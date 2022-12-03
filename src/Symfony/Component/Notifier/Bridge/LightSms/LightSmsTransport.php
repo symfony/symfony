@@ -28,9 +28,9 @@ final class LightSmsTransport extends AbstractTransport
 {
     protected const HOST = 'www.lightsms.com';
 
-    private $login;
-    private $password;
-    private $from;
+    private string $login;
+    private string $password;
+    private string $from;
 
     private const ERROR_CODES = [
         1 => 'Missing Signature',
@@ -75,7 +75,7 @@ final class LightSmsTransport extends AbstractTransport
         999 => 'Unknown Error',
     ];
 
-    public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, #[\SensitiveParameter] string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->password = $password;
@@ -100,10 +100,12 @@ final class LightSmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $data = [
             'login' => $this->login,
             'phone' => $phone = $this->escapePhoneNumber($message->getPhone()),
-            'sender' => $this->from,
+            'sender' => $from,
             'text' => $message->getSubject(),
             'timestamp' => time(),
         ];

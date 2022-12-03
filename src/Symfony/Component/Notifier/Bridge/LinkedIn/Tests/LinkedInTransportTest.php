@@ -21,16 +21,12 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class LinkedInTransportTest extends TransportTestCase
 {
-    /**
-     * @return LinkedInTransport
-     */
-    public function createTransport(HttpClientInterface $client = null): TransportInterface
+    public function createTransport(HttpClientInterface $client = null): LinkedInTransport
     {
         return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

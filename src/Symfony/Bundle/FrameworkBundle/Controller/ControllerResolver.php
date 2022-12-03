@@ -21,9 +21,6 @@ use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
  */
 class ControllerResolver extends ContainerControllerResolver
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function instantiateController(string $class): object
     {
         $controller = parent::instantiateController($class);

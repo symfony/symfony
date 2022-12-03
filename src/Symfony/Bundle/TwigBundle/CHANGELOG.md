@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add the `twig.mailer.html_to_text_converter` option to allow configuring custom `HtmlToTextConverterInterface`
+   implementations to be used by the `twig.mime_body_renderer` service
+
+6.1
+---
+
+ * Add option `twig.file_name_pattern` to restrict which files are compiled by cache warmer and linter
+ * Deprecate option `twig.autoescape`, use `twig.autoescape_service[_method]` instead
+
+6.0
+---
+
+ * The `twig` service is now private
+
 5.3
 ---
 

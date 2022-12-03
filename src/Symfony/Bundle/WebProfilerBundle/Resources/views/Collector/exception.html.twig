@@ -12,7 +12,7 @@
 
 {% block menu %}
     <span class="label {{ collector.hasexception ? 'label-status-error' : 'disabled' }}">
-        <span class="icon">{{ include('@WebProfiler/Icon/exception.svg') }}</span>
+        <span class="icon">{{ source('@WebProfiler/Icon/exception.svg') }}</span>
         <strong>Exception</strong>
         {% if collector.hasexception %}
             <span class="count">
@@ -23,10 +23,18 @@
 {% endblock %}
 
 {% block panel %}
+    {# these styles are needed to override some styles from Exception page, which wasn't
+       updated yet to the new style of the Symfony Profiler #}
+    <style>
+        .tab-navigation li { background: none; border: 0; font-size: 14px; }
+        .tab-navigation li.active { border-radius: 6px; }
+        .tab-navigation li.active .badge { background-color: var(--selected-badge-background); color: var(--selected-badge-color); }
+    </style>
+
     <h2>Exceptions</h2>
 
     {% if not collector.hasexception %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No exception was thrown and caught during the request.</p>
         </div>
     {% else %}

@@ -29,9 +29,9 @@ final class FakeChatEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';
 
-    private $mailer;
-    private $to;
-    private $from;
+    private MailerInterface $mailer;
+    private string $to;
+    private string $from;
 
     public function __construct(MailerInterface $mailer, string $to, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {

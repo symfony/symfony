@@ -279,7 +279,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
         $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
-        $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
+        $authenticator->expects($this->any())->method('createToken')->willReturn($this->token);
 
         $this->tokenStorage->expects($this->once())->method('setToken')->with($this->token);
 

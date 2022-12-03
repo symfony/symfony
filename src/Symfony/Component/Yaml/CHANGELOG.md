@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add support for `!php/enum` and `!php/enum *->value`
+ * Deprecate the `!php/const:` tag in key which will be replaced by the `!php/const` tag (without the colon) since 3.4
+
+6.1
+---
+
+ * In cases where it will likely improve readability, strings containing single quotes will be double-quoted
+
 5.4
 ---
 

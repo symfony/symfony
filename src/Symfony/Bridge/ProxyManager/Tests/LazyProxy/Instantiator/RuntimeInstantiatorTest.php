@@ -30,9 +30,6 @@ class RuntimeInstantiatorTest extends TestCase
      */
     protected $instantiator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->instantiator = new RuntimeInstantiator();

@@ -23,7 +23,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|bool $value
      * @return $this
      */
-    public function booleanNode($value): self
+    public function booleanNode($value): static
     {
         $this->_usedProperties['booleanNode'] = true;
         $this->booleanNode = $value;
@@ -36,7 +36,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|'foo'|'bar'|'baz' $value
      * @return $this
      */
-    public function enumNode($value): self
+    public function enumNode($value): static
     {
         $this->_usedProperties['enumNode'] = true;
         $this->enumNode = $value;
@@ -49,7 +49,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|float $value
      * @return $this
      */
-    public function floatNode($value): self
+    public function floatNode($value): static
     {
         $this->_usedProperties['floatNode'] = true;
         $this->floatNode = $value;
@@ -62,7 +62,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|int $value
      * @return $this
      */
-    public function integerNode($value): self
+    public function integerNode($value): static
     {
         $this->_usedProperties['integerNode'] = true;
         $this->integerNode = $value;
@@ -75,7 +75,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function scalarNode($value): self
+    public function scalarNode($value): static
     {
         $this->_usedProperties['scalarNode'] = true;
         $this->scalarNode = $value;
@@ -88,7 +88,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function scalarNodeWithDefault($value): self
+    public function scalarNodeWithDefault($value): static
     {
         $this->_usedProperties['scalarNodeWithDefault'] = true;
         $this->scalarNodeWithDefault = $value;

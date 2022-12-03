@@ -23,11 +23,8 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 final class GuardEvent extends Event
 {
-    private $transitionBlockerList;
+    private TransitionBlockerList $transitionBlockerList;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(object $subject, Marking $marking, Transition $transition, WorkflowInterface $workflow = null)
     {
         parent::__construct($subject, $marking, $transition, $workflow);

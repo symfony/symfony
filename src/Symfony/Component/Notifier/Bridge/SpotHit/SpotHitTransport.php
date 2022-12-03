@@ -33,10 +33,10 @@ final class SpotHitTransport extends AbstractTransport
 {
     protected const HOST = 'spot-hit.fr';
 
-    private $token;
-    private $from;
+    private string $token;
+    private ?string $from;
 
-    public function __construct(string $token, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->from = $from;
@@ -72,6 +72,8 @@ final class SpotHitTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://www.%s/api/envoyer/sms', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'body' => [
@@ -79,7 +81,7 @@ final class SpotHitTransport extends AbstractTransport
                 'destinataires' => $message->getPhone(),
                 'type' => 'premium',
                 'message' => $message->getSubject(),
-                'expediteur' => $this->from,
+                'expediteur' => $from,
             ],
         ]);
 

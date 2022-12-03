@@ -35,7 +35,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    protected function createValidator()
+    protected function createValidator(): CurrencyValidator
     {
         return new CurrencyValidator();
     }
@@ -113,12 +113,11 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getInvalidCurrencies
      */
     public function testInvalidCurrenciesNamed($currency)
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Currency(message: "myMessage");');
+        $constraint = new Currency(message: 'myMessage');
 
         $this->validator->validate($currency, $constraint);
 

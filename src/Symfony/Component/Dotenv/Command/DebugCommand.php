@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Dotenv\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -22,9 +26,17 @@ use Symfony\Component\Dotenv\Dotenv;
  *
  * @author Christopher Hertel <mail@christopher-hertel.de>
  */
+#[AsCommand(name: 'debug:dotenv', description: 'Lists all dotenv files with variables and values')]
 final class DebugCommand extends Command
 {
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultName = 'debug:dotenv';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultDescription = 'Lists all dotenv files with variables and values';
 
     private $kernelEnvironment;
@@ -36,6 +48,25 @@ final class DebugCommand extends Command
         $this->projectDirectory = $projectDirectory;
 
         parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDefinition([
+                new InputArgument('filter', InputArgument::OPTIONAL, 'The name of an environment variable or a filter.', null, $this->getAvailableVars(...)),
+            ])
+            ->setHelp(<<<'EOT'
+The <info>%command.full_name%</info> command displays all the environment variables configured by dotenv:
+
+  <info>php %command.full_name%</info>
+
+To get specific variables, specify its full or partial name:
+
+    <info>php %command.full_name% FOO_BAR</info>
+
+EOT
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -69,29 +100,47 @@ final class DebugCommand extends Command
                 : sprintf('<fg=red>⨯</> %s', $envFile);
         }, $envFiles));
 
-        $io->section('Variables');
-        $io->table(
-            array_merge(['Variable', 'Value'], $availableFiles),
-            $this->getVariables($availableFiles)
-        );
+        $nameFilter = $input->getArgument('filter');
+        $variables = $this->getVariables($availableFiles, $nameFilter);
 
-        $io->comment('Note real values might be different between web and CLI.');
+        $io->section('Variables');
+
+        if ($variables || null === $nameFilter) {
+            $io->table(
+                array_merge(['Variable', 'Value'], $availableFiles),
+                $this->getVariables($availableFiles, $nameFilter)
+            );
+
+            $io->comment('Note that values might be different between web and CLI.');
+        } else {
+            $io->warning(sprintf('No variables match the given filter "%s".', $nameFilter));
+        }
 
         return 0;
     }
 
-    private function getVariables(array $envFiles): array
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
-        $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
-        sort($vars);
+        if ($input->mustSuggestArgumentValuesFor('filter')) {
+            $suggestions->suggestValues($this->getAvailableVars());
+        }
+    }
+
+    private function getVariables(array $envFiles, ?string $nameFilter): array
+    {
+        $vars = $this->getAvailableVars();
 
         $output = [];
         $fileValues = [];
         foreach ($vars as $var) {
+            if (null !== $nameFilter && 0 !== stripos($var, $nameFilter)) {
+                continue;
+            }
+
             $realValue = $_SERVER[$var];
             $varDetails = [$var, $realValue];
             foreach ($envFiles as $envFile) {
-                $values = $fileValues[$envFile] ?? $fileValues[$envFile] = $this->loadValues($envFile);
+                $values = $fileValues[$envFile] ??= $this->loadValues($envFile);
 
                 $varString = $values[$var] ?? '<fg=yellow>n/a</>';
                 $shortenedVar = $this->getHelper('formatter')->truncate($varString, 30);
@@ -102,6 +151,14 @@ final class DebugCommand extends Command
         }
 
         return $output;
+    }
+
+    private function getAvailableVars(): array
+    {
+        $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
+        sort($vars);
+
+        return $vars;
     }
 
     private function getEnvFiles(): array

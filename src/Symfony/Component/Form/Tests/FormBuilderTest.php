@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
@@ -46,12 +45,6 @@ class FormBuilderTest extends TestCase
     public function testNoSetName()
     {
         $this->assertFalse(method_exists($this->builder, 'setName'));
-    }
-
-    public function testAddNameNoStringAndNoInteger()
-    {
-        $this->expectException(UnexpectedTypeException::class);
-        $this->builder->add(true);
     }
 
     public function testAddWithGuessFluent()
@@ -179,9 +172,6 @@ class FormBuilderTest extends TestCase
         $reflClass = new \ReflectionClass($config);
         $children = $reflClass->getProperty('children');
         $unresolvedChildren = $reflClass->getProperty('unresolvedChildren');
-
-        $children->setAccessible(true);
-        $unresolvedChildren->setAccessible(true);
 
         $this->assertEmpty($children->getValue($config));
         $this->assertEmpty($unresolvedChildren->getValue($config));

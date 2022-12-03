@@ -24,7 +24,7 @@ if (\in_array('-h', $argv) || \in_array('--help', $argv)) {
         '',
         ' Available configuration via environment variables:',
         '  SYMFONY_PATCH_TYPE_DECLARATIONS',
-        '      An url-encoded string to change the behavior of the script. Available parameters:',
+        '      A url-encoded string to change the behavior of the script. Available parameters:',
         '      - "force": any value enables deprecation notices - can be any of:',
         '          - "phpdoc" to patch only docblock annotations',
         '          - "2" to add all possible return types',
@@ -75,7 +75,7 @@ set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$dep
 
 $exclude = getenv('SYMFONY_PATCH_TYPE_EXCLUDE') ?: null;
 foreach ($loader->getClassMap() as $class => $file) {
-    if (false !== strpos($file = realpath($file), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
+    if (str_contains($file = realpath($file), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
         continue;
     }
 
@@ -93,6 +93,6 @@ foreach ($deprecations as $class => $classDeprecations) {
     echo implode(PHP_EOL, $classDeprecations).PHP_EOL.PHP_EOL;
 }
 
-if ($deprecations && false !== strpos(getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') ?? '', 'force')) {
+if ($deprecations && str_contains(getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') ?? '', 'force')) {
     echo 'These deprecations might be fixed by the patch script, run this again to check for type deprecations.'.PHP_EOL;
 }

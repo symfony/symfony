@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add option `Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD` with "html5-allow-no-tld" e-mail validation mode, to match with the W3C official specification
+ * Add method `getCause()` to `ConstraintViolationInterface`
+ * Add the `When` constraint and validator
+ * Deprecate the "loose" e-mail validation mode, use "html5" instead
+ * Add the `negate` option to the `Expression` constraint, to inverse the logic of the violation's creation
+ * Add the `extensions` option to the `File` constraint as an alternative to `mimeTypes` which checks the mime type of the file, its extension, and the consistency between them
+ * Add padding for enhanced privacy to the `NotCompromisedPasswordValidator`
+
+6.1
+---
+
+ * Add the `fields` option to the `Unique` constraint, to define which collection keys should be checked for uniqueness
+ * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
+ * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
+ * Allow creating constraints with required arguments
+ * Add the `match` option to the `Choice` constraint
+
+6.0
+---
+
+ * Remove the `allowEmptyString` option from the `Length` constraint
+ * Remove the `NumberConstraintTrait` trait
+ * `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore
+ * `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore
+
 5.4
 ---
 

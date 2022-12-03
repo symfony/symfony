@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
@@ -19,6 +20,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
@@ -41,7 +43,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -67,8 +70,23 @@ class WorkerTest extends TestCase
                 return $envelopes[] = $envelope;
             });
 
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+        $dispatcher = new class() implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
+
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(2);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
 
         $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
         $worker->run();
@@ -194,6 +212,25 @@ class WorkerTest extends TestCase
             });
 
         $worker = new Worker([$receiver], $bus, $eventDispatcher);
+        $worker->run();
+    }
+
+    public function testWorkerWithoutDispatcher()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $worker = new Worker([$receiver], $bus);
+
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(static function () use ($worker, $envelope) {
+                $worker->stop();
+
+                return $envelope;
+            });
+
         $worker->run();
     }
 
@@ -388,7 +425,42 @@ class WorkerTest extends TestCase
         $worker->run();
 
         $envelope = current($receiver->getAcknowledgedEnvelopes());
-        $this->assertCount(1, $envelope->all(\get_class($stamp)));
+        $this->assertCount(1, $envelope->all($stamp::class));
+    }
+
+    public function testWorkerRateLimitMessages()
+    {
+        $envelope = [
+            new Envelope(new DummyMessage('message1')),
+            new Envelope(new DummyMessage('message2')),
+        ];
+        $receiver = new DummyReceiver([$envelope]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturnArgument(0);
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+
+        $rateLimitCount = 0;
+        $listener = function (WorkerRateLimitedEvent $event) use (&$rateLimitCount) {
+            ++$rateLimitCount;
+            $event->getLimiter()->reset(); // Reset limiter to continue test
+        };
+        $eventDispatcher->addListener(WorkerRateLimitedEvent::class, $listener);
+
+        $rateLimitFactory = new RateLimiterFactory([
+            'id' => 'bus',
+            'policy' => 'fixed_window',
+            'limit' => 1,
+            'interval' => '1 minute',
+        ], new InMemoryStorage());
+
+        $worker = new Worker(['bus' => $receiver], $bus, $eventDispatcher, null, ['bus' => $rateLimitFactory]);
+        $worker->run();
+
+        $this->assertCount(2, $receiver->getAcknowledgedEnvelopes());
+        $this->assertEquals(1, $rateLimitCount);
     }
 
     public function testWorkerShouldLogOnStop()
@@ -575,7 +647,7 @@ class DummyBatchHandler implements BatchHandlerInterface
         return $this->handle($message, $ack);
     }
 
-    private function shouldFlush()
+    private function shouldFlush(): bool
     {
         return 2 <= \count($this->jobs);
     }

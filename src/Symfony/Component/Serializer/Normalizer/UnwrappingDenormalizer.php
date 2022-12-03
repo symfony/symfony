@@ -32,10 +32,7 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, $class, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $class, string $format = null, array $context = []): mixed
     {
         $propertyPath = $context[self::UNWRAP_PATH];
         $context['unwrapped'] = true;
@@ -51,17 +48,11 @@ final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerA
         return $this->serializer->denormalize($data, $class, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return \array_key_exists(self::UNWRAP_PATH, $context) && !isset($context['unwrapped']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->serializer instanceof CacheableSupportsMethodInterface && $this->serializer->hasCacheableSupportsMethod();

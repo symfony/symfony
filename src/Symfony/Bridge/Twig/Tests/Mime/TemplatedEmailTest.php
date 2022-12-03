@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Mime;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -58,7 +59,7 @@ class TemplatedEmailTest extends TestCase
         $e->textTemplate('email.txt.twig');
         $e->htmlTemplate('email.html.twig');
         $e->context(['foo' => 'bar']);
-        $e->attach('Some Text file', 'test.txt');
+        $e->addPart(new DataPart('Some Text file', 'test.txt'));
         $expected = clone $e;
 
         $expectedJson = <<<EOF
@@ -73,11 +74,9 @@ class TemplatedEmailTest extends TestCase
     "html": null,
     "htmlCharset": null,
     "attachments": [
-        {
-            "body": "Some Text file",
-            "name": "test.txt",
-            "content-type": null,
-            "inline": false
+        {%A
+            "body": "Some Text file",%A
+            "name": "test.txt",%A
         }
     ],
     "headers": {
@@ -111,11 +110,11 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, TemplatedEmail::class, 'json');
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n->from('fabien@symfony.com');
         $expected->from('fabien@symfony.com');

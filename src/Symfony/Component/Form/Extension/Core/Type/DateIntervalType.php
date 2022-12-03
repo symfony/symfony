@@ -43,9 +43,6 @@ class DateIntervalType extends AbstractType
         'choice' => ChoiceType::class,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['with_years'] && !$options['with_months'] && !$options['with_weeks'] && !$options['with_days'] && !$options['with_hours'] && !$options['with_minutes'] && !$options['with_seconds']) {
@@ -148,9 +145,6 @@ class DateIntervalType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $vars = [
@@ -163,9 +157,6 @@ class DateIntervalType extends AbstractType
         $view->vars = array_replace($view->vars, $vars);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
@@ -233,11 +224,7 @@ class DateIntervalType extends AbstractType
             'compound' => $compound,
             'empty_data' => $emptyData,
             'labels' => [],
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please choose a valid date interval.';
-            },
+            'invalid_message' => 'Please choose a valid date interval.',
         ]);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('labels', $labelsNormalizer);
@@ -281,10 +268,7 @@ class DateIntervalType extends AbstractType
         $resolver->setAllowedTypes('labels', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'dateinterval';
     }

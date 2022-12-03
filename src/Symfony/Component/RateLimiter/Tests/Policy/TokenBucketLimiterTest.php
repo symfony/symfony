@@ -128,6 +128,19 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
     }
 
+    public function testPeekConsume()
+    {
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(9);
+
+        for ($i = 0; $i < 2; ++$i) {
+            $rateLimit = $limiter->consume(0);
+            $this->assertTrue($rateLimit->isAccepted());
+            $this->assertSame(10, $rateLimit->getLimit());
+        }
+    }
+
     private function createLimiter($initialTokens = 10, Rate $rate = null)
     {
         return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage);

@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 class CollectionTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
-    use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;
 
     protected function createForm(array $options = [])
@@ -30,19 +28,5 @@ class CollectionTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form = $this->createForm();
 
         $this->assertSame('The collection is invalid.', $form->getConfig()->getOption('invalid_message'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyInvalidMessage()
-    {
-        $this->expectDeprecation('Since symfony/form 5.2: Setting the "legacy_error_messages" option to "true" is deprecated. It will be disabled in Symfony 6.0.');
-
-        $form = $this->createForm([
-            'legacy_error_messages' => true,
-        ]);
-
-        $this->assertSame('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 }

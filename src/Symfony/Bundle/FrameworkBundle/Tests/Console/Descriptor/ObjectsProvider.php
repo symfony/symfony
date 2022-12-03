@@ -71,10 +71,6 @@ class ObjectsProvider
             'array' => [12, 'Hello world!', true],
         ]);
 
-        if (\PHP_VERSION_ID < 80100) {
-            return;
-        }
-
         yield 'parameters_enums' => new ParameterBag([
             'unit_enum' => FooUnitEnum::BAR,
             'backed_enum' => Suit::Hearts,
@@ -262,7 +258,7 @@ class ObjectsProvider
             'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
             'callable_6' => function () { return 'Closure'; },
             'callable_7' => new CallableClass(),
-            'callable_from_callable' => \Closure::fromCallable(new CallableClass()),
+            'callable_from_callable' => (new CallableClass())(...),
         ];
     }
 

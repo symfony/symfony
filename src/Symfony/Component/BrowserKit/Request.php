@@ -51,70 +51,56 @@ class Request
 
     /**
      * Gets the request URI.
-     *
-     * @return string
      */
-    public function getUri()
+    public function getUri(): string
     {
         return $this->uri;
     }
 
     /**
      * Gets the request HTTP method.
-     *
-     * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
     /**
      * Gets the request parameters.
-     *
-     * @return array
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
     /**
      * Gets the request server files.
-     *
-     * @return array
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         return $this->files;
     }
 
     /**
      * Gets the request cookies.
-     *
-     * @return array
      */
-    public function getCookies()
+    public function getCookies(): array
     {
         return $this->cookies;
     }
 
     /**
      * Gets the request server parameters.
-     *
-     * @return array
      */
-    public function getServer()
+    public function getServer(): array
     {
         return $this->server;
     }
 
     /**
      * Gets the request raw body data.
-     *
-     * @return string|null
      */
-    public function getContent()
+    public function getContent(): ?string
     {
         return $this->content;
     }

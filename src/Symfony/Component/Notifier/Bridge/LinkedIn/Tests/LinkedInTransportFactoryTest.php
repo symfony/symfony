@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn\Tests;
 
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class LinkedInTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return LinkedInTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): LinkedInTransportFactory
     {
         return new LinkedInTransportFactory();
     }

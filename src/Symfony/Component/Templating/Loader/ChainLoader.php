@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Templating\Loader;
 
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
@@ -37,10 +38,7 @@ class ChainLoader extends Loader
         $this->loaders[] = $loader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): Storage|false
     {
         foreach ($this->loaders as $loader) {
             if (false !== $storage = $loader->load($template)) {
@@ -51,10 +49,7 @@ class ChainLoader extends Loader
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFresh(TemplateReferenceInterface $template, int $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         foreach ($this->loaders as $loader) {
             return $loader->isFresh($template, $time);

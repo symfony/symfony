@@ -61,7 +61,6 @@ class EntryManagerTest extends TestCase
         $entryManager = new EntryManager($connection);
 
         $method = (new \ReflectionClass(EntryManager::class))->getMethod('parseRdnFromEntry');
-        $method->setAccessible(true);
 
         $cn = $method->invokeArgs($entryManager, [$entry, 'a']);
 

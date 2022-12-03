@@ -22,8 +22,6 @@ use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
-use Symfony\Component\Cache\Traits\RedisClusterProxy;
-use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 /**
@@ -56,17 +54,12 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     private const DEFAULT_CACHE_TTL = 8640000;
 
     /**
-     * @var string|null detected eviction policy used on Redis server
+     * detected eviction policy used on Redis server.
      */
-    private $redisEvictionPolicy;
-    private $namespace;
+    private string $redisEvictionPolicy;
+    private string $namespace;
 
-    /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redis           The redis client
-     * @param string                                                                                $namespace       The default namespace
-     * @param int                                                                                   $defaultLifetime The default lifetime
-     */
-    public function __construct($redis, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
+    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
         if ($redis instanceof \Predis\ClientInterface && $redis->getConnection() instanceof ClusterInterface && !$redis->getConnection() instanceof PredisCluster) {
             throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, get_debug_type($redis->getConnection())));
@@ -86,9 +79,6 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         $this->namespace = $namespace;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime, array $addTagData = [], array $delTagData = []): array
     {
         $eviction = $this->getRedisEvictionPolicy();
@@ -140,9 +130,6 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         return $failed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDeleteYieldTags(array $ids): iterable
     {
         $lua = <<<'EOLUA'
@@ -175,15 +162,12 @@ EOLUA;
 
             try {
                 yield $id => !\is_string($result) || '' === $result ? [] : $this->marshaller->unmarshall($result);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 yield $id => [];
             }
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDeleteTagRelations(array $tagData): bool
     {
         $results = $this->pipeline(static function () use ($tagData) {
@@ -199,9 +183,6 @@ EOLUA;
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doInvalidate(array $tagIds): bool
     {
         // This script scans the set of items linked to tag: it empties the set
@@ -297,7 +278,7 @@ EOLUA;
 
     private function getRedisEvictionPolicy(): string
     {
-        if (null !== $this->redisEvictionPolicy) {
+        if (isset($this->redisEvictionPolicy)) {
             return $this->redisEvictionPolicy;
         }
 

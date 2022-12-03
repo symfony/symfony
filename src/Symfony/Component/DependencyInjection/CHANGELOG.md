@@ -1,6 +1,43 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Use lazy-loading ghost objects and virtual proxies out of the box
+ * Add arguments `&$asGhostObject` and `$id` to LazyProxy's `DumperInterface` to allow using ghost objects for lazy loading services
+ * Add `enum` env var processor
+ * Add `shuffle` env var processor
+ * Allow #[When] to be extended
+ * Change the signature of `ContainerAwareInterface::setContainer()` to `setContainer(?ContainerInterface)`
+ * Deprecate calling `ContainerAwareTrait::setContainer()` without arguments
+ * Deprecate using numeric parameter names
+ * Add support for tagged iterators/locators `exclude` option to the xml and yaml loaders/dumpers
+ * Allow injecting `string $env` into php config closures
+
+6.1
+---
+
+ * Add `#[MapDecorated]` attribute telling to which parameter the decorated service should be mapped in a decorator
+ * Add `#[AsDecorator]` attribute to make a service decorates another
+ * Add `$exclude` to `TaggedIterator` and `TaggedLocator` attributes
+ * Add `$exclude` to `tagged_iterator` and `tagged_locator` configurator
+ * Add an `env` function to the expression language provider
+ * Add an `Autowire` attribute to tell a parameter how to be autowired
+ * Allow using expressions as service factories
+ * Add argument type `closure` to help passing closures to services
+ * Deprecate `ReferenceSetArgumentTrait`
+ * Add `AbstractExtension` class for DI configuration/definition on a single file
+
+6.0
+---
+
+ * Remove `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
+ * Remove `inline()` in favor of `inline_service()` and `ref()` in favor of `service()` when using the PHP-DSL
+ * Remove `Definition::getDeprecationMessage()`, use `Definition::getDeprecation()` instead
+ * Remove `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead
+ * Remove the `Psr\Container\ContainerInterface` and `Symfony\Component\DependencyInjection\ContainerInterface` aliases of the `service_container` service
+
 5.4
 ---
  * Add `$defaultIndexMethod` and `$defaultPriorityMethod` to `TaggedIterator` and `TaggedLocator` attributes
@@ -89,7 +126,7 @@ CHANGELOG
 
  * added `%env(trim:...)%` processor to trim a string value
  * added `%env(default:param_name:...)%` processor to fallback to a parameter or to null when using `%env(default::...)%`
- * added `%env(url:...)%` processor to convert an URL or DNS into an array of components
+ * added `%env(url:...)%` processor to convert a URL or DNS into an array of components
  * added `%env(query_string:...)%` processor to convert a query string into an array of key values
  * added support for deprecating aliases
  * made `ContainerParametersResource` final and not implement `Serializable` anymore

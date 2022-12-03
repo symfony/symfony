@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Hostname;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class HostnameTest extends TestCase
 {
     public function testAttributes()

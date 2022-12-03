@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\MaxUuid;
 use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUuid;
 use Symfony\Component\Uid\Ulid;
@@ -21,11 +22,13 @@ use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
+use Symfony\Component\Uid\UuidV7;
 
 class UuidTest extends TestCase
 {
     private const A_UUID_V1 = 'd9e7a184-5d5b-11ea-a62a-3499710062d0';
     private const A_UUID_V4 = 'd6b3345b-2905-4048-a83c-b5988e765d98';
+    private const A_UUID_V7 = '017f22e2-79b0-7cc3-98c4-dc0c0c07398f';
 
     /**
      * @dataProvider provideInvalidUuids
@@ -68,6 +71,8 @@ class UuidTest extends TestCase
         yield ['8dac64d3-937a-4e7c-fa1d-d5d6c06a61f5'];
         yield ['8dac64d3-937a-5e7c-fa1d-d5d6c06a61f5'];
         yield ['8dac64d3-937a-6e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-7e7c-fa1d-d5d6c06a61f5'];
+        yield ['8dac64d3-937a-8e7c-fa1d-d5d6c06a61f5'];
     }
 
     public function testConstructorWithValidUuid()
@@ -133,6 +138,28 @@ class UuidTest extends TestCase
         $this->assertNotSame(substr($uuidV1, 24), substr($uuidV6, 24));
     }
 
+    public function testV7()
+    {
+        $uuid = Uuid::fromString(self::A_UUID_V7);
+
+        $this->assertInstanceOf(UuidV7::class, $uuid);
+        $this->assertSame(1645557742, $uuid->getDateTime()->getTimeStamp());
+
+        $prev = UuidV7::generate();
+
+        for ($i = 0; $i < 25; ++$i) {
+            $uuid = UuidV7::generate();
+            $now = gmdate('Y-m-d H:i');
+            $this->assertGreaterThan($prev, $uuid);
+            $prev = $uuid;
+        }
+
+        $this->assertTrue(Uuid::isValid($uuid));
+        $uuid = Uuid::fromString($uuid);
+        $this->assertInstanceOf(UuidV7::class, $uuid);
+        $this->assertSame($now, $uuid->getDateTime()->format('Y-m-d H:i'));
+    }
+
     public function testBinary()
     {
         $uuid = new UuidV4(self::A_UUID_V4);
@@ -140,6 +167,13 @@ class UuidTest extends TestCase
 
         $this->assertInstanceOf(UuidV4::class, $uuid);
         $this->assertSame(self::A_UUID_V4, (string) $uuid);
+    }
+
+    public function testHex()
+    {
+        $uuid = new UuidV4(self::A_UUID_V4);
+
+        $this->assertSame('0xd6b3345b29054048a83cb5988e765d98', $uuid->toHex());
     }
 
     public function testFromUlid()
@@ -229,6 +263,23 @@ class UuidTest extends TestCase
     public function testNewNilUuid()
     {
         $this->assertSame('00000000-0000-0000-0000-000000000000', (string) new NilUuid());
+    }
+
+    /**
+     * @testWith    ["ffffffff-ffff-ffff-ffff-ffffffffffff"]
+     *              ["7zzzzzzzzzzzzzzzzzzzzzzzzz"]
+     */
+    public function testMaxUuid(string $uuid)
+    {
+        $uuid = Uuid::fromString($uuid);
+
+        $this->assertInstanceOf(MaxUuid::class, $uuid);
+        $this->assertSame('ffffffff-ffff-ffff-ffff-ffffffffffff', (string) $uuid);
+    }
+
+    public function testNewMaxUuid()
+    {
+        $this->assertSame('ffffffff-ffff-ffff-ffff-ffffffffffff', (string) new MaxUuid());
     }
 
     public function testFromBinary()

@@ -31,10 +31,10 @@ final class PropertyInfoLoader implements LoaderInterface
 {
     use AutoMappingTrait;
 
-    private $listExtractor;
-    private $typeExtractor;
-    private $accessExtractor;
-    private $classValidatorRegexp;
+    private PropertyListExtractorInterface $listExtractor;
+    private PropertyTypeExtractorInterface $typeExtractor;
+    private PropertyAccessExtractorInterface $accessExtractor;
+    private ?string $classValidatorRegexp;
 
     public function __construct(PropertyListExtractorInterface $listExtractor, PropertyTypeExtractorInterface $typeExtractor, PropertyAccessExtractorInterface $accessExtractor, string $classValidatorRegexp = null)
     {
@@ -44,9 +44,6 @@ final class PropertyInfoLoader implements LoaderInterface
         $this->classValidatorRegexp = $classValidatorRegexp;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $className = $metadata->getClassName();

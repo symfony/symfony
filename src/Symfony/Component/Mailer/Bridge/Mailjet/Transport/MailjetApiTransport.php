@@ -30,17 +30,29 @@ class MailjetApiTransport extends AbstractApiTransport
     private const HOST = 'api.mailjet.com';
     private const API_VERSION = '3.1';
     private const FORBIDDEN_HEADERS = [
-        'Date', 'X-CSA-Complaints', 'Message-Id', 'X-Mailjet-Campaign', 'X-MJ-StatisticsContactsListID',
-        'DomainKey-Status', 'Received-SPF', 'Authentication-Results', 'Received', 'X-Mailjet-Prio',
+        'Date', 'X-CSA-Complaints', 'Message-Id', 'X-MJ-StatisticsContactsListID',
+        'DomainKey-Status', 'Received-SPF', 'Authentication-Results', 'Received',
         'From', 'Sender', 'Subject', 'To', 'Cc', 'Bcc', 'Reply-To', 'Return-Path', 'Delivered-To', 'DKIM-Signature',
         'X-Feedback-Id', 'X-Mailjet-Segmentation', 'List-Id', 'X-MJ-MID', 'X-MJ-ErrorMessage',
-        'X-MJ-TemplateErrorDeliver', 'X-MJ-TemplateErrorReporting', 'X-MJ-TemplateLanguage',
-        'X-Mailjet-Debug', 'User-Agent', 'X-Mailer', 'X-MJ-CustomID', 'X-MJ-EventPayload', 'X-MJ-Vars',
-        'X-Mailjet-TrackOpen', 'X-Mailjet-TrackClick', 'X-MJ-TemplateID', 'X-MJ-WorkflowID',
+        'X-Mailjet-Debug', 'User-Agent', 'X-Mailer', 'X-MJ-WorkflowID',
+    ];
+    private const HEADER_TO_MESSAGE = [
+        'X-MJ-TemplateLanguage' => ['TemplateLanguage', 'bool'],
+        'X-MJ-TemplateID' => ['TemplateID', 'int'],
+        'X-MJ-TemplateErrorReporting' => ['TemplateErrorReporting', 'json'],
+        'X-MJ-TemplateErrorDeliver' => ['TemplateErrorDeliver', 'bool'],
+        'X-MJ-Vars' => ['Variables', 'json'],
+        'X-MJ-CustomID' => ['CustomID', 'string'],
+        'X-MJ-EventPayload' => ['EventPayload', 'string'],
+        'X-Mailjet-Campaign' => ['CustomCampaign', 'string'],
+        'X-Mailjet-DeduplicateCampaign' => ['DeduplicateCampaign', 'bool'],
+        'X-Mailjet-Prio' => ['Priority', 'int'],
+        'X-Mailjet-TrackClick' => ['TrackClick', 'string'],
+        'X-Mailjet-TrackOpen' => ['TrackOpen', 'string'],
     ];
 
-    private $privateKey;
-    private $publicKey;
+    private string $privateKey;
+    private string $publicKey;
 
     public function __construct(string $publicKey, string $privateKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -68,7 +80,7 @@ class MailjetApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
+        } catch (DecodingExceptionInterface) {
             throw new HttpTransportException(sprintf('Unable to send an email: "%s" (code %d).', $response->getContent(false), $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mailjet server.', $response, 0, $e);
@@ -128,6 +140,10 @@ class MailjetApiTransport extends AbstractApiTransport
         }
 
         foreach ($email->getHeaders()->all() as $header) {
+            if ($convertConf = self::HEADER_TO_MESSAGE[$header->getName()] ?? false) {
+                $message[$convertConf[0]] = $this->castCustomHeader($header->getBodyAsString(), $convertConf[1]);
+                continue;
+            }
             if (\in_array($header->getName(), self::FORBIDDEN_HEADERS, true)) {
                 continue;
             }
@@ -142,7 +158,7 @@ class MailjetApiTransport extends AbstractApiTransport
 
     private function formatAddresses(array $addresses): array
     {
-        return array_map([$this, 'formatAddress'], $addresses);
+        return array_map($this->formatAddress(...), $addresses);
     }
 
     private function formatAddress(Address $address): array
@@ -178,5 +194,15 @@ class MailjetApiTransport extends AbstractApiTransport
     private function getEndpoint(): ?string
     {
         return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+    }
+
+    private function castCustomHeader(string $value, string $type)
+    {
+        return match ($type) {
+            'bool' => filter_var($value, \FILTER_VALIDATE_BOOL),
+            'int' => (int) $value,
+            'json' => json_decode($value, true, 512, \JSON_THROW_ON_ERROR),
+            'string' => $value,
+        };
     }
 }

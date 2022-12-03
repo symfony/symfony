@@ -209,30 +209,48 @@
 {%- endblock submit_widget %}
 
 {%- block checkbox_widget -%}
-    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
+    {%- set attr_class = attr_class|default(attr.class|default('')) -%}
+    {%- set row_class = '' -%}
+    {%- if 'btn-check' not in attr_class -%}
+        {%- set attr_class = attr_class ~ ' form-check-input' -%}
+        {%- set row_class = 'form-check' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({class: attr_class|trim}) -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
-    {%- set row_class = 'form-check' -%}
     {%- if 'checkbox-inline' in parent_label_class %}
         {%- set row_class = row_class ~ ' form-check-inline' -%}
     {% endif -%}
     {%- if 'checkbox-switch' in parent_label_class %}
         {%- set row_class = row_class ~ ' form-switch' -%}
     {% endif -%}
-    <div class="{{ row_class }}">
-        {{- form_label(form, null, { widget: parent() }) -}}
-    </div>
+    {%- if row_class is not empty -%}
+        <div class="{{ row_class }}">
+    {%- endif -%}
+    {{- form_label(form, null, { widget: parent() }) -}}
+    {%- if row_class is not empty -%}
+        </div>
+    {%- endif -%}
 {%- endblock checkbox_widget %}
 
 {%- block radio_widget -%}
-    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
+    {%- set attr_class = attr_class|default(attr.class|default('')) -%}
+    {%- set row_class = '' -%}
+    {%- if 'btn-check' not in attr_class -%}
+        {%- set attr_class = attr_class ~ ' form-check-input' -%}
+        {%- set row_class = 'form-check' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({class: attr_class|trim}) -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
-    {%- set row_class = 'form-check' -%}
     {%- if 'radio-inline' in parent_label_class -%}
         {%- set row_class = row_class ~ ' form-check-inline' -%}
     {%- endif -%}
-    <div class="{{ row_class }}">
-        {{- form_label(form, null, { widget: parent() }) -}}
-    </div>
+    {%- if row_class is not empty -%}
+        <div class="{{ row_class }}">
+    {%- endif -%}
+    {{- form_label(form, null, { widget: parent() }) -}}
+    {%- if row_class is not empty -%}
+        </div>
+    {%- endif -%}
 {%- endblock radio_widget %}
 
 {%- block choice_widget_collapsed -%}
@@ -276,7 +294,11 @@
 {%- block checkbox_radio_label -%}
     {#- Do not display the label if widget is not defined in order to prevent double label rendering -#}
     {%- if widget is defined -%}
-        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-check-label')|trim}) -%}
+        {%- set label_attr_class = label_attr_class|default(label_attr.class|default('')) -%}
+        {%- if 'btn' not in label_attr_class -%}
+            {%- set label_attr_class = label_attr_class ~ ' form-check-label' -%}
+        {%- endif -%}
+        {%- set label_attr = label_attr|merge({class: label_attr_class|trim}) -%}
         {%- if not compound -%}
             {% set label_attr = label_attr|merge({'for': id}) %}
         {%- endif -%}
@@ -286,33 +308,11 @@
         {%- if parent_label_class is defined -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|replace({'checkbox-inline': '', 'radio-inline': ''})|trim}) -%}
         {%- endif -%}
-        {%- if label is not same as(false) and label is empty -%}
-            {%- if label_format is not empty -%}
-                {%- set label = label_format|replace({
-                    '%name%': name,
-                    '%id%': id,
-                }) -%}
-            {%- else -%}
-                {%- set label = name|humanize -%}
-            {%- endif -%}
-        {%- endif -%}
 
         {{ widget|raw }}
         <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if label is not same as(false) -%}
-                {%- if translation_domain is same as(false) -%}
-                    {%- if label_html is same as(false) -%}
-                        {{- label -}}
-                    {%- else -%}
-                        {{- label|raw -}}
-                    {%- endif -%}
-                {%- else -%}
-                    {%- if label_html is same as(false) -%}
-                        {{- label|trans(label_translation_parameters, translation_domain) -}}
-                    {%- else -%}
-                        {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
-                    {%- endif -%}
-                {%- endif -%}
+                {{- block('form_label_content') -}}
             {%- endif -%}
         </label>
     {%- endif -%}

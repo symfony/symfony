@@ -11,54 +11,47 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+trigger_deprecation('symfony/http-foundation', '6.2', 'The "%s" class is deprecated, use "%s" instead.', RequestMatcher::class, ChainRequestMatcher::class);
+
 /**
  * RequestMatcher compares a pre-defined set of checks against a Request instance.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 6.2, use ChainRequestMatcher instead
  */
 class RequestMatcher implements RequestMatcherInterface
 {
-    /**
-     * @var string|null
-     */
-    private $path;
-
-    /**
-     * @var string|null
-     */
-    private $host;
-
-    /**
-     * @var int|null
-     */
-    private $port;
+    private ?string $path = null;
+    private ?string $host = null;
+    private ?int $port = null;
 
     /**
      * @var string[]
      */
-    private $methods = [];
+    private array $methods = [];
 
     /**
      * @var string[]
      */
-    private $ips = [];
-
-    /**
-     * @var array
-     */
-    private $attributes = [];
+    private array $ips = [];
 
     /**
      * @var string[]
      */
-    private $schemes = [];
+    private array $attributes = [];
+
+    /**
+     * @var string[]
+     */
+    private array $schemes = [];
 
     /**
      * @param string|string[]|null $methods
      * @param string|string[]|null $ips
      * @param string|string[]|null $schemes
      */
-    public function __construct(string $path = null, string $host = null, $methods = null, $ips = null, array $attributes = [], $schemes = null, int $port = null)
+    public function __construct(string $path = null, string $host = null, string|array $methods = null, string|array $ips = null, array $attributes = [], string|array $schemes = null, int $port = null)
     {
         $this->matchPath($path);
         $this->matchHost($host);
@@ -77,7 +70,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param string|string[]|null $scheme An HTTP scheme or an array of HTTP schemes
      */
-    public function matchScheme($scheme)
+    public function matchScheme(string|array|null $scheme)
     {
         $this->schemes = null !== $scheme ? array_map('strtolower', (array) $scheme) : [];
     }
@@ -123,7 +116,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param string|string[]|null $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
-    public function matchIps($ips)
+    public function matchIps(string|array|null $ips)
     {
         $ips = null !== $ips ? (array) $ips : [];
 
@@ -137,7 +130,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param string|string[]|null $method An HTTP method or an array of HTTP methods
      */
-    public function matchMethod($method)
+    public function matchMethod(string|array|null $method)
     {
         $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : [];
     }
@@ -150,10 +143,7 @@ class RequestMatcher implements RequestMatcherInterface
         $this->attributes[$key] = $regexp;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function matches(Request $request)
+    public function matches(Request $request): bool
     {
         if ($this->schemes && !\in_array($request->getScheme(), $this->schemes, true)) {
             return false;

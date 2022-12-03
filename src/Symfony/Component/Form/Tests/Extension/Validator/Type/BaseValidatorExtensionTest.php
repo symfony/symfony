@@ -57,7 +57,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
     public function testValidationGroupsCanBeSetToCallback()
     {
         $form = $this->createForm([
-            'validation_groups' => [$this, 'testValidationGroupsCanBeSetToCallback'],
+            'validation_groups' => $this->testValidationGroupsCanBeSetToCallback(...),
         ]);
 
         $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));

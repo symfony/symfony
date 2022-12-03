@@ -27,17 +27,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DecoratorServicePass extends AbstractRecursivePass
 {
-    private $innerId = '.inner';
-
-    public function __construct(?string $innerId = '.inner')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/dependency-injection', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->innerId = $innerId;
-    }
-
     public function process(ContainerBuilder $container)
     {
         $definitions = new \SplPriorityQueue();
@@ -95,7 +84,7 @@ class DecoratorServicePass extends AbstractRecursivePass
                 throw new ServiceNotFoundException($inner, $id);
             }
 
-            if ($decoratedDefinition && $decoratedDefinition->isSynthetic()) {
+            if ($decoratedDefinition?->isSynthetic()) {
                 throw new InvalidArgumentException(sprintf('A synthetic service cannot be decorated: service "%s" cannot decorate "%s".', $id, $inner));
             }
 
@@ -122,9 +111,9 @@ class DecoratorServicePass extends AbstractRecursivePass
         }
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
-        if ($value instanceof Reference && $this->innerId === (string) $value) {
+        if ($value instanceof Reference && '.inner' === (string) $value) {
             return new Reference($this->currentId, $value->getInvalidBehavior());
         }
 

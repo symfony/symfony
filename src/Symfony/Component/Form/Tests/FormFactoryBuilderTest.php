@@ -26,7 +26,6 @@ class FormFactoryBuilderTest extends TestCase
     {
         $factory = new \ReflectionClass(FormFactory::class);
         $this->registry = $factory->getProperty('registry');
-        $this->registry->setAccessible(true);
 
         $this->type = new FooType();
     }

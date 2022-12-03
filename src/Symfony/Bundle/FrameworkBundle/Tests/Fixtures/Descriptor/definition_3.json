@@ -7,8 +7,10 @@
     "abstract": false,
     "autowire": false,
     "autoconfigure": false,
+    "deprecated": false,
     "file": "\/path\/to\/file",
     "factory_service": "inline factory service (Full\\Qualified\\FactoryClass)",
     "factory_method": "get",
-    "tags": []
+    "tags": [],
+    "usages": []
 }

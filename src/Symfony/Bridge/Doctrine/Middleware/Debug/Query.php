@@ -20,17 +20,15 @@ use Doctrine\DBAL\ParameterType;
  */
 class Query
 {
-    private $params = [];
-    private $types = [];
+    private array $params = [];
+    private array $types = [];
 
-    private $start;
-    private $duration;
+    private ?float $start = null;
+    private ?float $duration = null;
 
-    private $sql;
-
-    public function __construct(string $sql)
-    {
-        $this->sql = $sql;
+    public function __construct(
+        private string $sql,
+    ) {
     }
 
     public function start(): void
@@ -45,11 +43,7 @@ class Query
         }
     }
 
-    /**
-     * @param string|int                 $param
-     * @param string|int|float|bool|null $variable
-     */
-    public function setParam($param, &$variable, int $type): void
+    public function setParam(string|int $param, null|string|int|float|bool &$variable, int $type): void
     {
         // Numeric indexes start at 0 in profiler
         $idx = \is_int($param) ? $param - 1 : $param;
@@ -58,11 +52,7 @@ class Query
         $this->types[$idx] = $type;
     }
 
-    /**
-     * @param string|int $param
-     * @param mixed      $value
-     */
-    public function setValue($param, $value, int $type): void
+    public function setValue(string|int $param, mixed $value, int $type): void
     {
         // Numeric indexes start at 0 in profiler
         $idx = \is_int($param) ? $param - 1 : $param;

@@ -54,16 +54,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public function __construct(array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
-
-        if (\PHP_VERSION_ID < 70400 && '' === $this->defaultContext[self::ESCAPE_CHAR_KEY]) {
-            $this->defaultContext[self::ESCAPE_CHAR_KEY] = '\\';
-        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function encode($data, string $format, array $context = [])
+    public function encode(mixed $data, string $format, array $context = []): string
     {
         $handle = fopen('php://temp,', 'w+');
 
@@ -126,18 +119,12 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsEncoding(string $format)
+    public function supportsEncoding(string $format): bool
     {
         return self::FORMAT === $format;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function decode(string $data, string $format, array $context = [])
+    public function decode(string $data, string $format, array $context = []): mixed
     {
         $handle = fopen('php://temp', 'r+');
         fwrite($handle, $data);
@@ -212,10 +199,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return $result[0];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDecoding(string $format)
+    public function supportsDecoding(string $format): bool
     {
         return self::FORMAT === $format;
     }

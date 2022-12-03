@@ -10,7 +10,7 @@
         <parameter key="env(REDIS_URL)">redis://paas.com</parameter>
     </parameters>
 
-    <framework:config>
+    <framework:config http-method-override="false">
         <framework:lock>
             <framework:resource name="foo">semaphore</framework:resource>
             <framework:resource name="bar">flock</framework:resource>

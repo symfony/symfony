@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class HttpBrowser extends AbstractBrowser
 {
-    private $client;
+    private HttpClientInterface $client;
 
     public function __construct(HttpClientInterface $client = null, History $history = null, CookieJar $cookieJar = null)
     {
@@ -87,7 +87,7 @@ class HttpBrowser extends AbstractBrowser
             return [$part->bodyToIterable(), $part->getPreparedHeaders()->toArray()];
         }
 
-        if (empty($fields)) {
+        if (!$fields) {
             return ['', []];
         }
 

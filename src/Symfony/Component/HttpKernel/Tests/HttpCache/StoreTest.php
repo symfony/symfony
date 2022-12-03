@@ -94,7 +94,7 @@ class StoreTest extends TestCase
         $entries = $this->getStoreMetadata($cacheKey);
         [, $res] = $entries[0];
 
-        $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
+        $this->assertEquals('en6c78e0e3bd51d358d01e758642b85fb8', $res['x-content-digest'][0]);
     }
 
     public function testDoesNotTrustXContentDigestFromUpstream()
@@ -105,8 +105,8 @@ class StoreTest extends TestCase
         $entries = $this->getStoreMetadata($cacheKey);
         [, $res] = $entries[0];
 
-        $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
-        $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $response->headers->get('X-Content-Digest'));
+        $this->assertEquals('en6c78e0e3bd51d358d01e758642b85fb8', $res['x-content-digest'][0]);
+        $this->assertEquals('en6c78e0e3bd51d358d01e758642b85fb8', $response->headers->get('X-Content-Digest'));
     }
 
     public function testWritesResponseEvenIfXContentDigestIsPresent()
@@ -198,7 +198,7 @@ class StoreTest extends TestCase
     {
         $this->storeSimpleEntry();
         $response = $this->store->lookup($this->request);
-        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test')), $response->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('xxh128', 'test')), $response->getContent());
     }
 
     public function testInvalidatesMetaAndEntityStoreEntriesWithInvalidate()
@@ -251,9 +251,9 @@ class StoreTest extends TestCase
         $res3 = new Response('test 3', 200, ['Vary' => 'Foo Bar']);
         $this->store->write($req3, $res3);
 
-        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 3')), $this->store->lookup($req3)->getContent());
-        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 2')), $this->store->lookup($req2)->getContent());
-        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 1')), $this->store->lookup($req1)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('xxh128', 'test 3')), $this->store->lookup($req3)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('xxh128', 'test 2')), $this->store->lookup($req2)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('xxh128', 'test 1')), $this->store->lookup($req1)->getContent());
 
         $this->assertCount(3, $this->getStoreMetadata($key));
     }
@@ -263,17 +263,17 @@ class StoreTest extends TestCase
         $req1 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $res1 = new Response('test 1', 200, ['Vary' => 'Foo Bar']);
         $this->store->write($req1, $res1);
-        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 1')), $this->store->lookup($req1)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('xxh128', 'test 1')), $this->store->lookup($req1)->getContent());
 
         $req2 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Bling', 'HTTP_BAR' => 'Bam']);
         $res2 = new Response('test 2', 200, ['Vary' => 'Foo Bar']);
         $this->store->write($req2, $res2);
-        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 2')), $this->store->lookup($req2)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('xxh128', 'test 2')), $this->store->lookup($req2)->getContent());
 
         $req3 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $res3 = new Response('test 3', 200, ['Vary' => 'Foo Bar']);
         $key = $this->store->write($req3, $res3);
-        $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 3')), $this->store->lookup($req3)->getContent());
+        $this->assertEquals($this->getStorePath('en'.hash('xxh128', 'test 3')), $this->store->lookup($req3)->getContent());
 
         $this->assertCount(2, $this->getStoreMetadata($key));
     }
@@ -319,9 +319,7 @@ class StoreTest extends TestCase
 
     protected function storeSimpleEntry($path = null, $headers = [])
     {
-        if (null === $path) {
-            $path = '/test';
-        }
+        $path ??= '/test';
 
         $this->request = Request::create($path, 'get', [], [], [], $headers);
         $this->response = new Response('test', 200, ['Cache-Control' => 'max-age=420']);
@@ -333,11 +331,9 @@ class StoreTest extends TestCase
     {
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('getMetadata');
-        $m->setAccessible(true);
 
         if ($key instanceof Request) {
             $m1 = $r->getMethod('getCacheKey');
-            $m1->setAccessible(true);
             $key = $m1->invoke($this->store, $key);
         }
 
@@ -348,7 +344,6 @@ class StoreTest extends TestCase
     {
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('getPath');
-        $m->setAccessible(true);
 
         return $m->invoke($this->store, $key);
     }

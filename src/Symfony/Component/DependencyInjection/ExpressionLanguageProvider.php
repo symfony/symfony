@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -19,22 +20,26 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  *
  * To get a service, use service('request').
  * To get a parameter, use parameter('kernel.debug').
+ * To get an env variable, use env('SOME_VARIABLE').
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
-    private $serviceCompiler;
+    private ?\Closure $serviceCompiler;
 
-    public function __construct(callable $serviceCompiler = null)
+    private ?\Closure $getEnv;
+
+    public function __construct(callable $serviceCompiler = null, \Closure $getEnv = null)
     {
-        $this->serviceCompiler = $serviceCompiler;
+        $this->serviceCompiler = null === $serviceCompiler ? null : $serviceCompiler(...);
+        $this->getEnv = $getEnv;
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new ExpressionFunction('service', $this->serviceCompiler ?: function ($arg) {
+            new ExpressionFunction('service', $this->serviceCompiler ?? function ($arg) {
                 return sprintf('$this->get(%s)', $arg);
             }, function (array $variables, $value) {
                 return $variables['container']->get($value);
@@ -44,6 +49,22 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
                 return sprintf('$this->getParameter(%s)', $arg);
             }, function (array $variables, $value) {
                 return $variables['container']->getParameter($value);
+            }),
+
+            new ExpressionFunction('env', function ($arg) {
+                return sprintf('$this->getEnv(%s)', $arg);
+            }, function (array $variables, $value) {
+                if (!$this->getEnv) {
+                    throw new LogicException('You need to pass a getEnv closure to the expression langage provider to use the "env" function.');
+                }
+
+                return ($this->getEnv)($value);
+            }),
+
+            new ExpressionFunction('arg', function ($arg) {
+                return sprintf('$args?->get(%s)', $arg);
+            }, function (array $variables, $value) {
+                return $variables['args']?->get($value);
             }),
         ];
     }

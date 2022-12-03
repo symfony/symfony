@@ -23,25 +23,22 @@ use Symfony\Component\HttpClient\Response\CurlResponse;
  */
 final class CurlClientState extends ClientState
 {
-    /** @var \CurlMultiHandle|resource|null */
-    public $handle;
-    /** @var \CurlShareHandle|resource|null */
-    public $share;
-    /** @var PushedResponse[] */
-    public $pushedResponses = [];
-    /** @var DnsCache */
-    public $dnsCache;
-    /** @var float[] */
-    public $pauseExpiries = [];
-    public $execCounter = \PHP_INT_MIN;
-    /** @var LoggerInterface|null */
-    public $logger;
+    public ?\CurlMultiHandle $handle;
+    public ?\CurlShareHandle $share;
 
-    public static $curlVersion;
+    /** @var PushedResponse[] */
+    public array $pushedResponses = [];
+    public DnsCache $dnsCache;
+    /** @var float[] */
+    public array $pauseExpiries = [];
+    public int $execCounter = \PHP_INT_MIN;
+    public ?LoggerInterface $logger = null;
+
+    public static array $curlVersion;
 
     public function __construct(int $maxHostConnections, int $maxPendingPushes)
     {
-        self::$curlVersion = self::$curlVersion ?? curl_version();
+        self::$curlVersion ??= curl_version();
 
         $this->handle = curl_multi_init();
         $this->dnsCache = new DnsCache();
@@ -59,7 +56,7 @@ final class CurlClientState extends ClientState
         }
 
         // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/77535
-        if (0 >= $maxPendingPushes || \PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304)) {
+        if (0 >= $maxPendingPushes) {
             return;
         }
 
@@ -85,7 +82,7 @@ final class CurlClientState extends ClientState
     public function reset()
     {
         foreach ($this->pushedResponses as $url => $response) {
-            $this->logger && $this->logger->debug(sprintf('Unused pushed response: "%s"', $url));
+            $this->logger?->debug(sprintf('Unused pushed response: "%s"', $url));
             curl_multi_remove_handle($this->handle, $response->handle);
             curl_close($response->handle);
         }
@@ -116,7 +113,7 @@ final class CurlClientState extends ClientState
         }
 
         if (!isset($headers[':method']) || !isset($headers[':scheme']) || !isset($headers[':authority']) || !isset($headers[':path'])) {
-            $this->logger && $this->logger->debug(sprintf('Rejecting pushed response from "%s": pushed headers are invalid', $origin));
+            $this->logger?->debug(sprintf('Rejecting pushed response from "%s": pushed headers are invalid', $origin));
 
             return \CURL_PUSH_DENY;
         }
@@ -127,7 +124,7 @@ final class CurlClientState extends ClientState
         // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
         // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
         if (!str_starts_with($origin, $url.'/')) {
-            $this->logger && $this->logger->debug(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
+            $this->logger?->debug(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
 
             return \CURL_PUSH_DENY;
         }
@@ -135,11 +132,11 @@ final class CurlClientState extends ClientState
         if ($maxPendingPushes <= \count($this->pushedResponses)) {
             $fifoUrl = key($this->pushedResponses);
             unset($this->pushedResponses[$fifoUrl]);
-            $this->logger && $this->logger->debug(sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
+            $this->logger?->debug(sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
         }
 
         $url .= $headers[':path'][0];
-        $this->logger && $this->logger->debug(sprintf('Queueing pushed response: "%s"', $url));
+        $this->logger?->debug(sprintf('Queueing pushed response: "%s"', $url));
 
         $this->pushedResponses[$url] = new PushedResponse(new CurlResponse($this, $pushed), $headers, $this->openHandles[(int) $parent][1] ?? [], $pushed);
 

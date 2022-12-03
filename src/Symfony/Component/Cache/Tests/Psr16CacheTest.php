@@ -163,13 +163,12 @@ class Psr16CacheTest extends SimpleCacheTest
 
     protected function isPruned(CacheInterface $cache, string $name): bool
     {
-        if (Psr16Cache::class !== \get_class($cache)) {
+        if (Psr16Cache::class !== $cache::class) {
             $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 
         $pool = ((array) $cache)[sprintf("\0%s\0pool", Psr16Cache::class)];
         $getFileMethod = (new \ReflectionObject($pool))->getMethod('getFile');
-        $getFileMethod->setAccessible(true);
 
         return !file_exists($getFileMethod->invoke($pool, $name));
     }

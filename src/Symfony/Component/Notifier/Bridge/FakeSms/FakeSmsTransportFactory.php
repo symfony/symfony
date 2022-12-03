@@ -16,7 +16,6 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author James Hemery <james@yieldstudio.fr>
@@ -25,8 +24,8 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {
-    protected $mailer;
-    protected $logger;
+    private MailerInterface $mailer;
+    private LoggerInterface $logger;
 
     public function __construct(MailerInterface $mailer, LoggerInterface $logger)
     {
@@ -36,10 +35,7 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
         $this->logger = $logger;
     }
 
-    /**
-     * @return FakeSmsEmailTransport|FakeSmsLoggerTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): FakeSmsEmailTransport|FakeSmsLoggerTransport
     {
         $scheme = $dsn->getScheme();
 

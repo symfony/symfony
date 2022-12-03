@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\Authentication\CustomAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
-use Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint;
-use Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint;
-use Symfony\Component\Security\Http\EntryPoint\RetryAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\EventListener\CookieClearingLogoutListener;
 use Symfony\Component\Security\Http\EventListener\DefaultLogoutListener;
 use Symfony\Component\Security\Http\EventListener\SessionLogoutListener;
@@ -31,16 +29,6 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-
-        ->set('security.authentication.basic_entry_point', BasicAuthenticationEntryPoint::class)
-            ->deprecate('symfony/security-bundle', '5.4', 'The "%service_id%" service is deprecated, the logic is contained in the authenticators.')
-
-        ->set('security.authentication.retry_entry_point', RetryAuthenticationEntryPoint::class)
-            ->deprecate('symfony/security-bundle', '5.4', 'The "%service_id%" service is deprecated, the logic is integrated directly in "security.channel_listener".')
-            ->args([
-                inline_service('int')->factory([service('router.request_context'), 'getHttpPort']),
-                inline_service('int')->factory([service('router.request_context'), 'getHttpsPort']),
-            ])
 
         ->set('security.channel_listener', ChannelListener::class)
             ->args([
@@ -84,12 +72,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.http_utils'),
                 abstract_arg('target url'),
-            ])
-
-        ->set('security.authentication.form_entry_point', FormAuthenticationEntryPoint::class)
-            ->abstract()
-            ->args([
-                service('http_kernel'),
             ])
 
         ->set('security.authentication.listener.abstract')
@@ -169,6 +151,8 @@ return static function (ContainerConfigurator $container) {
                 'ROLE_ALLOWED_TO_SWITCH',
                 service('event_dispatcher')->nullOnInvalid(),
                 false, // Stateless
+                service('router')->nullOnInvalid(),
+                abstract_arg('Target Route'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 
@@ -177,8 +161,10 @@ return static function (ContainerConfigurator $container) {
                 service('security.token_storage'),
                 service('security.access.decision_manager'),
                 service('security.access_map'),
-                service('security.authentication.manager'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+
+        ->set('security.firewall.event_dispatcher_locator', ServiceLocator::class)
+            ->args([[]])
     ;
 };

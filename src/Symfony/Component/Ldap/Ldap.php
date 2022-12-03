@@ -22,40 +22,28 @@ use Symfony\Component\Ldap\Exception\DriverNotFoundException;
  */
 final class Ldap implements LdapInterface
 {
-    private $adapter;
+    private AdapterInterface $adapter;
 
     public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function bind(string $dn = null, string $password = null)
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)
     {
         $this->adapter->getConnection()->bind($dn, $password);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function query(string $dn, string $query, array $options = []): QueryInterface
     {
         return $this->adapter->createQuery($dn, $query, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntryManager(): EntryManagerInterface
     {
         return $this->adapter->getEntryManager();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function escape(string $subject, string $ignore = '', int $flags = 0): string
     {
         return $this->adapter->escape($subject, $ignore, $flags);
@@ -66,10 +54,8 @@ final class Ldap implements LdapInterface
      *
      * @param string $adapter The adapter name
      * @param array  $config  The adapter's configuration
-     *
-     * @return static
      */
-    public static function create(string $adapter, array $config = []): self
+    public static function create(string $adapter, array $config = []): static
     {
         if ('ext_ldap' !== $adapter) {
             throw new DriverNotFoundException(sprintf('Adapter "%s" not found. Only "ext_ldap" is supported at the moment.', $adapter));

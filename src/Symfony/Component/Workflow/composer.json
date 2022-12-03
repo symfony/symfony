@@ -20,22 +20,24 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/polyfill-php80": "^1.15"
+        "php": ">=8.1"
     },
     "require-dev": {
         "psr/log": "^1|^2|^3",
-        "symfony/dependency-injection": "^4.4|^5.0|^6.0",
-        "symfony/event-dispatcher": "^4.4|^5.0|^6.0",
-        "symfony/expression-language": "^4.4|^5.0|^6.0",
-        "symfony/security-core": "^4.4|^5.0|^6.0",
-        "symfony/validator": "^4.4|^5.0|^6.0"
+        "symfony/dependency-injection": "^5.4|^6.0",
+        "symfony/event-dispatcher": "^5.4|^6.0",
+        "symfony/expression-language": "^5.4|^6.0",
+        "symfony/security-core": "^5.4|^6.0",
+        "symfony/validator": "^5.4|^6.0"
     },
     "conflict": {
-        "symfony/event-dispatcher": "<4.4"
+        "symfony/event-dispatcher": "<5.4"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Workflow\\": "" }
+        "psr-4": { "Symfony\\Component\\Workflow\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev"
 }

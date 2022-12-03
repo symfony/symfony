@@ -25,6 +25,7 @@ class Uuid extends AbstractUid
 
     protected const TYPE = 0;
     protected const NIL = '00000000-0000-0000-0000-000000000000';
+    protected const MAX = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 
     public function __construct(string $uuid, bool $checkVariant = false)
     {
@@ -41,10 +42,7 @@ class Uuid extends AbstractUid
         }
     }
 
-    /**
-     * @return static
-     */
-    public static function fromString(string $uuid): parent
+    public static function fromString(string $uuid): static
     {
         if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {
             $uuid = str_pad(BinaryUtil::fromBase($uuid, BinaryUtil::BASE58), 16, "\0", \STR_PAD_LEFT);
@@ -71,17 +69,24 @@ class Uuid extends AbstractUid
             return new NilUuid();
         }
 
-        if (\in_array($uuid[19], ['8', '9', 'a', 'b', 'A', 'B'], true)) {
-            switch ($uuid[14]) {
-                case UuidV1::TYPE: return new UuidV1($uuid);
-                case UuidV3::TYPE: return new UuidV3($uuid);
-                case UuidV4::TYPE: return new UuidV4($uuid);
-                case UuidV5::TYPE: return new UuidV5($uuid);
-                case UuidV6::TYPE: return new UuidV6($uuid);
-            }
+        if (self::MAX === $uuid = strtr($uuid, 'F', 'f')) {
+            return new MaxUuid();
         }
 
-        return new self($uuid);
+        if (!\in_array($uuid[19], ['8', '9', 'a', 'b', 'A', 'B'], true)) {
+            return new self($uuid);
+        }
+
+        return match ((int) $uuid[14]) {
+            UuidV1::TYPE => new UuidV1($uuid),
+            UuidV3::TYPE => new UuidV3($uuid),
+            UuidV4::TYPE => new UuidV4($uuid),
+            UuidV5::TYPE => new UuidV5($uuid),
+            UuidV6::TYPE => new UuidV6($uuid),
+            UuidV7::TYPE => new UuidV7($uuid),
+            UuidV8::TYPE => new UuidV8($uuid),
+            default => new self($uuid),
+        };
     }
 
     final public static function v1(): UuidV1
@@ -113,6 +118,16 @@ class Uuid extends AbstractUid
     final public static function v6(): UuidV6
     {
         return new UuidV6();
+    }
+
+    final public static function v7(): UuidV7
+    {
+        return new UuidV7();
+    }
+
+    final public static function v8(string $uuid): UuidV8
+    {
+        return new UuidV8($uuid);
     }
 
     public static function isValid(string $uuid): bool

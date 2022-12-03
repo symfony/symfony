@@ -23,12 +23,9 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  */
 trait HttpClientTrait
 {
-    private static $CHUNK_SIZE = 16372;
+    private static int $CHUNK_SIZE = 16372;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function withOptions(array $options): self
+    public function withOptions(array $options): static
     {
         $clone = clone $this;
         $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
@@ -97,6 +94,10 @@ trait HttpClientTrait
         }
 
         if (isset($options['body'])) {
+            if (\is_array($options['body']) && (!isset($options['normalized_headers']['content-type'][0]) || !str_contains($options['normalized_headers']['content-type'][0], 'application/x-www-form-urlencoded'))) {
+                $options['normalized_headers']['content-type'] = ['Content-Type: application/x-www-form-urlencoded'];
+            }
+
             $options['body'] = self::normalizeBody($options['body']);
 
             if (\is_string($options['body'])
@@ -202,7 +203,7 @@ trait HttpClientTrait
         }
 
         // Option "query" is never inherited from defaults
-        $options['query'] = $options['query'] ?? [];
+        $options['query'] ??= [];
 
         $options += $defaultOptions;
 
@@ -268,7 +269,7 @@ trait HttpClientTrait
         $normalizedHeaders = [];
 
         foreach ($headers as $name => $values) {
-            if (\is_object($values) && method_exists($values, '__toString')) {
+            if ($values instanceof \Stringable) {
                 $values = (string) $values;
             }
 
@@ -389,20 +390,18 @@ trait HttpClientTrait
     }
 
     /**
-     * @param string|string[] $fingerprint
-     *
      * @throws InvalidArgumentException When an invalid fingerprint is passed
      */
-    private static function normalizePeerFingerprint($fingerprint): array
+    private static function normalizePeerFingerprint(mixed $fingerprint): array
     {
         if (\is_string($fingerprint)) {
-            switch (\strlen($fingerprint = str_replace(':', '', $fingerprint))) {
-                case 32: $fingerprint = ['md5' => $fingerprint]; break;
-                case 40: $fingerprint = ['sha1' => $fingerprint]; break;
-                case 44: $fingerprint = ['pin-sha256' => [$fingerprint]]; break;
-                case 64: $fingerprint = ['sha256' => $fingerprint]; break;
-                default: throw new InvalidArgumentException(sprintf('Cannot auto-detect fingerprint algorithm for "%s".', $fingerprint));
-            }
+            $fingerprint = match (\strlen($fingerprint = str_replace(':', '', $fingerprint))) {
+                32 => ['md5' => $fingerprint],
+                40 => ['sha1' => $fingerprint],
+                44 => ['pin-sha256' => [$fingerprint]],
+                64 => ['sha256' => $fingerprint],
+                default => throw new InvalidArgumentException(sprintf('Cannot auto-detect fingerprint algorithm for "%s".', $fingerprint)),
+            };
         } elseif (\is_array($fingerprint)) {
             foreach ($fingerprint as $algo => $hash) {
                 $fingerprint[$algo] = 'pin-sha256' === $algo ? (array) $hash : str_replace(':', '', $hash);
@@ -415,22 +414,16 @@ trait HttpClientTrait
     }
 
     /**
-     * @param mixed $value
-     *
      * @throws InvalidArgumentException When the value cannot be json-encoded
      */
-    private static function jsonEncode($value, int $flags = null, int $maxDepth = 512): string
+    private static function jsonEncode(mixed $value, int $flags = null, int $maxDepth = 512): string
     {
-        $flags = $flags ?? (\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_PRESERVE_ZERO_FRACTION);
+        $flags ??= \JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_PRESERVE_ZERO_FRACTION;
 
         try {
-            $value = json_encode($value, $flags | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0), $maxDepth);
+            $value = json_encode($value, $flags | \JSON_THROW_ON_ERROR, $maxDepth);
         } catch (\JsonException $e) {
             throw new InvalidArgumentException('Invalid value for "json" option: '.$e->getMessage());
-        }
-
-        if (\PHP_VERSION_ID < 70300 && \JSON_ERROR_NONE !== json_last_error() && (false === $value || !($flags & \JSON_PARTIAL_OUTPUT_ON_ERROR))) {
-            throw new InvalidArgumentException('Invalid value for "json" option: '.json_last_error_msg());
         }
 
         return $value;
@@ -465,7 +458,7 @@ trait HttpClientTrait
             } else {
                 if (null === $url['path']) {
                     $url['path'] = $base['path'];
-                    $url['query'] = $url['query'] ?? $base['query'];
+                    $url['query'] ??= $base['query'];
                 } else {
                     if ('/' !== $url['path'][0]) {
                         if (null === $base['path']) {
@@ -661,7 +654,7 @@ trait HttpClientTrait
             throw new TransportException(sprintf('Unsupported proxy scheme "%s": "http" or "https" expected.', $proxy['scheme']));
         }
 
-        $noProxy = $noProxy ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '';
+        $noProxy ??= $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '';
         $noProxy = $noProxy ? preg_split('/[\s,]+/', $noProxy) : [];
 
         return [

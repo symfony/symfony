@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\Telegram\Tests;
 
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class TelegramTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return TelegramTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): TelegramTransportFactory
     {
         return new TelegramTransportFactory();
     }

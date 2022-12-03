@@ -13,7 +13,6 @@ namespace Symfony\Component\VarExporter;
 
 use Symfony\Component\VarExporter\Exception\ExceptionInterface;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
-use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\Registry;
 
 /**
@@ -26,67 +25,35 @@ final class Instantiator
     /**
      * Creates an object and sets its properties without calling its constructor nor any other methods.
      *
-     * For example:
+     * @see Hydrator::hydrate() for examples
      *
-     *     // creates an empty instance of Foo
-     *     Instantiator::instantiate(Foo::class);
+     * @template T of object
      *
-     *     // creates a Foo instance and sets one of its properties
-     *     Instantiator::instantiate(Foo::class, ['propertyName' => $propertyValue]);
+     * @param class-string<T>                           $class            The class of the instance to create
+     * @param array<string, mixed>                      $properties       The properties to set on the instance
+     * @param array<class-string, array<string, mixed>> $scopedProperties The properties to set on the instance,
+     *                                                                    keyed by their declaring class
      *
-     *     // creates a Foo instance and sets a private property defined on its parent Bar class
-     *     Instantiator::instantiate(Foo::class, [], [
-     *         Bar::class => ['privateBarProperty' => $propertyValue],
-     *     ]);
-     *
-     * Instances of ArrayObject, ArrayIterator and SplObjectStorage can be created
-     * by using the special "\0" property name to define their internal value:
-     *
-     *     // creates an SplObjectStorage where $info1 is attached to $obj1, etc.
-     *     Instantiator::instantiate(SplObjectStorage::class, ["\0" => [$obj1, $info1, $obj2, $info2...]]);
-     *
-     *     // creates an ArrayObject populated with $inputArray
-     *     Instantiator::instantiate(ArrayObject::class, ["\0" => [$inputArray]]);
-     *
-     * @param string $class             The class of the instance to create
-     * @param array  $properties        The properties to set on the instance
-     * @param array  $privateProperties The private properties to set on the instance,
-     *                                  keyed by their declaring class
+     * @return T
      *
      * @throws ExceptionInterface When the instance cannot be created
      */
-    public static function instantiate(string $class, array $properties = [], array $privateProperties = []): object
+    public static function instantiate(string $class, array $properties = [], array $scopedProperties = []): object
     {
-        $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
+        $reflector = Registry::$reflectors[$class] ??= Registry::getClassReflector($class);
 
         if (Registry::$cloneable[$class]) {
-            $wrappedInstance = [clone Registry::$prototypes[$class]];
+            $instance = clone Registry::$prototypes[$class];
         } elseif (Registry::$instantiableWithoutConstructor[$class]) {
-            $wrappedInstance = [$reflector->newInstanceWithoutConstructor()];
+            $instance = $reflector->newInstanceWithoutConstructor();
         } elseif (null === Registry::$prototypes[$class]) {
             throw new NotInstantiableTypeException($class);
-        } elseif ($reflector->implementsInterface('Serializable') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__unserialize'))) {
-            $wrappedInstance = [unserialize('C:'.\strlen($class).':"'.$class.'":0:{}')];
+        } elseif ($reflector->implementsInterface('Serializable') && !method_exists($class, '__unserialize')) {
+            $instance = unserialize('C:'.\strlen($class).':"'.$class.'":0:{}');
         } else {
-            $wrappedInstance = [unserialize('O:'.\strlen($class).':"'.$class.'":0:{}')];
+            $instance = unserialize('O:'.\strlen($class).':"'.$class.'":0:{}');
         }
 
-        if ($properties) {
-            $privateProperties[$class] = isset($privateProperties[$class]) ? $properties + $privateProperties[$class] : $properties;
-        }
-
-        foreach ($privateProperties as $class => $properties) {
-            if (!$properties) {
-                continue;
-            }
-            foreach ($properties as $name => $value) {
-                // because they're also used for "unserialization", hydrators
-                // deal with array of instances, so we need to wrap values
-                $properties[$name] = [$value];
-            }
-            (Hydrator::$hydrators[$class] ?? Hydrator::getHydrator($class))($properties, $wrappedInstance);
-        }
-
-        return $wrappedInstance[0];
+        return $properties || $scopedProperties ? Hydrator::hydrate($instance, $properties, $scopedProperties) : $instance;
     }
 }

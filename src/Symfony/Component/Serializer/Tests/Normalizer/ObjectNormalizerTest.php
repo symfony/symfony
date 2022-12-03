@@ -107,6 +107,7 @@ class ObjectNormalizerTest extends TestCase
         $obj->setBaz(true);
         $obj->setCamelCase('camelcase');
         $obj->setObject($object);
+        $obj->setGo(true);
 
         $this->serializer
             ->expects($this->once())
@@ -123,14 +124,12 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => 'string_object',
+                'go' => true,
             ],
             $this->normalizer->normalize($obj, 'any')
         );
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testNormalizeObjectWithUninitializedProperties()
     {
         $obj = new Php74Dummy();
@@ -160,9 +159,6 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testNormalizeObjectWithUninitializedPrivateProperties()
     {
         $obj = new Php74DummyPrivate();
@@ -675,6 +671,7 @@ class ObjectNormalizerTest extends TestCase
             'camelCase' => null,
             'object' => null,
             'bar' => null,
+            'go' => null,
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, ['not_serializable' => function () {
@@ -767,9 +764,6 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame(['foo' => 'bar', 'bar' => 'foo'], $normalizer->normalize($data, null, ['include_foo_and_bar' => true]));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testDenormalizeFalsePseudoType()
     {
         // given a serializer that extracts the attribute types of an object via ReflectionExtractor
@@ -814,6 +808,7 @@ class ObjectNormalizerTest extends TestCase
         $obj->setBaz(true);
         $obj->setCamelCase('camelcase');
         $obj->unwantedProperty = 'notwanted';
+        $obj->setGo(false);
 
         $this->assertEquals(
             [
@@ -823,6 +818,7 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => null,
+                'go' => false,
             ],
             $normalizer->normalize($obj, 'any')
         );
@@ -851,6 +847,7 @@ class ObjectNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => null,
+                'go' => null,
             ],
             $normalizer->normalize($obj, 'any')
         );

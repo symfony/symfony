@@ -87,8 +87,10 @@ class GeneratedConfigTest extends TestCase
         $expectedOutput = include $basePath.$name.'.output.php';
         $expectedCode = $basePath.$name;
 
-        // to regenerate snapshot files, uncomment this line
-        // $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
+        // to regenerate snapshot files, uncomment these lines
+        // (new Filesystem())->remove($expectedCode);
+        // $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $expectedCode);
+        // $this->markTestIncomplete('Re-comment the line above and relaunch the tests');
 
         $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
         $configBuilder = $this->generateConfigBuilder('Symfony\\Component\\Config\\Tests\\Builder\\Fixtures\\'.$name, $outputDir);
@@ -162,7 +164,7 @@ class GeneratedConfigTest extends TestCase
      */
     private function generateConfigBuilder(string $configurationClass, string $outputDir = null)
     {
-        $outputDir ?? $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
+        $outputDir ??= sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
         if (!str_contains($outputDir, __DIR__)) {
             $this->tempDir[] = $outputDir;
         }

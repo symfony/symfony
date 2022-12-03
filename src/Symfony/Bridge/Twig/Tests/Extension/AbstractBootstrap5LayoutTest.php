@@ -198,7 +198,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="form-text mb-0 help-text"]
     [.="[trans]Help text test![/trans]"]
@@ -218,7 +218,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="class-test form-text mb-0 help-text"]
     [.="[trans]Help text test![/trans]"]
@@ -236,7 +236,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="form-text mb-0 help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -244,7 +244,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="form-text mb-0 help-text"]
     /b
@@ -264,7 +264,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="form-text mb-0 help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -272,7 +272,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="form-text mb-0 help-text"]
     /b
@@ -290,7 +290,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         $html = $this->renderHelp($form->createView());
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="form-text mb-0 help-text"]
     [.="[trans]Help <b>text</b> test![/trans]"]
@@ -298,7 +298,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         );
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/div
     [@id="name_help"]
     [@class="form-text mb-0 help-text"]
     /b
@@ -377,7 +377,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
                 [@for="name"]
                 [.="[trans]foo[/trans]"]
         ]
-        /following-sibling::p
+        /following-sibling::div
             [@class="form-text mb-0 help-text"]
             [.="[trans]really helpful text[/trans]"]
     ]
@@ -400,6 +400,21 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
             [@class="checkbox-switch form-check-label required"]
             [.="[trans]Name[/trans]"]
     ]
+'
+        );
+    }
+
+    public function testCheckboxToggleWithValue()
+    {
+        $form = $this->factory->createNamed('name', CheckboxType::class, false, [
+            'value' => 'foo&bar',
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'btn-check my&class'], 'label_attr' => ['class' => 'btn btn-primary']],
+            '/input[@type="checkbox"][@name="name"][@id="my&id"][@class="btn-check my&class"][@value="foo&bar"]
+        /following-sibling::label
+            [@class="btn btn-primary required"]
+            [.="[trans]Name[/trans]"]
 '
         );
     }
@@ -871,7 +886,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
             '/div
     [@class="mb-3"]
     [
-        ./p
+        ./div
             [@class="form-text mb-0 help-text"]
             [.="[trans]really helpful text[/trans]"]
     ]

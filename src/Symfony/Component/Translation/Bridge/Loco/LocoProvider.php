@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Translation\CatalogueMetadataAwareInterface;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -30,19 +31,21 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LocoProvider implements ProviderInterface
 {
-    private $client;
-    private $loader;
-    private $logger;
-    private $defaultLocale;
-    private $endpoint;
+    private HttpClientInterface $client;
+    private LoaderInterface $loader;
+    private LoggerInterface $logger;
+    private string $defaultLocale;
+    private string $endpoint;
+    private ?TranslatorBagInterface $translatorBag = null;
 
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
+    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, TranslatorBagInterface $translatorBag = null)
     {
         $this->client = $client;
         $this->loader = $loader;
         $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
         $this->endpoint = $endpoint;
+        $this->translatorBag = $translatorBag;
     }
 
     public function __toString(): string
@@ -98,16 +101,43 @@ final class LocoProvider implements ProviderInterface
 
         foreach ($locales as $locale) {
             foreach ($domains as $domain) {
+                $previousCatalogue = $this->translatorBag?->getCatalogue($locale);
+
                 // Loco forbids concurrent requests, so the requests must be synchronous in order to prevent "429 Too Many Requests" errors.
                 $response = $this->client->request('GET', sprintf('export/locale/%s.xlf', rawurlencode($locale)), [
                     'query' => [
                         'filter' => $domain,
                         'status' => 'translated,blank-translation',
                     ],
+                    'headers' => [
+                        'If-Modified-Since' => $previousCatalogue instanceof CatalogueMetadataAwareInterface ? $previousCatalogue->getCatalogueMetadata('last-modified', $domain) : null,
+                    ],
                 ]);
 
                 if (404 === $response->getStatusCode()) {
                     $this->logger->warning(sprintf('Locale "%s" for domain "%s" does not exist in Loco.', $locale, $domain));
+                    continue;
+                }
+
+                if (304 === $response->getStatusCode()) {
+                    $this->logger->info(sprintf('No modifications found for locale "%s" and domain "%s" in Loco.', $locale, $domain));
+
+                    $catalogue = new MessageCatalogue($locale);
+                    $previousMessages = $previousCatalogue->all($domain);
+
+                    if (!str_ends_with($domain, $catalogue::INTL_DOMAIN_SUFFIX)) {
+                        $previousMessages = array_diff_key($previousMessages, $previousCatalogue->all($domain.$catalogue::INTL_DOMAIN_SUFFIX));
+                    }
+                    foreach ($previousMessages as $key => $message) {
+                        $catalogue->set($this->retrieveKeyFromId($key, $domain), $message, $domain);
+                    }
+
+                    foreach ($previousCatalogue->getCatalogueMetadata('', $domain) as $key => $value) {
+                        $catalogue->setCatalogueMetadata($key, $value, $domain);
+                    }
+
+                    $translatorBag->addCatalogue($catalogue);
+
                     continue;
                 }
 
@@ -122,6 +152,16 @@ final class LocoProvider implements ProviderInterface
 
                 foreach ($locoCatalogue->all($domain) as $key => $message) {
                     $catalogue->set($this->retrieveKeyFromId($key, $domain), $message, $domain);
+                }
+
+                if ($previousCatalogue instanceof CatalogueMetadataAwareInterface) {
+                    foreach ($previousCatalogue->getCatalogueMetadata('', $domain) ?? [] as $key => $value) {
+                        $catalogue->setCatalogueMetadata($key, $value, $domain);
+                    }
+                }
+
+                if (null !== $lastModified = $response->getHeaders()['last-modified'][0] ?? null) {
+                    $catalogue->setCatalogueMetadata('last-modified', $lastModified, $domain);
                 }
 
                 $translatorBag->addCatalogue($catalogue);
@@ -243,7 +283,7 @@ final class LocoProvider implements ProviderInterface
         // Separate ids with and without comma.
         $idsWithComma = $idsWithoutComma = [];
         foreach ($ids as $id) {
-            if (false !== strpos($id, ',')) {
+            if (str_contains($id, ',')) {
                 $idsWithComma[] = $id;
             } else {
                 $idsWithoutComma[] = $id;

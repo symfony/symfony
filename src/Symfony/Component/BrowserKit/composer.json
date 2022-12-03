@@ -16,15 +16,14 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/dom-crawler": "^4.4|^5.0|^6.0",
-        "symfony/polyfill-php80": "^1.16"
+        "php": ">=8.1",
+        "symfony/dom-crawler": "^5.4|^6.0"
     },
     "require-dev": {
-        "symfony/css-selector": "^4.4|^5.0|^6.0",
-        "symfony/http-client": "^4.4|^5.0|^6.0",
-        "symfony/mime": "^4.4|^5.0|^6.0",
-        "symfony/process": "^4.4|^5.0|^6.0"
+        "symfony/css-selector": "^5.4|^6.0",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/mime": "^5.4|^6.0",
+        "symfony/process": "^5.4|^6.0"
     },
     "suggest": {
         "symfony/process": ""

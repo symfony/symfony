@@ -66,7 +66,7 @@ foreach (array_slice($argv, 1) as $argumentOrOption) {
         continue;
     }
 
-    if (0 === strpos($argumentOrOption, '-')) {
+    if (str_starts_with($argumentOrOption, '-')) {
         $config['verbose_output'] = true;
     } else {
         $config['locale_to_analyze'] = $argumentOrOption;

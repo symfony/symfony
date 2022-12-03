@@ -6,10 +6,17 @@ The HttpClient component provides powerful methods to fetch HTTP resources synch
 Sponsor
 -------
 
-The Httpclient component for Symfony 5.4/6.0 is [backed][1] by [Klaxoon][2].
+The Httpclient component for Symfony 6.1 is [backed][1] by [Prisma Media][2].
 
-Klaxoon is a platform that empowers organizations to run effective and
-productive workshops easily in a hybrid environment. Anytime, Anywhere.
+Prisma Media has become in 40 years the n°1 French publishing group, on print and
+digitally, with 20 flagship brands of the news magazines : Femme Actuelle, GEO,
+Capital, Gala or Télé-Loisirs… Today, more than 42 million French people are in
+contact with one of our brand each month, either by leafing through a magazine,
+surfing the web, subscribing one our mobile or tablet application or listening to
+our podcasts' series. Prisma Media has successfully transformed one's business
+model : from a historic player in the world of paper, it has become in 5 years
+one of the first publishers of multi-media editorial content, and one of the
+first creators of digital solutions.
 
 Help Symfony by [sponsoring][3] its development!
 
@@ -23,5 +30,5 @@ Resources
    in the [main Symfony repository](https://github.com/symfony/symfony)
 
 [1]: https://symfony.com/backers
-[2]: https://klaxoon.com
+[2]: https://www.prismamedia.com
 [3]: https://symfony.com/sponsor

@@ -27,9 +27,9 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
  */
 class ResolveChildDefinitionsPass extends AbstractRecursivePass
 {
-    private $currentPath;
+    private array $currentPath;
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Definition) {
             return parent::processValue($value, $isRoot);
@@ -63,7 +63,6 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             throw $e;
         } catch (ExceptionInterface $e) {
             $r = new \ReflectionProperty($e, 'message');
-            $r->setAccessible(true);
             $r->setValue($e, sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
 
             throw $e;
@@ -139,13 +138,9 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());
         }
-        if (isset($changes['deprecated'])) {
-            if ($definition->isDeprecated()) {
-                $deprecation = $definition->getDeprecation('%service_id%');
-                $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
-            } else {
-                $def->setDeprecated(false);
-            }
+        if (isset($changes['deprecated']) && $definition->isDeprecated()) {
+            $deprecation = $definition->getDeprecation('%service_id%');
+            $def->setDeprecated($deprecation['package'], $deprecation['version'], $deprecation['message']);
         }
         if (isset($changes['autowired'])) {
             $def->setAutowired($definition->isAutowired());

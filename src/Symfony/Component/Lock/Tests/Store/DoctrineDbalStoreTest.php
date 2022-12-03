@@ -45,17 +45,11 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
         @unlink(self::$dbFile);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClockDelay()
     {
         return 1000000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));

@@ -83,6 +83,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
     {
         $c->register('logger', NullLogger::class);
         $c->loadFromExtension('framework', [
+            'http_method_override' => false,
             'secret' => '$ecret',
             'router' => ['utf8' => true],
         ]);
@@ -91,9 +92,6 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $c->register('halloween', 'stdClass')->setPublic(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

@@ -5,12 +5,12 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-    <framework:config>
+    <framework:config http-method-override="false">
         <framework:serializer enabled="true" />
-        <framework:messenger failure-transport="failed" reset-on-message="true">
+        <framework:messenger failure-transport="failed">
             <framework:serializer default-serializer="messenger.transport.symfony_serializer" />
             <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
-            <framework:transport name="customised" dsn="amqp://localhost/%2f/messages?exchange_name=exchange_name" serializer="messenger.transport.native_php_serializer">
+            <framework:transport name="customised" dsn="amqp://localhost/%2f/messages?exchange_name=exchange_name" serializer="messenger.transport.native_php_serializer" rate-limiter="customised_worker">
                 <framework:options>
                     <framework:queue>
                         <framework:name>Queue</framework:name>

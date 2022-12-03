@@ -87,9 +87,6 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertSame('first_place', (string) $subject->getMarking());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetMarkingWithUninitializedProperty()
     {
         $subject = new SubjectWithType();
@@ -102,9 +99,6 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertCount(0, $marking->getPlaces());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetMarkingWithUninitializedProperty2()
     {
         $subject = new SubjectWithType();
@@ -128,7 +122,7 @@ class MethodMarkingStoreTest extends TestCase
                 $this->markingValue = $markingValue;
             }
 
-            public function __toString()
+            public function __toString(): string
             {
                 return $this->markingValue;
             }

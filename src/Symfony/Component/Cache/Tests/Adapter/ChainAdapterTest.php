@@ -205,7 +205,6 @@ class ChainAdapterTest extends AdapterTestCase
         $itemValidator = function (CacheItem $item) {
             $refl = new \ReflectionObject($item);
             $propExpiry = $refl->getProperty('expiry');
-            $propExpiry->setAccessible(true);
             $expiry = $propExpiry->getValue($item);
             $this->assertGreaterThan(10, $expiry - time(), 'Item should be saved with the given ttl, not the default for the adapter.');
 

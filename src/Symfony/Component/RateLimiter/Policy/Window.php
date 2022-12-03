@@ -20,15 +20,11 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class Window implements LimiterStateInterface
 {
-    private $id;
-    private $hitCount = 0;
-    private $intervalInSeconds;
-    private $maxSize;
-
-    /**
-     * @var float
-     */
-    private $timer;
+    private string $id;
+    private int $hitCount = 0;
+    private int $intervalInSeconds;
+    private int $maxSize;
+    private float $timer;
 
     public function __construct(string $id, int $intervalInSeconds, int $windowSize, float $timer = null)
     {
@@ -50,7 +46,7 @@ final class Window implements LimiterStateInterface
 
     public function add(int $hits = 1, float $now = null)
     {
-        $now = $now ?? microtime(true);
+        $now ??= microtime(true);
         if (($now - $this->timer) > $this->intervalInSeconds) {
             // reset window
             $this->timer = $now;

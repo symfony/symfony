@@ -15,6 +15,14 @@ class Php80Dummy
 {
     public mixed $mixedProperty;
 
+    /**
+     * @param string $promotedAndMutated
+     * @param array<string> $collection
+     */
+    public function __construct(private mixed $promoted, private mixed $promotedAndMutated, private array $collection)
+    {
+    }
+
     public function getFoo(): array|null
     {
     }

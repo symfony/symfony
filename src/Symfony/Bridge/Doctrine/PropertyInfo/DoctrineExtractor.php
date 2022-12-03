@@ -31,17 +31,14 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getProperties(string $class, array $context = [])
+    public function getProperties(string $class, array $context = []): ?array
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -60,10 +57,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         return $properties;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypes(string $class, string $property, array $context = [])
+    public function getTypes(string $class, string $property, array $context = []): ?array
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -197,18 +191,12 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isReadable(string $class, string $property, array $context = [])
+    public function isReadable(string $class, string $property, array $context = []): ?bool
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isWritable(string $class, string $property, array $context = [])
+    public function isWritable(string $class, string $property, array $context = []): ?bool
     {
         if (
             null === ($metadata = $this->getMetadata($class))
@@ -225,7 +213,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         try {
             return $this->entityManager->getClassMetadata($class);
-        } catch (MappingException|OrmMappingException $exception) {
+        } catch (MappingException|OrmMappingException) {
             return null;
         }
     }
@@ -260,47 +248,33 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
      */
     private function getPhpType(string $doctrineType): ?string
     {
-        switch ($doctrineType) {
-            case Types::SMALLINT:
-            case Types::INTEGER:
-                return Type::BUILTIN_TYPE_INT;
-
-            case Types::FLOAT:
-                return Type::BUILTIN_TYPE_FLOAT;
-
-            case Types::BIGINT:
-            case Types::STRING:
-            case Types::TEXT:
-            case Types::GUID:
-            case Types::DECIMAL:
-                return Type::BUILTIN_TYPE_STRING;
-
-            case Types::BOOLEAN:
-                return Type::BUILTIN_TYPE_BOOL;
-
-            case Types::BLOB:
-            case Types::BINARY:
-                return Type::BUILTIN_TYPE_RESOURCE;
-
-            case Types::OBJECT:
-            case Types::DATE_MUTABLE:
-            case Types::DATETIME_MUTABLE:
-            case Types::DATETIMETZ_MUTABLE:
-            case 'vardatetime':
-            case Types::TIME_MUTABLE:
-            case Types::DATE_IMMUTABLE:
-            case Types::DATETIME_IMMUTABLE:
-            case Types::DATETIMETZ_IMMUTABLE:
-            case Types::TIME_IMMUTABLE:
-            case Types::DATEINTERVAL:
-                return Type::BUILTIN_TYPE_OBJECT;
-
-            case Types::ARRAY:
-            case Types::SIMPLE_ARRAY:
-            case 'json_array':
-                return Type::BUILTIN_TYPE_ARRAY;
-        }
-
-        return null;
+        return match ($doctrineType) {
+            Types::SMALLINT,
+            Types::INTEGER => Type::BUILTIN_TYPE_INT,
+            Types::FLOAT => Type::BUILTIN_TYPE_FLOAT,
+            Types::BIGINT,
+            Types::STRING,
+            Types::TEXT,
+            Types::GUID,
+            Types::DECIMAL => Type::BUILTIN_TYPE_STRING,
+            Types::BOOLEAN => Type::BUILTIN_TYPE_BOOL,
+            Types::BLOB,
+            Types::BINARY => Type::BUILTIN_TYPE_RESOURCE,
+            Types::OBJECT,
+            Types::DATE_MUTABLE,
+            Types::DATETIME_MUTABLE,
+            Types::DATETIMETZ_MUTABLE,
+            'vardatetime',
+            Types::TIME_MUTABLE,
+            Types::DATE_IMMUTABLE,
+            Types::DATETIME_IMMUTABLE,
+            Types::DATETIMETZ_IMMUTABLE,
+            Types::TIME_IMMUTABLE,
+            Types::DATEINTERVAL => Type::BUILTIN_TYPE_OBJECT,
+            Types::ARRAY,
+            Types::SIMPLE_ARRAY,
+            'json_array' => Type::BUILTIN_TYPE_ARRAY,
+            default => null,
+        };
     }
 }

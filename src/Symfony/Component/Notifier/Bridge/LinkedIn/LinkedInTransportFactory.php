@@ -14,14 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
  */
 final class LinkedInTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): LinkedInTransport
     {
         $scheme = $dsn->getScheme();
 

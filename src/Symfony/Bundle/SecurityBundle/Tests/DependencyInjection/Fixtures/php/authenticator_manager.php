@@ -3,7 +3,6 @@
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 
 $container->loadFromExtension('security', [
-    'enable_authenticator_manager' => true,
     'firewalls' => [
         'main' => [
             'required_badges' => [CsrfTokenBadge::class, 'RememberMeBadge'],

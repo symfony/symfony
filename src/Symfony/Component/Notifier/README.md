@@ -6,7 +6,7 @@ The Notifier component sends notifications via one or more channels (email, SMS,
 Sponsor
 -------
 
-The Notifier component for Symfony 5.4/6.0 is [backed][1] by [Mercure.rocks][2].
+The Notifier component for Symfony 6.1 is [backed][1] by [Mercure.rocks][2].
 
 Create real-time experiences in minutes! Mercure.rocks provides a realtime API service
 that is tightly integrated with Symfony: create UIs that update in live with UX Turbo,

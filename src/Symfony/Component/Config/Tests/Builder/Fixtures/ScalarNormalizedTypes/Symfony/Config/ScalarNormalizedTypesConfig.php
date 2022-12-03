@@ -24,10 +24,11 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     private $_usedProperties = [];
 
     /**
-     * @param ParamConfigurator|list<mixed|ParamConfigurator> $value
+     * @param ParamConfigurator|list<ParamConfigurator|mixed>|string $value
+     *
      * @return $this
      */
-    public function simpleArray($value): self
+    public function simpleArray(ParamConfigurator|string|array $value): static
     {
         $this->_usedProperties['simpleArray'] = true;
         $this->simpleArray = $value;
@@ -36,10 +37,9 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
-     * @param ParamConfigurator|array $value
      * @return $this
      */
-    public function keyedArray(string $name, $value): self
+    public function keyedArray(string $name, ParamConfigurator|string|array $value): static
     {
         $this->_usedProperties['keyedArray'] = true;
         $this->keyedArray[$name] = $value;
@@ -48,9 +48,13 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
+     * @default {"enabled":null}
      * @return \Symfony\Config\ScalarNormalizedTypes\ObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\ObjectConfig : static)
      */
-    public function object($value = [])
+    public function object(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\ObjectConfig|static
     {
         if (!\is_array($value)) {
             $this->_usedProperties['object'] = true;
@@ -70,9 +74,12 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig : static)
      */
-    public function listObject($value = [])
+    public function listObject(mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\ListObjectConfig|static
     {
         $this->_usedProperties['listObject'] = true;
         if (!\is_array($value)) {
@@ -85,9 +92,12 @@ class ScalarNormalizedTypesConfig implements \Symfony\Component\Config\Builder\C
     }
 
     /**
+     * @template TValue
+     * @param TValue $value
      * @return \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|$this
+     * @psalm-return (TValue is array ? \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig : static)
      */
-    public function keyedListObject(string $class, $value = [])
+    public function keyedListObject(string $class, mixed $value = []): \Symfony\Config\ScalarNormalizedTypes\KeyedListObjectConfig|static
     {
         if (!\is_array($value)) {
             $this->_usedProperties['keyedListObject'] = true;

@@ -32,7 +32,7 @@ final class ExpoTransport extends AbstractTransport
     /** @var string|null */
     private $token;
 
-    public function __construct(string $token = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->client = $client;
@@ -70,7 +70,7 @@ final class ExpoTransport extends AbstractTransport
 
         $options['title'] = $message->getSubject();
         $options['body'] = $message->getContent();
-        $options['data'] = $options['data'] ?? [];
+        $options['data'] ??= [];
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
@@ -86,7 +86,7 @@ final class ExpoTransport extends AbstractTransport
         }
 
         $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-        $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
+        $jsonContents = str_starts_with($contentType, 'application/json') ? $response->toArray(false) : null;
 
         if (200 !== $statusCode) {
             $errorMessage = $jsonContents['error']['message'] ?? $response->getContent(false);

@@ -86,10 +86,6 @@ class DoctrineExtractorTest extends TestCase
 
     public function testTestGetPropertiesWithEmbedded()
     {
-        if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
-            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
-        }
-
         $this->assertEquals(
             [
                 'id',
@@ -109,10 +105,6 @@ class DoctrineExtractorTest extends TestCase
 
     public function testExtractWithEmbedded()
     {
-        if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
-            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
-        }
-
         $expectedTypes = [new Type(
             Type::BUILTIN_TYPE_OBJECT,
             false,
@@ -128,9 +120,6 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($expectedTypes, $actualTypes);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {

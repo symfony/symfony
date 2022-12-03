@@ -8,7 +8,7 @@
             http://symfony.com/schema/dic/symfony
             https://symfony.com/schema/dic/symfony/symfony-1.0.xsd"
 >
-    <framework:config>
+    <framework:config http-method-override="false">
         <framework:csrf-protection enabled="false"/>
         <framework:form enabled="true">
             <framework:csrf-protection enabled="true"/>

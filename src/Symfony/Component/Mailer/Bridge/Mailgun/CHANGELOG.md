@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Allow multiple `TagHeaders` with `MailgunApiTransport`
+
 5.2
 ---
 

@@ -24,8 +24,8 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
  */
 class FirewallMap implements FirewallMapInterface
 {
-    private $container;
-    private $map;
+    private ContainerInterface $container;
+    private iterable $map;
 
     public function __construct(ContainerInterface $container, iterable $map)
     {
@@ -33,7 +33,7 @@ class FirewallMap implements FirewallMapInterface
         $this->map = $map;
     }
 
-    public function getListeners(Request $request)
+    public function getListeners(Request $request): array
     {
         $context = $this->getFirewallContext($request);
 
@@ -44,10 +44,7 @@ class FirewallMap implements FirewallMapInterface
         return [$context->getListeners(), $context->getExceptionListener(), $context->getLogoutListener()];
     }
 
-    /**
-     * @return FirewallConfig|null
-     */
-    public function getFirewallConfig(Request $request)
+    public function getFirewallConfig(Request $request): ?FirewallConfig
     {
         $context = $this->getFirewallContext($request);
 

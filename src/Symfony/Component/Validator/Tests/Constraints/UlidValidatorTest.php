@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UlidValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): UlidValidator
     {
         return new UlidValidator();
     }
@@ -82,12 +82,9 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidUlidNamed()
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Ulid(message: "testMessage");');
+        $constraint = new Ulid(message: 'testMessage');
 
         $this->validator->validate('01ARZ3NDEKTSV4RRFFQ69G5FA', $constraint);
 

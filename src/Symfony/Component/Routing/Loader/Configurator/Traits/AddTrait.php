@@ -35,7 +35,7 @@ trait AddTrait
      *
      * @param string|array $path the path, or the localized paths of the route
      */
-    public function add(string $name, $path): RouteConfigurator
+    public function add(string $name, string|array $path): RouteConfigurator
     {
         $parentConfigurator = $this instanceof CollectionConfigurator ? $this : ($this instanceof RouteConfigurator ? $this->parentConfigurator : null);
         $route = $this->createLocalizedRoute($this->collection, $name, $path, $this->name, $this->prefixes);
@@ -53,7 +53,7 @@ trait AddTrait
      *
      * @param string|array $path the path, or the localized paths of the route
      */
-    public function __invoke(string $name, $path): RouteConfigurator
+    public function __invoke(string $name, string|array $path): RouteConfigurator
     {
         return $this->add($name, $path);
     }

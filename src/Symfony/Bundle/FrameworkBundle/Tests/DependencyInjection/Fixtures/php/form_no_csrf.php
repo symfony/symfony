@@ -1,10 +1,10 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'form' => [
         'csrf_protection' => [
             'enabled' => false,
         ],
-        'legacy_error_messages' => false,
     ],
 ]);

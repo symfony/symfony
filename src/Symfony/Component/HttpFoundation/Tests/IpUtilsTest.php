@@ -82,33 +82,6 @@ class IpUtilsTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testIpTriggersDeprecationOnNull()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp(null, '192.168.1.1'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testIp4TriggersDeprecationOnNull()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp4()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp4(null, '192.168.1.1'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testIp6TriggersDeprecationOnNull()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp6()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp6(null, '2a01:198:603:0::/65'));
-    }
-
-    /**
      * @requires extension sockets
      */
     public function testAnIpv6WithOptionDisabledIpv6()

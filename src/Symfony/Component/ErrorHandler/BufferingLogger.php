@@ -20,7 +20,7 @@ use Psr\Log\AbstractLogger;
  */
 class BufferingLogger extends AbstractLogger
 {
-    private $logs = [];
+    private array $logs = [];
 
     public function log($level, $message, array $context = []): void
     {
@@ -35,10 +35,7 @@ class BufferingLogger extends AbstractLogger
         return $logs;
     }
 
-    /**
-     * @return array
-     */
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -51,21 +48,21 @@ class BufferingLogger extends AbstractLogger
     public function __destruct()
     {
         foreach ($this->logs as [$level, $message, $context]) {
-            if (false !== strpos($message, '{')) {
+            if (str_contains($message, '{')) {
                 foreach ($context as $key => $val) {
                     if (null === $val || \is_scalar($val) || (\is_object($val) && \is_callable([$val, '__toString']))) {
                         $message = str_replace("{{$key}}", $val, $message);
                     } elseif ($val instanceof \DateTimeInterface) {
-                        $message = str_replace("{{$key}}", $val->format(\DateTime::RFC3339), $message);
+                        $message = str_replace("{{$key}}", $val->format(\DateTimeInterface::RFC3339), $message);
                     } elseif (\is_object($val)) {
-                        $message = str_replace("{{$key}}", '[object '.\get_class($val).']', $message);
+                        $message = str_replace("{{$key}}", '[object '.get_debug_type($val).']', $message);
                     } else {
                         $message = str_replace("{{$key}}", '['.\gettype($val).']', $message);
                     }
                 }
             }
 
-            error_log(sprintf('%s [%s] %s', date(\DateTime::RFC3339), $level, $message));
+            error_log(sprintf('%s [%s] %s', date(\DateTimeInterface::RFC3339), $level, $message));
         }
     }
 }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\Lock\NoLock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
@@ -27,12 +26,8 @@ final class FixedWindowLimiter implements LimiterInterface
 {
     use ResetLimiterTrait;
 
-    private $limit;
-
-    /**
-     * @var int seconds
-     */
-    private $interval;
+    private int $limit;
+    private int $interval;
 
     public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, LockInterface $lock = null)
     {
@@ -41,7 +36,7 @@ final class FixedWindowLimiter implements LimiterInterface
         }
 
         $this->storage = $storage;
-        $this->lock = $lock ?? new NoLock();
+        $this->lock = $lock;
         $this->id = $id;
         $this->limit = $limit;
         $this->interval = TimeUtil::dateIntervalToSeconds($interval);
@@ -53,7 +48,7 @@ final class FixedWindowLimiter implements LimiterInterface
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the size of the rate limiter (%d).', $tokens, $this->limit));
         }
 
-        $this->lock->acquire(true);
+        $this->lock?->acquire(true);
 
         try {
             $window = $this->storage->fetch($this->id);
@@ -63,12 +58,13 @@ final class FixedWindowLimiter implements LimiterInterface
 
             $now = microtime(true);
             $availableTokens = $window->getAvailableTokens($now);
-            if ($availableTokens >= $tokens) {
+
+            if ($availableTokens >= max(1, $tokens)) {
                 $window->add($tokens, $now);
 
                 $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now)), true, $this->limit));
             } else {
-                $waitDuration = $window->calculateTimeForTokens($tokens);
+                $waitDuration = $window->calculateTimeForTokens(max(1, $tokens));
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
@@ -79,17 +75,17 @@ final class FixedWindowLimiter implements LimiterInterface
 
                 $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
             }
-            $this->storage->save($window);
+
+            if (0 < $tokens) {
+                $this->storage->save($window);
+            }
         } finally {
-            $this->lock->release();
+            $this->lock?->release();
         }
 
         return $reservation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(int $tokens = 1): RateLimit
     {
         try {

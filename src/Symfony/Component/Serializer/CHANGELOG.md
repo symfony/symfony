@@ -1,6 +1,36 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add support for constructor promoted properties to `Context` attribute
+ * Add context option `PropertyNormalizer::NORMALIZE_VISIBILITY` with bitmask flags `PropertyNormalizer::NORMALIZE_PUBLIC`, `PropertyNormalizer::NORMALIZE_PROTECTED`, `PropertyNormalizer::NORMALIZE_PRIVATE`
+ * Add method `withNormalizeVisibility` to `PropertyNormalizerContextBuilder`
+ * Deprecate calling `AttributeMetadata::setSerializedName()`, `ClassMetadata::setClassDiscriminatorMapping()` without arguments
+ * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
+ * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
+ * Add option YamlEncoder::YAML_INDENTATION to YamlEncoder constructor options to configure additional indentation for each level of nesting. This allows configuring indentation in the service configuration.
+ * Add `SerializedPath` annotation to flatten nested attributes
+
+6.1
+---
+
+ * Add `TraceableSerializer`, `TraceableNormalizer`, `TraceableEncoder` and `SerializerDataCollector` to integrate with the web profiler
+ * Add the ability to create contexts using context builders
+ * Set `Context` annotation as not final
+ * Deprecate `ContextAwareNormalizerInterface`, use `NormalizerInterface` instead
+ * Deprecate `ContextAwareDenormalizerInterface`, use `DenormalizerInterface` instead
+ * Deprecate supporting denormalization for `AbstractUid` in `UidNormalizer`, use one of `AbstractUid` child class instead
+ * Deprecate denormalizing to an abstract class in `UidNormalizer`
+ * Add support for `can*()` methods to `ObjectNormalizer`
+
+6.0
+---
+
+ * Remove `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
+ * Remove the ability to create instances of the annotation classes by passing an array of parameters, use named arguments instead
+
 5.4
 ---
 

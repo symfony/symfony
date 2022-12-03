@@ -20,14 +20,14 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class UriSigner
 {
-    private $secret;
-    private $parameter;
+    private string $secret;
+    private string $parameter;
 
     /**
      * @param string $secret    A secret
      * @param string $parameter Query string parameter to use
      */
-    public function __construct(string $secret, string $parameter = '_hash')
+    public function __construct(#[\SensitiveParameter] string $secret, string $parameter = '_hash')
     {
         $this->secret = $secret;
         $this->parameter = $parameter;
@@ -38,16 +38,14 @@ class UriSigner
      *
      * The given URI is signed by adding the query string parameter
      * which value depends on the URI and the secret.
-     *
-     * @return string
      */
-    public function sign(string $uri)
+    public function sign(string $uri): string
     {
         $url = parse_url($uri);
+        $params = [];
+
         if (isset($url['query'])) {
             parse_str($url['query'], $params);
-        } else {
-            $params = [];
         }
 
         $uri = $this->buildUrl($url, $params);
@@ -58,16 +56,14 @@ class UriSigner
 
     /**
      * Checks that a URI contains the correct hash.
-     *
-     * @return bool
      */
-    public function check(string $uri)
+    public function check(string $uri): bool
     {
         $url = parse_url($uri);
+        $params = [];
+
         if (isset($url['query'])) {
             parse_str($url['query'], $params);
-        } else {
-            $params = [];
         }
 
         if (empty($params[$this->parameter])) {
@@ -105,7 +101,7 @@ class UriSigner
         $pass = isset($url['pass']) ? ':'.$url['pass'] : '';
         $pass = ($user || $pass) ? "$pass@" : '';
         $path = $url['path'] ?? '';
-        $query = isset($url['query']) && $url['query'] ? '?'.$url['query'] : '';
+        $query = $url['query'] ? '?'.$url['query'] : '';
         $fragment = isset($url['fragment']) ? '#'.$url['fragment'] : '';
 
         return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;

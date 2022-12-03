@@ -42,6 +42,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
@@ -58,9 +59,7 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('serializer', Serializer::class)
-            ->public()
             ->args([[], []])
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->alias(SerializerInterface::class, 'serializer')
         ->alias(NormalizerInterface::class, 'serializer')
@@ -129,6 +128,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -1000])
 
         ->alias(ObjectNormalizer::class, 'serializer.normalizer.object')
+            ->deprecate('symfony/serializer', '6.2', 'The "%alias_id%" service alias is deprecated, type-hint against "'.NormalizerInterface::class.'" or implement "'.NormalizerAwareInterface::class.'" instead.')
 
         ->set('serializer.normalizer.property', PropertyNormalizer::class)
             ->args([
@@ -140,6 +140,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->alias(PropertyNormalizer::class, 'serializer.normalizer.property')
+            ->deprecate('symfony/serializer', '6.2', 'The "%alias_id%" service alias is deprecated, type-hint against "'.NormalizerInterface::class.'" or implement "'.NormalizerAwareInterface::class.'" instead.')
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -990])

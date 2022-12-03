@@ -31,6 +31,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
+                'http_method_override' => false,
                 'assets' => [
                     'base_urls' => 'http://cdn.example.com',
                     'base_path' => '/foo',
@@ -44,6 +45,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
+                'http_method_override' => false,
                 'assets' => [
                     'packages' => [
                         'impossible' => [
@@ -62,6 +64,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
+                'http_method_override' => false,
                 'workflows' => [
                     'article' => [
                         'type' => 'state_machine',
@@ -90,6 +93,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         try {
             $this->createContainerFromClosure(function (ContainerBuilder $container) {
                 $container->loadFromExtension('framework', [
+                    'http_method_override' => false,
                     'lock' => false,
                     'rate_limiter' => [
                         'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
@@ -99,11 +103,12 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
             $this->fail('No LogicException thrown');
         } catch (LogicException $e) {
-            $this->assertEquals('Rate limiter "with_lock" requires the Lock component to be installed and configured.', $e->getMessage());
+            $this->assertEquals('Rate limiter "with_lock" requires the Lock component to be configured.', $e->getMessage());
         }
 
         $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'http_method_override' => false,
                 'lock' => true,
                 'rate_limiter' => [
                     'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
@@ -119,6 +124,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
     {
         $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'http_method_override' => false,
                 'rate_limiter' => [
                     'without_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour', 'lock_factory' => null],
                 ],

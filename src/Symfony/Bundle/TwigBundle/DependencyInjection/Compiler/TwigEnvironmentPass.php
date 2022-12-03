@@ -50,7 +50,7 @@ class TwigEnvironmentPass implements CompilerPassInterface
             }
         }
 
-        if (!empty($twigBridgeExtensionsMethodCalls) || !empty($othersExtensionsMethodCalls)) {
+        if ($twigBridgeExtensionsMethodCalls || $othersExtensionsMethodCalls) {
             $definition->setMethodCalls(array_merge($twigBridgeExtensionsMethodCalls, $othersExtensionsMethodCalls, $currentMethodCalls));
         }
     }

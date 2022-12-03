@@ -158,14 +158,11 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReservedDomainsRaiseViolationIfTldRequiredNamed()
     {
         $this->validator->validate(
             'example',
-            eval('return new \Symfony\Component\Validator\Constraints\Hostname(message: "myMessage", requireTld: true);')
+            new Hostname(message: 'myMessage', requireTld: true)
         );
 
         $this->buildViolation('myMessage')
@@ -210,7 +207,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    protected function createValidator()
+    protected function createValidator(): HostnameValidator
     {
         return new HostnameValidator();
     }

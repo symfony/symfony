@@ -27,7 +27,7 @@ final class EnumType extends AbstractType
         $resolver
             ->setRequired(['class'])
             ->setAllowedTypes('class', 'string')
-            ->setAllowedValues('class', \Closure::fromCallable('enum_exists'))
+            ->setAllowedValues('class', enum_exists(...))
             ->setDefault('choices', static function (Options $options): array {
                 return $options['class']::cases();
             })

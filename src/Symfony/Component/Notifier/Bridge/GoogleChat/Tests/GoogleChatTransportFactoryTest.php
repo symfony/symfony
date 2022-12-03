@@ -13,14 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\GoogleChat\Tests;
 
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return GoogleChatTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): GoogleChatTransportFactory
     {
         return new GoogleChatTransportFactory();
     }

@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
-use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,17 +24,20 @@ use Symfony\Component\Process\Process;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
+#[AsCommand(name: 'completion', description: 'Dump the shell completion script')]
 final class DumpCompletionCommand extends Command
 {
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultName = 'completion';
+
+    /**
+     * @deprecated since Symfony 6.1
+     */
     protected static $defaultDescription = 'Dump the shell completion script';
 
-    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
-    {
-        if ($input->mustSuggestArgumentValuesFor('shell')) {
-            $suggestions->suggestValues($this->getSupportedShells());
-        }
-    }
+    private array $supportedShells;
 
     protected function configure()
     {
@@ -43,37 +45,44 @@ final class DumpCompletionCommand extends Command
         $commandName = basename($fullCommand);
         $fullCommand = @realpath($fullCommand) ?: $fullCommand;
 
+        $shell = $this->guessShell();
+        [$rcFile, $completionFile] = match ($shell) {
+            'fish' => ['~/.config/fish/config.fish', "/etc/fish/completions/$commandName.fish"],
+            'zsh' => ['~/.zshrc', '$fpath[1]/'.$commandName],
+            default => ['~/.bashrc', "/etc/bash_completion.d/$commandName"],
+        };
+
         $this
             ->setHelp(<<<EOH
 The <info>%command.name%</> command dumps the shell completion script required
-to use shell autocompletion (currently only bash completion is supported).
+to use shell autocompletion (currently, bash and fish completion is supported).
 
 <comment>Static installation
 -------------------</>
 
 Dump the script to a global completion file and restart your shell:
 
-    <info>%command.full_name% bash | sudo tee /etc/bash_completion.d/{$commandName}</>
+    <info>%command.full_name% {$shell} | sudo tee {$completionFile}</>
 
 Or dump the script to a local file and source it:
 
-    <info>%command.full_name% bash > completion.sh</>
+    <info>%command.full_name% {$shell} > completion.sh</>
 
     <comment># source the file whenever you use the project</>
     <info>source completion.sh</>
 
-    <comment># or add this line at the end of your "~/.bashrc" file:</>
+    <comment># or add this line at the end of your "{$rcFile}" file:</>
     <info>source /path/to/completion.sh</>
 
 <comment>Dynamic installation
 --------------------</>
 
-Add this to the end of your shell configuration file (e.g. <info>"~/.bashrc"</>):
+Add this to the end of your shell configuration file (e.g. <info>"{$rcFile}"</>):
 
-    <info>eval "$({$fullCommand} completion bash)"</>
+    <info>eval "$({$fullCommand} completion {$shell})"</>
 EOH
             )
-            ->addArgument('shell', InputArgument::OPTIONAL, 'The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given')
+            ->addArgument('shell', InputArgument::OPTIONAL, 'The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given', null, $this->getSupportedShells(...))
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Tail the completion debug log')
         ;
     }
@@ -105,7 +114,7 @@ EOH
             return self::INVALID;
         }
 
-        $output->write(str_replace(['{{ COMMAND_NAME }}', '{{ VERSION }}'], [$commandName, $this->getApplication()->getVersion()], file_get_contents($completionFile)));
+        $output->write(str_replace(['{{ COMMAND_NAME }}', '{{ VERSION }}'], [$commandName, CompleteCommand::COMPLETION_API_VERSION], file_get_contents($completionFile)));
 
         return self::SUCCESS;
     }
@@ -132,7 +141,7 @@ EOH
      */
     private function getSupportedShells(): array
     {
-        return array_map(function ($f) {
+        return $this->supportedShells ??= array_map(function ($f) {
             return pathinfo($f, \PATHINFO_EXTENSION);
         }, glob(__DIR__.'/../Resources/completion.*'));
     }

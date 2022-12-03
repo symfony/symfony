@@ -23,10 +23,7 @@ final class TelegramOptions implements MessageOptionsInterface
     public const PARSE_MODE_MARKDOWN = 'Markdown';
     public const PARSE_MODE_MARKDOWN_V2 = 'MarkdownV2';
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
     public function __construct(array $options = [])
     {
@@ -46,7 +43,7 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function chatId(string $id): self
+    public function chatId(string $id): static
     {
         $this->options['chat_id'] = $id;
 
@@ -56,7 +53,7 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function parseMode(string $mode): self
+    public function parseMode(string $mode): static
     {
         $this->options['parse_mode'] = $mode;
 
@@ -66,7 +63,7 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function disableWebPagePreview(bool $bool): self
+    public function disableWebPagePreview(bool $bool): static
     {
         $this->options['disable_web_page_preview'] = $bool;
 
@@ -76,7 +73,7 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function disableNotification(bool $bool): self
+    public function disableNotification(bool $bool): static
     {
         $this->options['disable_notification'] = $bool;
 
@@ -86,7 +83,7 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function replyTo(int $messageId): self
+    public function replyTo(int $messageId): static
     {
         $this->options['reply_to_message_id'] = $messageId;
 
@@ -96,9 +93,19 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
-    public function replyMarkup(AbstractTelegramReplyMarkup $markup): self
+    public function replyMarkup(AbstractTelegramReplyMarkup $markup): static
     {
         $this->options['reply_markup'] = $markup->toArray();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function edit(int $messageId): static
+    {
+        $this->options['message_id'] = $messageId;
 
         return $this;
     }

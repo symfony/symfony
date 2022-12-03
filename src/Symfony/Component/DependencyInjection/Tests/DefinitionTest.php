@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -20,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testConstructor()
     {
         $def = new Definition('stdClass');
@@ -185,22 +182,6 @@ class DefinitionTest extends TestCase
         $this->assertSame('deprecated_service', $deprecation['message'], '->getDeprecation() should return an array with the formatted message template');
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Definition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
-        $def = new Definition('stdClass');
-        $def->setDeprecated(true, '%service_id%');
-
-        $deprecation = $def->getDeprecation('deprecated_service');
-        $this->assertSame('deprecated_service', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
     }
 
     /**

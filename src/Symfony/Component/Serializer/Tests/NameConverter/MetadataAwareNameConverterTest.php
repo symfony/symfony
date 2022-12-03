@@ -13,6 +13,9 @@ namespace Symfony\Component\Serializer\Tests\NameConverter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Annotation\SerializedPath;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -163,4 +166,31 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals('buzForExport', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['b']]));
         $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class));
     }
+
+    public function testDenormalizeWithNestedPathAndName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Found SerializedName and SerializedPath annotations on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
+        $nameConverter->denormalize('foo', NestedPathAndName::class);
+    }
+
+    public function testNormalizeWithNestedPathAndName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Found SerializedName and SerializedPath annotations on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
+        $nameConverter->normalize('foo', NestedPathAndName::class);
+    }
+}
+
+class NestedPathAndName
+{
+    /**
+     * @SerializedName("five")
+     * @SerializedPath("[one][two][three]")
+     */
+    public $foo;
 }

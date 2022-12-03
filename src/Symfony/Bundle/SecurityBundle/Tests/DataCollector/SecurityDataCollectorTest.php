@@ -72,7 +72,6 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertCount(0, $collector->getInheritedRoles());
         $this->assertEmpty($collector->getUser());
         $this->assertNull($collector->getFirewall());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     /** @dataProvider provideRoles */
@@ -95,7 +94,6 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($normalizedRoles, $collector->getRoles()->getValue(true));
         $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     public function testCollectSwitchUserToken()
@@ -151,7 +149,6 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($firewallConfig->getAccessDeniedUrl(), $collected['access_denied_url']);
         $this->assertSame($firewallConfig->getUserChecker(), $collected['user_checker']);
         $this->assertSame($firewallConfig->getAuthenticators(), $collected['authenticators']->getValue());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     public function testGetFirewallReturnsNull()
@@ -242,14 +239,14 @@ class SecurityDataCollectorTest extends TestCase
                 ],
             ]],
             [$decoratedVoter1, $decoratedVoter1],
-            [\get_class($voter1), \get_class($voter2)],
+            [$voter1::class, $voter2::class],
             [[
                 'attributes' => ['view'],
                 'object' => new \stdClass(),
                 'result' => true,
                 'voter_details' => [
-                    ['class' => \get_class($voter1), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
-                    ['class' => \get_class($voter2), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
                 ],
             ]],
         ];
@@ -279,17 +276,17 @@ class SecurityDataCollectorTest extends TestCase
                 ],
             ],
             [$decoratedVoter1, $decoratedVoter1],
-            [\get_class($voter1), \get_class($voter2)],
+            [$voter1::class, $voter2::class],
             [
                 [
                     'attributes' => ['view', 'edit'],
                     'object' => new \stdClass(),
                     'result' => false,
                     'voter_details' => [
-                        ['class' => \get_class($voter1), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
-                        ['class' => \get_class($voter1), 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
-                        ['class' => \get_class($voter2), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                        ['class' => \get_class($voter2), 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['class' => $voter1::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['class' => $voter2::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['class' => $voter2::class, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
                     ],
                 ],
                 [
@@ -297,8 +294,8 @@ class SecurityDataCollectorTest extends TestCase
                     'object' => new \stdClass(),
                     'result' => true,
                     'voter_details' => [
-                        ['class' => \get_class($voter1), 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
-                        ['class' => \get_class($voter2), 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['class' => $voter1::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['class' => $voter2::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
                     ],
                 ],
             ],

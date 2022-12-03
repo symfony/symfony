@@ -11,6 +11,18 @@ services:
     private_alias:
         alias: public
         public: false
+    deprecated:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeprecatedClass
+        deprecated:
+            package: 'foo/bar'
+            version: '1.9'
+            message: The "%service_id%" service is deprecated since foo/bar 1.9 and will be removed in 2.0
+    deprecated_alias:
+        alias: deprecated
+        deprecated:
+            package: 'foo/bar'
+            version: '1.9'
+            message: The "%alias_id%" alias is deprecated since foo/bar 1.9 and will be removed in 2.0
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass:
         class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass: '@public'

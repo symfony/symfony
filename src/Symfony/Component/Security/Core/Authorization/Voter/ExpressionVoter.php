@@ -26,10 +26,10 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class ExpressionVoter implements CacheableVoterInterface
 {
-    private $expressionLanguage;
-    private $trustResolver;
-    private $authChecker;
-    private $roleHierarchy;
+    private ExpressionLanguage $expressionLanguage;
+    private AuthenticationTrustResolverInterface $trustResolver;
+    private AuthorizationCheckerInterface $authChecker;
+    private ?RoleHierarchyInterface $roleHierarchy;
 
     public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, RoleHierarchyInterface $roleHierarchy = null)
     {
@@ -49,10 +49,7 @@ class ExpressionVoter implements CacheableVoterInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
         $variables = null;
@@ -61,9 +58,7 @@ class ExpressionVoter implements CacheableVoterInterface
                 continue;
             }
 
-            if (null === $variables) {
-                $variables = $this->getVariables($token, $subject);
-            }
+            $variables ??= $this->getVariables($token, $subject);
 
             $result = VoterInterface::ACCESS_DENIED;
             if ($this->expressionLanguage->evaluate($attribute, $variables)) {
@@ -74,7 +69,7 @@ class ExpressionVoter implements CacheableVoterInterface
         return $result;
     }
 
-    private function getVariables(TokenInterface $token, $subject): array
+    private function getVariables(TokenInterface $token, mixed $subject): array
     {
         $roleNames = $token->getRoleNames();
 

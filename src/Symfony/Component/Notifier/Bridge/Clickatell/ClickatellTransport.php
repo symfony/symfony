@@ -28,10 +28,10 @@ final class ClickatellTransport extends AbstractTransport
 {
     protected const HOST = 'api.clickatell.com';
 
-    private $authToken;
-    private $from;
+    private string $authToken;
+    private ?string $from;
 
-    public function __construct(string $authToken, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $authToken, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->authToken = $authToken;
         $this->from = $from;
@@ -61,6 +61,8 @@ final class ClickatellTransport extends AbstractTransport
 
         $endpoint = sprintf('https://%s/rest/message', $this->getEndpoint());
 
+        $from = $message->getFrom() ?: $this->from;
+
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Accept' => 'application/json',
@@ -69,7 +71,7 @@ final class ClickatellTransport extends AbstractTransport
                 'X-Version' => 1,
             ],
             'json' => [
-                'from' => $this->from ?? '',
+                'from' => $from ?? '',
                 'to' => [$message->getPhone()],
                 'text' => $message->getSubject(),
             ],

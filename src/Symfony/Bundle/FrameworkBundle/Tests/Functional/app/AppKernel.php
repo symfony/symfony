@@ -126,7 +126,7 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         return '';
     }
 
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return false;
     }

@@ -13,8 +13,6 @@ namespace Symfony\Component\Lock\Store;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Traits\RedisClusterProxy;
-use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
@@ -25,24 +23,13 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class StoreFactory
 {
-    /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy|\Memcached|\MongoDB\Collection|\PDO|Connection|\Zookeeper|string $connection Connection or DSN or Store short name
-     *
-     * @return PersistingStoreInterface
-     */
-    public static function createStore($connection)
+    public static function createStore(object|string $connection): PersistingStoreInterface
     {
-        if (!\is_string($connection) && !\is_object($connection)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a string or a connection object, "%s" given.', __METHOD__, get_debug_type($connection)));
-        }
-
         switch (true) {
             case $connection instanceof \Redis:
             case $connection instanceof \RedisArray:
             case $connection instanceof \RedisCluster:
             case $connection instanceof \Predis\ClientInterface:
-            case $connection instanceof RedisProxy:
-            case $connection instanceof RedisClusterProxy:
                 return new RedisStore($connection);
 
             case $connection instanceof \Memcached:

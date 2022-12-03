@@ -18,20 +18,19 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  * Transforms between a timezone identifier string and a DateTimeZone object.
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @implements DataTransformerInterface<\DateTimeZone|array<\DateTimeZone>, string|array<string>>
  */
 class DateTimeZoneToStringTransformer implements DataTransformerInterface
 {
-    private $multiple;
+    private bool $multiple;
 
     public function __construct(bool $multiple = false)
     {
         $this->multiple = $multiple;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform($dateTimeZone)
+    public function transform(mixed $dateTimeZone): mixed
     {
         if (null === $dateTimeZone) {
             return null;
@@ -52,10 +51,7 @@ class DateTimeZoneToStringTransformer implements DataTransformerInterface
         return $dateTimeZone->getName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         if (null === $value) {
             return null;

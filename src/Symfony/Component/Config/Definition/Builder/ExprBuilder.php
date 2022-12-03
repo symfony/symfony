@@ -21,7 +21,14 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  */
 class ExprBuilder
 {
+    public const TYPE_ANY = 'any';
+    public const TYPE_STRING = 'string';
+    public const TYPE_NULL = 'null';
+    public const TYPE_ARRAY = 'array';
+
     protected $node;
+
+    public $allowedTypes;
     public $ifPart;
     public $thenPart;
 
@@ -35,9 +42,10 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function always(\Closure $then = null)
+    public function always(\Closure $then = null): static
     {
-        $this->ifPart = function () { return true; };
+        $this->ifPart = static fn () => true;
+        $this->allowedTypes = self::TYPE_ANY;
 
         if (null !== $then) {
             $this->thenPart = $then;
@@ -53,13 +61,10 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifTrue(\Closure $closure = null)
+    public function ifTrue(\Closure $closure = null): static
     {
-        if (null === $closure) {
-            $closure = function ($v) { return true === $v; };
-        }
-
-        $this->ifPart = $closure;
+        $this->ifPart = $closure ?? static fn ($v) => true === $v;
+        $this->allowedTypes = self::TYPE_ANY;
 
         return $this;
     }
@@ -69,9 +74,10 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifString()
+    public function ifString(): static
     {
-        $this->ifPart = function ($v) { return \is_string($v); };
+        $this->ifPart = \is_string(...);
+        $this->allowedTypes = self::TYPE_STRING;
 
         return $this;
     }
@@ -81,9 +87,10 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifNull()
+    public function ifNull(): static
     {
-        $this->ifPart = function ($v) { return null === $v; };
+        $this->ifPart = \is_null(...);
+        $this->allowedTypes = self::TYPE_NULL;
 
         return $this;
     }
@@ -93,9 +100,10 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifEmpty()
+    public function ifEmpty(): static
     {
-        $this->ifPart = function ($v) { return empty($v); };
+        $this->ifPart = static fn ($v) => empty($v);
+        $this->allowedTypes = self::TYPE_ANY;
 
         return $this;
     }
@@ -105,9 +113,10 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifArray()
+    public function ifArray(): static
     {
-        $this->ifPart = function ($v) { return \is_array($v); };
+        $this->ifPart = \is_array(...);
+        $this->allowedTypes = self::TYPE_ARRAY;
 
         return $this;
     }
@@ -117,9 +126,10 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifInArray(array $array)
+    public function ifInArray(array $array): static
     {
-        $this->ifPart = function ($v) use ($array) { return \in_array($v, $array, true); };
+        $this->ifPart = static fn ($v) => \in_array($v, $array, true);
+        $this->allowedTypes = self::TYPE_ANY;
 
         return $this;
     }
@@ -129,9 +139,10 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifNotInArray(array $array)
+    public function ifNotInArray(array $array): static
     {
-        $this->ifPart = function ($v) use ($array) { return !\in_array($v, $array, true); };
+        $this->ifPart = static fn ($v) => !\in_array($v, $array, true);
+        $this->allowedTypes = self::TYPE_ANY;
 
         return $this;
     }
@@ -141,10 +152,11 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function castToArray()
+    public function castToArray(): static
     {
-        $this->ifPart = function ($v) { return !\is_array($v); };
-        $this->thenPart = function ($v) { return [$v]; };
+        $this->ifPart = static fn ($v) => !\is_array($v);
+        $this->allowedTypes = self::TYPE_ANY;
+        $this->thenPart = static fn ($v) => [$v];
 
         return $this;
     }
@@ -154,7 +166,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function then(\Closure $closure)
+    public function then(\Closure $closure): static
     {
         $this->thenPart = $closure;
 
@@ -166,9 +178,9 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function thenEmptyArray()
+    public function thenEmptyArray(): static
     {
-        $this->thenPart = function () { return []; };
+        $this->thenPart = static fn () => [];
 
         return $this;
     }
@@ -182,9 +194,9 @@ class ExprBuilder
      *
      * @throws \InvalidArgumentException
      */
-    public function thenInvalid(string $message)
+    public function thenInvalid(string $message): static
     {
-        $this->thenPart = function ($v) use ($message) { throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
+        $this->thenPart = static fn ($v) => throw new \InvalidArgumentException(sprintf($message, json_encode($v)));
 
         return $this;
     }
@@ -196,9 +208,9 @@ class ExprBuilder
      *
      * @throws UnsetKeyException
      */
-    public function thenUnset()
+    public function thenUnset(): static
     {
-        $this->thenPart = function () { throw new UnsetKeyException('Unsetting key.'); };
+        $this->thenPart = static fn () => throw new UnsetKeyException('Unsetting key.');
 
         return $this;
     }
@@ -206,11 +218,9 @@ class ExprBuilder
     /**
      * Returns the related node.
      *
-     * @return NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
-     *
      * @throws \RuntimeException
      */
-    public function end()
+    public function end(): NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
     {
         if (null === $this->ifPart) {
             throw new \RuntimeException('You must specify an if part.');
@@ -226,18 +236,14 @@ class ExprBuilder
      * Builds the expressions.
      *
      * @param ExprBuilder[] $expressions An array of ExprBuilder instances to build
-     *
-     * @return array
      */
-    public static function buildExpressions(array $expressions)
+    public static function buildExpressions(array $expressions): array
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof self) {
                 $if = $expr->ifPart;
                 $then = $expr->thenPart;
-                $expressions[$k] = function ($v) use ($if, $then) {
-                    return $if($v) ? $then($v) : $v;
-                };
+                $expressions[$k] = static fn ($v) => $if($v) ? $then($v) : $v;
             }
         }
 

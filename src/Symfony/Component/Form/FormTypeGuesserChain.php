@@ -13,10 +13,12 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Guess\ValueGuess;
 
 class FormTypeGuesserChain implements FormTypeGuesserInterface
 {
-    private $guessers = [];
+    private array $guessers = [];
 
     /**
      * @param FormTypeGuesserInterface[] $guessers
@@ -41,40 +43,28 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
         $this->guessers = array_merge([], ...$tmpGuessers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessType(string $class, string $property)
+    public function guessType(string $class, string $property): ?TypeGuess
     {
         return $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessType($class, $property);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessRequired(string $class, string $property)
+    public function guessRequired(string $class, string $property): ?ValueGuess
     {
         return $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessRequired($class, $property);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessMaxLength(string $class, string $property)
+    public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
         return $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessMaxLength($class, $property);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessPattern(string $class, string $property)
+    public function guessPattern(string $class, string $property): ?ValueGuess
     {
         return $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessPattern($class, $property);

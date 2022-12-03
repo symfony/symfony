@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ResponseHeaderSame extends Constraint
 {
-    private $headerName;
-    private $expectedValue;
+    private string $headerName;
+    private string $expectedValue;
 
     public function __construct(string $headerName, string $expectedValue)
     {
@@ -25,9 +25,6 @@ final class ResponseHeaderSame extends Constraint
         $this->expectedValue = $expectedValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return sprintf('has header "%s" with value "%s"', $this->headerName, $this->expectedValue);
@@ -35,8 +32,6 @@ final class ResponseHeaderSame extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function matches($response): bool
     {
@@ -45,8 +40,6 @@ final class ResponseHeaderSame extends Constraint
 
     /**
      * @param Response $response
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($response): string
     {

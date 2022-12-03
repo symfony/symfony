@@ -37,9 +37,7 @@ class SymfonyCaster
         foreach (self::REQUEST_GETTERS as $prop => $getter) {
             $key = Caster::PREFIX_PROTECTED.$prop;
             if (\array_key_exists($key, $a) && null === $a[$key]) {
-                if (null === $clone) {
-                    $clone = clone $request;
-                }
+                $clone ??= clone $request;
                 $a[Caster::PREFIX_VIRTUAL.$prop] = $clone->{$getter}();
             }
         }
@@ -49,7 +47,7 @@ class SymfonyCaster
 
     public static function castHttpClient($client, array $a, Stub $stub, bool $isNested)
     {
-        $multiKey = sprintf("\0%s\0multi", \get_class($client));
+        $multiKey = sprintf("\0%s\0multi", $client::class);
         if (isset($a[$multiKey])) {
             $a[$multiKey] = new CutStub($a[$multiKey]);
         }

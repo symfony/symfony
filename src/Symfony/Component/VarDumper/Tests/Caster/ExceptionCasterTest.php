@@ -184,9 +184,6 @@ EODUMP;
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    /**
-     * @requires function Twig\Template::getSourceContext
-     */
     public function testFrameWithTwig()
     {
         require_once \dirname(__DIR__).'/Fixtures/Twig.php';

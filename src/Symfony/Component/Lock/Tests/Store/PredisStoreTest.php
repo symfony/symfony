@@ -29,10 +29,7 @@ class PredisStoreTest extends AbstractRedisStoreTest
         }
     }
 
-    /**
-     * @return \Predis\Client
-     */
-    protected function getRedisConnection(): object
+    protected function getRedisConnection(): \Predis\Client
     {
         $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => null]));
         $redis->connect();

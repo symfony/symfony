@@ -27,7 +27,7 @@ class ZookeeperStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $zookeeper;
+    private \Zookeeper $zookeeper;
 
     public function __construct(\Zookeeper $zookeeper)
     {
@@ -45,16 +45,17 @@ class ZookeeperStore implements PersistingStoreInterface
         }
 
         $host = $params['host'] ?? '';
-        if (isset($params['port'])) {
-            $host .= ':'.$params['port'];
+        $hosts = explode(',', $host);
+
+        foreach ($hosts as $index => $host) {
+            if (isset($params['port'])) {
+                $hosts[$index] = $host.':'.$params['port'];
+            }
         }
 
-        return new \Zookeeper($host);
+        return new \Zookeeper(implode(',', $hosts));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         if ($this->exists($key)) {
@@ -70,9 +71,6 @@ class ZookeeperStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         if (!$this->exists($key)) {
@@ -88,22 +86,16 @@ class ZookeeperStore implements PersistingStoreInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exists(Key $key): bool
     {
         $resource = $this->getKeyResource($key);
         try {
             return $this->zookeeper->get($resource) === $this->getUniqueToken($key);
-        } catch (\ZookeeperException $ex) {
+        } catch (\ZookeeperException) {
             return false;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, zookeeper locks forever.

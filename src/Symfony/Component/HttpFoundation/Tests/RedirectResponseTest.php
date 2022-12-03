@@ -59,17 +59,6 @@ class RedirectResponseTest extends TestCase
         $this->assertEquals('baz.beep', $response->getTargetUrl());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = RedirectResponse::create('foo', 301);
-
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals(301, $response->getStatusCode());
-    }
-
     public function testCacheHeaders()
     {
         $response = new RedirectResponse('foo.bar', 301);

@@ -11,14 +11,17 @@
 
 namespace Symfony\Component\PropertyInfo\Util;
 
+use phpDocumentor\Reflection\PseudoType;
 use phpDocumentor\Reflection\PseudoTypes\ConstExpression;
 use phpDocumentor\Reflection\PseudoTypes\List_;
 use phpDocumentor\Reflection\Type as DocType;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Compound;
+use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
+use phpDocumentor\Reflection\Types\String_;
 use Symfony\Component\PropertyInfo\Type;
 
 // Workaround for phpdocumentor/type-resolver < 1.6
@@ -104,7 +107,7 @@ final class PhpDocTypeHelper
      */
     private function createType(DocType $type, bool $nullable, string $docType = null): ?Type
     {
-        $docType = $docType ?? (string) $type;
+        $docType ??= (string) $type;
 
         if ($type instanceof Collection) {
             $fqsen = $type->getFqsen();
@@ -154,6 +157,14 @@ final class PhpDocTypeHelper
             return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);
         }
 
+        if ($type instanceof PseudoType) {
+            if ($type->underlyingType() instanceof Integer) {
+                return new Type(Type::BUILTIN_TYPE_INT, $nullable, null);
+            } elseif ($type->underlyingType() instanceof String_) {
+                return new Type(Type::BUILTIN_TYPE_STRING, $nullable, null);
+            }
+        }
+
         $docType = $this->normalizeType($docType);
         [$phpType, $class] = $this->getPhpTypeAndClass($docType);
 
@@ -166,26 +177,15 @@ final class PhpDocTypeHelper
 
     private function normalizeType(string $docType): string
     {
-        switch ($docType) {
-            case 'integer':
-                return 'int';
-
-            case 'boolean':
-                return 'bool';
-
+        return match ($docType) {
+            'integer' => 'int',
+            'boolean' => 'bool',
             // real is not part of the PHPDoc standard, so we ignore it
-            case 'double':
-                return 'float';
-
-            case 'callback':
-                return 'callable';
-
-            case 'void':
-                return 'null';
-
-            default:
-                return $docType;
-        }
+            'double' => 'float',
+            'callback' => 'callable',
+            'void' => 'null',
+            default => $docType,
+        };
     }
 
     private function getPhpTypeAndClass(string $docType): array

@@ -23,25 +23,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResolvedFormType implements ResolvedFormTypeInterface
 {
-    /**
-     * @var FormTypeInterface
-     */
-    private $innerType;
+    private FormTypeInterface $innerType;
 
     /**
      * @var FormTypeExtensionInterface[]
      */
-    private $typeExtensions;
+    private array $typeExtensions;
 
-    /**
-     * @var ResolvedFormTypeInterface|null
-     */
-    private $parent;
+    private ?ResolvedFormTypeInterface $parent;
 
-    /**
-     * @var OptionsResolver
-     */
-    private $optionsResolver;
+    private OptionsResolver $optionsResolver;
 
     /**
      * @param FormTypeExtensionInterface[] $typeExtensions
@@ -59,42 +50,27 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         $this->parent = $parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return $this->innerType->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?ResolvedFormTypeInterface
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getInnerType()
+    public function getInnerType(): FormTypeInterface
     {
         return $this->innerType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypeExtensions()
+    public function getTypeExtensions(): array
     {
         return $this->typeExtensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createBuilder(FormFactoryInterface $factory, string $name, array $options = [])
+    public function createBuilder(FormFactoryInterface $factory, string $name, array $options = []): FormBuilderInterface
     {
         try {
             $options = $this->getOptionsResolver()->resolve($options);
@@ -111,22 +87,14 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         return $builder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createView(FormInterface $form, FormView $parent = null)
+    public function createView(FormInterface $form, FormView $parent = null): FormView
     {
         return $this->newView($parent);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (null !== $this->parent) {
-            $this->parent->buildForm($builder, $options);
-        }
+        $this->parent?->buildForm($builder, $options);
 
         $this->innerType->buildForm($builder, $options);
 
@@ -135,14 +103,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if (null !== $this->parent) {
-            $this->parent->buildView($view, $form, $options);
-        }
+        $this->parent?->buildView($view, $form, $options);
 
         $this->innerType->buildView($view, $form, $options);
 
@@ -151,14 +114,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if (null !== $this->parent) {
-            $this->parent->finishView($view, $form, $options);
-        }
+        $this->parent?->finishView($view, $form, $options);
 
         $this->innerType->finishView($view, $form, $options);
 
@@ -168,12 +126,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOptionsResolver()
+    public function getOptionsResolver(): OptionsResolver
     {
-        if (null === $this->optionsResolver) {
+        if (!isset($this->optionsResolver)) {
             if (null !== $this->parent) {
                 $this->optionsResolver = clone $this->parent->getOptionsResolver();
             } else {
@@ -194,10 +149,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * Creates a new builder instance.
      *
      * Override this method if you want to customize the builder class.
-     *
-     * @return FormBuilderInterface
      */
-    protected function newBuilder(string $name, ?string $dataClass, FormFactoryInterface $factory, array $options)
+    protected function newBuilder(string $name, ?string $dataClass, FormFactoryInterface $factory, array $options): FormBuilderInterface
     {
         if ($this->innerType instanceof ButtonTypeInterface) {
             return new ButtonBuilder($name, $options);
@@ -214,10 +167,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * Creates a new view instance.
      *
      * Override this method if you want to customize the view class.
-     *
-     * @return FormView
      */
-    protected function newView(FormView $parent = null)
+    protected function newView(FormView $parent = null): FormView
     {
         return new FormView($parent);
     }

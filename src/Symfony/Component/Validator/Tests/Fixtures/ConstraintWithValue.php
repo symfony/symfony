@@ -24,7 +24,7 @@ class ConstraintWithValue extends Constraint
         return 'property';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT];
     }

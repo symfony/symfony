@@ -30,13 +30,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class KernelBrowser extends HttpKernelBrowser
 {
-    private $hasPerformedRequest = false;
-    private $profiler = false;
-    private $reboot = true;
+    private bool $hasPerformedRequest = false;
+    private bool $profiler = false;
+    private bool $reboot = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(KernelInterface $kernel, array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
         parent::__construct($kernel, $server, $history, $cookieJar);
@@ -44,10 +41,8 @@ class KernelBrowser extends HttpKernelBrowser
 
     /**
      * Returns the container.
-     *
-     * @return ContainerInterface
      */
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         $container = $this->kernel->getContainer();
 
@@ -56,20 +51,16 @@ class KernelBrowser extends HttpKernelBrowser
 
     /**
      * Returns the kernel.
-     *
-     * @return KernelInterface
      */
-    public function getKernel()
+    public function getKernel(): KernelInterface
     {
         return $this->kernel;
     }
 
     /**
      * Gets the profile associated with the current Response.
-     *
-     * @return HttpProfile|false|null
      */
-    public function getProfile()
+    public function getProfile(): HttpProfile|false|null
     {
         if (null === $this->response || !$this->getContainer()->has('profiler')) {
             return false;
@@ -114,33 +105,30 @@ class KernelBrowser extends HttpKernelBrowser
      *
      * @return $this
      */
-    public function loginUser(object $user, string $firewallContext = 'main'): self
+    public function loginUser(object $user, string $firewallContext = 'main'): static
     {
         if (!interface_exists(UserInterface::class)) {
             throw new \LogicException(sprintf('"%s" requires symfony/security-core to be installed.', __METHOD__));
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, \is_object($user) ? \get_class($user) : \gettype($user)));
+            throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, get_debug_type($user)));
         }
 
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
-        // @deprecated since Symfony 5.4
-        if (method_exists($token, 'setAuthenticated')) {
+        // required for compatibility with Symfony 5.4
+        if (method_exists($token, 'isAuthenticated')) {
             $token->setAuthenticated(true, false);
         }
 
         $container = $this->getContainer();
         $container->get('security.untracked_token_storage')->setToken($token);
 
-        if ($container->has('session.factory')) {
-            $session = $container->get('session.factory')->createSession();
-        } elseif ($container->has('session')) {
-            $session = $container->get('session');
-        } else {
+        if (!$container->has('session.factory')) {
             return $this;
         }
 
+        $session = $container->get('session.factory')->createSession();
         $session->set('_security_'.$firewallContext, serialize($token));
         $session->save();
 
@@ -156,13 +144,9 @@ class KernelBrowser extends HttpKernelBrowser
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Request $request
-     *
-     * @return Response
      */
-    protected function doRequest(object $request)
+    protected function doRequest(object $request): Response
     {
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
@@ -184,13 +168,9 @@ class KernelBrowser extends HttpKernelBrowser
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Request $request
-     *
-     * @return Response
      */
-    protected function doRequestInProcess(object $request)
+    protected function doRequestInProcess(object $request): Response
     {
         $response = parent::doRequestInProcess($request);
 
@@ -208,10 +188,8 @@ class KernelBrowser extends HttpKernelBrowser
      * client and override this method.
      *
      * @param Request $request
-     *
-     * @return string
      */
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);

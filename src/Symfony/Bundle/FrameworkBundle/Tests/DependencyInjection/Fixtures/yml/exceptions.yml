@@ -1,4 +1,5 @@
 framework:
+    http_method_override: false
     exceptions:
         Symfony\Component\HttpKernel\Exception\BadRequestHttpException:
             log_level: info

@@ -6,13 +6,7 @@ if (true === (require_once __DIR__.'/autoload.php') || empty($_SERVER['SCRIPT_FI
     return;
 }
 
-if (PHP_VERSION_ID < 80000 && in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
-    ob_start();
-    $app = require $_SERVER['SCRIPT_FILENAME'];
-    ob_end_clean();
-} else {
-    $app = require $_SERVER['SCRIPT_FILENAME'];
-}
+$app = require $_SERVER['SCRIPT_FILENAME'];
 
 if (!is_object($app)) {
     throw new TypeError(sprintf('Invalid return value: callable object expected, "%s" returned from "%s".', get_debug_type($app), $_SERVER['SCRIPT_FILENAME']));

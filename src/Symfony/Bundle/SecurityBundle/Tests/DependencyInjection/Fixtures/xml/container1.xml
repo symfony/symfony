@@ -8,7 +8,7 @@
         http://symfony.com/schema/dic/security
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
-    <config enable-authenticator-manager="true">
+    <config>
         <password_hasher class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
 
         <password_hasher class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="false" iterations="5" />
@@ -76,5 +76,8 @@
         <rule path="/blog/524" role="ROLE_USER" requires-channel="https" methods="get,POST" port="8000" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUserIdentifier() matches '/^admin/'" path="/blog/524" />
+        <rule role="ROLE_ADMIN" route="admin">
+            <attribute key="_controller">AdminController::index</attribute>
+        </rule>
     </config>
 </srv:container>

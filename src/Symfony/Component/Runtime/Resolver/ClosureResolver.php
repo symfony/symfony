@@ -27,9 +27,6 @@ class ClosureResolver implements ResolverInterface
         $this->arguments = $arguments;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(): array
     {
         return [$this->closure, ($this->arguments)()];

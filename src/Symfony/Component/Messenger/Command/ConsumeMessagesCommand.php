@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Command;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -37,20 +38,19 @@ use Symfony\Component\Messenger\Worker;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
+#[AsCommand(name: 'messenger:consume', description: 'Consume messages')]
 class ConsumeMessagesCommand extends Command
 {
-    protected static $defaultName = 'messenger:consume';
-    protected static $defaultDescription = 'Consume messages';
+    private RoutableMessageBus $routableBus;
+    private ContainerInterface $receiverLocator;
+    private EventDispatcherInterface $eventDispatcher;
+    private ?LoggerInterface $logger;
+    private array $receiverNames;
+    private ?ResetServicesListener $resetServicesListener;
+    private array $busIds;
+    private ?ContainerInterface $rateLimiterLocator;
 
-    private $routableBus;
-    private $receiverLocator;
-    private $eventDispatcher;
-    private $logger;
-    private $receiverNames;
-    private $resetServicesListener;
-    private $busIds;
-
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [], ContainerInterface $rateLimiterLocator = null)
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
@@ -59,13 +59,11 @@ class ConsumeMessagesCommand extends Command
         $this->receiverNames = $receiverNames;
         $this->resetServicesListener = $resetServicesListener;
         $this->busIds = $busIds;
+        $this->rateLimiterLocator = $rateLimiterLocator;
 
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $defaultReceiverName = 1 === \count($this->receiverNames) ? current($this->receiverNames) : null;
@@ -82,7 +80,6 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
                 new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
 
@@ -127,9 +124,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
@@ -153,12 +147,10 @@ EOF
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $receivers = [];
+        $rateLimiters = [];
         foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
                 $message = sprintf('The receiver "%s" does not exist.', $receiverName);
@@ -170,6 +162,9 @@ EOF
             }
 
             $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
+            if ($this->rateLimiterLocator?->has($receiverName)) {
+                $rateLimiters[$receiverName] = $this->rateLimiterLocator->get($receiverName);
+            }
         }
 
         if (null !== $this->resetServicesListener && !$input->getOption('no-reset')) {
@@ -224,7 +219,7 @@ EOF
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
+        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
         ];

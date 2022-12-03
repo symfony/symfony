@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Uid\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -22,12 +23,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\Uuid;
 
+#[AsCommand(name: 'uuid:generate', description: 'Generate a UUID')]
 class GenerateUuidCommand extends Command
 {
-    protected static $defaultName = 'uuid:generate';
-    protected static $defaultDescription = 'Generate a UUID';
-
-    private $factory;
+    private UuidFactory $factory;
 
     public function __construct(UuidFactory $factory = null)
     {
@@ -36,9 +35,6 @@ class GenerateUuidCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -51,7 +47,6 @@ class GenerateUuidCommand extends Command
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of UUID to generate', 1),
                 new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'The UUID output format: rfc4122, base58 or base32', 'rfc4122'),
             ])
-            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> generates a UUID.
 
@@ -89,10 +84,7 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
@@ -159,7 +151,7 @@ EOF
                 $create = function () use ($namespace, $name): Uuid {
                     try {
                         $factory = $this->factory->nameBased($namespace);
-                    } catch (\LogicException $e) {
+                    } catch (\LogicException) {
                         throw new \InvalidArgumentException('Missing namespace: use the "--namespace" option or configure a default namespace in the underlying factory.');
                     }
 
@@ -168,11 +160,11 @@ EOF
                 break;
 
             case $random:
-                $create = [$this->factory->randomBased(), 'create'];
+                $create = $this->factory->randomBased()->create(...);
                 break;
 
             default:
-                $create = [$this->factory, 'create'];
+                $create = $this->factory->create(...);
                 break;
         }
 

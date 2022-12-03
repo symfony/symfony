@@ -43,9 +43,6 @@ class DateType extends AbstractType
         'choice' => ChoiceType::class,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $dateFormat = \is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
@@ -182,9 +179,6 @@ class DateType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget'] = $options['widget'];
@@ -222,9 +216,6 @@ class DateType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
@@ -299,11 +290,7 @@ class DateType extends AbstractType
             },
             'choice_translation_domain' => false,
             'input_format' => 'Y-m-d',
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please enter a valid date.';
-            },
+            'invalid_message' => 'Please enter a valid date.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -337,10 +324,7 @@ class DateType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'date';
     }

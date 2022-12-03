@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 trait HttpExceptionTrait
 {
-    private $response;
+    private ResponseInterface $response;
 
     public function __construct(ResponseInterface $response)
     {

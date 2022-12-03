@@ -65,6 +65,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 
@@ -803,6 +804,19 @@ class SerializerTest extends TestCase
         $this->assertEquals(new FalseBuiltInDummy(), $actual);
     }
 
+    /**
+     * @requires PHP 8.2
+     */
+    public function testTrueBuiltInTypes()
+    {
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $extractor)], ['json' => new JsonEncoder()]);
+
+        $actual = $serializer->deserialize('{"true":true}', TrueBuiltInDummy::class, 'json');
+
+        $this->assertEquals(new TrueBuiltInDummy(), $actual);
+    }
+
     private function serializerWithClassDiscriminator()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -826,8 +840,6 @@ class SerializerTest extends TestCase
 
     /**
      * @dataProvider provideCollectDenormalizationErrors
-     *
-     * @requires PHP 7.4
      */
     public function testCollectDenormalizationErrors(?ClassMetadataFactory $classMetadataFactory)
     {
@@ -1047,8 +1059,6 @@ class SerializerTest extends TestCase
 
     /**
      * @dataProvider provideCollectDenormalizationErrors
-     *
-     * @requires PHP 7.4
      */
     public function testCollectDenormalizationErrors2(?ClassMetadataFactory $classMetadataFactory)
     {
@@ -1122,8 +1132,6 @@ class SerializerTest extends TestCase
 
     /**
      * @dataProvider provideCollectDenormalizationErrors
-     *
-     * @requires PHP 8.0
      */
     public function testCollectDenormalizationErrorsWithConstructor(?ClassMetadataFactory $classMetadataFactory)
     {
@@ -1175,9 +1183,6 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testCollectDenormalizationErrorsWithEnumConstructor()
     {
         $serializer = new Serializer(
@@ -1215,9 +1220,6 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testNoCollectDenormalizationErrorsWithWrongEnum()
     {
         $serializer = new Serializer(
@@ -1323,7 +1325,7 @@ class DummyUnionType
      *
      * @return $this
      */
-    public function setChanged($changed): self
+    public function setChanged($changed): static
     {
         $this->changed = $changed;
 

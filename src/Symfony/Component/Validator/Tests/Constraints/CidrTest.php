@@ -120,9 +120,6 @@ class CidrTest extends TestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(CidrDummy::class);

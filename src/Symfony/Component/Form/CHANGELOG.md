@@ -1,6 +1,38 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Allow passing `TranslatableInterface` objects to the `ChoiceView` label
+ * Allow passing `TranslatableInterface` objects to the `help` option
+ * Deprecate calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()` without arguments
+ * Change the signature of `FormConfigBuilderInterface::setDataMapper()` to `setDataMapper(?DataMapperInterface)`
+ * Change the signature of `FormInterface::setParent()` to `setParent(?self)`
+ * Add `PasswordHasherExtension` with support for `hash_property_path` option in `PasswordType`
+
+6.1
+---
+
+ * Add a `prototype_options` option to `CollectionType`
+
+6.0
+---
+
+ * Remove `PropertyPathMaper`
+ * Remove `Symfony\Component\Form\Extension\Validator\Util\ServerParams`
+ * Remove `FormPass` configuration
+ * Remove the `NumberToLocalizedStringTransformer::ROUND_*` constants, use `\NumberFormatter::ROUND_*` instead
+ * The `rounding_mode` option of the `PercentType` defaults to `\NumberFormatter::ROUND_HALFUP`
+ * The rounding mode argument of the constructor of `PercentToLocalizedStringTransformer` defaults to `\NumberFormatter::ROUND_HALFUP`
+ * Add `FormConfigInterface::getIsEmptyCallback()` and `FormConfigBuilderInterface::setIsEmptyCallback()`
+ * Change `$forms` parameter type of the `DataMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$forms` parameter type of the `DataMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+ * Change `$checkboxes` parameter type of the `CheckboxListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$checkboxes` parameter type of the `CheckboxListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+ * Change `$radios` parameter type of the `RadioListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$radios` parameter type of the `RadioListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+
 5.4
 ---
 

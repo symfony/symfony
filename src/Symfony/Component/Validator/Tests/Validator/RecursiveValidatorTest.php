@@ -1258,7 +1258,7 @@ class RecursiveValidatorTest extends TestCase
             $context->addViolation('Violation in Group 3');
         };
 
-        $metadata = new ClassMetadata(\get_class($entity));
+        $metadata = new ClassMetadata($entity::class);
         $metadata->addConstraint(new Callback([
             'callback' => function () {},
             'groups' => 'Group 1',
@@ -1779,9 +1779,6 @@ class RecursiveValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testReferenceCascadeEnabledIgnoresUntyped()
     {
         $entity = new Entity();
@@ -1804,9 +1801,6 @@ class RecursiveValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testTypedReferenceCascadeEnabled()
     {
         $entity = new CascadingEntity();
@@ -2228,9 +2222,6 @@ class RecursiveValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testValidateDoNotCascadeNestedObjectsAndArraysByDefault()
     {
         $this->metadataFactory->addMetadata(new ClassMetadata(CascadingEntity::class));
@@ -2251,9 +2242,6 @@ class RecursiveValidatorTest extends TestCase
         CascadingEntity::$staticChild = null;
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testValidateTraverseNestedArrayByDefaultIfConstrainedWithoutCascading()
     {
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
@@ -2275,9 +2263,6 @@ class RecursiveValidatorTest extends TestCase
         $this->assertInstanceOf(Type::class, $violations->get(0)->getConstraint());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testValidateCascadeWithValid()
     {
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
@@ -2309,9 +2294,6 @@ class RecursiveValidatorTest extends TestCase
         CascadingEntity::$staticChild = null;
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testValidateWithExplicitCascade()
     {
         $this->metadataFactory->addMetadata((new ClassMetadata(CascadingEntity::class))
@@ -2380,9 +2362,6 @@ final class TestConstraintHashesDoNotCollide extends Constraint
 
 final class TestConstraintHashesDoNotCollideValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, Constraint $constraint)
     {
         if (!$value instanceof Entity) {

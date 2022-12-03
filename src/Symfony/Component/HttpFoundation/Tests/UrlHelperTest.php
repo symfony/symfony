@@ -117,10 +117,6 @@ class UrlHelperTest extends TestCase
      */
     public function testGenerateRelativePath($expected, $path, $pathinfo)
     {
-        if (!method_exists(Request::class, 'getRelativeUriForPath')) {
-            $this->markTestSkipped('Your version of Symfony HttpFoundation is too old.');
-        }
-
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
         $urlHelper = new UrlHelper($stack);

@@ -53,9 +53,6 @@ class MongoDbStoreTest extends AbstractStoreTest
         return 250000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new MongoDbStore(self::getMongoClient(), [
@@ -121,7 +118,6 @@ class MongoDbStoreTest extends AbstractStoreTest
         $storeReflection = new \ReflectionObject($store);
 
         $optionsProperty = $storeReflection->getProperty('options');
-        $optionsProperty->setAccessible(true);
         $options = $optionsProperty->getValue($store);
 
         $this->assertSame('test_uri', $options['database']);
@@ -160,7 +156,6 @@ class MongoDbStoreTest extends AbstractStoreTest
         $storeReflection = new \ReflectionObject($store);
 
         $uriProperty = $storeReflection->getProperty('uri');
-        $uriProperty->setAccessible(true);
         $uri = $uriProperty->getValue($store);
         $this->assertSame($driverUri, $uri);
     }

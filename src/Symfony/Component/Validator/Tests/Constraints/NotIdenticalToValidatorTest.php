@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\NotIdenticalToValidator;
  */
 class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): NotIdenticalToValidator
     {
         return new NotIdenticalToValidator();
     }
@@ -35,9 +35,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return NotIdenticalTo::IS_IDENTICAL_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisons(): array
     {
         return [
@@ -54,9 +51,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -77,9 +71,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return $comparisons;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideInvalidComparisons(): array
     {
         $date = new \DateTime('2000-01-01');

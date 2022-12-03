@@ -26,7 +26,7 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function url(string $url): self
+    public function url(string $url): static
     {
         $this->options['url'] = $url;
 
@@ -36,7 +36,7 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function loginUrl(string $url): self
+    public function loginUrl(string $url): static
     {
         $this->options['login_url']['url'] = $url;
 
@@ -46,7 +46,7 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function loginUrlForwardText(string $text): self
+    public function loginUrlForwardText(string $text): static
     {
         $this->options['login_url']['forward_text'] = $text;
 
@@ -56,7 +56,7 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function requestWriteAccess(bool $bool): self
+    public function requestWriteAccess(bool $bool): static
     {
         $this->options['login_url']['request_write_access'] = $bool;
 
@@ -66,7 +66,7 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function callbackData(string $data): self
+    public function callbackData(string $data): static
     {
         $this->options['callback_data'] = $data;
 
@@ -76,7 +76,7 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function switchInlineQuery(string $query): self
+    public function switchInlineQuery(string $query): static
     {
         $this->options['switch_inline_query'] = $query;
 
@@ -86,7 +86,7 @@ final class InlineKeyboardButton extends AbstractKeyboardButton
     /**
      * @return $this
      */
-    public function payButton(bool $bool): self
+    public function payButton(bool $bool): static
     {
         $this->options['pay'] = $bool;
 

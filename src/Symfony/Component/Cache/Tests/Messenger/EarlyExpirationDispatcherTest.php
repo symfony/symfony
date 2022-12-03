@@ -26,9 +26,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-/**
- * @requires function Symfony\Component\DependencyInjection\ReverseContainer::__construct
- */
 class EarlyExpirationDispatcherTest extends TestCase
 {
     public static function tearDownAfterClass(): void

@@ -26,17 +26,11 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         $this->reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->updateMemoryUsage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->data = [
@@ -45,9 +39,6 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lateCollect()
     {
         $this->updateMemoryUsage();
@@ -58,10 +49,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['memory'];
     }
 
-    /**
-     * @return int|float
-     */
-    public function getMemoryLimit()
+    public function getMemoryLimit(): int|float
     {
         return $this->data['memory_limit'];
     }
@@ -71,18 +59,12 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         $this->data['memory'] = memory_get_peak_usage(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'memory';
     }
 
-    /**
-     * @return int|float
-     */
-    private function convertToBytes(string $memoryLimit)
+    private function convertToBytes(string $memoryLimit): int|float
     {
         if ('-1' === $memoryLimit) {
             return -1;
@@ -100,11 +82,11 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
 
         switch (substr($memoryLimit, -1)) {
             case 't': $max *= 1024;
-            // no break
+                // no break
             case 'g': $max *= 1024;
-            // no break
+                // no break
             case 'm': $max *= 1024;
-            // no break
+                // no break
             case 'k': $max *= 1024;
         }
 

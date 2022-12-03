@@ -42,10 +42,8 @@ class ServiceLocatorTagPassTest extends TestCase
         (new ServiceLocatorTagPass())->process($container);
     }
 
-    public function testInvalidServices()
+    public function testScalarServices()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "foo": an array of references is expected as first argument when the "container.service_locator" tag is set, "string" found for key "0".');
         $container = new ContainerBuilder();
 
         $container->register('foo', ServiceLocator::class)
@@ -56,6 +54,8 @@ class ServiceLocatorTagPassTest extends TestCase
         ;
 
         (new ServiceLocatorTagPass())->process($container);
+
+        $this->assertSame('dummy', $container->get('foo')->get(0));
     }
 
     public function testProcessValue()

@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,11 +21,11 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 
 class PhpFileLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -100,6 +99,9 @@ class PhpFileLoaderTest extends TestCase
         yield ['inline_binding'];
         yield ['remove'];
         yield ['config_builder'];
+        yield ['expression_factory'];
+        yield ['closure'];
+        yield ['env_param'];
     }
 
     public function testAutoConfigureAndChildDefinition()
@@ -165,16 +167,17 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedWithoutPackageAndVersion()
+    public function testEnumeration()
     {
-        $this->expectDeprecation('Since symfony/dependency-injection 5.1: The signature of method "Symfony\Component\DependencyInjection\Loader\Configurator\Traits\DeprecateTrait::deprecate()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
         $fixtures = realpath(__DIR__.'/../Fixtures');
-        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
-        $loader->load($fixtures.'/config/deprecated_without_package_version.php');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator($fixtures.'/config'));
+        $loader->load('services_with_enumeration.php');
+
+        $container->compile();
+
+        $definition = $container->getDefinition(FooClassWithEnumAttribute::class);
+        $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
     }
 
     public function testNestedBundleConfigNotAllowed()
@@ -189,9 +192,6 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/nested_bundle_config.php');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWhenEnv()
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');

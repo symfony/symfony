@@ -13,10 +13,14 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -457,5 +461,52 @@ class YamlFileLoaderTest extends TestCase
         $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
 
         $this->assertEquals($expectedRoutes('yaml'), $routes);
+    }
+
+    /**
+     * @dataProvider providePsr4ConfigFiles
+     */
+    public function testImportAttributesWithPsr4Prefix(string $configFile)
+    {
+        $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
+        new LoaderResolver([
+            $loader = new YamlFileLoader($locator),
+            new Psr4DirectoryLoader($locator),
+            new class() extends AnnotationClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
+                {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $route = $loader->load($configFile)->get('my_route');
+        $this->assertSame('/my-prefix/my/route', $route->getPath());
+        $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
+    }
+
+    public function providePsr4ConfigFiles(): array
+    {
+        return [
+            ['psr4-attributes.yaml'],
+            ['psr4-controllers-redirection.yaml'],
+        ];
+    }
+
+    public function testImportAttributesFromClass()
+    {
+        new LoaderResolver([
+            $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),
+            new class() extends AnnotationClassLoader {
+                protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
+                {
+                    $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+                }
+            },
+        ]);
+
+        $route = $loader->load('class-attributes.yaml')->get('my_route');
+        $this->assertSame('/my-prefix/my/route', $route->getPath());
+        $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
     }
 }

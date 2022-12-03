@@ -79,7 +79,7 @@ abstract class AdapterTestCase extends CachePoolTest
                 $this->value = $value;
             }
 
-            public function __invoke(CacheItemInterface $item, bool &$save)
+            public function __invoke(CacheItemInterface $item, bool &$save): mixed
             {
                 Assert::assertSame('bar', $item->getKey());
 

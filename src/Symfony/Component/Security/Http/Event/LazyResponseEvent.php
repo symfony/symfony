@@ -24,16 +24,13 @@ use Symfony\Component\Security\Core\Exception\LazyResponseException;
  */
 final class LazyResponseEvent extends RequestEvent
 {
-    private $event;
+    private parent $event;
 
     public function __construct(parent $event)
     {
         $this->event = $event;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setResponse(Response $response)
     {
         $this->stopPropagation();
@@ -42,45 +39,23 @@ final class LazyResponseEvent extends RequestEvent
         throw new LazyResponseException($response);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getKernel(): HttpKernelInterface
     {
         return $this->event->getKernel();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequest(): Request
     {
         return $this->event->getRequest();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequestType(): int
     {
         return $this->event->getRequestType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMainRequest(): bool
     {
-        return $this->event->isMainRequest();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isMasterRequest(): bool
-    {
-        trigger_deprecation('symfony/security-http', '5.3', '"%s()" is deprecated, use "isMainRequest()" instead.', __METHOD__);
-
         return $this->event->isMainRequest();
     }
 }

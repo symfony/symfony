@@ -32,11 +32,11 @@ final class LokaliseProvider implements ProviderInterface
 {
     private const LOKALISE_GET_KEYS_LIMIT = 5000;
 
-    private $client;
-    private $loader;
-    private $logger;
-    private $defaultLocale;
-    private $endpoint;
+    private HttpClientInterface $client;
+    private LoaderInterface $loader;
+    private LoggerInterface $logger;
+    private string $defaultLocale;
+    private string $endpoint;
 
     public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
     {
@@ -53,8 +53,6 @@ final class LokaliseProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Lokalise API recommends sending payload in chunks of up to 500 keys per request.
      *
      * @see https://app.lokalise.com/api2docs/curl/#transition-create-keys-post
@@ -149,7 +147,7 @@ final class LokaliseProvider implements ProviderInterface
                 'original_filenames' => true,
                 'directory_prefix' => '%LANG_ISO%',
                 'filter_langs' => array_values($locales),
-                'filter_filenames' => array_map([$this, 'getLokaliseFilenameFromDomain'], $domains),
+                'filter_filenames' => array_map($this->getLokaliseFilenameFromDomain(...), $domains),
                 'export_empty_as' => 'skip',
                 'replace_breaks' => false,
             ],

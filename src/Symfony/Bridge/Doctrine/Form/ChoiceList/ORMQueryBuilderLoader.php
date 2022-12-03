@@ -30,28 +30,20 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      * entities.
      *
      * This property should only be accessed through queryBuilder.
-     *
-     * @var QueryBuilder
      */
-    private $queryBuilder;
+    private QueryBuilder $queryBuilder;
 
     public function __construct(QueryBuilder $queryBuilder)
     {
         $this->queryBuilder = $queryBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntities()
+    public function getEntities(): array
     {
         return $this->queryBuilder->getQuery()->execute();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntitiesByIds(string $identifier, array $values)
+    public function getEntitiesByIds(string $identifier, array $values): array
     {
         if (null !== $this->queryBuilder->getMaxResults() || 0 < (int) $this->queryBuilder->getFirstResult()) {
             // an offset or a limit would apply on results including the where clause with submitted id values

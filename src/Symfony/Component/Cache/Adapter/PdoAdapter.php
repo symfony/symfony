@@ -12,9 +12,6 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Schema;
-use Psr\Cache\CacheItemInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -24,22 +21,20 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 {
     protected $maxIdLength = 255;
 
-    private $marshaller;
-    private $conn;
-    private $dsn;
-    private $driver;
-    private $serverVersion;
-    private $table = 'cache_items';
-    private $idCol = 'item_id';
-    private $dataCol = 'item_data';
-    private $lifetimeCol = 'item_lifetime';
-    private $timeCol = 'item_time';
-    private $username = '';
-    private $password = '';
-    private $connectionOptions = [];
-    private $namespace;
-
-    private $dbalAdapter;
+    private MarshallerInterface $marshaller;
+    private \PDO|Connection $conn;
+    private string $dsn;
+    private string $driver;
+    private string $serverVersion;
+    private mixed $table = 'cache_items';
+    private mixed $idCol = 'item_id';
+    private mixed $dataCol = 'item_data';
+    private mixed $lifetimeCol = 'item_lifetime';
+    private mixed $timeCol = 'item_time';
+    private mixed $username = '';
+    private mixed $password = '';
+    private mixed $connectionOptions = [];
+    private string $namespace;
 
     /**
      * You can either pass an existing database connection as PDO instance or
@@ -56,19 +51,14 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: []]
      *
-     * @param \PDO|string $connOrDsn
-     *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct($connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], MarshallerInterface $marshaller = null)
+    public function __construct(\PDO|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], MarshallerInterface $marshaller = null)
     {
-        if ($connOrDsn instanceof Connection || (\is_string($connOrDsn) && str_contains($connOrDsn, '://'))) {
-            trigger_deprecation('symfony/cache', '5.4', 'Usage of a DBAL Connection with "%s" is deprecated and will be removed in symfony 6.0. Use "%s" instead.', __CLASS__, DoctrineDbalAdapter::class);
-            $this->dbalAdapter = new DoctrineDbalAdapter($connOrDsn, $namespace, $defaultLifetime, $options, $marshaller);
-
-            return;
+        if (\is_string($connOrDsn) && str_contains($connOrDsn, '://')) {
+            throw new InvalidArgumentException(sprintf('Usage of Doctrine DBAL URL with "%s" is not supported. Use a PDO DSN or "%s" instead. Got "%s".', __CLASS__, DoctrineDbalAdapter::class, $connOrDsn));
         }
 
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
@@ -81,10 +71,8 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             }
 
             $this->conn = $connOrDsn;
-        } elseif (\is_string($connOrDsn)) {
-            $this->dsn = $connOrDsn;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, get_debug_type($connOrDsn)));
+            $this->dsn = $connOrDsn;
         }
 
         $this->table = $options['db_table'] ?? $this->table;
@@ -102,166 +90,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getItem($key)
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->getItem($key);
-        }
-
-        return parent::getItem($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getItems(array $keys = [])
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->getItems($keys);
-        }
-
-        return parent::getItems($keys);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function hasItem($key)
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->hasItem($key);
-        }
-
-        return parent::hasItem($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function deleteItem($key)
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->deleteItem($key);
-        }
-
-        return parent::deleteItem($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function deleteItems(array $keys)
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->deleteItems($keys);
-        }
-
-        return parent::deleteItems($keys);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function clear(string $prefix = '')
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->clear($prefix);
-        }
-
-        return parent::clear($prefix);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->get($key, $callback, $beta, $metadata);
-        }
-
-        return parent::get($key, $callback, $beta, $metadata);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function delete(string $key): bool
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->delete($key);
-        }
-
-        return parent::delete($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function save(CacheItemInterface $item)
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->save($item);
-        }
-
-        return parent::save($item);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function saveDeferred(CacheItemInterface $item)
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->saveDeferred($item);
-        }
-
-        return parent::saveDeferred($item);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setLogger(LoggerInterface $logger): void
-    {
-        if (isset($this->dbalAdapter)) {
-            $this->dbalAdapter->setLogger($logger);
-
-            return;
-        }
-
-        parent::setLogger($logger);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function commit()
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->commit();
-        }
-
-        return parent::commit();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function reset()
-    {
-        if (isset($this->dbalAdapter)) {
-            $this->dbalAdapter->reset();
-
-            return;
-        }
-
-        parent::reset();
-    }
-
-    /**
      * Creates the table to store cache items which can be called once for setup.
      *
      * Cache ID are saved in a column of maximum length 255. Cache data is
@@ -272,64 +100,28 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
      */
     public function createTable()
     {
-        if (isset($this->dbalAdapter)) {
-            $this->dbalAdapter->createTable();
-
-            return;
-        }
-
         // connect if we are not yet
         $conn = $this->getConnection();
 
-        switch ($this->driver) {
-            case 'mysql':
-                // We use varbinary for the ID column because it prevents unwanted conversions:
-                // - character set conversions between server and client
-                // - trailing space removal
-                // - case-insensitivity
-                // - language processing like é == e
-                $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(255) NOT NULL PRIMARY KEY, $this->dataCol MEDIUMBLOB NOT NULL, $this->lifetimeCol INTEGER UNSIGNED, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB";
-                break;
-            case 'sqlite':
-                $sql = "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
-                break;
-            case 'pgsql':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
-                break;
-            case 'oci':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR2(255) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
-                break;
-            case 'sqlsrv':
-                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol VARBINARY(MAX) NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
-                break;
-            default:
-                throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver));
-        }
+        $sql = match ($this->driver) {
+            // We use varbinary for the ID column because it prevents unwanted conversions:
+            // - character set conversions between server and client
+            // - trailing space removal
+            // - case-insensitivity
+            // - language processing like é == e
+            'mysql' => "CREATE TABLE $this->table ($this->idCol VARBINARY(255) NOT NULL PRIMARY KEY, $this->dataCol MEDIUMBLOB NOT NULL, $this->lifetimeCol INTEGER UNSIGNED, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB",
+            'sqlite' => "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)",
+            'pgsql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)",
+            'oci' => "CREATE TABLE $this->table ($this->idCol VARCHAR2(255) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)",
+            'sqlsrv' => "CREATE TABLE $this->table ($this->idCol VARCHAR(255) NOT NULL PRIMARY KEY, $this->dataCol VARBINARY(MAX) NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)",
+            default => throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver)),
+        };
 
         $conn->exec($sql);
     }
 
-    /**
-     * Adds the Table to the Schema if the adapter uses this Connection.
-     *
-     * @deprecated since symfony/cache 5.4 use DoctrineDbalAdapter instead
-     */
-    public function configureSchema(Schema $schema, Connection $forConnection): void
+    public function prune(): bool
     {
-        if (isset($this->dbalAdapter)) {
-            $this->dbalAdapter->configureSchema($schema, $forConnection);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function prune()
-    {
-        if (isset($this->dbalAdapter)) {
-            return $this->dbalAdapter->prune();
-        }
-
         $deleteSql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= :time";
 
         if ('' !== $this->namespace) {
@@ -340,7 +132,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $delete = $connection->prepare($deleteSql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             return true;
         }
         $delete->bindValue(':time', time(), \PDO::PARAM_INT);
@@ -350,15 +142,12 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
         try {
             return $delete->execute();
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             return true;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doFetch(array $ids)
+    protected function doFetch(array $ids): iterable
     {
         $connection = $this->getConnection();
 
@@ -401,10 +190,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doHave(string $id)
+    protected function doHave(string $id): bool
     {
         $connection = $this->getConnection();
 
@@ -418,10 +204,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         return (bool) $stmt->fetchColumn();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doClear(string $namespace)
+    protected function doClear(string $namespace): bool
     {
         $conn = $this->getConnection();
 
@@ -437,32 +220,26 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
         try {
             $conn->exec($sql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
         }
 
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doDelete(array $ids)
+    protected function doDelete(array $ids): bool
     {
         $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN ($sql)";
         try {
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute(array_values($ids));
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
         }
 
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doSave(array $values, int $lifetime)
+    protected function doSave(array $values, int $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
@@ -506,7 +283,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $lifetime = $lifetime ?: null;
         try {
             $stmt = $conn->prepare($sql);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                 $this->createTable();
             }
@@ -541,7 +318,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         foreach ($values as $id => $data) {
             try {
                 $stmt->execute();
-            } catch (\PDOException $e) {
+            } catch (\PDOException) {
                 if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                     $this->createTable();
                 }
@@ -550,7 +327,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             if (null === $driver && !$stmt->rowCount()) {
                 try {
                     $insertStmt->execute();
-                } catch (\PDOException $e) {
+                } catch (\PDOException) {
                     // A concurrent write won, let it be
                 }
             }
@@ -561,23 +338,17 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
 
     private function getConnection(): \PDO
     {
-        if (null === $this->conn) {
+        if (!isset($this->conn)) {
             $this->conn = new \PDO($this->dsn, $this->username, $this->password, $this->connectionOptions);
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
-        if (null === $this->driver) {
-            $this->driver = $this->conn->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        }
+        $this->driver ??= $this->conn->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
         return $this->conn;
     }
 
     private function getServerVersion(): string
     {
-        if (null === $this->serverVersion) {
-            $this->serverVersion = $this->conn->getAttribute(\PDO::ATTR_SERVER_VERSION);
-        }
-
-        return $this->serverVersion;
+        return $this->serverVersion ??= $this->conn->getAttribute(\PDO::ATTR_SERVER_VERSION);
     }
 }

@@ -29,11 +29,11 @@ final class MessageMediaTransport extends AbstractTransport
 {
     protected const HOST = 'api.messagemedia.com';
 
-    private $apiKey;
-    private $apiSecret;
-    private $from;
+    private string $apiKey;
+    private string $apiSecret;
+    private ?string $from;
 
-    public function __construct(string $apiKey, string $apiSecret, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, #[\SensitiveParameter] string $apiSecret, string $from = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;
@@ -62,6 +62,8 @@ final class MessageMediaTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/v1/messages', $this->getEndpoint());
         $response = $this->client->request(
             'POST',
@@ -72,7 +74,7 @@ final class MessageMediaTransport extends AbstractTransport
                     'messages' => [
                         [
                             'destination_number' => $message->getPhone(),
-                            'source_number' => $this->from,
+                            'source_number' => $from,
                             'content' => $message->getSubject(),
                         ],
                     ],
@@ -98,7 +100,7 @@ final class MessageMediaTransport extends AbstractTransport
             $error = $response->toArray(false);
 
             $errorMessage = $error['details'][0] ?? ($error['message'] ?? 'Unknown reason');
-        } catch (DecodingExceptionInterface|TransportExceptionInterface $e) {
+        } catch (DecodingExceptionInterface|TransportExceptionInterface) {
             $errorMessage = 'Unknown reason';
         }
 

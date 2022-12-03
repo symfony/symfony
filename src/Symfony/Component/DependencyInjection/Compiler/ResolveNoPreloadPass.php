@@ -24,21 +24,8 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
 {
     private const DO_PRELOAD_TAG = '.container.do_preload';
 
-    private $tagName;
-    private $resolvedIds = [];
+    private array $resolvedIds = [];
 
-    public function __construct(string $tagName = 'container.no_preload')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/dependency-injection', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->tagName = $tagName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
@@ -66,15 +53,12 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
             if ($definition->hasTag(self::DO_PRELOAD_TAG)) {
                 $definition->clearTag(self::DO_PRELOAD_TAG);
             } elseif (!$definition->isDeprecated() && !$definition->hasErrors()) {
-                $definition->addTag($this->tagName);
+                $definition->addTag('container.no_preload');
             }
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->hasDefinition($id = (string) $value)) {
             $definition = $this->container->getDefinition($id);
@@ -91,7 +75,7 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        if ($value->hasTag($this->tagName) || $value->isDeprecated() || $value->hasErrors()) {
+        if ($value->hasTag('container.no_preload') || $value->isDeprecated() || $value->hasErrors()) {
             return $value;
         }
 

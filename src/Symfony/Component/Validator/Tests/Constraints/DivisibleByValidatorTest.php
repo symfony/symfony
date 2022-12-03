@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): DivisibleByValidator
     {
         return new DivisibleByValidator();
     }
@@ -36,9 +36,6 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         return DivisibleBy::NOT_DIVISIBLE_BY;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisons(): array
     {
         return [
@@ -65,9 +62,6 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -75,9 +69,6 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideInvalidComparisons(): array
     {
         return [

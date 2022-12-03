@@ -30,11 +30,10 @@ class Token
     public const PUNCTUATION_TYPE = 'punctuation';
 
     /**
-     * @param string                $type   The type of the token (self::*_TYPE)
-     * @param string|int|float|null $value  The token value
-     * @param int                   $cursor The cursor position in the source
+     * @param string $type   The type of the token (self::*_TYPE)
+     * @param int    $cursor The cursor position in the source
      */
-    public function __construct(string $type, $value, ?int $cursor)
+    public function __construct(string $type, string|int|float|null $value, ?int $cursor)
     {
         $this->type = $type;
         $this->value = $value;
@@ -43,20 +42,16 @@ class Token
 
     /**
      * Returns a string representation of the token.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('%3d %-11s %s', $this->cursor, strtoupper($this->type), $this->value);
     }
 
     /**
      * Tests the current token for a type and/or a value.
-     *
-     * @return bool
      */
-    public function test(string $type, string $value = null)
+    public function test(string $type, string $value = null): bool
     {
         return $this->type === $type && (null === $value || $this->value == $value);
     }

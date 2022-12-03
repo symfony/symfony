@@ -16,26 +16,24 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/config": "^4.4|^5.0|^6.0",
-        "symfony/framework-bundle": "^5.3|^6.0",
-        "symfony/http-kernel": "^5.3|^6.0",
-        "symfony/polyfill-php80": "^1.16",
-        "symfony/routing": "^4.4|^5.0|^6.0",
-        "symfony/twig-bundle": "^4.4|^5.0|^6.0",
+        "php": ">=8.1",
+        "symfony/config": "^5.4|^6.0",
+        "symfony/framework-bundle": "^5.4|^6.0",
+        "symfony/http-kernel": "^6.1",
+        "symfony/routing": "^5.4|^6.0",
+        "symfony/twig-bundle": "^5.4|^6.0",
         "twig/twig": "^2.13|^3.0.4"
     },
     "require-dev": {
-        "symfony/browser-kit": "^4.4|^5.0|^6.0",
-        "symfony/console": "^4.4|^5.0|^6.0",
-        "symfony/css-selector": "^4.4|^5.0|^6.0",
-        "symfony/stopwatch": "^4.4|^5.0|^6.0"
+        "symfony/browser-kit": "^5.4|^6.0",
+        "symfony/console": "^5.4|^6.0",
+        "symfony/css-selector": "^5.4|^6.0",
+        "symfony/stopwatch": "^5.4|^6.0"
     },
     "conflict": {
-        "symfony/form": "<4.4",
+        "symfony/form": "<5.4",
         "symfony/mailer": "<5.4",
-        "symfony/messenger": "<4.4",
-        "symfony/dependency-injection": "<5.2"
+        "symfony/messenger": "<5.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },

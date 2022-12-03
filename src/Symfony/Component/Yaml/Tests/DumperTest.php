@@ -61,7 +61,7 @@ class DumperTest extends TestCase
         $expected = <<<'EOF'
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+"foo'bar": {  }
 bar:
        - 1
        - foo
@@ -114,7 +114,7 @@ EOF;
     public function testInlineLevel()
     {
         $expected = <<<'EOF'
-{ '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo, { a: A }], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
+{ '': bar, foo: '#bar', "foo'bar": {  }, bar: [1, foo, { a: A }], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
 EOF;
         $this->assertSame($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
         $this->assertSame($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
@@ -123,7 +123,7 @@ EOF;
         $expected = <<<'EOF'
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+"foo'bar": {  }
 bar: [1, foo, { a: A }]
 foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
 
@@ -134,7 +134,7 @@ EOF;
         $expected = <<<'EOF'
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+"foo'bar": {  }
 bar:
     - 1
     - foo
@@ -151,7 +151,7 @@ EOF;
         $expected = <<<'EOF'
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+"foo'bar": {  }
 bar:
     - 1
     - foo
@@ -173,7 +173,7 @@ EOF;
         $expected = <<<'EOF'
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+"foo'bar": {  }
 bar:
     - 1
     - foo
@@ -438,25 +438,6 @@ YAML;
         $expected = '!user { name: jane }';
         $this->assertSame($expected, $yaml);
         $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
-    }
-
-    public function testDumpingTaggedValueTopLevelAssoc()
-    {
-        $data = new TaggedValue('user', ['name' => 'jane']);
-
-        // @todo Fix the dumper, the output should not be ''.
-        $expected = '';
-        $yaml = $this->dumper->dump($data, 2);
-        $this->assertSame($expected, $yaml);
-    }
-
-    public function testDumpingTaggedValueTopLevelMultiLine()
-    {
-        $data = new TaggedValue('text', "a\nb\n");
-
-        // @todo Fix the dumper, the output should not be ''.
-        $expected = '';
-        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     public function testDumpingTaggedValueSpecialCharsInTag()

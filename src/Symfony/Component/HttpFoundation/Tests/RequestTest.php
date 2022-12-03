@@ -81,12 +81,31 @@ class RequestTest extends TestCase
         $this->assertFalse($isNoCache);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetContentType()
     {
+        $this->expectDeprecation('Since symfony/http-foundation 6.2: The "Symfony\Component\HttpFoundation\Request::getContentType()" method is deprecated, use "getContentTypeFormat()" instead.');
         $request = new Request();
+
         $contentType = $request->getContentType();
 
         $this->assertNull($contentType);
+    }
+
+    public function testGetContentTypeFormat()
+    {
+        $request = new Request();
+        $this->assertNull($request->getContentTypeFormat());
+
+        $server = ['HTTP_CONTENT_TYPE' => 'application/json'];
+        $request = new Request([], [], [], [], [], $server);
+        $this->assertEquals('json', $request->getContentTypeFormat());
+
+        $server = ['HTTP_CONTENT_TYPE' => 'text/html'];
+        $request = new Request([], [], [], [], [], $server);
+        $this->assertEquals('html', $request->getContentTypeFormat());
     }
 
     public function testSetDefaultLocale()
@@ -1855,7 +1874,6 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
-        $me->setAccessible(true);
 
         $this->assertSame($expect, $me->invoke($request, $string, $prefix));
     }
@@ -1878,7 +1896,6 @@ class RequestTest extends TestCase
     {
         $class = new \ReflectionClass(Request::class);
         $property = $class->getProperty('httpMethodParameterOverride');
-        $property->setAccessible(true);
         $property->setValue(false);
     }
 
@@ -2324,9 +2341,7 @@ class RequestTest extends TestCase
      */
     public function testNonstandardRequests($requestUri, $queryString, $expectedPathInfo, $expectedUri, $expectedBasePath = '', $expectedBaseUrl = null)
     {
-        if (null === $expectedBaseUrl) {
-            $expectedBaseUrl = $expectedBasePath;
-        }
+        $expectedBaseUrl ??= $expectedBasePath;
 
         $server = [
             'HTTP_HOST' => 'host:8080',
@@ -2530,16 +2545,6 @@ class RequestTest extends TestCase
                 true,
             ],
         ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testXForwarededAllConstantDeprecated()
-    {
-        $this->expectDeprecation('Since symfony/http-foundation 5.2: The "HEADER_X_FORWARDED_ALL" constant is deprecated, use either "HEADER_X_FORWARDED_FOR | HEADER_X_FORWARDED_HOST | HEADER_X_FORWARDED_PORT | HEADER_X_FORWARDED_PROTO" or "HEADER_X_FORWARDED_AWS_ELB" or "HEADER_X_FORWARDED_TRAEFIK" constants instead.');
-
-        Request::setTrustedProxies([], Request::HEADER_X_FORWARDED_ALL);
     }
 
     public function testReservedFlags()

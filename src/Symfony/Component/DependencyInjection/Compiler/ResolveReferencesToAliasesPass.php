@@ -22,9 +22,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResolveReferencesToAliasesPass extends AbstractRecursivePass
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         parent::process($container);
@@ -39,10 +36,7 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);

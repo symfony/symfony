@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -27,6 +27,8 @@ class ProjectServiceContainer extends Container
         $this->methodMap = [
             'BAR' => 'getBARService',
             'BAR2' => 'getBAR2Service',
+            'a_service' => 'getAServiceService',
+            'b_service' => 'getBServiceService',
             'bar' => 'getBar3Service',
             'bar2' => 'getBar22Service',
             'baz' => 'getBazService',
@@ -70,8 +72,7 @@ class ProjectServiceContainer extends Container
     public function getRemovedIds(): array
     {
         return [
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'a_factory' => true,
             'configurator_service' => true,
             'configurator_service_simple' => true,
             'decorated.pif-pouf' => true,
@@ -106,6 +107,26 @@ class ProjectServiceContainer extends Container
     protected function getBAR2Service()
     {
         return $this->services['BAR2'] = new \stdClass();
+    }
+
+    /**
+     * Gets the public 'a_service' shared service.
+     *
+     * @return \Bar
+     */
+    protected function getAServiceService()
+    {
+        return $this->services['a_service'] = ($this->privates['a_factory'] ??= new \Bar())->getBar();
+    }
+
+    /**
+     * Gets the public 'b_service' shared service.
+     *
+     * @return \Bar
+     */
+    protected function getBServiceService()
+    {
+        return $this->services['b_service'] = ($this->privates['a_factory'] ??= new \Bar())->getBar();
     }
 
     /**
@@ -381,7 +402,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getRuntimeErrorService()
     {
-        return $this->services['runtime_error'] = new \stdClass($this->throw('Service "errored_definition" is broken.'));
+        return $this->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
     }
 
     /**
@@ -403,7 +424,7 @@ class ProjectServiceContainer extends Container
     {
         return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
             yield 0 => ($this->services['foo'] ?? $this->getFooService());
-            yield 1 => ($this->privates['tagged_iterator_foo'] ?? ($this->privates['tagged_iterator_foo'] = new \Bar()));
+            yield 1 => ($this->privates['tagged_iterator_foo'] ??= new \Bar());
         }, 2));
     }
 
@@ -421,13 +442,10 @@ class ProjectServiceContainer extends Container
         return new \SimpleFactoryClass('foo');
     }
 
-    /**
-     * @return array|bool|float|int|string|\UnitEnum|null
-     */
-    public function getParameter(string $name)
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -464,7 +482,7 @@ class ProjectServiceContainer extends Container
 
     private function getDynamicParameter(string $name)
     {
-        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
+        throw new ParameterNotFoundException($name);
     }
 
     protected function getDefaultParameters(): array
@@ -474,10 +492,5 @@ class ProjectServiceContainer extends Container
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
         ];
-    }
-
-    protected function throw($message)
-    {
-        throw new RuntimeException($message);
     }
 }

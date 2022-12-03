@@ -12,7 +12,6 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Image;
@@ -20,8 +19,6 @@ use Symfony\Component\DomCrawler\Link;
 
 abstract class AbstractCrawlerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     abstract public function getDoctype(): string;
 
     protected function createCrawler($node = null, string $uri = null, string $baseHref = null)
@@ -80,13 +77,6 @@ abstract class AbstractCrawlerTest extends TestCase
         $crawler = $this->createCrawler();
         $crawler->add($this->getDoctype().'<html><body>Foo</body></html>');
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
-    }
-
-    public function testAddInvalidType()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $crawler = $this->createCrawler();
-        $crawler->add(1);
     }
 
     public function testAddMultipleDocumentNode()
@@ -1103,31 +1093,6 @@ HTML;
         $this->assertEquals(1, $foo->children('span')->count());
         $this->assertEquals(1, $foo->children('span.ipsum')->count());
         $this->assertEquals(1, $foo->children('.ipsum')->count());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testParents()
-    {
-        $this->expectDeprecation('Since symfony/dom-crawler 5.3: The Symfony\Component\DomCrawler\Crawler::parents() method is deprecated, use ancestors() instead.');
-
-        $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
-        $this->assertNotSame($crawler, $crawler->parents(), '->parents() returns a new instance of a crawler');
-        $this->assertInstanceOf(Crawler::class, $crawler->parents(), '->parents() returns a new instance of a crawler');
-
-        $nodes = $crawler->parents();
-        $this->assertEquals(3, $nodes->count());
-
-        $nodes = $this->createTestCrawler()->filterXPath('//html')->parents();
-        $this->assertEquals(0, $nodes->count());
-
-        try {
-            $this->createTestCrawler()->filterXPath('//ol')->parents();
-            $this->fail('->parents() throws an \InvalidArgumentException if the node list is empty');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->parents() throws an \InvalidArgumentException if the node list is empty');
-        }
     }
 
     public function testAncestors()

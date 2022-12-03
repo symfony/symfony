@@ -22,6 +22,8 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultChoiceListFactoryTest extends TestCase
 {
@@ -139,7 +141,7 @@ class DefaultChoiceListFactoryTest extends TestCase
     {
         $list = $this->factory->createListFromChoices(
             ['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4],
-            [$this, 'getValue']
+            $this->getValue(...)
         );
 
         $this->assertObjectListWithCustomValues($list);
@@ -184,7 +186,7 @@ class DefaultChoiceListFactoryTest extends TestCase
                 'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
                 'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
             ],
-            [$this, 'getValue']
+            $this->getValue(...)
         );
 
         $this->assertObjectListWithCustomValues($list);
@@ -333,7 +335,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             [$this->obj4, $this->obj2, $this->obj1, $this->obj3],
             null, // label
             null, // index
-            [$this, 'getGroup']
+            $this->getGroup(...)
         );
 
         $preferredLabels = array_map(static function (ChoiceGroupView $groupView): array {
@@ -378,7 +380,7 @@ class DefaultChoiceListFactoryTest extends TestCase
     {
         $view = $this->factory->createView(
             $this->list,
-            [$this, 'isPreferred']
+            $this->isPreferred(...)
         );
 
         $this->assertFlatView($view);
@@ -428,7 +430,7 @@ class DefaultChoiceListFactoryTest extends TestCase
         $view = $this->factory->createView(
             $this->list,
             [$this->obj2, $this->obj3],
-            [$this, 'getLabel']
+            $this->getLabel(...)
         );
 
         $this->assertFlatView($view);
@@ -484,7 +486,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             $this->list,
             [$this->obj2, $this->obj3],
             null, // label
-            [$this, 'getFormIndex']
+            $this->getFormIndex(...)
         );
 
         $this->assertFlatViewWithCustomIndices($view);
@@ -578,7 +580,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             [$this->obj2, $this->obj3],
             null, // label
             null, // index
-            [$this, 'getGroup']
+            $this->getGroup(...)
         );
 
         $this->assertGroupedView($view);
@@ -591,7 +593,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             [],
             null, // label
             null, // index
-            [$this, 'getGroupArray']
+            $this->getGroupArray(...)
         );
 
         $this->assertGroupedViewWithChoiceDuplication($view);
@@ -604,7 +606,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             [$this->obj2, $this->obj3],
             null, // label
             null, // index
-            [$this, 'getGroupAsObject']
+            $this->getGroupAsObject(...)
         );
 
         $this->assertGroupedView($view);
@@ -697,7 +699,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // label
             null, // index
             null, // group
-            [$this, 'getAttr']
+            $this->getAttr(...)
         );
 
         $this->assertFlatViewWithAttr($view);
@@ -728,11 +730,11 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // index
             null, // group
             function ($object, $key) {
-                switch ($key) {
-                    case 'B': return ['attr1' => 'value1'];
-                    case 'C': return ['attr2' => 'value2'];
-                    default: return [];
-                }
+                return match ($key) {
+                    'B' => ['attr1' => 'value1'],
+                    'C' => ['attr2' => 'value2'],
+                    default => [],
+                };
             }
         );
 
@@ -748,20 +750,17 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // index
             null, // group
             function ($object, $key, $value) {
-                switch ($value) {
-                    case '1': return ['attr1' => 'value1'];
-                    case '2': return ['attr2' => 'value2'];
-                    default: return [];
-                }
+                return match ($value) {
+                    '1' => ['attr1' => 'value1'],
+                    '2' => ['attr2' => 'value2'],
+                    default => [],
+                };
             }
         );
 
         $this->assertFlatViewWithAttr($view);
     }
 
-    /**
-     * @requires function Symfony\Component\Translation\TranslatableMessage::__construct
-     */
     public function testPassTranslatableMessageAsLabelDoesntCastItToString()
     {
         $view = $this->factory->createView(
@@ -775,6 +774,26 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertInstanceOf(TranslatableMessage::class, $view->choices[0]->label);
         $this->assertEquals('my_message', $view->choices[0]->label->getMessage());
         $this->assertArrayHasKey('param1', $view->choices[0]->label->getParameters());
+    }
+
+    public function testPassTranslatableInterfaceAsLabelDoesntCastItToString()
+    {
+        $message = new class() implements TranslatableInterface {
+            public function trans(TranslatorInterface $translator, string $locale = null): string
+            {
+                return 'my_message';
+            }
+        };
+
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj1],
+            static function () use ($message) {
+                return $message;
+            }
+        );
+
+        $this->assertSame($message, $view->choices[0]->label);
     }
 
     public function testCreateViewFlatLabelTranslationParametersAsArray()
@@ -818,7 +837,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // index
             null, // group
             null, // attr
-            [$this, 'getlabelTranslationParameters']
+            $this->getlabelTranslationParameters(...)
         );
 
         $this->assertFlatViewWithlabelTranslationParameters($view);
@@ -851,10 +870,10 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // group
             null, // attr
             function ($object, $key) {
-                switch ($key) {
-                    case 'D': return ['%placeholder1%' => 'value1'];
-                    default: return [];
-                }
+                return match ($key) {
+                    'D' => ['%placeholder1%' => 'value1'],
+                    default => [],
+                };
             }
         );
 
@@ -871,10 +890,10 @@ class DefaultChoiceListFactoryTest extends TestCase
             null, // group
             null, // attr
             function ($object, $key, $value) {
-                switch ($value) {
-                    case '3': return ['%placeholder1%' => 'value1'];
-                    default: return [];
-                }
+                return match ($value) {
+                    '3' => ['%placeholder1%' => 'value1'],
+                    default => [],
+                };
             }
         );
 

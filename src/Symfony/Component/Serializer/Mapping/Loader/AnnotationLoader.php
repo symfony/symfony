@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Annotation\SerializedPath;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -38,6 +39,7 @@ class AnnotationLoader implements LoaderInterface
         Ignore::class,
         MaxDepth::class,
         SerializedName::class,
+        SerializedPath::class,
         Context::class,
     ];
 
@@ -48,10 +50,7 @@ class AnnotationLoader implements LoaderInterface
         $this->reader = $reader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
         $reflectionClass = $classMetadata->getReflectionClass();
         $className = $reflectionClass->name;
@@ -84,6 +83,8 @@ class AnnotationLoader implements LoaderInterface
                         $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth());
                     } elseif ($annotation instanceof SerializedName) {
                         $attributesMetadata[$property->name]->setSerializedName($annotation->getSerializedName());
+                    } elseif ($annotation instanceof SerializedPath) {
+                        $attributesMetadata[$property->name]->setSerializedPath($annotation->getSerializedPath());
                     } elseif ($annotation instanceof Ignore) {
                         $attributesMetadata[$property->name]->setIgnore(true);
                     } elseif ($annotation instanceof Context) {
@@ -137,6 +138,12 @@ class AnnotationLoader implements LoaderInterface
                     }
 
                     $attributeMetadata->setSerializedName($annotation->getSerializedName());
+                } elseif ($annotation instanceof SerializedPath) {
+                    if (!$accessorOrMutator) {
+                        throw new MappingException(sprintf('SerializedPath on "%s::%s()" cannot be added. SerializedPath can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                    }
+
+                    $attributeMetadata->setSerializedPath($annotation->getSerializedPath());
                 } elseif ($annotation instanceof Ignore) {
                     if (!$accessorOrMutator) {
                         throw new MappingException(sprintf('Ignore on "%s::%s()" cannot be added. Ignore can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
@@ -163,10 +170,22 @@ class AnnotationLoader implements LoaderInterface
      */
     public function loadAnnotations(object $reflector): iterable
     {
-        if (\PHP_VERSION_ID >= 80000) {
-            foreach ($reflector->getAttributes() as $attribute) {
-                if ($this->isKnownAttribute($attribute->getName())) {
+        foreach ($reflector->getAttributes() as $attribute) {
+            if ($this->isKnownAttribute($attribute->getName())) {
+                try {
                     yield $attribute->newInstance();
+                } catch (\Error $e) {
+                    if (\Error::class !== $e::class) {
+                        throw $e;
+                    }
+                    $on = match (true) {
+                        $reflector instanceof \ReflectionClass => ' on class '.$reflector->name,
+                        $reflector instanceof \ReflectionMethod => sprintf(' on "%s::%s()"', $reflector->getDeclaringClass()->name, $reflector->name),
+                        $reflector instanceof \ReflectionProperty => sprintf(' on "%s::$%s"', $reflector->getDeclaringClass()->name, $reflector->name),
+                        default => '',
+                    };
+
+                    throw new MappingException(sprintf('Could not instantiate attribute "%s"%s.', $attribute->getName(), $on), 0, $e);
                 }
             }
         }

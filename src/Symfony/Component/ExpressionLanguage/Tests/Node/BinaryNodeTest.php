@@ -65,6 +65,10 @@ class BinaryNodeTest extends AbstractNodeTest
 
             [[1, 2, 3], new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
+            [true, new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('a'))],
+            [false, new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('b'))],
+            [true, new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('c'))],
+            [false, new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('b'))],
             [1, new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
             [0, new BinaryNode('matches', new ConstantNode(''), new ConstantNode('/^[a-z]+$/'))],
             [0, new BinaryNode('matches', new ConstantNode(null), new ConstantNode('/^[a-z]+$/'))],
@@ -117,6 +121,9 @@ class BinaryNodeTest extends AbstractNodeTest
             ['range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 
             ['(static function ($regexp, $str) { set_error_handler(function ($t, $m) use ($regexp, $str) { throw new \Symfony\Component\ExpressionLanguage\SyntaxError(sprintf(\'Regexp "%s" passed to "matches" is not valid\', $regexp).substr($m, 12)); }); try { return preg_match($regexp, (string) $str); } finally { restore_error_handler(); } })("/^[a-z]+\$/", "abc")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))],
+
+            ['str_starts_with("abc", "a")', new BinaryNode('starts with', new ConstantNode('abc'), new ConstantNode('a'))],
+            ['str_ends_with("abc", "a")', new BinaryNode('ends with', new ConstantNode('abc'), new ConstantNode('a'))],
         ];
     }
 

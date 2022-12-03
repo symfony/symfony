@@ -30,7 +30,7 @@ class LocoProviderTest extends ProviderTestCase
 {
     public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
     {
-        return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint);
+        return new LocoProvider($client, $loader, $logger, $defaultLocale, $endpoint, $this->getTranslatorBag());
     }
 
     public function toStringProvider(): iterable
@@ -706,6 +706,10 @@ class LocoProviderTest extends ProviderTestCase
             ->method('load')
             ->willReturn((new XliffFileLoader())->load($responseContent, $locale, $domain));
 
+        $this->getTranslatorBag()->expects($this->any())
+            ->method('getCatalogue')
+            ->willReturn(new MessageCatalogue($locale));
+
         $provider = $this->createProvider((new MockHttpClient(new MockResponse($responseContent)))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => [
@@ -744,6 +748,10 @@ class LocoProviderTest extends ProviderTestCase
             ->withConsecutive(...$consecutiveLoadArguments)
             ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
 
+        $this->getTranslatorBag()->expects($this->any())
+            ->method('getCatalogue')
+            ->willReturn(new MessageCatalogue($locale));
+
         $provider = $this->createProvider((new MockHttpClient($responses))->withOptions([
             'base_uri' => 'https://localise.biz/api/',
             'headers' => [
@@ -755,6 +763,85 @@ class LocoProviderTest extends ProviderTestCase
         foreach ($translatorBag->getCatalogues() as $catalogue) {
             $catalogue->deleteMetadata('', '');
         }
+
+        $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
+    }
+
+    /**
+     * @dataProvider getResponsesForReadWithLastModified
+     */
+    public function testReadWithLastModified(array $locales, array $domains, array $responseContents, array $lastModifieds, TranslatorBag $expectedTranslatorBag)
+    {
+        $responses = [];
+        $consecutiveLoadArguments = [];
+        $consecutiveLoadReturns = [];
+
+        foreach ($locales as $locale) {
+            foreach ($domains as $domain) {
+                $responses[] = function (string $method, string $url, array $options = []) use ($responseContents, $lastModifieds, $locale, $domain): ResponseInterface {
+                    $this->assertSame('GET', $method);
+                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.rawurlencode($domain).'&status=translated%2Cblank-translation', $url);
+                    $this->assertSame(['filter' => $domain, 'status' => 'translated,blank-translation'], $options['query']);
+                    $this->assertSame(['Accept: */*'], $options['headers']);
+
+                    return new MockResponse($responseContents[$locale][$domain], [
+                        'response_headers' => [
+                            'Last-Modified' => $lastModifieds[$locale],
+                        ],
+                    ]);
+                };
+                $consecutiveLoadArguments[] = [$responseContents[$locale][$domain], $locale, $domain];
+                $consecutiveLoadReturns[] = (new XliffFileLoader())->load($responseContents[$locale][$domain], $locale, $domain);
+            }
+        }
+
+        $loader = $this->getLoader();
+        $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
+            ->method('load')
+            ->withConsecutive(...$consecutiveLoadArguments)
+            ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
+
+        $this->translatorBag = new TranslatorBag();
+
+        $provider = $this->createProvider(
+            new MockHttpClient($responses, 'https://localise.biz/api/'),
+            $this->getLoader(),
+            $this->getLogger(),
+            $this->getDefaultLocale(),
+            'localise.biz/api/'
+        );
+
+        $this->translatorBag = $provider->read($domains, $locales);
+
+        $responses = [];
+
+        foreach ($locales as $locale) {
+            foreach ($domains as $domain) {
+                $responses[] = function (string $method, string $url, array $options = []) use ($responseContents, $lastModifieds, $locale, $domain): ResponseInterface {
+                    $this->assertSame('GET', $method);
+                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.rawurlencode($domain).'&status=translated%2Cblank-translation', $url);
+                    $this->assertSame(['filter' => $domain, 'status' => 'translated,blank-translation'], $options['query']);
+                    $this->assertSame(['If-Modified-Since: '.$lastModifieds[$locale], 'Accept: */*'], $options['headers']);
+
+                    return new MockResponse($responseContents[$locale][$domain], [
+                        'http_code' => 304,
+                        'response_headers' => [
+                            'Last-Modified' => $lastModifieds[$locale],
+                        ],
+                    ]);
+                };
+            }
+        }
+
+        $provider = $this->createProvider(
+            new MockHttpClient($responses, 'https://localise.biz/api/'),
+            $this->getLoader(),
+            $this->getLogger(),
+            $this->getDefaultLocale(),
+            'localise.biz/api/'
+        );
+
+        $translatorBag = $provider->read($domains, $locales);
 
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
@@ -852,9 +939,9 @@ class LocoProviderTest extends ProviderTestCase
         $expectedTranslatorBagEn->addCatalogue($arrayLoader->load([
             'index.hello' => 'Hello',
             'index.greetings' => 'Welcome, {firstname}!',
-        ], 'en'));
+        ], 'en', 'messages+intl-icu'));
 
-        yield ['en', 'messages', <<<'XLIFF'
+        yield ['en', 'messages+intl-icu', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
@@ -862,7 +949,7 @@ class LocoProviderTest extends ProviderTestCase
       <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
     </header>
     <body>
-      <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+      <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext" extradata="loco:format=icu">
         <source>index.hello</source>
         <target state="translated">Hello</target>
       </trans-unit>
@@ -882,9 +969,9 @@ XLIFF
         $expectedTranslatorBagFr->addCatalogue($arrayLoader->load([
             'index.hello' => 'Bonjour',
             'index.greetings' => 'Bienvenue, {firstname} !',
-        ], 'fr'));
+        ], 'fr', 'messages+intl-icu'));
 
-        yield ['fr', 'messages', <<<'XLIFF'
+        yield ['fr', 'messages+intl-icu', <<<'XLIFF'
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
   <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
@@ -892,7 +979,7 @@ XLIFF
       <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
     </header>
     <body>
-      <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+      <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext" extradata="loco:format=icu">
         <source>index.hello</source>
         <target state="translated">Bonjour</target>
       </trans-unit>
@@ -1056,5 +1143,24 @@ XLIFF
             ],
             $expectedTranslatorBag,
         ];
+    }
+
+    public function getResponsesForReadWithLastModified(): \Generator
+    {
+        $lastModifieds = [
+            'en' => 'Tue, 16 Nov 2021 11:35:24 GMT',
+            'fr' => 'Wed, 17 Nov 2021 11:22:33 GMT',
+        ];
+
+        foreach ($this->getResponsesForManyLocalesAndManyDomains() as [$locales, $domains, $responseContents, $expectedTranslatorBag]) {
+            foreach ($locales as $locale) {
+                foreach ($domains as $domain) {
+                    $catalogue = $expectedTranslatorBag->getCatalogue($locale);
+                    $catalogue->setCatalogueMetadata('last-modified', $lastModifieds[$locale], $domain);
+                }
+            }
+
+            yield [$locales, $domains, $responseContents, $lastModifieds, $expectedTranslatorBag];
+        }
     }
 }

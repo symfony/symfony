@@ -25,42 +25,36 @@ use Symfony\Component\Intl\Exception\BadMethodCallException;
  */
 class ArrayAccessibleResourceBundle implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    private $bundleImpl;
+    private \ResourceBundle $bundleImpl;
 
     public function __construct(\ResourceBundle $bundleImpl)
     {
         $this->bundleImpl = $bundleImpl;
     }
 
-    public function get($offset)
+    public function get(int|string $offset)
     {
         $value = $this->bundleImpl->get($offset);
 
         return $value instanceof \ResourceBundle ? new static($value) : $value;
     }
 
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return null !== $this->bundleImpl->get($offset);
     }
 
-    /**
-     * @param mixed $offset
-     *
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->get($offset);
     }
 
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new BadMethodCallException('Resource bundles cannot be modified.');
     }
 
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         throw new BadMethodCallException('Resource bundles cannot be modified.');
     }

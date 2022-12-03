@@ -16,14 +16,14 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 class RouterContextStamp implements StampInterface
 {
-    private $baseUrl;
-    private $method;
-    private $host;
-    private $scheme;
-    private $httpPort;
-    private $httpsPort;
-    private $pathInfo;
-    private $queryString;
+    private string $baseUrl;
+    private string $method;
+    private string $host;
+    private string $scheme;
+    private int $httpPort;
+    private int $httpsPort;
+    private string $pathInfo;
+    private string $queryString;
 
     public function __construct(string $baseUrl, string $method, string $host, string $scheme, int $httpPort, int $httpsPort, string $pathInfo, string $queryString)
     {

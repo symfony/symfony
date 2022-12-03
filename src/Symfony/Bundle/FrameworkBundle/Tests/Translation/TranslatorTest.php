@@ -22,6 +22,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslatorTest extends TestCase
 {
@@ -310,7 +311,7 @@ class TranslatorTest extends TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = Translator::class, $defaultLocale = 'en', array $enabledLocales = [])
+    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = Translator::class, $defaultLocale = 'en', array $enabledLocales = []): TranslatorInterface
     {
         $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale, $enabledLocales);
 
@@ -417,9 +418,6 @@ class TranslatorTest extends TestCase
 
 class TranslatorWithInvalidLocale extends Translator
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale(): string
     {
         return 'invalid locale';

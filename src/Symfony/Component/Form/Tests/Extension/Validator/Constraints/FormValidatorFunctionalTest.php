@@ -439,9 +439,9 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertTrue($form->isSubmitted());
         $this->assertFalse($form->isValid());
         $this->assertCount(2, $form->getErrors());
-        $this->assertSame('This value is not valid.', $form->getErrors()[0]->getMessage());
+        $this->assertSame('Please enter a valid date.', $form->getErrors()[0]->getMessage());
         $this->assertSame($form->get('year'), $form->getErrors()[0]->getOrigin());
-        $this->assertSame('This value is not valid.', $form->getErrors()[1]->getMessage());
+        $this->assertSame('Please enter a valid date.', $form->getErrors()[1]->getMessage());
         $this->assertSame($form->get('month'), $form->getErrors()[1]->getOrigin());
     }
 

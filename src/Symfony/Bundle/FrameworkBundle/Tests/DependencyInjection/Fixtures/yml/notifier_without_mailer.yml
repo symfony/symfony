@@ -1,9 +1,9 @@
 framework:
+    http_method_override: false
     mailer:
         enabled: false
     messenger:
         enabled: true
-        reset_on_message: true
     notifier:
         enabled: true
         notification_on_failed_messages: true

@@ -32,10 +32,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
      */
     protected $redisClient;
 
-    /**
-     * @return \Redis|\RedisArray|\RedisCluster|\Predis\Client
-     */
-    abstract protected function createRedisClient(string $host): object;
+    abstract protected function createRedisClient(string $host): \Redis|\RedisArray|\RedisCluster|\Predis\Client;
 
     protected function setUp(): void
     {
@@ -159,6 +156,18 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $options = [
             'prefix' => self::PREFIX,
             'ttl' => $ttl,
+        ];
+
+        $handler = new RedisSessionHandler($this->redisClient, $options);
+        $handler->write('id', 'data');
+        $redisTtl = $this->redisClient->ttl(self::PREFIX.'id');
+
+        $this->assertLessThan($redisTtl, $ttl - 5);
+        $this->assertGreaterThan($redisTtl, $ttl + 5);
+
+        $options = [
+            'prefix' => self::PREFIX,
+            'ttl' => fn () => $ttl,
         ];
 
         $handler = new RedisSessionHandler($this->redisClient, $options);

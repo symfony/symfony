@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestSuite;
 use PHPUnit\Metadata\Api\Groups;
 use PHPUnit\Util\Test;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
-use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 class_exists(Groups::class);
@@ -84,7 +83,7 @@ class Deprecation
             }
 
             if ('trigger_error' === $trace[$j]['function'] && !isset($trace[$j]['class'])) {
-                if (\in_array($trace[1 + $j]['class'], [DebugClassLoader::class, LegacyDebugClassLoader::class], true)) {
+                if (DebugClassLoader::class === $trace[1 + $j]['class']) {
                     $class = $trace[1 + $j]['args'][0];
                     $this->triggeringFile = isset($trace[1 + $j]['args'][1]) ? realpath($trace[1 + $j]['args'][1]) : (new \ReflectionClass($class))->getFileName();
                     $this->getOriginalFilesStack();
@@ -330,9 +329,6 @@ class Deprecation
             self::$vendors[] = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Legacy';
             if (class_exists(DebugClassLoader::class, false)) {
                 self::$vendors[] = \dirname((new \ReflectionClass(DebugClassLoader::class))->getFileName());
-            }
-            if (class_exists(LegacyDebugClassLoader::class, false)) {
-                self::$vendors[] = \dirname((new \ReflectionClass(LegacyDebugClassLoader::class))->getFileName());
             }
             foreach (get_declared_classes() as $class) {
                 if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {

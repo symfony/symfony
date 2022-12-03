@@ -48,4 +48,25 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
         ];
         $this->assertSame($params, $connection->getParameters()->toArray());
     }
+
+    public function testAclUserPasswordAuth()
+    {
+        // creating user via php-redis cause Predis (v1.1.10) does not support ACL command yet
+        $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+
+        if (version_compare($redis->info()['redis_version'], '6.0', '<')) {
+            $this->markTestSkipped('Redis server >= 6.0 required');
+        }
+
+        $this->assertTrue($redis->acl('SETUSER', 'predis', 'on'));
+        $this->assertTrue($redis->acl('SETUSER', 'predis', '>password'));
+        $this->assertTrue($redis->acl('SETUSER', 'predis', 'allkeys'));
+        $this->assertTrue($redis->acl('SETUSER', 'predis', '+@all'));
+
+        $predis = RedisAdapter::createConnection('redis://predis:password@'.getenv('REDIS_HOST'), ['class' => \Predis\Client::class]);
+        $this->assertInstanceOf(\Predis\Client::class, $predis);
+        $this->assertSame('OK', $predis->set(__FUNCTION__, 'value2')->getPayload());
+
+        $this->assertSame(1, $redis->acl('DELUSER', 'predis'));
+    }
 }

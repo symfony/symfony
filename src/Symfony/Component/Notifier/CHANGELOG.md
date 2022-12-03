@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add PHPUnit constraints
+ * Add `from` property in `SmsMessage`
+
+6.1
+---
+
+ * Use importance level to set flash message type
+
 5.4
 ---
 

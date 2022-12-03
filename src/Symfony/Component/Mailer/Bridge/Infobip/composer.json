@@ -1,0 +1,42 @@
+{
+    "name": "symfony/infobip-mailer",
+    "description": "Symfony Infobip Mailer Bridge",
+    "type": "symfony-mailer-bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jean-Baptiste Delhommeau",
+            "email": "jeanbadel@gmail.com"
+        },
+        {
+            "name": "Benoit Galati",
+            "email": "benoit.galati@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/mailer": "^6.1",
+        "symfony/mime": "^5.4.13|~6.0.13|^6.1.5"
+    },
+    "require-dev": {
+        "symfony/http-client": "^6.1"
+    },
+    "conflict": {
+        "symfony/mime": "<6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Mailer\\Bridge\\Infobip\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

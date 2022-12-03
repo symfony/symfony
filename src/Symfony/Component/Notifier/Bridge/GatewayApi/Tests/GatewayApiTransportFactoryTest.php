@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\GatewayApi\Tests;
 
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
-use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
@@ -21,10 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
  */
 final class GatewayApiTransportFactoryTest extends TransportFactoryTestCase
 {
-    /**
-     * @return GatewayApiTransportFactory
-     */
-    public function createFactory(): TransportFactoryInterface
+    public function createFactory(): GatewayApiTransportFactory
     {
         return new GatewayApiTransportFactory();
     }

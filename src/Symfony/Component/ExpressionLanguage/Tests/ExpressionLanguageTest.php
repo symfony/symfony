@@ -237,12 +237,120 @@ class ExpressionLanguageTest extends TestCase
         $registerCallback($el);
     }
 
-    public function testCallBadCallable()
+    /**
+     * @dataProvider provideNullSafe
+     */
+    public function testNullSafeEvaluate($expression, $foo)
     {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertNull($expressionLanguage->evaluate($expression, ['foo' => $foo]));
+    }
+
+    /**
+     * @dataProvider provideNullSafe
+     */
+    public function testNullSafeCompile($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertNull(eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))));
+    }
+
+    public function provideNullSafe()
+    {
+        $foo = new class() extends \stdClass {
+            public function bar()
+            {
+                return null;
+            }
+        };
+
+        yield ['foo?.bar', null];
+        yield ['foo?.bar()', null];
+        yield ['foo.bar?.baz', (object) ['bar' => null]];
+        yield ['foo.bar?.baz()', (object) ['bar' => null]];
+        yield ['foo["bar"]?.baz', ['bar' => null]];
+        yield ['foo["bar"]?.baz()', ['bar' => null]];
+        yield ['foo.bar()?.baz', $foo];
+        yield ['foo.bar()?.baz()', $foo];
+
+        yield ['foo?.bar.baz', null];
+        yield ['foo?.bar["baz"]', null];
+        yield ['foo?.bar["baz"]["qux"]', null];
+        yield ['foo?.bar["baz"]["qux"].quux', null];
+        yield ['foo?.bar["baz"]["qux"].quux()', null];
+        yield ['foo?.bar().baz', null];
+        yield ['foo?.bar()["baz"]', null];
+        yield ['foo?.bar()["baz"]["qux"]', null];
+        yield ['foo?.bar()["baz"]["qux"].quux', null];
+        yield ['foo?.bar()["baz"]["qux"].quux()', null];
+    }
+
+    /**
+     * @dataProvider provideInvalidNullSafe
+     */
+    public function testNullSafeEvaluateFails($expression, $foo, $message)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
-        $el = new ExpressionLanguage();
-        $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
+        $this->expectExceptionMessage($message);
+        $expressionLanguage->evaluate($expression, ['foo' => $foo]);
+    }
+
+    /**
+     * @dataProvider provideInvalidNullSafe
+     */
+    public function testNullSafeCompileFails($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $this->expectWarning();
+        eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo'])));
+    }
+
+    public function provideInvalidNullSafe()
+    {
+        yield ['foo?.bar.baz', (object) ['bar' => null], 'Unable to get property "baz" of non-object "foo.bar".'];
+        yield ['foo?.bar["baz"]', (object) ['bar' => null], 'Unable to get an item of non-array "foo.bar".'];
+        yield ['foo?.bar["baz"].qux.quux', (object) ['bar' => ['baz' => null]], 'Unable to get property "qux" of non-object "foo.bar["baz"]".'];
+    }
+
+    /**
+     * @dataProvider provideNullCoalescing
+     */
+    public function testNullCoalescingEvaluate($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame($expressionLanguage->evaluate($expression, ['foo' => $foo]), 'default');
+    }
+
+    /**
+     * @dataProvider provideNullCoalescing
+     */
+    public function testNullCoalescingCompile($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame(eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))), 'default');
+    }
+
+    public function provideNullCoalescing()
+    {
+        $foo = new class() extends \stdClass {
+            public function bar()
+            {
+                return null;
+            }
+        };
+
+        yield ['foo.bar ?? "default"', null];
+        yield ['foo.bar.baz ?? "default"', (object) ['bar' => null]];
+        yield ['foo.bar ?? foo.baz ?? "default"', null];
+        yield ['foo[0] ?? "default"', []];
+        yield ['foo["bar"] ?? "default"', ['bar' => null]];
+        yield ['foo["baz"] ?? "default"', ['bar' => null]];
+        yield ['foo["bar"]["baz"] ?? "default"', ['bar' => null]];
+        yield ['foo["bar"].baz ?? "default"', ['bar' => null]];
+        yield ['foo.bar().baz ?? "default"', $foo];
     }
 
     /**

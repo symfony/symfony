@@ -21,14 +21,13 @@ jobs:
     name: Tests
 
     env:
-      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis-5.3.4
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis
 
     strategy:
       matrix:
         include:
-          - php: '7.2'
-          - php: '7.4'
-          - php: '8.0'
+          - php: '8.1'
+          - php: '8.1'
             mode: high-deps
           - php: '8.1'
             mode: low-deps
@@ -94,7 +93,7 @@ jobs:
             echo SYMFONY_DEPRECATIONS_HELPER=weak >> $GITHUB_ENV
             cp composer.json composer.json.orig
             echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json
-            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -maxdepth 6 -type f -name composer.json -printf '%h\n')
+            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -maxdepth 6 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Intl/Resources/emoji)
             mv composer.json composer.json.phpunit
             mv composer.json.orig composer.json
           fi
@@ -140,13 +139,12 @@ jobs:
       - name: Patch return types
         if: "matrix.php == '8.1' && ! matrix.mode"
         run: |
-          sed -i 's/"\*\*\/Tests\/"//' composer.json
+          patch -sp1 < .github/expected-missing-return-types.diff
           git add .
           composer install -q --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=1&php=7.2' php .github/patch-types.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=1&php=7.2' php .github/patch-types.php # ensure the script is idempotent
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.1' php .github/patch-types.php # ensure the script is idempotent
           git diff --exit-code
-          echo PHPUNIT="$PHPUNIT,legacy" >> $GITHUB_ENV
 
       - name: Run tests
         run: |
@@ -222,12 +220,12 @@ jobs:
             script -e -c './phpunit --group tty' /dev/null
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '7.2' && ! matrix.mode"
+        if: "matrix.php == '8.1' && ! matrix.mode"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.2.5-pcntl-sigchild.tar.bz2
-          tar -xjf php-7.2.5-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.1.2-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.1.2-pcntl-sigchild.tar.bz2
           cd ..
 
           ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

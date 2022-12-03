@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
-use Doctrine\Common\Annotations\PsrCachedReader;
-use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FullStack;
@@ -27,6 +25,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Lock\Lock;
@@ -37,6 +36,7 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\Semaphore\Semaphore;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Uid\Factory\UuidFactory;
@@ -49,7 +49,7 @@ use Symfony\Component\Workflow\WorkflowEvents;
  */
 class Configuration implements ConfigurationInterface
 {
-    private $debug;
+    private bool $debug;
 
     /**
      * @param bool $debug Whether debugging is enabled or not
@@ -61,10 +61,8 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Generates the configuration tree builder.
-     *
-     * @return TreeBuilder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('framework');
         $rootNode = $treeBuilder->getRootNode();
@@ -78,14 +76,29 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->validate()
+                ->always(function ($v) {
+                    if (!isset($v['http_method_override'])) {
+                        trigger_deprecation('symfony/framework-bundle', '6.1', 'Not setting the "framework.http_method_override" config option is deprecated. It will default to "false" in 7.0.');
+
+                        $v['http_method_override'] = true;
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->fixXmlConfig('enabled_locale')
             ->children()
                 ->scalarNode('secret')->end()
-                ->scalarNode('http_method_override')
+                ->booleanNode('http_method_override')
                     ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests. Note: When using the HttpCache, you need to call the method in your front controller instead")
-                    ->defaultTrue()
+                    ->treatNullLike(false)
                 ->end()
-                ->scalarNode('ide')->defaultNull()->end()
+                ->scalarNode('trust_x_sendfile_type_header')
+                    ->info('Set true to enable support for xsendfile in binary file responses.')
+                    ->defaultFalse()
+                ->end()
+                ->scalarNode('ide')->defaultValue('%env(default::SYMFONY_IDE)%')->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
                 ->booleanNode('set_locale_from_accept_language')
@@ -120,6 +133,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('error_controller')
                     ->defaultValue('error_controller')
                 ->end()
+                ->booleanNode('handle_all_throwables')->info('HttpKernel will handle all kinds of \Throwable')->end()
             ->end()
         ;
 
@@ -127,7 +141,7 @@ class Configuration implements ConfigurationInterface
             $parentPackages = (array) $parentPackage;
             $parentPackages[] = 'symfony/framework-bundle';
 
-            return ContainerBuilder::willBeAvailable($package, $class, $parentPackages, true);
+            return ContainerBuilder::willBeAvailable($package, $class, $parentPackages);
         };
 
         $enableIfStandalone = static function (string $package, string $class) use ($willBeAvailable) {
@@ -147,9 +161,9 @@ class Configuration implements ConfigurationInterface
         $this->addRequestSection($rootNode);
         $this->addAssetsSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
-        $this->addValidationSection($rootNode, $enableIfStandalone, $willBeAvailable);
+        $this->addValidationSection($rootNode, $enableIfStandalone);
         $this->addAnnotationsSection($rootNode, $willBeAvailable);
-        $this->addSerializerSection($rootNode, $enableIfStandalone, $willBeAvailable);
+        $this->addSerializerSection($rootNode, $enableIfStandalone);
         $this->addPropertyAccessSection($rootNode, $willBeAvailable);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
@@ -157,6 +171,7 @@ class Configuration implements ConfigurationInterface
         $this->addExceptionsSection($rootNode);
         $this->addWebLinkSection($rootNode, $enableIfStandalone);
         $this->addLockSection($rootNode, $enableIfStandalone);
+        $this->addSemaphoreSection($rootNode, $enableIfStandalone);
         $this->addMessengerSection($rootNode, $enableIfStandalone);
         $this->addRobotsIndexSection($rootNode);
         $this->addHttpClientSection($rootNode, $enableIfStandalone);
@@ -165,6 +180,7 @@ class Configuration implements ConfigurationInterface
         $this->addNotifierSection($rootNode, $enableIfStandalone);
         $this->addRateLimiterSection($rootNode, $enableIfStandalone);
         $this->addUidSection($rootNode, $enableIfStandalone);
+        $this->addHtmlSanitizerSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -221,17 +237,8 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                             ->end()
                         ->end()
-                        // to be set to false in Symfony 6.0
                         ->booleanNode('legacy_error_messages')
-                            ->defaultTrue()
-                            ->validate()
-                                ->ifTrue()
-                                ->then(function ($v) {
-                                    trigger_deprecation('symfony/framework-bundle', '5.2', 'Setting the "framework.form.legacy_error_messages" option to "true" is deprecated. It will have no effect as of Symfony 6.0.');
-
-                                    return $v;
-                                })
-                            ->end()
+                            ->setDeprecated('symfony/framework-bundle', '6.2')
                         ->end()
                     ->end()
                 ->end()
@@ -262,6 +269,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('allow_revalidate')->end()
                         ->integerNode('stale_while_revalidate')->end()
                         ->integerNode('stale_if_error')->end()
+                        ->booleanNode('terminate_on_cache_hit')->end()
                     ->end()
                 ->end()
             ->end()
@@ -319,8 +327,8 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('collect_parameter')->defaultNull()->info('The name of the parameter to use to enable or disable collection on a per request basis')->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_main_requests')->defaultFalse()->end()
-                        ->booleanNode('only_master_requests')->setDeprecated('symfony/framework-bundle', '5.3', 'Option "%node%" at "%path%" is deprecated, use "only_main_requests" instead.')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
+                        ->booleanNode('collect_serializer_data')->info('Enables the serializer data collector and profiler panel')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()
@@ -344,7 +352,7 @@ class Configuration implements ConfigurationInterface
                                     $workflows = [];
                                 }
 
-                                if (1 === \count($workflows) && isset($workflows['workflows']) && !array_is_list($workflows['workflows']) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_marking', 'places', 'transitions']))) {
+                                if (1 === \count($workflows) && isset($workflows['workflows']) && !array_is_list($workflows['workflows']) && array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_marking', 'places', 'transitions'])) {
                                     $workflows = $workflows['workflows'];
                                 }
 
@@ -600,6 +608,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
+                        ->scalarNode('cache_dir')->defaultValue('%kernel.cache_dir%')->end()
                         ->scalarNode('default_uri')
                             ->info('The default URI used to generate URLs in a non-HTTP context')
                             ->defaultNull()
@@ -615,7 +624,7 @@ class Configuration implements ConfigurationInterface
                             )
                             ->defaultTrue()
                         ->end()
-                        ->booleanNode('utf8')->defaultNull()->end()
+                        ->booleanNode('utf8')->defaultTrue()->end()
                     ->end()
                 ->end()
             ->end()
@@ -629,15 +638,8 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('session')
                     ->info('session configuration')
                     ->canBeEnabled()
-                    ->beforeNormalization()
-                        ->ifTrue(function ($v) {
-                            return \is_array($v) && isset($v['storage_id']) && isset($v['storage_factory_id']);
-                        })
-                        ->thenInvalid('You cannot use both "storage_id" and "storage_factory_id" at the same time under "framework.session"')
-                    ->end()
                     ->children()
-                        ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
-                        ->scalarNode('storage_factory_id')->defaultNull()->end()
+                        ->scalarNode('storage_factory_id')->defaultValue('session.storage.factory.native')->end()
                         ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
                         ->scalarNode('name')
                             ->validate()
@@ -809,7 +811,6 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/translation', Translator::class)}()
                     ->fixXmlConfig('fallback')
                     ->fixXmlConfig('path')
-                    ->fixXmlConfig('enabled_locale')
                     ->fixXmlConfig('provider')
                     ->children()
                         ->arrayNode('fallbacks')
@@ -827,11 +828,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('paths')
                             ->prototype('scalar')->end()
-                        ->end()
-                        ->arrayNode('enabled_locales')
-                            ->setDeprecated('symfony/framework-bundle', '5.3', 'Option "%node%" at "%path%" is deprecated, set the "framework.enabled_locales" option instead.')
-                            ->prototype('scalar')->end()
-                            ->defaultValue([])
                         ->end()
                         ->arrayNode('pseudo_localization')
                             ->canBeEnabled()
@@ -876,7 +872,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone, callable $willBeAvailable)
+    private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
@@ -885,7 +881,7 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/validator', Validation::class)}()
                     ->children()
                         ->scalarNode('cache')->end()
-                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && (\PHP_VERSION_ID >= 80000 || $willBeAvailable('doctrine/annotations', Annotation::class, 'symfony/validator')) ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(['loadValidatorMetadata'])
                             ->prototype('scalar')->end()
@@ -968,16 +964,16 @@ class Configuration implements ConfigurationInterface
 
     private function addAnnotationsSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
     {
-        $doctrineCache = $willBeAvailable('doctrine/cache', Cache::class, 'doctrine/annotations');
-        $psr6Cache = $willBeAvailable('symfony/cache', PsrCachedReader::class, 'doctrine/annotations');
-
         $rootNode
             ->children()
                 ->arrayNode('annotations')
                     ->info('annotation configuration')
                     ->{$willBeAvailable('doctrine/annotations', Annotation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
-                        ->scalarNode('cache')->defaultValue(($doctrineCache || $psr6Cache) ? 'php_array' : 'none')->end()
+                        ->enumNode('cache')
+                            ->values(['none', 'php_array', 'file'])
+                            ->defaultValue('php_array')
+                        ->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
                         ->booleanNode('debug')->defaultValue($this->debug)->end()
                     ->end()
@@ -986,7 +982,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone, callable $willBeAvailable)
+    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
@@ -994,7 +990,7 @@ class Configuration implements ConfigurationInterface
                     ->info('serializer configuration')
                     ->{$enableIfStandalone('symfony/serializer', Serializer::class)}()
                     ->children()
-                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && (\PHP_VERSION_ID >= 80000 || $willBeAvailable('doctrine/annotations', Annotation::class, 'symfony/serializer')) ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->scalarNode('name_converter')->end()
                         ->scalarNode('circular_reference_handler')->end()
                         ->scalarNode('max_depth_handler')->end()
@@ -1074,7 +1070,6 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue('cache.adapter.system')
                         ->end()
                         ->scalarNode('directory')->defaultValue('%kernel.cache_dir%/pools/app')->end()
-                        ->scalarNode('default_doctrine_provider')->end()
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
@@ -1314,6 +1309,61 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    private function addSemaphoreSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('semaphore')
+                    ->info('Semaphore configuration')
+                    ->{$enableIfStandalone('symfony/semaphore', Semaphore::class)}()
+                    ->beforeNormalization()
+                        ->ifString()->then(function ($v) { return ['enabled' => true, 'resources' => $v]; })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['enabled']); })
+                        ->then(function ($v) { return $v + ['enabled' => true]; })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['resources']) && !isset($v['resource']); })
+                        ->then(function ($v) {
+                            $e = $v['enabled'];
+                            unset($v['enabled']);
+
+                            return ['enabled' => $e, 'resources' => $v];
+                        })
+                    ->end()
+                    ->addDefaultsIfNotSet()
+                    ->fixXmlConfig('resource')
+                    ->children()
+                        ->arrayNode('resources')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
+                            ->requiresAtLeastOneElement()
+                            ->beforeNormalization()
+                                ->ifString()->then(function ($v) { return ['default' => $v]; })
+                            ->end()
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return \is_array($v) && array_is_list($v); })
+                                ->then(function ($v) {
+                                    $resources = [];
+                                    foreach ($v as $resource) {
+                                        $resources[] = \is_array($resource) && isset($resource['name'])
+                                            ? [$resource['name'] => $resource['value']]
+                                            : ['default' => $resource]
+                                        ;
+                                    }
+
+                                    return array_merge_recursive([], ...$resources);
+                                })
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addWebLinkSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
@@ -1452,6 +1502,10 @@ class Configuration implements ConfigurationInterface
                                             ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite)')->end()
                                         ->end()
                                     ->end()
+                                    ->scalarNode('rate_limiter')
+                                        ->defaultNull()
+                                        ->info('Rate limiter name to use when processing messages')
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -1460,20 +1514,46 @@ class Configuration implements ConfigurationInterface
                             ->info('Transport name to send failed messages to (after all retries have failed).')
                         ->end()
                         ->booleanNode('reset_on_message')
-                            ->defaultNull()
+                            ->defaultTrue()
                             ->info('Reset container services after each message.')
+                            ->setDeprecated('symfony/framework-bundle', '6.1', 'Option "%node%" at "%path%" is deprecated. It does nothing and will be removed in version 7.0.')
+                            ->validate()
+                                ->ifTrue(static fn ($v) => true !== $v)
+                                ->thenInvalid('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.')
+                            ->end()
                         ->end()
                         ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')
-                            ->defaultValue(['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]])
+                            ->defaultValue(['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]])
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
                                 ->addDefaultsIfNotSet()
                                 ->children()
-                                    ->enumNode('default_middleware')
-                                        ->values([true, false, 'allow_no_handlers'])
-                                        ->defaultTrue()
+                                    ->arrayNode('default_middleware')
+                                        ->beforeNormalization()
+                                            ->ifTrue(function ($defaultMiddleware) { return \is_string($defaultMiddleware) || \is_bool($defaultMiddleware); })
+                                            ->then(function ($defaultMiddleware): array {
+                                                if (\is_string($defaultMiddleware) && 'allow_no_handlers' === $defaultMiddleware) {
+                                                    return [
+                                                        'enabled' => true,
+                                                        'allow_no_handlers' => true,
+                                                        'allow_no_senders' => true,
+                                                    ];
+                                                }
+
+                                                return [
+                                                    'enabled' => $defaultMiddleware,
+                                                    'allow_no_handlers' => false,
+                                                    'allow_no_senders' => true,
+                                                ];
+                                            })
+                                        ->end()
+                                        ->canBeDisabled()
+                                        ->children()
+                                            ->booleanNode('allow_no_handlers')->defaultFalse()->end()
+                                            ->booleanNode('allow_no_senders')->defaultTrue()->end()
+                                        ->end()
                                     ->end()
                                     ->arrayNode('middleware')
                                         ->performNoDeepMerging()
@@ -2055,7 +2135,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->enumNode('default_uuid_version')
                             ->defaultValue(6)
-                            ->values([6, 4, 1])
+                            ->values([7, 6, 4, 1])
                         ->end()
                         ->enumNode('name_based_uuid_version')
                             ->defaultValue(5)
@@ -2066,10 +2146,161 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->enumNode('time_based_uuid_version')
                             ->defaultValue(6)
-                            ->values([6, 1])
+                            ->values([7, 6, 1])
                         ->end()
                         ->scalarNode('time_based_uuid_node')
                             ->cannotBeEmpty()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addHtmlSanitizerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('html_sanitizer')
+                    ->info('HtmlSanitizer configuration')
+                    ->{$enableIfStandalone('symfony/html-sanitizer', HtmlSanitizerInterface::class)}()
+                    ->fixXmlConfig('sanitizer')
+                    ->children()
+                        ->arrayNode('sanitizers')
+                            ->useAttributeAsKey('name')
+                            ->arrayPrototype()
+                                ->fixXmlConfig('allow_element')
+                                ->fixXmlConfig('block_element')
+                                ->fixXmlConfig('drop_element')
+                                ->fixXmlConfig('allow_attribute')
+                                ->fixXmlConfig('drop_attribute')
+                                ->fixXmlConfig('force_attribute')
+                                ->fixXmlConfig('allowed_link_scheme')
+                                ->fixXmlConfig('allowed_link_host')
+                                ->fixXmlConfig('allowed_media_scheme')
+                                ->fixXmlConfig('allowed_media_host')
+                                ->fixXmlConfig('with_attribute_sanitizer')
+                                ->fixXmlConfig('without_attribute_sanitizer')
+                                ->children()
+                                    ->booleanNode('allow_safe_elements')
+                                        ->info('Allows "safe" elements and attributes.')
+                                        ->defaultFalse()
+                                    ->end()
+                                    ->booleanNode('allow_static_elements')
+                                        ->info('Allows all static elements and attributes from the W3C Sanitizer API standard.')
+                                        ->defaultFalse()
+                                    ->end()
+                                    ->arrayNode('allow_elements')
+                                        ->info('Configures the elements that the sanitizer should retain from the input. The element name is the key, the value is either a list of allowed attributes for this element or "*" to allow the default set of attributes (https://wicg.github.io/sanitizer-api/#default-configuration).')
+                                        ->example(['i' => '*', 'a' => ['title'], 'span' => 'class'])
+                                        ->normalizeKeys(false)
+                                        ->useAttributeAsKey('name')
+                                        ->variablePrototype()
+                                            ->beforeNormalization()
+                                                ->ifArray()->then(fn ($n) => $n['attribute'] ?? $n)
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(fn ($n): bool => !\is_string($n) && !\is_array($n))
+                                                ->thenInvalid('The value must be either a string or an array of strings.')
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('block_elements')
+                                        ->info('Configures elements as blocked. Blocked elements are elements the sanitizer should remove from the input, but retain their children.')
+                                        ->beforeNormalization()
+                                            ->ifString()
+                                            ->then(fn (string $n): array => (array) $n)
+                                        ->end()
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->arrayNode('drop_elements')
+                                        ->info('Configures elements as dropped. Dropped elements are elements the sanitizer should remove from the input, including their children.')
+                                        ->beforeNormalization()
+                                            ->ifString()
+                                            ->then(fn (string $n): array => (array) $n)
+                                        ->end()
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->arrayNode('allow_attributes')
+                                        ->info('Configures attributes as allowed. Allowed attributes are attributes the sanitizer should retain from the input.')
+                                        ->normalizeKeys(false)
+                                        ->useAttributeAsKey('name')
+                                        ->variablePrototype()
+                                            ->beforeNormalization()
+                                                ->ifArray()->then(fn ($n) => $n['element'] ?? $n)
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('drop_attributes')
+                                        ->info('Configures attributes as dropped. Dropped attributes are attributes the sanitizer should remove from the input.')
+                                        ->normalizeKeys(false)
+                                        ->useAttributeAsKey('name')
+                                        ->variablePrototype()
+                                            ->beforeNormalization()
+                                                ->ifArray()->then(fn ($n) => $n['element'] ?? $n)
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('force_attributes')
+                                        ->info('Forcefully set the values of certain attributes on certain elements.')
+                                        ->normalizeKeys(false)
+                                        ->useAttributeAsKey('name')
+                                        ->arrayPrototype()
+                                            ->normalizeKeys(false)
+                                            ->useAttributeAsKey('name')
+                                            ->scalarPrototype()->end()
+                                        ->end()
+                                    ->end()
+                                    ->booleanNode('force_https_urls')
+                                        ->info('Transforms URLs using the HTTP scheme to use the HTTPS scheme instead.')
+                                        ->defaultFalse()
+                                    ->end()
+                                    ->arrayNode('allowed_link_schemes')
+                                        ->info('Allows only a given list of schemes to be used in links href attributes.')
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->variableNode('allowed_link_hosts')
+                                        ->info('Allows only a given list of hosts to be used in links href attributes.')
+                                        ->defaultValue(null)
+                                        ->validate()
+                                            ->ifTrue(function ($v) { return !\is_array($v) && null !== $v; })
+                                            ->thenInvalid('The "allowed_link_hosts" parameter must be an array or null')
+                                        ->end()
+                                    ->end()
+                                    ->booleanNode('allow_relative_links')
+                                        ->info('Allows relative URLs to be used in links href attributes.')
+                                        ->defaultFalse()
+                                    ->end()
+                                    ->arrayNode('allowed_media_schemes')
+                                        ->info('Allows only a given list of schemes to be used in media source attributes (img, audio, video, ...).')
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->variableNode('allowed_media_hosts')
+                                        ->info('Allows only a given list of hosts to be used in media source attributes (img, audio, video, ...).')
+                                        ->defaultValue(null)
+                                        ->validate()
+                                            ->ifTrue(function ($v) { return !\is_array($v) && null !== $v; })
+                                            ->thenInvalid('The "allowed_media_hosts" parameter must be an array or null')
+                                        ->end()
+                                    ->end()
+                                    ->booleanNode('allow_relative_medias')
+                                        ->info('Allows relative URLs to be used in media source attributes (img, audio, video, ...).')
+                                        ->defaultFalse()
+                                    ->end()
+                                    ->arrayNode('with_attribute_sanitizers')
+                                        ->info('Registers custom attribute sanitizers.')
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->arrayNode('without_attribute_sanitizers')
+                                        ->info('Unregisters custom attribute sanitizers.')
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->integerNode('max_input_length')
+                                        ->info('The maximum length allowed for the sanitized input.')
+                                        ->defaultValue(0)
+                                    ->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
@@ -34,8 +33,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class ReflectionExtractorTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @var ReflectionExtractor
      */
@@ -215,14 +212,14 @@ class ReflectionExtractorTest extends TestCase
             ['c', [new Type(Type::BUILTIN_TYPE_BOOL)]],
             ['d', [new Type(Type::BUILTIN_TYPE_BOOL)]],
             ['e', null],
-            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))]],
+            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))]],
             ['donotexist', null],
             ['staticGetter', null],
             ['staticSetter', null],
             ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')]],
             ['realParent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')]],
-            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]],
-            ['dates', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class))]],
+            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)]],
+            ['dates', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class))]],
         ];
     }
 
@@ -268,8 +265,6 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php80TypesProvider
-     *
-     * @requires PHP 8
      */
     public function testExtractPhp80Type($property, array $type = null)
     {
@@ -292,8 +287,6 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php81TypesProvider
-     *
-     * @requires PHP 8.1
      */
     public function testExtractPhp81Type($property, array $type = null)
     {
@@ -308,9 +301,6 @@ class ReflectionExtractorTest extends TestCase
         ];
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testReadonlyPropertiesAreNotWriteable()
     {
         $this->assertFalse($this->extractor->isWritable(Php81Dummy::class, 'foo'));
@@ -330,6 +320,7 @@ class ReflectionExtractorTest extends TestCase
     {
         yield ['nil', null];
         yield ['false', [new Type(Type::BUILTIN_TYPE_FALSE)]];
+        yield ['true', [new Type(Type::BUILTIN_TYPE_TRUE)]];
 
         // Nesting intersection and union types is not supported yet,
         // but we should make sure this kind of composite types does not crash the extractor.
@@ -501,9 +492,6 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals(PropertyWriteInfo::TYPE_NONE, $bazMutator->getType());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testTypedProperties()
     {
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(Php74Dummy::class, 'dummy'));
@@ -617,32 +605,6 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testGetReadInfoDeprecatedEnableMagicCallExtractionInContext()
-    {
-        $this->expectDeprecation('Since symfony/property-info 5.2: Using the "enable_magic_call_extraction" context option in "Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor::getReadInfo()" is deprecated. Use "enable_magic_methods_extraction" instead.');
-
-        $extractor = new ReflectionExtractor();
-        $extractor->getReadInfo(\stdClass::class, 'foo', [
-            'enable_magic_call_extraction' => true,
-        ]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetWriteInfoDeprecatedEnableMagicCallExtractionInContext()
-    {
-        $this->expectDeprecation('Since symfony/property-info 5.2: Using the "enable_magic_call_extraction" context option in "Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor::getWriteInfo()" is deprecated. Use "enable_magic_methods_extraction" instead.');
-
-        $extractor = new ReflectionExtractor();
-        $extractor->getWriteInfo(\stdClass::class, 'foo', [
-            'enable_magic_call_extraction' => true,
-        ]);
-    }
-
-    /**
      * @dataProvider extractConstructorTypesProvider
      */
     public function testExtractConstructorTypes(string $property, array $type = null)
@@ -656,7 +618,7 @@ class ReflectionExtractorTest extends TestCase
             ['timezone', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeZone')]],
             ['date', null],
             ['dateObject', null],
-            ['dateTime', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
+            ['dateTime', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
             ['ddd', null],
         ];
     }

@@ -76,7 +76,7 @@ class PostmarkSmtpTransport extends EsmtpTransport
     /**
      * @return $this
      */
-    public function setMessageStream(string $messageStream): self
+    public function setMessageStream(string $messageStream): static
     {
         $this->messageStream = $messageStream;
 

@@ -69,7 +69,6 @@ class SendinblueApiTransportTest extends TestCase
 
         $transport = new SendinblueApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendinblueApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('X-Mailin-Custom', $payload['headers']);
@@ -131,7 +130,6 @@ class SendinblueApiTransportTest extends TestCase
         $transport = new SendinblueApiTransport('ACCESS_KEY', $client);
         $transport->setPort(8984);
 
-        $dataPart = new DataPart('body');
         $mail = new Email();
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
@@ -141,7 +139,7 @@ class SendinblueApiTransportTest extends TestCase
             ->addCc('foo@bar.fr')
             ->addBcc('foo@bar.fr')
             ->addReplyTo('foo@bar.fr')
-            ->attachPart($dataPart)
+            ->addPart(new DataPart('body'))
         ;
 
         $message = $transport->send($mail);

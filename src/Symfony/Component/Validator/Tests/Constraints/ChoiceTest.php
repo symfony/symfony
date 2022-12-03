@@ -26,9 +26,6 @@ class ChoiceTest extends TestCase
         self::assertEquals(['A', 'B', 'C'], $constraint->choices);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(ChoiceDummy::class);

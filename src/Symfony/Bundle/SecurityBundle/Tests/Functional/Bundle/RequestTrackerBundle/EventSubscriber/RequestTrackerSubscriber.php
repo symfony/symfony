@@ -17,8 +17,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 final class RequestTrackerSubscriber implements EventSubscriberInterface
 {
-    /** @var ?Request */
-    private $lastRequest;
+    private ?Request $lastRequest;
 
     public static function getSubscribedEvents(): array
     {

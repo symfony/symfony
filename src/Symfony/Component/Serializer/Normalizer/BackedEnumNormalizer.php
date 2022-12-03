@@ -22,14 +22,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  */
 final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return int|string
-     */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): int|string
     {
         if (!$object instanceof \BackedEnum) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
@@ -38,20 +31,15 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         return $object->value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, string $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof \BackedEnum;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         if (!is_subclass_of($type, \BackedEnum::class)) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
@@ -68,17 +56,11 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return is_subclass_of($type, \BackedEnum::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

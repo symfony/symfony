@@ -60,14 +60,11 @@ class WebProfilerExtension extends ProfilerExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('profiler_dump', [$this, 'dumpData'], ['is_safe' => ['html'], 'needs_environment' => true]),
-            new TwigFunction('profiler_dump_log', [$this, 'dumpLog'], ['is_safe' => ['html'], 'needs_environment' => true]),
+            new TwigFunction('profiler_dump', $this->dumpData(...), ['is_safe' => ['html'], 'needs_environment' => true]),
+            new TwigFunction('profiler_dump_log', $this->dumpLog(...), ['is_safe' => ['html'], 'needs_environment' => true]),
         ];
     }
 
@@ -103,9 +100,6 @@ class WebProfilerExtension extends ProfilerExtension
         return '<span class="dump-inline">'.strtr($message, $replacements).'</span>';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'profiler';

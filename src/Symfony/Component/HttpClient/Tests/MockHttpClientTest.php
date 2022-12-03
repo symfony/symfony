@@ -281,6 +281,43 @@ class MockHttpClientTest extends HttpClientTestCase
         $mockHttpClient->request('GET', '/foo', ['base_uri' => null]);
     }
 
+    public function testExceptionDirectlyInBody()
+    {
+        $mockHttpClient = new MockHttpClient([
+            new MockResponse(['foo', new \RuntimeException('foo ccc')]),
+            new MockResponse((static function (): \Generator {
+                yield 'bar';
+                yield new TransportException('bar ccc');
+            })()),
+        ]);
+
+        try {
+            $mockHttpClient->request('GET', 'https://symfony.com', [])->getContent();
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new \RuntimeException('foo ccc'), $e->getPrevious());
+            $this->assertSame('foo ccc', $e->getMessage());
+        }
+
+        $chunks = [];
+        try {
+            foreach ($mockHttpClient->stream($mockHttpClient->request('GET', 'https://symfony.com', [])) as $chunk) {
+                $chunks[] = $chunk;
+            }
+            $this->fail();
+        } catch (TransportException $e) {
+            $this->assertEquals(new TransportException('bar ccc'), $e->getPrevious());
+            $this->assertSame('bar ccc', $e->getMessage());
+        }
+
+        $this->assertCount(3, $chunks);
+        $this->assertEquals(new FirstChunk(0, ''), $chunks[0]);
+        $this->assertEquals(new DataChunk(0, 'bar'), $chunks[1]);
+        $this->assertInstanceOf(ErrorChunk::class, $chunks[2]);
+        $this->assertSame(3, $chunks[2]->getOffset());
+        $this->assertSame('bar ccc', $chunks[2]->getError());
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         $responses = [];

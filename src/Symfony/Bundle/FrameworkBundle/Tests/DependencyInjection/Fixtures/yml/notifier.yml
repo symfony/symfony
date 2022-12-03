@@ -1,7 +1,7 @@
 framework:
+    http_method_override: false
     messenger:
         enabled: true
-        reset_on_message: true
     mailer:
         dsn: 'smtp://example.com'
     notifier:

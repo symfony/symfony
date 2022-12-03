@@ -22,12 +22,12 @@ use Symfony\Component\HttpClient\Response\CurlResponse;
  */
 final class PushedResponse
 {
-    public $response;
+    public CurlResponse $response;
 
     /** @var string[] */
-    public $requestHeaders;
+    public array $requestHeaders;
 
-    public $parentOptions = [];
+    public array $parentOptions = [];
 
     public $handle;
 

@@ -198,7 +198,6 @@ class MongoDbSessionHandlerTest extends TestCase
     public function testGetConnection()
     {
         $method = new \ReflectionMethod($this->storage, 'getMongo');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(Client::class, $method->invoke($this->storage));
     }

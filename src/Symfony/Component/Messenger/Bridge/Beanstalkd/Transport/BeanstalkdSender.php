@@ -22,8 +22,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class BeanstalkdSender implements SenderInterface
 {
-    private $connection;
-    private $serializer;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -31,9 +31,6 @@ class BeanstalkdSender implements SenderInterface
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         $encodedMessage = $this->serializer->encode($envelope);

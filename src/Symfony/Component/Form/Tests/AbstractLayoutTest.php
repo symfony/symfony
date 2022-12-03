@@ -20,6 +20,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
@@ -432,7 +434,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $html = $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
-            '/p
+            '/*[self::div or self::p]
     [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help text test![/trans]"]
@@ -2688,6 +2690,28 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => new TranslatableMessage('foo'),
+        ]);
+        $html = $this->renderHelp($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/*
+    [@id="name_help"]
+    [.="[trans]foo[/trans]"]
+'
+        );
+    }
+
+    public function testHelpWithTranslatableInterface()
+    {
+        $message = new class() implements TranslatableInterface {
+            public function trans(TranslatorInterface $translator, string $locale = null): string
+            {
+                return $translator->trans('foo');
+            }
+        };
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => $message,
         ]);
         $html = $this->renderHelp($form->createView());
 

@@ -25,6 +25,11 @@
         <attribute name="bar" serialized-name="qux" />
     </class>
 
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy">
+        <attribute name="three" serialized-path="[one][two]" />
+        <attribute name="seven" serialized-path="[three][four]" />
+    </class>
+
     <class name="Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy">
         <discriminator-map type-property="type">
             <mapping type="first" class="Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild" />

@@ -24,17 +24,14 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class RangeValidator extends ConstraintValidator
 {
-    private $propertyAccessor;
+    private ?PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Range) {
             throw new UnexpectedTypeException($constraint, Range::class);
@@ -75,7 +72,7 @@ class RangeValidator extends ConstraintValidator
 
                 try {
                     $min = new $dateTimeClass($min);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     throw new ConstraintDefinitionException(sprintf('The min value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $min, $dateTimeClass, get_debug_type($constraint)));
                 }
             }
@@ -85,7 +82,7 @@ class RangeValidator extends ConstraintValidator
 
                 try {
                     $max = new $dateTimeClass($max);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $max, $dateTimeClass, get_debug_type($constraint)));
                 }
             }
@@ -97,16 +94,6 @@ class RangeValidator extends ConstraintValidator
         if ($hasLowerLimit && $hasUpperLimit && ($value < $min || $value > $max)) {
             $message = $constraint->notInRangeMessage;
             $code = Range::NOT_IN_RANGE_ERROR;
-
-            if ($value < $min && $constraint->deprecatedMinMessageSet) {
-                $message = $constraint->minMessage;
-                $code = Range::TOO_LOW_ERROR;
-            }
-
-            if ($value > $max && $constraint->deprecatedMaxMessageSet) {
-                $message = $constraint->maxMessage;
-                $code = Range::TOO_HIGH_ERROR;
-            }
 
             $violationBuilder = $this->context->buildViolation($message)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
@@ -164,7 +151,7 @@ class RangeValidator extends ConstraintValidator
         }
     }
 
-    private function getLimit(?string $propertyPath, $default, Constraint $constraint)
+    private function getLimit(?string $propertyPath, mixed $default, Constraint $constraint): mixed
     {
         if (null === $propertyPath) {
             return $default;
@@ -183,14 +170,10 @@ class RangeValidator extends ConstraintValidator
 
     private function getPropertyAccessor(): PropertyAccessorInterface
     {
-        if (null === $this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
+        return $this->propertyAccessor ??= PropertyAccess::createPropertyAccessor();
     }
 
-    private function isParsableDatetimeString($boundary): bool
+    private function isParsableDatetimeString(mixed $boundary): bool
     {
         if (null === $boundary) {
             return true;
@@ -202,7 +185,7 @@ class RangeValidator extends ConstraintValidator
 
         try {
             new \DateTime($boundary);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
 

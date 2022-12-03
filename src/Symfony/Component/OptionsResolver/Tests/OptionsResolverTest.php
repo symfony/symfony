@@ -13,7 +13,6 @@ namespace Symfony\Component\OptionsResolver\Tests;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
@@ -27,8 +26,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OptionsResolverTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @var OptionsResolver
      */
@@ -452,7 +449,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver
             ->setDefault('bar', 'baz')
             ->setDefault('foo', function (Options $options) {
-                $options->setDeprecated('bar');
+                $options->setDeprecated('bar', 'vendor/package', '1.1');
             })
             ->resolve()
         ;
@@ -461,17 +458,7 @@ class OptionsResolverTest extends TestCase
     public function testSetDeprecatedFailsIfUnknownOption()
     {
         $this->expectException(UndefinedOptionsException::class);
-        $this->resolver->setDeprecated('foo');
-    }
-
-    public function testSetDeprecatedFailsIfInvalidDeprecationMessageType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid type for deprecation message argument, expected string or \Closure, but got "bool".');
-        $this->resolver
-            ->setDefined('foo')
-            ->setDeprecated('foo', 'vendor/package', '1.1', true)
-        ;
+        $this->resolver->setDeprecated('foo', 'vendor/package', '1.1');
     }
 
     public function testLazyDeprecationFailsIfInvalidDeprecationMessageType()
@@ -790,11 +777,11 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsIfInvalidTypedArray()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTime".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTimeImmutable".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
 
-        $this->resolver->resolve(['foo' => [new \DateTime()]]);
+        $this->resolver->resolve(['foo' => [new \DateTimeImmutable()]]);
     }
 
     public function testResolveFailsWithNonArray()
@@ -810,13 +797,13 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsIfTypedArrayContainsInvalidTypes()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass|array|DateTime".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass|array|DateTimeImmutable".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
         $values = range(1, 5);
         $values[] = new \stdClass();
         $values[] = [];
-        $values[] = new \DateTime();
+        $values[] = new \DateTimeImmutable();
         $values[] = 123;
 
         $this->resolver->resolve(['foo' => $values]);
@@ -906,12 +893,12 @@ class OptionsResolverTest extends TestCase
     public function testResolveSucceedsIfTypedArray()
     {
         $this->resolver->setDefault('foo', null);
-        $this->resolver->setAllowedTypes('foo', ['null', 'DateTime[]']);
+        $this->resolver->setAllowedTypes('foo', ['null', 'DateTimeImmutable[]']);
 
         $data = [
             'foo' => [
-                new \DateTime(),
-                new \DateTime(),
+                new \DateTimeImmutable(),
+                new \DateTimeImmutable(),
             ],
         ];
         $result = $this->resolver->resolve($data);
@@ -2265,9 +2252,7 @@ class OptionsResolverTest extends TestCase
         });
         // defined by subclass
         $this->resolver->setNormalizer('foo', function (Options $options, $resolvedValue) {
-            if (null === $resolvedValue['bar']) {
-                $resolvedValue['bar'] = 'baz';
-            }
+            $resolvedValue['bar'] ??= 'baz';
 
             return $resolvedValue;
         });
@@ -2480,31 +2465,18 @@ class OptionsResolverTest extends TestCase
     public function testInfoOnInvalidValue()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "expires" with value DateTime is invalid. Info: A future date time.');
+        $this->expectExceptionMessage('The option "expires" with value DateTimeImmutable is invalid. Info: A future date time.');
 
         $this->resolver
             ->setRequired('expires')
             ->setInfo('expires', 'A future date time')
-            ->setAllowedTypes('expires', \DateTime::class)
+            ->setAllowedTypes('expires', \DateTimeImmutable::class)
             ->setAllowedValues('expires', static function ($value) {
-                return $value >= new \DateTime('now');
+                return $value >= new \DateTimeImmutable('now');
             })
         ;
 
-        $this->resolver->resolve(['expires' => new \DateTime('-1 hour')]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/options-resolver 5.1: The signature of method "Symfony\Component\OptionsResolver\OptionsResolver::setDeprecated()" requires 2 new arguments: "string $package, string $version", not defining them is deprecated.');
-
-        $this->resolver
-            ->setDefined('foo')
-            ->setDeprecated('foo')
-        ;
+        $this->resolver->resolve(['expires' => new \DateTimeImmutable('-1 hour')]);
     }
 
     public function testInvalidValueForPrototypeDefinition()

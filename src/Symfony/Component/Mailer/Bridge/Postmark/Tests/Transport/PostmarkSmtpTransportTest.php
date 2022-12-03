@@ -28,7 +28,6 @@ class PostmarkSmtpTransportTest extends TestCase
 
         $transport = new PostmarkSmtpTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkSmtpTransport::class, 'addPostmarkHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(2, $email->getHeaders()->toArray());
@@ -47,7 +46,6 @@ class PostmarkSmtpTransportTest extends TestCase
 
         $transport = new PostmarkSmtpTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkSmtpTransport::class, 'addPostmarkHeaders');
-        $method->setAccessible(true);
         $method->invoke($transport, $email);
 
         $this->assertCount(6, $email->getHeaders()->toArray());
@@ -67,7 +65,6 @@ class PostmarkSmtpTransportTest extends TestCase
 
         $transport = new PostmarkSmtpTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(PostmarkSmtpTransport::class, 'addPostmarkHeaders');
-        $method->setAccessible(true);
 
         $this->expectException(TransportException::class);
 

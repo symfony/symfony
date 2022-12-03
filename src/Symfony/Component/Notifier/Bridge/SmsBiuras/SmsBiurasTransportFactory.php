@@ -14,17 +14,13 @@ namespace Symfony\Component\Notifier\Bridge\SmsBiuras;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Vasilij Duško <vasilij@prado.lt>
  */
 final class SmsBiurasTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return SmsBiurasTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): SmsBiurasTransport
     {
         $scheme = $dsn->getScheme();
 
@@ -35,7 +31,7 @@ final class SmsBiurasTransportFactory extends AbstractTransportFactory
         $uid = $this->getUser($dsn);
         $apiKey = $this->getPassword($dsn);
         $from = $dsn->getRequiredOption('from');
-        $testMode = filter_var($dsn->getOption('test_mode', false), \FILTER_VALIDATE_BOOLEAN);
+        $testMode = filter_var($dsn->getOption('test_mode', false), \FILTER_VALIDATE_BOOL);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

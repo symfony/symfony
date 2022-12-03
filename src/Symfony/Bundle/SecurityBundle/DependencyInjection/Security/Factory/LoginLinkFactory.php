@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 /**
  * @internal
  */
-class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryInterface
+class LoginLinkFactory extends AbstractFactory
 {
     public const PRIORITY = -20;
 
@@ -147,30 +147,5 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
     public function getPriority(): int
     {
         return self::PRIORITY;
-    }
-
-    public function getPosition(): string
-    {
-        return 'form';
-    }
-
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function getListenerId(): string
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
-    }
-
-    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId): ?string
-    {
-        throw new \Exception('The old authentication system is not supported with login_link.');
     }
 }

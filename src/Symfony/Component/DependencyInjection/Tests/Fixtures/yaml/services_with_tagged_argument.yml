@@ -8,24 +8,32 @@ services:
         class: Foo
         tags:
             - foo
+    baz_service:
+        class: Baz
+        tags:
+            - foo
+    qux_service:
+        class: Qux
+        tags:
+            - foo
     foo_service_tagged_iterator:
         class: Bar
         arguments: [!tagged_iterator { tag: foo, index_by: barfoo, default_index_method: foobar, default_priority_method: getPriority }]
+    foo2_service_tagged_iterator:
+        class: Bar
+        arguments: [!tagged_iterator { tag: foo, exclude: baz }]
+    foo3_service_tagged_iterator:
+        class: Bar
+        arguments: [!tagged_iterator { tag: foo, exclude: [baz, qux] }]
     foo_service_tagged_locator:
         class: Bar
         arguments: [!tagged_locator { tag: foo, index_by: barfoo, default_index_method: foobar, default_priority_method: getPriority }]
+    foo2_service_tagged_locator:
+        class: Bar
+        arguments: [!tagged_locator { tag: foo, exclude: baz }]
+    foo3_service_tagged_locator:
+        class: Bar
+        arguments: [!tagged_locator { tag: foo, exclude: [baz, qux] }]
     bar_service_tagged_locator:
         class: Bar
         arguments: [!tagged_locator foo]
-    Psr\Container\ContainerInterface:
-        alias: service_container
-        deprecated:
-            package: symfony/dependency-injection
-            version: 5.1
-            message: The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.
-    Symfony\Component\DependencyInjection\ContainerInterface:
-        alias: service_container
-        deprecated:
-            package: symfony/dependency-injection
-            version: 5.1
-            message: The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.

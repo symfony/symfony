@@ -68,9 +68,6 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         $this->release();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquire(): bool
     {
         try {
@@ -82,7 +79,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
             $this->logger->debug('Successfully acquired the "{resource}" semaphore.', ['resource' => $this->key]);
 
             return true;
-        } catch (SemaphoreAcquiringException $e) {
+        } catch (SemaphoreAcquiringException) {
             $this->logger->notice('Failed to acquire the "{resource}" semaphore. Someone else already acquired the semaphore.', ['resource' => $this->key]);
 
             return false;
@@ -93,15 +90,9 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refresh(float $ttlInSecond = null)
     {
-        if (null === $ttlInSecond) {
-            $ttlInSecond = $this->ttlInSecond;
-        }
-        if (!$ttlInSecond) {
+        if (!$ttlInSecond ??= $this->ttlInSecond) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
         }
 
@@ -125,17 +116,11 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAcquired(): bool
     {
         return $this->dirty = $this->store->exists($this->key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function release()
     {
         try {
@@ -150,17 +135,11 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isExpired(): bool
     {
         return $this->key->isExpired();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRemainingLifetime(): ?float
     {
         return $this->key->getRemainingLifetime();

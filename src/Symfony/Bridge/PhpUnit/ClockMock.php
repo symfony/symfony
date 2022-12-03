@@ -90,6 +90,19 @@ class ClockMock
         return \gmdate($format, $timestamp);
     }
 
+    public static function hrtime($asNumber = false)
+    {
+        $ns = (self::$now - (int) self::$now) * 1000000000;
+
+        if ($asNumber) {
+            $number = sprintf('%d%d', (int) self::$now, $ns);
+
+            return \PHP_INT_SIZE === 8 ? (int) $number : (float) $number;
+        }
+
+        return [(int) self::$now, (int) $ns];
+    }
+
     public static function register($class)
     {
         $self = static::class;
@@ -136,6 +149,11 @@ function date(\$format, \$timestamp = null)
 function gmdate(\$format, \$timestamp = null)
 {
     return \\$self::gmdate(\$format, \$timestamp);
+}
+
+function hrtime(\$asNumber = false)
+{
+    return \\$self::hrtime(\$asNumber);
 }
 EOPHP
             );

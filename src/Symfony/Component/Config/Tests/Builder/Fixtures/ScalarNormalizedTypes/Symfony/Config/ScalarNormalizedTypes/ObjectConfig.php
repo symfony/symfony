@@ -20,7 +20,7 @@ class ObjectConfig
      * @param ParamConfigurator|bool $value
      * @return $this
      */
-    public function enabled($value): self
+    public function enabled($value): static
     {
         $this->_usedProperties['enabled'] = true;
         $this->enabled = $value;
@@ -33,7 +33,7 @@ class ObjectConfig
      * @param ParamConfigurator|mixed $value
      * @return $this
      */
-    public function dateFormat($value): self
+    public function dateFormat($value): static
     {
         $this->_usedProperties['dateFormat'] = true;
         $this->dateFormat = $value;
@@ -46,7 +46,7 @@ class ObjectConfig
      * @param ParamConfigurator|bool $value
      * @return $this
      */
-    public function removeUsedContextFields($value): self
+    public function removeUsedContextFields($value): static
     {
         $this->_usedProperties['removeUsedContextFields'] = true;
         $this->removeUsedContextFields = $value;

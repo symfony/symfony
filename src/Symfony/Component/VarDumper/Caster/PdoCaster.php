@@ -76,7 +76,7 @@ class PdoCaster
                 if ($v && isset($v[$attr[$k]])) {
                     $attr[$k] = new ConstStub($v[$attr[$k]], $attr[$k]);
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
         if (isset($attr[$k = 'STATEMENT_CLASS'][1])) {

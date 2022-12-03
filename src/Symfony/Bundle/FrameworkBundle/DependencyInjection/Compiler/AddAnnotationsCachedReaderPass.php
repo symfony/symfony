@@ -20,9 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AddAnnotationsCachedReaderPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         // "annotations.cached_reader" is wired late so that any passes using

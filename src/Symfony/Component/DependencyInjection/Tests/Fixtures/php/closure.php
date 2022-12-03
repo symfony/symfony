@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'closure' => 'getClosureService',
@@ -48,8 +50,8 @@ class ProjectServiceContainer extends Container
      *
      * @return \Closure
      */
-    protected function getClosureService()
+    protected static function getClosureService($container)
     {
-        return $this->services['closure'] = (new \stdClass())->__invoke(...);
+        return $container->services['closure'] = (new \stdClass())->__invoke(...);
     }
 }

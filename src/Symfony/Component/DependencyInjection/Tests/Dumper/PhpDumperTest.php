@@ -1243,6 +1243,7 @@ class PhpDumperTest extends TestCase
 %A
     private function getDynamicParameter(string $name)
     {
+        $container = $this;
         $value = match ($name) {
             'unit_enum' => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
             'enum_array' => [

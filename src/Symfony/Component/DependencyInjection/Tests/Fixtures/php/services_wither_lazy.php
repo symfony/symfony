@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Service_Wither_Lazy extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'wither' => 'getWitherService',
@@ -53,10 +55,12 @@ class Symfony_DI_PhpDumper_Service_Wither_Lazy extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Compiler\Wither
      */
-    protected function getWitherService($lazyLoad = true)
+    protected static function getWitherService($container, $lazyLoad = true)
     {
+        $containerRef = $container->ref;
+
         if (true === $lazyLoad) {
-            return $this->services['wither'] = $this->createProxy('WitherProxy94fa281', fn () => \WitherProxy94fa281::createLazyProxy(fn () => $this->getWitherService(false)));
+            return $container->services['wither'] = $container->createProxy('WitherProxy94fa281', static fn () => \WitherProxy94fa281::createLazyProxy(static fn () => self::getWitherService($containerRef->get(), false)));
         }
 
         $instance = new \Symfony\Component\DependencyInjection\Tests\Compiler\Wither();

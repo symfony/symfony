@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -53,9 +55,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        return $this->services['bar'] = new \stdClass((isset($this->factories['service_container']['foo']) ? $this->factories['service_container']['foo']() : $this->getFooService()));
+        return $container->services['bar'] = new \stdClass((isset($container->factories['service_container']['foo']) ? $container->factories['service_container']['foo']($container) : self::getFooService($container)));
     }
 
     /**
@@ -63,9 +65,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getFooService($lazyLoad = true)
+    protected static function getFooService($container, $lazyLoad = true)
     {
-        $this->factories['service_container']['foo'] ??= $this->getFooService(...);
+        $containerRef = $container->ref;
+
+        $container->factories['service_container']['foo'] ??= self::getFooService(...);
 
         // lazy factory for stdClass
 

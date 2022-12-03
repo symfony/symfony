@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'foo' => 'getFooService',
@@ -43,9 +45,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Foo
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
-        return $this->services['foo'] = new \Foo();
+        return $container->services['foo'] = new \Foo();
     }
 
     /**
@@ -53,10 +55,14 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getServiceClosureService()
+    protected static function getServiceClosureService($container)
     {
-        return $this->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] function () {
-            return ($this->services['foo'] ??= new \Foo());
+        $containerRef = $container->ref;
+
+        return $container->services['service_closure'] = new \Bar(#[\Closure(name: 'foo', class: 'Foo')] static function () use ($containerRef) {
+            $container = $containerRef->get();
+
+            return ($container->services['foo'] ??= new \Foo());
         });
     }
 
@@ -65,9 +71,13 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getServiceClosureInvalidService()
+    protected static function getServiceClosureInvalidService($container)
     {
-        return $this->services['service_closure_invalid'] = new \Bar(function () {
+        $containerRef = $container->ref;
+
+        return $container->services['service_closure_invalid'] = new \Bar(static function () use ($containerRef) {
+            $container = $containerRef->get();
+
             return NULL;
         });
     }

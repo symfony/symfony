@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'App\\Bus' => 'getBusService',
@@ -53,13 +55,13 @@ class ProjectServiceContainer extends Container
      *
      * @return \App\Bus
      */
-    protected function getBusService()
+    protected static function getBusService($container)
     {
-        $a = ($this->services['App\\Db'] ?? $this->getDbService());
+        $a = ($container->services['App\\Db'] ?? self::getDbService($container));
 
-        $this->services['App\\Bus'] = $instance = new \App\Bus($a);
+        $container->services['App\\Bus'] = $instance = new \App\Bus($a);
 
-        $b = ($this->privates['App\\Schema'] ?? $this->getSchemaService());
+        $b = ($container->privates['App\\Schema'] ?? self::getSchemaService($container));
         $c = new \App\Registry();
         $c->processor = [0 => $a, 1 => $instance];
 
@@ -76,11 +78,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \App\Db
      */
-    protected function getDbService()
+    protected static function getDbService($container)
     {
-        $this->services['App\\Db'] = $instance = new \App\Db();
+        $container->services['App\\Db'] = $instance = new \App\Db();
 
-        $instance->schema = ($this->privates['App\\Schema'] ?? $this->getSchemaService());
+        $instance->schema = ($container->privates['App\\Schema'] ?? self::getSchemaService($container));
 
         return $instance;
     }
@@ -90,14 +92,14 @@ class ProjectServiceContainer extends Container
      *
      * @return \App\Schema
      */
-    protected function getSchemaService()
+    protected static function getSchemaService($container)
     {
-        $a = ($this->services['App\\Db'] ?? $this->getDbService());
+        $a = ($container->services['App\\Db'] ?? self::getDbService($container));
 
-        if (isset($this->privates['App\\Schema'])) {
-            return $this->privates['App\\Schema'];
+        if (isset($container->privates['App\\Schema'])) {
+            return $container->privates['App\\Schema'];
         }
 
-        return $this->privates['App\\Schema'] = new \App\Schema($a);
+        return $container->privates['App\\Schema'] = new \App\Schema($a);
     }
 }

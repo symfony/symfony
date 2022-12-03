@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -44,9 +46,9 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        return $this->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar($this->getEnv('QUZ'));
+        return $container->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar($container->getEnv('QUZ'));
     }
 
     /**
@@ -54,9 +56,9 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      *
      * @return object A %env(FOO)% instance
      */
-    protected function getTestService()
+    protected static function getTestService($container)
     {
-        return $this->services['test'] = new ${($_ = $this->getEnv('FOO')) && false ?: "_"}($this->getEnv('Bar'), 'foo'.$this->getEnv('string:FOO').'baz', $this->getEnv('int:Baz'));
+        return $container->services['test'] = new ${($_ = $container->getEnv('FOO')) && false ?: "_"}($container->getEnv('Bar'), 'foo'.$container->getEnv('string:FOO').'baz', $container->getEnv('int:Baz'));
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
@@ -104,11 +106,12 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
+        $container = $this;
         $value = match ($name) {
-            'bar' => $this->getEnv('FOO'),
-            'baz' => $this->getEnv('int:Baz'),
-            'json' => $this->getEnv('json:file:json_file'),
-            'db_dsn' => $this->getEnv('resolve:DB'),
+            'bar' => $container->getEnv('FOO'),
+            'baz' => $container->getEnv('int:Baz'),
+            'json' => $container->getEnv('json:file:json_file'),
+            'db_dsn' => $container->getEnv('resolve:DB'),
             default => throw new ParameterNotFoundException($name),
         };
         $this->loadedDynamicParameters[$name] = true;

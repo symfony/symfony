@@ -69,7 +69,7 @@ final class LazyServiceDumper implements DumperInterface
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= sprintf(' $this->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
+            $instantiation .= sprintf(' $container->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
         }
 
         $asGhostObject = str_contains($factoryCode, '$proxy');
@@ -78,22 +78,18 @@ final class LazyServiceDumper implements DumperInterface
         if (!$asGhostObject) {
             return <<<EOF
                     if (true === \$lazyLoad) {
-                        $instantiation \$this->createProxy('$proxyClass', fn () => \\$proxyClass::createLazyProxy(fn () => $factoryCode));
+                        $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::createLazyProxy(static fn () => $factoryCode));
                     }
 
 
             EOF;
         }
 
-        if (preg_match('/^\$this->\w++\(\$proxy\)$/', $factoryCode)) {
-            $factoryCode = substr_replace($factoryCode, '(...)', -8);
-        } else {
-            $factoryCode = sprintf('fn ($proxy) => %s', $factoryCode);
-        }
+        $factoryCode = sprintf('static fn ($proxy) => %s', $factoryCode);
 
         return <<<EOF
                 if (true === \$lazyLoad) {
-                    $instantiation \$this->createProxy('$proxyClass', fn () => \\$proxyClass::createLazyGhost($factoryCode));
+                    $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::createLazyGhost($factoryCode));
                 }
 
 

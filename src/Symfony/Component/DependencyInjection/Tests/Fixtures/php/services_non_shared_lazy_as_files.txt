@@ -19,10 +19,12 @@ class getNonSharedFooService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->factories['non_shared_foo'] ??= fn () => self::do($container);
+        $containerRef = $container->ref;
+
+        $container->factories['non_shared_foo'] ??= self::do(...);
 
         if (true === $lazyLoad) {
-            return $container->createProxy('FooLazyClassGhostF814e3a', fn () => \FooLazyClassGhostF814e3a::createLazyGhost(fn ($proxy) => self::do($container, $proxy)));
+            return $container->createProxy('FooLazyClassGhostF814e3a', static fn () => \FooLazyClassGhostF814e3a::createLazyGhost(static fn ($proxy) => self::do($containerRef->get(), $proxy)));
         }
 
         static $include = true;
@@ -79,9 +81,11 @@ class ProjectServiceContainer extends Container
     protected $targetDir;
     protected $parameters = [];
     private $buildParameters;
+    protected readonly \WeakReference $ref;
 
     public function __construct(array $buildParameters = [], $containerDir = __DIR__)
     {
+        $this->ref = \WeakReference::create($this);
         $this->buildParameters = $buildParameters;
         $this->containerDir = $containerDir;
         $this->targetDir = \dirname($containerDir);

@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Service_WitherStaticReturnType extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'wither' => 'getWitherService',
@@ -48,13 +50,13 @@ class Symfony_DI_PhpDumper_Service_WitherStaticReturnType extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType
      */
-    protected function getWitherService()
+    protected static function getWitherService($container)
     {
         $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType();
 
         $a = new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo();
 
-        $this->services['wither'] = $instance = $instance->withFoo($a);
+        $container->services['wither'] = $instance = $instance->withFoo($a);
         $instance->setFoo($a);
 
         return $instance;

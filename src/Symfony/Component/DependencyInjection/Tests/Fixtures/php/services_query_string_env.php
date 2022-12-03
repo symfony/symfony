@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_QueryStringParameters extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -77,8 +79,9 @@ class Symfony_DI_PhpDumper_Test_QueryStringParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
+        $container = $this;
         $value = match ($name) {
-            'hello' => $this->getEnv('query_string:foo'),
+            'hello' => $container->getEnv('query_string:foo'),
             default => throw new ParameterNotFoundException($name),
         };
         $this->loadedDynamicParameters[$name] = true;

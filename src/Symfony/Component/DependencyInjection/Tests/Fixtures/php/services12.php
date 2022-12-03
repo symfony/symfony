@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -43,9 +45,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getTestService()
+    protected static function getTestService($container)
     {
-        return $this->services['test'] = new \stdClass(('file://'.\dirname(__DIR__, 1)), [('file://'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
+        return $container->services['test'] = new \stdClass(('file://'.\dirname(__DIR__, 1)), [('file://'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null

@@ -53,7 +53,7 @@ class ProxyDumper implements DumperInterface
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= sprintf(' $this->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
+            $instantiation .= sprintf(' $container->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
         }
 
         $proxifiedClass = new \ReflectionClass($this->proxyGenerator->getProxifiedClass($definition));
@@ -61,8 +61,9 @@ class ProxyDumper implements DumperInterface
 
         return <<<EOF
         if (true === \$lazyLoad) {
-            $instantiation \$this->createProxy('$proxyClass', function () {
-                return \\$proxyClass::staticProxyConstructor(function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
+            $instantiation \$container->createProxy('$proxyClass', static function () use (\$containerRef) {
+                return \\$proxyClass::staticProxyConstructor(static function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$containerRef) {
+                    \$container = \$containerRef->get();
                     \$wrappedInstance = $factoryCode;
 
                     \$proxy->setProxyInitializer(null);

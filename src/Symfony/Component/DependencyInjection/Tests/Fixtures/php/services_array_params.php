@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -43,11 +45,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \BarClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        $this->services['bar'] = $instance = new \BarClass();
+        $container->services['bar'] = $instance = new \BarClass();
 
-        $instance->setBaz($this->parameters['array_1'], $this->parameters['array_2'], '%array_1%', $this->parameters['array_1']);
+        $instance->setBaz($container->parameters['array_1'], $container->parameters['array_2'], '%array_1%', $container->parameters['array_1']);
 
         return $instance;
     }

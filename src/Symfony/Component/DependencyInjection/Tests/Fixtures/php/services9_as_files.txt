@@ -39,7 +39,7 @@ class getBAR2Service extends ProjectServiceContainer
     {
         $container->services['BAR'] = $instance = new \stdClass();
 
-        $instance->bar = ($container->services['bar'] ?? $container->getBarService());
+        $instance->bar = ($container->services['bar'] ?? self::getBarService($container));
 
         return $instance;
     }
@@ -281,7 +281,7 @@ class getFooService extends ProjectServiceContainer
         $instance->foo = 'bar';
         $instance->moo = $a;
         $instance->qux = ['bar' => 'foo is bar', 'foobar' => 'bar'];
-        $instance->setBar(($container->services['bar'] ?? $container->getBarService()));
+        $instance->setBar(($container->services['bar'] ?? self::getBarService($container)));
         $instance->initialize();
         sc_configure($instance);
 
@@ -319,11 +319,11 @@ class getFooBarService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->factories['foo_bar'] = function () use ($container) {
+        $container->factories['foo_bar'] = static function ($container) {
             return new \Bar\FooClass(($container->services['deprecated_service'] ?? $container->load('getDeprecatedServiceService')));
         };
 
-        return $container->factories['foo_bar']();
+        return $container->factories['foo_bar']($container);
     }
 }
 
@@ -361,10 +361,14 @@ class getLazyContextService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () use ($container) {
+        $containerRef = $container->ref;
+
+        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(static function () use ($containerRef) {
+            $container = $containerRef->get();
+
             yield 'k1' => ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
             yield 'k2' => $container;
-        }, 2), new RewindableGenerator(function () use ($container) {
+        }, 2), new RewindableGenerator(static function () {
             return new \EmptyIterator();
         }, 0));
     }
@@ -381,9 +385,13 @@ class getLazyContextIgnoreInvalidRefService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () use ($container) {
+        $containerRef = $container->ref;
+
+        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(static function () use ($containerRef) {
+            $container = $containerRef->get();
+
             yield 0 => ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
-        }, 1), new RewindableGenerator(function () use ($container) {
+        }, 1), new RewindableGenerator(static function () {
             return new \EmptyIterator();
         }, 0));
     }
@@ -447,11 +455,11 @@ class getNonSharedFooService extends ProjectServiceContainer
     {
         include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
-        $container->factories['non_shared_foo'] = function () use ($container) {
+        $container->factories['non_shared_foo'] = static function ($container) {
             return new \Bar\FooClass();
         };
 
-        return $container->factories['non_shared_foo']();
+        return $container->factories['non_shared_foo']($container);
     }
 }
 
@@ -511,7 +519,11 @@ class getTaggedIteratorService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () use ($container) {
+        $containerRef = $container->ref;
+
+        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(static function () use ($containerRef) {
+            $container = $containerRef->get();
+
             yield 0 => ($container->services['foo'] ?? $container->load('getFooService'));
             yield 1 => ($container->privates['tagged_iterator_foo'] ??= new \Bar());
         }, 2));
@@ -555,9 +567,11 @@ class ProjectServiceContainer extends Container
     protected $targetDir;
     protected $parameters = [];
     private $buildParameters;
+    protected readonly \WeakReference $ref;
 
     public function __construct(array $buildParameters = [], $containerDir = __DIR__)
     {
+        $this->ref = \WeakReference::create($this);
         $this->buildParameters = $buildParameters;
         $this->containerDir = $containerDir;
         $this->targetDir = \dirname($containerDir);
@@ -643,11 +657,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        $a = ($this->services['foo.baz'] ?? $this->load('getFoo_BazService'));
+        $a = ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
 
-        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
+        $container->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $container->getParameter('foo_bar'));
 
         $a->configure($instance);
 

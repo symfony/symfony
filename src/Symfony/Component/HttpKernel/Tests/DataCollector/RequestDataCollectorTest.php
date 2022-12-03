@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -33,8 +32,25 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Tests\Fixtures\DataCollector\DummyController;
 
-class RequestDataCollectorTest extends TestCase
+class SubRequestDataCollectorTest extends AbstractRequestDataCollectorTest
 {
+    public function subControllerMethod($name, $callable, $expected)
+    {
+        $c = new RequestDataCollector();
+        $request = $this->createRequest();
+        $response = $this->createResponse();
+        $this->injectController($c, $callable, $request);
+        $c->collect($request, $response);
+        $c->lateCollect();
+
+        $this->assertSame($expected, $c->getController()->getValue(true), sprintf('Testing: %s', $name));
+    }
+}
+
+class RequestDataCollectorTest extends SubRequestDataCollectorTest
+{
+    use SubRequestDataCollectorTrait;
+
     public function testCollect()
     {
         $c = new RequestDataCollector();
@@ -100,6 +116,12 @@ class RequestDataCollectorTest extends TestCase
         $r1 = new \ReflectionMethod($controller, 'regularCallable');
         $r2 = new \ReflectionMethod($controller, 'staticControllerMethod');
         $r3 = new \ReflectionClass($controller);
+        $r4 = new \ReflectionMethod($controller, 'inheritedControllerMethod');
+        $r5 = new \ReflectionClass(AbstractRequestDataCollectorTest::class);
+        $r6 = new \ReflectionMethod($controller, 'subControllerMethod');
+        $r7 = new \ReflectionClass(SubRequestDataCollectorTest::class);
+        $r8 = new \ReflectionMethod($controller, 'traitControllerMethod');
+        $r9 = new \ReflectionClass(SubRequestDataCollectorTrait::class);
 
         // test name, callable, expected
         return [
@@ -111,6 +133,48 @@ class RequestDataCollectorTest extends TestCase
                     'method' => 'regularCallable',
                     'file' => $r1->getFileName(),
                     'line' => $r1->getStartLine(),
+                ],
+            ],
+
+            [
+                'Trait callable',
+                [$controller, 'traitControllerMethod'],
+                [
+                    'class' => self::class,
+                    'method' => 'traitControllerMethod',
+                    'file' => $r9->getFileName(),
+                    'line' => $r8->getStartLine(),
+                    'methodClass' => self::class,
+                    'classFile' => __FILE__,
+                    'classLine' => $r3->getStartLine(),
+                ],
+            ],
+
+            [
+                'Inherited callable',
+                [$controller, 'inheritedControllerMethod'],
+                [
+                    'class' => self::class,
+                    'method' => 'inheritedControllerMethod',
+                    'file' => $r5->getFileName(),
+                    'line' => $r4->getStartLine(),
+                    'methodClass' => AbstractRequestDataCollectorTest::class,
+                    'classFile' => __FILE__,
+                    'classLine' => $r3->getStartLine(),
+                ],
+            ],
+
+            [
+                'Inherited same file callable',
+                [$controller, 'subControllerMethod'],
+                [
+                    'class' => self::class,
+                    'method' => 'subControllerMethod',
+                    'file' => $r7->getFileName(),
+                    'line' => $r6->getStartLine(),
+                    'methodClass' => SubRequestDataCollectorTest::class,
+                    'classFile' => __FILE__,
+                    'classLine' => $r3->getStartLine(),
                 ],
             ],
 

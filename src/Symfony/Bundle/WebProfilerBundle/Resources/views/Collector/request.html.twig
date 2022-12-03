@@ -415,7 +415,18 @@
     {% if controller.class is defined -%}
         {%- if method|default(false) %}<span class="sf-toolbar-status sf-toolbar-redirection-method">{{ method }}</span>{% endif -%}
         {%- set link = controller.file|file_link(controller.line) %}
-        {%- if link %}<a href="{{ link }}" title="{{ controller.class }}">{% else %}<span title="{{ controller.class }}">{% endif %}
+
+        {%- if controller.classFile is defined and controller.method %}
+            {%- set classLink = controller.classFile|file_link(controller.classLine) %}
+            <a href="{{ classLink }}" title="{{ controller.class }}">
+                {{- controller.class|abbr_class|striptags -}}
+            </a>
+            ::
+            <a href="{{ link }}" title="{{ controller.methodClass }}::{{ controller.method }}">
+                {{ controller.method }}
+            </a>
+        {%- else -%}
+            {%- if link %}<a href="{{ link }}" title="{{ controller.class }}">{% else %}<span title="{{ controller.class }}">{% endif %}
 
             {%- if route|default(false) -%}
                 @{{ route }}
@@ -424,7 +435,8 @@
                 {{- controller.method ? ' :: ' ~ controller.method -}}
             {%- endif -%}
 
-        {%- if link %}</a>{% else %}</span>{% endif %}
+            {%- if link %}</a>{% else %}</span>{% endif %}
+        {% endif -%}
     {%- else -%}
         <span>{{ route|default(controller) }}</span>
     {%- endif %}

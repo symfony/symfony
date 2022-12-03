@@ -471,14 +471,23 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         if (\is_array($controller)) {
             try {
+                $rc = new \ReflectionClass($controller[0]);
                 $r = new \ReflectionMethod($controller[0], $controller[1]);
 
-                return [
+                $data = [
                     'class' => \is_object($controller[0]) ? get_debug_type($controller[0]) : $controller[0],
                     'method' => $controller[1],
                     'file' => $r->getFileName(),
                     'line' => $r->getStartLine(),
                 ];
+
+                if ($r->class !== $rc->name || $r->getFileName() !== $rc->getFileName()) {
+                    $data['methodClass'] = $r->class;
+                    $data['classFile'] = $rc->getFileName();
+                    $data['classLine'] = $rc->getStartLine();
+                }
+
+                return $data;
             } catch (\ReflectionException) {
                 if (\is_callable($controller)) {
                     // using __call or  __callStatic

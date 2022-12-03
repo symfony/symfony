@@ -33,7 +33,7 @@ class Blank extends Constraint
      */
     protected static $errorNames = self::ERROR_NAMES;
 
-    public $message = 'This value should be blank.';
+    public string $message = 'This value should be blank.';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, mixed $payload = null)
     {

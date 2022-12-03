@@ -12,7 +12,7 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
+use Symfony\Component\VarExporter\Internal\LazyObjectState;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildMagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildTestClass;
@@ -28,7 +28,7 @@ class LazyGhostTraitTest extends TestCase
             $ghost->__construct();
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
         $this->assertSame(-4, $instance->public);
         $this->assertSame(4, $instance->publicReadonly);
     }
@@ -50,7 +50,7 @@ class LazyGhostTraitTest extends TestCase
             $ghost->__construct();
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
         $this->assertTrue(isset($instance->public));
         $this->assertSame(4, $instance->publicReadonly);
     }
@@ -61,7 +61,7 @@ class LazyGhostTraitTest extends TestCase
             $ghost->__construct();
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
         unset($instance->public);
         $this->assertFalse(isset($instance->public));
         $this->assertSame(4, $instance->publicReadonly);
@@ -73,7 +73,7 @@ class LazyGhostTraitTest extends TestCase
             $ghost->__construct();
         });
 
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
         $instance->public = 12;
         $this->assertSame(12, $instance->public);
         $this->assertSame(4, $instance->publicReadonly);
@@ -100,8 +100,8 @@ class LazyGhostTraitTest extends TestCase
         $clone = clone $instance;
 
         $this->assertNotSame((array) $instance, (array) $clone);
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $clone));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $clone));
 
         $clone = clone $clone;
         $this->assertTrue($clone->resetLazyObject());
@@ -114,12 +114,12 @@ class LazyGhostTraitTest extends TestCase
         });
 
         $serialized = serialize($instance);
-        $this->assertStringNotContainsString('lazyObjectId', $serialized);
+        $this->assertStringNotContainsString('lazyObjectState', $serialized);
 
         $clone = unserialize($serialized);
         $expected = (array) $instance;
-        $this->assertArrayHasKey("\0".TestClass::class."\0lazyObjectId", $expected);
-        unset($expected["\0".TestClass::class."\0lazyObjectId"]);
+        $this->assertArrayHasKey("\0".TestClass::class."\0lazyObjectState", $expected);
+        unset($expected["\0".TestClass::class."\0lazyObjectState"]);
         $this->assertSame(array_keys($expected), array_keys((array) $clone));
         $this->assertFalse($clone->resetLazyObject());
         $this->assertTrue($clone->isLazyObjectInitialized());
@@ -154,29 +154,6 @@ class LazyGhostTraitTest extends TestCase
         yield [ChildMagicClass::createLazyGhost(function (ChildMagicClass $instance) {
             $instance->__construct();
         })];
-    }
-
-    public function testDestruct()
-    {
-        $registryCount = \count(LazyObjectRegistry::$states);
-        $destructCounter = MagicClass::$destructCounter;
-
-        $instance = ChildMagicClass::createLazyGhost(function (ChildMagicClass $instance) {
-            $instance->__construct();
-        });
-
-        unset($instance);
-        $this->assertSame($destructCounter, MagicClass::$destructCounter);
-
-        $instance = ChildMagicClass::createLazyGhost(function (ChildMagicClass $instance) {
-            $instance->__construct();
-        });
-        $instance->initializeLazyObject();
-        unset($instance);
-
-        $this->assertSame(1 + $destructCounter, MagicClass::$destructCounter);
-
-        $this->assertCount($registryCount, LazyObjectRegistry::$states);
     }
 
     public function testResetLazyGhost()
@@ -244,12 +221,12 @@ class LazyGhostTraitTest extends TestCase
             'dummyProperty' => fn () => 123,
         ]);
 
-        $this->assertSame(["\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
+        $this->assertSame(["\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
         $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertSame(123, $instance->public);
         $this->assertFalse($instance->isLazyObjectInitialized());
         $this->assertTrue($instance->isLazyObjectInitialized(true));
-        $this->assertSame(['public', "\0".TestClass::class."\0lazyObjectId"], array_keys((array) $instance));
+        $this->assertSame(['public', "\0".TestClass::class."\0lazyObjectState"], array_keys((array) $instance));
         $this->assertSame(1, $counter);
 
         $instance->initializeLazyObject();
@@ -258,8 +235,8 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(6, $counter);
 
         $properties = (array) $instance;
-        $this->assertIsInt($properties["\0".TestClass::class."\0lazyObjectId"]);
-        unset($properties["\0".TestClass::class."\0lazyObjectId"]);
+        $this->assertInstanceOf(LazyObjectState::class, $properties["\0".TestClass::class."\0lazyObjectState"]);
+        unset($properties["\0".TestClass::class."\0lazyObjectState"]);
         $this->assertSame(array_keys((array) new ChildTestClass()), array_keys($properties));
         $this->assertSame([123, 345, 456, 567, 234, 678], array_values($properties));
     }

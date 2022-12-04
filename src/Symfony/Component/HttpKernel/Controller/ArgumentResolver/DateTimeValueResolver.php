@@ -39,9 +39,10 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $value = $request->attributes->get($argument->getName());
+        $class = \DateTimeInterface::class === $argument->getType() ? \DateTimeImmutable::class : $argument->getType();
 
         if ($value instanceof \DateTimeInterface) {
-            yield $value;
+            yield $value instanceof $class ? $value : $class::createFromInterface($value);
 
             return;
         }
@@ -52,7 +53,6 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface
             return;
         }
 
-        $class = \DateTimeInterface::class === $argument->getType() ? \DateTimeImmutable::class : $argument->getType();
         $format = null;
 
         if ($attributes = $argument->getAttributes(MapDateTime::class, ArgumentMetadata::IS_INSTANCEOF)) {

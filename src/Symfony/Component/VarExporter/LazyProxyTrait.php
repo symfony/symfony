@@ -18,7 +18,7 @@ use Symfony\Component\VarExporter\Internal\LazyObjectState;
 
 trait LazyProxyTrait
 {
-    private int $lazyObjectId;
+    private LazyObjectState $lazyObjectState;
     private object $lazyObjectReal;
 
     /**
@@ -29,14 +29,13 @@ trait LazyProxyTrait
     public static function createLazyProxy(\Closure $initializer, self $instance = null): static
     {
         if (self::class !== $class = $instance ? $instance::class : static::class) {
-            $skippedProperties = ["\0".self::class."\0lazyObjectId" => true];
+            $skippedProperties = ["\0".self::class."\0lazyObjectState" => true];
         } elseif (\defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
             Hydrator::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
         }
 
         $instance ??= (Registry::$classReflectors[$class] ??= new \ReflectionClass($class))->newInstanceWithoutConstructor();
-        $instance->lazyObjectId = $id = spl_object_id($instance);
-        Registry::$states[$id] = new LazyObjectState($initializer);
+        $instance->lazyObjectState = new LazyObjectState($initializer);
 
         foreach (Registry::$classResetters[$class] ??= Registry::getClassResetters($class) as $reset) {
             $reset($instance, $skippedProperties ??= []);
@@ -52,7 +51,7 @@ trait LazyProxyTrait
      */
     public function isLazyObjectInitialized(bool $partial = false): bool
     {
-        if (0 >= ($this->lazyObjectId ?? 0)) {
+        if (!isset($this->lazyObjectState) || Registry::$noInitializerState === $this->lazyObjectState) {
             return true;
         }
 
@@ -76,7 +75,7 @@ trait LazyProxyTrait
      */
     public function resetLazyObject(): bool
     {
-        if (0 >= ($this->lazyObjectId ?? 0)) {
+        if (!isset($this->lazyObjectState) || Registry::$noInitializerState === $this->lazyObjectState) {
             return false;
         }
 
@@ -97,10 +96,9 @@ trait LazyProxyTrait
             $scope = Registry::getScope($propertyScopes, $class, $name);
 
             if (null === $scope || isset($propertyScopes["\0$scope\0$name"])) {
-                if (isset($this->lazyObjectId)) {
+                if ($state = $this->lazyObjectState ?? null) {
                     if ('lazyObjectReal' === $name && self::class === $scope) {
-                        $state = Registry::$states[$this->lazyObjectId] ?? null;
-                        $this->lazyObjectReal = $state ? ($state->initializer)() : null;
+                        $this->lazyObjectReal = ($state->initializer)();
 
                         return $this->lazyObjectReal;
                     }
@@ -155,7 +153,7 @@ trait LazyProxyTrait
             $scope = Registry::getScope($propertyScopes, $class, $name, $readonlyScope);
 
             if ($readonlyScope === $scope || isset($propertyScopes["\0$scope\0$name"])) {
-                if (isset($this->lazyObjectId)) {
+                if (isset($this->lazyObjectState)) {
                     if ('lazyObjectReal' === $name && self::class === $scope) {
                         $this->lazyObjectReal = $value;
 
@@ -197,9 +195,9 @@ trait LazyProxyTrait
             $scope = Registry::getScope($propertyScopes, $class, $name);
 
             if (null === $scope || isset($propertyScopes["\0$scope\0$name"])) {
-                if (isset($this->lazyObjectId)) {
+                if (isset($this->lazyObjectState)) {
                     if ('lazyObjectReal' === $name && self::class === $scope) {
-                        $state = Registry::$states[$this->lazyObjectId] ?? null;
+                        $state = $this->lazyObjectState ?? null;
 
                         return null !== $this->lazyObjectReal = $state ? ($state->initializer)() : null;
                     }
@@ -237,7 +235,7 @@ trait LazyProxyTrait
             $scope = Registry::getScope($propertyScopes, $class, $name, $readonlyScope);
 
             if ($readonlyScope === $scope || isset($propertyScopes["\0$scope\0$name"])) {
-                if (isset($this->lazyObjectId)) {
+                if (isset($this->lazyObjectState)) {
                     if ('lazyObjectReal' === $name && self::class === $scope) {
                         unset($this->lazyObjectReal);
 
@@ -271,7 +269,7 @@ trait LazyProxyTrait
 
     public function __clone(): void
     {
-        if (!isset($this->lazyObjectId)) {
+        if (!isset($this->lazyObjectState)) {
             if ((Registry::$parentMethods[self::class] ??= Registry::getParentMethods(self::class))['clone']) {
                 parent::__clone();
             }
@@ -282,8 +280,8 @@ trait LazyProxyTrait
         if (\array_key_exists("\0".self::class."\0lazyObjectReal", (array) $this)) {
             $this->lazyObjectReal = clone $this->lazyObjectReal;
         }
-        if ($state = Registry::$states[$this->lazyObjectId] ?? null) {
-            Registry::$states[$this->lazyObjectId = spl_object_id($this)] = clone $state;
+        if ($state = $this->lazyObjectState ?? null) {
+            $this->lazyObjectState = clone $state;
         }
     }
 
@@ -296,7 +294,7 @@ trait LazyProxyTrait
         } else {
             $properties = (array) $this;
         }
-        unset($properties["\0$class\0lazyObjectId"]);
+        unset($properties["\0$class\0lazyObjectState"]);
 
         if (isset($this->lazyObjectReal) || Registry::$parentMethods[$class]['serialize'] || !Registry::$parentMethods[$class]['sleep']) {
             return $properties;
@@ -332,8 +330,7 @@ trait LazyProxyTrait
             } else {
                 $this->lazyObjectReal = $data["\0$class\0lazyObjectReal"];
             }
-            Registry::$states[-1] ??= new LazyObjectState(static fn () => throw new \LogicException('Lazy proxy has no initializer.'));
-            $this->lazyObjectId = -1;
+            $this->lazyObjectState = Registry::$noInitializerState ??= new LazyObjectState(static fn () => throw new \LogicException('Lazy proxy has no initializer.'));
         } elseif ((Registry::$parentMethods[$class] ??= Registry::getParentMethods($class))['unserialize']) {
             parent::__unserialize($data);
         } else {
@@ -347,11 +344,7 @@ trait LazyProxyTrait
 
     public function __destruct()
     {
-        if (isset($this->lazyObjectId)) {
-            if (0 < $this->lazyObjectId) {
-                unset(Registry::$states[$this->lazyObjectId]);
-            }
-
+        if (isset($this->lazyObjectState)) {
             return;
         }
 

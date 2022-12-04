@@ -765,7 +765,7 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
         $dumper->setProxyDumper(new NullDumper());
 
-        $message = 'Circular reference detected for service "foo", path: "foo -> bar -> foo". Try running "composer require symfony/proxy-manager-bridge".';
+        $message = 'Circular reference detected for service "foo", path: "foo -> bar -> foo".';
         $this->expectException(ServiceCircularReferenceException::class);
         $this->expectExceptionMessage($message);
 

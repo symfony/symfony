@@ -193,6 +193,37 @@ JSON;
         $transport->send(new ChatMessage('testMessage', $options));
     }
 
+    public function testSendWithOptionToAnswerCallbackQuery()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $content = <<<JSON
+            {
+                "ok": true,
+                "result": true
+            }
+JSON;
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content)
+        ;
+
+        $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
+            $this->assertStringEndsWith('/answerCallbackQuery', $url);
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+        $options = (new TelegramOptions())->answerCallbackQuery('123', true, 1);
+
+        $transport->send(new ChatMessage('testMessage', $options));
+    }
+
     public function testSendWithChannelOverride()
     {
         $channelOverride = 'channelOverride';

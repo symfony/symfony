@@ -253,10 +253,6 @@
         {% if has_trace %}
             {% set trace_id = 'trace-' ~ category ~ '-' ~ log_index %}
             <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ trace_id }}" data-toggle-alt-content="Hide trace">Show trace</button></span>
-
-            <div id="{{ trace_id }}" class="context sf-toggle-content sf-toggle-hidden">
-                {{ profiler_dump(log.context.exception.trace, maxDepth=1) }}
-            </div>
         {% endif %}
 
         {% if has_context %}

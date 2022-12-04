@@ -43,6 +43,8 @@ use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
+use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
+use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
@@ -56,6 +58,7 @@ use Symfony\Component\Notifier\Bridge\SmsFactor\SmsFactorTransportFactory;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
+use Symfony\Component\Notifier\Bridge\Termii\TermiiTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransportFactory;
@@ -105,6 +108,8 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             OctopushTransportFactory::class => false,
             OneSignalTransportFactory::class => false,
             OvhCloudTransportFactory::class => false,
+            PlivoTransportFactory::class => false,
+            RingCentralTransportFactory::class => false,
             RocketChatTransportFactory::class => false,
             SendberryTransportFactory::class => false,
             SendinblueTransportFactory::class => false,
@@ -118,6 +123,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             SpotHitTransportFactory::class => false,
             TelegramTransportFactory::class => false,
             TelnyxTransportFactory::class => false,
+            TermiiTransportFactory::class => false,
             TurboSmsTransportFactory::class => false,
             TwilioTransportFactory::class => false,
             TwitterTransportFactory::class => false,

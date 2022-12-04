@@ -100,6 +100,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\LightSms\LightSmsTransportFactory::class,
             'package' => 'symfony/light-sms-notifier',
         ],
+        'linenotify' => [
+            'class' => Bridge\LineNotify\LineNotifyTransportFactory::class,
+            'package' => 'symfony/line-notify-notifier',
+        ],
         'linkedin' => [
             'class' => Bridge\LinkedIn\LinkedInTransportFactory::class,
             'package' => 'symfony/linked-in-notifier',

@@ -29,7 +29,6 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
@@ -168,15 +167,7 @@ class PhpDumper extends Dumper
 
         if ($this->getProxyDumper() instanceof NullDumper) {
             (new AnalyzeServiceReferencesPass(true, false))->process($this->container);
-            try {
-                (new CheckCircularReferencesPass())->process($this->container);
-            } catch (ServiceCircularReferenceException $e) {
-                $path = $e->getPath();
-                end($path);
-                $path[key($path)] .= '". Try running "composer require symfony/proxy-manager-bridge';
-
-                throw new ServiceCircularReferenceException($e->getServiceId(), $path);
-            }
+            (new CheckCircularReferencesPass())->process($this->container);
         }
 
         $this->analyzeReferences();

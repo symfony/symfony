@@ -97,6 +97,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory as InfobipMailerTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
@@ -395,7 +396,7 @@ class FrameworkExtension extends Extension
         if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
 
-            if (!class_exists(MailerTestCommand::class)) {
+            if (!class_exists(MailerTestCommand::class) || !$this->hasConsole()) {
                 $container->removeDefinition('console.command.mailer_test');
             }
         }
@@ -2457,7 +2458,7 @@ class FrameworkExtension extends Extension
 
         $classToServices = [
             GmailTransportFactory::class => 'mailer.transport_factory.gmail',
-            InfobipTransportFactory::class => 'mailer.transport_factory.infobip',
+            InfobipMailerTransportFactory::class => 'mailer.transport_factory.infobip',
             MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
             MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
             MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',

@@ -235,9 +235,11 @@ class UuidValidator extends ConstraintValidator
 
         // Check version
         if (!\in_array($value[self::STRICT_VERSION_POSITION], $constraint->versions)) {
+            $code = Uuid::TIME_BASED_VERSIONS === $constraint->versions ? Uuid::INVALID_TIME_BASED_VERSION_ERROR : Uuid::INVALID_VERSION_ERROR;
+
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Uuid::INVALID_VERSION_ERROR)
+                ->setCode($code)
                 ->addViolation();
         }
 

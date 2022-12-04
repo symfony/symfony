@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DateTimeValueResolverTest extends TestCase
 {
-    private $defaultTimezone;
+    private readonly string $defaultTimezone;
 
     protected function setUp(): void
     {
@@ -32,11 +32,18 @@ class DateTimeValueResolverTest extends TestCase
         date_default_timezone_set($this->defaultTimezone);
     }
 
-    public function getTimeZones()
+    public static function getTimeZones()
     {
         yield ['UTC'];
         yield ['Etc/GMT+9'];
         yield ['Etc/GMT-14'];
+    }
+
+    public static function getClasses()
+    {
+        yield [\DateTimeInterface::class];
+        yield [\DateTime::class];
+        yield [FooDateTime::class];
     }
 
     /**
@@ -137,17 +144,23 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertSame($timezone, $results[0]->getTimezone()->getName(), 'Default timezone');
     }
 
-    public function testPreviouslyConvertedAttribute()
+    /**
+     * @param class-string<\DateTimeInterface> $class
+     *
+     * @dataProvider getClasses
+     */
+    public function testPreviouslyConvertedAttribute(string $class)
     {
         $resolver = new DateTimeValueResolver();
 
-        $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null, true);
+        $argument = new ArgumentMetadata('dummy', $class, false, false, null, true);
         $request = self::requestWithAttributes(['dummy' => $datetime = new \DateTimeImmutable()]);
 
         $results = $resolver->resolve($request, $argument);
 
         $this->assertCount(1, $results);
-        $this->assertSame($datetime, $results[0]);
+        $this->assertEquals($datetime, $results[0], 'The value is the same, but the class can be modified.');
+        $this->assertInstanceOf($class, $results[0]);
     }
 
     public function testCustomClass()
@@ -205,7 +218,7 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertEquals('2016-09-08 12:34:56', $results[0]->format('Y-m-d H:i:s'));
     }
 
-    public function provideInvalidDates()
+    public static function provideInvalidDates()
     {
         return [
             'invalid date' => [

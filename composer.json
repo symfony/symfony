@@ -157,7 +157,7 @@
         "egulias/email-validator": "~3.0.0",
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<5.2",
-        "phpdocumentor/type-resolver": "<1.5.1",
+        "phpdocumentor/type-resolver": "<1.5.1|>=1.7.0",
         "phpunit/phpunit": "<5.4.3"
     },
     "config": {

@@ -32,6 +32,7 @@ use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Isendpro\IsendproTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
@@ -97,6 +98,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             IqsmsTransportFactory::class => false,
             IsendproTransportFactory::class => false,
             LightSmsTransportFactory::class => false,
+            LineNotifyTransportFactory::class => false,
             LinkedInTransportFactory::class => false,
             MailjetTransportFactory::class => false,
             MattermostTransportFactory::class => false,
@@ -167,6 +169,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['iqsms', 'symfony/iqsms-notifier'];
         yield ['isendpro', 'symfony/isendpro-notifier'];
         yield ['lightsms', 'symfony/light-sms-notifier'];
+        yield ['linenotify', 'symfony/line-notify-notifier'];
         yield ['linkedin', 'symfony/linked-in-notifier'];
         yield ['mailjet', 'symfony/mailjet-notifier'];
         yield ['mattermost', 'symfony/mattermost-notifier'];

@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-25T14:11:51Z
+
+What if one gets a `ParameterBag(Interface)` injected directly? Should it throw a generic error when trying to access any param starting with a dot?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-09-25T14:49:59Z
+
+@chalasr I thought about adding some logic in the `FrozenParameterBag`.
+I didn't because:
+- with the current implementation, when the container is dumped, the bag is created without the build parameters already (see https://github.com/symfony/symfony/blob/6.2/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php#L1567)
+- when injecting `ContainerBagInterface` or `ParameterBagInterface` or `Psr\Container\ContainerInterface $parameterBag` one actually gets the dumped container under the hood, so unless I'm missing something, it's covered already
+- I'm not sure we want to add complexity to handle throwing when the container is compiled but not dumped, waiting for some feedback about this.
+ Also it would cause problem when the dumper gets the frozen bag as it would get such exception while trying to dump parameter values.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-09-25T15:02:13Z
+
+@HeahDude Makes sense, thanks. That could be done later if needed anyways
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-09-26T16:31:24Z
+
+>The next step will likely be to find a way to help the community move from public params to private ones. Here is an idea: when both 'foo' and '.foo' exist, we could consider that this means that using 'foo' at runtime is deprecated. This might help bundles adopt private params.
+
+>And another step could be to find a way to completely deprecate a parameter. An idea: params starting-and-ending with a ~ would mean that: get('foo') would lookup for get('~foo~') and trigger a deprecation. That'd work with private and public params of course.
+
+Before working on this, my intention was to work on deprecating parameters (https://symfony-devs.slack.com/archives/C8WHX21K7/p1663341791619939), so I definitely agree that this should be the next step for another PR :).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-09-26T16:38:16Z
+
+I like this idea too 👍🏼 I proposed that [8 years ago](https://github.com/symfony/symfony/issues/11881#issuecomment-56247459) 👼🏼
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-18T10:10:08Z
+
+I just force-pushed on your fork some changes, see second commit.
+Can you please add some tests to cover the new pass, in a dedicated test class?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-24T15:30:50Z
+
+On top of my message against convention based functionality in the other PR, I just learned that a *service* starting with a `.` makes it a hidden service (which only means that `debug:container` won't list it).
+Are we sure we want to have the same convention, but for other functionality for parameters and services?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-24T15:41:07Z
+
+We're wondering about how to achieve built-time parameters [since years](https://github.com/symfony/symfony/pull/47680#issuecomment-1258324066) and this is the best and only actionable idea we've had. I like it a lot personnaly: simple and effective.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-05T11:58:18Z
+
+Any other vote @symfony/mergers ? I'd like to merge this before #48469 to prevent merge conflicts.

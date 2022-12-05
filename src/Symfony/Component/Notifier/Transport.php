@@ -81,6 +81,7 @@ final class Transport
         Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
         Bridge\Smsc\SmscTransportFactory::class,
         Bridge\SmsFactor\SmsFactorTransportFactory::class,
+        Bridge\Smsmode\SmsmodeTransportFactory::class,
         Bridge\SpotHit\SpotHitTransportFactory::class,
         Bridge\Telegram\TelegramTransportFactory::class,
         Bridge\Telnyx\TelnyxTransportFactory::class,

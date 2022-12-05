@@ -2752,6 +2752,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\SmsBiuras\SmsBiurasTransportFactory::class => 'notifier.transport_factory.sms-biuras',
             NotifierBridge\Smsc\SmscTransportFactory::class => 'notifier.transport_factory.smsc',
             NotifierBridge\SmsFactor\SmsFactorTransportFactory::class => 'notifier.transport_factory.sms-factor',
+            NotifierBridge\Smsmode\SmsmodeTransportFactory::class => 'notifier.transport_factory.smsmode',
             NotifierBridge\SpotHit\SpotHitTransportFactory::class => 'notifier.transport_factory.spot-hit',
             NotifierBridge\Telegram\TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             NotifierBridge\Telnyx\TelnyxTransportFactory::class => 'notifier.transport_factory.telnyx',

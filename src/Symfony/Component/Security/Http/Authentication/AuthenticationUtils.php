@@ -56,7 +56,13 @@ class AuthenticationUtils
             return $request->attributes->get(Security::LAST_USERNAME, '');
         }
 
-        return $request->hasSession() ? $request->getSession()->get(Security::LAST_USERNAME, '') : '';
+        if (!$request->hasSession()) {
+            return '';
+        }
+
+        $lastUsername = $request->getSession()->get(Security::LAST_USERNAME, '');
+
+        return \is_string($lastUsername) ? $lastUsername : '';
     }
 
     /**

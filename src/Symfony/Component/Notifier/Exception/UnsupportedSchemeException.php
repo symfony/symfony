@@ -184,6 +184,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sendinblue\SendinblueTransportFactory::class,
             'package' => 'symfony/sendinblue-notifier',
         ],
+        'simpletextin' => [
+            'class' => Bridge\SimpleTextin\SimpleTextinTransportFactory::class,
+            'package' => 'symfony/simple-textin-notifier',
+        ],
         'sinch' => [
             'class' => Bridge\Sinch\SinchTransportFactory::class,
             'package' => 'symfony/sinch-notifier',

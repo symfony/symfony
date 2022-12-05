@@ -47,6 +47,7 @@ use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
+use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
@@ -117,6 +118,7 @@ final class Transport
         RocketChatTransportFactory::class,
         SendberryTransportFactory::class,
         SendinblueTransportFactory::class,
+        SimpleTextinTransportFactory::class,
         SinchTransportFactory::class,
         SlackTransportFactory::class,
         Sms77TransportFactory::class,

@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-03T16:13:17Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by qdequippe at 2022-11-03T16:47:50Z
+
+I will check also like you did @nicolas-grekas in TwitterOptions to upload medias using https://docs.joinmastodon.org/methods/statuses/media/
+
+---------------------------------------------------------------------------
+
+by qdequippe at 2022-11-04T08:22:12Z
+
+@OskarStark PRs open!
+
+https://github.com/symfony/symfony-docs/pull/17411
+https://github.com/symfony/recipes/pull/1141
+
+Regards
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-04T11:20:05Z
+
+We need to wait until `6.3` branch is created
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-11-04T19:30:56Z
+
+Thanks for this PR!
+
+One key feature of Mastodon is that it is decentralized and supports the ActivityPub open standard (https://docs.joinmastodon.org/spec/activitypub/), so I wonder if we shouldn't use the ActivityPub API they provide instead of the "custom" endpoint.
+
+This would allow the Notifier component to support any app from the Fediverse (WriteFreely, Pleroma, PixelFed, WordPress with the ActivityPub plugin...) and even Symfony apps supporting ActivityPub through [API Platform ActivityPub](https://github.com/api-platform/activity-pub).
+
+The request to do looks like this: https://www.w3.org/TR/activitypub/#create-activity-outbox
+
+The only issue is for images. ActivityPub expects the image to be already hosted somewhere or to use an extension to upload it: https://www.w3.org/wiki/SocialCG/ActivityPub/MediaUpload
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-04T20:02:11Z
+
+I think we can do both :)
+
+---------------------------------------------------------------------------
+
+by qdequippe at 2022-11-04T20:52:12Z
+
+Really cool :)
+Maybe an "option" in DSN? In this PR?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-12-05T10:07:40Z
+
+Build should be green after another rebase @nicolas-grekas, I fixed a failing test in line notifier 👍🏻

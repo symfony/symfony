@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add caster for `WeakMap`
+
 6.2
 ---
 

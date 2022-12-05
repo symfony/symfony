@@ -213,6 +213,26 @@ Symfony\Component\VarDumper\Tests\Caster\BadSplFileInfo {
 EOTXT;
         $this->assertDumpEquals($expected, $var);
     }
+
+    public function testWeakMap()
+    {
+        $var = new \WeakMap();
+        $obj = new \stdClass();
+        $var[$obj] = 123;
+
+        $expected = <<<EOTXT
+            WeakMap {
+              map: array:1 [
+                0 => {
+                  object: {}
+                  data: 123
+                }
+              ]
+            }
+            EOTXT;
+
+        $this->assertDumpEquals($expected, $var);
+    }
 }
 
 class MyArrayIterator extends \ArrayIterator

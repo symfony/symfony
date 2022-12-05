@@ -56,7 +56,7 @@ class RedirectController
      */
     public function redirectAction(Request $request, string $route, bool $permanent = false, $ignoreAttributes = false, bool $keepRequestMethod = false, bool $keepQueryParams = false): Response
     {
-        if ('' == $route) {
+        if (!$route || ctype_space($route)) {
             throw new HttpException($permanent ? 410 : 404);
         }
 
@@ -109,7 +109,7 @@ class RedirectController
      */
     public function urlRedirectAction(Request $request, string $path, bool $permanent = false, string $scheme = null, int $httpPort = null, int $httpsPort = null, bool $keepRequestMethod = false): Response
     {
-        if ('' == $path) {
+        if (!$path || ctype_space($path)) {
             throw new HttpException($permanent ? 410 : 404);
         }
 

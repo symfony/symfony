@@ -58,6 +58,21 @@ class RedirectControllerTest extends TestCase
         } catch (HttpException $e) {
             $this->assertSame(404, $e->getStatusCode());
         }
+
+        try {
+            $controller->redirectAction($request, '  ', true);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(410, $e->getStatusCode());
+        }
+
+        $request = new Request([], [], ['_route_params' => ['route' => '  ', 'permanent' => false]]);
+        try {
+            $controller($request);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(404, $e->getStatusCode());
+        }
     }
 
     /**

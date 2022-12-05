@@ -12,29 +12,29 @@
 namespace Symfony\Bridge\Doctrine\Tests;
 
 use PHPUnit\Framework\TestCase;
+use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManager\Proxy\ValueHolderInterface;
+use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
+use Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper\PhpDumperTest;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\VarExporter\LazyObjectInterface;
 
-class ManagerRegistryTest extends TestCase
+/**
+ * @group legacy
+ */
+class LegacyManagerRegistryTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        $container = new ContainerBuilder();
-
-        $container->register('foo', \stdClass::class)->setPublic(true);
-        $container->getDefinition('foo')->setLazy(true)->addTag('proxy', ['interface' => \stdClass::class]);
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-        eval('?>'.$dumper->dump(['class' => 'LazyServiceDoctrineBridgeContainer']));
+        $test = new PhpDumperTest();
+        $test->testDumpContainerWithProxyServiceWillShareProxies();
     }
 
     public function testResetService()
     {
-        $container = new \LazyServiceDoctrineBridgeContainer();
+        $container = new \LazyServiceProjectServiceContainer();
 
         $registry = new TestManagerRegistry('name', [], ['defaultManager' => 'foo'], 'defaultConnection', 'defaultManager', 'proxyInterfaceName');
         $registry->setTestContainer($container);
@@ -61,10 +61,10 @@ class ManagerRegistryTest extends TestCase
     public function testResetServiceWillNotNestFurtherLazyServicesWithinEachOther()
     {
         // This test scenario only applies to containers composed as a set of generated sources
-        $this->dumpLazyServiceDoctrineBridgeContainerAsFiles();
+        $this->dumpLazyServiceProjectAsFilesServiceContainer();
 
         /** @var ContainerInterface $container */
-        $container = new \LazyServiceDoctrineBridgeContainerAsFiles();
+        $container = new \LazyServiceProjectAsFilesServiceContainer();
 
         $registry = new TestManagerRegistry(
             'irrelevant',
@@ -79,25 +79,27 @@ class ManagerRegistryTest extends TestCase
         $service = $container->get('foo');
 
         self::assertInstanceOf(\stdClass::class, $service);
-        self::assertInstanceOf(LazyObjectInterface::class, $service);
-        self::assertFalse($service->isLazyObjectInitialized());
+        self::assertInstanceOf(LazyLoadingInterface::class, $service);
+        self::assertInstanceOf(ValueHolderInterface::class, $service);
+        self::assertFalse($service->isProxyInitialized());
 
-        $service->initializeLazyObject();
+        $service->initializeProxy();
 
         self::assertTrue($container->initialized('foo'));
-        self::assertTrue($service->isLazyObjectInitialized());
+        self::assertTrue($service->isProxyInitialized());
 
         $registry->resetManager();
-        $service->initializeLazyObject();
+        $service->initializeProxy();
 
-        $wrappedValue = $service->initializeLazyObject();
+        $wrappedValue = $service->getWrappedValueHolderValue();
         self::assertInstanceOf(\stdClass::class, $wrappedValue);
-        self::assertNotInstanceOf(LazyObjectInterface::class, $wrappedValue);
+        self::assertNotInstanceOf(LazyLoadingInterface::class, $wrappedValue);
+        self::assertNotInstanceOf(ValueHolderInterface::class, $wrappedValue);
     }
 
-    private function dumpLazyServiceDoctrineBridgeContainerAsFiles()
+    private function dumpLazyServiceProjectAsFilesServiceContainer()
     {
-        if (class_exists(\LazyServiceDoctrineBridgeContainerAsFiles::class, false)) {
+        if (class_exists(\LazyServiceProjectAsFilesServiceContainer::class, false)) {
             return;
         }
 
@@ -105,8 +107,7 @@ class ManagerRegistryTest extends TestCase
 
         $container->register('foo', \stdClass::class)
             ->setPublic(true)
-            ->setLazy(true)
-            ->addTag('proxy', ['interface' => \stdClass::class]);
+            ->setLazy(true);
         $container->compile();
 
         $fileSystem = new Filesystem();
@@ -117,8 +118,9 @@ class ManagerRegistryTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
+        $dumper->setProxyDumper(new ProxyDumper());
         $containerFiles = $dumper->dump([
-            'class' => 'LazyServiceDoctrineBridgeContainerAsFiles',
+            'class' => 'LazyServiceProjectAsFilesServiceContainer',
             'as_files' => true,
         ]);
 
@@ -129,6 +131,6 @@ class ManagerRegistryTest extends TestCase
             }
         );
 
-        require $temporaryPath.'/LazyServiceDoctrineBridgeContainerAsFiles.php';
+        require $temporaryPath.'/LazyServiceProjectAsFilesServiceContainer.php';
     }
 }

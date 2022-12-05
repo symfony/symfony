@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  * with the ProxyManager bridge.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @group legacy
  */
 class PhpDumperTest extends TestCase
 {

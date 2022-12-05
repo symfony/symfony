@@ -24,6 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * with the ProxyManager bridge.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @group legacy
  */
 class ContainerBuilderTest extends TestCase
 {

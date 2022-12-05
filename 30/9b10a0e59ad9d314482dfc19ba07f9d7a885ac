@@ -1,0 +1,142 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-11-28T15:36:11Z
+
+I wouldn't use this trait myself (given the benefits over a regular constructor parameter is not that significant IMHO) and I think there is no need to rush, better discuss this for 6.3.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-28T15:52:52Z
+
+Now targeting 6.3. About adding a constructor argument for the clock, I think many will find that overkill and will decide to just not make their clock injectable. That just happened to me. Relying on the ambient clock is too convenient to warrant the boilerplate of adding a clock everywhere.
+
+But making it settable through the trait does reduce this design overhead. It provides a DX closer to the current ambient one, without scarifying anything that DI provides (testability/etc).
+
+Note that I'm not saying that everybody should use the trait after this is possibly merged. I'm just proposing a way to reduce the friction of using a clock, thus improving the adoption of the concept.
+
+Another alternative to solve the DX concern would be to provide a global static clock. That's why e.g. Chronos are so convenient to use. But I'm not ready yet to give up to DI :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-11-28T16:48:55Z
+
+As this was discussed in a private chat rather than GitHub, I'll list my feelings about adding a class like this, so everyone can take this in consideration for 6.3 :)
+
+Looking at it from impact on actual code, the approach can be compared as:
+
+<table>
+<tr><td>Current situation</td><td>With trait</td></tr>
+<tr>
+<td>
+
+```diff
+  class Store
+  {
+      public function __construct(
+          // ...
++         private ClockInterface $clock
+      ) {
+      }
+
+      public function isOpen(): bool
+      {
+-         $now = new \DateTimeImmutable();
++         $now = $this->clock->now();
+
+          return $this->openTime > $now && ...;
+      }
+  }
+```
+
+</td>
+<td>
+
+```diff
+  class Store
+  {
++     use ClockAwareTrait;
+
+      public function __construct(
+          // ...
+      ) {
+      }
+
+      public function isOpen(): bool
+      {
+-         $now = new \DateTimeImmutable();
++         $now = $this->now();
+
+          return $this->openTime > $now && ...;
+      }
+  }
+```
+
+</td></tr></table>
+
+I fail to see the actual difference. In my opinion, if the DX on the left side is bad, so would the DX on the right side be.
+
+On a design point of view, the trait *is* contradicting a few things that I consider important. Important enough to at least raise them in this discussion: :wink:
+* The internal API of the object now covers more concerns than the concerns of the object itself with the addition of a `now()`.
+* It advocates the use of setter injection (and the need of `?=`) whereas constructor injection is recommended in these cases.
+* It hides dependencies of this class.
+
+Note that these points are not only important from a design point of view, but also affect cognitive load of the class. Using constructor injection, it is immediately clear by reading a single file (a) who is responsible for providing current time and (b) how to change the clock implementation.
+
+From a Symfony maintainer perspective it is unclear to me what is special about the clock service compared to other services. The only class I recall that comes close to "facade methods" like used here is `AbstractController`, and we've recently became more strict on what facade methods to allow there. If we were to accept a trait like this, would we accept e.g. `EventDispatcherAwareTrait::dispatch()`?
+
+At last, there is nothing wrong with using `new DateTimeImmutable()` in your code. Using any clock/time library instead of `new DateTimeImmutable()` is useful to make your classes easier to test. I feel like education (talks, blog posts, documentation) in how to test time-based logic in much more of a key factor of adaption here than a small bit of boilerplate.
+And the great thing about having 101 libraries doing mostly the same thing: people can decide whether they want the DI-based approach (e.g. symfony/clock) or the global state based approach (e.g. Chronos).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-28T17:02:40Z
+
+Thanks for writing your thoughts.
+
+* About internal API, having a property or a method is the same, in terms of concerns managed by of the object.
+* About setter injection, `#[Required]` makes them just fine, allowing to differentiate instantiation-time methods vs the others. Nothing is hidden, quite the contrary.
+* About `$this->now();` vs ` $this->clock->now();`, people do use `DateTime` instead `DateTimeImmutable` *because* it is boring to type, even with IDE autocompletion.
+* About constructor injection, this is a significant overhead to me, vs doing nothing when using `new DateTimeImmutable` inline. I don't mean from a typing pov, but from a dependency management pov: now, I have another argument to deal with when e.g. refactoring the order of my arguments + all corresponding tests.
+* The setter injection is perfect for the test-ability need: usually do not care, it's not even needed to have DI in place, but in a time-sensitive test case, there is a door to mock the clock. Constructor injection puts this possibility on the front door, while only a side door is needed.
+
+Also, I think using `new DateTimeImmutable` is *not* fine. In our own code bases, I see a weird mix of DateTime, DateTimeInterface and DateTimeImmutable, and that's not really fun to deal with. I'd better have all places use a time factory and make everything consistent and easier to reason about. But if this goes with costly boilerplate, it will never happen.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-11-30T23:54:48Z
+
+I don't like setter injection because it allows to update the service instances after their initialization. This is too risked for side-effects, especially in tests if the DIC is reused between tests (for performances) and the clock is updated on some of them (with a different mocked value).
+
+From @wouterj's example, the clock can easily be optional as last argument of the constructor.
+```diff
+      public function __construct(
+          // ...
+-         private ClockInterface $clock
++         private readonly ClockInterface $clock = new NativeClock()
+      ) {
+      }
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2022-12-01T00:40:33Z
+
+@GromNaN as the trait defines the property as readonly, you can only call the setter once (the second time will get an error from PHP)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-01T03:01:30Z
+
+Oh, good point @stof, the problem I am raising may not exist. The service instance cannot be updated.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-04T22:58:56Z
+
+This trait could be used for changes like https://github.com/symfony/symfony/pull/48098. Would we use it internally?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-05T07:28:54Z
+
+It'd make sense to me yes.

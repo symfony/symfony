@@ -152,6 +152,7 @@ use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory as MailjetNotifierTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mastodon\MastodonTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransport;
@@ -2580,6 +2581,7 @@ class FrameworkExtension extends Extension
             LineNotifyTransportFactory::class => 'notifier.transport_factory.line-notify',
             LinkedInTransportFactory::class => 'notifier.transport_factory.linked-in',
             MailjetNotifierTransportFactory::class => 'notifier.transport_factory.mailjet',
+            MastodonTransportFactory::class => 'notifier.transport_factory.mastodon',
             MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
             MercureTransportFactory::class => 'notifier.transport_factory.mercure',
             MessageBirdTransport::class => 'notifier.transport_factory.message-bird',

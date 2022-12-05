@@ -22,7 +22,6 @@ final class TwitterOptions implements MessageOptionsInterface
     public const REPLY_MENTIONED_USERS = 'mentionedUsers';
     public const REPLY_FOLLOWING = 'following';
 
-
     public function __construct(
         private array $options = [],
     ) {

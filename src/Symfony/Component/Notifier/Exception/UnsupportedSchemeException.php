@@ -112,6 +112,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mailjet\MailjetTransportFactory::class,
             'package' => 'symfony/mailjet-notifier',
         ],
+        'mastodon' => [
+            'class' => Bridge\Mastodon\MastodonTransportFactory::class,
+            'package' => 'symfony/mastodon-notifier',
+        ],
         'mattermost' => [
             'class' => Bridge\Mattermost\MattermostTransportFactory::class,
             'package' => 'symfony/mattermost-notifier',

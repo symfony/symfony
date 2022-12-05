@@ -31,6 +31,7 @@ use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Isendpro\IsendproTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mastodon\MastodonTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
@@ -98,6 +99,7 @@ final class Transport
         IsendproTransportFactory::class,
         LightSmsTransportFactory::class,
         MailjetTransportFactory::class,
+        MastodonTransportFactory::class,
         MattermostTransportFactory::class,
         MessageBirdTransportFactory::class,
         MessageMediaTransportFactory::class,

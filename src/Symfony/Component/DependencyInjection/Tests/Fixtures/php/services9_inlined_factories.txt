@@ -557,8 +557,6 @@ class ProjectServiceContainer extends Container
             'baz_class' => 'BazClass',
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
-            'container.dumper.inline_factories' => true,
-            'container.dumper.inline_class_loader' => true,
         ];
     }
 }

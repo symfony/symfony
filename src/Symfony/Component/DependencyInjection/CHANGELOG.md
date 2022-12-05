@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add options `inline_factories` and `inline_class_loader` to `PhpDumper::dump()`
+ * Deprecate `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`
+ * Add `RemoveBuildParametersPass`, which removes parameters starting with a dot during compilation
+
 6.2
 ---
 

@@ -17,6 +17,7 @@ use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\RemoveBuildParametersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -648,12 +649,37 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         // cache the container
         $dumper = new PhpDumper($container);
 
+        $buildParameters = [];
+        foreach ($container->getCompilerPassConfig()->getPasses() as $pass) {
+            if ($pass instanceof RemoveBuildParametersPass) {
+                $buildParameters = array_merge($buildParameters, $pass->getRemovedParameters());
+            }
+        }
+
+        $inlineFactories = false;
+        if (isset($buildParameters['.container.dumper.inline_factories'])) {
+            $inlineFactories = $buildParameters['.container.dumper.inline_factories'];
+        } elseif ($container->hasParameter('container.dumper.inline_factories')) {
+            trigger_deprecation('symfony/http-kernel', '6.3', 'Parameter "%s" is deprecated, use ".%$1s" instead.', 'container.dumper.inline_factories');
+            $inlineFactories = $container->getParameter('container.dumper.inline_factories');
+        }
+
+        $inlineClassLoader = $this->debug;
+        if (isset($buildParameters['.container.dumper.inline_class_loader'])) {
+            $inlineClassLoader = $buildParameters['.container.dumper.inline_class_loader'];
+        } elseif ($container->hasParameter('container.dumper.inline_class_loader')) {
+            trigger_deprecation('symfony/http-kernel', '6.3', 'Parameter "%s" is deprecated, use ".%$1s" instead.', 'container.dumper.inline_class_loader');
+            $inlineClassLoader = $container->getParameter('container.dumper.inline_class_loader');
+        }
+
         $content = $dumper->dump([
             'class' => $class,
             'base_class' => $baseClass,
             'file' => $cache->getPath(),
             'as_files' => true,
             'debug' => $this->debug,
+            'inline_factories' => $inlineFactories,
+            'inline_class_loader' => $inlineClassLoader,
             'build_time' => $container->hasParameter('kernel.container_build_time') ? $container->getParameter('kernel.container_build_time') : time(),
             'preload_classes' => array_map('get_class', $this->bundles),
         ]);

@@ -143,8 +143,6 @@ class ProjectServiceContainer extends Container
     protected function getDefaultParameters(): array
     {
         return [
-            'container.dumper.inline_factories' => true,
-            'container.dumper.inline_class_loader' => true,
             'lazy_foo_class' => 'Bar\\FooClass',
         ];
     }

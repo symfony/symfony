@@ -222,7 +222,7 @@ class PhpDumperTest extends TestCase
             ->addError('No-no-no-no');
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories' => false, 'inline_class_loader' => false]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -241,7 +241,7 @@ class PhpDumperTest extends TestCase
             ->setPublic(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories' => false, 'inline_class_loader' => false]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -252,8 +252,6 @@ class PhpDumperTest extends TestCase
     public function testDumpAsFilesWithFactoriesInlined()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
-        $container->setParameter('container.dumper.inline_factories', true);
-        $container->setParameter('container.dumper.inline_class_loader', true);
 
         $container->getDefinition('bar')->addTag('hot');
         $container->register('non_shared_foo', \Bar\FooClass::class)
@@ -268,7 +266,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341, 'inline_factories' => true, 'inline_class_loader' => true]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -279,8 +277,6 @@ class PhpDumperTest extends TestCase
     public function testDumpAsFilesWithLazyFactoriesInlined()
     {
         $container = new ContainerBuilder();
-        $container->setParameter('container.dumper.inline_factories', true);
-        $container->setParameter('container.dumper.inline_class_loader', true);
         $container->setParameter('lazy_foo_class', \Bar\FooClass::class);
 
         $container->register('lazy_foo', '%lazy_foo_class%')
@@ -292,7 +288,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341, 'inline_factories' => true, 'inline_class_loader' => true]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -310,7 +306,7 @@ class PhpDumperTest extends TestCase
             ->setLazy(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories' => false, 'inline_class_loader' => false]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -473,7 +469,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php', 'inline_factories' => false, 'inline_class_loader' => false]));
 
         require self::$fixturesPath.'/php/services26.php';
         $container = new \Symfony_DI_PhpDumper_Test_EnvParameters();
@@ -994,7 +990,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false])));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories' => false, 'inline_class_loader' => false])));
     }
 
     public function testExpressionReferencingPrivateService()
@@ -1162,11 +1158,10 @@ class PhpDumperTest extends TestCase
     public function testHotPathOptimizations()
     {
         $container = include self::$fixturesPath.'/containers/container_inline_requires.php';
-        $container->setParameter('inline_requires', true);
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $dump = $dumper->dump(['hot_path_tag' => 'container.hot_path', 'inline_class_loader_parameter' => 'inline_requires', 'file' => self::$fixturesPath.'/php/services_inline_requires.php']);
+        $dump = $dumper->dump(['hot_path_tag' => 'container.hot_path', 'inline_class_loader' => true, 'file' => self::$fixturesPath.'/php/services_inline_requires.php']);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -1199,13 +1194,12 @@ class PhpDumperTest extends TestCase
             new Reference('foo'),
         ]))->setPublic(true);
 
-        $container->setParameter('inline_requires', true);
         $container->compile();
 
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump([
             'class' => 'Symfony_DI_PhpDumper_Test_Object_Class_Name',
-            'inline_class_loader_parameter' => 'inline_requires',
+            'inline_class_loader' => true,
         ]));
 
         $container = new \Symfony_DI_PhpDumper_Test_Object_Class_Name();
@@ -1281,7 +1275,6 @@ PHP
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump([
             'class' => 'Symfony_DI_PhpDumper_Test_UninitializedSyntheticReference',
-            'inline_class_loader_parameter' => 'inline_requires',
         ]));
 
         $container = new \Symfony_DI_PhpDumper_Test_UninitializedSyntheticReference();

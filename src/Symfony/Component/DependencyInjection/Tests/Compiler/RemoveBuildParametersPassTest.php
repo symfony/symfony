@@ -28,6 +28,6 @@ class RemoveBuildParametersPassTest extends TestCase
 
         $this->assertSame('Foo', $builder->getParameter('foo'), '"foo" parameter must be defined.');
         $this->assertFalse($builder->hasParameter('.bar'), '".bar" parameter must be removed.');
-        $this->assertSame(['.bar' => 'Bar'], $pass->getRemovedParameters(), '".baz" parameter must be returned with its value.');
+        $this->assertSame(['.bar' => 'Bar'], $pass->getRemovedParameters(), '".bar" parameter must be returned with its value.');
     }
 }

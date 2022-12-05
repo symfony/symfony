@@ -33,6 +33,7 @@ final class Transport
         Bridge\Bandwidth\BandwidthTransportFactory::class,
         Bridge\Chatwork\ChatworkTransportFactory::class,
         Bridge\Clickatell\ClickatellTransportFactory::class,
+        Bridge\ClickSend\ClickSendTransportFactory::class,
         Bridge\ContactEveryone\ContactEveryoneTransportFactory::class,
         Bridge\Discord\DiscordTransportFactory::class,
         Bridge\Engagespot\EngagespotTransportFactory::class,

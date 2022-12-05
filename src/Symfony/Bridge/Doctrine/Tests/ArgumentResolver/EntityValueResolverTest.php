@@ -373,6 +373,20 @@ class EntityValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
+    public function testAlreadyResolved()
+    {
+        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('arg', new \stdClass());
+
+        $argument = $this->createArgument('stdClass', name: 'arg');
+
+        $this->assertSame([], $resolver->resolve($request, $argument));
+    }
+
     private function createArgument(string $class = null, MapEntity $entity = null, string $name = 'arg', bool $isNullable = false): ArgumentMetadata
     {
         return new ArgumentMetadata($name, $class ?? \stdClass::class, false, false, null, $isNullable, $entity ? [$entity] : []);

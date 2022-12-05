@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\LineNotify\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransport;
-use Symfony\Component\Notifier\Exception\LengthException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -48,16 +47,6 @@ final class LineNotifyTransportTest extends TransportTestCase
         yield [$this->createMock(MessageInterface::class)];
     }
 
-    public function testSendChatMessageWithMoreThan2000CharsThrowsLogicException()
-    {
-        $transport = $this->createTransport();
-
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('The subject length of a Line message must not exceed 1000 characters.');
-
-        $transport->send(new ChatMessage(str_repeat('囍', 1001)));
-    }
-
     public function testSendWithErrorResponseThrows()
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -66,7 +55,7 @@ final class LineNotifyTransportTest extends TransportTestCase
             ->willReturn(400);
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn(json_encode(['message' => 'testDescription', 'code' => 'testErrorCode']));
+            ->willReturn(json_encode(['message' => 'testDescription', 'code' => 'testErrorCode', 'status' => 'testStatus']));
 
         $client = new MockHttpClient(static function () use ($response): ResponseInterface {
             return $response;
@@ -75,7 +64,7 @@ final class LineNotifyTransportTest extends TransportTestCase
         $transport = $this->createTransport($client);
 
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
+        $this->expectExceptionMessageMatches('/testMessage.+testDescription/');
 
         $transport->send(new ChatMessage('testMessage'));
     }

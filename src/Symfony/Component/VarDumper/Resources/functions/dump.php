@@ -19,18 +19,33 @@ if (!function_exists('dump')) {
      */
     function dump(mixed ...$vars): mixed
     {
-        if (!$vars) {
-            VarDumper::dump(new ScalarStub('🐛'));
+        $options = array_filter(
+            $vars,
+            static fn (mixed $key): bool => \in_array($key, VarDumper::AVAILABLE_OPTIONS, true),
+            \ARRAY_FILTER_USE_KEY
+        );
 
-            return null;
-        }
+        $trace = $options['_trace'] ?? null;
+        unset($options['_trace']);
 
         if (array_key_exists(0, $vars) && 1 === count($vars)) {
-            VarDumper::dump($vars[0]);
+            VarDumper::dump($vars[0], null, $options);
             $k = 0;
         } else {
+            $vars = array_filter($vars, static fn (int|string $key) => !str_starts_with($key, '_'), \ARRAY_FILTER_USE_KEY);
+
+            if (!$vars) {
+                VarDumper::dump(new ScalarStub('🐛'), null, $options);
+
+                return null;
+            }
+
             foreach ($vars as $k => $v) {
-                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+                if (array_key_last($vars) === $k) {
+                    $options['_trace'] = $trace;
+                }
+
+                VarDumper::dump($v, is_int($k) ? 1 + $k : $k, $options);
             }
         }
 
@@ -55,11 +70,21 @@ if (!function_exists('dd')) {
             exit(1);
         }
 
+        $options = array_filter(
+            $vars,
+            static fn (mixed $key): bool => \in_array($key, VarDumper::AVAILABLE_OPTIONS, true),
+            \ARRAY_FILTER_USE_KEY
+        );
+
         if (array_key_exists(0, $vars) && 1 === count($vars)) {
-            VarDumper::dump($vars[0]);
+            VarDumper::dump($vars[0], null, $options);
         } else {
             foreach ($vars as $k => $v) {
-                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+                if (str_starts_with($k, '_')) {
+                    continue;
+                }
+
+                VarDumper::dump($v, is_int($k) ? 1 + $k : $k, $options);
             }
         }
 

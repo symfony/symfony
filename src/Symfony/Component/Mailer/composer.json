@@ -33,7 +33,8 @@
     "conflict": {
         "symfony/http-kernel": "<5.4",
         "symfony/messenger": "<6.2",
-        "symfony/mime": "<6.2"
+        "symfony/mime": "<6.2",
+        "symfony/twig-bridge": "<6.2.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\": "" },

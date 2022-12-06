@@ -59,15 +59,13 @@ final class BodyRenderer implements BodyRendererInterface
 
         if ($template = $message->getTextTemplate()) {
             $message->text($this->twig->render($template, $vars));
-            $message->textTemplate(null);
         }
 
         if ($template = $message->getHtmlTemplate()) {
             $message->html($this->twig->render($template, $vars));
-            $message->htmlTemplate(null);
         }
 
-        $message->context([]);
+        $message->markAsRendered();
 
         // if text body is empty, compute one from the HTML body
         if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {

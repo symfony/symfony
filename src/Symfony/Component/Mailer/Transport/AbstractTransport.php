@@ -76,7 +76,7 @@ abstract class AbstractTransport implements TransportInterface
             $envelope = $event->getEnvelope();
             $message = $event->getMessage();
 
-            if ($message instanceof TemplatedEmail && ($message->getTextTemplate() || $message->getHtmlTemplate())) {
+            if ($message instanceof TemplatedEmail && !$message->isRendered()) {
                 throw new LogicException(sprintf('You must configure a "%s" when a "%s" instance has a text or HTML template set.', BodyRendererInterface::class, get_debug_type($message)));
             }
 

@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-06T07:51:19Z
+
+Looking why we forgot that in #46564, I think the correct patch is to add `\\` to the strtr on this line:
+https://github.com/symfony/symfony/blob/6.2/src/Symfony/Component/DependencyInjection/ParameterBag/EnvPlaceholderParameterBag.php#L52

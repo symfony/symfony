@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-12-05T14:30:09Z
+
+@ogizanagi where does this happen to you? On macOS + Chrome or Firefox I see the close button with the right color without having to do this change:
+
+<img width="289" alt="close-button" src="https://user-images.githubusercontent.com/73419/205661898-e27842ef-2e90-4203-978a-34159038d158.png">
+
+And the color is maintained when hovering the mouse pointer:
+
+![close-button-in-action](https://user-images.githubusercontent.com/73419/205661968-620185c4-eb03-403f-b8a7-62bee6306adf.gif)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-12-05T16:24:53Z
+
+@javiereguiluz : It happens to me and a teammate, with Symfony 6.2.0 using on macOS + Chrome 108.0.5359.71, Firefox and Safari as well 🤔
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-12-05T16:27:57Z
+
+It's strange that I don't see this issue when using the same browser + OS.
+
+In any case, your contribution is perfect and it doesn't hurt at all to define the color explicitly. So, let's merge this. Thanks!
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-12-05T16:30:01Z
+
+To complete, here is what shows the Chrome inspector on the `<svg>` element:
+
+![SCR-20221205-o9m](https://user-images.githubusercontent.com/2211145/205689770-5cfcb918-605d-441b-906c-5638ce56824c.png)
+
+![SCR-20221205-o8r](https://user-images.githubusercontent.com/2211145/205689765-e00b4bea-35bd-4799-b7ad-50963d7aef4b.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-12-05T16:58:17Z
+
+Thanks for sharing this. Now I know what happened ... the `app.css` file of my apps apply a `color: inherit` to certain form elements. That's the difference with your app and that's why I couldn't see this issue while working on the redesign 🙈
+
+<img width="551" alt="inspector-svg-element" src="https://user-images.githubusercontent.com/73419/205696435-a7f13002-edde-4027-9f3f-63b67287a4ed.png">

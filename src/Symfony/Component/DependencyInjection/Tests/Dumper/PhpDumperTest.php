@@ -772,24 +772,18 @@ class PhpDumperTest extends TestCase
         $dumper->dump();
     }
 
-    /**
-     * @testWith [false]
-     *           [true]
-     */
-    public function testDedupLazyProxy(bool $asGhostObject)
+    public function testDedupLazyProxy()
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setLazy(true)->setPublic(true);
         $container->register('bar', 'stdClass')->setLazy(true)->setPublic(true);
+        $container->register('baz', 'stdClass')->setLazy(true)->setPublic(true)->setFactory('foo_bar');
+        $container->register('buz', 'stdClass')->setLazy(true)->setPublic(true)->setFactory('foo_bar');
         $container->compile();
 
         $dumper = new PhpDumper($container);
 
-        if (!$asGhostObject) {
-            $dumper->setProxyDumper(new \DummyProxyDumper());
-        }
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dedup_lazy'.($asGhostObject ? '_ghost' : '_proxy').'.php', $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dedup_lazy.php', $dumper->dump());
     }
 
     public function testLazyArgumentProvideGenerator()

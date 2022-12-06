@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-12-06T12:44:32Z
+
+looks like we need to bump the minimum allowed version of `symfony/mime` in the Mailer component

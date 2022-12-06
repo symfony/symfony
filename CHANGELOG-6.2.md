@@ -7,6 +7,25 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.1 (2022-12-06)
+
+ * bug #48502 [DependencyInjection] Fix `ContainerBuilder` stats env usage with enum (alamirault)
+ * bug #48509 [HttpKernel] Fix using entities with the `#[Cache()]` attribute (HypeMC)
+ * bug #48505 [Mailer] Fix rendered templates for notifications (fabpot)
+ * bug #48476 [WebProfilerBundle] Use same color as other icons for the close toolbar btn (ogizanagi)
+ * bug #48483 [DependencyInjection] Remove refs that point to container.excluded services when allowed (nicolas-grekas)
+ * bug #48346 [HttpKernel] In DateTimeValueResolver, convert previously defined date attribute to the expected class (GromNaN)
+ * bug #48450 [WebProfilerBundle] Fix form panel expanders (MatTheCat)
+ * bug #48459 [FrameworkBundle] [Framework] Fix Infobip Mailer transport factory import (gnito-org)
+ * bug #48461 [VarExporter] Fix possible memory-leak when using lazy-objects (nicolas-grekas)
+ * bug #48335 [TwigBridge] Amend `MoneyType` twig to include a space (mogilvie)
+ * bug #48046 [WebProfilerBundle] Remove redundant code from logger template (HypeMC)
+ * bug #48428 Fixed undefined variable error (Kevin Meijer)
+ * bug #48416 [FrameworkBundle] don't register the MailerTestCommand symfony/console is not installed (xabbuh)
+ * bug #48395 [String] Fix AsciiSlugger with emojis (fancyweb)
+ * bug #48385 [Security] Reuse `AbstractFactory`'s config tree in `AccessTokenFactory` (chalasr)
+ * bug #48292 [Security] [LoginLink] Throw InvalidLoginLinkException on missing parameter (MatTheCat)
+
 * 6.2.0 (2022-11-30)
 
  * bug #48395 [String] Fix AsciiSlugger with emojis (fancyweb)

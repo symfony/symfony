@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -170,35 +170,48 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame('86400', $this->response->headers->getCacheControlDirective('stale-if-error'));
     }
 
-    public function testLastModifiedNotModifiedResponse()
+    /**
+     * @testWith ["test.getDate()"]
+     *           ["date"]
+     */
+    public function testLastModifiedNotModifiedResponse(string $expression)
     {
-        $request = $this->createRequest(new Cache(lastModified: 'test.getDate()'));
-        $request->attributes->set('test', new TestEntity());
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(new Cache(lastModified: $expression));
+        $request->attributes->set('date', new \DateTimeImmutable('Fri, 23 Aug 2013 00:00:00 GMT'));
         $request->headers->add(['If-Modified-Since' => 'Fri, 23 Aug 2013 00:00:00 GMT']);
 
         $listener = new CacheAttributeListener();
-        $controllerEvent = new ControllerEvent($this->getKernel(), function () {
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), function (TestEntity $test) {
             return new Response();
-        }, $request, null);
+        }, [$entity], $request, null);
 
-        $listener->onKernelController($controllerEvent);
-        $response = \call_user_func($controllerEvent->getController());
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
+        $response = $controllerArgumentsEvent->getController()($entity);
 
         $this->assertSame(304, $response->getStatusCode());
     }
 
-    public function testLastModifiedHeader()
+    /**
+     * @testWith ["test.getDate()"]
+     *           ["date"]
+     */
+    public function testLastModifiedHeader(string $expression)
     {
-        $request = $this->createRequest(new Cache(lastModified: 'test.getDate()'));
-        $request->attributes->set('test', new TestEntity());
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(new Cache(lastModified: $expression));
+        $request->attributes->set('date', new \DateTimeImmutable('Fri, 23 Aug 2013 00:00:00 GMT'));
 
         $listener = new CacheAttributeListener();
-        $controllerEvent = new ControllerEvent($this->getKernel(), function () {
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), function (TestEntity $test) {
             return new Response();
-        }, $request, null);
-        $listener->onKernelController($controllerEvent);
+        }, [$entity], $request, null);
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
 
-        $responseEvent = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, \call_user_func($controllerEvent->getController()));
+        $controllerResponse = $controllerArgumentsEvent->getController()($entity);
+        $responseEvent = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $controllerResponse);
         $listener->onKernelResponse($responseEvent);
 
         $response = $responseEvent->getResponse();
@@ -208,35 +221,48 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame('Fri, 23 Aug 2013 00:00:00 GMT', $response->headers->get('Last-Modified'));
     }
 
-    public function testEtagNotModifiedResponse()
+    /**
+     * @testWith ["test.getId()"]
+     *           ["id"]
+     */
+    public function testEtagNotModifiedResponse(string $expression)
     {
-        $request = $this->createRequest(new Cache(etag: 'test.getId()'));
-        $request->attributes->set('test', $entity = new TestEntity());
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(new Cache(etag: $expression));
+        $request->attributes->set('id', '12345');
         $request->headers->add(['If-None-Match' => sprintf('"%s"', hash('sha256', $entity->getId()))]);
 
         $listener = new CacheAttributeListener();
-        $controllerEvent = new ControllerEvent($this->getKernel(), function () {
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), function (TestEntity $test) {
             return new Response();
-        }, $request, null);
+        }, [$entity], $request, null);
 
-        $listener->onKernelController($controllerEvent);
-        $response = \call_user_func($controllerEvent->getController());
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
+        $response = $controllerArgumentsEvent->getController()($entity);
 
         $this->assertSame(304, $response->getStatusCode());
     }
 
-    public function testEtagHeader()
+    /**
+     * @testWith ["test.getId()"]
+     *           ["id"]
+     */
+    public function testEtagHeader(string $expression)
     {
-        $request = $this->createRequest(new Cache(etag: 'test.getId()'));
-        $request->attributes->set('test', $entity = new TestEntity());
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(new Cache(etag: $expression));
+        $request->attributes->set('id', '12345');
 
         $listener = new CacheAttributeListener();
-        $controllerEvent = new ControllerEvent($this->getKernel(), function () {
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), function (TestEntity $test) {
             return new Response();
-        }, $request, null);
-        $listener->onKernelController($controllerEvent);
+        }, [$entity], $request, null);
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
 
-        $responseEvent = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, \call_user_func($controllerEvent->getController()));
+        $controllerResponse = $controllerArgumentsEvent->getController()($entity);
+        $responseEvent = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $controllerResponse);
         $listener->onKernelResponse($responseEvent);
 
         $response = $responseEvent->getResponse();
@@ -280,8 +306,8 @@ class CacheAttributeListenerTest extends TestCase
     public function testAttribute()
     {
         $request = new Request();
-        $event = new ControllerEvent($this->getKernel(), [new CacheAttributeController(), 'foo'], $request, null);
-        $this->listener->onKernelController($event);
+        $event = new ControllerArgumentsEvent($this->getKernel(), [new CacheAttributeController(), 'foo'], [], $request, null);
+        $this->listener->onKernelControllerArguments($event);
 
         $response = new Response();
         $event = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $response);
@@ -290,8 +316,8 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame(CacheAttributeController::METHOD_SMAXAGE, $response->getMaxAge());
 
         $request = new Request();
-        $event = new ControllerEvent($this->getKernel(), [new CacheAttributeController(), 'bar'], $request, null);
-        $this->listener->onKernelController($event);
+        $event = new ControllerArgumentsEvent($this->getKernel(), [new CacheAttributeController(), 'bar'], [], $request, null);
+        $this->listener->onKernelControllerArguments($event);
 
         $response = new Response();
         $event = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $response);

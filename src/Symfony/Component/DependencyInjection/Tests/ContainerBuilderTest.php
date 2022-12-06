@@ -51,6 +51,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -543,6 +544,23 @@ class ContainerBuilderTest extends TestCase
         $_ENV['BAR_FOO'] = 'Foo value';
 
         $this->assertEquals('Foo value', $container->get('bar')->foo);
+    }
+
+    public function testGetEnvCountersWithEnum()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $config = new ContainerBuilder($bag);
+        $config->resolveEnvPlaceholders([
+            $bag->get('env(enum:'.StringBackedEnum::class.':foo)'),
+            $bag->get('env(Bar)'),
+        ]);
+
+        $expected = [
+            'enum:Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum:foo' => 1,
+            'Bar' => 1,
+        ];
+
+        $this->assertSame($expected, $config->getEnvCounters());
     }
 
     public function testCreateServiceWithAbstractArgument()

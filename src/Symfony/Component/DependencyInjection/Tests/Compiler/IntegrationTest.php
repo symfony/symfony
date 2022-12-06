@@ -849,7 +849,6 @@ class IntegrationTest extends TestCase
                 $definition->addTag('app.custom_tag', get_object_vars($attribute) + ['class' => $reflector->getName()]);
             }
         );
-        $container->registerForAutoconfiguration(TaggedService1::class)->addTag('app.custom_tag');
 
         $container->register('one', TaggedService1::class)
             ->setPublic(true)

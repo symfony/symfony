@@ -10,7 +10,7 @@ while (!file_exists($vendor.'/vendor')) {
 }
 require $vendor.'/vendor/autoload.php';
 
-dump();
+dump()->dump();
 
 --EXPECT--
 🐛

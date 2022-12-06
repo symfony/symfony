@@ -12,7 +12,9 @@
 namespace Symfony\Component\VarDumper\Cloner;
 
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\BacktraceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
+use Symfony\Component\VarDumper\Dumper\VarDumperOptions;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -275,12 +277,17 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         $cursor->hashType = -1;
         $cursor->attr = $this->context[SourceContextProvider::class] ?? [];
         $label = $this->context['label'] ?? '';
+        $options = $this->context['options'] ?? new VarDumperOptions();
 
         if ($cursor->attr || '' !== $label) {
             $dumper->dumpScalar($cursor, 'label', $label);
         }
         $cursor->hashType = 0;
         $this->dumpItem($dumper, $cursor, $refs, $this->data[$this->position][$this->key]);
+
+        if (false !== $options->get(VarDumperOptions::TRACE) && $cursor->attr = $this->context[BacktraceContextProvider::class] ?? []) {
+            $this->dumpDebugBacktrace($dumper, $cursor);
+        }
     }
 
     /**
@@ -430,5 +437,15 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         $stub->value = $stub->cut + ($stub->position ? \count($this->data[$stub->position]) : 0);
 
         return $stub;
+    }
+
+    private function dumpDebugBacktrace(DumperInterface $dumper, Cursor $cursor): void
+    {
+        $backtrace = $cursor->attr['backtrace'];
+
+        $dumper->dumpScalar($cursor, 'default', '');
+        $dumper->dumpScalar($cursor, 'default', '**DEBUG BACKTRACE**');
+
+        $backtrace->dump($dumper);
     }
 }

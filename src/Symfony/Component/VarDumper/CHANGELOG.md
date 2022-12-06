@@ -8,6 +8,7 @@ CHANGELOG
  * Add support of named arguments to `dd()` and `dump()` to display the argument name
  * Add support for `Relay\Relay`
  * Add display of invisible characters
+ * Add support of options when using `dd()` and `dump()`
 
 6.2
 ---

@@ -21,7 +21,7 @@
         "symfony/dependency-injection": "^5.4|^6.0|^7.0",
         "symfony/http-kernel": "^5.4|^6.0|^7.0",
         "symfony/twig-bridge": "^5.4|^6.0|^7.0",
-        "symfony/var-dumper": "^5.4|^6.0|^7.0"
+        "symfony/var-dumper": "^6.3|^7.0"
     },
     "require-dev": {
         "symfony/config": "^5.4|^6.0|^7.0",

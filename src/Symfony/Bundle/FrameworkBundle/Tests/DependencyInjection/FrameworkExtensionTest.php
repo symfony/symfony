@@ -37,6 +37,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -2057,7 +2058,9 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->markTestSkipped('LocaleSwitcher not available.');
         }
 
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('full', compile: false);
+        $container->addCompilerPass(new ResolveTaggedIteratorArgumentPass());
+        $container->compile();
 
         $this->assertTrue($container->has('translation.locale_switcher'));
 
@@ -2067,6 +2070,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(TaggedIteratorArgument::class, $switcherDef->getArgument(1));
         $this->assertSame('kernel.locale_aware', $switcherDef->getArgument(1)->getTag());
         $this->assertEquals(new Reference('router.request_context', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $switcherDef->getArgument(2));
+
+        $localeAwareServices = array_map(fn (Reference $r) => (string) $r, $switcherDef->getArgument(1)->getValues());
+
+        $this->assertNotContains('translation.locale_switcher', $localeAwareServices);
     }
 
     public function testHtmlSanitizer()

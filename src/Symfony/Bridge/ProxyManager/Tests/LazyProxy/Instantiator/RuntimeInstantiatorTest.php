@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Definition;
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @group legacy
  */
 class RuntimeInstantiatorTest extends TestCase
 {

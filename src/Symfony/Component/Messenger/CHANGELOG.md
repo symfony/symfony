@@ -4,6 +4,7 @@ CHANGELOG
 6.3
 ---
 
+ * Add support for namespace wildcards in the HandlersLocator to allow routing multiple messages within the same namespace
  * Deprecate `Symfony\Component\Messenger\Transport\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and

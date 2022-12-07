@@ -1061,6 +1061,13 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessengerInvalidTransportRouting()
     {
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Invalid Messenger routing configuration: invalid namespace "Symfony\*\DummyMessage" wildcard.');
+        $this->createContainerFromFile('messenger_routing_invalid_wildcard');
+    }
+
+    public function testMessengerInvalidWildcardRouting()
+    {
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
         $this->createContainerFromFile('messenger_routing_invalid_transport');
     }

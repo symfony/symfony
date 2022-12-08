@@ -23,10 +23,10 @@
     "require": {
         "php": ">=8.1",
         "symfony/http-client": "^5.4|^6.0",
-        "symfony/notifier": "^6.2",
-        "symfony/event-dispatcher-contracts": "^2|^3"
+        "symfony/notifier": "^6.2"
     },
     "require-dev": {
+        "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/mailer": "^5.4|^6.0",
         "psr/log": "^1|^2|^3"
     },

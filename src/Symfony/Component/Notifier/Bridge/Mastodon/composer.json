@@ -21,6 +21,7 @@
         "symfony/notifier": "^6.2"
     },
     "require-dev": {
+        "symfony/event-dispatcher": "^5.4|^6.0",,
         "symfony/mime": "^6.2"
     },
     "autoload": {

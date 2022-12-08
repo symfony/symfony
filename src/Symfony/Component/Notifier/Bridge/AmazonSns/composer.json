@@ -21,6 +21,9 @@
         "symfony/notifier": "^6.2",
         "async-aws/sns": "^1.0"
     },
+    "require-dev": {
+        "symfony/event-dispatcher": "^5.4|^6.0"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\AmazonSns\\": "" },
         "exclude-from-classmap": [

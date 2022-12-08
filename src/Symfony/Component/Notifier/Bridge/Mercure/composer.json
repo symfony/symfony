@@ -21,6 +21,9 @@
         "symfony/notifier": "^6.2",
         "symfony/service-contracts": "^1.10|^2|^3"
     },
+    "require-dev": {
+        "symfony/event-dispatcher": "^5.4|^6.0"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Mercure\\": "" },
         "exclude-from-classmap": [

@@ -22,9 +22,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #48046 [WebProfilerBundle] Remove redundant code from logger template (HypeMC)
  * bug #48428 Fixed undefined variable error (Kevin Meijer)
  * bug #48416 [FrameworkBundle] don't register the MailerTestCommand symfony/console is not installed (xabbuh)
- * bug #48395 [String] Fix AsciiSlugger with emojis (fancyweb)
- * bug #48385 [Security] Reuse `AbstractFactory`'s config tree in `AccessTokenFactory` (chalasr)
- * bug #48292 [Security] [LoginLink] Throw InvalidLoginLinkException on missing parameter (MatTheCat)
 
 * 6.2.0 (2022-11-30)
 

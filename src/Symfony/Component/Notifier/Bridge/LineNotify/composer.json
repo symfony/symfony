@@ -1,5 +1,5 @@
 {
-    "name": "symfony/line-notifier",
+    "name": "symfony/line-notify-notifier",
     "type": "symfony-notifier-bridge",
     "description": "Provides LINE Notify integration for Symfony Notifier.",
     "keywords": ["line", "notifier", "chat"],

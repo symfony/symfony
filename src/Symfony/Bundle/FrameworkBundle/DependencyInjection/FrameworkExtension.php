@@ -398,7 +398,7 @@ class FrameworkExtension extends Extension
         if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
 
-            if (!class_exists(MailerTestCommand::class) || !$this->hasConsole()) {
+            if (!$this->hasConsole() || !class_exists(MailerTestCommand::class)) {
                 $container->removeDefinition('console.command.mailer_test');
             }
         }
@@ -1979,7 +1979,7 @@ class FrameworkExtension extends Extension
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
         }
 
-        if (!class_exists(StatsCommand::class)) {
+        if (!$this->hasConsole() || !class_exists(StatsCommand::class)) {
             $container->removeDefinition('console.command.messenger_stats');
         }
 

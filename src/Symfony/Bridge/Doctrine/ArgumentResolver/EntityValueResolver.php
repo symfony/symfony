@@ -40,7 +40,13 @@ final class EntityValueResolver implements ValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
-        $options = $this->getMapEntityAttribute($argument);
+        if (\is_object($request->attributes->get($argument->getName()))) {
+            return [];
+        }
+
+        $options = $argument->getAttributes(MapEntity::class, ArgumentMetadata::IS_INSTANCEOF);
+        $options = ($options[0] ?? $this->defaults)->withDefaults($this->defaults, $argument->getType());
+
         if (!$options->class || $options->disabled) {
             return [];
         }
@@ -200,13 +206,5 @@ final class EntityValueResolver implements ValueResolverInterface
         } catch (NoResultException|ConversionException) {
             return null;
         }
-    }
-
-    private function getMapEntityAttribute(ArgumentMetadata $argument): MapEntity
-    {
-        /** @var MapEntity $options */
-        $options = $argument->getAttributes(MapEntity::class, ArgumentMetadata::IS_INSTANCEOF)[0] ?? $this->defaults;
-
-        return $options->withDefaults($this->defaults, $argument->getType());
     }
 }

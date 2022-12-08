@@ -21,6 +21,8 @@ class ProjectServiceContainer extends Container
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
+            'baz' => 'getBazService',
+            'buz' => 'getBuzService',
             'foo' => 'getFooService',
         ];
 
@@ -50,10 +52,38 @@ class ProjectServiceContainer extends Container
     protected function getBarService($lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $this->services['bar'] = $this->createProxy('stdClass_5a8a5eb', fn () => \stdClass_5a8a5eb::createLazyGhost($this->getBarService(...)));
+            return $this->services['bar'] = $this->createProxy('stdClassGhost5a8a5eb', fn () => \stdClassGhost5a8a5eb::createLazyGhost($this->getBarService(...)));
         }
 
         return $lazyLoad;
+    }
+
+    /**
+     * Gets the public 'baz' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getBazService($lazyLoad = true)
+    {
+        if (true === $lazyLoad) {
+            return $this->services['baz'] = $this->createProxy('stdClassProxy5a8a5eb', fn () => \stdClassProxy5a8a5eb::createLazyProxy(fn () => $this->getBazService(false)));
+        }
+
+        return \foo_bar();
+    }
+
+    /**
+     * Gets the public 'buz' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getBuzService($lazyLoad = true)
+    {
+        if (true === $lazyLoad) {
+            return $this->services['buz'] = $this->createProxy('stdClassProxy5a8a5eb', fn () => \stdClassProxy5a8a5eb::createLazyProxy(fn () => $this->getBuzService(false)));
+        }
+
+        return \foo_bar();
     }
 
     /**
@@ -64,18 +94,33 @@ class ProjectServiceContainer extends Container
     protected function getFooService($lazyLoad = true)
     {
         if (true === $lazyLoad) {
-            return $this->services['foo'] = $this->createProxy('stdClass_5a8a5eb', fn () => \stdClass_5a8a5eb::createLazyGhost($this->getFooService(...)));
+            return $this->services['foo'] = $this->createProxy('stdClassGhost5a8a5eb', fn () => \stdClassGhost5a8a5eb::createLazyGhost($this->getFooService(...)));
         }
 
         return $lazyLoad;
     }
 }
 
-class stdClass_5a8a5eb extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+class stdClassGhost5a8a5eb extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 {
     use \Symfony\Component\VarExporter\LazyGhostTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
+}
+
+// Help opcache.preload discover always-needed symbols
+class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
+
+class stdClassProxy5a8a5eb extends \stdClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+{
+    use \Symfony\Component\VarExporter\LazyProxyTrait;
+
+    private const LAZY_OBJECT_PROPERTY_SCOPES = [
+        'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
+        "\0".self::class."\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],
+    ];
 }
 
 // Help opcache.preload discover always-needed symbols

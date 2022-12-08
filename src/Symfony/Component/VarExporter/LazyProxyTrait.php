@@ -337,7 +337,7 @@ trait LazyProxyTrait
             PublicHydrator::hydrate($this, $data);
 
             if (Registry::$parentMethods[$class]['wakeup']) {
-                parent:__wakeup();
+                parent::__wakeup();
             }
         }
     }

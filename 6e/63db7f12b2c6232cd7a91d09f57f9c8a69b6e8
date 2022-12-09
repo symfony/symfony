@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-12-05T21:06:59Z
+
+There was a declined PR in the past
+* https://github.com/symfony/symfony/pull/39774
+
+But lets bring this topic back on the table, as it looks like there is a need for being more specific.
+
+Maybe its more important then we think @fabpot.
+
+The follow up policy could be, that you can easily switch from one to another SMS Provider **if** the current and the new transport does **not** support specific options. And if your `SmsMessage` was instantiated without given options... 🤔
+
+---------------------------------------------------------------------------
+
+by gnito-org at 2022-12-05T21:23:41Z
+
+For my purposes, the ability to add options to the SMS could be limited to only when you use the notifier bridge as a stand-alone component.
+
+My app does not use the Symfony SMS channel to automatically choose the bridge from the DSN. It 'manually' instantiates the bridge using the transport factory of the bridge.
+
+In other words, for my purposes, you do not need to complicate the Symfony texter with the ability to handle options.
+
+If the SMSMessage can carry options, and the bridge can handle those options, then it works for me.
+
+If you're really adamant that SMSMessage should not have options, then it's not a train-smash. I'll implement Plan B.
+
+---------------------------------------------------------------------------
+
+by gnito-org at 2022-12-05T23:02:03Z
+
+Looking at the existing [SMS DSNs](https://symfony.com/doc/current/notifier.html#notifier-sms-channel), there are already DSNs that have options that others don't have.
+
+How is that different from adding an options property to the SMSMessage object?
+
+---------------------------------------------------------------------------
+
+by gnito-org at 2022-12-06T10:51:03Z
+
+Let me throw this personal opinion in the mix as well.
+
+`MessageInterface` promises that the object will have non-mandatory options. In its current state, `SmsMessage` does not properly implement `MessageInterface` because it does not allow options at all. It uses a dummy stub `getOptions()` method to pretend that it impements the interface.
+
+---------------------------------------------------------------------------
+
+by gnito-org at 2022-12-08T10:01:59Z
+
+SmsMessage will have get an options property because of the new [Webhook & Remote Event components](https://github.com/symfony/symfony/pull/48542).
+
+@OskarStark @fabpot Should I close this PR or leave it open?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-12-08T11:41:46Z
+
+Leave it open please 👍
+
+---------------------------------------------------------------------------
+
+by gnito-org at 2022-12-08T12:25:50Z
+
+I will add the XXXOptions unit tests to all the SMS notifiers that I contributed once this PR has been merged.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-12-08T13:12:21Z
+
+Thank you 👍
+
+---------------------------------------------------------------------------
+
+by leblanc-simon at 2022-12-08T22:01:00Z
+
+Shouldn't we remove the `$from` from the constructor to go through via the options?
+
+We will have an identical structure like `ChatMessage` and `PushMessage`.
+
+A lot of texter bridges let's to customize the `from` globally at the DSN level and going through an option would seem consistent with the ways of doing things for the other briges.
+
+Moreover with the new webhook component, it would force to pass an empty parameter in the constructor to pass the options (or use a named parameter)
+
+Could I propose to deprecate the `$from` parameter for 6.3 and remove at 6.4 :
+
+```php
+public function __construct(string $phone, string $subject, string | MessageOptionsInterface $options = null)
+{
+    If (is_string($options)) {
+        trigger_error('using from inside constructor is deprecated',E_USER_DEPRECATED);
+        $this->from = $from;
+    }
+
+    $this->subject = $subject;
+    $this->phone = $phone;
+    $this->options = $options;
+}

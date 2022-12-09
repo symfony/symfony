@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-01T12:56:26Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by curlycarla2004 at 2022-12-02T13:29:06Z
+
+Thank you for your reviews. I have updated my code and PR description.
+
+---------------------------------------------------------------------------
+
+by curlycarla2004 at 2022-12-02T14:15:26Z
+
+Thanks for approving! and thanks to @HeahDude for helping with my first contribution!!!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-04T16:14:31Z
+
+deps=low failure is related. FrameworkBundle should bump the minimum version of DomCrawler in its composer.json file.
+
+---------------------------------------------------------------------------
+
+by curlycarla2004 at 2022-12-05T11:54:43Z
+
+ok so i have corrected the problem with low deps(and some extra white spaces).

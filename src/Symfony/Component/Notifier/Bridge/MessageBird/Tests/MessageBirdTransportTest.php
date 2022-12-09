@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\MessageBird\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdOptions;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -34,6 +35,7 @@ final class MessageBirdTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [new SmsMessage('0611223344', 'Hello!', 'from', new MessageBirdOptions(['from' => 'foo']))];
     }
 
     public static function unsupportedMessagesProvider(): iterable

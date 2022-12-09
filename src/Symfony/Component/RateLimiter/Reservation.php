@@ -45,6 +45,6 @@ final class Reservation
 
     public function wait(): void
     {
-        usleep($this->getWaitDuration() * 1e6);
+        usleep((int) ($this->getWaitDuration() * 1e6));
     }
 }

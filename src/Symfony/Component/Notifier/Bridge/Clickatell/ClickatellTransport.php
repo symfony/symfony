@@ -50,7 +50,7 @@ final class ClickatellTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof ClickatellOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -61,7 +61,13 @@ final class ClickatellTransport extends AbstractTransport
 
         $endpoint = sprintf('https://%s/rest/message', $this->getEndpoint());
 
-        $from = $message->getFrom() ?: $this->from;
+        $from = $message->getFrom() ?: $this->from ?: '';
+
+        $opts = $message->getOptions();
+        $options = $opts ? $opts->toArray() : [];
+        $options['from'] = $options['from'] ?? $from;
+        $options['to'] = $message->getPhone();
+        $options['text'] = $message->getSubject();
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
@@ -70,11 +76,7 @@ final class ClickatellTransport extends AbstractTransport
                 'Content-Type' => 'application/json',
                 'X-Version' => 1,
             ],
-            'json' => [
-                'from' => $from ?? '',
-                'to' => [$message->getPhone()],
-                'text' => $message->getSubject(),
-            ],
+            'json' => array_filter($options),
         ]);
 
         try {

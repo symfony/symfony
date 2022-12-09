@@ -26,22 +26,16 @@ class Security implements AuthorizationCheckerInterface
 {
     /**
      * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::ACCESS_DENIED_ERROR instead
-     *
-     * In 7.0, move this constant to the NewSecurityHelper class and make it reference SecurityRequestAttributes::ACCESS_DENIED_ERROR.
      */
     public const ACCESS_DENIED_ERROR = '_security.403_error';
 
     /**
      * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::AUTHENTICATION_ERROR instead
-     *
-     * In 7.0, move this constant to the NewSecurityHelper class and make it reference SecurityRequestAttributes::AUTHENTICATION_ERROR.
      */
     public const AUTHENTICATION_ERROR = '_security.last_error';
 
     /**
      * @deprecated since Symfony 6.2, use \Symfony\Bundle\SecurityBundle\Security::LAST_USERNAME instead
-     *
-     * In 7.0, move this constant to the NewSecurityHelper class and make it reference SecurityRequestAttributes::LAST_USERNAME.
      */
     public const LAST_USERNAME = '_security.last_username';
 

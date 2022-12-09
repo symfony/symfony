@@ -33,8 +33,6 @@ final class PostgreSqlConnection extends Connection
         'get_notify_timeout' => 0,
     ];
 
-    private bool $listening = false;
-
     public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
@@ -116,21 +114,16 @@ SQL
      */
     public function registerPgNotifyListener(): void
     {
-        if ($this->listening) {
-            return;
-        }
-
         // This is secure because the table name must be a valid identifier:
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+        // Running "LISTEN" potentially multiple times is expected and desired, as discussed here:
+        // https://github.com/symfony/symfony/pull/47209
         $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
-
-        $this->listening = true;
     }
 
     private function unlisten()
     {
         $this->executeStatement(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
-        $this->listening = false;
     }
 
     /**

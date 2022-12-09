@@ -169,6 +169,57 @@ class SecurityTest extends TestCase
         $security->login($user);
     }
 
+    public function testLoginReturnsAuthenticatorResponse()
+    {
+        $request = new Request();
+        $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $requestStack = $this->createMock(RequestStack::class);
+        $firewallMap = $this->createMock(FirewallMap::class);
+        $firewall = new FirewallConfig('main', 'main');
+        $user = $this->createMock(UserInterface::class);
+        $userChecker = $this->createMock(UserCheckerInterface::class);
+        $userAuthenticator = $this->createMock(UserAuthenticatorInterface::class);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->atLeastOnce())
+            ->method('get')
+            ->willReturnMap([
+                ['request_stack', $requestStack],
+                ['security.firewall.map', $firewallMap],
+                ['security.user_authenticator', $userAuthenticator],
+                ['security.user_checker', $userChecker],
+            ])
+        ;
+
+        $requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
+        $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewall);
+        $userChecker->expects($this->once())->method('checkPreAuth')->with($user);
+        $userAuthenticator->expects($this->once())->method('authenticateUser')
+            ->with($user, $authenticator, $request)
+            ->willReturn(new Response('authenticator response'));
+
+        $firewallAuthenticatorLocator = $this->createMock(ServiceProviderInterface::class);
+        $firewallAuthenticatorLocator
+            ->expects($this->once())
+            ->method('getProvidedServices')
+            ->willReturn(['security.authenticator.custom.dev' => $authenticator])
+        ;
+        $firewallAuthenticatorLocator
+            ->expects($this->once())
+            ->method('get')
+            ->with('security.authenticator.custom.dev')
+            ->willReturn($authenticator)
+        ;
+
+        $security = new Security($container, ['main' => $firewallAuthenticatorLocator]);
+
+        $response = $security->login($user);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('authenticator response', $response->getContent());
+    }
+
     public function testLoginWithoutAuthenticatorThrows()
     {
         $request = new Request();

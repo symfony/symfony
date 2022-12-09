@@ -14,10 +14,35 @@ namespace Symfony\Component\Notifier\Bridge\FakeChat\Tests;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\Dsn;
 
 final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
 {
+    /**
+     * @dataProvider missingRequiredDependencyProvider
+     */
+    public function testMissingRequiredDependency(?MailerInterface $mailer, ?LoggerInterface $logger, string $dsn, string $message)
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage($message);
+
+        $factory = new FakeChatTransportFactory($mailer, $logger);
+        $factory->create(new Dsn($dsn));
+    }
+
+    /**
+     * @dataProvider missingOptionalDependencyProvider
+     */
+    public function testMissingOptionalDependency(?MailerInterface $mailer, ?LoggerInterface $logger, string $dsn)
+    {
+        $factory = new FakeChatTransportFactory($mailer, $logger);
+        $transport = $factory->create(new Dsn($dsn));
+
+        $this->assertSame($dsn, (string) $transport);
+    }
+
     public function createFactory(): FakeChatTransportFactory
     {
         return new FakeChatTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
@@ -62,5 +87,36 @@ final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
     public function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://default?to=recipient@email.net&from=sender@email.net'];
+    }
+
+    public function missingRequiredDependencyProvider(): iterable
+    {
+        $exceptionMessage = 'Cannot create a transport for scheme "%s" without providing an implementation of "%s".';
+        yield 'missing mailer' => [
+            null,
+            $this->createMock(LoggerInterface::class),
+            'fakechat+email://default?to=recipient@email.net&from=sender@email.net',
+            sprintf($exceptionMessage, 'fakechat+email', MailerInterface::class),
+        ];
+        yield 'missing logger' => [
+            $this->createMock(MailerInterface::class),
+            null,
+            'fakechat+logger://default',
+            sprintf($exceptionMessage, 'fakechat+logger', LoggerInterface::class),
+        ];
+    }
+
+    public function missingOptionalDependencyProvider(): iterable
+    {
+        yield 'missing logger' => [
+            $this->createMock(MailerInterface::class),
+            null,
+            'fakechat+email://default?to=recipient@email.net&from=sender@email.net',
+        ];
+        yield 'missing mailer' => [
+            null,
+            $this->createMock(LoggerInterface::class),
+            'fakechat+logger://default',
+        ];
     }
 }

@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-01T11:07:03Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-01T11:07:04Z
+
+Hey!
+
+Oh no, it looks like you have made this PR towards a branch that is not maintained anymore. :/
+Could you update the [PR base branch](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request) to target one of these branches instead? 5.4, 6.0, 6.1, 6.2, 6.3.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by bonroyage at 2022-12-01T11:22:32Z
+
+Tests seem to be failing on unrelated issues in the Serializer component
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-05T16:21:50Z
+
+Hey!
+
+I think @PhilETaylor has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-12-05T16:29:42Z
+
+Interesting. I have never seen a "IPv4-mapped IPv6 address" in the wild. I had never heard of them until today. Sorry if my previous PR caused you issues.
+
+---------------------------------------------------------------------------
+
+by bonroyage at 2022-12-06T09:45:43Z
+
+> Interesting. I have never seen a "IPv4-mapped IPv6 address" in the wild. I had never heard of them until today. Sorry if my previous PR caused you issues.
+
+I hadn't seen them used anywhere until Azure when my regular IPv4 trusted proxies didn't work without converting them to IPv6 first (`$ip6 = "::ffff:{$ip4}"`). Fortunately, we managed to detect the issue early and lock to 6.1.7 for now.
+
+There is a potential other discussion to be had about the expected behaviour of these methods, one I'm not familiar enough with IP to offer an educated opinion on. The question of whether IPv4-mapped IPv6 addresses should be compared against IPv4 addresses/CIDR and vice versa. Given the naming of these methods, it would seem wrong to return true in my opinion. Concretely in code samples:
+```php
+checkIp4('10.0.0.123', '::ffff:10.0.0.0/8')
+checkIp6('::ffff:10.0.0.123', '10.0.0.0/8')
+```
+
+---------------------------------------------------------------------------
+
+by emielmolenaar at 2022-12-06T14:39:07Z
+
+I have just tested this, and this fixes the issue for us. We are dealing with IPv4-mapped addresses like `::ffff:172.28.0.1`. I have not tested this PR using subnets.

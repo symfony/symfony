@@ -298,6 +298,8 @@ class Application implements ResetInterface
 
                         return isset($event) ? $event->getExitCode() : 1;
                     }
+
+                    throw $e;
                 } catch (NamespaceNotFoundException) {
                     throw $e;
                 }

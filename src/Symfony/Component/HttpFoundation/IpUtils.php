@@ -136,16 +136,16 @@ class IpUtils
         }
 
         // Check to see if we were given a IP4 $requestIp or $ip by mistake
-        if (str_contains($requestIp, '.') || str_contains($ip, '.')) {
-            return self::$checkedIps[$cacheKey] = false;
-        }
-
         if (!filter_var($requestIp, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
             return self::$checkedIps[$cacheKey] = false;
         }
 
         if (str_contains($ip, '/')) {
             [$address, $netmask] = explode('/', $ip, 2);
+
+            if (!filter_var($address, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
+                return self::$checkedIps[$cacheKey] = false;
+            }
 
             if ('0' === $netmask) {
                 return (bool) unpack('n*', @inet_pton($address));
@@ -155,6 +155,10 @@ class IpUtils
                 return self::$checkedIps[$cacheKey] = false;
             }
         } else {
+            if (!filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
+                return self::$checkedIps[$cacheKey] = false;
+            }
+
             $address = $ip;
             $netmask = 128;
         }

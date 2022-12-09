@@ -60,6 +60,7 @@ final class ProgressBar
     private Terminal $terminal;
     private ?string $previousMessage = null;
     private Cursor $cursor;
+    private array $placeholders = [];
 
     private static array $formatters;
     private static array $formats;
@@ -95,12 +96,12 @@ final class ProgressBar
     }
 
     /**
-     * Sets a placeholder formatter for a given name.
+     * Sets a placeholder formatter for a given name, globally for all instances of ProgressBar.
      *
      * This method also allow you to override an existing placeholder.
      *
-     * @param string   $name     The placeholder name (including the delimiter char like %)
-     * @param callable $callable A PHP callable
+     * @param string                       $name     The placeholder name (including the delimiter char like %)
+     * @param callable(ProgressBar):string $callable A PHP callable
      */
     public static function setPlaceholderFormatterDefinition(string $name, callable $callable): void
     {
@@ -119,6 +120,26 @@ final class ProgressBar
         self::$formatters ??= self::initPlaceholderFormatters();
 
         return self::$formatters[$name] ?? null;
+    }
+
+    /**
+     * Sets a placeholder formatter for a given name, for this instance only.
+     *
+     * @param callable(ProgressBar):string $callable A PHP callable
+     */
+    public function setPlaceholderFormatter(string $name, callable $callable): void
+    {
+        $this->placeholders[$name] = $callable;
+    }
+
+    /**
+     * Gets the placeholder formatter for a given name.
+     *
+     * @param string $name The placeholder name (including the delimiter char like %)
+     */
+    public function getPlaceholderFormatter(string $name): ?callable
+    {
+        return $this->placeholders[$name] ?? $this::getPlaceholderFormatterDefinition($name);
     }
 
     /**
@@ -573,7 +594,7 @@ final class ProgressBar
 
         $regex = "{%([a-z\-_]+)(?:\:([^%]+))?%}i";
         $callback = function ($matches) {
-            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
+            if ($formatter = $this->getPlaceholderFormatter($matches[1])) {
                 $text = $formatter($this, $this->output);
             } elseif (isset($this->messages[$matches[1]])) {
                 $text = $this->messages[$matches[1]];

@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-08T17:03:21Z
+
+This is on purpose. The constants will be moved to the new Security helper, and will just reference the ones from `SecurityRequestAttributes`. The BC layer may be wrong though as the new Security class extends the deprecated one (and inherits the constants). Is it the case?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-12-08T17:07:31Z
+
+If the new class relies on inheriting the constants instead of overriding them, any SA tool will report the constants as deprecated on the child class too.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-08T17:31:47Z
+
+Thanks for confirming. PR updated
+
+---------------------------------------------------------------------------
+
+by IonBazan at 2022-12-09T03:07:38Z
+
+@chalasr yes - that's exactly the case. Besides, some IDEs like PHPStorm discourage from referencing inherited constants by derived class and suggest using the class where the constant was defined.
+
+Is there any particular reason we are using `\Symfony\Bundle\SecurityBundle\Security`, instead of `SecurityRequestAttributes` directly? Seems inconsistent with what we did with `Security::MAX_USERNAME_LENGTH` -> `UserBadge::MAX_USERNAME_LENGTH`.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-09T12:42:16Z
+
+> Is there any particular reason we are using \Symfony\Bundle\SecurityBundle\Security, instead of SecurityRequestAttributes directly? Seems inconsistent with what we did with Security::MAX_USERNAME_LENGTH -> UserBadge::MAX_USERNAME_LENGTH.
+
+@IonBazan The `MAX_USERNAME_LENGTH` constant is mostly used by authenticators where `UserBadge` is mandatory, while other constants are also meant to be used at the controller layer (including underlying services).
+If someone asks for it at some point, we could consider adding such shortcut to the Security helper for that constant though.

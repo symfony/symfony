@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\MessageMedia\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaOptions;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
@@ -38,6 +39,7 @@ final class MessageMediaTransportTest extends TransportTestCase
     public function supportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0491570156', 'Hello!')];
+        yield [new SmsMessage('0491570156', 'Hello!', 'from', new MessageMediaOptions(['from' => 'foo']))];
     }
 
     public function unsupportedMessagesProvider(): iterable

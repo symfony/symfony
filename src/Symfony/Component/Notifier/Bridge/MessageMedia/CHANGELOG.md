@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `MessageMediaOptions` class
+
 6.2
 ---
 

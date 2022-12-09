@@ -53,7 +53,7 @@ final class MessageMediaTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof MessageMediaOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -64,6 +64,14 @@ final class MessageMediaTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
+        $opts = $message->getOptions();
+        $options = $opts ? $opts->toArray() : [];
+        $options['source_number'] = $options['from'] ?? $from;
+        $options['destination_number'] = $message->getPhone();
+        $options['content'] = $message->getSubject();
+
+        unset($options['from']);
+
         $endpoint = sprintf('https://%s/v1/messages', $this->getEndpoint());
         $response = $this->client->request(
             'POST',
@@ -72,11 +80,7 @@ final class MessageMediaTransport extends AbstractTransport
                 'auth_basic' => $this->apiKey.':'.$this->apiSecret,
                 'json' => [
                     'messages' => [
-                        [
-                            'destination_number' => $message->getPhone(),
-                            'source_number' => $from,
-                            'content' => $message->getSubject(),
-                        ],
+                        array_filter($options),
                     ],
                 ],
             ]

@@ -205,7 +205,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * As a separate method to allow "get()" to use the really fast `??` operator.
      */
-    private static function make($container, string $id, int $invalidBehavior)
+    private static function make(self $container, string $id, int $invalidBehavior)
     {
         if (isset($container->loading[$id])) {
             throw new ServiceCircularReferenceException($id, array_merge(array_keys($container->loading), [$id]));

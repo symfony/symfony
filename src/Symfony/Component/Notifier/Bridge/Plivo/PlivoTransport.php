@@ -47,7 +47,7 @@ final class PlivoTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof PlivoOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage

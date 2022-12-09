@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-23T13:24:53Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by akuzia at 2022-11-23T13:30:27Z
+
+> Works for me as a bugfix.
+
+It is possibly a breaking change, as some of the users may or may not introduce own handlers to bypass this. Not sure if chanelog or doc changes needed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-11-26T09:20:40Z
+
+That's a behavior change, so it cannot be merged in 5.4. It needs to target 6.3.
+A changelog is also needed to explain the changes.
+
+---------------------------------------------------------------------------
+
+by akuzia at 2022-12-01T15:06:15Z
+
+@fabpot I've rebased to 6.3 and added changelog entry. Phrasing may be a bit to complex, I've opened to suggestions

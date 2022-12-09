@@ -52,7 +52,7 @@ final class AllMySmsTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof AllMySmsOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -63,14 +63,31 @@ final class AllMySmsTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
+        $opts = $message->getOptions();
+        $options = $opts ? $opts->toArray() : [];
+        $options['from'] = $options['from'] ?? $from;
+        $options['to'] = $message->getPhone();
+        $options['text'] = $message->getSubject();
+
+        if (isset($options['campaign_name'])) {
+            $options['campaignName'] = $options['campaign_name'];
+            unset($options['campaign_name']);
+        }
+
+        if (isset($options['cli_msg_id'])) {
+            $options['cliMsgId'] = $options['cli_msg_id'];
+            unset($options['cli_msg_id']);
+        }
+
+        if (isset($options['unique_identifier'])) {
+            $options['uniqueIdentifier'] = $options['unique_identifier'];
+            unset($options['unique_identifier']);
+        }
+
         $endpoint = sprintf('https://%s/sms/send/', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => $this->login.':'.$this->apiKey,
-            'json' => [
-                'from' => $from,
-                'to' => $message->getPhone(),
-                'text' => $message->getSubject(),
-            ],
+            'json' => array_filter($options),
         ]);
 
         try {

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `DomCrawlerAssertionsTrait::assertSelectorCount(int $count, string $selector)`
+
 6.2
 ---
 

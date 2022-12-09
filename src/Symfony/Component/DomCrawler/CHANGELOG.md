@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `CrawlerSelectorCount` test constraint
+
 6.0
 ---
 

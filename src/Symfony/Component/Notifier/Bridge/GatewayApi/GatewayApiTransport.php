@@ -46,7 +46,7 @@ final class GatewayApiTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage && (null === $message->getOptions() || $message->getOptions() instanceof GatewayApiOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -57,15 +57,22 @@ final class GatewayApiTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
+        $opts = $message->getOptions();
+        $options = $opts ? $opts->toArray() : [];
+        $options['sender'] = $options['from'] ?? $from;
+        $options['recipients'] = [['msisdn' => $message->getPhone()]];
+        $options['message'] = $message->getSubject();
+
+        if (isset($options['user_ref'])) {
+            $options['userref'] = $options['user_ref'];
+            unset($options['user_ref']);
+        }
+
         $endpoint = sprintf('https://%s/rest/mtsms', $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->authToken, ''],
-            'json' => [
-                'sender' => $from,
-                'recipients' => [['msisdn' => $message->getPhone()]],
-                'message' => $message->getSubject(),
-            ],
+            'json' => array_filter($options),
         ]);
 
         try {

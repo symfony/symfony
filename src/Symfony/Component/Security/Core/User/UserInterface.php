@@ -55,7 +55,7 @@ interface UserInterface
     public function eraseCredentials();
 
     /**
-     * Returns the identifier for this user (e.g. its username or email address).
+     * Returns the identifier for this user (e.g. username or email address).
      */
     public function getUserIdentifier(): string;
 }

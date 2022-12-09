@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -90,11 +92,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBARService()
+    protected static function getBARService($container)
     {
-        $this->services['BAR'] = $instance = new \stdClass();
+        $container->services['BAR'] = $instance = new \stdClass();
 
-        $instance->bar = ($this->services['bar'] ?? $this->getBar3Service());
+        $instance->bar = ($container->services['bar'] ?? self::getBar3Service($container));
 
         return $instance;
     }
@@ -104,9 +106,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBAR2Service()
+    protected static function getBAR2Service($container)
     {
-        return $this->services['BAR2'] = new \stdClass();
+        return $container->services['BAR2'] = new \stdClass();
     }
 
     /**
@@ -114,9 +116,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getAServiceService()
+    protected static function getAServiceService($container)
     {
-        return $this->services['a_service'] = ($this->privates['a_factory'] ??= new \Bar())->getBar();
+        return $container->services['a_service'] = ($container->privates['a_factory'] ??= new \Bar())->getBar();
     }
 
     /**
@@ -124,9 +126,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getBServiceService()
+    protected static function getBServiceService($container)
     {
-        return $this->services['b_service'] = ($this->privates['a_factory'] ??= new \Bar())->getBar();
+        return $container->services['b_service'] = ($container->privates['a_factory'] ??= new \Bar())->getBar();
     }
 
     /**
@@ -134,11 +136,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getBar3Service()
+    protected static function getBar3Service($container)
     {
-        $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
+        $a = ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
 
-        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
+        $container->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $container->getParameter('foo_bar'));
 
         $a->configure($instance);
 
@@ -150,9 +152,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBar22Service()
+    protected static function getBar22Service($container)
     {
-        return $this->services['bar2'] = new \stdClass();
+        return $container->services['bar2'] = new \stdClass();
     }
 
     /**
@@ -160,11 +162,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \Baz
      */
-    protected function getBazService()
+    protected static function getBazService($container)
     {
-        $this->services['baz'] = $instance = new \Baz();
+        $container->services['baz'] = $instance = new \Baz();
 
-        $instance->setFoo(($this->services['foo_with_inline'] ?? $this->getFooWithInlineService()));
+        $instance->setFoo(($container->services['foo_with_inline'] ?? self::getFooWithInlineService($container)));
 
         return $instance;
     }
@@ -174,12 +176,12 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getConfiguredServiceService()
+    protected static function getConfiguredServiceService($container)
     {
-        $this->services['configured_service'] = $instance = new \stdClass();
+        $container->services['configured_service'] = $instance = new \stdClass();
 
         $a = new \ConfClass();
-        $a->setFoo(($this->services['baz'] ?? $this->getBazService()));
+        $a->setFoo(($container->services['baz'] ?? self::getBazService($container)));
 
         $a->configureStdClass($instance);
 
@@ -191,9 +193,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getConfiguredServiceSimpleService()
+    protected static function getConfiguredServiceSimpleService($container)
     {
-        $this->services['configured_service_simple'] = $instance = new \stdClass();
+        $container->services['configured_service_simple'] = $instance = new \stdClass();
 
         (new \ConfClass('bar'))->configureStdClass($instance);
 
@@ -205,9 +207,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getDecoratorServiceService()
+    protected static function getDecoratorServiceService($container)
     {
-        return $this->services['decorator_service'] = new \stdClass();
+        return $container->services['decorator_service'] = new \stdClass();
     }
 
     /**
@@ -215,9 +217,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getDecoratorServiceWithNameService()
+    protected static function getDecoratorServiceWithNameService($container)
     {
-        return $this->services['decorator_service_with_name'] = new \stdClass();
+        return $container->services['decorator_service_with_name'] = new \stdClass();
     }
 
     /**
@@ -227,11 +229,11 @@ class ProjectServiceContainer extends Container
      *
      * @deprecated Since vendor/package 1.1: The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.
      */
-    protected function getDeprecatedServiceService()
+    protected static function getDeprecatedServiceService($container)
     {
         trigger_deprecation('vendor/package', '1.1', 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.');
 
-        return $this->services['deprecated_service'] = new \stdClass();
+        return $container->services['deprecated_service'] = new \stdClass();
     }
 
     /**
@@ -239,9 +241,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getFactoryServiceService()
+    protected static function getFactoryServiceService($container)
     {
-        return $this->services['factory_service'] = ($this->services['foo.baz'] ?? $this->getFoo_BazService())->getInstance();
+        return $container->services['factory_service'] = ($container->services['foo.baz'] ?? self::getFoo_BazService($container))->getInstance();
     }
 
     /**
@@ -249,9 +251,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getFactoryServiceSimpleService()
+    protected static function getFactoryServiceSimpleService($container)
     {
-        return $this->services['factory_service_simple'] = $this->getFactorySimpleService()->getInstance();
+        return $container->services['factory_service_simple'] = self::getFactorySimpleService($container)->getInstance();
     }
 
     /**
@@ -259,16 +261,16 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
-        $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
+        $a = ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
 
-        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, ['bar' => 'foo is bar', 'foobar' => 'bar'], true, $this);
+        $container->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, ['bar' => 'foo is bar', 'foobar' => 'bar'], true, $container);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
         $instance->qux = ['bar' => 'foo is bar', 'foobar' => 'bar'];
-        $instance->setBar(($this->services['bar'] ?? $this->getBar3Service()));
+        $instance->setBar(($container->services['bar'] ?? self::getBar3Service($container)));
         $instance->initialize();
         sc_configure($instance);
 
@@ -280,9 +282,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \BazClass
      */
-    protected function getFoo_BazService()
+    protected static function getFoo_BazService($container)
     {
-        $this->services['foo.baz'] = $instance = \BazClass::getInstance();
+        $container->services['foo.baz'] = $instance = \BazClass::getInstance();
 
         \BazClass::configureStatic1($instance);
 
@@ -294,13 +296,13 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getFooBarService()
+    protected static function getFooBarService($container)
     {
-        $this->factories['foo_bar'] = function () {
-            return new \Bar\FooClass(($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService()));
+        $container->factories['foo_bar'] = static function ($container) {
+            return new \Bar\FooClass(($container->services['deprecated_service'] ?? self::getDeprecatedServiceService($container)));
         };
 
-        return $this->factories['foo_bar']();
+        return $container->factories['foo_bar']($container);
     }
 
     /**
@@ -308,13 +310,13 @@ class ProjectServiceContainer extends Container
      *
      * @return \Foo
      */
-    protected function getFooWithInlineService()
+    protected static function getFooWithInlineService($container)
     {
-        $this->services['foo_with_inline'] = $instance = new \Foo();
+        $container->services['foo_with_inline'] = $instance = new \Foo();
 
         $a = new \Bar();
         $a->pub = 'pub';
-        $a->setBaz(($this->services['baz'] ?? $this->getBazService()));
+        $a->setBaz(($container->services['baz'] ?? self::getBazService($container)));
 
         $instance->setBar($a);
 
@@ -326,12 +328,16 @@ class ProjectServiceContainer extends Container
      *
      * @return \LazyContext
      */
-    protected function getLazyContextService()
+    protected static function getLazyContextService($container)
     {
-        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
-            yield 'k1' => ($this->services['foo.baz'] ?? $this->getFoo_BazService());
-            yield 'k2' => $this;
-        }, 2), new RewindableGenerator(function () {
+        $containerRef = $container->ref;
+
+        return $container->services['lazy_context'] = new \LazyContext(new RewindableGenerator(static function () use ($containerRef) {
+            $container = $containerRef->get();
+
+            yield 'k1' => ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
+            yield 'k2' => $container;
+        }, 2), new RewindableGenerator(static function () {
             return new \EmptyIterator();
         }, 0));
     }
@@ -341,11 +347,15 @@ class ProjectServiceContainer extends Container
      *
      * @return \LazyContext
      */
-    protected function getLazyContextIgnoreInvalidRefService()
+    protected static function getLazyContextIgnoreInvalidRefService($container)
     {
-        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () {
-            yield 0 => ($this->services['foo.baz'] ?? $this->getFoo_BazService());
-        }, 1), new RewindableGenerator(function () {
+        $containerRef = $container->ref;
+
+        return $container->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(static function () use ($containerRef) {
+            $container = $containerRef->get();
+
+            yield 0 => ($container->services['foo.baz'] ?? self::getFoo_BazService($container));
+        }, 1), new RewindableGenerator(static function () {
             return new \EmptyIterator();
         }, 0));
     }
@@ -355,15 +365,15 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getMethodCall1Service()
+    protected static function getMethodCall1Service($container)
     {
         include_once '%path%foo.php';
 
-        $this->services['method_call1'] = $instance = new \Bar\FooClass();
+        $container->services['method_call1'] = $instance = new \Bar\FooClass();
 
-        $instance->setBar(($this->services['foo'] ?? $this->getFooService()));
+        $instance->setBar(($container->services['foo'] ?? self::getFooService($container)));
         $instance->setBar(NULL);
-        $instance->setBar((($this->services['foo'] ?? $this->getFooService())->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
+        $instance->setBar((($container->services['foo'] ?? self::getFooService($container))->foo() . (($container->hasParameter("foo")) ? ($container->getParameter("foo")) : ("default"))));
 
         return $instance;
     }
@@ -373,12 +383,12 @@ class ProjectServiceContainer extends Container
      *
      * @return \FooBarBaz
      */
-    protected function getNewFactoryServiceService()
+    protected static function getNewFactoryServiceService($container)
     {
         $a = new \FactoryClass();
         $a->foo = 'bar';
 
-        $this->services['new_factory_service'] = $instance = $a->getInstance();
+        $container->services['new_factory_service'] = $instance = $a->getInstance();
 
         $instance->foo = 'bar';
 
@@ -390,9 +400,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getPreloadSidekickService()
+    protected static function getPreloadSidekickService($container)
     {
-        return $this->services['preload_sidekick'] = new \stdClass();
+        return $container->services['preload_sidekick'] = new \stdClass();
     }
 
     /**
@@ -400,9 +410,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getRuntimeErrorService()
+    protected static function getRuntimeErrorService($container)
     {
-        return $this->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
+        return $container->services['runtime_error'] = new \stdClass(throw new RuntimeException('Service "errored_definition" is broken.'));
     }
 
     /**
@@ -410,9 +420,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getServiceFromStaticMethodService()
+    protected static function getServiceFromStaticMethodService($container)
     {
-        return $this->services['service_from_static_method'] = \Bar\FooClass::getInstance();
+        return $container->services['service_from_static_method'] = \Bar\FooClass::getInstance();
     }
 
     /**
@@ -420,11 +430,15 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar
      */
-    protected function getTaggedIteratorService()
+    protected static function getTaggedIteratorService($container)
     {
-        return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
-            yield 0 => ($this->services['foo'] ?? $this->getFooService());
-            yield 1 => ($this->privates['tagged_iterator_foo'] ??= new \Bar());
+        $containerRef = $container->ref;
+
+        return $container->services['tagged_iterator'] = new \Bar(new RewindableGenerator(static function () use ($containerRef) {
+            $container = $containerRef->get();
+
+            yield 0 => ($container->services['foo'] ?? self::getFooService($container));
+            yield 1 => ($container->privates['tagged_iterator_foo'] ??= new \Bar());
         }, 2));
     }
 
@@ -435,7 +449,7 @@ class ProjectServiceContainer extends Container
      *
      * @deprecated Since vendor/package 1.1: The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.
      */
-    protected function getFactorySimpleService()
+    protected static function getFactorySimpleService($container)
     {
         trigger_deprecation('vendor/package', '1.1', 'The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.');
 

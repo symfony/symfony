@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -78,9 +80,10 @@ class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
 
     private function getDynamicParameter(string $name)
     {
+        $container = $this;
         $value = match ($name) {
-            'hello' => $this->getEnv('json:foo'),
-            'hello-bar' => $this->getEnv('json:bar'),
+            'hello' => $container->getEnv('json:foo'),
+            'hello-bar' => $container->getEnv('json:bar'),
             default => throw new ParameterNotFoundException($name),
         };
         $this->loadedDynamicParameters[$name] = true;

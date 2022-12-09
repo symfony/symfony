@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'tsantos_serializer' => 'getTsantosSerializerService',
@@ -48,7 +50,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \TSantos\Serializer\EventEmitterSerializer
      */
-    protected function getTsantosSerializerService()
+    protected static function getTsantosSerializerService($container)
     {
         $a = new \TSantos\Serializer\NormalizerRegistry();
 
@@ -57,7 +59,7 @@ class ProjectServiceContainer extends Container
         $c = new \TSantos\Serializer\EventDispatcher\EventDispatcher();
         $c->addSubscriber(new \TSantos\SerializerBundle\EventListener\StopwatchListener(new \Symfony\Component\Stopwatch\Stopwatch(true)));
 
-        $this->services['tsantos_serializer'] = $instance = new \TSantos\Serializer\EventEmitterSerializer(new \TSantos\Serializer\Encoder\JsonEncoder(), $a, $c);
+        $container->services['tsantos_serializer'] = $instance = new \TSantos\Serializer\EventEmitterSerializer(new \TSantos\Serializer\Encoder\JsonEncoder(), $a, $c);
 
         $b->setSerializer($instance);
         $d = new \TSantos\Serializer\Normalizer\JsonNormalizer();

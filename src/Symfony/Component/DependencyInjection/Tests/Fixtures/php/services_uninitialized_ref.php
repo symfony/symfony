@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -51,32 +53,44 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        $this->services['bar'] = $instance = new \stdClass();
+        $containerRef = $container->ref;
 
-        $instance->foo1 = ($this->services['foo1'] ?? null);
+        $container->services['bar'] = $instance = new \stdClass();
+
+        $instance->foo1 = ($container->services['foo1'] ?? null);
         $instance->foo2 = null;
-        $instance->foo3 = ($this->privates['foo3'] ?? null);
-        $instance->closures = [0 => #[\Closure(name: 'foo1', class: 'stdClass')] function () {
-            return ($this->services['foo1'] ?? null);
-        }, 1 => #[\Closure(name: 'foo2')] function () {
+        $instance->foo3 = ($container->privates['foo3'] ?? null);
+        $instance->closures = [0 => #[\Closure(name: 'foo1', class: 'stdClass')] static function () use ($containerRef) {
+            $container = $containerRef->get();
+
+            return ($container->services['foo1'] ?? null);
+        }, 1 => #[\Closure(name: 'foo2')] static function () use ($containerRef) {
+            $container = $containerRef->get();
+
             return null;
-        }, 2 => #[\Closure(name: 'foo3', class: 'stdClass')] function () {
-            return ($this->privates['foo3'] ?? null);
+        }, 2 => #[\Closure(name: 'foo3', class: 'stdClass')] static function () use ($containerRef) {
+            $container = $containerRef->get();
+
+            return ($container->privates['foo3'] ?? null);
         }];
-        $instance->iter = new RewindableGenerator(function () {
-            if (isset($this->services['foo1'])) {
-                yield 'foo1' => ($this->services['foo1'] ?? null);
+        $instance->iter = new RewindableGenerator(static function () use ($containerRef) {
+            $container = $containerRef->get();
+
+            if (isset($container->services['foo1'])) {
+                yield 'foo1' => ($container->services['foo1'] ?? null);
             }
             if (false) {
                 yield 'foo2' => null;
             }
-            if (isset($this->privates['foo3'])) {
-                yield 'foo3' => ($this->privates['foo3'] ?? null);
+            if (isset($container->privates['foo3'])) {
+                yield 'foo3' => ($container->privates['foo3'] ?? null);
             }
-        }, function () {
-            return 0 + (int) (isset($this->services['foo1'])) + (int) (false) + (int) (isset($this->privates['foo3']));
+        }, static function () use ($containerRef) {
+            $container = $containerRef->get();
+
+            return 0 + (int) (isset($container->services['foo1'])) + (int) (false) + (int) (isset($container->privates['foo3']));
         });
 
         return $instance;
@@ -87,11 +101,11 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      *
      * @return \stdClass
      */
-    protected function getBazService()
+    protected static function getBazService($container)
     {
-        $this->services['baz'] = $instance = new \stdClass();
+        $container->services['baz'] = $instance = new \stdClass();
 
-        $instance->foo3 = ($this->privates['foo3'] ??= new \stdClass());
+        $instance->foo3 = ($container->privates['foo3'] ??= new \stdClass());
 
         return $instance;
     }
@@ -101,8 +115,8 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      *
      * @return \stdClass
      */
-    protected function getFoo1Service()
+    protected static function getFoo1Service($container)
     {
-        return $this->services['foo1'] = new \stdClass();
+        return $container->services['foo1'] = new \stdClass();
     }
 }

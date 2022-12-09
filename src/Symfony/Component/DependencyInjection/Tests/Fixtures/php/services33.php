@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'Bar\\Foo' => 'getFooService',
@@ -42,9 +44,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\Foo
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
-        return $this->services['Bar\\Foo'] = new \Bar\Foo();
+        return $container->services['Bar\\Foo'] = new \Bar\Foo();
     }
 
     /**
@@ -52,8 +54,8 @@ class ProjectServiceContainer extends Container
      *
      * @return \Foo\Foo
      */
-    protected function getFoo2Service()
+    protected static function getFoo2Service($container)
     {
-        return $this->services['Foo\\Foo'] = new \Foo\Foo();
+        return $container->services['Foo\\Foo'] = new \Foo\Foo();
     }
 }

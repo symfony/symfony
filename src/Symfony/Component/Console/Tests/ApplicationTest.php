@@ -2132,8 +2132,6 @@ class BaseSignableCommand extends Command
     private $emitsSignal;
     private $signal;
 
-    protected static $defaultName = 'signal';
-
     public function __construct(bool $emitsSignal = true, int $signal = \SIGUSR1)
     {
         parent::__construct();
@@ -2173,10 +2171,9 @@ class SignableCommand extends BaseSignableCommand implements SignalableCommandIn
     }
 }
 
+#[AsCommand(name: 'signal')]
 class TerminatableCommand extends BaseSignableCommand implements SignalableCommandInterface
 {
-    protected static $defaultName = 'signal';
-
     public function getSubscribedSignals(): array
     {
         return SignalRegistry::isSupported() ? [\SIGINT] : [];

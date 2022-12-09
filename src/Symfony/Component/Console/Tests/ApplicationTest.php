@@ -2014,6 +2014,19 @@ class ApplicationTest extends TestCase
         $this->assertSame([SignalEventSubscriber::class, SignableCommand::class], $command->signalHandlers);
     }
 
+    public function testSignalableCommandDoesNotInterruptedOnTermSignals()
+    {
+        $command = new TerminatableCommand(true, \SIGINT);
+        $command->exitCode = 129;
+
+        $dispatcher = new EventDispatcher();
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($dispatcher);
+        $application->add($command);
+        $this->assertSame(129, $application->run(new ArrayInput(['signal'])));
+    }
+
     /**
      * @group tty
      */
@@ -2113,26 +2126,31 @@ class DisabledCommand extends Command
 class BaseSignableCommand extends Command
 {
     public $signaled = false;
+    public $exitCode = 1;
     public $signalHandlers = [];
     public $loop = 1000;
     private $emitsSignal;
+    private $signal;
 
-    public function __construct(bool $emitsSignal = true)
+    protected static $defaultName = 'signal';
+
+    public function __construct(bool $emitsSignal = true, int $signal = \SIGUSR1)
     {
         parent::__construct();
         $this->emitsSignal = $emitsSignal;
+        $this->signal = $signal;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->emitsSignal) {
-            posix_kill(posix_getpid(), \SIGUSR1);
+            posix_kill(posix_getpid(), $this->signal);
         }
 
         for ($i = 0; $i < $this->loop; ++$i) {
             usleep(100);
             if ($this->signaled) {
-                return 1;
+                return $this->exitCode;
             }
         }
 
@@ -2146,6 +2164,22 @@ class SignableCommand extends BaseSignableCommand implements SignalableCommandIn
     public function getSubscribedSignals(): array
     {
         return SignalRegistry::isSupported() ? [\SIGUSR1] : [];
+    }
+
+    public function handleSignal(int $signal): void
+    {
+        $this->signaled = true;
+        $this->signalHandlers[] = __CLASS__;
+    }
+}
+
+class TerminatableCommand extends BaseSignableCommand implements SignalableCommandInterface
+{
+    protected static $defaultName = 'signal';
+
+    public function getSubscribedSignals(): array
+    {
+        return SignalRegistry::isSupported() ? [\SIGINT] : [];
     }
 
     public function handleSignal(int $signal): void

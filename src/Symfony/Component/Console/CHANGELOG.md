@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Remove `exit` call in `Application` signal handlers. Commands will no longer be automatically interrupted after receiving signal other than `SIGUSR1` or `SIGUSR2`
+
 6.2
 ---
 

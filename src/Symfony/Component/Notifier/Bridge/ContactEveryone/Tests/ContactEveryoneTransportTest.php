@@ -18,7 +18,6 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -47,7 +46,7 @@ final class ContactEveryoneTransportTest extends TransportTestCase
 
     public function testSendSuccessfully()
     {
-        $messageId = Uuid::v4()->toRfc4122();
+        $messageId = bin2hex(random_bytes(7));
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $response->method('getContent')->willReturn($messageId);

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-11-28T11:59:04Z
+
+I don't think we want to ship this change in 4.4's final bugfix release. Let's target 5.4 instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-11-28T12:06:44Z
+
+Or fix the vendor?

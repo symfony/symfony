@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `XmlEncoder::SAVE_OPTIONS` context option
+
 6.2
 ---
 

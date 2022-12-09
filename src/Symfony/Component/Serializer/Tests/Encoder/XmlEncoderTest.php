@@ -189,12 +189,13 @@ class XmlEncoderTest extends TestCase
 
     public function testContext()
     {
-        $array = ['person' => ['name' => 'George Abitbol']];
+        $array = ['person' => ['name' => 'George Abitbol', 'age' => null]];
         $expected = <<<'XML'
 <?xml version="1.0"?>
 <response>
   <person>
     <name>George Abitbol</name>
+    <age></age>
   </person>
 </response>
 
@@ -202,6 +203,7 @@ XML;
 
         $context = [
             'xml_format_output' => true,
+            'save_options' => \LIBXML_NOEMPTYTAG,
         ];
 
         $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));

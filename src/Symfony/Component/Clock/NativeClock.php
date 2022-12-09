@@ -41,7 +41,7 @@ final class NativeClock implements ClockInterface
         }
 
         if (0 < $us = $seconds - $s) {
-            usleep($us * 1E6);
+            usleep((int) ($us * 1E6));
         }
     }
 

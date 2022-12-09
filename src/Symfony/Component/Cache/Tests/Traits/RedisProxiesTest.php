@@ -60,6 +60,7 @@ class RedisProxiesTest extends TestCase
         $stub = file_get_contents("https://raw.githubusercontent.com/phpredis/phpredis/develop/{$stub}.stub.php");
         $stub = preg_replace('/^class /m', 'return; \0', $stub);
         $stub = preg_replace('/^return; class ([a-zA-Z]++)/m', 'interface \1StubInterface', $stub, 1);
+        $stub = preg_replace('/^    public const .*/m', '', $stub);
         eval(substr($stub, 5));
 
         $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php");

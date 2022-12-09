@@ -186,10 +186,11 @@ return static function (ContainerConfigurator $container) {
         ->set('translation.locale_switcher', LocaleSwitcher::class)
             ->args([
                 param('kernel.default_locale'),
-                tagged_iterator('kernel.locale_aware'),
+                tagged_iterator('kernel.locale_aware', exclude: 'translation.locale_switcher'),
                 service('router.request_context')->ignoreOnInvalid(),
             ])
             ->tag('kernel.reset', ['method' => 'reset'])
+            ->tag('kernel.locale_aware')
         ->alias(LocaleAwareInterface::class, 'translation.locale_switcher')
         ->alias(LocaleSwitcher::class, 'translation.locale_switcher')
     ;

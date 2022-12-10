@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-final class AccessTokenFactory extends AbstractFactory
+final class AccessTokenFactory extends AbstractFactory implements StatelessAuthenticatorFactoryInterface
 {
     private const PRIORITY = -40;
 
@@ -67,7 +67,7 @@ final class AccessTokenFactory extends AbstractFactory
         return 'access_token';
     }
 
-    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, ?string $userProviderId): string
     {
         $successHandler = isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)) : null;
         $failureHandler = isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null;
@@ -78,7 +78,7 @@ final class AccessTokenFactory extends AbstractFactory
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.access_token'))
             ->replaceArgument(0, new Reference($config['token_handler']))
             ->replaceArgument(1, new Reference($extractorId))
-            ->replaceArgument(2, new Reference($userProviderId))
+            ->replaceArgument(2, $userProviderId ? new Reference($userProviderId) : null)
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])

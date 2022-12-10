@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `NativeMemcachedSessionHandler` and `NativeRedisSessionHandler` to `Symfony\Component\HttpFoundation\Session\Storage\Handler` for native (locking) sessions in Memcache and Redis.
+ 
 6.2
 ---
 

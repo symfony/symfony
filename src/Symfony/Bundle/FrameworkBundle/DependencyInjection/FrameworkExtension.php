@@ -2532,6 +2532,18 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('notifier.channel.email');
         }
 
+        foreach (['texter', 'chatter', 'notifier.channel.chat', 'notifier.channel.email', 'notifier.channel.sms'] as $serviceId) {
+            if (!$container->hasDefinition($serviceId)) {
+                continue;
+            }
+
+            if (false === $messageBus = $config['message_bus']) {
+                $container->getDefinition($serviceId)->replaceArgument(1, null);
+            } else {
+                $container->getDefinition($serviceId)->replaceArgument(1, $messageBus ? new Reference($messageBus) : new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+            }
+        }
+
         if ($this->isInitializedConfigEnabled('messenger')) {
             if ($config['notification_on_failed_messages']) {
                 $container->getDefinition('notifier.failed_message_listener')->addTag('kernel.event_subscriber');

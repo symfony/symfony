@@ -2140,7 +2140,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('html_sanitizer.config.custom_default')->getMethodCalls();
         $this->assertContains(['allowLinkHosts', [null], true], $calls);
+        $this->assertContains(['allowRelativeLinks', [false], true], $calls);
         $this->assertContains(['allowMediaHosts', [null], true], $calls);
+        $this->assertContains(['allowRelativeMedias', [false], true], $calls);
     }
 
     public function testHtmlSanitizerDefaultConfig()

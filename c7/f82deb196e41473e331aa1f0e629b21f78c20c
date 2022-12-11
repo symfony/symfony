@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-10T17:08:52Z
+
+It looks like your commit is not associated with your GitHub account:
+![image](https://user-images.githubusercontent.com/995707/101805128-af370200-3b12-11eb-947b-a6f0fb35a08c.jpeg)
+
+And FrameworkBundle is twice in the PR header 🧐
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-30T16:36:26Z
+
+Anything left todo here @jschaedl ?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-01-31T08:05:56Z
+
+Hi @OskarStark
+Implementation is done. But I have no idea why tests are failing on PHP 7.4 🤔
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-31T10:12:30Z
+
+Can you please rebase and see if it's still failing ? Thanks
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-06T11:14:51Z
+
+@jschaedl can you please check the failing tests?
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-04-06T13:56:45Z
+
+@OskarStark I rebased the branch. Tests are still failing on PHP 8.0 but this seems to be unrelated with my changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-13T08:03:57Z
+
+The failures are related I believe.
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-04-17T07:45:37Z
+
+Needs rebase after https://github.com/symfony/symfony/pull/40842 was merged
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-04-17T15:43:19Z
+
+@OskarStark I am about to split this PR.
+1. Adding the missing TransportFactories to the FrameworkBundle: https://github.com/symfony/symfony/pull/40843 ✅
+2. I would like to add basic tests for the Framework integration for the Notifier: https://github.com/symfony/symfony/pull/40844 ✅
+2. Adding a test to make sure we won't forget to add TransportFactories anymore: https://github.com/symfony/symfony/pull/40845 ✅
+3. And then adding the possibility to add a specific message bus with this PR ✅
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-05-03T07:46:37Z
+
+Rebased and ready for another review :-)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-06-17T09:19:27Z
+
+Ready to merge @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-04T21:25:02Z
+
+Please rebase to get rid of Travis, thanks
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-08-17T06:28:57Z
+
+@OskarStark Rebase done.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-08-19T21:58:58Z
+
+Some tests are failing
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-10-19T07:31:23Z
+
+@jschaedl Can you have a look at the failing tests?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-07-21T10:15:05Z
+
+@jschaedl I've rebased on current 6.2 and fixed the tests. Can you review my commit before I merge?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-19T12:05:40Z
+
+Friendly ping @jschaedl
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2022-11-09T19:58:08Z
+
+I rebased again. Looks good to me now.

@@ -23,7 +23,7 @@ class NativeRedisSessionHandler extends \SessionHandler
      *
      * @see https://github.com/phpredis/phpredis#php-session-handler for further details.
      */
-    public function __construct(string $savePath = null, string $sessionName = null)
+    public function __construct(string $savePath = null, array $sessionOptions = null)
     {
         // 
         // PHP Session handler (from: https://github.com/phpredis/phpredis#php-session-handler)
@@ -57,21 +57,17 @@ class NativeRedisSessionHandler extends \SessionHandler
         // session.save_path = "unix:///var/run/redis/redis.sock?persistent=1&weight=1&database=0"
         //
 
-        if (null === $savePath) {
-            $savePath = ini_get('session.save_path');
-        }
-        if (null === $sessionName) {
-            $sessionName = ini_get('session.name');
-        }
+        $savePath ??= ini_get('session.save_path');
+        $sessionName = $sessionOptions['name'] ?? ini_get('session.name');
 
-        $query = parse_url($savePath, PHP_URL_QUERY);
-        parse_str($query, $arguments);
+        $savePathParts = explode('?', $savePath, 2);
+        parse_str($savePathParts[1] ?? '', $arguments);
         if (!isset($arguments['prefix'])) {
-            $arguments['prefix'] = "PHPREDIS_SESSION:$sessionName:";
+            $arguments['prefix'] = "PHPREDIS_SESSION.$sessionName.";
         }
-        $query = http_build_query($arguments);
+        $savePathParts[1] = http_build_query($arguments);
 
-        ini_set('session.save_path', $savePath);
+        ini_set('session.save_path', implode('?', $savePathParts));
         ini_set('session.save_handler', 'redis');
 
         //

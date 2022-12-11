@@ -23,7 +23,7 @@ class NativeMemcachedSessionHandler extends \SessionHandler
      *
      * @see https://github.com/php-memcached-dev/php-memcached for further details.
      */
-    public function __construct(string $savePath = null, string $sessionName = null)
+    public function __construct(string $savePath = null, array $sessionOptions = null)
     {
         // 
         // Sessions support (from: https://www.php.net/manual/en/memcached.sessions.php)
@@ -41,9 +41,7 @@ class NativeMemcachedSessionHandler extends \SessionHandler
         //   pool, for example "sess1:11211, sess2:11211".
         //
 
-        if (null === $savePath) {
-            $savePath = ini_get('session.save_path');
-        }
+        $savePath ??= ini_get('session.save_path');
 
         ini_set('session.save_path', $savePath);
         ini_set('session.save_handler', 'memcached');
@@ -56,11 +54,6 @@ class NativeMemcachedSessionHandler extends \SessionHandler
         // - memcached.sess_locking bool
         //   Use session locking. Valid values: On, Off, the default is On.
         // 
-        // - memcached.sess_lock_wait int
-        //   Session spin lock retry wait time in microseconds. Be careful when setting this value. 
-        //   Valid values are integers, where 0 is interpreted as the default value. Negative values 
-        //   result in a reduces locking to a try lock. The default is 150000.
-        //
         // - memcached.sess_prefix string
         //   Memcached session key prefix. Valid values are strings less than 219 bytes long. 
         //   The default value is "memc.sess.key."
@@ -73,18 +66,13 @@ class NativeMemcachedSessionHandler extends \SessionHandler
         //   The number of times to retry locking the session lock, not including the first attempt. 
         //   Default is 5.
         // 
-        // - memcached.sess_lock_wait_max int
-        //   The maximum time, in milliseconds, to wait between session lock attempts. The default is 150.
-        // 
         // - memcached.sess_lock_wait_min int
         //   The minimum time, in milliseconds, to wait between session lock attempts. This value is 
         //   double on each lock retry until memcached.sess_lock_wait_max is reached, after which any 
         //   further retries will take sess_lock_wait_max seconds. The default is 150.
         //
 
-        if (null === $sessionName) {
-            $sessionName = ini_get('session.name');
-        }
+        $sessionName = $sessionOptions['name'] ?? ini_get('session.name');
 
         $prefix = "memc.sess.key.$sessionName.";
         $lock_expire = ini_get("max_execution_time") ?: 30; // 30s
@@ -94,9 +82,7 @@ class NativeMemcachedSessionHandler extends \SessionHandler
         ini_set('memcached.sess_locking', 1);
         ini_set('memcached.sess_prefix', $prefix);
         ini_set('memcached.sess_lock_expire', $lock_expire);
-        ini_set('memcached.sess_lock_wait', $lock_wait_time * 1000);
         ini_set('memcached.sess_lock_wait_min', $lock_wait_time);
-        ini_set('memcached.sess_lock_wait_max', $lock_wait_time);
         ini_set('memcached.sess_lock_retries', $lock_retries);
     }
 }

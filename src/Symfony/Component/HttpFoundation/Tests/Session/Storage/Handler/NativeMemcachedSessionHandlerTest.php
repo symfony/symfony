@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  * @author Maurits van der Schee <maurits@vdschee.nl>
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 class NativeMemcachedSessionHandlerTest extends TestCase
@@ -35,9 +36,9 @@ class NativeMemcachedSessionHandlerTest extends TestCase
 
         new NativeSessionStorage($sessionOptions, new NativeMemcachedSessionHandler($savePath, $sessionOptions));
 
-        $this->assertEquals($expectedSessionName, ini_get('session.name'));
-        $this->assertEquals($expectedSavePath, ini_get('session.save_path'));
-        $this->assertTrue((bool) ini_get('memcached.sess_locking'));
+        $this->assertEquals($expectedSessionName, \ini_get('session.name'));
+        $this->assertEquals($expectedSavePath, \ini_get('session.save_path'));
+        $this->assertTrue((bool) \ini_get('memcached.sess_locking'));
     }
 
     public function savePathDataProvider()
@@ -56,8 +57,8 @@ class NativeMemcachedSessionHandlerTest extends TestCase
 
         new NativeSessionStorage([], new NativeMemcachedSessionHandler());
 
-        $this->assertEquals('localhost:11211', ini_get('session.save_path'));
-        $this->assertEquals('TESTING', ini_get('session.name'));
-        $this->assertTrue((bool) ini_get('memcached.sess_locking'));
+        $this->assertEquals('localhost:11211', \ini_get('session.save_path'));
+        $this->assertEquals('TESTING', \ini_get('session.name'));
+        $this->assertTrue((bool) \ini_get('memcached.sess_locking'));
     }
 }

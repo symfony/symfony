@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  * @author Maurits van der Schee <maurits@vdschee.nl>
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 class NativeRedisSessionHandlerTest extends TestCase
@@ -35,9 +36,9 @@ class NativeRedisSessionHandlerTest extends TestCase
 
         new NativeSessionStorage($sessionOptions, new NativeRedisSessionHandler($savePath, $sessionOptions));
 
-        $this->assertEquals($expectedSessionName, ini_get('session.name'));
-        $this->assertEquals($expectedSavePath, ini_get('session.save_path'));
-        $this->assertTrue((bool) ini_get('redis.session.locking_enabled'));
+        $this->assertEquals($expectedSessionName, \ini_get('session.name'));
+        $this->assertEquals($expectedSavePath, \ini_get('session.save_path'));
+        $this->assertTrue((bool) \ini_get('redis.session.locking_enabled'));
     }
 
     public function savePathDataProvider()
@@ -57,8 +58,8 @@ class NativeRedisSessionHandlerTest extends TestCase
 
         new NativeSessionStorage([], new NativeRedisSessionHandler());
 
-        $this->assertEquals('tcp://localhost:6379?prefix=PHPREDIS_SESSION.TESTING.', ini_get('session.save_path'));
-        $this->assertEquals('TESTING', ini_get('session.name'));
-        $this->assertTrue((bool) ini_get('redis.session.locking_enabled'));
+        $this->assertEquals('tcp://localhost:6379?prefix=PHPREDIS_SESSION.TESTING.', \ini_get('session.save_path'));
+        $this->assertEquals('TESTING', \ini_get('session.name'));
+        $this->assertTrue((bool) \ini_get('redis.session.locking_enabled'));
     }
 }

@@ -142,6 +142,7 @@ class Connection
      *   * delay:
      *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_%exchange_name%_%routing_key%_%delay%")
      *     * exchange_name: Name of the exchange to be used for the delayed/retried messages (Default: "delays")
+     *     * arguments: array of extra delay queue arguments (for example:  ['x-queue-type' => 'classic', 'x-message-deduplication' => true,])
      *   * auto_setup: Enable or not the auto-setup of queues and exchanges (Default: true)
      *
      *   * Connection tuning options (see http://www.rabbitmq.com/amqp-0-9-1-reference.html#connection.tune for details):
@@ -386,7 +387,7 @@ class Connection
         $queue = $this->amqpFactory->createQueue($this->channel());
         $queue->setName($this->getRoutingKeyForDelay($delay, $routingKey, $isRetryAttempt));
         $queue->setFlags(\AMQP_DURABLE);
-        $queue->setArguments([
+        $queue->setArguments(array_merge([
             'x-message-ttl' => $delay,
             // delete the delay queue 10 seconds after the message expires
             // publishing another message redeclares the queue which renews the lease
@@ -397,7 +398,7 @@ class Connection
             // after being released from to DLX, make sure the original routing key will be used
             // we must use an empty string instead of null for the argument to be picked up
             'x-dead-letter-routing-key' => $routingKey ?? '',
-        ]);
+        ], $this->connectionOptions['delay']['arguments'] ?? []));
 
         return $queue;
     }

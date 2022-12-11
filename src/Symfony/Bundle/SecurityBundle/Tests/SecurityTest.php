@@ -169,6 +169,38 @@ class SecurityTest extends TestCase
         $security->login($user);
     }
 
+    public function testLoginWithoutAuthenticatorThrows()
+    {
+        $request = new Request();
+        $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $requestStack = $this->createMock(RequestStack::class);
+        $firewallMap = $this->createMock(FirewallMap::class);
+        $firewall = new FirewallConfig('main', 'main');
+        $user = $this->createMock(UserInterface::class);
+        $userChecker = $this->createMock(UserCheckerInterface::class);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->atLeastOnce())
+            ->method('get')
+            ->willReturnMap([
+                ['request_stack', $requestStack],
+                ['security.firewall.map', $firewallMap],
+                ['security.user_checker', $userChecker],
+            ])
+        ;
+
+        $requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
+        $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewall);
+
+        $security = new Security($container, ['main' => null]);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('No authenticators found for firewall "main".');
+
+        $security->login($user);
+    }
+
     public function testLogout()
     {
         $request = new Request();

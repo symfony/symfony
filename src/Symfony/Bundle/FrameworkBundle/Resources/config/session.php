@@ -80,13 +80,13 @@ return static function (ContainerConfigurator $container) {
         ->set('session.handler.native_memcached', StrictSessionHandler::class)
             ->args([
                 inline_service(NativeMemcachedSessionHandler::class)
-                    ->args([param('session.save_path')]),
+                    ->args([param('session.save_path'), param('session.storage.options')]),
             ])
 
         ->set('session.handler.native_redis', StrictSessionHandler::class)
             ->args([
                 inline_service(NativeRedisSessionHandler::class)
-                    ->args([param('session.save_path')]),
+                    ->args([param('session.save_path'), param('session.storage.options')]),
             ])
 
         ->set('session.abstract_handler', AbstractSessionHandler::class)

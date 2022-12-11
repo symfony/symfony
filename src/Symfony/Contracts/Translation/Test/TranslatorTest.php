@@ -140,7 +140,7 @@ class TranslatorTest extends TestCase
     }
 
     /**
-     * @dataProvider getInternal
+     * @dataProvider getInterval
      */
     public function testInterval($expected, $number, $interval)
     {
@@ -149,7 +149,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals($expected, $translator->trans($interval.' foo|[1,Inf[ bar', ['%count%' => $number]));
     }
 
-    public function getInternal()
+    public function getInterval()
     {
         return [
             ['foo', 3, '{1,2, 3 ,4}'],

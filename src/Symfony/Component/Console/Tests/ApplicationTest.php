@@ -2058,6 +2058,19 @@ class ApplicationTest extends TestCase
 
         return $application;
     }
+
+    public function testThrowUncaughtError()
+    {
+        $application = new ThrowUncaughtErrorApplication();
+        $application->add(new \FooCommand());
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['foo']);
+
+        $this->assertEquals(1, $tester->getStatusCode());
+        $this->assertStringContainsString('That doesn\'t work!', $tester->getDisplay(true));
+    }
 }
 
 class CustomApplication extends Application
@@ -2088,6 +2101,14 @@ class CustomDefaultCommandApplication extends Application
         $command = new \FooCommand();
         $this->add($command);
         $this->setDefaultCommand($command->getName());
+    }
+}
+
+class ThrowUncaughtErrorApplication extends Application
+{
+    public function find(string $name)
+    {
+        throw new \Exception('That doesn\'t work!');
     }
 }
 

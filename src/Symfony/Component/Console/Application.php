@@ -302,8 +302,8 @@ class Application implements ResetInterface
                     throw $e;
                 }
             }
-            
-            throw $e;
+
+            $command ?? throw $e;
         }
 
         if ($command instanceof LazyCommand) {

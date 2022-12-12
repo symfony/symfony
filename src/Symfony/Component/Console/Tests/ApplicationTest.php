@@ -2106,7 +2106,7 @@ class CustomDefaultCommandApplication extends Application
 
 class ThrowUncaughtErrorApplication extends Application
 {
-    public function find(string $name)
+    public function find(string $name): Command
     {
         throw new \Exception('That doesn\'t work!');
     }

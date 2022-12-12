@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IpValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IpValidator
     {
         return new IpValidator();
     }

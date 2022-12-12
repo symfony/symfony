@@ -336,6 +336,16 @@ class CompoundFormTest extends TestCase
         $this->assertSame($this->form->all(), iterator_to_array($this->form));
     }
 
+    public function testIteratorKeys()
+    {
+        $this->form->add($this->getBuilder('0')->getForm());
+        $this->form->add($this->getBuilder('1')->getForm());
+
+        foreach ($this->form as $key => $value) {
+            $this->assertIsString($key);
+        }
+    }
+
     public function testAddMapsViewDataToFormIfInitialized()
     {
         $form = $this->getBuilder()

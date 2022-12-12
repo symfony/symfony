@@ -37,9 +37,6 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
     {
         $trans = $this->translator->trans($id = (string) $id, $parameters, $domain, $locale);
@@ -48,9 +45,6 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
         return $trans;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLocale(string $locale)
     {
         $prev = $this->translator->getLocale();
@@ -62,25 +56,16 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
         $this->logger->debug(sprintf('The locale of the translator has changed from "%s" to "%s".', $prev, $locale));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale(): string
     {
         return $this->translator->getLocale();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCatalogue(string $locale = null): MessageCatalogueInterface
     {
         return $this->translator->getCatalogue($locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCatalogues(): array
     {
         return $this->translator->getCatalogues();
@@ -111,9 +96,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
      */
     private function log(string $id, ?string $domain, ?string $locale)
     {
-        if (null === $domain) {
-            $domain = 'messages';
-        }
+        $domain ??= 'messages';
 
         $catalogue = $this->translator->getCatalogue($locale);
         if ($catalogue->defines($id, $domain)) {

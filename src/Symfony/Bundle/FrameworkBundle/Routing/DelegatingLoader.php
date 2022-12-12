@@ -40,9 +40,6 @@ class DelegatingLoader extends BaseDelegatingLoader
         parent::__construct($resolver);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(mixed $resource, string $type = null): RouteCollection
     {
         if ($this->loading) {
@@ -58,7 +55,7 @@ class DelegatingLoader extends BaseDelegatingLoader
             //   the fatal error from occurring a second time,
             //   otherwise the PHP process would be killed immediately;
             // - while rendering the exception page, the router can be required
-            //   (by e.g. the web profiler that needs to generate an URL);
+            //   (by e.g. the web profiler that needs to generate a URL);
             // - this handles the case and prevents the second fatal error
             //   by triggering an exception beforehand.
 

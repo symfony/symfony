@@ -21,11 +21,12 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class EnvVarProcessor implements EnvVarProcessorInterface
 {
     private ContainerInterface $container;
+    /** @var \Traversable<EnvVarLoaderInterface> */
     private \Traversable $loaders;
     private array $loadedVars = [];
 
     /**
-     * @param EnvVarLoaderInterface[] $loaders
+     * @param \Traversable<EnvVarLoaderInterface>|null $loaders
      */
     public function __construct(ContainerInterface $container, \Traversable $loaders = null)
     {
@@ -33,9 +34,6 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         $this->loaders = $loaders ?? new \ArrayIterator();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getProvidedTypes(): array
     {
         return [
@@ -56,12 +54,11 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'string' => 'string',
             'trim' => 'string',
             'require' => 'bool|int|float|string|array',
+            'enum' => \BackedEnum::class,
+            'shuffle' => 'array',
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         $i = strpos($name, ':');
@@ -84,6 +81,26 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             return $array[$key];
+        }
+
+        if ('enum' === $prefix) {
+            if (false === $i) {
+                throw new RuntimeException(sprintf('Invalid env "enum:%s": a "%s" class-string should be provided.', $name, \BackedEnum::class));
+            }
+
+            $next = substr($name, $i + 1);
+            $backedEnumClassName = substr($name, 0, $i);
+            $backedEnumValue = $getEnv($next);
+
+            if (!\is_string($backedEnumValue) && !\is_int($backedEnumValue)) {
+                throw new RuntimeException(sprintf('Resolved value of "%s" did not result in a string or int value.', $next));
+            }
+
+            if (!is_subclass_of($backedEnumClassName, \BackedEnum::class)) {
+                throw new RuntimeException(sprintf('"%s" is not a "%s".', $backedEnumClassName, \BackedEnum::class));
+            }
+
+            return $backedEnumClassName::tryFrom($backedEnumValue) ?? throw new RuntimeException(sprintf('Enum value "%s" is not backed by "%s".', $backedEnumValue, $backedEnumClassName));
         }
 
         if ('default' === $prefix) {
@@ -184,6 +201,12 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return null;
         }
 
+        if ('shuffle' === $prefix) {
+            \is_array($env) ? shuffle($env) : throw new RuntimeException(sprintf('Env var "%s" cannot be shuffled, expected array, got "%s".', $name, get_debug_type($env)));
+
+            return $env;
+        }
+
         if (!\is_scalar($env)) {
             throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to "%s".', $name, $prefix));
         }
@@ -193,7 +216,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if (\in_array($prefix, ['bool', 'not'], true)) {
-            $env = (bool) (filter_var($env, \FILTER_VALIDATE_BOOLEAN) ?: filter_var($env, \FILTER_VALIDATE_INT) ?: filter_var($env, \FILTER_VALIDATE_FLOAT));
+            $env = (bool) (filter_var($env, \FILTER_VALIDATE_BOOL) ?: filter_var($env, \FILTER_VALIDATE_INT) ?: filter_var($env, \FILTER_VALIDATE_FLOAT));
 
             return 'not' === $prefix ? !$env : $env;
         }

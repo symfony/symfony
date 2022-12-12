@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class TimeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): TimeValidator
     {
         return new TimeValidator();
     }

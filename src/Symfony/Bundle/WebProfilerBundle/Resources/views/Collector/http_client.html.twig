@@ -38,7 +38,7 @@
 {% block panel %}
     <h2>HTTP Client</h2>
     {% if collector.requestCount == 0 %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No HTTP requests were made.</p>
         </div>
     {% else %}
@@ -77,17 +77,14 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
-                                <table>
+                                <table class="sf-profiler-httpclient-requests">
                                     <thead>
                                     <tr>
                                         <th>
-                                            <span class="label">{{ trace.method }}</span>
+                                            <span class="http-method">{{ trace.method }}</span>
                                         </th>
                                         <th class="full-width">
                                             {{ trace.url }}
-                                            {% if trace.options is not empty %}
-                                                {{ profiler_dump(trace.options, maxDepth=1) }}
-                                            {% endif %}
                                         </th>
                                         {% if profiler_token and profiler_link %}
                                             <th>
@@ -96,14 +93,21 @@
                                         {% endif %}
                                         {% if trace.curlCommand is not null %}
                                             <th>
-                                                <button class="btn btn-sm hidden label" title="Copy as curl" data-clipboard-text="{{ trace.curlCommand }}">curl</button>
+                                                <button class="btn btn-sm hidden" title="Copy as cURL" data-clipboard-text="{{ trace.curlCommand }}">Copy as cURL</button>
                                             </th>
                                         {% endif %}
                                     </tr>
                                     </thead>
                                     <tbody>
+                                    {% if trace.options is not empty %}
+                                        <tr>
+                                            <th class="font-normal">Request options</th>
+                                            <td>{{ profiler_dump(trace.options, maxDepth=1) }}</td>
+                                        </tr>
+                                    {% endif %}
                                     <tr>
-                                        <th>
+                                        <th class="font-normal">Response</th>
+                                        <td{% if trace.curlCommand %} colspan="2"{% endif %}>
                                             {% if trace.http_code >= 500 %}
                                                 {% set responseStatus = 'error' %}
                                             {% elseif trace.http_code >= 400 %}
@@ -111,11 +115,10 @@
                                             {% else %}
                                                 {% set responseStatus = 'success' %}
                                             {% endif %}
-                                            <span class="label status-{{ responseStatus }}">
+                                            <span class="font-normal status-response-status-code status-{{ responseStatus }}">
                                                 {{ trace.http_code }}
                                             </span>
-                                        </th>
-                                        <td{% if trace.curlCommand %} colspan="2"{% endif %}>
+
                                             {{ profiler_dump(trace.info, maxDepth=1) }}
                                         </td>
                                         {% if profiler_token and profiler_link %}

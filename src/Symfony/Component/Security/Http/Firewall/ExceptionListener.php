@@ -28,11 +28,11 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
@@ -164,7 +164,7 @@ class ExceptionListener
                 }
             } elseif (null !== $this->errorPage) {
                 $subRequest = $this->httpUtils->createRequest($event->getRequest(), $this->errorPage);
-                $subRequest->attributes->set(Security::ACCESS_DENIED_ERROR, $exception);
+                $subRequest->attributes->set(SecurityRequestAttributes::ACCESS_DENIED_ERROR, $exception);
 
                 $event->setResponse($event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true));
                 $event->allowCustomResponseCode();

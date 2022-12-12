@@ -266,6 +266,12 @@ class YamlDumper extends Dumper
                         $content['default_priority_method'] = $tag->getDefaultPriorityMethod();
                     }
                 }
+                if ($excludes = $tag->getExclude()) {
+                    if (!\is_array($content)) {
+                        $content = ['tag' => $content];
+                    }
+                    $content['exclude'] = 1 === \count($excludes) ? $excludes[0] : $excludes;
+                }
 
                 return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator', $content);
             }
@@ -297,7 +303,7 @@ class YamlDumper extends Dumper
         } elseif ($value instanceof Definition) {
             return new TaggedValue('service', (new Parser())->parse("_:\n".$this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
         } elseif ($value instanceof \UnitEnum) {
-            return new TaggedValue('php/const', sprintf('%s::%s', \get_class($value), $value->name));
+            return new TaggedValue('php/const', sprintf('%s::%s', $value::class, $value->name));
         } elseif ($value instanceof AbstractArgument) {
             return new TaggedValue('abstract', $value->getText());
         } elseif (\is_object($value) || \is_resource($value)) {

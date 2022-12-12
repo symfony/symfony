@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -50,7 +50,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -78,7 +77,6 @@ class SecurityExtensionTest extends TestCase
         $extension->addUserProviderFactory(new DummyProvider());
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'my_foo' => ['foo' => []],
             ],
@@ -99,7 +97,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -124,7 +121,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -147,7 +143,6 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -170,7 +165,6 @@ class SecurityExtensionTest extends TestCase
         $this->expectExceptionMessage('Not configuring explicitly the provider for the "http_basic" authenticator on "ambiguous" firewall is ambiguous as there is more than one registered provider.');
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -191,7 +185,6 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -216,7 +209,6 @@ class SecurityExtensionTest extends TestCase
         $rawExpression = "'foo' == 'bar' or 1 in [1, 3, 3]";
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -256,11 +248,10 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $requestMatcherId = 'My\Test\RequestMatcher';
-        $requestMatcher = new RequestMatcher('/');
+        $requestMatcher = new PathRequestMatcher('/');
         $container->set($requestMatcherId, $requestMatcher);
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -291,11 +282,10 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $requestMatcherId = 'My\Test\RequestMatcher';
-        $requestMatcher = new RequestMatcher('/');
+        $requestMatcher = new PathRequestMatcher('/');
         $container->set($requestMatcherId, $requestMatcher);
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -323,13 +313,108 @@ class SecurityExtensionTest extends TestCase
         yield 'Invalid configuration with port' => [['port' => 80]];
         yield 'Invalid configuration with methods' => [['methods' => ['POST']]];
         yield 'Invalid configuration with ips' => [['ips' => ['0.0.0.0']]];
+        yield 'Invalid configuration with attributes' => [['attributes' => ['_route' => 'foo_route']]];
+        yield 'Invalid configuration with route' => [['route' => 'foo_route']];
+    }
+
+    public function testRegisterAccessControlWithSpecifiedAttributes()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['attributes' => ['_route' => 'foo_route']],
+            ],
+        ]);
+
+        $container->compile();
+
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(1, $accessMap->getMethodCalls());
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+
+        $chainRequestMatcherDefinition = $container->getDefinition((string) $args[0]);
+        $chainRequestMatcherConstructorArguments = $chainRequestMatcherDefinition->getArguments();
+        $attributesRequestMatcher = $container->getDefinition((string) $chainRequestMatcherConstructorArguments[0][0]);
+
+        $this->assertCount(1, $attributesRequestMatcher->getArguments());
+        $this->assertArrayHasKey('_route', $attributesRequestMatcher->getArgument(0));
+        $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
+    }
+
+    public function testRegisterAccessControlWithSpecifiedRoute()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['route' => 'foo_route'],
+            ],
+        ]);
+
+        $container->compile();
+
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(1, $accessMap->getMethodCalls());
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+
+        $chainRequestMatcherDefinition = $container->getDefinition((string) $args[0]);
+        $chainRequestMatcherConstructorArguments = $chainRequestMatcherDefinition->getArguments();
+        $attributesRequestMatcher = $container->getDefinition((string) $chainRequestMatcherConstructorArguments[0][0]);
+
+        $this->assertCount(1, $attributesRequestMatcher->getArguments());
+        $this->assertArrayHasKey('_route', $attributesRequestMatcher->getArgument(0));
+        $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
+    }
+
+    public function testRegisterAccessControlWithSpecifiedAttributesThrowsException()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['route' => 'anything', 'attributes' => ['_route' => 'foo_route']],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
+
+        $container->compile();
     }
 
     public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -350,7 +435,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -373,7 +457,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -400,8 +483,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
-
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'foo'],
@@ -427,7 +508,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -453,7 +533,6 @@ class SecurityExtensionTest extends TestCase
 
         $container->register('custom_remember_me', \stdClass::class);
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => [
                 'default' => [
                     'remember_me' => ['secret' => 'very', 'service' => 'custom_remember_me'],
@@ -474,7 +553,6 @@ class SecurityExtensionTest extends TestCase
 
         $container->register('custom_remember_me', \stdClass::class);
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => [
                 'default' => [
                     'remember_me' => ['secret' => 'very'],
@@ -494,7 +572,6 @@ class SecurityExtensionTest extends TestCase
 
         $container->register('custom_remember_me', \stdClass::class);
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => [
                 'default' => [
                     'remember_me' => ['secret' => 'very', 'token_provider' => 'token_provider_id'],
@@ -543,7 +620,6 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -568,7 +644,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -594,7 +669,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -625,7 +699,6 @@ class SecurityExtensionTest extends TestCase
 
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'users'],
             ],
@@ -655,7 +728,6 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
         $container->register(TestAuthenticator::class);
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'users'],
             ],
@@ -689,7 +761,6 @@ class SecurityExtensionTest extends TestCase
 
         $firewallId = 'stateless_firewall';
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => [
                 $firewallId => [
                     'pattern' => '/.*',
@@ -710,7 +781,6 @@ class SecurityExtensionTest extends TestCase
 
         $firewallId = 'statefull_firewall';
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => [
                 $firewallId => [
                     'pattern' => '/.*',
@@ -734,7 +804,6 @@ class SecurityExtensionTest extends TestCase
         $container->register(TestUserChecker::class);
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => [
                 'main' => array_merge([
                     'pattern' => '/.*',
@@ -764,7 +833,6 @@ class SecurityExtensionTest extends TestCase
         $extension->addAuthenticatorFactory(new TestFirewallListenerFactory());
 
         $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
             'firewalls' => [
                 'main' => [
                     'custom_listener' => true,
@@ -778,6 +846,22 @@ class SecurityExtensionTest extends TestCase
         $listenersIteratorArgument = $container->getDefinition('security.firewall.map.context.main')->getArgument(0);
         $firewallListeners = array_map('strval', $listenersIteratorArgument->getValues());
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNothingDoneWithEmptyConfiguration()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security');
+
+        $this->expectDeprecation('Since symfony/security-bundle 6.3: Enabling bundle "Symfony\Bundle\SecurityBundle\SecurityBundle" and not configuring it is deprecated.');
+
+        $container->compile();
+
+        $this->assertFalse($container->has('security.authorization_checker'));
     }
 
     protected function getRawContainer()

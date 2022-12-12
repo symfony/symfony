@@ -107,10 +107,7 @@ class Parser
         $this->lines = explode("\n", $value);
         $this->numberOfParsedLines = \count($this->lines);
         $this->locallySkippedLineNumbers = [];
-
-        if (null === $this->totalNumberOfLines) {
-            $this->totalNumberOfLines = $this->numberOfParsedLines;
-        }
+        $this->totalNumberOfLines ??= $this->numberOfParsedLines;
 
         if (!$this->moveToNextLine()) {
             return null;
@@ -201,9 +198,14 @@ class Parser
                     array_pop($this->refsBeingParsed);
                 }
             } elseif (
+                // @todo in 7.0 remove legacy "(?:!?!php/const:)?"
                 self::preg_match('#^(?P<key>(?:![^\s]++\s++)?(?:'.Inline::REGEX_QUOTED_STRING.'|(?:!?!php/const:)?[^ \'"\[\{!].*?)) *\:(( |\t)++(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
                 && (!str_contains($values['key'], ' #') || \in_array($values['key'][0], ['"', "'"]))
             ) {
+                if (str_starts_with($values['key'], '!php/const:')) {
+                    trigger_deprecation('symfony/yaml', '6.2', 'YAML syntax for key "%s" is deprecated and replaced by "!php/const %s".', $values['key'], substr($values['key'], 11));
+                }
+
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence.', $this->currentLineNb + 1, $this->currentLine, $this->filename);
                 }
@@ -1036,23 +1038,12 @@ class Parser
      *
      * @throws ParseException on a PCRE internal error
      *
-     * @see preg_last_error()
-     *
      * @internal
      */
     public static function preg_match(string $pattern, string $subject, array &$matches = null, int $flags = 0, int $offset = 0): int
     {
         if (false === $ret = preg_match($pattern, $subject, $matches, $flags, $offset)) {
-            $error = match (preg_last_error()) {
-                \PREG_INTERNAL_ERROR => 'Internal PCRE error.',
-                \PREG_BACKTRACK_LIMIT_ERROR => 'pcre.backtrack_limit reached.',
-                \PREG_RECURSION_LIMIT_ERROR => 'pcre.recursion_limit reached.',
-                \PREG_BAD_UTF8_ERROR => 'Malformed UTF-8 data.',
-                \PREG_BAD_UTF8_OFFSET_ERROR => 'Offset doesn\'t correspond to the begin of a valid UTF-8 code point.',
-                default => 'Error.',
-            };
-
-            throw new ParseException($error);
+            throw new ParseException(preg_last_error_msg());
         }
 
         return $ret;

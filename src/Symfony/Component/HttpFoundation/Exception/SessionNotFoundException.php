@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Exception;
 
 /**
- * Raised when a session does not exists. This happens in the following cases:
+ * Raised when a session does not exist. This happens in the following cases:
  * - the session is not enabled
  * - attempt to read a session outside a request context (ie. cli script).
  *

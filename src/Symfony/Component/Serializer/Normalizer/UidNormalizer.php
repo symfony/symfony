@@ -42,37 +42,24 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param AbstractUid $object
      */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        switch ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
-            case self::NORMALIZATION_FORMAT_CANONICAL:
-                return (string) $object;
-            case self::NORMALIZATION_FORMAT_BASE58:
-                return $object->toBase58();
-            case self::NORMALIZATION_FORMAT_BASE32:
-                return $object->toBase32();
-            case self::NORMALIZATION_FORMAT_RFC4122:
-                return $object->toRfc4122();
-        }
-
-        throw new LogicException(sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]));
+        return match ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
+            self::NORMALIZATION_FORMAT_CANONICAL => (string) $object,
+            self::NORMALIZATION_FORMAT_BASE58 => $object->toBase58(),
+            self::NORMALIZATION_FORMAT_BASE32 => $object->toBase32(),
+            self::NORMALIZATION_FORMAT_RFC4122 => $object->toRfc4122(),
+            default => throw new LogicException(sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY])),
+        };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof AbstractUid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         try {
@@ -94,9 +81,6 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         if (AbstractUid::class === $type) {
@@ -108,9 +92,6 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
         return is_subclass_of($type, AbstractUid::class, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

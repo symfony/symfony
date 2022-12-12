@@ -1258,7 +1258,7 @@ class RecursiveValidatorTest extends TestCase
             $context->addViolation('Violation in Group 3');
         };
 
-        $metadata = new ClassMetadata(\get_class($entity));
+        $metadata = new ClassMetadata($entity::class);
         $metadata->addConstraint(new Callback([
             'callback' => function () {},
             'groups' => 'Group 1',
@@ -2362,9 +2362,6 @@ final class TestConstraintHashesDoNotCollide extends Constraint
 
 final class TestConstraintHashesDoNotCollideValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
     public function validate($value, Constraint $constraint)
     {
         if (!$value instanceof Entity) {

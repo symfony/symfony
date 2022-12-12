@@ -42,9 +42,6 @@ class PhpFileLoader extends FileLoader
         $this->generator = $generator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(mixed $resource, string $type = null): mixed
     {
         // the container and loader variables are exposed to the included file below
@@ -74,9 +71,6 @@ class PhpFileLoader extends FileLoader
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(mixed $resource, string $type = null): bool
     {
         if (!\is_string($resource)) {
@@ -101,7 +95,7 @@ class PhpFileLoader extends FileLoader
         $r = new \ReflectionFunction($callback);
 
         $attribute = null;
-        foreach ($r->getAttributes(When::class) as $attribute) {
+        foreach ($r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             if ($this->env === $attribute->newInstance()->env) {
                 $attribute = null;
                 break;
@@ -129,6 +123,12 @@ class PhpFileLoader extends FileLoader
                 case self::class:
                     $arguments[] = $this;
                     break;
+                case 'string':
+                    if (null !== $this->env && 'env' === $parameter->getName()) {
+                        $arguments[] = $this->env;
+                        break;
+                    }
+                    // no break
                 default:
                     try {
                         $configBuilder = $this->configBuilder($type);
@@ -169,7 +169,7 @@ class PhpFileLoader extends FileLoader
             return new $namespace();
         }
 
-        // If it does not start with Symfony\Config\ we dont know how to handle this
+        // If it does not start with Symfony\Config\ we don't know how to handle this
         if (!str_starts_with($namespace, 'Symfony\\Config\\')) {
             throw new InvalidArgumentException(sprintf('Could not find or generate class "%s".', $namespace));
         }

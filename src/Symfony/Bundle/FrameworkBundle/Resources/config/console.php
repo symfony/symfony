@@ -47,6 +47,7 @@ use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
+use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Command\StopWorkersCommand;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
@@ -159,6 +160,7 @@ return static function (ContainerConfigurator $container) {
                 [], // Receiver names
                 service('messenger.listener.reset_services')->nullOnInvalid(),
                 [], // Bus names
+                service('messenger.rate_limiter_locator')->nullOnInvalid(),
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])
@@ -189,6 +191,7 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.routable_message_bus'),
                 service('event_dispatcher'),
                 service('logger'),
+                service('messenger.transport.native_php_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -196,6 +199,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Default failure receiver name'),
                 abstract_arg('Receivers'),
+                service('messenger.transport.native_php_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -203,6 +207,14 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Default failure receiver name'),
                 abstract_arg('Receivers'),
+                service('messenger.transport.native_php_serializer')->nullOnInvalid(),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.messenger_stats', StatsCommand::class)
+            ->args([
+                service('messenger.receiver_locator'),
+                abstract_arg('Receivers names'),
             ])
             ->tag('console.command')
 
@@ -274,6 +286,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command', ['command' => 'translation:push'])
 
         ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
+            ->args([
+                tagged_locator('workflow', 'name'),
+            ])
             ->tag('console.command')
 
         ->set('console.command.xliff_lint', XliffLintCommand::class)

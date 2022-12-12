@@ -316,6 +316,44 @@ class ExpressionLanguageTest extends TestCase
     }
 
     /**
+     * @dataProvider provideNullCoalescing
+     */
+    public function testNullCoalescingEvaluate($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame($expressionLanguage->evaluate($expression, ['foo' => $foo]), 'default');
+    }
+
+    /**
+     * @dataProvider provideNullCoalescing
+     */
+    public function testNullCoalescingCompile($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame(eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))), 'default');
+    }
+
+    public function provideNullCoalescing()
+    {
+        $foo = new class() extends \stdClass {
+            public function bar()
+            {
+                return null;
+            }
+        };
+
+        yield ['foo.bar ?? "default"', null];
+        yield ['foo.bar.baz ?? "default"', (object) ['bar' => null]];
+        yield ['foo.bar ?? foo.baz ?? "default"', null];
+        yield ['foo[0] ?? "default"', []];
+        yield ['foo["bar"] ?? "default"', ['bar' => null]];
+        yield ['foo["baz"] ?? "default"', ['bar' => null]];
+        yield ['foo["bar"]["baz"] ?? "default"', ['bar' => null]];
+        yield ['foo["bar"].baz ?? "default"', ['bar' => null]];
+        yield ['foo.bar().baz ?? "default"', $foo];
+    }
+
+    /**
      * @dataProvider getRegisterCallbacks
      */
     public function testRegisterAfterCompile($registerCallback)

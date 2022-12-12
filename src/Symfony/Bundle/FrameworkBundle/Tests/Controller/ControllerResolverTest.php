@@ -172,7 +172,7 @@ class ContainerAwareController implements ContainerAwareInterface
 {
     private $container;
 
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container)
     {
         $this->container = $container;
     }

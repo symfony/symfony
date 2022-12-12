@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add caster for `WeakMap`
+
+6.2
+---
+
+ * Add support for `FFI\CData` and `FFI\CType`
+ * Deprecate calling `VarDumper::setHandler()` without arguments
+
 5.4
 ---
 

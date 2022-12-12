@@ -16,12 +16,11 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ConstraintValidatorTestCaseTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator(): ConstraintValidatorInterface
+    protected function createValidator(): TestCustomValidator
     {
         return new TestCustomValidator();
     }

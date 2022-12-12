@@ -18,9 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PasswordType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['always_empty'] || !$form->isSubmitted()) {
@@ -28,9 +25,6 @@ class PasswordType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -40,17 +34,11 @@ class PasswordType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent(): ?string
     {
         return TextType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'password';

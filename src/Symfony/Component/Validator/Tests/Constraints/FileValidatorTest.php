@@ -24,7 +24,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     protected $file;
 
-    protected function createValidator()
+    protected function createValidator(): FileValidator
     {
         return new FileValidator();
     }
@@ -501,7 +501,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ], '1'];
 
             // access FileValidator::factorizeSizes() private method to format max file size
-            $reflection = new \ReflectionClass(\get_class(new FileValidator()));
+            $reflection = new \ReflectionClass((new FileValidator()));
             $method = $reflection->getMethod('factorizeSizes');
             [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 
@@ -528,6 +528,133 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
         $file = new File();
         $file->maxSize = -1;
+    }
+
+    /**
+     * @dataProvider validExtensionProvider
+     */
+    public function testExtensionValid(string $name)
+    {
+        $path = __DIR__.'/Fixtures/'.$name;
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypes: [], extensions: ['gif', 'txt'], extensionsMessage: 'myMessage');
+
+        $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    private function validExtensionProvider(): iterable
+    {
+        yield ['test.gif'];
+        yield ['test.png.gif'];
+        yield ['ccc.txt'];
+    }
+
+    /**
+     * @dataProvider invalidExtensionProvider
+     */
+    public function testExtensionInvalid(string $name, string $extension)
+    {
+        $path = __DIR__.'/Fixtures/'.$name;
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        $constraint = new File(extensions: ['png', 'svg'], extensionsMessage: 'myMessage');
+
+        $this->validator->validate($file, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ extension }}' => '"'.$extension.'"',
+                '{{ extensions }}' => '"png", "svg"',
+                '{{ name }}' => '"'.$name.'"',
+            ])
+            ->setCode(File::INVALID_EXTENSION_ERROR)
+            ->assertRaised();
+    }
+
+    private function invalidExtensionProvider(): iterable
+    {
+        yield ['test.gif', 'gif'];
+        yield ['test.png.gif', 'gif'];
+        yield ['bar', ''];
+    }
+
+    public function testExtensionAutodetectMimeTypesInvalid()
+    {
+        $path = __DIR__.'/Fixtures/invalid-content.gif';
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['gif']);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ name }}' => '"invalid-content.gif"',
+                '{{ type }}' => '"text/plain"',
+                '{{ types }}' => '"image/gif"',
+            ])
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testExtensionTypesIncoherent()
+    {
+        $path = __DIR__.'/Fixtures/invalid-content.gif';
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['gif', 'txt']);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ name }}' => '"invalid-content.gif"',
+                '{{ type }}' => '"text/plain"',
+                '{{ types }}' => '"image/gif"',
+            ])
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testUploadedFileExtensions()
+    {
+        $file = new UploadedFile(__DIR__.'/Fixtures/bar', 'bar.txt', 'text/plain', \UPLOAD_ERR_OK, true);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['txt']);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
     }
 
     abstract protected function getFile($filename);

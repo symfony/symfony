@@ -17,6 +17,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,8 +48,9 @@ class ConsumeMessagesCommand extends Command
     private array $receiverNames;
     private ?ResetServicesListener $resetServicesListener;
     private array $busIds;
+    private ?ContainerInterface $rateLimiterLocator;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ResetServicesListener $resetServicesListener = null, array $busIds = [], ContainerInterface $rateLimiterLocator = null)
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
@@ -57,13 +59,11 @@ class ConsumeMessagesCommand extends Command
         $this->receiverNames = $receiverNames;
         $this->resetServicesListener = $resetServicesListener;
         $this->busIds = $busIds;
+        $this->rateLimiterLocator = $rateLimiterLocator;
 
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $defaultReceiverName = 1 === \count($this->receiverNames) ? current($this->receiverNames) : null;
@@ -124,14 +124,11 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        if ($this->receiverNames && 0 === \count($input->getArgument('receivers'))) {
+        if ($this->receiverNames && !$input->getArgument('receivers')) {
             $io->block('Which transports/receivers do you want to consume?', null, 'fg=white;bg=blue', ' ', true);
 
             $io->writeln('Choose which receivers you want to consume messages from in order of priority.');
@@ -145,17 +142,15 @@ EOF
             $input->setArgument('receivers', $io->askQuestion($question));
         }
 
-        if (0 === \count($input->getArgument('receivers'))) {
+        if (!$input->getArgument('receivers')) {
             throw new RuntimeException('Please pass at least one receiver.');
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $receivers = [];
+        $rateLimiters = [];
         foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
                 $message = sprintf('The receiver "%s" does not exist.', $receiverName);
@@ -167,6 +162,9 @@ EOF
             }
 
             $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
+            if ($this->rateLimiterLocator?->has($receiverName)) {
+                $rateLimiters[$receiverName] = $this->rateLimiterLocator->get($receiverName);
+            }
         }
 
         if (null !== $this->resetServicesListener && !$input->getOption('no-reset')) {
@@ -174,7 +172,11 @@ EOF
         }
 
         $stopsWhen = [];
-        if ($limit = $input->getOption('limit')) {
+        if (null !== $limit = $input->getOption('limit')) {
+            if (!is_numeric($limit) || 0 >= $limit) {
+                throw new InvalidOptionException(sprintf('Option "limit" must be a positive integer, "%s" passed.', $limit));
+            }
+
             $stopsWhen[] = "processed {$limit} messages";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener($limit, $this->logger));
         }
@@ -189,7 +191,11 @@ EOF
             $this->eventDispatcher->addSubscriber(new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger));
         }
 
-        if (null !== ($timeLimit = $input->getOption('time-limit'))) {
+        if (null !== $timeLimit = $input->getOption('time-limit')) {
+            if (!is_numeric($timeLimit) || 0 >= $timeLimit) {
+                throw new InvalidOptionException(sprintf('Option "time-limit" must be a positive integer, "%s" passed.', $timeLimit));
+            }
+
             $stopsWhen[] = "been running for {$timeLimit}s";
             $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
         }
@@ -197,7 +203,7 @@ EOF
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
-        $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 0 ? 's' : '', implode(', ', $receiverNames)));
+        $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 1 ? 's' : '', implode(', ', $receiverNames)));
 
         if ($stopsWhen) {
             $last = array_pop($stopsWhen);
@@ -213,7 +219,7 @@ EOF
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
+        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
         ];
@@ -252,11 +258,11 @@ EOF
 
         switch (substr(rtrim($memoryLimit, 'b'), -1)) {
             case 't': $max *= 1024;
-                // no break
+            // no break
             case 'g': $max *= 1024;
-                // no break
+            // no break
             case 'm': $max *= 1024;
-                // no break
+            // no break
             case 'k': $max *= 1024;
         }
 

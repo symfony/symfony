@@ -42,7 +42,7 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
     private string $searchPassword;
     private string $queryString;
 
-    public function __construct(AuthenticatorInterface $authenticator, string $ldapServiceId, string $dnString = '{username}', string $searchDn = '', string $searchPassword = '', string $queryString = '')
+    public function __construct(AuthenticatorInterface $authenticator, string $ldapServiceId, string $dnString = '{user_identifier}', string $searchDn = '', string $searchPassword = '', string $queryString = '')
     {
         $this->authenticator = $authenticator;
         $this->ldapServiceId = $ldapServiceId;

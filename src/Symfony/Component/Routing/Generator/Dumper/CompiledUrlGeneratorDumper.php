@@ -88,9 +88,6 @@ class CompiledUrlGeneratorDumper extends GeneratorDumper
         return $compiledAliases;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dump(array $options = []): string
     {
         return <<<EOF

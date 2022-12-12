@@ -84,9 +84,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         $this->options = $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
     {
         if ($this->locked) {
@@ -98,9 +95,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addEventSubscriber(EventSubscriberInterface $subscriber): static
     {
         if ($this->locked) {
@@ -112,9 +106,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addViewTransformer(DataTransformerInterface $viewTransformer, bool $forcePrepend = false): static
     {
         if ($this->locked) {
@@ -130,9 +121,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resetViewTransformers(): static
     {
         if ($this->locked) {
@@ -144,9 +132,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addModelTransformer(DataTransformerInterface $modelTransformer, bool $forceAppend = false): static
     {
         if ($this->locked) {
@@ -162,9 +147,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resetModelTransformers(): static
     {
         if ($this->locked) {
@@ -176,9 +158,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEventDispatcher(): EventDispatcherInterface
     {
         if ($this->locked && !$this->dispatcher instanceof ImmutableEventDispatcher) {
@@ -188,169 +167,106 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this->dispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPropertyPath(): ?PropertyPathInterface
     {
         return $this->propertyPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMapped(): bool
     {
         return $this->mapped;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getByReference(): bool
     {
         return $this->byReference;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInheritData(): bool
     {
         return $this->inheritData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCompound(): bool
     {
         return $this->compound;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getType(): ResolvedFormTypeInterface
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getViewTransformers(): array
     {
         return $this->viewTransformers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getModelTransformers(): array
     {
         return $this->modelTransformers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataMapper(): ?DataMapperInterface
     {
         return $this->dataMapper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequired(): bool
     {
         return $this->required;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDisabled(): bool
     {
         return $this->disabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getErrorBubbling(): bool
     {
         return $this->errorBubbling;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEmptyData(): mixed
     {
         return $this->emptyData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasAttribute(string $name): bool
     {
         return \array_key_exists($name, $this->attributes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAttribute(string $name, mixed $default = null): mixed
     {
         return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getData(): mixed
     {
         return $this->data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataClass(): ?string
     {
         return $this->dataClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataLocked(): bool
     {
         return $this->dataLocked;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormFactory(): FormFactoryInterface
     {
         if (!isset($this->formFactory)) {
@@ -360,73 +276,46 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this->formFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAction(): string
     {
         return $this->action;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMethod(): string
     {
         return $this->method;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequestHandler(): RequestHandlerInterface
     {
         return $this->requestHandler ??= self::$nativeRequestHandler ??= new NativeRequestHandler();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAutoInitialize(): bool
     {
         return $this->autoInitialize;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasOption(string $name): bool
     {
         return \array_key_exists($name, $this->options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOption(string $name, mixed $default = null): mixed
     {
         return \array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIsEmptyCallback(): ?callable
     {
         return $this->isEmptyCallback;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAttribute(string $name, mixed $value): static
     {
         if ($this->locked) {
@@ -438,9 +327,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAttributes(array $attributes): static
     {
         if ($this->locked) {
@@ -452,11 +338,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDataMapper(DataMapperInterface $dataMapper = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/form', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
@@ -466,9 +352,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDisabled(bool $disabled): static
     {
         if ($this->locked) {
@@ -480,9 +363,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setEmptyData(mixed $emptyData): static
     {
         if ($this->locked) {
@@ -494,9 +374,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setErrorBubbling(bool $errorBubbling): static
     {
         if ($this->locked) {
@@ -508,9 +385,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRequired(bool $required): static
     {
         if ($this->locked) {
@@ -522,9 +396,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPropertyPath(string|PropertyPathInterface|null $propertyPath): static
     {
         if ($this->locked) {
@@ -540,9 +411,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setMapped(bool $mapped): static
     {
         if ($this->locked) {
@@ -554,9 +422,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setByReference(bool $byReference): static
     {
         if ($this->locked) {
@@ -568,9 +433,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setInheritData(bool $inheritData): static
     {
         if ($this->locked) {
@@ -582,9 +444,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setCompound(bool $compound): static
     {
         if ($this->locked) {
@@ -596,9 +455,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setType(ResolvedFormTypeInterface $type): static
     {
         if ($this->locked) {
@@ -610,9 +466,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setData(mixed $data): static
     {
         if ($this->locked) {
@@ -624,9 +477,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDataLocked(bool $locked): static
     {
         if ($this->locked) {
@@ -638,9 +488,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFormFactory(FormFactoryInterface $formFactory)
     {
         if ($this->locked) {
@@ -652,9 +499,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAction(string $action): static
     {
         if ($this->locked) {
@@ -666,9 +510,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setMethod(string $method): static
     {
         if ($this->locked) {
@@ -680,9 +521,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRequestHandler(RequestHandlerInterface $requestHandler): static
     {
         if ($this->locked) {
@@ -694,9 +532,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAutoInitialize(bool $initialize): static
     {
         if ($this->locked) {
@@ -708,9 +543,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormConfig(): FormConfigInterface
     {
         if ($this->locked) {
@@ -724,9 +556,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setIsEmptyCallback(?callable $isEmptyCallback): static
     {
         $this->isEmptyCallback = null === $isEmptyCallback ? null : $isEmptyCallback(...);

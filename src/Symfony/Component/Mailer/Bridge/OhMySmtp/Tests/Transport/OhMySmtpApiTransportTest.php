@@ -22,6 +22,9 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
+/**
+ * @group legacy
+ */
 final class OhMySmtpApiTransportTest extends TestCase
 {
     /**

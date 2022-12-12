@@ -21,12 +21,14 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\TraceStub;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
@@ -44,13 +46,15 @@ abstract class AbstractFailedMessagesCommand extends Command
     protected const DEFAULT_TRANSPORT_OPTION = 'choose';
 
     protected $failureTransports;
+    protected ?PhpSerializer $phpSerializer;
 
     private ?string $globalFailureReceiverName;
 
-    public function __construct(?string $globalFailureReceiverName, ServiceProviderInterface $failureTransports)
+    public function __construct(?string $globalFailureReceiverName, ServiceProviderInterface $failureTransports, PhpSerializer $phpSerializer = null)
     {
         $this->failureTransports = $failureTransports;
         $this->globalFailureReceiverName = $globalFailureReceiverName;
+        $this->phpSerializer = $phpSerializer;
 
         parent::__construct();
     }
@@ -78,9 +82,11 @@ abstract class AbstractFailedMessagesCommand extends Command
         $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
         /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
         $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
+        /** @var MessageDecodingFailedStamp|null $lastMessageDecodingFailedStamp */
+        $lastMessageDecodingFailedStamp = $envelope->last(MessageDecodingFailedStamp::class);
 
         $rows = [
-            ['Class', \get_class($envelope->getMessage())],
+            ['Class', $envelope->getMessage()::class],
         ];
 
         if (null !== $id = $this->getMessageId($envelope)) {
@@ -126,12 +132,18 @@ abstract class AbstractFailedMessagesCommand extends Command
 
         if ($io->isVeryVerbose()) {
             $io->title('Message:');
+            if (null !== $lastMessageDecodingFailedStamp) {
+                $io->error('The message could not be decoded. See below an APPROXIMATIVE representation of the class.');
+            }
             $dump = new Dumper($io, null, $this->createCloner());
             $io->writeln($dump($envelope->getMessage()));
             $io->title('Exception:');
             $flattenException = $lastErrorDetailsStamp?->getFlattenException();
             $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException));
         } else {
+            if (null !== $lastMessageDecodingFailedStamp) {
+                $io->error('The message could not be decoded.');
+            }
             $io->writeln(' Re-run command with <info>-vv</info> to see more message & error details.');
         }
     }

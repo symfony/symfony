@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add support for mocking the `hrtime()` function
+
 6.1
 ---
 

@@ -31,9 +31,6 @@ class Collection implements CollectionInterface
         $this->search = $search;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(): array
     {
         return $this->entries ??= iterator_to_array($this->getIterator(), false);

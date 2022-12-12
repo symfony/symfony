@@ -77,9 +77,6 @@ abstract class AbstractOperation implements OperationInterface
         $this->messages = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDomains(): array
     {
         if (null === $this->domains) {
@@ -100,9 +97,6 @@ abstract class AbstractOperation implements OperationInterface
         return $this->domains;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessages(string $domain): array
     {
         if (!\in_array($domain, $this->getDomains())) {
@@ -116,9 +110,6 @@ abstract class AbstractOperation implements OperationInterface
         return $this->messages[$domain][self::ALL_BATCH];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNewMessages(string $domain): array
     {
         if (!\in_array($domain, $this->getDomains())) {
@@ -132,9 +123,6 @@ abstract class AbstractOperation implements OperationInterface
         return $this->messages[$domain][self::NEW_BATCH];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getObsoleteMessages(string $domain): array
     {
         if (!\in_array($domain, $this->getDomains())) {
@@ -148,9 +136,6 @@ abstract class AbstractOperation implements OperationInterface
         return $this->messages[$domain][self::OBSOLETE_BATCH];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult(): MessageCatalogueInterface
     {
         foreach ($this->getDomains() as $domain) {

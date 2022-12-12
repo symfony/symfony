@@ -59,9 +59,6 @@ class MemcachedSessionHandler extends AbstractSessionHandler
         return $this->memcached->quit();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doRead(string $sessionId): string
     {
         return $this->memcached->get($this->prefix.$sessionId) ?: '';
@@ -75,9 +72,6 @@ class MemcachedSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $sessionId, string $data): bool
     {
         $ttl = ($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? \ini_get('session.gc_maxlifetime');
@@ -85,9 +79,6 @@ class MemcachedSessionHandler extends AbstractSessionHandler
         return $this->memcached->set($this->prefix.$sessionId, $data, time() + (int) $ttl);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDestroy(string $sessionId): bool
     {
         $result = $this->memcached->delete($this->prefix.$sessionId);

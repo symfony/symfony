@@ -92,9 +92,6 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $c->register('halloween', 'stdClass')->setPublic(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

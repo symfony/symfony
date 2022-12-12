@@ -137,9 +137,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInfo(string $type = null): mixed
     {
         return null !== $type ? $this->info[$type] ?? null : $this->info;
@@ -168,9 +165,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private static function schedule(self $response, array &$runningResponses): void
     {
         if (isset($runningResponses[0])) {
@@ -186,8 +180,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param AmpClientState $multi
      */
     private static function perform(ClientState $multi, array &$responses = null): void
@@ -208,8 +200,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param AmpClientState $multi
      */
     private static function select(ClientState $multi, float $timeout): int
@@ -217,7 +207,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         $timeout += microtime(true);
         self::$delay = Loop::defer(static function () use ($timeout) {
             if (0 < $timeout -= microtime(true)) {
-                self::$delay = Loop::delay(ceil(1000 * $timeout), [Loop::class, 'stop']);
+                self::$delay = Loop::delay(ceil(1000 * $timeout), Loop::stop(...));
             } else {
                 Loop::stop();
             }
@@ -457,6 +447,6 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             self::$delay = null;
         }
 
-        Loop::defer([Loop::class, 'stop']);
+        Loop::defer(Loop::stop(...));
     }
 }

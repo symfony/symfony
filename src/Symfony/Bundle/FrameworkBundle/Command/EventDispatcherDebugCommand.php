@@ -46,9 +46,6 @@ class EventDispatcherDebugCommand extends Command
         $this->dispatchers = $dispatchers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -72,8 +69,6 @@ EOF
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

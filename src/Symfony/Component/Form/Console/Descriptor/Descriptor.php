@@ -40,26 +40,16 @@ abstract class Descriptor implements DescriptorInterface
     protected $parents = [];
     protected $extensions = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function describe(OutputInterface $output, ?object $object, array $options = [])
     {
         $this->output = $output instanceof OutputStyle ? $output : new SymfonyStyle(new ArrayInput([]), $output);
 
-        switch (true) {
-            case null === $object:
-                $this->describeDefaults($options);
-                break;
-            case $object instanceof ResolvedFormTypeInterface:
-                $this->describeResolvedFormType($object, $options);
-                break;
-            case $object instanceof OptionsResolver:
-                $this->describeOption($object, $options);
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object)));
-        }
+        match (true) {
+            null === $object => $this->describeDefaults($options),
+            $object instanceof ResolvedFormTypeInterface => $this->describeResolvedFormType($object, $options),
+            $object instanceof OptionsResolver => $this->describeOption($object, $options),
+            default => throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object))),
+        };
     }
 
     abstract protected function describeDefaults(array $options);
@@ -179,7 +169,7 @@ abstract class Descriptor implements DescriptorInterface
 
     private function getParentOptionsResolver(ResolvedFormTypeInterface $type): OptionsResolver
     {
-        $this->parents[$class = \get_class($type->getInnerType())] = [];
+        $this->parents[$class = $type->getInnerType()::class] = [];
 
         if (null !== $type->getParent()) {
             $optionsResolver = clone $this->getParentOptionsResolver($type->getParent());
@@ -201,7 +191,7 @@ abstract class Descriptor implements DescriptorInterface
         foreach ($type->getTypeExtensions() as $extension) {
             $inheritedOptions = $optionsResolver->getDefinedOptions();
             $extension->configureOptions($optionsResolver);
-            $this->extensions[\get_class($extension)] = array_diff($optionsResolver->getDefinedOptions(), $inheritedOptions);
+            $this->extensions[$extension::class] = array_diff($optionsResolver->getDefinedOptions(), $inheritedOptions);
         }
     }
 }

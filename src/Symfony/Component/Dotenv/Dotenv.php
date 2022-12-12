@@ -152,7 +152,7 @@ final class Dotenv
 
         $k = $this->debugKey;
         $debug = $_SERVER[$k] ?? !\in_array($_SERVER[$this->envKey], $this->prodEnvs, true);
-        $_SERVER[$k] = $_ENV[$k] = (int) $debug || (!\is_bool($debug) && filter_var($debug, \FILTER_VALIDATE_BOOLEAN)) ? '1' : '0';
+        $_SERVER[$k] = $_ENV[$k] = (int) $debug || (!\is_bool($debug) && filter_var($debug, \FILTER_VALIDATE_BOOL)) ? '1' : '0';
     }
 
     /**
@@ -446,12 +446,7 @@ final class Dotenv
                 throw new \LogicException('Resolving commands requires the Symfony Process component.');
             }
 
-            $process = method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline('echo '.$matches[0]) : new Process('echo '.$matches[0]);
-
-            if (!method_exists(Process::class, 'fromShellCommandline') && method_exists(Process::class, 'inheritEnvironmentVariables')) {
-                // Symfony 3.4 does not inherit env vars by default:
-                $process->inheritEnvironmentVariables();
-            }
+            $process = Process::fromShellCommandline('echo '.$matches[0]);
 
             $env = [];
             foreach ($this->values as $name => $value) {

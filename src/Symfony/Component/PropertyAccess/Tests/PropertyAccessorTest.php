@@ -19,6 +19,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ExtendedUninitializedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
@@ -41,10 +42,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
 
 class PropertyAccessorTest extends TestCase
 {
-    /**
-     * @var PropertyAccessor
-     */
-    private $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     protected function setUp(): void
     {
@@ -83,7 +81,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidReadPropertyPaths
      */
     public function testGetValue($objectOrArray, $path, $value)
     {
@@ -312,7 +310,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidWritePropertyPaths
      */
     public function testSetValue($objectOrArray, $path)
     {
@@ -412,7 +410,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidReadPropertyPaths
      */
     public function testIsReadable($objectOrArray, $path)
     {
@@ -465,7 +463,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidWritePropertyPaths
      */
     public function testIsWritable($objectOrArray, $path)
     {
@@ -517,7 +515,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
-    public function getValidPropertyPaths()
+    public function getValidWritePropertyPaths()
     {
         return [
             [['Bernhard', 'Schussek'], '[0]', 'Bernhard'],
@@ -561,6 +559,19 @@ class PropertyAccessorTest extends TestCase
             [new TestClass(new TestClass(new TestClass('bar'))), 'publicGetter.publicGetter.publicGetSetter', 'bar'],
             [new TestClass(['foo' => ['baz' => new TestClass('bar')]]), 'publicGetter[foo][baz].publicGetSetter', 'bar'],
         ];
+    }
+
+    public function getValidReadPropertyPaths(): iterable
+    {
+        yield from $this->getValidWritePropertyPaths();
+
+        // Optional paths can only be read and can't be written to.
+        yield [(object) [], 'foo?', null];
+        yield [(object) ['foo' => (object) ['firstName' => 'Bernhard']], 'foo.bar?', null];
+        yield [(object) ['foo' => (object) ['firstName' => 'Bernhard']], 'foo.bar?.baz?', null];
+        yield [[], '[foo?]', null];
+        yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?]', null];
+        yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?][baz?]', null];
     }
 
     public function testTicket5755()
@@ -621,16 +632,16 @@ class PropertyAccessorTest extends TestCase
     public function testThrowTypeError()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected argument of type "DateTime", "string" given at property path "date"');
+        $this->expectExceptionMessage('Expected argument of type "DateTimeImmutable", "string" given at property path "date"');
         $object = new TypeHinted();
 
-        $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTime expected.');
+        $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTimeImmutable expected.');
     }
 
     public function testThrowTypeErrorWithNullArgument()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected argument of type "DateTime", "null" given');
+        $this->expectExceptionMessage('Expected argument of type "DateTimeImmutable", "null" given');
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', null);
@@ -638,7 +649,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testSetTypeHint()
     {
-        $date = new \DateTime();
+        $date = new \DateTimeImmutable();
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', $date);
@@ -738,17 +749,11 @@ class PropertyAccessorTest extends TestCase
                 $this->foo = $foo;
             }
 
-            /**
-             * @return mixed
-             */
             public function getFoo()
             {
                 return $this->foo;
             }
 
-            /**
-             * @param mixed $foo
-             */
             public function setFoo($foo)
             {
                 $this->foo = $foo;
@@ -769,7 +774,7 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(\TypeError::class);
         $object = new ReturnTyped();
 
-        $this->propertyAccessor->setValue($object, 'foos', [new \DateTime()]);
+        $this->propertyAccessor->setValue($object, 'foos', [new \DateTimeImmutable()]);
     }
 
     public function testDoNotDiscardReturnTypeErrorWhenWriterMethodIsMisconfigured()

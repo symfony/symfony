@@ -166,6 +166,22 @@ class DataPartTest extends TestCase
         $this->assertTrue($p->hasContentId());
     }
 
+    public function testSetContentId()
+    {
+        $p = new DataPart('content');
+        $p->setContentId('test@test');
+        $this->assertTrue($p->hasContentId());
+        $this->assertSame('test@test', $p->getContentId());
+    }
+
+    public function testSetContentIdInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $p = new DataPart('content');
+        $p->setContentId('test');
+    }
+
     public function testGetFilename()
     {
         $p = new DataPart('content', null);

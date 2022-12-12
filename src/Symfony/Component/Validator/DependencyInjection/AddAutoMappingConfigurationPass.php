@@ -22,9 +22,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddAutoMappingConfigurationPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasParameter('validator.auto_mapping') || !$container->hasDefinition('validator.builder')) {

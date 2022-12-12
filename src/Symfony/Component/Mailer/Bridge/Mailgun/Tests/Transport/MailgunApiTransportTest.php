@@ -58,7 +58,7 @@ class MailgunApiTransportTest extends TestCase
     public function testCustomHeader()
     {
         $json = json_encode(['foo' => 'bar']);
-        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeImmutable::RFC2822);
+        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeInterface::RFC2822);
 
         $email = new Email();
         $email->getHeaders()->addTextHeader('h:X-Mailgun-Variables', $json);
@@ -100,7 +100,7 @@ class MailgunApiTransportTest extends TestCase
     public function testPrefixHeaderWithH()
     {
         $json = json_encode(['foo' => 'bar']);
-        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeImmutable::RFC2822);
+        $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeInterface::RFC2822);
 
         $email = new Email();
         $email->getHeaders()->addTextHeader('h:bar', 'bar-value');

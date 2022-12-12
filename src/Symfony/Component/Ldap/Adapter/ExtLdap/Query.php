@@ -61,9 +61,6 @@ class Query extends AbstractQuery
         unset($this->results);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function execute(): CollectionInterface
     {
         if (!isset($this->results)) {

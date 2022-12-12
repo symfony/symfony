@@ -27,6 +27,10 @@ class SortableIterator implements \IteratorAggregate
     public const SORT_BY_CHANGED_TIME = 4;
     public const SORT_BY_MODIFIED_TIME = 5;
     public const SORT_BY_NAME_NATURAL = 6;
+    public const SORT_BY_NAME_CASE_INSENSITIVE = 7;
+    public const SORT_BY_NAME_NATURAL_CASE_INSENSITIVE = 8;
+    public const SORT_BY_EXTENSION = 9;
+    public const SORT_BY_SIZE = 10;
 
     /** @var \Traversable<string, \SplFileInfo> */
     private \Traversable $iterator;
@@ -51,6 +55,14 @@ class SortableIterator implements \IteratorAggregate
             $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
                 return $order * strnatcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
             };
+        } elseif (self::SORT_BY_NAME_CASE_INSENSITIVE === $sort) {
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
+                return $order * strcasecmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            };
+        } elseif (self::SORT_BY_NAME_NATURAL_CASE_INSENSITIVE === $sort) {
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
+                return $order * strnatcasecmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            };
         } elseif (self::SORT_BY_TYPE === $sort) {
             $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
                 if ($a->isDir() && $b->isFile()) {
@@ -72,6 +84,14 @@ class SortableIterator implements \IteratorAggregate
         } elseif (self::SORT_BY_MODIFIED_TIME === $sort) {
             $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
                 return $order * ($a->getMTime() - $b->getMTime());
+            };
+        } elseif (self::SORT_BY_EXTENSION === $sort) {
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
+                return $order * strnatcmp($a->getExtension(), $b->getExtension());
+            };
+        } elseif (self::SORT_BY_SIZE === $sort) {
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
+                return $order * ($a->getSize() - $b->getSize());
             };
         } elseif (self::SORT_BY_NONE === $sort) {
             $this->sort = $order;

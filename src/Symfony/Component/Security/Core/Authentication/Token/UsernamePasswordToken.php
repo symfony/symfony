@@ -39,17 +39,11 @@ class UsernamePasswordToken extends AbstractToken
         return $this->firewallName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __serialize(): array
     {
         return [null, $this->firewallName, parent::__serialize()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __unserialize(array $data): void
     {
         [, $this->firewallName, $parentData] = $data;

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Mime;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -58,7 +59,7 @@ class TemplatedEmailTest extends TestCase
         $e->textTemplate('email.txt.twig');
         $e->htmlTemplate('email.html.twig');
         $e->context(['foo' => 'bar']);
-        $e->attach('Some Text file', 'test.txt');
+        $e->addPart(new DataPart('Some Text file', 'test.txt'));
         $expected = clone $e;
 
         $expectedJson = <<<EOF

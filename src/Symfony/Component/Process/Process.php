@@ -1204,11 +1204,7 @@ class Process implements \IteratorAggregate
     {
         static $isTtySupported;
 
-        if (null === $isTtySupported) {
-            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', [['file', '/dev/tty', 'r'], ['file', '/dev/tty', 'w'], ['file', '/dev/tty', 'w']], $pipes);
-        }
-
-        return $isTtySupported;
+        return $isTtySupported ??= ('/' === \DIRECTORY_SEPARATOR && stream_isatty(\STDOUT));
     }
 
     /**

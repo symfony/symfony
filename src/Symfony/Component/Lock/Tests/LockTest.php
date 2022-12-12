@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\BlockingSharedLockStoreInterface;
 use Symfony\Component\Lock\BlockingStoreInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Store\ExpiringStoreTrait;
+use Symfony\Component\Lock\Store\InMemoryStore;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -364,6 +366,34 @@ class LockTest extends TestCase
             ->willReturn(true);
 
         $lock->release();
+    }
+
+    public function testSuccessReleaseLog()
+    {
+        $key = new Key((string) random_int(100, 1000));
+        $store = new InMemoryStore();
+        $logger = new class() extends AbstractLogger {
+            private array $logs = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->logs[] = [
+                    $level,
+                    (string) $message,
+                    $context,
+                ];
+            }
+
+            public function logs(): array
+            {
+                return $this->logs;
+            }
+        };
+        $lock = new Lock($key, $store, 10, true);
+        $lock->setLogger($logger);
+        $lock->release();
+
+        $this->assertSame([['debug', 'Successfully released the "{resource}" lock.', ['resource' => $key]]], $logger->logs());
     }
 
     /**

@@ -24,43 +24,6 @@
     {% endif %}
 {% endblock %}
 
-{% block head %}
-    {{ parent() }}
-    <style type="text/css">
-        /* utility classes */
-        .m-t-0 { margin-top: 0 !important; }
-        .m-t-10 { margin-top: 10px !important; }
-
-        /* basic grid */
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: -15px;
-            margin-left: -15px;
-        }
-        .col {
-            flex-basis: 0;
-            flex-grow: 1;
-            max-width: 100%;
-            position: relative;
-            width: 100%;
-            min-height: 1px;
-            padding-right: 15px;
-            padding-left: 15px;
-        }
-        .col-4 {
-            flex: 0 0 33.333333%;
-            max-width: 33.333333%;
-        }
-
-        /* small tabs */
-        .sf-tabs-sm .tab-navigation li {
-            font-size: 14px;
-            padding: .3em .5em;
-        }
-    </style>
-{% endblock %}
-
 {% block menu %}
     {% set events = collector.events %}
 
@@ -78,156 +41,224 @@
 
 {% block panel %}
     {% set events = collector.events %}
-
     <h2>Emails</h2>
 
     {% if not events.messages|length %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No emails were sent.</p>
+        </div>
+    {% else %}
+        <div class="metrics">
+            <div class="metric-group">
+                <div class="metric">
+                    <span class="value">{{ events.events|filter(e => e.isQueued())|length }}</span>
+                    <span class="label">Queued</span>
+                </div>
+
+                <div class="metric">
+                    <span class="value">{{ events.events|filter(e => not e.isQueued())|length }}</span>
+                    <span class="label">Sent</span>
+                </div>
+            </div>
         </div>
     {% endif %}
 
-    <div class="metrics">
-        <div class="metric">
-            <span class="value">{{ events.events|filter(e => e.isQueued())|length }}</span>
-            <span class="label">Queued</span>
-        </div>
+    {% if events.transports|length > 1 %}
+        {% for transport in events.transports %}
+            <h2><code>{{ transport }}</code> transport</h2>
+            {{ _self.render_transport_details(collector, transport) }}
+        {% endfor %}
+    {% elseif events.transports is not empty %}
+        {{ _self.render_transport_details(collector, events.transports|first, true) }}
+    {% endif %}
 
-        <div class="metric">
-            <span class="value">{{ events.events|filter(e => not e.isQueued())|length }}</span>
-            <span class="label">Sent</span>
-        </div>
-    </div>
+    {% macro render_transport_details(collector, transport, show_transport_name = false) %}
+        <div class="card">
+            {% set num_emails = collector.events.events(transport)|length %}
+            {% if num_emails > 1 %}
+                <div class="mailer-email-summary-table-wrapper">
+                    <table class="mailer-email-summary-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Subject</th>
+                                <th>To</th>
+                                <th class="visually-hidden">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in collector.events.events(transport) %}
+                                <tr class="mailer-email-summary-table-row {{ loop.first ? 'active' }}" data-target="#email-{{ loop.index }}">
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ event.message.headers.get('subject').bodyAsString() ?? '(No subject)' }}</td>
+                                    <td>{{ (event.message.headers.get('to').bodyAsString() ?? '(empty)')|replace({'To:': ''}) }}</td>
+                                    <td class="visually-hidden"><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View email details</button></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-    {% for transport in events.transports %}
-        <div class="card-block">
-            <div class="sf-tabs sf-tabs-sm">
-                {% for event in events.events(transport) %}
-                    {% set message = event.message %}
-                    <div class="tab">
-                        <h3 class="tab-title">Email {{ event.isQueued() ? 'queued' : 'sent via ' ~ transport }}</h3>
-                        <div class="tab-content">
-                            <div class="card">
-                                {% if message.headers is not defined %}
-                                    {# RawMessage instance #}
-                                    <div class="card-block">
-                                        <pre class="prewrap" style="max-height: 600px">{{ message.toString() }}</pre>
-                                    </div>
-                                {% else %}
-                                    {# Message instance #}
-                                    <div class="card-block">
-                                        <div class="sf-tabs sf-tabs-sm">
-                                            <div class="tab">
-                                                <h3 class="tab-title">Headers</h3>
-                                                <div class="tab-content">
-                                                    <span class="label">Subject</span>
-                                                    <h2 class="m-t-10">{{ message.headers.get('subject').bodyAsString() ?? '(empty)' }}</h2>
-                                                    <div class="row">
-                                                        <div class="col col-4">
-                                                            <span class="label">From</span>
-                                                            <pre class="prewrap">{{ (message.headers.get('from').bodyAsString() ?? '(empty)')|replace({'From:': ''}) }}</pre>
-
-                                                            <span class="label">To</span>
-                                                            <pre class="prewrap">{{ (message.headers.get('to').bodyAsString() ?? '(empty)')|replace({'To:': ''}) }}</pre>
-
-                                                            {% if event.envelope.recipients|length > 0 %}
-                                                                <span class="label">Recipients</span>
-                                                                {% for recipient in event.envelope.recipients %}
-                                                                    <pre class="prewrap">{{ recipient.address }}</pre>
-                                                                {% endfor %}
-                                                            {% endif %}
-                                                        </div>
-                                                        <div class="col">
-                                                            <span class="label">Headers</span>
-                                                            <pre class="prewrap">{% for header in message.headers.all|filter(header => (header.name ?? '') not in ['Subject', 'From', 'To']) %}
-                                                                {{- header.toString }}
-                                                            {%~ endfor %}</pre>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {% if message.htmlBody is defined %}
-                                                {# Email instance #}
-                                                {% set htmlBody = message.htmlBody() %}
-                                                {% if htmlBody is not null %}
-                                                    <div class="tab">
-                                                        <h3 class="tab-title">HTML Preview</h3>
-                                                        <div class="tab-content">
-                                                            <pre class="prewrap" style="max-height: 600px">
-                                                                <iframe
-                                                                    src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}"
-                                                                    style="height: 80vh;width: 100%;"
-                                                                >
-                                                                </iframe>
-                                                            </pre>
-                                                        </div>
-                                                    </div>
-                                                    <div class="tab">
-                                                        <h3 class="tab-title">HTML Content</h3>
-                                                        <div class="tab-content">
-                                                            <pre class="prewrap" style="max-height: 600px">
-                                                                {%- if message.htmlCharset() %}
-                                                                    {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
-                                                                {%- else %}
-                                                                    {{- htmlBody }}
-                                                                {%- endif -%}
-                                                            </pre>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-                                                {% set textBody = message.textBody() %}
-                                                {% if textBody is not null %}
-                                                    <div class="tab">
-                                                        <h3 class="tab-title">Text Content</h3>
-                                                        <div class="tab-content">
-                                                            <pre class="prewrap" style="max-height: 600px">
-                                                                {%- if message.textCharset() %}
-                                                                    {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
-                                                                {%- else %}
-                                                                    {{- textBody }}
-                                                                {%- endif -%}
-                                                            </pre>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-                                                {% for attachment in message.attachments %}
-                                                    <div class="tab">
-                                                        <h3 class="tab-title">Attachment #{{ loop.index }}</h3>
-                                                        <div class="tab-content">
-                                                            <p>
-                                                                <a href="data:{{ attachment.contentType|default('application/octet-stream') }};base64,{{ collector.base64Encode(attachment.body) }}" download="{{ attachment.filename|default('attachment') }}">
-                                                                    {% if attachment.filename|default %}
-                                                                        {{ attachment.filename }}
-                                                                    {% else %}
-                                                                        <em>(no filename)</em>
-                                                                    {% endif %}
-                                                                </a>
-                                                            </p>
-                                                            <pre class="prewrap" style="max-height: 600px">{{ attachment.toString() }}</pre>
-                                                        </div>
-                                                    </div>
-                                                {% endfor %}
-                                            {% endif %}
-                                            <div class="tab">
-                                                <h3 class="tab-title">Parts Hierarchy</h3>
-                                                <div class="tab-content">
-                                                    <pre class="prewrap" style="max-height: 600px">{{ message.body().asDebugString() }}</pre>
-                                                </div>
-                                            </div>
-                                            <div class="tab">
-                                                <h3 class="tab-title">Raw</h3>
-                                                <div class="tab-content">
-                                                    <pre class="prewrap" style="max-height: 600px">{{ message.toString() }}</pre>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
+                {% for event in collector.events.events(transport) %}
+                    <div class="mailer-email-details {{ loop.first ? 'active' }}" id="email-{{ loop.index }}">
+                        {{ _self.render_email_details(collector, transport, event.message, event.isQueued, show_transport_name) }}
                     </div>
                 {% endfor %}
-            </div>
+
+                <script>Sfjs.initializeMailerTable();</script>
+            {% else %}
+                {% set event = (collector.events.events(transport)|first) %}
+                {{ _self.render_email_details(collector, transport, event.message, event.isQueued, show_transport_name) }}
+            {% endif %}
         </div>
-    {% endfor %}
+    {% endmacro %}
+
+    {% macro render_email_details(collector, transport, message, message_is_queued, show_transport_name = false) %}
+        {% if show_transport_name %}
+            <p class="mailer-transport-information">
+                <strong>Status:</strong> <span class="badge badge-{{ message_is_queued ? 'warning' : 'success' }}">{{ message_is_queued ? 'Queued' : 'Sent' }}</span>
+                &bull;
+                <strong>Transport:</strong> <code>{{ transport }}</code>
+            </p>
+        {% endif %}
+
+        {% if message.headers is not defined %}
+            {# render the raw message contents #}
+            <a class="mailer-message-download-raw" href="data:application/octet-stream;base64,{{ collector.base64Encode(message.toString()) }}" download="email.eml">
+                {{ source('@WebProfiler/Icon/download.svg') }}
+                Download as EML file
+            </a>
+
+            <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+        {% else %}
+            <div class="sf-tabs">
+                <div class="tab">
+                    <h3 class="tab-title">Email contents</h3>
+                    <div class="tab-content">
+                        <div class="card-block">
+                            <p class="mailer-message-subject">
+                                {{ message.headers.get('subject').bodyAsString() ?? '(No subject)' }}
+                            </p>
+                            <div class="mailer-message-headers">
+                                <p><strong>From:</strong> {{ (message.headers.get('from').bodyAsString() ?? '(empty)')|replace({'From:': ''}) }}</p>
+                                <p><strong>To:</strong> {{ (message.headers.get('to').bodyAsString() ?? '(empty)')|replace({'To:': ''}) }}</p>
+                                {% for header in message.headers.all|filter(header => (header.name ?? '') not in ['Subject', 'From', 'To']) %}
+                                    <p class="mailer-message-header-secondary">{{ header.toString }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {% if message.attachments %}
+                            <div class="card-block">
+                                {% set num_of_attachments = message.attachments|length %}
+                                {% set total_attachments_size_in_bytes = message.attachments|reduce((total_size, attachment) => total_size + attachment.body|length) %}
+                                <p class="mailer-message-attachments-title">
+                                    {{ source('@WebProfiler/Icon/attachment.svg') }}
+                                    Attachments <span>({{ num_of_attachments }} file{{ num_of_attachments > 1 ? 's' }} / {{ _self.render_file_size_humanized(total_attachments_size_in_bytes) }})</span>
+                                </p>
+
+                                <ul class="mailer-message-attachments-list">
+                                    {% for attachment in message.attachments %}
+                                        <li>
+                                            {{ source('@WebProfiler/Icon/file.svg') }}
+
+                                            {% if attachment.filename|default %}
+                                                {{ attachment.filename }}
+                                            {% else %}
+                                                <em>(no filename)</em>
+                                            {% endif %}
+
+                                            ({{ _self.render_file_size_humanized(attachment.body|length) }})
+
+                                            <a href="data:{{ attachment.contentType|default('application/octet-stream') }};base64,{{ collector.base64Encode(attachment.body) }}" download="{{ attachment.filename|default('attachment') }}">Download</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if message.htmlBody or message.textBody %}
+                            <div class="card-block">
+                                <div class="sf-tabs sf-tabs-sm">
+                                    {% if message.htmlBody %}
+                                        {% set htmlBody = message.htmlBody() %}
+                                        <div class="tab">
+                                            <h3 class="tab-title">HTML content</h3>
+                                            <div class="tab-content">
+                                                <pre class="prewrap" style="max-height: 600px">
+                                                    {%- if message.htmlCharset() %}
+                                                        {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
+                                                    {%- else %}
+                                                        {{- htmlBody }}
+                                                    {%- endif -%}
+                                                </pre>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab">
+                                            <h3 class="tab-title">HTML preview</h3>
+                                            <div class="tab-content">
+                                                <pre class="prewrap" style="max-height: 600px">
+                                                    <iframe
+                                                        src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}"
+                                                        style="height: 80vh;width: 100%;"
+                                                    >
+                                                    </iframe>
+                                                </pre>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if message.textBody %}
+                                        {% set textBody = message.textBody() %}
+                                        <div class="tab">
+                                            <h3 class="tab-title">Text content</h3>
+                                            <div class="tab-content">
+                                                <pre class="prewrap" style="max-height: 600px">
+                                                    {%- if message.textCharset() %}
+                                                        {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
+                                                    {%- else %}
+                                                        {{- textBody }}
+                                                    {%- endif -%}
+                                                </pre>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="tab">
+                    <h3 class="tab-title">MIME parts</h3>
+                    <div class="tab-content">
+                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.body().asDebugString() }}</pre>
+                    </div>
+                </div>
+
+                <div class="tab">
+                    <h3 class="tab-title">Raw Message</h3>
+                    <div class="tab-content">
+                        <a class="mailer-message-download-raw" href="data:application/octet-stream;base64,{{ collector.base64Encode(message.toString()) }}" download="email.eml">
+                            {{ source('@WebProfiler/Icon/download.svg') }}
+                            Download as EML file
+                        </a>
+
+                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endmacro %}
+
+    {% macro render_file_size_humanized(bytes) %}
+        {%- if bytes < 1000 -%}
+            {{- bytes ~ ' bytes' -}}
+        {%- elseif bytes < 1000 ** 2 -%}
+            {{- (bytes / 1000)|number_format(2) ~ ' kB' -}}
+        {%- else -%}
+            {{- (bytes / 1000 ** 2)|number_format(2) ~ ' MB' -}}
+        {%- endif -%}
+    {% endmacro %}
 {% endblock %}

@@ -7,9 +7,11 @@
     "abstract": false,
     "autowire": false,
     "autoconfigure": false,
+    "deprecated": false,
     "arguments": [
         "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\FooUnitEnum::FOO"
     ],
     "file": null,
-    "tags": []
+    "tags": [],
+    "usages": []
 }

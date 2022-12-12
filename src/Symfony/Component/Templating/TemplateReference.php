@@ -33,9 +33,6 @@ class TemplateReference implements TemplateReferenceInterface
         return $this->getLogicalName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(string $name, string $value): static
     {
         if (\array_key_exists($name, $this->parameters)) {
@@ -47,9 +44,6 @@ class TemplateReference implements TemplateReferenceInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $name): string
     {
         if (\array_key_exists($name, $this->parameters)) {
@@ -59,25 +53,16 @@ class TemplateReference implements TemplateReferenceInterface
         throw new \InvalidArgumentException(sprintf('The template does not support the "%s" parameter.', $name));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function all(): array
     {
         return $this->parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath(): string
     {
         return $this->parameters['name'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLogicalName(): string
     {
         return $this->parameters['name'];

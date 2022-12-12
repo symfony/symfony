@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Allow passing `TranslatableInterface` objects to the `ChoiceView` label
+ * Allow passing `TranslatableInterface` objects to the `help` option
+ * Deprecate calling `Button/Form::setParent()`, `ButtonBuilder/FormConfigBuilder::setDataMapper()`, `TransformationFailedException::setInvalidMessage()` without arguments
+ * Change the signature of `FormConfigBuilderInterface::setDataMapper()` to `setDataMapper(?DataMapperInterface)`
+ * Change the signature of `FormInterface::setParent()` to `setParent(?self)`
+ * Add `PasswordHasherExtension` with support for `hash_property_path` option in `PasswordType`
+
 6.1
 ---
 

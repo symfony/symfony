@@ -184,10 +184,10 @@ class SplCaster
 
         $clone = clone $c;
         foreach ($clone as $obj) {
-            $storage[] = [
+            $storage[] = new EnumStub([
                 'object' => $obj,
                 'info' => $clone->getInfo(),
-             ];
+             ]);
         }
 
         $a += [
@@ -211,6 +211,24 @@ class SplCaster
         return $a;
     }
 
+    public static function castWeakMap(\WeakMap $c, array $a, Stub $stub, bool $isNested)
+    {
+        $map = [];
+
+        foreach (clone $c as $obj => $data) {
+            $map[] = new EnumStub([
+                'object' => $obj,
+                'data' => $data,
+             ]);
+        }
+
+        $a += [
+            Caster::PREFIX_VIRTUAL.'map' => $map,
+        ];
+
+        return $a;
+    }
+
     private static function castSplArray(\ArrayObject|\ArrayIterator $c, array $a, Stub $stub, bool $isNested): array
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -218,7 +236,7 @@ class SplCaster
 
         if (!($flags & \ArrayObject::STD_PROP_LIST)) {
             $c->setFlags(\ArrayObject::STD_PROP_LIST);
-            $a = Caster::castObject($c, \get_class($c), method_exists($c, '__debugInfo'), $stub->class);
+            $a = Caster::castObject($c, $c::class, method_exists($c, '__debugInfo'), $stub->class);
             $c->setFlags($flags);
         }
         $a += [

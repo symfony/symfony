@@ -796,17 +796,17 @@ class ResponseTest extends ResponseTestCase
     public function testSetDate()
     {
         $response = new Response();
-        $response->setDate(\DateTime::createFromFormat(\DateTime::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
+        $response->setDate(\DateTime::createFromFormat(\DateTimeInterface::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
 
-        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTime::ATOM));
+        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTimeInterface::ATOM));
     }
 
     public function testSetDateWithImmutable()
     {
         $response = new Response();
-        $response->setDate(\DateTimeImmutable::createFromFormat(\DateTime::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
+        $response->setDate(\DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, '2013-01-26T09:21:56+0100', new \DateTimeZone('Europe/Berlin')));
 
-        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTime::ATOM));
+        $this->assertEquals('2013-01-26T08:21:56+00:00', $response->getDate()->format(\DateTimeInterface::ATOM));
     }
 
     public function testSetExpires()
@@ -995,7 +995,7 @@ class ResponseTest extends ResponseTestCase
     public function testSetEtag()
     {
         $response = new Response('', 200, ['ETag' => '"12345"']);
-        $response->setEtag();
+        $response->setEtag(null);
 
         $this->assertNull($response->headers->get('Etag'), '->setEtag() removes Etags when call with null');
     }

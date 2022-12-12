@@ -173,6 +173,9 @@ class ArgumentResolverTest extends TestCase
         self::$resolver->getArguments($request, $controller);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetArgumentWithoutArray()
     {
         $this->expectException(\InvalidArgumentException::class);

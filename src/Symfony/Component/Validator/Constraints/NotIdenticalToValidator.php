@@ -19,17 +19,11 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class NotIdenticalToValidator extends AbstractComparisonValidator
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function compareValues(mixed $value1, mixed $value2): bool
     {
         return $value1 !== $value2;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getErrorCode(): ?string
     {
         return NotIdenticalTo::IS_IDENTICAL_ERROR;

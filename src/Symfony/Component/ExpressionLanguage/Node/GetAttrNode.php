@@ -24,13 +24,11 @@ class GetAttrNode extends Node
     public const METHOD_CALL = 2;
     public const ARRAY_CALL = 3;
 
-    private bool $isShortCircuited = false;
-
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, int $type)
     {
         parent::__construct(
             ['node' => $node, 'attribute' => $attribute, 'arguments' => $arguments],
-            ['type' => $type]
+            ['type' => $type, 'is_null_coalesce' => false, 'is_short_circuited' => false],
         );
     }
 
@@ -72,9 +70,8 @@ class GetAttrNode extends Node
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
-
-                if (null === $obj && $this->nodes['attribute']->isNullSafe) {
-                    $this->isShortCircuited = true;
+                if (null === $obj && ($this->nodes['attribute']->isNullSafe || $this->attributes['is_null_coalesce'])) {
+                    $this->attributes['is_short_circuited'] = true;
 
                     return null;
                 }
@@ -88,13 +85,17 @@ class GetAttrNode extends Node
 
                 $property = $this->nodes['attribute']->attributes['value'];
 
+                if ($this->attributes['is_null_coalesce']) {
+                    return $obj->$property ?? null;
+                }
+
                 return $obj->$property;
 
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
 
                 if (null === $obj && $this->nodes['attribute']->isNullSafe) {
-                    $this->isShortCircuited = true;
+                    $this->attributes['is_short_circuited'] = true;
 
                     return null;
                 }
@@ -118,8 +119,12 @@ class GetAttrNode extends Node
                     return null;
                 }
 
-                if (!\is_array($array) && !$array instanceof \ArrayAccess) {
+                if (!\is_array($array) && !$array instanceof \ArrayAccess && !(null === $array && $this->attributes['is_null_coalesce'])) {
                     throw new \RuntimeException(sprintf('Unable to get an item of non-array "%s".', $this->nodes['node']->dump()));
+                }
+
+                if ($this->attributes['is_null_coalesce']) {
+                    return $array[$this->nodes['attribute']->evaluate($functions, $values)] ?? null;
                 }
 
                 return $array[$this->nodes['attribute']->evaluate($functions, $values)];
@@ -128,9 +133,7 @@ class GetAttrNode extends Node
 
     private function isShortCircuited(): bool
     {
-        return $this->isShortCircuited
-            || ($this->nodes['node'] instanceof self && $this->nodes['node']->isShortCircuited())
-        ;
+        return $this->attributes['is_short_circuited'] || ($this->nodes['node'] instanceof self && $this->nodes['node']->isShortCircuited());
     }
 
     public function toArray()

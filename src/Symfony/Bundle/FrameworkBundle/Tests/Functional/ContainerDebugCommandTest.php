@@ -69,6 +69,22 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('The "private_alias" service or alias has been removed', $tester->getDisplay());
     }
 
+    public function testDeprecatedServiceAndAlias()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'debug:container', 'name' => 'deprecated', '--format' => 'txt']);
+        $this->assertStringContainsString('[WARNING] The "deprecated" service is deprecated since foo/bar 1.9 and will be removed in 2.0', $tester->getDisplay());
+
+        $tester->run(['command' => 'debug:container', 'name' => 'deprecated_alias', '--format' => 'txt']);
+        $this->assertStringContainsString('[WARNING] The "deprecated_alias" alias is deprecated since foo/bar 1.9 and will be removed in 2.0', $tester->getDisplay());
+    }
+
     /**
      * @dataProvider provideIgnoreBackslashWhenFindingService
      */
@@ -82,6 +98,27 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', 'name' => $validServiceId]);
         $this->assertStringNotContainsString('No services found', $tester->getDisplay());
+    }
+
+    public function testTagsPartialSearch()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->setInputs(['0']);
+        $tester->run(['command' => 'debug:container', '--tag' => 'kernel.'], ['decorated' => false]);
+
+        $this->assertStringContainsString('Select one of the following tags to display its information', $tester->getDisplay());
+        $this->assertStringContainsString('[0] kernel.event_subscriber', $tester->getDisplay());
+        $this->assertStringContainsString('[1] kernel.locale_aware', $tester->getDisplay());
+        $this->assertStringContainsString('[2] kernel.cache_warmer', $tester->getDisplay());
+        $this->assertStringContainsString('[3] kernel.fragment_renderer', $tester->getDisplay());
+        $this->assertStringContainsString('[4] kernel.reset', $tester->getDisplay());
+        $this->assertStringContainsString('[5] kernel.cache_clearer', $tester->getDisplay());
+        $this->assertStringContainsString('Symfony Container Services Tagged with "kernel.event_subscriber" Tag', $tester->getDisplay());
     }
 
     public function testDescribeEnvVars()

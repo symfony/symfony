@@ -350,9 +350,6 @@ final class EnglishInflector implements InflectorInterface
         'seiceps',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function singularize(string $plural): array
     {
         $pluralRev = strrev($plural);
@@ -429,9 +426,6 @@ final class EnglishInflector implements InflectorInterface
         return [$plural];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pluralize(string $singular): array
     {
         $singularRev = strrev($singular);

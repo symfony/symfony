@@ -44,7 +44,7 @@ trait BuildDebugContainerTrait
                 $this->initializeBundles();
 
                 return $this->buildContainer();
-            }, $kernel, \get_class($kernel));
+            }, $kernel, $kernel::class);
             $container = $buildContainer();
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

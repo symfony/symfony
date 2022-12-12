@@ -58,9 +58,6 @@ final class TranslationExtension extends AbstractExtension
         return $this->translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [
@@ -68,9 +65,6 @@ final class TranslationExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFilters(): array
     {
         return [
@@ -78,9 +72,6 @@ final class TranslationExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTokenParsers(): array
     {
         return [
@@ -92,9 +83,6 @@ final class TranslationExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNodeVisitors(): array
     {
         return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor()];

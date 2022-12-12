@@ -25,17 +25,11 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
  */
 class BlackHoleMetadataFactory implements MetadataFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadataFor(mixed $value): MetadataInterface
     {
         throw new LogicException('This class does not support metadata.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasMetadataFor(mixed $value): bool
     {
         return false;

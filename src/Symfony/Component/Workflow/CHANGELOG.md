@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Mark `Symfony\Component\Workflow\Registry` as internal
+ * Deprecate calling `Definition::setInitialPlaces()` without arguments
+
 6.0
 ---
 

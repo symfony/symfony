@@ -7,7 +7,7 @@ Symfony full-stack framework.
 Sponsor
 -------
 
-The FrameworkBundle for Symfony 6.1 is [backed][1] by [alximy][2].
+The FrameworkBundle for Symfony 6.2 is [backed][1] by [alximy][2].
 
 A team of passionate humans from very different backgrounds, sharing their love of
 PHP, Symfony and its ecosystem. Their CTO, Expert developers, tech leads, can help

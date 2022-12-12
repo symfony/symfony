@@ -20,7 +20,7 @@ use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * Default implementation of {@link ChoiceListFactoryInterface}.
@@ -30,9 +30,6 @@ use Symfony\Component\Translation\TranslatableMessage;
  */
 class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function createListFromChoices(iterable $choices, callable $value = null, callable $filter = null): ChoiceListInterface
     {
         if ($filter) {
@@ -47,9 +44,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ArrayChoiceList($choices, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null, callable $filter = null): ChoiceListInterface
     {
         if ($filter) {
@@ -59,9 +53,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new LazyChoiceList($loader, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createView(ChoiceListInterface $list, array|callable $preferredChoices = null, callable|false $label = null, callable $index = null, callable $groupBy = null, array|callable $attr = null, array|callable $labelTranslationParameters = []): ChoiceListView
     {
         $preferredViews = [];
@@ -71,7 +62,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         $keys = $list->getOriginalKeys();
 
         if (!\is_callable($preferredChoices)) {
-            if (empty($preferredChoices)) {
+            if (!$preferredChoices) {
                 $preferredChoices = null;
             } else {
                 // make sure we have keys that reflect order
@@ -83,9 +74,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
 
         // The names are generated from an incrementing integer by default
-        if (null === $index) {
-            $index = 0;
-        }
+        $index ??= 0;
 
         // If $groupBy is a callable returning a string
         // choices are added to the group with the name returned by the callable.
@@ -175,7 +164,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             if (false === $dynamicLabel) {
                 $label = false;
-            } elseif ($dynamicLabel instanceof TranslatableMessage) {
+            } elseif ($dynamicLabel instanceof TranslatableInterface) {
                 $label = $dynamicLabel;
             } else {
                 $label = (string) $dynamicLabel;

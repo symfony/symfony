@@ -102,16 +102,13 @@ class PropertyAccessor implements PropertyAccessorInterface
         $this->writeInfoExtractor = $writeInfoExtractor ?? new ReflectionExtractor(['set'], null, null, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): mixed
     {
         $zval = [
             self::VALUE => $objectOrArray,
         ];
 
-        if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[')) {
+        if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[?')) {
             return $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
         }
 
@@ -122,9 +119,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         return $propertyValues[\count($propertyValues) - 1][self::VALUE];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value)
     {
         if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[')) {
@@ -220,9 +214,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isReadable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
     {
         if (!$propertyPath instanceof PropertyPathInterface) {
@@ -243,9 +234,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
     {
         $propertyPath = $this->getPropertyPath($propertyPath);
@@ -300,6 +288,14 @@ class PropertyAccessor implements PropertyAccessorInterface
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
 
+            $isNullSafe = false;
+            if (method_exists($propertyPath, 'isNullSafe')) {
+                // To be removed in symfony 7 once we are sure isNullSafe is always implemented.
+                $isNullSafe = $propertyPath->isNullSafe($i);
+            } else {
+                trigger_deprecation('symfony/property-access', '6.2', 'The "%s()" method in class "%s" needs to be implemented in version 7.0, not defining it is deprecated.', 'isNullSafe', PropertyPathInterface::class);
+            }
+
             if ($isIndex) {
                 // Create missing nested arrays on demand
                 if (($zval[self::VALUE] instanceof \ArrayAccess && !$zval[self::VALUE]->offsetExists($property)) ||
@@ -328,12 +324,14 @@ class PropertyAccessor implements PropertyAccessorInterface
                 }
 
                 $zval = $this->readIndex($zval, $property);
+            } elseif ($isNullSafe && !\is_object($zval[self::VALUE])) {
+                $zval[self::VALUE] = null;
             } else {
-                $zval = $this->readProperty($zval, $property, $this->ignoreInvalidProperty);
+                $zval = $this->readProperty($zval, $property, $this->ignoreInvalidProperty, $isNullSafe);
             }
 
             // the final value of the path must not be validated
-            if ($i + 1 < $propertyPath->getLength() && !\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE])) {
+            if ($i + 1 < $propertyPath->getLength() && !\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE]) && !$isNullSafe) {
                 throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, $i + 1);
             }
 
@@ -385,7 +383,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException If $ignoreInvalidProperty is false and the property does not exist or is not public
      */
-    private function readProperty(array $zval, string $property, bool $ignoreInvalidProperty = false): array
+    private function readProperty(array $zval, string $property, bool $ignoreInvalidProperty = false, bool $isNullSafe = false): array
     {
         if (!\is_object($zval[self::VALUE])) {
             throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%1$s]" instead.', $property));
@@ -393,7 +391,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $result = self::RESULT_PROTO;
         $object = $zval[self::VALUE];
-        $class = \get_class($object);
+        $class = $object::class;
         $access = $this->getReadInfo($class, $property);
 
         if (null !== $access) {
@@ -445,6 +443,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             if (isset($zval[self::REF])) {
                 $result[self::REF] = &$object->$property;
             }
+        } elseif ($isNullSafe) {
+            $result[self::VALUE] = null;
         } elseif (!$ignoreInvalidProperty) {
             throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $class));
         }
@@ -514,7 +514,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $object = $zval[self::VALUE];
-        $class = \get_class($object);
+        $class = $object::class;
         $mutator = $this->getWriteInfo($class, $property, $value);
 
         if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType()) {
@@ -609,13 +609,13 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function isPropertyWritable(object $object, string $property): bool
     {
-        $mutatorForArray = $this->getWriteInfo(\get_class($object), $property, []);
+        $mutatorForArray = $this->getWriteInfo($object::class, $property, []);
 
         if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType() || ($object instanceof \stdClass && property_exists($object, $property))) {
             return true;
         }
 
-        $mutator = $this->getWriteInfo(\get_class($object), $property, '');
+        $mutator = $this->getWriteInfo($object::class, $property, '');
 
         return PropertyWriteInfo::TYPE_NONE !== $mutator->getType() || ($object instanceof \stdClass && property_exists($object, $property));
     }
@@ -666,7 +666,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $apcu = new ApcuAdapter($namespace, $defaultLifetime / 5, $version);
-        if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
+        if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL)) {
             $apcu->setLogger(new NullLogger());
         } elseif (null !== $logger) {
             $apcu->setLogger($logger);

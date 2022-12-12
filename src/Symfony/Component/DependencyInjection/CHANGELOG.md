@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add options `inline_factories` and `inline_class_loader` to `PhpDumper::dump()`
+ * Deprecate `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`
+ * Add `RemoveBuildParametersPass`, which removes parameters starting with a dot during compilation
+
+6.2
+---
+
+ * Use lazy-loading ghost objects and virtual proxies out of the box
+ * Add arguments `&$asGhostObject` and `$id` to LazyProxy's `DumperInterface` to allow using ghost objects for lazy loading services
+ * Add `enum` env var processor
+ * Add `shuffle` env var processor
+ * Allow #[When] to be extended
+ * Change the signature of `ContainerAwareInterface::setContainer()` to `setContainer(?ContainerInterface)`
+ * Deprecate calling `ContainerAwareTrait::setContainer()` without arguments
+ * Deprecate using numeric parameter names
+ * Add support for tagged iterators/locators `exclude` option to the xml and yaml loaders/dumpers
+ * Allow injecting `string $env` into php config closures
+
 6.1
 ---
 
@@ -112,7 +133,7 @@ CHANGELOG
 
  * added `%env(trim:...)%` processor to trim a string value
  * added `%env(default:param_name:...)%` processor to fallback to a parameter or to null when using `%env(default::...)%`
- * added `%env(url:...)%` processor to convert an URL or DNS into an array of components
+ * added `%env(url:...)%` processor to convert a URL or DNS into an array of components
  * added `%env(query_string:...)%` processor to convert a query string into an array of key values
  * added support for deprecating aliases
  * made `ContainerParametersResource` final and not implement `Serializable` anymore

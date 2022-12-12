@@ -4,13 +4,13 @@ Array
 
 namespace Container%s;
 
-include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
+include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
-class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
+class FooClassGhost2b16075 extends \Bar\FooClass implements \Symfony\Component\VarExporter\LazyObjectInterface
 %A
 
-if (!\class_exists('FooClass_%s', false)) {
-    \class_alias(__NAMESPACE__.'\\FooClass_%s', 'FooClass_%s', false);
+if (!\class_exists('FooClassGhost2b16075', false)) {
+    \class_alias(__NAMESPACE__.'\\FooClassGhost2b16075', 'FooClassGhost2b16075', false);
 }
 
     [Container%s/ProjectServiceContainer.php] => <?php
@@ -20,8 +20,8 @@ namespace Container%s;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -35,9 +35,11 @@ class ProjectServiceContainer extends Container
     protected $targetDir;
     protected $parameters = [];
     private $buildParameters;
+    protected readonly \WeakReference $ref;
 
     public function __construct(array $buildParameters = [], $containerDir = __DIR__)
     {
+        $this->ref = \WeakReference::create($this);
         $this->buildParameters = $buildParameters;
         $this->containerDir = $containerDir;
         $this->targetDir = \dirname($containerDir);
@@ -50,7 +52,7 @@ class ProjectServiceContainer extends Container
 
         $this->aliases = [];
 
-        $this->privates['service_container'] = function () {
+        $this->privates['service_container'] = static function ($container) {
             include_once __DIR__.'/proxy-classes.php';
         };
     }
@@ -73,25 +75,19 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the public 'lazy_foo' shared service.
      *
-     * @return \Bar\FooClass
+     * @return object A %lazy_foo_class% instance
      */
-    protected function getLazyFooService($lazyLoad = true)
+    protected static function getLazyFooService($container, $lazyLoad = true)
     {
-        if ($lazyLoad) {
-            return $this->services['lazy_foo'] = $this->createProxy('FooClass_8976cfa', function () {
-                return \FooClass_8976cfa::staticProxyConstructor(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
-                    $wrappedInstance = $this->getLazyFooService(false);
+        $containerRef = $container->ref;
 
-                    $proxy->setProxyInitializer(null);
-
-                    return true;
-                });
-            });
+        if (true === $lazyLoad) {
+            return $container->services['lazy_foo'] = $container->createProxy('FooClassGhost2b16075', static fn () => \FooClassGhost2b16075::createLazyGhost(static fn ($proxy) => self::getLazyFooService($containerRef->get(), $proxy)));
         }
 
-        include_once $this->targetDir.''.'/Fixtures/includes/foo_lazy.php';
+        include_once $container->targetDir.''.'/Fixtures/includes/foo_lazy.php';
 
-        return new \Bar\FooClass(new \Bar\FooLazyClass());
+        return ($lazyLoad->__construct(new \Bar\FooLazyClass()) && false ?: $lazyLoad);
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
@@ -101,7 +97,7 @@ class ProjectServiceContainer extends Container
         }
 
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -145,14 +141,13 @@ class ProjectServiceContainer extends Container
 
     private function getDynamicParameter(string $name)
     {
-        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
+        throw new ParameterNotFoundException($name);
     }
 
     protected function getDefaultParameters(): array
     {
         return [
-            'container.dumper.inline_factories' => true,
-            'container.dumper.inline_class_loader' => true,
+            'lazy_foo_class' => 'Bar\\FooClass',
         ];
     }
 }

@@ -28,7 +28,7 @@ final class Response
      * then the value is an array of all the values.
      *
      * @param string $content The content of the response
-     * @param int    $status  The response status code
+     * @param int    $status  The response status code (302 "Found" by default)
      * @param array  $headers An array of headers
      */
     public function __construct(string $content = '', int $status = 200, array $headers = [])

@@ -21,6 +21,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Prophecy\ProphecySubjectInterface;
 use ProxyManager\Proxy\ProxyInterface;
 use Symfony\Component\ErrorHandler\Internal\TentativeTypes;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 /**
  * Autoloader checking if the class is really defined in the file found.
@@ -250,6 +251,7 @@ class DebugClassLoader
                     && !is_subclass_of($symbols[$i], ProphecySubjectInterface::class)
                     && !is_subclass_of($symbols[$i], Proxy::class)
                     && !is_subclass_of($symbols[$i], ProxyInterface::class)
+                    && !is_subclass_of($symbols[$i], LazyObjectInterface::class)
                     && !is_subclass_of($symbols[$i], LegacyProxy::class)
                     && !is_subclass_of($symbols[$i], MockInterface::class)
                     && !is_subclass_of($symbols[$i], IMock::class)
@@ -851,6 +853,11 @@ class DebugClassLoader
             if ('resource' === $n) {
                 // there is no native type for "resource"
                 return;
+            }
+
+            if (!preg_match('/^(?:\\\\?[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)+$/', $n)) {
+                // exclude any invalid PHP class name (e.g. `Cookie::SAMESITE_*`)
+                continue;
             }
 
             if (!isset($phpTypes[''])) {

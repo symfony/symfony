@@ -128,7 +128,7 @@ class MicroKernelTraitTest extends TestCase
 
             protected function configureRoutes(RoutingConfigurator $routes): void
             {
-                $routes->add('hello', '/')->controller([$this, 'helloAction']);
+                $routes->add('hello', '/')->controller($this->helloAction(...));
             }
         };
 

@@ -33,9 +33,6 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         $beanstalkdEnvelope = $this->connection->get();
@@ -58,25 +55,16 @@ class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterfac
         return [$envelope->with(new BeanstalkdReceivedStamp($beanstalkdEnvelope['id'], $this->connection->getTube()))];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         $this->connection->ack($this->findBeanstalkdReceivedStamp($envelope)->getId());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $this->connection->reject($this->findBeanstalkdReceivedStamp($envelope)->getId());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
         return $this->connection->getMessageCount();

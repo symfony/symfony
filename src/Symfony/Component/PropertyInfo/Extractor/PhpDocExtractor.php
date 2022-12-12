@@ -71,9 +71,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $this->arrayMutatorPrefixes = $arrayMutatorPrefixes ?? ReflectionExtractor::$defaultArrayMutatorPrefixes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
@@ -101,9 +98,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
@@ -117,9 +111,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return '' === $contents ? null : $contents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         /** @var $docBlock DocBlock */
@@ -173,9 +164,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $types[0])];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypesFromConstructor(string $class, string $property): ?array
     {
         $docBlock = $this->getDocBlockFromConstructor($class, $property);

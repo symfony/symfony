@@ -49,6 +49,7 @@ final class ProgressBar
     private float $maxSecondsBetweenRedraws = 1;
     private OutputInterface $output;
     private int $step = 0;
+    private int $startingStep = 0;
     private ?int $max = null;
     private int $startTime;
     private int $stepWidth;
@@ -59,6 +60,7 @@ final class ProgressBar
     private Terminal $terminal;
     private ?string $previousMessage = null;
     private Cursor $cursor;
+    private array $placeholders = [];
 
     private static array $formatters;
     private static array $formats;
@@ -94,12 +96,12 @@ final class ProgressBar
     }
 
     /**
-     * Sets a placeholder formatter for a given name.
+     * Sets a placeholder formatter for a given name, globally for all instances of ProgressBar.
      *
      * This method also allow you to override an existing placeholder.
      *
-     * @param string   $name     The placeholder name (including the delimiter char like %)
-     * @param callable $callable A PHP callable
+     * @param string                       $name     The placeholder name (including the delimiter char like %)
+     * @param callable(ProgressBar):string $callable A PHP callable
      */
     public static function setPlaceholderFormatterDefinition(string $name, callable $callable): void
     {
@@ -118,6 +120,26 @@ final class ProgressBar
         self::$formatters ??= self::initPlaceholderFormatters();
 
         return self::$formatters[$name] ?? null;
+    }
+
+    /**
+     * Sets a placeholder formatter for a given name, for this instance only.
+     *
+     * @param callable(ProgressBar):string $callable A PHP callable
+     */
+    public function setPlaceholderFormatter(string $name, callable $callable): void
+    {
+        $this->placeholders[$name] = $callable;
+    }
+
+    /**
+     * Gets the placeholder formatter for a given name.
+     *
+     * @param string $name The placeholder name (including the delimiter char like %)
+     */
+    public function getPlaceholderFormatter(string $name): ?callable
+    {
+        return $this->placeholders[$name] ?? $this::getPlaceholderFormatterDefinition($name);
     }
 
     /**
@@ -199,11 +221,11 @@ final class ProgressBar
 
     public function getEstimated(): float
     {
-        if (!$this->step) {
+        if (0 === $this->step || $this->step === $this->startingStep) {
             return 0;
         }
 
-        return round((time() - $this->startTime) / $this->step * $this->max);
+        return round((time() - $this->startTime) / ($this->step - $this->startingStep) * $this->max);
     }
 
     public function getRemaining(): float
@@ -212,7 +234,7 @@ final class ProgressBar
             return 0;
         }
 
-        return round((time() - $this->startTime) / $this->step * ($this->max - $this->step));
+        return round((time() - $this->startTime) / ($this->step - $this->startingStep) * ($this->max - $this->step));
     }
 
     public function setBarWidth(int $size)
@@ -302,13 +324,16 @@ final class ProgressBar
     /**
      * Starts the progress output.
      *
-     * @param int|null $max Number of steps to complete the bar (0 if indeterminate), null to leave unchanged
+     * @param int|null $max     Number of steps to complete the bar (0 if indeterminate), null to leave unchanged
+     * @param int      $startAt The starting point of the bar (useful e.g. when resuming a previously started bar)
      */
-    public function start(int $max = null)
+    public function start(int $max = null, int $startAt = 0): void
     {
         $this->startTime = time();
-        $this->step = 0;
-        $this->percent = 0.0;
+        $this->step = $startAt;
+        $this->startingStep = $startAt;
+
+        $startAt > 0 ? $this->setProgress($startAt) : $this->percent = 0.0;
 
         if (null !== $max) {
             $this->setMaxSteps($max);
@@ -466,10 +491,13 @@ final class ProgressBar
                     }
                     $this->output->clear($lineCount);
                 } else {
-                    for ($i = 0; $i < $this->formatLineCount; ++$i) {
-                        $this->cursor->moveToColumn(1);
-                        $this->cursor->clearLine();
-                        $this->cursor->moveUp();
+                    if ('' !== $this->previousMessage) {
+                        // only clear upper lines when last call was not a clear
+                        for ($i = 0; $i < $this->formatLineCount; ++$i) {
+                            $this->cursor->moveToColumn(1);
+                            $this->cursor->clearLine();
+                            $this->cursor->moveUp();
+                        }
                     }
 
                     $this->cursor->moveToColumn(1);
@@ -566,7 +594,7 @@ final class ProgressBar
 
         $regex = "{%([a-z\-_]+)(?:\:([^%]+))?%}i";
         $callback = function ($matches) {
-            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
+            if ($formatter = $this->getPlaceholderFormatter($matches[1])) {
                 $text = $formatter($this, $this->output);
             } elseif (isset($this->messages[$matches[1]])) {
                 $text = $this->messages[$matches[1]];

@@ -1,10 +1,30 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Deprecate enabling bundle and not configuring it
+
+6.2
+---
+
+ * Add the `Security` helper class
+ * Deprecate the `Symfony\Component\Security\Core\Security` service alias, use `Symfony\Bundle\SecurityBundle\Security` instead
+ * Add `Security::getFirewallConfig()` to help to get the firewall configuration associated to the Request
+ * Add `Security::login()` to login programmatically
+ * Add `Security::logout()` to logout programmatically
+ * Add `security.firewalls.logout.enable_csrf` to enable CSRF protection using the default CSRF token generator
+ * Add RFC6750 Access Token support to allow token-based authentication
+ * Add `security.firewalls.switch_user.target_route` option to configure redirect target route on switch user
+ * Deprecate the `security.enable_authenticator_manager` config option
+
 6.1
 ---
 
  * The `security.access_control` now accepts a `RequestMatcherInterface` under the `request_matcher` option as scope configuration
+ * The `security.access_control` now accepts an `attributes` array to match request attributes in the `RequestMatcher`
+ * The `security.access_control` now accepts a `route` option to match request route in the `RequestMatcher`
  * Display the inherited roles of the logged-in user in the Web Debug Toolbar
 
 6.0

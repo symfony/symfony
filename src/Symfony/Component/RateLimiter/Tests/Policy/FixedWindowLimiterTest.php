@@ -108,6 +108,20 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
     }
 
+    public function testPeekConsume()
+    {
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(9);
+
+        // peek by consuming 0 tokens twice (making sure peeking doesn't claim a token)
+        for ($i = 0; $i < 2; ++$i) {
+            $rateLimit = $limiter->consume(0);
+            $this->assertSame(10, $rateLimit->getLimit());
+            $this->assertTrue($rateLimit->isAccepted());
+        }
+    }
+
     public function provideConsumeOutsideInterval(): \Generator
     {
         yield ['PT15S'];

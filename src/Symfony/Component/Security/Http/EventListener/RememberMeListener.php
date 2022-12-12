@@ -47,7 +47,7 @@ class RememberMeListener implements EventSubscriberInterface
     {
         $passport = $event->getPassport();
         if (!$passport->hasBadge(RememberMeBadge::class)) {
-            $this->logger?->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => \get_class($event->getAuthenticator())]);
+            $this->logger?->debug('Remember me skipped: your authenticator does not support it.', ['authenticator' => $event->getAuthenticator()::class]);
 
             return;
         }

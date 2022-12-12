@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Yunpian;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -30,7 +31,7 @@ class YunpianTransport extends AbstractTransport
 
     private string $apiKey;
 
-    public function __construct(string $apiKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $apiKey, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
 
@@ -51,6 +52,10 @@ class YunpianTransport extends AbstractTransport
     {
         if (!$message instanceof SmsMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
+        }
+
+        if ('' !== $message->getFrom()) {
+            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
         $endpoint = sprintf('https://%s/v2/sms/single_send.json', self::HOST);

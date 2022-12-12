@@ -43,15 +43,10 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     private ?string $passwordAttribute;
     private array $extraFields;
 
-    public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null, array $extraFields = [])
+    public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, #[\SensitiveParameter] string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null, array $extraFields = [])
     {
-        if (null === $uidKey) {
-            $uidKey = 'sAMAccountName';
-        }
-
-        if (null === $filter) {
-            $filter = '({uid_key}={user_identifier})';
-        }
+        $uidKey ??= 'sAMAccountName';
+        $filter ??= '({uid_key}={user_identifier})';
 
         $this->ldap = $ldap;
         $this->baseDn = $baseDn;
@@ -81,7 +76,11 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
-        $query = str_replace(['{username}', '{user_identifier}'], $identifier, $this->defaultSearch);
+        $query = str_replace('{username}', '{user_identifier}', $this->defaultSearch, $replaceCount);
+        if ($replaceCount > 0) {
+            trigger_deprecation('symfony/ldap', '6.2', 'Using "{username}" parameter in LDAP configuration is deprecated, consider using "{user_identifier}" instead.');
+        }
+        $query = str_replace('{user_identifier}', $identifier, $query);
         $search = $this->ldap->query($this->baseDn, $query, ['filter' => 0 == \count($this->extraFields) ? '*' : $this->extraFields]);
 
         $entries = $search->execute();
@@ -113,9 +112,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         return $this->loadUser($identifier, $entry);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof LdapUser) {
@@ -126,8 +122,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @final
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
@@ -149,9 +143,6 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class): bool
     {
         return LdapUser::class === $class;

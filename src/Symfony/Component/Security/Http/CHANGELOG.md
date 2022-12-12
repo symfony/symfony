@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add maximum username length enforcement of 4096 characters in `UserBadge`
+ * Add `#[IsGranted()]`
+ * Deprecate empty username or password when using when using `JsonLoginAuthenticator`
+ * Set custom lifetime for login link
+ * Add `$lifetime` parameter to `LoginLinkHandlerInterface::createLoginLink()`
+ * Add RFC6750 Access Token support to allow token-based authentication
+ * Allow using expressions as `#[IsGranted()]` attribute and subject
+
 6.0
 ---
 

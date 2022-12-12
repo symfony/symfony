@@ -15,6 +15,7 @@ use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -32,7 +34,14 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\Form\Extension\PasswordHasher\PasswordHasherExtension;
+use Symfony\Component\HttpFoundation\ChainRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\IpsRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PortRequestMatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
@@ -44,6 +53,7 @@ use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -79,6 +89,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     public function load(array $configs, ContainerBuilder $container)
     {
         if (!array_filter($configs)) {
+            trigger_deprecation('symfony/security-bundle', '6.3', 'Enabling bundle "%s" and not configuring it is deprecated.', SecurityBundle::class);
+            // uncomment the following line in 7.0
+            // throw new InvalidArgumentException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
             return;
         }
 
@@ -98,6 +111,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $loader->load('security_authenticator.php');
+        $loader->load('security_authenticator_access_token.php');
 
         if ($container::willBeAvailable('symfony/twig-bridge', LogoutUrlExtension::class, ['symfony/security-bundle'])) {
             $loader->load('templating_twig.php');
@@ -112,6 +126,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (!$container::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/security-bundle'])) {
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
+            $container->removeDefinition('security.is_granted_attribute_expression_language');
+        }
+
+        if (!class_exists(PasswordHasherExtension::class)) {
+            $container->removeDefinition('form.listener.password_hasher');
+            $container->removeDefinition('form.type_extension.form.password_hasher');
+            $container->removeDefinition('form.type_extension.password.password_hasher');
         }
 
         // set some global scalars
@@ -169,18 +190,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
      */
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
     {
-        switch ($strategy) {
-            case MainConfiguration::STRATEGY_AFFIRMATIVE:
-                return new Definition(AffirmativeStrategy::class, [$allowIfAllAbstainDecisions]);
-            case MainConfiguration::STRATEGY_CONSENSUS:
-                return new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]);
-            case MainConfiguration::STRATEGY_UNANIMOUS:
-                return new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]);
-            case MainConfiguration::STRATEGY_PRIORITY:
-                return new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]);
-        }
-
-        throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
+        return match ($strategy) {
+            MainConfiguration::STRATEGY_AFFIRMATIVE => new Definition(AffirmativeStrategy::class, [$allowIfAllAbstainDecisions]),
+            MainConfiguration::STRATEGY_CONSENSUS => new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]),
+            MainConfiguration::STRATEGY_UNANIMOUS => new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]),
+            MainConfiguration::STRATEGY_PRIORITY => new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]),
+            default => throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy)),
+        };
     }
 
     private function createRoleHierarchy(array $config, ContainerBuilder $container)
@@ -199,24 +215,34 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         foreach ($config['access_control'] as $access) {
             if (isset($access['request_matcher'])) {
-                if ($access['path'] || $access['host'] || $access['port'] || $access['ips'] || $access['methods']) {
+                if ($access['path'] || $access['host'] || $access['port'] || $access['ips'] || $access['methods'] || $access['attributes'] || $access['route']) {
                     throw new InvalidConfigurationException('The "request_matcher" option should not be specified alongside other options. Consider integrating your constraints inside your RequestMatcher directly.');
                 }
                 $matcher = new Reference($access['request_matcher']);
             } else {
+                $attributes = $access['attributes'];
+
+                if ($access['route']) {
+                    if (\array_key_exists('_route', $attributes)) {
+                        throw new InvalidConfigurationException('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
+                    }
+                    $attributes['_route'] = $access['route'];
+                }
+
                 $matcher = $this->createRequestMatcher(
                     $container,
                     $access['path'],
                     $access['host'],
                     $access['port'],
                     $access['methods'],
-                    $access['ips']
+                    $access['ips'],
+                    $attributes
                 );
             }
 
-            $attributes = $access['roles'];
+            $roles = $access['roles'];
             if ($access['allow_if']) {
-                $attributes[] = $this->createExpression($container, $access['allow_if']);
+                $roles[] = $this->createExpression($container, $access['allow_if']);
             }
 
             $emptyAccess = 0 === \count(array_filter($access));
@@ -226,7 +252,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
 
             $container->getDefinition('security.access_map')
-                      ->addMethodCall('add', [$matcher, $attributes, $access['requires_channel']]);
+                      ->addMethodCall('add', [$matcher, $roles, $access['requires_channel']]);
         }
 
         // allow cache warm-up for expressions
@@ -277,7 +303,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
-        $map = $authenticationProviders = $contextRefs = [];
+        $map = $authenticationProviders = $contextRefs = $authenticators = [];
         foreach ($firewalls as $name => $firewall) {
             if (isset($firewall['user_checker']) && 'security.user_checker' !== $firewall['user_checker']) {
                 $customUserChecker = true;
@@ -285,8 +311,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             $configId = 'security.firewall.map.config.'.$name;
 
-            [$matcher, $listeners, $exceptionListener, $logoutListener] = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
+            [$matcher, $listeners, $exceptionListener, $logoutListener, $firewallAuthenticators] = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
 
+            if (!$firewallAuthenticators) {
+                $authenticators[$name] = null;
+            } else {
+                $firewallAuthenticatorRefs = [];
+                foreach ($firewallAuthenticators as $authenticatorId) {
+                    $firewallAuthenticatorRefs[$authenticatorId] = new Reference($authenticatorId);
+                }
+                $authenticators[$name] = ServiceLocatorTagPass::register($container, $firewallAuthenticatorRefs);
+            }
             $contextId = 'security.firewall.map.context.'.$name;
             $isLazy = !$firewall['stateless'] && (!empty($firewall['anonymous']['lazy']) || $firewall['lazy']);
             $context = new ChildDefinition($isLazy ? 'security.firewall.lazy_context' : 'security.firewall.context');
@@ -301,6 +336,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $contextRefs[$contextId] = new Reference($contextId);
             $map[$contextId] = $matcher;
         }
+        $container
+            ->getDefinition('security.helper')
+            ->replaceArgument(1, $authenticators)
+        ;
 
         $container->setAlias('security.firewall.context_locator', (string) ServiceLocatorTagPass::register($container, $contextRefs));
 
@@ -335,7 +374,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // Security disabled?
         if (false === $firewall['security']) {
-            return [$matcher, [], null, null];
+            return [$matcher, [], null, null, []];
         }
 
         $config->replaceArgument(4, $firewall['stateless']);
@@ -362,6 +401,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Register Firewall-specific event dispatcher
         $container->register($firewallEventDispatcherId, EventDispatcher::class)
             ->addTag('event_dispatcher.dispatcher', ['name' => $firewallEventDispatcherId]);
+
+        $eventDispatcherLocator = $container->getDefinition('security.firewall.event_dispatcher_locator');
+        $eventDispatcherLocator
+            ->replaceArgument(0, array_merge($eventDispatcherLocator->getArgument(0), [
+                $id => new ServiceClosureArgument(new Reference($firewallEventDispatcherId)),
+            ]))
+        ;
+
+        // Register Firewall-specific chained user checker
+        $container->register('security.user_checker.chain.'.$id, ChainUserChecker::class)
+            ->addArgument(new TaggedIteratorArgument('security.user_checker.'.$id));
 
         // Register listeners
         $listeners = [];
@@ -406,7 +456,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
             // add CSRF provider
-            if (isset($firewall['logout']['csrf_token_generator'])) {
+            if ($firewall['logout']['enable_csrf']) {
                 $logoutListener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
             }
 
@@ -435,6 +485,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     false === $firewall['stateless'] && isset($firewall['context']) ? $firewall['context'] : null,
                 ])
             ;
+
+            $config->replaceArgument(12, $firewall['logout']);
         }
 
         // Determine default entry point
@@ -528,7 +580,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $config->replaceArgument(10, $listenerKeys);
         $config->replaceArgument(11, $firewall['switch_user'] ?? null);
 
-        return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null];
+        return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null, $firewallAuthenticationProviders];
     }
 
     private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId)
@@ -821,6 +873,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (!$userProvider) {
             throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "switch_user" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
         }
+        if ($stateless && null !== $config['target_route']) {
+            throw new InvalidConfigurationException(sprintf('Cannot set a "target_route" for the "switch_user" listener on the "%s" firewall as it is stateless.', $id));
+        }
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new ChildDefinition('security.authentication.switchuser_listener'));
@@ -830,6 +885,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listener->replaceArgument(6, $config['parameter']);
         $listener->replaceArgument(7, $config['role']);
         $listener->replaceArgument(9, $stateless);
+        $listener->replaceArgument(11, $config['target_route']);
 
         return $switchUserListenerId;
     }
@@ -859,7 +915,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $methods = array_map('strtoupper', $methods);
         }
 
-        if (null !== $ips) {
+        if ($ips) {
             foreach ($ips as $ip) {
                 $container->resolveEnvPlaceholders($ip, null, $usedEnvs);
 
@@ -871,22 +927,58 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
         }
 
-        $id = '.security.request_matcher.'.ContainerBuilder::hash([$path, $host, $port, $methods, $ips, $attributes]);
+        $id = '.security.request_matcher.'.ContainerBuilder::hash([ChainRequestMatcher::class, $path, $host, $port, $methods, $ips, $attributes]);
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];
         }
 
-        // only add arguments that are necessary
-        $arguments = [$path, $host, $methods, $ips, $attributes, null, $port];
-        while (\count($arguments) > 0 && !end($arguments)) {
-            array_pop($arguments);
+        $arguments = [];
+        if ($methods) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([MethodRequestMatcher::class, $methods]))) {
+                $container->register($lid, MethodRequestMatcher::class)->setArguments([$methods]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($path) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([PathRequestMatcher::class, $path]))) {
+                $container->register($lid, PathRequestMatcher::class)->setArguments([$path]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($host) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([HostRequestMatcher::class, $host]))) {
+                $container->register($lid, HostRequestMatcher::class)->setArguments([$host]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($ips) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([IpsRequestMatcher::class, $ips]))) {
+                $container->register($lid, IpsRequestMatcher::class)->setArguments([$ips]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($attributes) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([AttributesRequestMatcher::class, $attributes]))) {
+                $container->register($lid, AttributesRequestMatcher::class)->setArguments([$attributes]);
+            }
+            $arguments[] = new Reference($lid);
+        }
+
+        if ($port) {
+            if (!$container->hasDefinition($lid = '.security.request_matcher.'.ContainerBuilder::hash([PortRequestMatcher::class, $port]))) {
+                $container->register($lid, PortRequestMatcher::class)->setArguments([$port]);
+            }
+            $arguments[] = new Reference($lid);
         }
 
         $container
-            ->register($id, RequestMatcher::class)
-            ->setPublic(false)
-            ->setArguments($arguments)
+            ->register($id, ChainRequestMatcher::class)
+            ->setArguments([$arguments])
         ;
 
         return $this->requestMatchers[$id] = new Reference($id);
@@ -903,9 +995,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $this->userProviderFactories[] = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';

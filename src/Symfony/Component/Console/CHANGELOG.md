@@ -1,13 +1,30 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Remove `exit` call in `Application` signal handlers. Commands will no longer be automatically interrupted after receiving signal other than `SIGUSR1` or `SIGUSR2`
+ * Add `ProgressBar::setPlaceholderFormatter` to set a placeholder attached to a instance, instead of being global.
+
+6.2
+---
+
+ * Improve truecolor terminal detection in some cases
+ * Add support for 256 color terminals (conversion from Ansi24 to Ansi8 if terminal is capable of it)
+ * Deprecate calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()`, `Question::setAutocompleterCallback/setValidator()`without any arguments
+ * Change the signature of `OutputFormatterStyleInterface::setForeground/setBackground()` to `setForeground/setBackground(?string)`
+ * Change the signature of `HelperInterface::setHelperSet()` to `setHelperSet(?HelperSet)`
+
 6.1
 ---
 
  * Add support to display table vertically when calling setVertical()
  * Add method `__toString()` to `InputInterface`
+ * Added `OutputWrapper` to prevent truncated URL in `SymfonyStyle::createBlock`.
  * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
  * Add suggested values for arguments and options in input definition, for input completion
+ * Add `$resumeAt` parameter to `ProgressBar#start()`, so that one can easily 'resume' progress on longer tasks, and still get accurate `getEstimate()` and `getRemaining()` results.
 
 6.0
 ---

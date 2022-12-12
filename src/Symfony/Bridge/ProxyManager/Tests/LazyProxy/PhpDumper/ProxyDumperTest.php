@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @group legacy
  */
 class ProxyDumperTest extends TestCase
 {
@@ -28,9 +30,6 @@ class ProxyDumperTest extends TestCase
      */
     protected $dumper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->dumper = new ProxyDumper();
@@ -73,10 +72,10 @@ class ProxyDumperTest extends TestCase
 
         $definition->setLazy(true);
 
-        $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
+        $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$container->getFoo2Service(false)');
 
         $this->assertStringMatchesFormat(
-            '%A$wrappedInstance = $this->getFoo2Service(false);%w$proxy->setProxyInitializer(null);%A',
+            '%A$wrappedInstance = $container->getFoo2Service(false);%w$proxy->setProxyInitializer(null);%A',
             $code
         );
     }
@@ -88,9 +87,9 @@ class ProxyDumperTest extends TestCase
     {
         $definition->setLazy(true);
 
-        $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
+        $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$container->getFoo2Service(false)');
 
-        $this->assertStringMatchesFormat('%A$this->'.$access.'[\'foo\'] = %A', $code);
+        $this->assertStringMatchesFormat('%A$container->'.$access.'[\'foo\'] = %A', $code);
     }
 
     public function getPrivatePublicDefinitions()
@@ -119,7 +118,7 @@ class ProxyDumperTest extends TestCase
         $definition->addTag('proxy', ['interface' => SunnyInterface::class]);
 
         $implem = "<?php\n\n".$this->dumper->getProxyCode($definition);
-        $factory = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFooService(false)');
+        $factory = $this->dumper->getProxyFactoryCode($definition, 'foo', '$container->getFooService(false)');
         $factory = <<<EOPHP
 <?php
 
@@ -130,6 +129,9 @@ return new class
 
     public function getFooService(\$lazyLoad = true)
     {
+        \$container = \$this;
+        \$containerRef = \\WeakReference::create(\$this);
+
 {$factory}        return new {$class}();
     }
 

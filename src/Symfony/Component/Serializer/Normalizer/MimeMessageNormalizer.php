@@ -48,9 +48,6 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         $this->normalizer->setSerializer($serializer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if ($object instanceof Headers) {
@@ -64,7 +61,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
 
         if ($object instanceof AbstractPart) {
             $ret = $this->normalizer->normalize($object, $format, $context);
-            $ret['class'] = \get_class($object);
+            $ret['class'] = $object::class;
             unset($ret['seekable'], $ret['cid'], $ret['handle']);
 
             return $ret;
@@ -73,9 +70,6 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         return $this->normalizer->normalize($object, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
     {
         if (Headers::class === $type) {
@@ -97,25 +91,16 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         return $this->normalizer->denormalize($data, $type, $format, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof Message || $data instanceof Headers || $data instanceof HeaderInterface || $data instanceof Address || $data instanceof AbstractPart;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return is_a($type, Message::class, true) || Headers::class === $type || AbstractPart::class === $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

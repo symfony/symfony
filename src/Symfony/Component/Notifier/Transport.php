@@ -13,7 +13,10 @@ namespace Symfony\Component\Notifier;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransportFactory;
+use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkTransportFactory;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
+use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Engagespot\EngagespotTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
@@ -25,8 +28,10 @@ use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
 use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Isendpro\IsendproTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mailjet\MailjetTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mastodon\MastodonTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
@@ -35,6 +40,8 @@ use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
+use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
+use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendberry\SendberryTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
@@ -44,12 +51,16 @@ use Symfony\Component\Notifier\Bridge\Sms77\Sms77TransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
+use Symfony\Component\Notifier\Bridge\SmsFactor\SmsFactorTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
+use Symfony\Component\Notifier\Bridge\Termii\TermiiTransportFactory;
 use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Bridge\Twitter\TwitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
+use Symfony\Component\Notifier\Bridge\Zendesk\ZendeskTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -70,7 +81,10 @@ final class Transport
     private const FACTORY_CLASSES = [
         AllMySmsTransportFactory::class,
         AmazonSnsTransportFactory::class,
+        BandwidthTransportFactory::class,
+        ChatworkTransportFactory::class,
         ClickatellTransportFactory::class,
+        ContactEveryoneTransportFactory::class,
         DiscordTransportFactory::class,
         EngagespotTransportFactory::class,
         EsendexTransportFactory::class,
@@ -82,8 +96,10 @@ final class Transport
         GitterTransportFactory::class,
         InfobipTransportFactory::class,
         IqsmsTransportFactory::class,
+        IsendproTransportFactory::class,
         LightSmsTransportFactory::class,
         MailjetTransportFactory::class,
+        MastodonTransportFactory::class,
         MattermostTransportFactory::class,
         MessageBirdTransportFactory::class,
         MessageMediaTransportFactory::class,
@@ -92,6 +108,8 @@ final class Transport
         OctopushTransportFactory::class,
         OrangeSmsTransportFactory::class,
         OvhCloudTransportFactory::class,
+        PlivoTransportFactory::class,
+        RingCentralTransportFactory::class,
         RocketChatTransportFactory::class,
         SendberryTransportFactory::class,
         SendinblueTransportFactory::class,
@@ -101,12 +119,16 @@ final class Transport
         SmsapiTransportFactory::class,
         SmsBiurasTransportFactory::class,
         SmscTransportFactory::class,
+        SmsFactorTransportFactory::class,
         TelegramTransportFactory::class,
         TelnyxTransportFactory::class,
+        TermiiTransportFactory::class,
         TurboSmsTransportFactory::class,
         TwilioTransportFactory::class,
+        TwitterTransportFactory::class,
         VonageTransportFactory::class,
         YunpianTransportFactory::class,
+        ZendeskTransportFactory::class,
         ZulipTransportFactory::class,
     ];
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
 use AsyncAws\Sns\SnsClient;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -51,6 +52,10 @@ final class AmazonSnsTransport extends AbstractTransport
     {
         if (!$this->supports($message)) {
             throw new UnsupportedMessageTypeException(__CLASS__, sprintf('"%s" or "%s"', SmsMessage::class, ChatMessage::class), $message);
+        }
+
+        if ($message instanceof SmsMessage && '' !== $message->getFrom()) {
+            throw new InvalidArgumentException(sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
         if ($message instanceof ChatMessage && $message->getOptions() instanceof AmazonSnsOptions) {

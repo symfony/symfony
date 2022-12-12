@@ -219,12 +219,11 @@
     <xsd:attribute name="public" type="boolean" />
   </xsd:complexType>
 
-  <xsd:complexType name="tag">
-    <xsd:simpleContent>
-      <xsd:extension base="xsd:string">
-        <xsd:anyAttribute namespace="##any" processContents="lax" />
-      </xsd:extension>
-    </xsd:simpleContent>
+  <xsd:complexType name="tag" mixed="true">
+    <xsd:choice minOccurs="0">
+      <xsd:element name="attribute" type="tag_attribute" maxOccurs="unbounded"/>
+    </xsd:choice>
+    <xsd:anyAttribute namespace="##any" processContents="lax" />
   </xsd:complexType>
 
   <xsd:complexType name="deprecated">
@@ -234,6 +233,13 @@
         <xsd:attribute name="version" type="xsd:string" use="required" />
       </xsd:extension>
     </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="tag_attribute" mixed="true">
+    <xsd:choice minOccurs="0">
+      <xsd:element name="attribute" type="tag_attribute" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="name" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="parameters">
@@ -284,6 +290,7 @@
     <xsd:choice minOccurs="0">
       <xsd:element name="argument" type="argument" maxOccurs="unbounded" />
       <xsd:element name="service" type="service" />
+      <xsd:element name="exclude" type="xsd:string" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="type" type="argument_type" />
     <xsd:attribute name="id" type="xsd:string" />
@@ -294,6 +301,7 @@
     <xsd:attribute name="index-by" type="xsd:string" />
     <xsd:attribute name="default-index-method" type="xsd:string" />
     <xsd:attribute name="default-priority-method" type="xsd:string" />
+    <xsd:attribute name="exclude" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">

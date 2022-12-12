@@ -35,7 +35,7 @@ class SignatureHasher
      * @param ExpiredSignatureStorage|null $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
      * @param int|null                     $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, ExpiredSignatureStorage $expiredSignaturesStorage = null, int $maxUses = null)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, array $signatureProperties, #[\SensitiveParameter] string $secret, ExpiredSignatureStorage $expiredSignaturesStorage = null, int $maxUses = null)
     {
         $this->propertyAccessor = $propertyAccessor;
         $this->signatureProperties = $signatureProperties;
@@ -88,7 +88,7 @@ class SignatureHasher
             }
 
             if (!\is_scalar($value) && !$value instanceof \Stringable) {
-                throw new \InvalidArgumentException(sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, \get_class($user), get_debug_type($value)));
+                throw new \InvalidArgumentException(sprintf('The property path "%s" on the user object "%s" must return a value that can be cast to a string, but "%s" was returned.', $property, $user::class, get_debug_type($value)));
             }
             $signatureFields[] = base64_encode($value);
         }

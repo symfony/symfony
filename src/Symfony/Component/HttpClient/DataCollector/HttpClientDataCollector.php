@@ -36,9 +36,6 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         $this->clients[$name] = $client;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->reset();
@@ -78,9 +75,6 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         return $this->data['error_count'] ?? 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'http_client';

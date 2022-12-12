@@ -1,0 +1,30 @@
+{
+    "name": "symfony/contact-everyone-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Contact Everyone Notifier Bridge",
+    "keywords": ["sms", "contact-everyone", "orange-business", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Franck Ranaivo-Harisoa",
+            "email": "franckranaivo@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^6.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\ContactEveryone\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

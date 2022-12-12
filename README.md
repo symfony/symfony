@@ -17,15 +17,19 @@ Installation
 Sponsor
 -------
 
-Symfony 6.1 is [backed][27] by [basecom][28].
+Symfony 6.2 is [backed][27] by [Les-Tilleuls.coop][28] and [Sulu][29].
 
-As a professional software service provider, basecom implements customized
-solutions in the areas of e-commerce, PIM solutions and web portals. With our
-experience and certified expertise, we have been one of the most renowned
-Symfony specialists in Germany for many years.
+**Les-Tilleuls.coop** is a team of 50+ Symfony experts who can help you design,
+develop and fix your projects. We provide a wide range of professional services
+including development, consulting, coaching, training and audits. We also are
+highly skilled in JS, Go and DevOps. We are a worker cooperative!
 
-Help Symfony by [sponsoring][29] its development!
+**Sulu** is the CMS for Symfony developers. It provides pre-built content-management
+features while giving developers the freedom to build, deploy, and maintain
+custom solutions using full-stack Symfony. Sulu is ideal for creating complex
+websites, integrating external tools, and building custom-built solutions.
 
+Help Symfony by [sponsoring][30] its development!
 
 Documentation
 -------------
@@ -88,5 +92,6 @@ and supported by [Symfony contributors][19].
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
 [27]: https://symfony.com/backers
-[28]: https://www.basecom.de/
-[29]: https://symfony.com/sponsor
+[28]: https://les-tilleuls.coop/
+[29]: https://sulu.io/
+[30]: https://symfony.com/sponsor

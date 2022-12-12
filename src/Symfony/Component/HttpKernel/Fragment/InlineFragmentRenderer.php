@@ -37,8 +37,6 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Additional available options:
      *
      *  * alt: an alternative URI to render in case of an error
@@ -120,9 +118,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
 
         static $setSession;
 
-        if (null === $setSession) {
-            $setSession = \Closure::bind(static function ($subRequest, $request) { $subRequest->session = $request->session; }, null, Request::class);
-        }
+        $setSession ??= \Closure::bind(static function ($subRequest, $request) { $subRequest->session = $request->session; }, null, Request::class);
         $setSession($subRequest, $request);
 
         if ($request->get('_format')) {
@@ -135,9 +131,6 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         return $subRequest;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'inline';

@@ -25,9 +25,6 @@ trait HttpClientTrait
 {
     private static int $CHUNK_SIZE = 16372;
 
-    /**
-     * {@inheritdoc}
-     */
     public function withOptions(array $options): static
     {
         $clone = clone $this;

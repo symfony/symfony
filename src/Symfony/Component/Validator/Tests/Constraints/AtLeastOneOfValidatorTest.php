@@ -43,7 +43,7 @@ use Symfony\Component\Validator\Validation;
  */
 class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): AtLeastOneOfValidator
     {
         return new AtLeastOneOfValidator();
     }

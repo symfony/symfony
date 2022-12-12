@@ -33,7 +33,7 @@ final class VonageTransport extends AbstractTransport
     private $apiSecret;
     private $from;
 
-    public function __construct(string $apiKey, string $apiSecret, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, #[\SensitiveParameter] string $apiSecret, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;
@@ -58,9 +58,11 @@ final class VonageTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/sms/json', [
             'body' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => $message->getPhone(),
                 'text' => $message->getSubject(),
                 'api_key' => $this->apiKey,

@@ -30,9 +30,6 @@ class TextType extends AbstractType implements DataTransformerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -40,26 +37,17 @@ class TextType extends AbstractType implements DataTransformerInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'text';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform(mixed $data): mixed
     {
         // Model data should not be transformed
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverseTransform(mixed $data): mixed
     {
         return $data ?? '';

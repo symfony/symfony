@@ -27,8 +27,8 @@ final class SerializedName
 {
     public function __construct(private string $serializedName)
     {
-        if (empty($serializedName)) {
-            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', static::class));
+        if ('' === $serializedName) {
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', self::class));
         }
     }
 

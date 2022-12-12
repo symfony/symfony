@@ -73,16 +73,13 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         self::$setInnerItem ??= \Closure::bind(
             static function (CacheItemInterface $innerItem, CacheItem $item, $expiry = null) {
                 $innerItem->set($item->pack());
-                $innerItem->expiresAt(($expiry ?? $item->expiry) ? \DateTime::createFromFormat('U.u', sprintf('%.6F', $expiry ?? $item->expiry)) : null);
+                $innerItem->expiresAt(($expiry ?? $item->expiry) ? \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $expiry ?? $item->expiry)) : null);
             },
             null,
             CacheItem::class
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed
     {
         if (!$this->pool instanceof CacheInterface) {
@@ -98,9 +95,6 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         }, $beta, $metadata);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItem(mixed $key): CacheItem
     {
         $item = $this->pool->getItem($this->getId($key));
@@ -108,9 +102,6 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return (self::$createCacheItem)($key, $item, $this->poolHash);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItems(array $keys = []): iterable
     {
         if ($this->namespaceLen) {
@@ -122,17 +113,11 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $this->generateItems($this->pool->getItems($keys));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasItem(mixed $key): bool
     {
         return $this->pool->hasItem($this->getId($key));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(string $prefix = ''): bool
     {
         if ($this->pool instanceof AdapterInterface) {
@@ -142,17 +127,11 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $this->pool->clear();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteItem(mixed $key): bool
     {
         return $this->pool->deleteItem($this->getId($key));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteItems(array $keys): bool
     {
         if ($this->namespaceLen) {
@@ -164,25 +143,16 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $this->pool->deleteItems($keys);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(CacheItemInterface $item): bool
     {
         return $this->doSave($item, __FUNCTION__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveDeferred(CacheItemInterface $item): bool
     {
         return $this->doSave($item, __FUNCTION__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(): bool
     {
         return $this->pool->commit();

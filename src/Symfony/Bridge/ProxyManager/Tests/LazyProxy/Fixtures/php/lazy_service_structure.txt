@@ -3,12 +3,15 @@
 use %a
 class LazyServiceProjectServiceContainer extends Container
 {%a
-    protected function getFooService($lazyLoad = true)
+    protected static function getFooService($container, $lazyLoad = true)
     {
-        if ($lazyLoad) {
-            return $this->services['foo'] = $this->createProxy('stdClass_%s', function () {
-                return %S\stdClass_%s(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
-                    $wrappedInstance = $this->getFooService(false);
+        $containerRef = $container->ref;
+
+        if (true === $lazyLoad) {
+            return $container->services['foo'] = $container->createProxy('stdClass_%s', static function () use ($containerRef) {
+                return %S\stdClass_%s(static function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($containerRef) {
+                    $container = $containerRef->get();
+                    $wrappedInstance = self::getFooService($containerRef->get(), false);
 
                     $proxy->setProxyInitializer(null);
 

@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Definition;
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @group legacy
  */
 class RuntimeInstantiatorTest extends TestCase
 {
@@ -30,9 +32,6 @@ class RuntimeInstantiatorTest extends TestCase
      */
     protected $instantiator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->instantiator = new RuntimeInstantiator();

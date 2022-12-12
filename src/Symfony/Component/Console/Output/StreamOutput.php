@@ -47,9 +47,7 @@ class StreamOutput extends Output
 
         $this->stream = $stream;
 
-        if (null === $decorated) {
-            $decorated = $this->hasColorSupport();
-        }
+        $decorated ??= $this->hasColorSupport();
 
         parent::__construct($verbosity, $decorated, $formatter);
     }
@@ -64,9 +62,6 @@ class StreamOutput extends Output
         return $this->stream;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite(string $message, bool $newline)
     {
         if ($newline) {

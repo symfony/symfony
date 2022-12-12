@@ -24,6 +24,8 @@ interface FormTypeExtensionInterface
      * This method is called after the extended type has built the form to
      * further modify it.
      *
+     * @param array<string, mixed> $options
+     *
      * @see FormTypeInterface::buildForm()
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
@@ -34,6 +36,8 @@ interface FormTypeExtensionInterface
      * This method is called after the extended type has built the view to
      * further modify it.
      *
+     * @param array<string, mixed> $options
+     *
      * @see FormTypeInterface::buildView()
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
@@ -43,6 +47,8 @@ interface FormTypeExtensionInterface
      *
      * This method is called after the extended type has finished the view to
      * further modify it.
+     *
+     * @param array<string, mixed> $options
      *
      * @see FormTypeInterface::finishView()
      */

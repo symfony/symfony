@@ -71,9 +71,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         $this->release();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquire(bool $blocking = false): bool
     {
         $this->key->resetLifetime();
@@ -127,9 +124,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquireRead(bool $blocking = false): bool
     {
         $this->key->resetLifetime();
@@ -188,15 +182,9 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refresh(float $ttl = null)
     {
-        if (null === $ttl) {
-            $ttl = $this->ttl;
-        }
-        if (!$ttl) {
+        if (!$ttl ??= $this->ttl) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
         }
 
@@ -225,17 +213,11 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAcquired(): bool
     {
         return $this->dirty = $this->store->exists($this->key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function release()
     {
         try {
@@ -251,23 +233,19 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
             if ($this->store->exists($this->key)) {
                 throw new LockReleasingException(sprintf('Failed to release the "%s" lock, the resource is still locked.', $this->key));
             }
+
+            $this->logger->debug('Successfully released the "{resource}" lock.', ['resource' => $this->key]);
         } catch (LockReleasingException $e) {
             $this->logger->notice('Failed to release the "{resource}" lock.', ['resource' => $this->key]);
             throw $e;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isExpired(): bool
     {
         return $this->key->isExpired();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRemainingLifetime(): ?float
     {
         return $this->key->getRemainingLifetime();

@@ -13,7 +13,6 @@ namespace Symfony\Component\Mime\Part;
 
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
-use Symfony\Component\Mime\MimeTypes;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -23,23 +22,22 @@ class DataPart extends TextPart
     /** @internal */
     protected $_parent;
 
-    private static $mimeTypes;
-
     private $filename;
     private $mediaType;
     private $cid;
-    private $handle;
 
     /**
-     * @param resource|string $body
+     * @param resource|string|File $body Use a File instance to defer loading the file until rendering
      */
     public function __construct($body, string $filename = null, string $contentType = null, string $encoding = null)
     {
         unset($this->_parent);
 
-        if (null === $contentType) {
-            $contentType = 'application/octet-stream';
+        if ($body instanceof File && !$filename) {
+            $filename = $body->getFilename();
         }
+
+        $contentType ??= $body instanceof File ? $body->getContentType() : 'application/octet-stream';
         [$this->mediaType, $subtype] = explode('/', $contentType);
 
         parent::__construct($body, null, $subtype, $encoding);
@@ -53,32 +51,7 @@ class DataPart extends TextPart
 
     public static function fromPath(string $path, string $name = null, string $contentType = null): self
     {
-        if (null === $contentType) {
-            $ext = strtolower(substr($path, strrpos($path, '.') + 1));
-            if (null === self::$mimeTypes) {
-                self::$mimeTypes = new MimeTypes();
-            }
-            $contentType = self::$mimeTypes->getMimeTypes($ext)[0] ?? 'application/octet-stream';
-        }
-
-        if ((is_file($path) && !is_readable($path)) || is_dir($path)) {
-            throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
-        }
-
-        if (false === $handle = @fopen($path, 'r', false)) {
-            throw new InvalidArgumentException(sprintf('Unable to open path "%s".', $path));
-        }
-
-        if (!is_file($path)) {
-            $cache = fopen('php://temp', 'r+');
-            stream_copy_to_stream($handle, $cache);
-            $handle = $cache;
-        }
-
-        $p = new self($handle, $name ?: basename($path), $contentType);
-        $p->handle = $handle;
-
-        return $p;
+        return new self(new File($path), $name, $contentType);
     }
 
     /**
@@ -87,6 +60,20 @@ class DataPart extends TextPart
     public function asInline(): static
     {
         return $this->setDisposition('inline');
+    }
+
+    /**
+     * @return $this
+     */
+    public function setContentId(string $cid): static
+    {
+        if (!str_contains($cid, '@')) {
+            throw new InvalidArgumentException(sprintf('Invalid cid "%s".', $cid));
+        }
+
+        $this->cid = $cid;
+
+        return $this;
     }
 
     public function getContentId(): string
@@ -142,13 +129,6 @@ class DataPart extends TextPart
     private function generateContentId(): string
     {
         return bin2hex(random_bytes(16)).'@symfony';
-    }
-
-    public function __destruct()
-    {
-        if (null !== $this->handle && \is_resource($this->handle)) {
-            fclose($this->handle);
-        }
     }
 
     public function __sleep(): array

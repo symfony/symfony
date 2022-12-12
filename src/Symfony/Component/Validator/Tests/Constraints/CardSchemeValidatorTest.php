@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CardSchemeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): CardSchemeValidator
     {
         return new CardSchemeValidator();
     }

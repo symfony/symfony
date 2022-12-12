@@ -54,7 +54,7 @@ ob_start();
 class TestSessionHandler extends AbstractSessionHandler
 {
     private $data;
-    private $sessionId;
+    private ?string $sessionId;
 
     public function __construct($data = '', $sessionId = null)
     {
@@ -76,9 +76,6 @@ class TestSessionHandler extends AbstractSessionHandler
         return parent::validateId($sessionId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function read(string $sessionId): string
     {
         echo __FUNCTION__, "\n";
@@ -86,9 +83,6 @@ class TestSessionHandler extends AbstractSessionHandler
         return parent::read($sessionId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function updateTimestamp($sessionId, $data): bool
     {
         echo __FUNCTION__, "\n";
@@ -96,9 +90,6 @@ class TestSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write(string $sessionId, string $data): bool
     {
         echo __FUNCTION__, "\n";
@@ -106,9 +97,6 @@ class TestSessionHandler extends AbstractSessionHandler
         return parent::write($sessionId, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function destroy(string $sessionId): bool
     {
         echo __FUNCTION__, "\n";

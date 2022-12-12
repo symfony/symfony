@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\LessThanValidator;
  */
 class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): LessThanValidator
     {
         return new LessThanValidator();
     }
@@ -35,9 +35,6 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         return LessThan::TOO_HIGH_ERROR;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisons(): array
     {
         return [
@@ -51,9 +48,6 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideValidComparisonsToPropertyPath(): array
     {
         return [
@@ -61,9 +55,6 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function provideInvalidComparisons(): array
     {
         return [

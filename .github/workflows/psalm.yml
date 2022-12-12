@@ -49,6 +49,8 @@ jobs:
           git checkout composer.json
           git checkout -m ${{ github.base_ref }}
 
+          # to be removed when psalm adds support for intersection types
+          sed -i 's/Uuid&/Uuid|/' src/Symfony/Component/Uid/Factory/TimeBasedUuidFactory.php
           ./vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
           git checkout -m FETCH_HEAD
 

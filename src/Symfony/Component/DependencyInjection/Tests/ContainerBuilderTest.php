@@ -38,6 +38,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -50,6 +51,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -372,6 +374,7 @@ class ContainerBuilderTest extends TestCase
     public function testCreateProxyWithRealServiceInstantiator()
     {
         $builder = new ContainerBuilder();
+        $builder->setProxyInstantiator(new RealServiceInstantiator());
 
         $builder->register('foo1', 'Bar\FooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
         $builder->getDefinition('foo1')->setLazy(true);
@@ -379,7 +382,20 @@ class ContainerBuilderTest extends TestCase
         $foo1 = $builder->get('foo1');
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
-        $this->assertSame('Bar\FooClass', \get_class($foo1));
+        $this->assertSame('Bar\FooClass', $foo1::class);
+    }
+
+    public function testCreateLazyProxy()
+    {
+        $builder = new ContainerBuilder();
+
+        $builder->setParameter('foo1_class', 'Bar\FooClass');
+        $builder->register('foo1', '%foo1_class%')->setLazy(true);
+
+        $foo1 = $builder->get('foo1');
+
+        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
+        $this->assertInstanceOf(\Bar\FooClass::class, $foo1);
     }
 
     public function testCreateServiceClass()
@@ -530,6 +546,23 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals('Foo value', $container->get('bar')->foo);
     }
 
+    public function testGetEnvCountersWithEnum()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $config = new ContainerBuilder($bag);
+        $config->resolveEnvPlaceholders([
+            $bag->get('env(enum:'.StringBackedEnum::class.':foo)'),
+            $bag->get('env(Bar)'),
+        ]);
+
+        $expected = [
+            'enum:Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum:foo' => 1,
+            'Bar' => 1,
+        ];
+
+        $this->assertSame($expected, $config->getEnvCounters());
+    }
+
     public function testCreateServiceWithAbstractArgument()
     {
         $this->expectException(RuntimeException::class);
@@ -631,6 +664,21 @@ class ContainerBuilderTest extends TestCase
         $childDefB = $config->registerForAutoconfiguration('BInterface');
         $container->merge($config);
         $this->assertSame(['AInterface' => $childDefA, 'BInterface' => $childDefB], $container->getAutoconfiguredInstanceof());
+    }
+
+    public function testMergeWithExcludedServices()
+    {
+        $container = new ContainerBuilder();
+        $container->setAlias('bar', 'foo');
+        $container->register('foo', 'Bar\FooClass');
+        $config = new ContainerBuilder();
+        $config->register('bar', 'Bar')->addTag('container.excluded');
+        $config->register('foo', 'Bar')->addTag('container.excluded');
+        $config->register('baz', 'Bar')->addTag('container.excluded');
+        $container->merge($config);
+        $this->assertEquals(['service_container', 'foo', 'baz'], array_keys($container->getDefinitions()));
+        $this->assertFalse($container->getDefinition('foo')->hasTag('container.excluded'));
+        $this->assertTrue($container->getDefinition('baz')->hasTag('container.excluded'));
     }
 
     public function testMergeThrowsExceptionForDuplicateAutomaticInstanceofDefinitions()
@@ -1266,20 +1314,20 @@ class ContainerBuilderTest extends TestCase
     public function testNoClassFromGlobalNamespaceClassId()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "DateTime" has no class attribute, and appears to reference a class or interface in the global namespace.');
+        $this->expectExceptionMessage('The definition for "DateTimeImmutable" has no class attribute, and appears to reference a class or interface in the global namespace.');
         $container = new ContainerBuilder();
 
-        $container->register(\DateTime::class);
+        $container->register(\DateTimeImmutable::class);
         $container->compile();
     }
 
     public function testNoClassFromGlobalNamespaceClassIdWithLeadingSlash()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "\DateTime" has no class attribute, and appears to reference a class or interface in the global namespace.');
+        $this->expectExceptionMessage('The definition for "\DateTimeImmutable" has no class attribute, and appears to reference a class or interface in the global namespace.');
         $container = new ContainerBuilder();
 
-        $container->register('\\'.\DateTime::class);
+        $container->register('\\'.\DateTimeImmutable::class);
         $container->compile();
     }
 
@@ -1649,6 +1697,25 @@ class ContainerBuilderTest extends TestCase
 
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
+    }
+
+    public function testLazyWither()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', Wither::class)
+            ->setLazy(true)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+
+        $wither = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither->foo);
+        $this->assertTrue($wither->resetLazyObject());
+        $this->assertInstanceOf(Wither::class, $wither->withFoo1($wither->foo));
     }
 
     public function testWitherWithStaticReturnType()

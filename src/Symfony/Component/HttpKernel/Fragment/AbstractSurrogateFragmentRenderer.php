@@ -42,8 +42,6 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Note that if the current Request has no surrogate capability, this method
      * falls back to use the inline rendering strategy.
      *
@@ -51,6 +49,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
      *
      *  * alt: an alternative URI to render in case of an error
      *  * comment: a comment to add when returning the surrogate tag
+     *  * absolute_uri: whether to generate an absolute URI or not. Default is false
      *
      * Note, that not all surrogate strategies support all options. For now
      * 'alt' and 'comment' are only supported by ESI.
@@ -67,13 +66,15 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
             return $this->inlineStrategy->render($uri, $request, $options);
         }
 
+        $absolute = $options['absolute_uri'] ?? false;
+
         if ($uri instanceof ControllerReference) {
-            $uri = $this->generateSignedFragmentUri($uri, $request);
+            $uri = $this->generateSignedFragmentUri($uri, $request, $absolute);
         }
 
         $alt = $options['alt'] ?? null;
         if ($alt instanceof ControllerReference) {
-            $alt = $this->generateSignedFragmentUri($alt, $request);
+            $alt = $this->generateSignedFragmentUri($alt, $request, $absolute);
         }
 
         $tag = $this->surrogate->renderIncludeTag($uri, $alt, $options['ignore_errors'] ?? false, $options['comment'] ?? '');
@@ -81,9 +82,9 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         return new Response($tag);
     }
 
-    private function generateSignedFragmentUri(ControllerReference $uri, Request $request): string
+    private function generateSignedFragmentUri(ControllerReference $uri, Request $request, bool $absolute): string
     {
-        return (new FragmentUriGenerator($this->fragmentPath, $this->signer))->generate($uri, $request);
+        return (new FragmentUriGenerator($this->fragmentPath, $this->signer))->generate($uri, $request, $absolute);
     }
 
     private function containsNonScalars(array $values): bool

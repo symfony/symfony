@@ -73,7 +73,7 @@ class ArrayNodeTest extends TestCase
     public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, array|\Exception $expected, string $message = '')
     {
         if ($expected instanceof \Exception) {
-            $this->expectException(\get_class($expected));
+            $this->expectException($expected::class);
             $this->expectExceptionMessage($expected->getMessage());
         }
         $node = new ArrayNode('root');

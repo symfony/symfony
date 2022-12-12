@@ -73,7 +73,7 @@ class RegisterListenersPass implements CompilerPassInterface
                         continue;
                     }
 
-                    $event['method'] = $event['method'] ?? '__invoke';
+                    $event['method'] ??= '__invoke';
                     $event['event'] = $this->getEventFromTypeDeclaration($container, $id, $event['method']);
                 }
 

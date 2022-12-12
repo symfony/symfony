@@ -40,6 +40,7 @@ class Expression extends Constraint
     public $message = 'This value is not valid.';
     public $expression;
     public $values = [];
+    public bool $negate = true;
 
     public function __construct(
         string|ExpressionObject|array|null $expression,
@@ -47,7 +48,8 @@ class Expression extends Constraint
         array $values = null,
         array $groups = null,
         mixed $payload = null,
-        array $options = []
+        array $options = [],
+        bool $negate = null,
     ) {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint.', __CLASS__));
@@ -63,35 +65,24 @@ class Expression extends Constraint
 
         $this->message = $message ?? $this->message;
         $this->values = $values ?? $this->values;
+        $this->negate = $negate ?? $this->negate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption(): ?string
     {
         return 'expression';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredOptions(): array
     {
         return ['expression'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validatedBy(): string
     {
         return 'validator.expression';

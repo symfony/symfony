@@ -21,9 +21,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class Voter implements VoterInterface, CacheableVoterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         // abstain vote by default in case none of the attributes are supported

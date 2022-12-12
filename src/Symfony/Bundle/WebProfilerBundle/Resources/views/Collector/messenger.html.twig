@@ -57,8 +57,6 @@
         .message-bus .badge.status-some-errors { line-height: 16px; border-bottom: 2px solid #B0413E; }
 
         .message-item tbody.sf-toggle-content.sf-toggle-visible { display: table-row-group; }
-        td.message-bus-dispatch-caller { background: #f1f2f3; }
-        .theme-dark td.message-bus-dispatch-caller { background: var(--base-1); }
     </style>
 {% endblock %}
 
@@ -68,9 +66,12 @@
     <h2>Messages</h2>
 
     {% if collector.messages is empty %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No messages have been collected.</p>
         </div>
+    {% elseif 1 == collector.buses|length %}
+        <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
+        {{ helper.render_bus_messages(collector.messages, true) }}
     {% else %}
         <div class="sf-tabs message-bus">
             <div class="tab">
@@ -112,9 +113,6 @@
                     data-toggle-initial="{{ loop.first ? 'display' }}"
                 >
                     <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
-                    {% if showBus %}
-                        <span class="label">{{ dispatchCall.bus }}</span>
-                    {% endif %}
                     {% if dispatchCall.exception is defined %}
                         <span class="label status-error">exception</span>
                     {% endif %}
@@ -127,21 +125,21 @@
         </thead>
         <tbody id="message-item-{{ discr }}-{{ loop.index0 }}-details" class="sf-toggle-content">
             <tr>
-                <td colspan="2" class="message-bus-dispatch-caller">
-                    <span class="metadata">In
-                        {% set caller = dispatchCall.caller %}
-                        {% if caller.line %}
-                            {% set link = caller.file|file_link(caller.line) %}
-                            {% if link %}
-                                <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
-                            {% else %}
-                                <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
-                            {% endif %}
+                <th scope="row" class="font-normal">Caller</th>
+                <td class="message-bus-dispatch-caller">
+                    In
+                    {% set caller = dispatchCall.caller %}
+                    {% if caller.line %}
+                        {% set link = caller.file|file_link(caller.line) %}
+                        {% if link %}
+                            <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
                         {% else %}
-                            {{ caller.name }}
+                            <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
                         {% endif %}
-                        line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ discr }}-{{ loop.index0 }}">{{ caller.line }}</a>
-                    </span>
+                    {% else %}
+                        {{ caller.name }}
+                    {% endif %}
+                    line <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ discr }}-{{ loop.index0 }}">{{ caller.line }}</a>
 
                     <div class="hidden" id="sf-trace-{{ discr }}-{{ loop.index0 }}">
                         <div class="trace">
@@ -157,27 +155,27 @@
             </tr>
             {% if showBus %}
                 <tr>
-                    <td class="text-bold">Bus</td>
+                    <th scope="row" class="font-normal">Bus</th>
                     <td>{{ dispatchCall.bus }}</td>
                 </tr>
             {% endif %}
             <tr>
-                <td class="text-bold">Message</td>
+                <th scope="row" class="font-normal">Message</th>
                 <td>{{ profiler_dump(dispatchCall.message.value, maxDepth=2) }}</td>
             </tr>
             <tr>
-                <td class="text-bold">Envelope stamps <span class="text-muted">when dispatching</span></td>
+                <th scope="row" class="font-normal">Envelope stamps <span class="block text-muted">when dispatching</span></th>
                 <td>
                     {% for item in dispatchCall.stamps %}
                         {{ profiler_dump(item) }}
                     {% else %}
-                        <span class="text-muted">No items</span>
+                        <span class="text-muted font-normal">No items</span>
                     {% endfor %}
                 </td>
             </tr>
             {% if dispatchCall.stamps_after_dispatch is defined %}
                 <tr>
-                    <td class="text-bold">Envelope stamps <span class="text-muted">after dispatch</span></td>
+                    <th scope="row" class="font-normal">Envelope stamps <span class="block text-muted">after dispatch</span></th>
                     <td>
                         {% for item in dispatchCall.stamps_after_dispatch %}
                             {{ profiler_dump(item) }}

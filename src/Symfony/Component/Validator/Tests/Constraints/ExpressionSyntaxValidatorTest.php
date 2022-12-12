@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): ExpressionSyntaxValidator
     {
         return new ExpressionSyntaxValidator(new ExpressionLanguage());
     }

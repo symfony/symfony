@@ -21,6 +21,7 @@
         "symfony/translation-contracts": "^2.3|^3.0"
     },
     "require-dev": {
+        "nikic/php-parser": "^4.13",
         "symfony/config": "^5.4|^6.0",
         "symfony/console": "^5.4|^6.0",
         "symfony/dependency-injection": "^5.4|^6.0",
@@ -46,6 +47,7 @@
         "symfony/translation-implementation": "2.3|3.0"
     },
     "suggest": {
+        "nikic/php-parser": "To use PhpAstExtractor",
         "symfony/config": "",
         "symfony/yaml": "",
         "psr/log-implementation": "To use logging capability in translator"

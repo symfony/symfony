@@ -12,7 +12,6 @@
 namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\Lock\NoLock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
@@ -35,7 +34,7 @@ final class TokenBucketLimiter implements LimiterInterface
         $this->maxBurst = $maxBurst;
         $this->rate = $rate;
         $this->storage = $storage;
-        $this->lock = $lock ?? new NoLock();
+        $this->lock = $lock;
     }
 
     /**
@@ -57,7 +56,7 @@ final class TokenBucketLimiter implements LimiterInterface
             throw new \InvalidArgumentException(sprintf('Cannot reserve more tokens (%d) than the burst size of the rate limiter (%d).', $tokens, $this->maxBurst));
         }
 
-        $this->lock->acquire(true);
+        $this->lock?->acquire(true);
 
         try {
             $bucket = $this->storage->fetch($this->id);
@@ -67,7 +66,8 @@ final class TokenBucketLimiter implements LimiterInterface
 
             $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
-            if ($availableTokens >= $tokens) {
+
+            if ($availableTokens >= max(1, $tokens)) {
                 // tokens are now available, update bucket
                 $bucket->setTokens($availableTokens - $tokens);
                 $bucket->setTimer($now);
@@ -92,17 +92,16 @@ final class TokenBucketLimiter implements LimiterInterface
                 $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
             }
 
-            $this->storage->save($bucket);
+            if (0 < $tokens) {
+                $this->storage->save($bucket);
+            }
         } finally {
-            $this->lock->release();
+            $this->lock?->release();
         }
 
         return $reservation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function consume(int $tokens = 1): RateLimit
     {
         try {

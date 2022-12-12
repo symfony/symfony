@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UlidValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): UlidValidator
     {
         return new UlidValidator();
     }

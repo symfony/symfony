@@ -16,6 +16,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements DataTransformerInterface<array, array>
  */
 class ArrayToPartsTransformer implements DataTransformerInterface
 {
@@ -28,18 +30,14 @@ class ArrayToPartsTransformer implements DataTransformerInterface
 
     public function transform(mixed $array): mixed
     {
-        if (null === $array) {
-            $array = [];
-        }
-
-        if (!\is_array($array)) {
+        if (!\is_array($array ??= [])) {
             throw new TransformationFailedException('Expected an array.');
         }
 
         $result = [];
 
         foreach ($this->partMapping as $partKey => $originalKeys) {
-            if (empty($array)) {
+            if (!$array) {
                 $result[$partKey] = null;
             } else {
                 $result[$partKey] = array_intersect_key($array, array_flip($originalKeys));

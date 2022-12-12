@@ -47,7 +47,7 @@ class CallbackValidatorTest_Object
 
 class CallbackValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): CallbackValidator
     {
         return new CallbackValidator();
     }

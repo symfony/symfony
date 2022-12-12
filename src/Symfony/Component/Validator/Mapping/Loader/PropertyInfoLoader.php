@@ -44,9 +44,6 @@ final class PropertyInfoLoader implements LoaderInterface
         $this->classValidatorRegexp = $classValidatorRegexp;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $className = $metadata->getClassName();

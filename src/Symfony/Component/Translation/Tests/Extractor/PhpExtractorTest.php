@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Extractor\PhpExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
 
+/**
+ * @group legacy
+ */
 class PhpExtractorTest extends TestCase
 {
     /**

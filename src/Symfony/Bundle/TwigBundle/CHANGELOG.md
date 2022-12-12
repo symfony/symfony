@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add the `twig.mailer.html_to_text_converter` option to allow configuring custom `HtmlToTextConverterInterface`
+   implementations to be used by the `twig.mime_body_renderer` service
+
 6.1
 ---
 

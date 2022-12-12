@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -44,9 +46,9 @@ class ProjectServiceContainer extends Container
      *
      * @return object A %env(FOO)% instance
      */
-    protected function getServiceFromAnonymousFactoryService()
+    protected static function getServiceFromAnonymousFactoryService($container)
     {
-        return $this->services['service_from_anonymous_factory'] = (new ${($_ = $this->getEnv('FOO')) && false ?: "_"}())->getInstance();
+        return $container->services['service_from_anonymous_factory'] = (new ${($_ = $container->getEnv('FOO')) && false ?: "_"}())->getInstance();
     }
 
     /**
@@ -54,9 +56,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getServiceWithMethodCallAndFactoryService()
+    protected static function getServiceWithMethodCallAndFactoryService($container)
     {
-        $this->services['service_with_method_call_and_factory'] = $instance = new \Bar\FooClass();
+        $container->services['service_with_method_call_and_factory'] = $instance = new \Bar\FooClass();
 
         $instance->setBar(\Bar\FooClass::getInstance());
 
@@ -66,7 +68,7 @@ class ProjectServiceContainer extends Container
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new ParameterNotFoundException($name);
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -105,9 +107,10 @@ class ProjectServiceContainer extends Container
 
     private function getDynamicParameter(string $name)
     {
+        $container = $this;
         $value = match ($name) {
-            'foo' => $this->getEnv('FOO'),
-            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+            'foo' => $container->getEnv('FOO'),
+            default => throw new ParameterNotFoundException($name),
         };
         $this->loadedDynamicParameters[$name] = true;
 

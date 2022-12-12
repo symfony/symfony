@@ -57,6 +57,19 @@ final class TwilioTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
+    /**
+     * @dataProvider invalidFromProvider
+     */
+    public function testInvalidArgumentExceptionIsThrownIfSmsMessageFromIsInvalid(string $from)
+    {
+        $transport = $this->createTransport();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+
+        $transport->send(new SmsMessage('+33612345678', 'Hello!', $from));
+    }
+
     public function invalidFromProvider(): iterable
     {
         // alphanumeric sender ids

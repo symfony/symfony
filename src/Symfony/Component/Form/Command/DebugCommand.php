@@ -54,9 +54,6 @@ class DebugCommand extends Command
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -98,9 +95,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -128,7 +122,7 @@ EOF
                 $object = $resolvedType->getOptionsResolver();
 
                 if (!$object->isDefined($option)) {
-                    $message = sprintf('Option "%s" is not defined in "%s".', $option, \get_class($resolvedType->getInnerType()));
+                    $message = sprintf('Option "%s" is not defined in "%s".', $option, $resolvedType->getInnerType()::class);
 
                     if ($alternatives = $this->findAlternatives($option, $object->getDefinedOptions())) {
                         if (1 === \count($alternatives)) {
@@ -210,7 +204,7 @@ EOF
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-        $coreTypes = array_map(function (FormTypeInterface $type) { return \get_class($type); }, $coreTypes);
+        $coreTypes = array_map(function (FormTypeInterface $type) { return $type::class; }, $coreTypes);
         sort($coreTypes);
 
         return $coreTypes;

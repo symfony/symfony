@@ -62,9 +62,6 @@ class ChoiceType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $unknownValues = [];
@@ -147,11 +144,10 @@ class ChoiceType extends AbstractType
                         }
                     }
                 } else {
-                    foreach ($data as $value) {
-                        if ($choiceList->getChoicesForValues([$value])) {
-                            $knownValues[] = $value;
-                            unset($unknownValues[$value]);
-                        }
+                    foreach ($choiceList->getChoicesForValues($data) as $index => $choice) {
+                        $value = $data[$index];
+                        $knownValues[] = $value;
+                        unset($unknownValues[$value]);
                     }
                 }
 
@@ -218,9 +214,6 @@ class ChoiceType extends AbstractType
         }, 256);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $choiceTranslationDomain = $options['choice_translation_domain'];
@@ -277,9 +270,6 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['expanded']) {
@@ -297,9 +287,6 @@ class ChoiceType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $emptyData = function (Options $options) {
@@ -391,9 +378,6 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'choice';

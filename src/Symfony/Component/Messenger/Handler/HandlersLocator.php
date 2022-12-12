@@ -32,9 +32,6 @@ class HandlersLocator implements HandlersLocatorInterface
         $this->handlers = $handlers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHandlers(Envelope $envelope): iterable
     {
         $seen = [];
@@ -66,7 +63,7 @@ class HandlersLocator implements HandlersLocatorInterface
      */
     public static function listTypes(Envelope $envelope): array
     {
-        $class = \get_class($envelope->getMessage());
+        $class = $envelope->getMessage()::class;
 
         return [$class => $class]
             + class_parents($class)

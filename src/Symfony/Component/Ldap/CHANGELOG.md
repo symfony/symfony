@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate `{username}` parameter use in favour of `{user_identifier}`
+
 6.1
 ---
 

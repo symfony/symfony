@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\FreeMobile\Tests;
 
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransport;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -41,5 +42,15 @@ final class FreeMobileTransportTest extends TransportTestCase
         yield [new SmsMessage('0699887766', 'Hello!')]; // because this phone number is not configured on the transport!
         yield [new ChatMessage('Hello!')];
         yield [$this->createMock(MessageInterface::class)];
+    }
+
+    public function testSmsMessageWithFrom()
+    {
+        $transport = $this->createTransport();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransport" transport does not support "from" in "Symfony\Component\Notifier\Message\SmsMessage".');
+
+        $transport->send(new SmsMessage('+33611223344', 'test', 'foo'));
     }
 }

@@ -20,6 +20,9 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
+/**
+ * @group legacy
+ */
 class SecurityTest extends TestCase
 {
     public function testGetToken()

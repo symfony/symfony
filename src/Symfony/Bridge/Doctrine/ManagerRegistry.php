@@ -14,8 +14,8 @@ namespace Symfony\Bridge\Doctrine;
 use Doctrine\Persistence\AbstractManagerRegistry;
 use ProxyManager\Proxy\GhostObjectInterface;
 use ProxyManager\Proxy\LazyLoadingInterface;
-use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 /**
  * References Doctrine connections and entity/document managers.
@@ -29,17 +29,11 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
      */
     protected $container;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getService($name): object
     {
         return $this->container->get($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function resetService($name): void
     {
         if (!$this->container->initialized($name)) {
@@ -47,8 +41,15 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
         }
         $manager = $this->container->get($name);
 
+        if ($manager instanceof LazyObjectInterface) {
+            if (!$manager->resetLazyObject()) {
+                throw new \LogicException(sprintf('Resetting a non-lazy manager service is not supported. Declare the "%s" service as lazy.', $name));
+            }
+
+            return;
+        }
         if (!$manager instanceof LazyLoadingInterface) {
-            throw new \LogicException('Resetting a non-lazy manager service is not supported. '.(interface_exists(LazyLoadingInterface::class) && class_exists(RuntimeInstantiator::class) ? sprintf('Declare the "%s" service as lazy.', $name) : 'Try running "composer require symfony/proxy-manager-bridge".'));
+            throw new \LogicException(sprintf('Resetting a non-lazy manager service is not supported. Declare the "%s" service as lazy.', $name));
         }
         if ($manager instanceof GhostObjectInterface) {
             throw new \LogicException('Resetting a lazy-ghost-object manager service is not supported.');

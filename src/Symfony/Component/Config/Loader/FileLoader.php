@@ -62,8 +62,6 @@ abstract class FileLoader extends Loader
      * @param string|null          $sourceResource The original resource importing the new resource
      * @param string|string[]|null $exclude        Glob patterns to exclude from the import
      *
-     * @return mixed
-     *
      * @throws LoaderLoadException
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
@@ -136,7 +134,15 @@ abstract class FileLoader extends Loader
         try {
             $loader = $this->resolve($resource, $type);
 
-            if ($loader instanceof self && null !== $this->currentDir) {
+            if ($loader instanceof DirectoryAwareLoaderInterface) {
+                $loader = $loader->forDirectory($this->currentDir);
+            }
+
+            if (!$loader instanceof self) {
+                return $loader->load($resource, $type);
+            }
+
+            if (null !== $this->currentDir) {
                 $resource = $loader->getLocator()->locate($resource, $this->currentDir, false);
             }
 

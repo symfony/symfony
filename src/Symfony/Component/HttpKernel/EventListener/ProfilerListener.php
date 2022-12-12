@@ -87,7 +87,7 @@ class ProfilerListener implements EventSubscriberInterface
 
         $request = $event->getRequest();
         if (null !== $this->collectParameter && null !== $collectParameterValue = $request->get($this->collectParameter)) {
-            true === $collectParameterValue || filter_var($collectParameterValue, \FILTER_VALIDATE_BOOLEAN) ? $this->profiler->enable() : $this->profiler->disable();
+            true === $collectParameterValue || filter_var($collectParameterValue, \FILTER_VALIDATE_BOOL) ? $this->profiler->enable() : $this->profiler->disable();
         }
 
         $exception = $this->exception;
@@ -97,7 +97,7 @@ class ProfilerListener implements EventSubscriberInterface
             return;
         }
 
-        $session = $request->hasPreviousSession() && $request->hasSession() ? $request->getSession() : null;
+        $session = $request->hasPreviousSession() ? $request->getSession() : null;
 
         if ($session instanceof Session) {
             $usageIndexValue = $usageIndexReference = &$session->getUsageIndex();

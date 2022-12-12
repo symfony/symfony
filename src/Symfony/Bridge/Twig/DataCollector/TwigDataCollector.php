@@ -38,16 +38,10 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->twig = $twig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->profile->reset();
@@ -55,9 +49,6 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->data = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lateCollect()
     {
         $this->data['profile'] = serialize($this->profile);
@@ -187,9 +178,6 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'twig';

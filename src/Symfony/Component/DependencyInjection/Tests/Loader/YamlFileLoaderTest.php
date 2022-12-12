@@ -392,9 +392,17 @@ class YamlFileLoaderTest extends TestCase
 
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
         $this->assertEquals($taggedIterator, $container->getDefinition('foo_service_tagged_iterator')->getArgument(0));
+        $taggedIterator2 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz']);
+        $this->assertEquals($taggedIterator2, $container->getDefinition('foo2_service_tagged_iterator')->getArgument(0));
+        $taggedIterator3 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz', 'qux']);
+        $this->assertEquals($taggedIterator3, $container->getDefinition('foo3_service_tagged_iterator')->getArgument(0));
 
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', true, 'getPriority');
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_service_tagged_locator')->getArgument(0));
+        $taggedIterator2 = new TaggedIteratorArgument('foo', 'foo', 'getDefaultFooName', true, 'getDefaultFooPriority', ['baz']);
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator2), $container->getDefinition('foo2_service_tagged_locator')->getArgument(0));
+        $taggedIterator3 = new TaggedIteratorArgument('foo', 'foo', 'getDefaultFooName', true, 'getDefaultFooPriority', ['baz', 'qux']);
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator3), $container->getDefinition('foo3_service_tagged_locator')->getArgument(0));
 
         $taggedIterator = new TaggedIteratorArgument('foo', null, null, true);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
@@ -418,16 +426,14 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
     }
 
-    public function testTagWithAttributeArrayThrowsException()
+    public function testTagWithAttributeArray()
     {
-        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
-        try {
-            $loader->load('badtag3.yml');
-            $this->fail('->load() should throw an exception when a tag-attribute is not a scalar');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
-            $this->assertStringStartsWith('A "tags" attribute must be of a scalar-type for service "foo_service", tag "foo", attribute "bar"', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
-        }
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('tag_array_arguments.yml');
+
+        $definition = $container->getDefinition('foo_service');
+        $this->assertEquals(['foo' => [['bar' => ['foo' => 'foo', 'bar' => 'bar']]]], $definition->getTags());
     }
 
     public function testLoadYamlOnlyWithKeys()
@@ -497,7 +503,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_prototype.yml');
 
-        $ids = array_keys($container->getDefinitions());
+        $ids = array_keys(array_filter($container->getDefinitions(), fn ($def) => !$def->hasTag('container.excluded')));
         sort($ids);
         $this->assertSame([Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
 
@@ -522,13 +528,34 @@ class YamlFileLoaderTest extends TestCase
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
+    /**
+     * @dataProvider prototypeWithNullOrEmptyNodeDataProvider
+     */
+    public function testPrototypeWithNullOrEmptyNode(string $fileName)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The exclude list must not contain a "null" value.');
+
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load($fileName);
+    }
+
+    public function prototypeWithNullOrEmptyNodeDataProvider(): iterable
+    {
+        return [
+            ['services_prototype_with_null_node.yml'],
+            ['services_prototype_with_empty_node.yml'],
+        ];
+    }
+
     public function testPrototypeWithNamespace()
     {
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_prototype_namespace.yml');
 
-        $ids = array_keys($container->getDefinitions());
+        $ids = array_keys(array_filter($container->getDefinitions(), fn ($def) => !$def->hasTag('container.excluded')));
         sort($ids);
 
         $this->assertSame([

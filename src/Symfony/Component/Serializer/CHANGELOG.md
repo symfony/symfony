@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `XmlEncoder::SAVE_OPTIONS` context option
+
+6.2
+---
+
+ * Add support for constructor promoted properties to `Context` attribute
+ * Add context option `PropertyNormalizer::NORMALIZE_VISIBILITY` with bitmask flags `PropertyNormalizer::NORMALIZE_PUBLIC`, `PropertyNormalizer::NORMALIZE_PROTECTED`, `PropertyNormalizer::NORMALIZE_PRIVATE`
+ * Add method `withNormalizeVisibility` to `PropertyNormalizerContextBuilder`
+ * Deprecate calling `AttributeMetadata::setSerializedName()`, `ClassMetadata::setClassDiscriminatorMapping()` without arguments
+ * Change the signature of `AttributeMetadataInterface::setSerializedName()` to `setSerializedName(?string)`
+ * Change the signature of `ClassMetadataInterface::setClassDiscriminatorMapping()` to `setClassDiscriminatorMapping(?ClassDiscriminatorMapping)`
+ * Add option YamlEncoder::YAML_INDENTATION to YamlEncoder constructor options to configure additional indentation for each level of nesting. This allows configuring indentation in the service configuration.
+ * Add `SerializedPath` annotation to flatten nested attributes
+
 6.1
 ---
 

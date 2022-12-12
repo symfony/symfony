@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\OhMySmtp\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceSmtpTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
@@ -20,8 +21,12 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
+trigger_deprecation('symfony/oh-my-smtp-mailer', '6.2', 'The "%s" class is deprecated, use "%s" instead.', OhMySmtpSmtpTransport::class, MailPaceSmtpTransport::class);
+
 /**
  * @author Paul Oms <support@ohmysmtp.com>
+ *
+ * @deprecated since Symfony 6.2, use MailPaceSmtpTransport instead
  */
 final class OhMySmtpSmtpTransport extends EsmtpTransport
 {

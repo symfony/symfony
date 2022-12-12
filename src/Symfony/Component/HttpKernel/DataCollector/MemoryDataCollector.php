@@ -26,17 +26,11 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         $this->reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->updateMemoryUsage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->data = [
@@ -45,9 +39,6 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lateCollect()
     {
         $this->updateMemoryUsage();
@@ -68,9 +59,6 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         $this->data['memory'] = memory_get_peak_usage(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'memory';

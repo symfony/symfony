@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -36,6 +35,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -222,7 +222,7 @@ class PhpDumperTest extends TestCase
             ->addError('No-no-no-no');
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories' => false, 'inline_class_loader' => false]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -241,7 +241,7 @@ class PhpDumperTest extends TestCase
             ->setPublic(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories' => false, 'inline_class_loader' => false]), true);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -252,8 +252,6 @@ class PhpDumperTest extends TestCase
     public function testDumpAsFilesWithFactoriesInlined()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
-        $container->setParameter('container.dumper.inline_factories', true);
-        $container->setParameter('container.dumper.inline_class_loader', true);
 
         $container->getDefinition('bar')->addTag('hot');
         $container->register('non_shared_foo', \Bar\FooClass::class)
@@ -268,7 +266,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341, 'inline_factories' => true, 'inline_class_loader' => true]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -276,25 +274,21 @@ class PhpDumperTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_inlined_factories.txt', $dump);
     }
 
-    /**
-     * @requires function \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper::getProxyCode
-     */
     public function testDumpAsFilesWithLazyFactoriesInlined()
     {
         $container = new ContainerBuilder();
-        $container->setParameter('container.dumper.inline_factories', true);
-        $container->setParameter('container.dumper.inline_class_loader', true);
+        $container->setParameter('lazy_foo_class', \Bar\FooClass::class);
 
-        $container->register('lazy_foo', \Bar\FooClass::class)
+        $container->register('lazy_foo', '%lazy_foo_class%')
             ->addArgument(new Definition(\Bar\FooLazyClass::class))
             ->setPublic(true)
             ->setLazy(true);
 
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new ProxyDumper());
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'build_time' => 1563381341, 'inline_factories' => true, 'inline_class_loader' => true]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -312,8 +306,7 @@ class PhpDumperTest extends TestCase
             ->setLazy(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
-        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'inline_factories' => false, 'inline_class_loader' => false]), true);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
@@ -476,7 +469,7 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php', 'inline_factories' => false, 'inline_class_loader' => false]));
 
         require self::$fixturesPath.'/php/services26.php';
         $container = new \Symfony_DI_PhpDumper_Test_EnvParameters();
@@ -696,7 +689,11 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services13.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
     }
 
-    public function testNonSharedLazyDefinitionReferences()
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function testNonSharedLazyDefinitionReferences(bool $asGhostObject)
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setShared(false)->setLazy(true);
@@ -704,9 +701,12 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_lazy.php', $dumper->dump());
+        if (!$asGhostObject) {
+            $dumper->setProxyDumper(new \DummyProxyDumper());
+        }
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_lazy'.($asGhostObject ? '_ghost' : '').'.php', $dumper->dump());
     }
 
     public function testNonSharedDuplicates()
@@ -722,7 +722,6 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_non_shared_duplicates.php', $dumper->dump());
     }
@@ -755,14 +754,14 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
         $dumper->dump();
 
         $this->addToAssertionCount(1);
 
         $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new NullDumper());
 
-        $message = 'Circular reference detected for service "foo", path: "foo -> bar -> foo". Try running "composer require symfony/proxy-manager-bridge".';
+        $message = 'Circular reference detected for service "foo", path: "foo -> bar -> foo".';
         $this->expectException(ServiceCircularReferenceException::class);
         $this->expectExceptionMessage($message);
 
@@ -774,12 +773,13 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setLazy(true)->setPublic(true);
         $container->register('bar', 'stdClass')->setLazy(true)->setPublic(true);
+        $container->register('baz', 'stdClass')->setLazy(true)->setPublic(true)->setFactory('foo_bar');
+        $container->register('buz', 'stdClass')->setLazy(true)->setPublic(true)->setFactory('foo_bar');
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dumper->setProxyDumper(new \DummyProxyDumper());
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dedup_lazy_proxy.php', $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dedup_lazy.php', $dumper->dump());
     }
 
     public function testLazyArgumentProvideGenerator()
@@ -922,9 +922,6 @@ class PhpDumperTest extends TestCase
         $container->register(TestDefinition1::class, TestDefinition1::class)->setPublic(true);
 
         $container->addCompilerPass(new class() implements CompilerPassInterface {
-            /**
-             * {@inheritdoc}
-             */
             public function process(ContainerBuilder $container)
             {
                 $container->setDefinition('late_alias', new Definition(TestDefinition1::class))->setPublic(true);
@@ -987,7 +984,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false])));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dumper->dump(['file' => self::$fixturesPath.'/php/services_array_params.php', 'inline_factories' => false, 'inline_class_loader' => false])));
     }
 
     public function testExpressionReferencingPrivateService()
@@ -1051,6 +1048,7 @@ class PhpDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
         $container->compile();
         $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new NullDumper());
 
         $container = 'Symfony_DI_PhpDumper_Test_Almost_Circular_'.ucfirst($visibility);
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_almost_circular_'.$visibility.'.php', $dumper->dump(['class' => $container]));
@@ -1154,11 +1152,10 @@ class PhpDumperTest extends TestCase
     public function testHotPathOptimizations()
     {
         $container = include self::$fixturesPath.'/containers/container_inline_requires.php';
-        $container->setParameter('inline_requires', true);
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $dump = $dumper->dump(['hot_path_tag' => 'container.hot_path', 'inline_class_loader_parameter' => 'inline_requires', 'file' => self::$fixturesPath.'/php/services_inline_requires.php']);
+        $dump = $dumper->dump(['hot_path_tag' => 'container.hot_path', 'inline_class_loader' => true, 'file' => self::$fixturesPath.'/php/services_inline_requires.php']);
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
@@ -1191,13 +1188,12 @@ class PhpDumperTest extends TestCase
             new Reference('foo'),
         ]))->setPublic(true);
 
-        $container->setParameter('inline_requires', true);
         $container->compile();
 
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump([
             'class' => 'Symfony_DI_PhpDumper_Test_Object_Class_Name',
-            'inline_class_loader_parameter' => 'inline_requires',
+            'inline_class_loader' => true,
         ]));
 
         $container = new \Symfony_DI_PhpDumper_Test_Object_Class_Name();
@@ -1247,13 +1243,14 @@ class PhpDumperTest extends TestCase
 %A
     private function getDynamicParameter(string $name)
     {
+        $container = $this;
         $value = match ($name) {
             'unit_enum' => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
             'enum_array' => [
                 0 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAR,
                 1 => \Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::FOO,
             ],
-            default => throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name)),
+            default => throw new ParameterNotFoundException($name),
         };
 %A
 PHP
@@ -1273,7 +1270,6 @@ PHP
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump([
             'class' => 'Symfony_DI_PhpDumper_Test_UninitializedSyntheticReference',
-            'inline_class_loader_parameter' => 'inline_requires',
         ]));
 
         $container = new \Symfony_DI_PhpDumper_Test_UninitializedSyntheticReference();
@@ -1421,6 +1417,30 @@ PHP
 
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
+    }
+
+    public function testLazyWither()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', Wither::class)
+            ->setLazy(true)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Lazy']);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_lazy.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_Wither_Lazy();
+
+        $wither = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither->foo);
+        $this->assertTrue($wither->resetLazyObject());
     }
 
     public function testWitherWithStaticReturnType()

@@ -186,7 +186,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $this->object = $object;
         $this->metadata = \is_object($object)
-            ? new ClassMetadata(\get_class($object))
+            ? new ClassMetadata($object::class)
             : null;
 
         $this->context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
@@ -196,7 +196,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $this->object = $object;
         $this->metadata = \is_object($object)
-            ? new PropertyMetadata(\get_class($object), $property)
+            ? new PropertyMetadata($object::class, $property)
             : null;
 
         $this->context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
@@ -295,6 +295,11 @@ abstract class ConstraintValidatorTestCase extends TestCase
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
     }
 
+    /**
+     * @return ConstraintValidatorInterface
+     *
+     * @psalm-return T
+     */
     abstract protected function createValidator();
 }
 

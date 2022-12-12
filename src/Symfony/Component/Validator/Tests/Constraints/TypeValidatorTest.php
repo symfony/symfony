@@ -19,7 +19,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 {
     protected static $file;
 
-    protected function createValidator()
+    protected function createValidator(): TypeValidator
     {
         return new TypeValidator();
     }

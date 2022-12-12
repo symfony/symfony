@@ -24,9 +24,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getAutoconfiguredInstanceof() as $interface => $definition) {
@@ -110,7 +107,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             $definition->setBindings([]);
             $definition = serialize($definition);
 
-            if (Definition::class === \get_class($abstract)) {
+            if (Definition::class === $abstract::class) {
                 // cast Definition to ChildDefinition
                 $definition = substr_replace($definition, '53', 2, 2);
                 $definition = substr_replace($definition, 'Child', 44, 0);
@@ -129,7 +126,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 foreach ($instanceofTags[$i] as $k => $v) {
                     if (null === $definition->getDecoratedService() || \in_array($k, $tagsToKeep, true)) {
                         foreach ($v as $v) {
-                            if ($definition->hasTag($k) && (!$v || \in_array($v, $definition->getTag($k)))) {
+                            if ($definition->hasTag($k) && \in_array($v, $definition->getTag($k))) {
                                 continue;
                             }
                             $definition->addTag($k, $v);

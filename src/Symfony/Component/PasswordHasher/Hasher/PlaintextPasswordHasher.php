@@ -35,10 +35,7 @@ class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
         $this->ignorePasswordCase = $ignorePasswordCase;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hash(string $plainPassword, string $salt = null): string
+    public function hash(#[\SensitiveParameter] string $plainPassword, string $salt = null): string
     {
         if ($this->isPasswordTooLong($plainPassword)) {
             throw new InvalidPasswordException();
@@ -47,7 +44,7 @@ class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
         return $this->mergePasswordAndSalt($plainPassword, $salt);
     }
 
-    public function verify(string $hashedPassword, string $plainPassword, string $salt = null): bool
+    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword, string $salt = null): bool
     {
         if ($this->isPasswordTooLong($plainPassword)) {
             return false;
@@ -67,7 +64,7 @@ class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
         return false;
     }
 
-    private function mergePasswordAndSalt(string $password, ?string $salt): string
+    private function mergePasswordAndSalt(#[\SensitiveParameter] string $password, ?string $salt): string
     {
         if (empty($salt)) {
             return $password;

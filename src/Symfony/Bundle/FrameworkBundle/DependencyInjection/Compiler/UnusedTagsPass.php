@@ -34,6 +34,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'container.do_not_inline',
         'container.env_var_loader',
         'container.env_var_processor',
+        'container.excluded',
         'container.hot_path',
         'container.no_preload',
         'container.preload',
@@ -88,6 +89,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'texter.transport_factory',
         'translation.dumper',
         'translation.extractor',
+        'translation.extractor.visitor',
         'translation.loader',
         'translation.provider_factory',
         'twig.extension',
@@ -96,6 +98,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'validator.auto_mapper',
         'validator.constraint_validator',
         'validator.initializer',
+        'workflow',
     ];
 
     public function process(ContainerBuilder $container)
@@ -122,7 +125,7 @@ class UnusedTagsPass implements CompilerPassInterface
 
             $services = array_keys($container->findTaggedServiceIds($tag));
             $message = sprintf('Tag "%s" was defined on service(s) "%s", but was never used.', $tag, implode('", "', $services));
-            if (!empty($candidates)) {
+            if ($candidates) {
                 $message .= sprintf(' Did you mean "%s"?', implode('", "', $candidates));
             }
 

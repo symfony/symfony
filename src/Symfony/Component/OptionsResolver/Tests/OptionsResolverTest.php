@@ -777,11 +777,11 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsIfInvalidTypedArray()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTime".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTimeImmutable".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
 
-        $this->resolver->resolve(['foo' => [new \DateTime()]]);
+        $this->resolver->resolve(['foo' => [new \DateTimeImmutable()]]);
     }
 
     public function testResolveFailsWithNonArray()
@@ -797,13 +797,13 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsIfTypedArrayContainsInvalidTypes()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass|array|DateTime".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass|array|DateTimeImmutable".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
         $values = range(1, 5);
         $values[] = new \stdClass();
         $values[] = [];
-        $values[] = new \DateTime();
+        $values[] = new \DateTimeImmutable();
         $values[] = 123;
 
         $this->resolver->resolve(['foo' => $values]);
@@ -893,12 +893,12 @@ class OptionsResolverTest extends TestCase
     public function testResolveSucceedsIfTypedArray()
     {
         $this->resolver->setDefault('foo', null);
-        $this->resolver->setAllowedTypes('foo', ['null', 'DateTime[]']);
+        $this->resolver->setAllowedTypes('foo', ['null', 'DateTimeImmutable[]']);
 
         $data = [
             'foo' => [
-                new \DateTime(),
-                new \DateTime(),
+                new \DateTimeImmutable(),
+                new \DateTimeImmutable(),
             ],
         ];
         $result = $this->resolver->resolve($data);
@@ -2252,9 +2252,7 @@ class OptionsResolverTest extends TestCase
         });
         // defined by subclass
         $this->resolver->setNormalizer('foo', function (Options $options, $resolvedValue) {
-            if (null === $resolvedValue['bar']) {
-                $resolvedValue['bar'] = 'baz';
-            }
+            $resolvedValue['bar'] ??= 'baz';
 
             return $resolvedValue;
         });
@@ -2467,18 +2465,18 @@ class OptionsResolverTest extends TestCase
     public function testInfoOnInvalidValue()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "expires" with value DateTime is invalid. Info: A future date time.');
+        $this->expectExceptionMessage('The option "expires" with value DateTimeImmutable is invalid. Info: A future date time.');
 
         $this->resolver
             ->setRequired('expires')
             ->setInfo('expires', 'A future date time')
-            ->setAllowedTypes('expires', \DateTime::class)
+            ->setAllowedTypes('expires', \DateTimeImmutable::class)
             ->setAllowedValues('expires', static function ($value) {
-                return $value >= new \DateTime('now');
+                return $value >= new \DateTimeImmutable('now');
             })
         ;
 
-        $this->resolver->resolve(['expires' => new \DateTime('-1 hour')]);
+        $this->resolver->resolve(['expires' => new \DateTimeImmutable('-1 hour')]);
     }
 
     public function testInvalidValueForPrototypeDefinition()

@@ -22,9 +22,6 @@ use Symfony\Component\Form\FormInterface;
  */
 class CallbackAccessor implements DataAccessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getValue(object|array $data, FormInterface $form): mixed
     {
         if (null === $getter = $form->getConfig()->getOption('getter')) {
@@ -34,9 +31,6 @@ class CallbackAccessor implements DataAccessorInterface
         return ($getter)($data, $form);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValue(object|array &$data, mixed $value, FormInterface $form): void
     {
         if (null === $setter = $form->getConfig()->getOption('setter')) {
@@ -46,17 +40,11 @@ class CallbackAccessor implements DataAccessorInterface
         ($setter)($data, $form->getData(), $form);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isReadable(object|array $data, FormInterface $form): bool
     {
         return null !== $form->getConfig()->getOption('getter');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isWritable(object|array $data, FormInterface $form): bool
     {
         return null !== $form->getConfig()->getOption('setter');

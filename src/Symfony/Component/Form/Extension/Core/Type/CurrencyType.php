@@ -22,9 +22,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CurrencyType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -47,17 +44,11 @@ class CurrencyType extends AbstractType
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'currency';

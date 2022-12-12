@@ -27,7 +27,7 @@ class CutStub extends Stub
         switch (\gettype($value)) {
             case 'object':
                 $this->type = self::TYPE_OBJECT;
-                $this->class = \get_class($value);
+                $this->class = $value::class;
 
                 if ($value instanceof \Closure) {
                     ReflectionCaster::castClosure($value, [], $this, true, Caster::EXCLUDE_VERBOSE);

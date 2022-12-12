@@ -32,7 +32,7 @@ final class FortySixElksTransport extends AbstractTransport
     private string $apiPassword;
     private string $from;
 
-    public function __construct(string $apiUsername, string $apiPassword, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiUsername, #[\SensitiveParameter] string $apiPassword, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiUsername = $apiUsername;
         $this->apiPassword = $apiPassword;
@@ -57,10 +57,12 @@ final class FortySixElksTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $endpoint = sprintf('https://%s/a1/sms', self::HOST);
         $response = $this->client->request('POST', $endpoint, [
             'body' => [
-                'from' => $this->from,
+                'from' => $from,
                 'to' => $message->getPhone(),
                 'message' => $message->getSubject(),
             ],

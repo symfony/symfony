@@ -35,10 +35,7 @@ class CacheTokenVerifier implements TokenVerifierInterface
         $this->cacheKeyPrefix = $cacheKeyPrefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function verifyToken(PersistentTokenInterface $token, string $tokenValue): bool
+    public function verifyToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue): bool
     {
         if (hash_equals($token->getTokenValue(), $tokenValue)) {
             return true;
@@ -55,10 +52,7 @@ class CacheTokenVerifier implements TokenVerifierInterface
         return hash_equals($outdatedToken, $tokenValue);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function updateExistingToken(PersistentTokenInterface $token, string $tokenValue, \DateTimeInterface $lastUsed): void
+    public function updateExistingToken(PersistentTokenInterface $token, #[\SensitiveParameter] string $tokenValue, \DateTimeInterface $lastUsed): void
     {
         // When a token gets updated, persist the outdated token for $outdatedTokenTtl seconds so we can
         // still accept it as valid in verifyToken

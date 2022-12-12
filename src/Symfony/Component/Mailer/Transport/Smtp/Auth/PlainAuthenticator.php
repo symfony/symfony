@@ -26,8 +26,6 @@ class PlainAuthenticator implements AuthenticatorInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @see https://www.ietf.org/rfc/rfc4954.txt
      */
     public function authenticate(EsmtpTransport $client): void

@@ -19,6 +19,11 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\RequestMatcher\AttributesRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PortRequestMatcher;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
@@ -131,7 +136,7 @@ abstract class CompleteConfigurationTest extends TestCase
             [
                 'simple',
                 'security.user_checker',
-                '.security.request_matcher.xmi9dcw',
+                '.security.request_matcher.h5ibf38',
                 false,
                 false,
                 '',
@@ -140,6 +145,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 '',
                 '',
                 [],
+                null,
                 null,
             ],
             [
@@ -164,12 +170,22 @@ abstract class CompleteConfigurationTest extends TestCase
                 [
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                    'target_route' => null,
+                ],
+                [
+                    'csrf_parameter' => '_csrf_token',
+                    'csrf_token_id' => 'logout',
+                    'path' => '/logout',
+                    'target' => '/',
+                    'invalidate_session' => true,
+                    'delete_cookies' => [],
+                    'enable_csrf' => null,
                 ],
             ],
             [
                 'host',
                 'security.user_checker',
-                '.security.request_matcher.iw4hyjb',
+                '.security.request_matcher.bcmu4fb',
                 true,
                 false,
                 'security.user.provider.concrete.default',
@@ -180,6 +196,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 [
                     'http_basic',
                 ],
+                null,
                 null,
             ],
             [
@@ -196,6 +213,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 [
                     'http_basic',
                 ],
+                null,
                 null,
             ],
         ], $configs);
@@ -235,20 +253,27 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach ($arguments[1]->getValues() as $reference) {
             if ($reference instanceof Reference) {
                 $definition = $container->getDefinition((string) $reference);
-                $matchers[] = $definition->getArguments();
+                $matchers[] = $definition->getArgument(0);
             }
         }
 
-        $this->assertEquals([
-            [
-                '/login',
-            ],
-            [
-                '/test',
-                'foo\\.example\\.org',
-                ['GET', 'POST'],
-            ],
-        ], $matchers);
+        $this->assertCount(2, $matchers);
+
+        $this->assertCount(1, $matchers[0]);
+        $def = $container->getDefinition((string) $matchers[0][0]);
+        $this->assertSame(PathRequestMatcher::class, $def->getClass());
+        $this->assertSame('/login', $def->getArgument(0));
+
+        $this->assertCount(3, $matchers[1]);
+        $def = $container->getDefinition((string) $matchers[1][0]);
+        $this->assertSame(MethodRequestMatcher::class, $def->getClass());
+        $this->assertSame(['GET', 'POST'], $def->getArgument(0));
+        $def = $container->getDefinition((string) $matchers[1][1]);
+        $this->assertSame(PathRequestMatcher::class, $def->getClass());
+        $this->assertSame('/test', $def->getArgument(0));
+        $def = $container->getDefinition((string) $matchers[1][2]);
+        $this->assertSame(HostRequestMatcher::class, $def->getClass());
+        $this->assertSame('foo\\.example\\.org', $def->getArgument(0));
     }
 
     public function testUserCheckerAliasIsRegistered()
@@ -281,23 +306,36 @@ abstract class CompleteConfigurationTest extends TestCase
             if (1 === $i) {
                 $this->assertEquals(['ROLE_USER'], $attributes);
                 $this->assertEquals('https', $channel);
-                $this->assertEquals(
-                    ['/blog/524', null, ['GET', 'POST'], [], [], null, 8000],
-                    $requestMatcher->getArguments()
-                );
+                $this->assertCount(3, $requestMatcher->getArgument(0));
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[0]);
+                $this->assertSame(MethodRequestMatcher::class, $def->getClass());
+                $this->assertSame(['GET', 'POST'], $def->getArgument(0));
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[1]);
+                $this->assertSame(PathRequestMatcher::class, $def->getClass());
+                $this->assertSame('/blog/524', $def->getArgument(0));
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[2]);
+                $this->assertSame(PortRequestMatcher::class, $def->getClass());
+                $this->assertSame(8000, $def->getArgument(0));
             } elseif (2 === $i) {
                 $this->assertEquals(['IS_AUTHENTICATED_ANONYMOUSLY'], $attributes);
                 $this->assertNull($channel);
-                $this->assertEquals(
-                    ['/blog/.*'],
-                    $requestMatcher->getArguments()
-                );
+                $this->assertCount(1, $requestMatcher->getArgument(0));
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[0]);
+                $this->assertSame(PathRequestMatcher::class, $def->getClass());
+                $this->assertSame('/blog/.*', $def->getArgument(0));
             } elseif (3 === $i) {
                 $this->assertEquals('IS_AUTHENTICATED_ANONYMOUSLY', $attributes[0]);
                 $expression = $container->getDefinition((string) $attributes[1])->getArgument(0);
                 $this->assertEquals("token.getUserIdentifier() matches '/^admin/'", $expression);
+            } elseif (4 === $i) {
+                $this->assertEquals(['ROLE_ADMIN'], $attributes);
+                $def = $container->getDefinition((string) $requestMatcher->getArgument(0)[0]);
+                $this->assertSame(AttributesRequestMatcher::class, $def->getClass());
+                $this->assertSame(['_controller' => 'AdminController::index', '_route' => 'admin'], $def->getArgument(0));
             }
         }
+
+        $this->assertCount(4, $matcherIds);
     }
 
     public function testMerge()

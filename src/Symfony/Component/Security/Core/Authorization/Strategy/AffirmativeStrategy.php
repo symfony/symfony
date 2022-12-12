@@ -31,9 +31,6 @@ final class AffirmativeStrategy implements AccessDecisionStrategyInterface, \Str
         $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decide(\Traversable $results): bool
     {
         $deny = 0;

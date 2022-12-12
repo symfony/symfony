@@ -35,33 +35,21 @@ class Adapter implements AdapterInterface
         $this->config = $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConnection(): ConnectionInterface
     {
         return $this->connection ??= new Connection($this->config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntryManager(): EntryManagerInterface
     {
         return $this->entryManager ??= new EntryManager($this->getConnection());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createQuery(string $dn, string $query, array $options = []): QueryInterface
     {
         return new Query($this->getConnection(), $dn, $query, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function escape(string $subject, string $ignore = '', int $flags = 0): string
     {
         $value = ldap_escape($subject, $ignore, $flags);

@@ -6,6 +6,7 @@
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - Arguments: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
@@ -17,3 +18,4 @@
 - Tag: `tag1`
     - Attr3: val3
 - Tag: `tag2`
+- Usages: none

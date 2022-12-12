@@ -32,7 +32,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     protected $imageCorrupted;
     protected $notAnImage;
 
-    protected function createValidator()
+    protected function createValidator(): ImageValidator
     {
         return new ImageValidator();
     }

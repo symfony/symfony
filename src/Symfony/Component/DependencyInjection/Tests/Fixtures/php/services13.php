@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -48,11 +50,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
         $a = new \stdClass();
-        $a->add($this);
+        $a->add($container);
 
-        return $this->services['bar'] = new \stdClass($a);
+        return $container->services['bar'] = new \stdClass($a);
     }
 }

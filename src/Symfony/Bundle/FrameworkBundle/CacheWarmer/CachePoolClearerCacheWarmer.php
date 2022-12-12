@@ -38,8 +38,6 @@ final class CachePoolClearerCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string[]
      */
     public function warmUp(string $cacheDirectory): array
@@ -53,9 +51,6 @@ final class CachePoolClearerCacheWarmer implements CacheWarmerInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOptional(): bool
     {
         // optional cache warmers are not run when handling the request

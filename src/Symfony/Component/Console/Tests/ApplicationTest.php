@@ -555,6 +555,22 @@ class ApplicationTest extends TestCase
         ];
     }
 
+    public function testRunNamespace()
+    {
+        putenv('COLUMNS=120');
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'foo'], ['decorated' => false]);
+        $display = trim($tester->getDisplay(true));
+        $this->assertStringContainsString('Available commands for the "foo" namespace:', $display);
+        $this->assertStringContainsString('The foo:bar command', $display);
+        $this->assertStringContainsString('The foo:bar1 command', $display);
+    }
+
     public function testFindAlternativeExceptionMessageMultiple()
     {
         putenv('COLUMNS=120');
@@ -906,7 +922,7 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function () {
-            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', \get_class(new class() { })));
+            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', (new class() { })::class));
         });
         $tester = new ApplicationTester($application);
 
@@ -932,7 +948,7 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function () {
-            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', \get_class(new class() { })));
+            throw new \InvalidArgumentException(sprintf('Dummy type "%s" is invalid.', (new class() { })::class));
         });
         $tester = new ApplicationTester($application);
 
@@ -1945,6 +1961,10 @@ class ApplicationTest extends TestCase
      */
     public function testSetSignalsToDispatchEvent()
     {
+        if (!\defined('SIGUSR1')) {
+            $this->markTestSkipped('SIGUSR1 not available');
+        }
+
         $command = new BaseSignableCommand();
 
         $subscriber = new SignalEventSubscriber();
@@ -1973,6 +1993,38 @@ class ApplicationTest extends TestCase
         $application->setDispatcher($dispatcher);
         $application->add($command);
         $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+    }
+
+    public function testSignalableCommandHandlerCalledAfterEventListener()
+    {
+        if (!\defined('SIGUSR1')) {
+            $this->markTestSkipped('SIGUSR1 not available');
+        }
+
+        $command = new SignableCommand();
+
+        $subscriber = new SignalEventSubscriber();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+        $application->setSignalsToDispatchEvent(\SIGUSR1);
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertSame([SignalEventSubscriber::class, SignableCommand::class], $command->signalHandlers);
+    }
+
+    public function testSignalableCommandDoesNotInterruptedOnTermSignals()
+    {
+        $command = new TerminatableCommand(true, \SIGINT);
+        $command->exitCode = 129;
+
+        $dispatcher = new EventDispatcher();
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($dispatcher);
+        $application->add($command);
+        $this->assertSame(129, $application->run(new ArrayInput(['signal'])));
     }
 
     /**
@@ -2074,25 +2126,29 @@ class DisabledCommand extends Command
 class BaseSignableCommand extends Command
 {
     public $signaled = false;
+    public $exitCode = 1;
+    public $signalHandlers = [];
     public $loop = 1000;
     private $emitsSignal;
+    private $signal;
 
-    public function __construct(bool $emitsSignal = true)
+    public function __construct(bool $emitsSignal = true, int $signal = \SIGUSR1)
     {
         parent::__construct();
         $this->emitsSignal = $emitsSignal;
+        $this->signal = $signal;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->emitsSignal) {
-            posix_kill(posix_getpid(), SIGUSR1);
+            posix_kill(posix_getpid(), $this->signal);
         }
 
         for ($i = 0; $i < $this->loop; ++$i) {
             usleep(100);
             if ($this->signaled) {
-                return 1;
+                return $this->exitCode;
             }
         }
 
@@ -2111,6 +2167,22 @@ class SignableCommand extends BaseSignableCommand implements SignalableCommandIn
     public function handleSignal(int $signal): void
     {
         $this->signaled = true;
+        $this->signalHandlers[] = __CLASS__;
+    }
+}
+
+#[AsCommand(name: 'signal')]
+class TerminatableCommand extends BaseSignableCommand implements SignalableCommandInterface
+{
+    public function getSubscribedSignals(): array
+    {
+        return SignalRegistry::isSupported() ? [\SIGINT] : [];
+    }
+
+    public function handleSignal(int $signal): void
+    {
+        $this->signaled = true;
+        $this->signalHandlers[] = __CLASS__;
     }
 }
 
@@ -2122,6 +2194,7 @@ class SignalEventSubscriber implements EventSubscriberInterface
     {
         $this->signaled = true;
         $event->getCommand()->signaled = true;
+        $event->getCommand()->signalHandlers[] = __CLASS__;
     }
 
     public static function getSubscribedEvents(): array

@@ -83,7 +83,7 @@ class EsmtpTransport extends SmtpTransport
     /**
      * @return $this
      */
-    public function setPassword(string $password): static
+    public function setPassword(#[\SensitiveParameter] string $password): static
     {
         $this->password = $password;
 
@@ -180,12 +180,15 @@ class EsmtpTransport extends SmtpTransport
                 continue;
             }
 
+            $code = null;
             $authNames[] = $authenticator->getAuthKeyword();
             try {
                 $authenticator->authenticate($this);
 
                 return;
             } catch (TransportExceptionInterface $e) {
+                $code = $e->getCode();
+
                 try {
                     $this->executeCommand("RSET\r\n", [250]);
                 } catch (TransportExceptionInterface) {
@@ -198,7 +201,7 @@ class EsmtpTransport extends SmtpTransport
         }
 
         if (!$authNames) {
-            throw new TransportException(sprintf('Failed to find an authenticator supported by the SMTP server, which currently supports: "%s".', implode('", "', $modes)));
+            throw new TransportException(sprintf('Failed to find an authenticator supported by the SMTP server, which currently supports: "%s".', implode('", "', $modes)), $code ?: 504);
         }
 
         $message = sprintf('Failed to authenticate on SMTP server with username "%s" using the following authenticators: "%s".', $this->username, implode('", "', $authNames));
@@ -206,6 +209,6 @@ class EsmtpTransport extends SmtpTransport
             $message .= sprintf(' Authenticator "%s" returned "%s".', $name, $error);
         }
 
-        throw new TransportException($message);
+        throw new TransportException($message, $code ?: 535);
     }
 }

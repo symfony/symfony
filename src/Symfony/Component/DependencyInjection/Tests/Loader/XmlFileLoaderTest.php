@@ -123,7 +123,7 @@ class XmlFileLoaderTest extends TestCase
 
         $actual = $container->getParameterBag()->all();
         $expected = [
-            'a string',
+            'a_string' => 'a string',
             'foo' => 'bar',
             'values' => [
                 0,
@@ -159,7 +159,7 @@ class XmlFileLoaderTest extends TestCase
 
         $actual = $container->getParameterBag()->all();
         $expected = [
-            'a string',
+            'a_string' => 'a string',
             'foo' => 'bar',
             'values' => [
                 0,
@@ -404,9 +404,17 @@ class XmlFileLoaderTest extends TestCase
 
         $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', false, 'getPriority');
         $this->assertEquals($taggedIterator, $container->getDefinition('foo_tagged_iterator')->getArgument(0));
+        $taggedIterator2 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz']);
+        $this->assertEquals($taggedIterator2, $container->getDefinition('foo2_tagged_iterator')->getArgument(0));
+        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz', 'qux']);
+        $this->assertEquals($taggedIterator3, $container->getDefinition('foo3_tagged_iterator')->getArgument(0));
 
         $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', true, 'getPriority');
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_tagged_locator')->getArgument(0));
+        $taggedIterator2 = new TaggedIteratorArgument('foo_tag', 'foo_tag', 'getDefaultFooTagName', true, 'getDefaultFooTagPriority', ['baz']);
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator2), $container->getDefinition('foo2_tagged_locator')->getArgument(0));
+        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', 'foo_tag', 'getDefaultFooTagName', true, 'getDefaultFooTagPriority', ['baz', 'qux']);
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator3), $container->getDefinition('foo3_tagged_locator')->getArgument(0));
     }
 
     public function testParseServiceClosure()
@@ -416,6 +424,15 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('services_with_service_closure.xml');
 
         $this->assertEquals(new ServiceClosureArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)), $container->getDefinition('foo')->getArgument(0));
+    }
+
+    public function testParseServiceTagsWithArrayAttributes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_with_array_tags.xml');
+
+        $this->assertEquals(['foo_tag' => [['foo' => 'bar', 'bar' => ['foo' => 'bar', 'bar' => 'foo']]]], $container->getDefinition('foo')->getTags());
     }
 
     public function testParseTagsWithoutNameThrowsException()
@@ -718,7 +735,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_prototype.xml');
 
-        $ids = array_keys($container->getDefinitions());
+        $ids = array_keys(array_filter($container->getDefinitions(), fn ($def) => !$def->hasTag('container.excluded')));
         sort($ids);
         $this->assertSame([Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
 
@@ -744,20 +761,23 @@ class XmlFileLoaderTest extends TestCase
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
-    public function testPrototypeExcludeWithArray()
+    /**
+     * @dataProvider prototypeExcludeWithArrayDataProvider
+     */
+    public function testPrototypeExcludeWithArray(string $fileName)
     {
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services_prototype_array.xml');
+        $loader->load($fileName);
 
-        $ids = array_keys($container->getDefinitions());
+        $ids = array_keys(array_filter($container->getDefinitions(), fn ($def) => !$def->hasTag('container.excluded')));
         sort($ids);
         $this->assertSame([Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
 
         $resources = array_map('strval', $container->getResources());
 
         $fixturesDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR;
-        $this->assertContains((string) new FileResource($fixturesDir.'xml'.\DIRECTORY_SEPARATOR.'services_prototype_array.xml'), $resources);
+        $this->assertContains((string) new FileResource($fixturesDir.'xml'.\DIRECTORY_SEPARATOR.$fileName), $resources);
 
         $prototypeRealPath = realpath(__DIR__.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Prototype');
         $globResource = new GlobResource(
@@ -774,6 +794,25 @@ class XmlFileLoaderTest extends TestCase
         $this->assertContains((string) $globResource, $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo', $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
+    }
+
+    public function prototypeExcludeWithArrayDataProvider(): iterable
+    {
+        return [
+            ['services_prototype_array.xml'],
+            // Same config than above but “<exclude> </exclude>” has been added
+            ['services_prototype_array_with_space_node.xml'],
+        ];
+    }
+
+    public function testPrototypeExcludeWithArrayWithEmptyNode()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The exclude list must not contain an empty value.');
+
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_prototype_array_with_empty_node.xml');
     }
 
     public function testAliasDefinitionContainsUnsupportedElements()

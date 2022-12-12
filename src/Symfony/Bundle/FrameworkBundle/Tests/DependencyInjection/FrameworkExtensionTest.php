@@ -37,6 +37,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -59,7 +60,7 @@ use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -295,6 +296,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertArrayHasKey('index_4', $args);
         $this->assertNull($args['index_4'], 'Workflows has eventsToDispatch=null');
 
+        $this->assertSame(['workflow' => [['name' => 'article']], 'workflow.workflow' => [['name' => 'article']]], $container->getDefinition('workflow.article')->getTags());
+
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
@@ -323,6 +326,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
         $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition'), 'State machine definition is registered as a service');
+
+        $this->assertSame(['workflow' => [['name' => 'pull_request']], 'workflow.state_machine' => [['name' => 'pull_request']]], $container->getDefinition('state_machine.pull_request')->getTags());
 
         $stateMachineDefinition = $container->getDefinition('state_machine.pull_request.definition');
 
@@ -371,8 +376,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(Reference::class, $markingStoreRef);
         $this->assertEquals('workflow_service', (string) $markingStoreRef);
 
-        $this->assertTrue($container->hasDefinition('workflow.registry'), 'Workflow registry is registered as a service');
-        $registryDefinition = $container->getDefinition('workflow.registry');
+        $this->assertTrue($container->hasDefinition('.workflow.registry'), 'Workflow registry is registered as a service');
+        $registryDefinition = $container->getDefinition('.workflow.registry');
         $this->assertGreaterThan(0, \count($registryDefinition->getMethodCalls()));
     }
 
@@ -957,6 +962,12 @@ abstract class FrameworkExtensionTest extends TestCase
             return array_shift($values);
         }, $failureTransports);
         $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
+
+        $rateLimitedTransports = $container->getDefinition('messenger.rate_limiter_locator')->getArgument(0);
+        $expectedRateLimitersByRateLimitedTransports = [
+            'customised' => new Reference('limiter.customised_worker'),
+        ];
+        $this->assertEquals($expectedRateLimitersByRateLimitedTransports, $rateLimitedTransports);
     }
 
     public function testMessengerRouting()
@@ -1003,8 +1014,8 @@ abstract class FrameworkExtensionTest extends TestCase
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
-            ['id' => 'send_message'],
-            ['id' => 'handle_message'],
+            ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'handle_message', 'arguments' => [false]],
         ], $container->getParameter('messenger.bus.commands.middleware'));
         $this->assertTrue($container->has('messenger.bus.events'));
         $this->assertSame([], $container->getDefinition('messenger.bus.events')->getArgument(0));
@@ -1014,8 +1025,8 @@ abstract class FrameworkExtensionTest extends TestCase
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
-            ['id' => 'send_message'],
-            ['id' => 'handle_message'],
+            ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'handle_message', 'arguments' => [false]],
         ], $container->getParameter('messenger.bus.events.middleware'));
         $this->assertTrue($container->has('messenger.bus.queries'));
         $this->assertSame([], $container->getDefinition('messenger.bus.queries')->getArgument(0));
@@ -1076,7 +1087,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
-        $ref = new \ReflectionClass(Security::class);
+        $ref = new \ReflectionClass(AuthenticationEvents::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
@@ -2057,7 +2068,9 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->markTestSkipped('LocaleSwitcher not available.');
         }
 
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('full', compile: false);
+        $container->addCompilerPass(new ResolveTaggedIteratorArgumentPass());
+        $container->compile();
 
         $this->assertTrue($container->has('translation.locale_switcher'));
 
@@ -2067,6 +2080,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(TaggedIteratorArgument::class, $switcherDef->getArgument(1));
         $this->assertSame('kernel.locale_aware', $switcherDef->getArgument(1)->getTag());
         $this->assertEquals(new Reference('router.request_context', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $switcherDef->getArgument(2));
+
+        $localeAwareServices = array_map(fn (Reference $r) => (string) $r, $switcherDef->getArgument(1)->getValues());
+
+        $this->assertNotContains('translation.locale_switcher', $localeAwareServices);
     }
 
     public function testHtmlSanitizer()
@@ -2161,6 +2178,28 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // Default alias
         $this->assertSame('html_sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class));
+    }
+
+    public function testNotifierWithDisabledMessageBus()
+    {
+        $container = $this->createContainerFromFile('notifier_with_disabled_message_bus');
+
+        $this->assertNull($container->getDefinition('chatter')->getArgument(1));
+        $this->assertNull($container->getDefinition('texter')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.chat')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.email')->getArgument(1));
+        $this->assertNull($container->getDefinition('notifier.channel.sms')->getArgument(1));
+    }
+
+    public function testNotifierWithSpecificMessageBus()
+    {
+        $container = $this->createContainerFromFile('notifier_with_specific_message_bus');
+
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('chatter')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('texter')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.chat')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.email')->getArgument(1));
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.sms')->getArgument(1));
     }
 
     protected function createContainer(array $data = [])
@@ -2270,26 +2309,14 @@ abstract class FrameworkExtensionTest extends TestCase
             $parentDefinition = $container->findDefinition($parentId);
         } while ($parentDefinition instanceof ChildDefinition);
 
-        switch ($adapter) {
-            case 'cache.adapter.apcu':
-                $this->assertSame(ApcuAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.app':
-            case 'cache.adapter.filesystem':
-                $this->assertSame(FilesystemAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.psr6':
-                $this->assertSame(ProxyAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.redis':
-                $this->assertSame(RedisAdapter::class, $parentDefinition->getClass());
-                break;
-            case 'cache.adapter.array':
-                $this->assertSame(ArrayAdapter::class, $parentDefinition->getClass());
-                break;
-            default:
-                $this->fail('Unresolved adapter: '.$adapter);
-        }
+        match ($adapter) {
+            'cache.adapter.apcu' => $this->assertSame(ApcuAdapter::class, $parentDefinition->getClass()),
+            'cache.app', 'cache.adapter.filesystem' => $this->assertSame(FilesystemAdapter::class, $parentDefinition->getClass()),
+            'cache.adapter.psr6' => $this->assertSame(ProxyAdapter::class, $parentDefinition->getClass()),
+            'cache.adapter.redis' => $this->assertSame(RedisAdapter::class, $parentDefinition->getClass()),
+            'cache.adapter.array' => $this->assertSame(ArrayAdapter::class, $parentDefinition->getClass()),
+            default => $this->fail('Unresolved adapter: '.$adapter),
+        };
     }
 }
 

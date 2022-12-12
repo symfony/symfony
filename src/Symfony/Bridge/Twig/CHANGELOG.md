@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add `form_label_content` and `form_help_content` block to form themes
+ * Add `#[Template()]` to describe how to render arrays returned by controllers
+ * Add support for toggle buttons in Bootstrap 5 form theme
+ * Add `app.current_route` and `app.current_route_parameters` variables
+
 6.1
 ---
 

@@ -32,9 +32,6 @@ class Cascade extends Constraint
         parent::__construct($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

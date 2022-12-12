@@ -146,7 +146,7 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $user2 = $em->getReference('Symfony\Bridge\Doctrine\Tests\Fixtures\User', ['id1' => 1, 'id2' => 1]);
-        $this->assertTrue($provider->supportsClass(\get_class($user2)));
+        $this->assertTrue($provider->supportsClass($user2::class));
     }
 
     public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()

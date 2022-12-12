@@ -207,7 +207,7 @@ class FormTest extends TestCase
             $values,
             array_map(
                 function ($field) {
-                    $class = \get_class($field);
+                    $class = $field::class;
 
                     return [substr($class, strrpos($class, '\\') + 1), $field->getValue()];
                 },
@@ -902,9 +902,7 @@ class FormTest extends TestCase
         $xPath = new \DOMXPath($dom);
         $nodes = $xPath->query('//input | //button');
 
-        if (null === $currentUri) {
-            $currentUri = 'http://example.com/';
-        }
+        $currentUri ??= 'http://example.com/';
 
         return new Form($nodes->item($nodes->length - 1), $currentUri, $method);
     }

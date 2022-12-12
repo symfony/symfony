@@ -35,7 +35,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    protected function createValidator()
+    protected function createValidator(): CountryValidator
     {
         return new CountryValidator();
     }

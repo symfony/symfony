@@ -44,9 +44,7 @@ class JsonResponse extends Response
             throw new \TypeError(sprintf('"%s": If $json is set to true, argument $data must be a string or object implementing __toString(), "%s" given.', __METHOD__, get_debug_type($data)));
         }
 
-        if (null === $data) {
-            $data = new \ArrayObject();
-        }
+        $data ??= new \ArrayObject();
 
         $json ? $this->setJson($data) : $this->setData($data);
     }
@@ -60,7 +58,7 @@ class JsonResponse extends Response
      *         ->setSharedMaxAge(300);
      *
      * @param string $data    The JSON response string
-     * @param int    $status  The response status code
+     * @param int    $status  The response status code (200 "OK" by default)
      * @param array  $headers An array of response headers
      */
     public static function fromJsonString(string $data, int $status = 200, array $headers = []): static
@@ -79,6 +77,9 @@ class JsonResponse extends Response
      */
     public function setCallback(string $callback = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         if (null !== $callback) {
             // partially taken from https://geekality.net/2011/08/03/valid-javascript-identifier/
             // partially taken from https://github.com/willdurand/JsonpCallbackValidator
@@ -127,7 +128,7 @@ class JsonResponse extends Response
         try {
             $data = json_encode($data, $this->encodingOptions);
         } catch (\Exception $e) {
-            if ('Exception' === \get_class($e) && str_starts_with($e->getMessage(), 'Failed calling ')) {
+            if ('Exception' === $e::class && str_starts_with($e->getMessage(), 'Failed calling ')) {
                 throw $e->getPrevious() ?: $e;
             }
             throw $e;

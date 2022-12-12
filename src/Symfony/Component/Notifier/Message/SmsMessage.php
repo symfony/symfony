@@ -23,8 +23,10 @@ class SmsMessage implements MessageInterface
     private ?string $transport = null;
     private string $subject;
     private string $phone;
+    private string $from;
+    private ?MessageOptionsInterface $options;
 
-    public function __construct(string $phone, string $subject)
+    public function __construct(string $phone, string $subject, string $from = '', MessageOptionsInterface $options = null)
     {
         if ('' === $phone) {
             throw new InvalidArgumentException(sprintf('"%s" needs a phone number, it cannot be empty.', __CLASS__));
@@ -32,6 +34,8 @@ class SmsMessage implements MessageInterface
 
         $this->subject = $subject;
         $this->phone = $phone;
+        $this->from = $from;
+        $this->options = $options;
     }
 
     public static function fromNotification(Notification $notification, SmsRecipientInterface $recipient): self
@@ -93,8 +97,33 @@ class SmsMessage implements MessageInterface
         return $this->transport;
     }
 
+    /**
+     * @return $this
+     */
+    public function from(string $from): static
+    {
+        $this->from = $from;
+
+        return $this;
+    }
+
+    public function getFrom(): string
+    {
+        return $this->from;
+    }
+
+    /**
+     * @return $this
+     */
+    public function options(MessageOptionsInterface $options): static
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
     public function getOptions(): ?MessageOptionsInterface
     {
-        return null;
+        return $this->options;
     }
 }

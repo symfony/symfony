@@ -15,6 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
@@ -44,6 +45,7 @@ final class Transport
 {
     private const FACTORY_CLASSES = [
         GmailTransportFactory::class,
+        InfobipTransportFactory::class,
         MailgunTransportFactory::class,
         MailjetTransportFactory::class,
         MandrillTransportFactory::class,

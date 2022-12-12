@@ -76,9 +76,6 @@ class Isbn extends Constraint
         $this->bothIsbnMessage = $bothIsbnMessage ?? $this->bothIsbnMessage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption(): ?string
     {
         return 'type';

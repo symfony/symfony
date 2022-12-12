@@ -109,6 +109,7 @@ class RequirementTest extends TestCase
 
     /**
      * @testWith    ["0"]
+     *              ["012"]
      *              ["1"]
      *              ["42"]
      *              ["42198"]
@@ -132,6 +133,36 @@ class RequirementTest extends TestCase
     {
         $this->assertDoesNotMatchRegularExpression(
             (new Route('/{digits}', [], ['digits' => Requirement::DIGITS]))->compile()->getRegex(),
+            '/'.$digits,
+        );
+    }
+
+    /**
+     * @testWith    ["1"]
+     *              ["42"]
+     *              ["42198"]
+     *              ["999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"]
+     */
+    public function testPositiveIntOK(string $digits)
+    {
+        $this->assertMatchesRegularExpression(
+            (new Route('/{digits}', [], ['digits' => Requirement::POSITIVE_INT]))->compile()->getRegex(),
+            '/'.$digits,
+        );
+    }
+
+    /**
+     * @testWith    [""]
+     *              ["0"]
+     *              ["045"]
+     *              ["foo"]
+     *              ["-1"]
+     *              ["3.14"]
+     */
+    public function testPositiveIntKO(string $digits)
+    {
+        $this->assertDoesNotMatchRegularExpression(
+            (new Route('/{digits}', [], ['digits' => Requirement::POSITIVE_INT]))->compile()->getRegex(),
             '/'.$digits,
         );
     }

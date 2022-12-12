@@ -37,7 +37,7 @@ class MessageTest extends TestCase
         $this->assertNull($m->getBody());
         $this->assertEquals(new Headers(), $m->getHeaders());
 
-        $m = new Message($h = (new Headers())->addDateHeader('Date', new \DateTime()), $b = new TextPart('content'));
+        $m = new Message($h = (new Headers())->addDateHeader('Date', new \DateTimeImmutable()), $b = new TextPart('content'));
         $this->assertSame($b, $m->getBody());
         $this->assertEquals($h, $m->getHeaders());
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2
+---
+
+ * Allow `ServiceSubscriberInterface::getSubscribedServices()` to return `SubscribedService[]`
+
 3.0
 ---
 

@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
@@ -42,6 +43,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -422,7 +425,42 @@ class WorkerTest extends TestCase
         $worker->run();
 
         $envelope = current($receiver->getAcknowledgedEnvelopes());
-        $this->assertCount(1, $envelope->all(\get_class($stamp)));
+        $this->assertCount(1, $envelope->all($stamp::class));
+    }
+
+    public function testWorkerRateLimitMessages()
+    {
+        $envelope = [
+            new Envelope(new DummyMessage('message1')),
+            new Envelope(new DummyMessage('message2')),
+        ];
+        $receiver = new DummyReceiver([$envelope]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturnArgument(0);
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+
+        $rateLimitCount = 0;
+        $listener = function (WorkerRateLimitedEvent $event) use (&$rateLimitCount) {
+            ++$rateLimitCount;
+            $event->getLimiter()->reset(); // Reset limiter to continue test
+        };
+        $eventDispatcher->addListener(WorkerRateLimitedEvent::class, $listener);
+
+        $rateLimitFactory = new RateLimiterFactory([
+            'id' => 'bus',
+            'policy' => 'fixed_window',
+            'limit' => 1,
+            'interval' => '1 minute',
+        ], new InMemoryStorage());
+
+        $worker = new Worker(['bus' => $receiver], $bus, $eventDispatcher, null, ['bus' => $rateLimitFactory]);
+        $worker->run();
+
+        $this->assertCount(2, $receiver->getAcknowledgedEnvelopes());
+        $this->assertEquals(1, $rateLimitCount);
     }
 
     public function testWorkerShouldLogOnStop()

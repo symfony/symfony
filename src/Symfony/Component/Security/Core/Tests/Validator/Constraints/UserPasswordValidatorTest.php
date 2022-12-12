@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -44,7 +45,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
      */
     protected $hasherFactory;
 
-    protected function createValidator()
+    protected function createValidator(): UserPasswordValidator
     {
         return new UserPasswordValidator($this->tokenStorage, $this->hasherFactory);
     }

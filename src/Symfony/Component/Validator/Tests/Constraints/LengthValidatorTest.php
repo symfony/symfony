@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LengthValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): LengthValidator
     {
         return new LengthValidator();
     }

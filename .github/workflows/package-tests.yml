@@ -21,7 +21,7 @@ jobs:
 
       - name: Find packages
         id: find-packages
-        run: echo "packages=$(php .github/get-modified-packages.php $(find src/Symfony -mindepth 2 -maxdepth 6 -type f -name composer.json -printf '%h\n' | jq -R -s -c 'split("\n")[:-1]') $(git diff --name-only origin/${{ github.base_ref }} HEAD | grep src/ | jq -R -s -c 'split("\n")[:-1]'))" >> $GITHUB_OUTPUT
+        run: echo "packages=$(php .github/get-modified-packages.php $(find src/Symfony -mindepth 2 -maxdepth 6 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Intl/Resources/emoji |jq -R -s -c 'split("\n")[:-1]') $(git diff --name-only origin/${{ github.base_ref }} HEAD | grep src/ | jq -R -s -c 'split("\n")[:-1]'))" >> $GITHUB_OUTPUT
 
       - name: Verify meta files are correct
         run: |

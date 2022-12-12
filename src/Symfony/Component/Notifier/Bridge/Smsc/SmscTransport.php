@@ -34,7 +34,7 @@ final class SmscTransport extends AbstractTransport
     private ?string $password;
     private string $from;
 
-    public function __construct(?string $username, ?string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(?string $username, #[\SensitiveParameter] ?string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $username;
         $this->password = $password;
@@ -59,10 +59,12 @@ final class SmscTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $body = [
             'login' => $this->login,
             'psw' => $this->password,
-            'sender' => $this->from,
+            'sender' => $from,
             'phones' => $message->getPhone(),
             'mes' => $message->getSubject(),
             'fmt' => 3, // response as JSON

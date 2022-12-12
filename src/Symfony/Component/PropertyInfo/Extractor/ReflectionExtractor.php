@@ -98,9 +98,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->arrayMutatorPrefixesLast = array_reverse($this->arrayMutatorPrefixesFirst);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProperties(string $class, array $context = []): ?array
     {
         try {
@@ -136,9 +133,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return $properties ? array_values($properties) : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         if ($fromMutator = $this->extractFromMutator($class, $property)) {
@@ -163,9 +157,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypesFromConstructor(string $class, string $property): ?array
     {
         try {
@@ -201,9 +192,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isReadable(string $class, string $property, array $context = []): ?bool
     {
         if ($this->isAllowedProperty($class, $property)) {
@@ -213,9 +201,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null !== $this->getReadInfo($class, $property, $context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isWritable(string $class, string $property, array $context = []): ?bool
     {
         if ($this->isAllowedProperty($class, $property, true)) {
@@ -227,9 +212,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null !== $reflectionMethod;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isInitializable(string $class, string $property, array $context = []): ?bool
     {
         try {
@@ -255,9 +237,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getReadInfo(string $class, string $property, array $context = []): ?PropertyReadInfo
     {
         try {
@@ -307,9 +286,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getWriteInfo(string $class, string $property, array $context = []): ?PropertyWriteInfo
     {
         try {

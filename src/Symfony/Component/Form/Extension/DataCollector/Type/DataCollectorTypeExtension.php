@@ -32,17 +32,11 @@ class DataCollectorTypeExtension extends AbstractTypeExtension
         $this->listener = new DataCollectorListener($dataCollector);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->listener);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];

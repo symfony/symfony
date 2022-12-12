@@ -32,9 +32,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     public function __construct(string $savePath = null, string $name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {
-        if (null === $savePath) {
-            $savePath = sys_get_temp_dir();
-        }
+        $savePath ??= sys_get_temp_dir();
 
         if (!is_dir($savePath) && !@mkdir($savePath, 0777, true) && !is_dir($savePath)) {
             throw new \RuntimeException(sprintf('Session Storage was not able to create directory "%s".', $savePath));
@@ -45,9 +43,6 @@ class MockFileSessionStorage extends MockArraySessionStorage
         parent::__construct($name, $metaBag);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function start(): bool
     {
         if ($this->started) {
@@ -65,9 +60,6 @@ class MockFileSessionStorage extends MockArraySessionStorage
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function regenerate(bool $destroy = false, int $lifetime = null): bool
     {
         if (!$this->started) {
@@ -81,9 +73,6 @@ class MockFileSessionStorage extends MockArraySessionStorage
         return parent::regenerate($destroy, $lifetime);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save()
     {
         if (!$this->started) {

@@ -63,13 +63,10 @@ class ConstraintViolation implements ConstraintViolationInterface
         $this->cause = $cause;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         if (\is_object($this->root)) {
-            $class = 'Object('.\get_class($this->root).')';
+            $class = 'Object('.$this->root::class.')';
         } elseif (\is_array($this->root)) {
             $class = 'Array';
         } else {
@@ -89,57 +86,36 @@ class ConstraintViolation implements ConstraintViolationInterface
         return $class.$propertyPath.":\n    ".$this->getMessage().$code;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageTemplate(): string
     {
         return (string) $this->messageTemplate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPlural(): ?int
     {
         return $this->plural;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessage(): string|\Stringable
     {
         return $this->message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoot(): mixed
     {
         return $this->root;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPropertyPath(): string
     {
         return (string) $this->propertyPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInvalidValue(): mixed
     {
         return $this->invalidValue;
@@ -161,9 +137,6 @@ class ConstraintViolation implements ConstraintViolationInterface
         return $this->cause;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCode(): ?string
     {
         return $this->code;

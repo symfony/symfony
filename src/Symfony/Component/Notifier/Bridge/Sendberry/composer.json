@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.0.2",
         "symfony/http-client": "^5.4|^6.0",
-        "symfony/notifier": "^5.4|^6.0"
+        "symfony/notifier": "^6.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sendberry\\": "" },

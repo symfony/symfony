@@ -91,11 +91,7 @@ class Connection
     private array $amqpQueues = [];
 
     private \AMQPExchange $amqpDelayExchange;
-
-    /**
-     * @var int
-     */
-    private $lastActivityTime = 0;
+    private int $lastActivityTime = 0;
 
     public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, AmqpFactory $amqpFactory = null)
     {
@@ -205,7 +201,7 @@ class Connection
         $queuesOptions = $amqpOptions['queues'];
         unset($amqpOptions['queues'], $amqpOptions['exchange']);
         if (isset($amqpOptions['auto_setup'])) {
-            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
+            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL);
         }
 
         $queuesOptions = array_map(function ($queueOptions) {
@@ -335,8 +331,8 @@ class Connection
     {
         $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
         $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);
-        $attributes['delivery_mode'] = $attributes['delivery_mode'] ?? 2;
-        $attributes['timestamp'] = $attributes['timestamp'] ?? time();
+        $attributes['delivery_mode'] ??= 2;
+        $attributes['timestamp'] ??= time();
 
         $this->lastActivityTime = time();
 

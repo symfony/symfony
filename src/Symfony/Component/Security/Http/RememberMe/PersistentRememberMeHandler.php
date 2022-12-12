@@ -36,7 +36,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
     private ?TokenVerifierInterface $tokenVerifier;
     private string $secret;
 
-    public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
+    public function __construct(TokenProviderInterface $tokenProvider, #[\SensitiveParameter] string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
     {
         parent::__construct($userProvider, $requestStack, $options, $logger);
 
@@ -48,22 +48,16 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         $this->secret = $secret;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createRememberMeCookie(UserInterface $user): void
     {
         $series = base64_encode(random_bytes(64));
         $tokenValue = $this->generateHash(base64_encode(random_bytes(64)));
-        $token = new PersistentToken(\get_class($user), $user->getUserIdentifier(), $series, $tokenValue, new \DateTime());
+        $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, new \DateTime());
 
         $this->tokenProvider->createNewToken($token);
         $this->createCookie(RememberMeDetails::fromPersistentToken($token, time() + $this->options['lifetime']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function processRememberMe(RememberMeDetails $rememberMeDetails, UserInterface $user): void
     {
         if (!str_contains($rememberMeDetails->getValue(), ':')) {
@@ -98,9 +92,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearRememberMeCookie(): void
     {
         parent::clearRememberMeCookie();

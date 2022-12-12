@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IsFalseValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IsFalseValidator
     {
         return new IsFalseValidator();
     }

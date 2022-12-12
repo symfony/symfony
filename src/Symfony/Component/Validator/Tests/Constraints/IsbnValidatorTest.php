@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class IsbnValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IsbnValidator
     {
         return new IsbnValidator();
     }

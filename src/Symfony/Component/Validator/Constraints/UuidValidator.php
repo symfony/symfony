@@ -35,7 +35,7 @@ class UuidValidator extends ConstraintValidator
 
     // Roughly speaking:
     // x = any hexadecimal character
-    // M = any allowed version {1..6}
+    // M = any allowed version {1..8}
     // N = any allowed variant {8, 9, a, b}
 
     public const STRICT_LENGTH = 36;
@@ -59,9 +59,6 @@ class UuidValidator extends ConstraintValidator
     public const LOOSE_MAX_LENGTH = 39;
     public const LOOSE_FIRST_HYPHEN_POSITION = 4;
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Uuid) {
@@ -238,9 +235,11 @@ class UuidValidator extends ConstraintValidator
 
         // Check version
         if (!\in_array($value[self::STRICT_VERSION_POSITION], $constraint->versions)) {
+            $code = Uuid::TIME_BASED_VERSIONS === $constraint->versions ? Uuid::INVALID_TIME_BASED_VERSION_ERROR : Uuid::INVALID_VERSION_ERROR;
+
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Uuid::INVALID_VERSION_ERROR)
+                ->setCode($code)
                 ->addViolation();
         }
 

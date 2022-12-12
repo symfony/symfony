@@ -31,9 +31,6 @@ class RangeValidator extends ConstraintValidator
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Range) {
@@ -173,11 +170,7 @@ class RangeValidator extends ConstraintValidator
 
     private function getPropertyAccessor(): PropertyAccessorInterface
     {
-        if (null === $this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
+        return $this->propertyAccessor ??= PropertyAccess::createPropertyAccessor();
     }
 
     private function isParsableDatetimeString(mixed $boundary): bool

@@ -29,9 +29,6 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
         $this->classMetadataFactory = $classMetadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMappingForClass(string $class): ?ClassDiscriminatorMapping
     {
         if ($this->classMetadataFactory->hasMetadataFor($class)) {
@@ -41,9 +38,6 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMappingForMappedObject(object|string $object): ?ClassDiscriminatorMapping
     {
         if ($this->classMetadataFactory->hasMetadataFor($object)) {
@@ -54,7 +48,7 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
             }
         }
 
-        $cacheKey = \is_object($object) ? \get_class($object) : $object;
+        $cacheKey = \is_object($object) ? $object::class : $object;
         if (!\array_key_exists($cacheKey, $this->mappingForMappedObjectCache)) {
             $this->mappingForMappedObjectCache[$cacheKey] = $this->resolveMappingForMappedObject($object);
         }
@@ -62,9 +56,6 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
         return $this->mappingForMappedObjectCache[$cacheKey];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeForMappedObject(object|string $object): ?string
     {
         if (null === $mapping = $this->getMappingForMappedObject($object)) {

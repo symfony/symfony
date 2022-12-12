@@ -30,9 +30,6 @@ class ExpressionSyntaxValidator extends ConstraintValidator
         $this->expressionLanguage = $expressionLanguage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validate(mixed $expression, Constraint $constraint): void
     {
         if (!$constraint instanceof ExpressionSyntax) {
@@ -47,9 +44,7 @@ class ExpressionSyntaxValidator extends ConstraintValidator
             throw new UnexpectedValueException($expression, 'string');
         }
 
-        if (null === $this->expressionLanguage) {
-            $this->expressionLanguage = new ExpressionLanguage();
-        }
+        $this->expressionLanguage ??= new ExpressionLanguage();
 
         try {
             $this->expressionLanguage->lint($expression, $constraint->allowedVariables);

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Mapping\Loader;
 
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -34,16 +36,9 @@ class YamlFileLoader extends FileLoader
      */
     private $classes;
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
-        if (null === $this->classes) {
-            $this->classes = $this->getClassesFromYaml();
-        }
-
-        if (!$this->classes) {
+        if (!$this->classes ??= $this->getClassesFromYaml()) {
             return false;
         }
 
@@ -87,11 +82,19 @@ class YamlFileLoader extends FileLoader
                 }
 
                 if (isset($data['serialized_name'])) {
-                    if (!\is_string($data['serialized_name']) || empty($data['serialized_name'])) {
+                    if (!\is_string($data['serialized_name']) || '' === $data['serialized_name']) {
                         throw new MappingException(sprintf('The "serialized_name" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
                     $attributeMetadata->setSerializedName($data['serialized_name']);
+                }
+
+                if (isset($data['serialized_path'])) {
+                    try {
+                        $attributeMetadata->setSerializedPath(new PropertyPath((string) $data['serialized_path']));
+                    } catch (InvalidPropertyPathException) {
+                        throw new MappingException(sprintf('The "serialized_path" value must be a valid property path in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
                 }
 
                 if (isset($data['ignore'])) {
@@ -146,11 +149,7 @@ class YamlFileLoader extends FileLoader
      */
     public function getMappedClasses(): array
     {
-        if (null === $this->classes) {
-            $this->classes = $this->getClassesFromYaml();
-        }
-
-        return array_keys($this->classes);
+        return array_keys($this->classes ??= $this->getClassesFromYaml());
     }
 
     private function getClassesFromYaml(): array
@@ -159,9 +158,7 @@ class YamlFileLoader extends FileLoader
             throw new MappingException(sprintf('This is not a local file "%s".', $this->file));
         }
 
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new Parser();
-        }
+        $this->yamlParser ??= new Parser();
 
         $classes = $this->yamlParser->parseFile($this->file, Yaml::PARSE_CONSTANT);
 

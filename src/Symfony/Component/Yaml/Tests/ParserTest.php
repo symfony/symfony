@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -19,8 +20,9 @@ use Symfony\Component\Yaml\Yaml;
 
 class ParserTest extends TestCase
 {
-    /** @var Parser */
-    protected $parser;
+    use ExpectDeprecationTrait;
+
+    private ?Parser $parser;
 
     protected function setUp(): void
     {
@@ -54,8 +56,7 @@ class ParserTest extends TestCase
     {
         $yml = '!number 5';
         $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
-        // @todo Preserve the number, don't turn into string.
-        $expected = new TaggedValue('number', '5');
+        $expected = new TaggedValue('number', 5);
         $this->assertSameData($expected, $data);
     }
 
@@ -63,9 +64,8 @@ class ParserTest extends TestCase
     {
         $yml = '!tag null';
         $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
-        // @todo Preserve literal null, don't turn into string.
-        $expected = new TaggedValue('tag', 'null');
-        $this->assertSameData($expected, $data);
+
+        $this->assertSameData(new TaggedValue('tag', null), $data);
     }
 
     public function testTaggedValueTopLevelString()
@@ -1546,17 +1546,15 @@ EOT
         $yaml = <<<'EOT'
 date: 2002-12-14
 EOT;
-        $expectedDate = new \DateTime();
-        $expectedDate->setTimeZone(new \DateTimeZone('UTC'));
-        $expectedDate->setDate(2002, 12, 14);
-        $expectedDate->setTime(0, 0, 0);
+        $expectedDate = (new \DateTimeImmutable())
+            ->setTimeZone(new \DateTimeZone('UTC'))
+            ->setDate(2002, 12, 14)
+            ->setTime(0, 0, 0);
 
         $this->assertSameData(['date' => $expectedDate], $this->parser->parse($yaml, Yaml::PARSE_DATETIME));
     }
 
     /**
-     * @param $lineNumber
-     * @param $yaml
      * @dataProvider parserThrowsExceptionWithCorrectLineNumberProvider
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
@@ -2310,7 +2308,7 @@ YAML
 
     public function testNonSpecificTagSupport()
     {
-        $this->assertSame('12', $this->parser->parse('! 12'));
+        $this->assertSame(12, $this->parser->parse('! 12'));
     }
 
     public function testCustomTagsDisabled()
@@ -2482,6 +2480,17 @@ YAML;
         $this->expectExceptionMessage('Missing value for tag "php/const:App\Kernel::SEMART_VERSION" at line 1 (near "!php/const:App\Kernel::SEMART_VERSION").');
 
         $this->parser->parse('!php/const:App\Kernel::SEMART_VERSION', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedPhpConstantSyntaxAsScalarKey()
+    {
+        $this->expectDeprecation('Since symfony/yaml 6.2: YAML syntax for key "!php/const:Symfony\Component\Yaml\Tests\B::BAR" is deprecated and replaced by "!php/const Symfony\Component\Yaml\Tests\B::BAR".');
+        $actual = $this->parser->parse('!php/const:Symfony\Component\Yaml\Tests\B::BAR: value', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
+
+        $this->assertSame(['bar' => 'value'], $actual);
     }
 
     public function testPhpConstantTagMappingAsScalarKey()

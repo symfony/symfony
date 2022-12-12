@@ -48,8 +48,6 @@ abstract class FileLoader extends BaseFileLoader
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
      */
     public function import(mixed $resource, string $type = null, bool|string $ignoreErrors = false, string $sourceResource = null, $exclude = null): mixed
@@ -90,8 +88,9 @@ abstract class FileLoader extends BaseFileLoader
      * @param string               $namespace The namespace prefix of classes in the scanned directory
      * @param string               $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
+     * @param string|null          $source    The path to the file that defines the auto-discovery rule
      */
-    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null)
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */)
     {
         if (!str_ends_with($namespace, '\\')) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
@@ -99,10 +98,19 @@ abstract class FileLoader extends BaseFileLoader
         if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\\)++$/', $namespace)) {
             throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: "%s".', $namespace));
         }
+        // This can happen with YAML files
+        if (\is_array($exclude) && \in_array(null, $exclude, true)) {
+            throw new InvalidArgumentException('The exclude list must not contain a "null" value.');
+        }
+        // This can happen with XML files
+        if (\is_array($exclude) && \in_array('', $exclude, true)) {
+            throw new InvalidArgumentException('The exclude list must not contain an empty value.');
+        }
 
+        $source = \func_num_args() > 4 ? func_get_arg(4) : null;
         $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();
         $autoconfigureAttributes = $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null;
-        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes);
+        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes, $source);
         // prepare for deep cloning
         $serializedPrototype = serialize($prototype);
 
@@ -110,7 +118,7 @@ abstract class FileLoader extends BaseFileLoader
             if (null === $errorMessage && $autoconfigureAttributes && $this->env) {
                 $r = $this->container->getReflectionClass($class);
                 $attribute = null;
-                foreach ($r->getAttributes(When::class) as $attribute) {
+                foreach ($r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                     if ($this->env === $attribute->newInstance()->env) {
                         $attribute = null;
                         break;
@@ -169,7 +177,7 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    private function findClasses(string $namespace, string $pattern, array $excludePatterns, ?RegisterAutoconfigureAttributesPass $autoconfigureAttributes): array
+    private function findClasses(string $namespace, string $pattern, array $excludePatterns, ?RegisterAutoconfigureAttributesPass $autoconfigureAttributes, ?string $source): array
     {
         $parameterBag = $this->container->getParameterBag();
 
@@ -178,9 +186,7 @@ abstract class FileLoader extends BaseFileLoader
         $excludePatterns = $parameterBag->unescapeValue($parameterBag->resolveValue($excludePatterns));
         foreach ($excludePatterns as $excludePattern) {
             foreach ($this->glob($excludePattern, true, $resource, true, true) as $path => $info) {
-                if (null === $excludePrefix) {
-                    $excludePrefix = $resource->getPrefix();
-                }
+                $excludePrefix ??= $resource->getPrefix();
 
                 // normalize Windows slashes and remove trailing slashes
                 $excludePaths[rtrim(str_replace('\\', '/', $path), '/')] = true;
@@ -189,7 +195,6 @@ abstract class FileLoader extends BaseFileLoader
 
         $pattern = $parameterBag->unescapeValue($parameterBag->resolveValue($pattern));
         $classes = [];
-        $extRegexp = '/\\.php$/';
         $prefixLen = null;
         foreach ($this->glob($pattern, true, $resource, false, false, $excludePaths) as $path => $info) {
             if (null === $prefixLen) {
@@ -204,10 +209,10 @@ abstract class FileLoader extends BaseFileLoader
                 continue;
             }
 
-            if (!preg_match($extRegexp, $path, $m) || !$info->isReadable()) {
+            if (!str_ends_with($path, '.php') || !$info->isReadable()) {
                 continue;
             }
-            $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, -\strlen($m[0]))), '\\');
+            $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, -4)), '\\');
 
             if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $class)) {
                 continue;
@@ -239,6 +244,19 @@ abstract class FileLoader extends BaseFileLoader
         } else {
             foreach ($resource as $path) {
                 $this->container->fileExists($path, false);
+            }
+        }
+
+        if (null !== $prefixLen) {
+            $attributes = null !== $source ? ['source' => sprintf('in "%s/%s"', basename(\dirname($source)), basename($source))] : [];
+
+            foreach ($excludePaths as $path => $_) {
+                $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, str_ends_with($path, '.php') ? -4 : null)), '\\');
+                if (!$this->container->has($class)) {
+                    $this->container->register($class)
+                        ->setAbstract(true)
+                        ->addTag('container.excluded', $attributes);
+                }
             }
         }
 

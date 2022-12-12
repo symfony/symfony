@@ -30,9 +30,6 @@ class BufferedBundleReader implements BundleReaderInterface
         $this->buffer = new RingBuffer($bufferSize);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function read(string $path, string $locale): mixed
     {
         $hash = $path.'//'.$locale;

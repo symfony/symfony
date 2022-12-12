@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IbanValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IbanValidator
     {
         return new IbanValidator();
     }

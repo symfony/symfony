@@ -59,9 +59,7 @@ class UserCheckerListenerTest extends TestCase
 
     private function createCheckPassportEvent($passport = null)
     {
-        if (null === $passport) {
-            $passport = new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }));
-        }
+        $passport ??= new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }));
 
         return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
     }

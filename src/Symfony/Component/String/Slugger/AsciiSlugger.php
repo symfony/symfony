@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\String\Slugger;
 
+use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
 use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -58,6 +59,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
     private \Closure|array $symbolsMap = [
         'en' => ['@' => 'at', '&' => 'and'],
     ];
+    private bool|string $emoji = false;
 
     /**
      * Cache of transliterators per locale.
@@ -72,25 +74,33 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         $this->symbolsMap = $symbolsMap ?? $this->symbolsMap;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLocale(string $locale)
     {
         $this->defaultLocale = $locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale(): string
     {
         return $this->defaultLocale;
     }
 
     /**
-     * {@inheritdoc}
+     * @param bool|string $emoji true will use the same locale,
+     *                           false will disable emoji,
+     *                           and a string to use a specific locale
      */
+    public function withEmoji(bool|string $emoji = true): static
+    {
+        if (false !== $emoji && !class_exists(EmojiTransliterator::class)) {
+            throw new \LogicException(sprintf('You cannot use the "%s()" method as the "symfony/intl" package is not installed. Try running "composer require symfony/intl".', __METHOD__));
+        }
+
+        $new = clone $this;
+        $new->emoji = $emoji;
+
+        return $new;
+    }
+
     public function slug(string $string, string $separator = '-', string $locale = null): AbstractUnicodeString
     {
         $locale ??= $this->defaultLocale;
@@ -101,6 +111,10 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
             $transliterator = ['de-ASCII'];
         } elseif (\function_exists('transliterator_transliterate') && $locale) {
             $transliterator = (array) $this->createTransliterator($locale);
+        }
+
+        if ($emojiTransliterator = $this->createEmojiTransliterator($locale)) {
+            $transliterator[] = $emojiTransliterator;
         }
 
         if ($this->symbolsMap instanceof \Closure) {
@@ -159,6 +173,25 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         }
 
         return $this->transliterators[$locale] = $this->transliterators[$parent] = $transliterator ?? null;
+    }
+
+    private function createEmojiTransliterator(?string $locale): ?EmojiTransliterator
+    {
+        if (\is_string($this->emoji)) {
+            $locale = $this->emoji;
+        } elseif (!$this->emoji) {
+            return null;
+        }
+
+        while (null !== $locale) {
+            try {
+                return EmojiTransliterator::create("emoji-$locale");
+            } catch (\IntlException) {
+                $locale = self::getParentLocale($locale);
+            }
+        }
+
+        return null;
     }
 
     private static function getParentLocale(?string $locale): ?string

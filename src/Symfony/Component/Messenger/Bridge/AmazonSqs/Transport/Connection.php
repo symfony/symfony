@@ -128,7 +128,7 @@ class Connection
             'wait_time' => (int) $options['wait_time'],
             'poll_timeout' => $options['poll_timeout'],
             'visibility_timeout' => $options['visibility_timeout'],
-            'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOLEAN),
+            'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL),
             'queue_name' => (string) $options['queue_name'],
         ];
 
@@ -342,7 +342,7 @@ class Connection
             ]);
         }
 
-        if (!empty($specialHeaders)) {
+        if ($specialHeaders) {
             $parameters['MessageAttributes'][self::MESSAGE_ATTRIBUTE_NAME] = new MessageAttributeValue([
                 'DataType' => 'String',
                 'StringValue' => json_encode($specialHeaders),

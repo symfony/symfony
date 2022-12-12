@@ -61,7 +61,7 @@ final class WrappedListener
         } else {
             $this->name = get_debug_type($listener);
             $this->pretty = $this->name.'::__invoke';
-            $this->callableRef = \get_class($listener).'::__invoke';
+            $this->callableRef = $listener::class.'::__invoke';
         }
 
         if (null !== $name) {
@@ -134,7 +134,7 @@ final class WrappedListener
         }
 
         if (\is_object($listener[0])) {
-            return [get_debug_type($listener[0]), \get_class($listener[0])];
+            return [get_debug_type($listener[0]), $listener[0]::class];
         }
 
         return [$listener[0], $listener[0]];

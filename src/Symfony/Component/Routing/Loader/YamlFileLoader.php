@@ -105,9 +105,6 @@ class YamlFileLoader extends FileLoader
         return $collection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(mixed $resource, string $type = null): bool
     {
         return \is_string($resource) && \in_array(pathinfo($resource, \PATHINFO_EXTENSION), ['yml', 'yaml'], true) && (!$type || 'yaml' === $type);

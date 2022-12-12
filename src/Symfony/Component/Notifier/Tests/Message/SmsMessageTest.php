@@ -25,6 +25,16 @@ class SmsMessageTest extends TestCase
 
         $this->assertSame('subject', $message->getSubject());
         $this->assertSame('+3312345678', $message->getPhone());
+        $this->assertSame('', $message->getFrom());
+    }
+
+    public function testCanBeConstructedWithFrom()
+    {
+        $message = new SmsMessage('+3312345678', 'subject', 'foo');
+
+        $this->assertSame('subject', $message->getSubject());
+        $this->assertSame('+3312345678', $message->getPhone());
+        $this->assertSame('foo', $message->getFrom());
     }
 
     public function testEnsureNonEmptyPhoneOnConstruction()
@@ -56,5 +66,16 @@ class SmsMessageTest extends TestCase
         $this->assertSame('+3312345678', $message->getPhone());
 
         $message->phone('');
+    }
+
+    public function testSetFrom()
+    {
+        $message = new SmsMessage('+3312345678', 'subject');
+
+        $this->assertSame('', $message->getFrom());
+
+        $message->from('foo');
+
+        $this->assertSame('foo', $message->getFrom());
     }
 }

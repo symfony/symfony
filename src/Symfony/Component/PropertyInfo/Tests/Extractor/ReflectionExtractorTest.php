@@ -212,14 +212,14 @@ class ReflectionExtractorTest extends TestCase
             ['c', [new Type(Type::BUILTIN_TYPE_BOOL)]],
             ['d', [new Type(Type::BUILTIN_TYPE_BOOL)]],
             ['e', null],
-            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))]],
+            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))]],
             ['donotexist', null],
             ['staticGetter', null],
             ['staticSetter', null],
             ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')]],
             ['realParent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')]],
-            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]],
-            ['dates', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class))]],
+            ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)]],
+            ['dates', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class))]],
         ];
     }
 
@@ -320,6 +320,7 @@ class ReflectionExtractorTest extends TestCase
     {
         yield ['nil', null];
         yield ['false', [new Type(Type::BUILTIN_TYPE_FALSE)]];
+        yield ['true', [new Type(Type::BUILTIN_TYPE_TRUE)]];
 
         // Nesting intersection and union types is not supported yet,
         // but we should make sure this kind of composite types does not crash the extractor.
@@ -617,7 +618,7 @@ class ReflectionExtractorTest extends TestCase
             ['timezone', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeZone')]],
             ['date', null],
             ['dateObject', null],
-            ['dateTime', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
+            ['dateTime', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
             ['ddd', null],
         ];
     }

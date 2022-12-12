@@ -41,9 +41,6 @@ final class CachePoolInvalidateTagsCommand extends Command
         $this->poolNames = array_keys($pools->getProvidedServices());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -59,9 +56,6 @@ final class CachePoolInvalidateTagsCommand extends Command
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

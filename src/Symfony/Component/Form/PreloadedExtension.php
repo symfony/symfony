@@ -36,13 +36,10 @@ class PreloadedExtension implements FormExtensionInterface
         $this->typeGuesser = $typeGuesser;
 
         foreach ($types as $type) {
-            $this->types[\get_class($type)] = $type;
+            $this->types[$type::class] = $type;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getType(string $name): FormTypeInterface
     {
         if (!isset($this->types[$name])) {
@@ -52,34 +49,22 @@ class PreloadedExtension implements FormExtensionInterface
         return $this->types[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasType(string $name): bool
     {
         return isset($this->types[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeExtensions(string $name): array
     {
         return $this->typeExtensions[$name]
             ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasTypeExtensions(string $name): bool
     {
         return !empty($this->typeExtensions[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         return $this->typeGuesser;

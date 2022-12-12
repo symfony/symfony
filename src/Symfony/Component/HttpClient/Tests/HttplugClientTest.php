@@ -203,8 +203,8 @@ class HttplugClientTest extends TestCase
 
                 return $response;
             }, function (\Exception $exception) use (&$failureCallableCalled, $client) {
-                $this->assertSame(NetworkException::class, \get_class($exception));
-                $this->assertSame(TransportException::class, \get_class($exception->getPrevious()));
+                $this->assertSame(NetworkException::class, $exception::class);
+                $this->assertSame(TransportException::class, $exception->getPrevious()::class);
                 $failureCallableCalled = true;
 
                 return $client->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057'));
@@ -246,7 +246,7 @@ class HttplugClientTest extends TestCase
                     return $response;
                 },
                 function (\Exception $exception) use ($errorMessage, &$failureCallableCalled, $client, $request) {
-                    $this->assertSame(NetworkException::class, \get_class($exception));
+                    $this->assertSame(NetworkException::class, $exception::class);
                     $this->assertSame($errorMessage, $exception->getMessage());
                     $failureCallableCalled = true;
 

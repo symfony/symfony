@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -92,6 +93,16 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
     }
 
+    public function testLoadSerializedPath()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\SerializedPathDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals(new PropertyPath('[one][two]'), $attributesMetadata['three']->getSerializedPath());
+        $this->assertEquals(new PropertyPath('[three][four]'), $attributesMetadata['seven']->getSerializedPath());
+    }
+
     public function testLoadClassMetadataAndMerge()
     {
         $classMetadata = new ClassMetadata($this->getNamespace().'\GroupDummy');
@@ -118,6 +129,11 @@ abstract class AnnotationLoaderTest extends TestCase
     public function testLoadContexts()
     {
         $this->assertLoadedContexts($this->getNamespace().'\ContextDummy', $this->getNamespace().'\ContextDummyParent');
+    }
+
+    public function testLoadContextsPropertiesPromoted()
+    {
+        $this->assertLoadedContexts($this->getNamespace().'\ContextDummyPromotedProperties', $this->getNamespace().'\ContextDummyParent');
     }
 
     public function testThrowsOnContextOnInvalidMethod()

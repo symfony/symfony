@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Bridge\Twig\DataCollector\TwigDataCollector;
 use Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer;
+use Symfony\Bridge\Twig\EventListener\TemplateAttributeListener;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Bridge\Twig\Extension\CodeExtension;
 use Symfony\Bridge\Twig\Extension\ExpressionExtension;
@@ -140,7 +141,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('translation.extractor', ['alias' => 'twig'])
 
         ->set('workflow.twig_extension', WorkflowExtension::class)
-            ->args([service('workflow.registry')])
+            ->args([service('.workflow.registry')])
 
         ->set('twig.configurator.environment', EnvironmentConfigurator::class)
             ->args([
@@ -169,5 +170,9 @@ return static function (ContainerConfigurator $container) {
             ->args([service('serializer')])
 
         ->set('twig.extension.serializer', SerializerExtension::class)
+
+        ->set('controller.template_attribute_listener', TemplateAttributeListener::class)
+            ->args([service('twig')])
+            ->tag('kernel.event_subscriber')
     ;
 };

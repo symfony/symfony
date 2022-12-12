@@ -13,10 +13,12 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -33,7 +35,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -41,6 +43,7 @@ use Symfony\Component\Security\Core\User\MissingUserProvider;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
+use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -76,17 +79,28 @@ return static function (ContainerConfigurator $container) {
         ->set('security.untracked_token_storage', TokenStorage::class)
 
         ->set('security.helper', Security::class)
-            ->args([service_locator([
-                'security.token_storage' => service('security.token_storage'),
-                'security.authorization_checker' => service('security.authorization_checker'),
-            ])])
+            ->args([
+                service_locator([
+                    'security.token_storage' => service('security.token_storage'),
+                    'security.authorization_checker' => service('security.authorization_checker'),
+                    'security.user_authenticator' => service('security.user_authenticator')->ignoreOnInvalid(),
+                    'request_stack' => service('request_stack'),
+                    'security.firewall.map' => service('security.firewall.map'),
+                    'security.user_checker' => service('security.user_checker'),
+                    'security.firewall.event_dispatcher_locator' => service('security.firewall.event_dispatcher_locator'),
+                    'security.csrf.token_manager' => service('security.csrf.token_manager')->ignoreOnInvalid(),
+                ]),
+                abstract_arg('authenticators'),
+            ])
         ->alias(Security::class, 'security.helper')
+        ->alias(LegacySecurity::class, 'security.helper')
+            ->deprecate('symfony/security-bundle', '6.2', 'The "%alias_id%" service alias is deprecated, use "'.Security::class.'" instead.')
 
         ->set('security.user_value_resolver', UserValueResolver::class)
             ->args([
                 service('security.token_storage'),
             ])
-            ->tag('controller.argument_value_resolver', ['priority' => 40])
+            ->tag('controller.argument_value_resolver', ['priority' => 120])
 
         // Authentication related services
         ->set('security.authentication.trust_resolver', AuthenticationTrustResolver::class)
@@ -195,6 +209,7 @@ return static function (ContainerConfigurator $container) {
                 null,
                 [], // listeners
                 null, // switch_user
+                null, // logout
             ])
 
         ->set('security.logout_url_generator', LogoutUrlGenerator::class)
@@ -259,5 +274,19 @@ return static function (ContainerConfigurator $container) {
                 service('security.expression_language'),
             ])
             ->tag('kernel.cache_warmer')
+
+        ->set('controller.is_granted_attribute_listener', IsGrantedAttributeListener::class)
+            ->args([
+                service('security.authorization_checker'),
+                service('security.is_granted_attribute_expression_language')->nullOnInvalid(),
+            ])
+            ->tag('kernel.event_subscriber')
+
+        ->set('security.is_granted_attribute_expression_language', BaseExpressionLanguage::class)
+            ->args([service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid()])
+
+        ->set('cache.security_is_granted_attribute_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
     ;
 };

@@ -39,22 +39,19 @@ class TwigErrorRenderer implements ErrorRendererInterface
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function render(\Throwable $exception): FlattenException
     {
-        $exception = $this->fallbackErrorRenderer->render($exception);
-        $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
+        $flattenException = FlattenException::createFromThrowable($exception);
+        $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($flattenException);
 
-        if ($debug || !$template = $this->findTemplate($exception->getStatusCode())) {
-            return $exception;
+        if ($debug || !$template = $this->findTemplate($flattenException->getStatusCode())) {
+            return $this->fallbackErrorRenderer->render($exception);
         }
 
-        return $exception->setAsString($this->twig->render($template, [
-            'exception' => $exception,
-            'status_code' => $exception->getStatusCode(),
-            'status_text' => $exception->getStatusText(),
+        return $flattenException->setAsString($this->twig->render($template, [
+            'exception' => $flattenException,
+            'status_code' => $flattenException->getStatusCode(),
+            'status_text' => $flattenException->getStatusText(),
         ]));
     }
 

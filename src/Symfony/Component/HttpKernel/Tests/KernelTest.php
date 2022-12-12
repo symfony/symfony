@@ -99,7 +99,7 @@ class KernelTest extends TestCase
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr(\get_class($kernel->getContainer()), 0, 16);
+        $containerDir = __DIR__.'/Fixtures/var/cache/custom/'.substr($kernel->getContainer()::class, 0, 16);
         $this->assertTrue(unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
         $this->assertFileExists($containerDir);
         $this->assertFileDoesNotExist($containerDir.'.legacy');
@@ -489,7 +489,7 @@ EOF
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
-        $containerClass = \get_class($kernel->getContainer());
+        $containerClass = $kernel->getContainer()::class;
         $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
         unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
@@ -640,7 +640,7 @@ EOF
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->willReturn($bundleName ?? \get_class($bundle))
+            ->willReturn($bundleName ?? $bundle::class)
         ;
 
         $bundle

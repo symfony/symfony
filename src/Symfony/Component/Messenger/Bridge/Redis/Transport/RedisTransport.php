@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class RedisTransport implements TransportInterface, SetupableTransportInterface
+class RedisTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
     private Connection $connection;
@@ -34,44 +35,34 @@ class RedisTransport implements TransportInterface, SetupableTransportInterface
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         return $this->getReceiver()->get();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         $this->getReceiver()->ack($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $this->getReceiver()->reject($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         return $this->getSender()->send($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setup(): void
     {
         $this->connection->setup();
+    }
+
+    public function getMessageCount(): int
+    {
+        return $this->getReceiver()->getMessageCount();
     }
 
     private function getReceiver(): RedisReceiver

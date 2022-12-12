@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpClient;
 
+use FriendsOfPHP\WellKnownImplementations\WellKnownPsr17Factory;
+use FriendsOfPHP\WellKnownImplementations\WellKnownPsr7Request;
+use FriendsOfPHP\WellKnownImplementations\WellKnownPsr7Uri;
 use Http\Discovery\Exception\NotFoundException;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -62,12 +65,12 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         $streamFactory ??= $responseFactory instanceof StreamFactoryInterface ? $responseFactory : null;
 
         if (null === $responseFactory || null === $streamFactory) {
-            if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
+            if (!class_exists(Psr17Factory::class) && !class_exists(WellKnownPsr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
             }
 
             try {
-                $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
+                $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : (class_exists(WellKnownPsr17Factory::class, false) ? new WellKnownPsr17Factory() : null);
                 $responseFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
                 $streamFactory ??= $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
             } catch (NotFoundException $e) {
@@ -79,9 +82,14 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         $this->streamFactory = $streamFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function withOptions(array $options): static
+    {
+        $clone = clone $this;
+        $clone->client = $clone->client->withOptions($options);
+
+        return $clone;
+    }
+
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         try {
@@ -131,9 +139,6 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createRequest(string $method, $uri): RequestInterface
     {
         if ($this->responseFactory instanceof RequestFactoryInterface) {
@@ -144,6 +149,10 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             return new Request($method, $uri);
         }
 
+        if (class_exists(WellKnownPsr7Request::class)) {
+            return new WellKnownPsr7Request($method, $uri);
+        }
+
         if (class_exists(Psr17FactoryDiscovery::class)) {
             return Psr17FactoryDiscovery::findRequestFactory()->createRequest($method, $uri);
         }
@@ -151,9 +160,6 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createStream(string $content = ''): StreamInterface
     {
         $stream = $this->streamFactory->createStream($content);
@@ -165,25 +171,16 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         return $stream;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
     {
         return $this->streamFactory->createStreamFromFile($filename, $mode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createStreamFromResource($resource): StreamInterface
     {
         return $this->streamFactory->createStreamFromResource($resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createUri(string $uri = ''): UriInterface
     {
         if ($this->responseFactory instanceof UriFactoryInterface) {
@@ -192,6 +189,10 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
 
         if (class_exists(Uri::class)) {
             return new Uri($uri);
+        }
+
+        if (class_exists(WellKnownPsr7Uri::class)) {
+            return new WellKnownPsr7Uri($uri);
         }
 
         if (class_exists(Psr17FactoryDiscovery::class)) {

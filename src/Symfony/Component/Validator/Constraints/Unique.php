@@ -40,8 +40,6 @@ class Unique extends Constraint
     public $normalizer;
 
     /**
-     * {@inheritdoc}
-     *
      * @param array|string $fields the combination of fields that must contain unique values or a set of options
      */
     public function __construct(

@@ -37,9 +37,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $nodeBuilder;
     protected $normalizeKeys = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(?string $name, NodeParentInterface $parent = null)
     {
         parent::__construct($name, $parent);
@@ -48,17 +45,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $this->trueEquivalent = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setBuilder(NodeBuilder $builder)
     {
         $this->nodeBuilder = $builder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function children(): NodeBuilder
     {
         return $this->getNodeBuilder();
@@ -255,7 +246,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             ->beforeNormalization()
                 ->ifArray()
                 ->then(function (array $v) {
-                    $v['enabled'] = $v['enabled'] ?? true;
+                    $v['enabled'] ??= true;
 
                     return $v;
                 })
@@ -335,9 +326,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function append(NodeDefinition $node): static
     {
         $this->children[$node->name] = $node->setParent($this);
@@ -350,16 +338,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      */
     protected function getNodeBuilder(): NodeBuilder
     {
-        if (null === $this->nodeBuilder) {
-            $this->nodeBuilder = new NodeBuilder();
-        }
+        $this->nodeBuilder ??= new NodeBuilder();
 
         return $this->nodeBuilder->setParent($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createNode(): NodeInterface
     {
         if (null === $this->prototype) {
@@ -420,6 +403,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
         if (null !== $this->normalization) {
             $node->setNormalizationClosures($this->normalization->before);
+            $node->setNormalizedTypes($this->normalization->declaredTypes);
             $node->setXmlRemappings($this->normalization->remappings);
         }
 

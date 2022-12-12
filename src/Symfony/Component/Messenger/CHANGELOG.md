@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add new `messenger:stats` command that returns a list of transports with their "to be processed" message count
+ * Add `TransportNamesStamp` to change the transport while dispatching a message
+ * Add support for rate limited transports by using the RateLimiter component.
+ * Deprecate `MessageHandlerInterface` and `MessageSubscriberInterface`, use `#[AsMessageHandler]` instead
+ * Add new parameter `allowNoSenders` to `SendMessageMiddleware` to enable throwing when a message doesn't have a sender
+
 6.1
 ---
 
@@ -28,6 +37,7 @@ CHANGELOG
  * Deprecate not setting the `reset_on_message` config option, its default value will change to `true` in 6.0
  * Add log when worker should stop.
  * Add log when `SIGTERM` is received.
+ * Add `--stats` and `--class-filter` options to `FailedMessagesShowCommand`
 
 5.3
 ---

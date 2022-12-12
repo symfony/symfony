@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BicValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): BicValidator
     {
         return new BicValidator();
     }
@@ -163,7 +163,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Bic(['ibanPropertyPath' => 'foo']);
 
         $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
+        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', $constraint::class));
 
         $object = new BicComparisonTestClass(5);
 

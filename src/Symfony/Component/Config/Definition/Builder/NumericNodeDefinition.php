@@ -58,8 +58,6 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws InvalidDefinitionException
      */
     public function cannotBeEmpty(): static

@@ -26,17 +26,20 @@ class ExpressionTest extends TestCase
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame('value == "1"', $aConstraint->expression);
         self::assertSame([], $aConstraint->values);
+        self::assertTrue($aConstraint->negate);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('value == "1"', $bConstraint->expression);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'ExpressionDummy'], $bConstraint->groups);
+        self::assertTrue($bConstraint->negate);
 
         [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame('value == someVariable', $cConstraint->expression);
         self::assertSame(['someVariable' => 42], $cConstraint->values);
         self::assertSame(['foo'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
+        self::assertFalse($cConstraint->negate);
     }
 }
 
@@ -45,9 +48,9 @@ class ExpressionDummy
     #[Expression('value == "1"')]
     private $a;
 
-    #[Expression(expression: 'value == "1"', message: 'myMessage')]
+    #[Expression(expression: 'value == "1"', message: 'myMessage', negate: true)]
     private $b;
 
-    #[Expression(expression: 'value == someVariable', values: ['someVariable' => 42], groups: ['foo'], payload: 'some attached data')]
+    #[Expression(expression: 'value == someVariable', values: ['someVariable' => 42], groups: ['foo'], payload: 'some attached data', negate: false)]
     private $c;
 }

@@ -22,17 +22,19 @@
     },
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3.1",
+        "league/html-to-markdown": "^5.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "symfony/dependency-injection": "^5.4|^6.0",
         "symfony/property-access": "^5.4|^6.0",
         "symfony/property-info": "^5.4|^6.0",
-        "symfony/serializer": "^5.2|^6.0"
+        "symfony/serializer": "^6.2"
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",
-        "symfony/mailer": "<5.4"
+        "symfony/mailer": "<5.4",
+        "symfony/serializer": "<6.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mime\\": "" },

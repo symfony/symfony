@@ -383,19 +383,19 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(
             [
                 'existing_bus' => [
-                    'default_middleware' => true,
+                    'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'existing_bus.middleware', 'arguments' => []],
                     ],
                 ],
                 'common_bus' => [
-                    'default_middleware' => false,
+                    'default_middleware' => ['enabled' => false, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'common_bus.new_middleware', 'arguments' => []],
                     ],
                 ],
                 'new_bus' => [
-                    'default_middleware' => true,
+                    'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'new_bus.middleware', 'arguments' => []],
                     ],
@@ -433,7 +433,10 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
 
         $config = $processor->processConfiguration($configuration, [
-            ['lock' => ['enabled' => false]],
+            [
+                'http_method_override' => false,
+                'lock' => ['enabled' => false],
+            ],
         ]);
 
         $this->assertFalse($config['lock']['enabled']);
@@ -448,7 +451,10 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
 
         $processor->processConfiguration($configuration, [
-            ['lock' => ['enabled' => true]],
+            [
+                'http_method_override' => false,
+                'lock' => ['enabled' => true],
+            ],
         ]);
     }
 
@@ -557,6 +563,7 @@ class ConfigurationTest extends TestCase
                 'https_port' => 443,
                 'strict_requirements' => true,
                 'utf8' => true,
+                'cache_dir' => '%kernel.cache_dir%',
             ],
             'session' => [
                 'enabled' => false,
@@ -631,7 +638,7 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 'default_bus' => null,
-                'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
+                'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
                 'reset_on_message' => true,
             ],
             'disallow_search_engine_index' => true,
@@ -648,6 +655,7 @@ class ConfigurationTest extends TestCase
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
+                'message_bus' => null,
                 'chatter_transports' => [],
                 'texter_transports' => [],
                 'channel_policy' => [],

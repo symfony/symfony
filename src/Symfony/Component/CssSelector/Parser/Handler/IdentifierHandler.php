@@ -38,9 +38,6 @@ class IdentifierHandler implements HandlerInterface
         $this->escaping = $escaping;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Reader $reader, TokenStream $stream): bool
     {
         $match = $reader->findPattern($this->patterns->getIdentifierPattern());

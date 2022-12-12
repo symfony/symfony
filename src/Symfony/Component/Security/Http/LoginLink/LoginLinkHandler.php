@@ -44,9 +44,9 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         ], $options);
     }
 
-    public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, Request $request = null, int $lifetime = null): LoginLinkDetails
     {
-        $expires = time() + $this->options['lifetime'];
+        $expires = time() + ($lifetime ?: $this->options['lifetime']);
         $expiresAt = new \DateTimeImmutable('@'.$expires);
 
         $parameters = [
@@ -89,8 +89,12 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             throw new InvalidLoginLinkException('User not found.', 0, $exception);
         }
 
-        $hash = $request->get('hash');
-        $expires = $request->get('expires');
+        if (!$hash = $request->get('hash')) {
+            throw new InvalidLoginLinkException('Missing "hash" parameter.');
+        }
+        if (!$expires = $request->get('expires')) {
+            throw new InvalidLoginLinkException('Missing "expires" parameter.');
+        }
 
         try {
             $this->signatureHasher->verifySignatureHash($user, $expires, $hash);

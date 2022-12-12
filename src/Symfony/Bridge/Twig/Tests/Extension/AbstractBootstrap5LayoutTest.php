@@ -404,6 +404,21 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
         );
     }
 
+    public function testCheckboxToggleWithValue()
+    {
+        $form = $this->factory->createNamed('name', CheckboxType::class, false, [
+            'value' => 'foo&bar',
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'btn-check my&class'], 'label_attr' => ['class' => 'btn btn-primary']],
+            '/input[@type="checkbox"][@name="name"][@id="my&id"][@class="btn-check my&class"][@value="foo&bar"]
+        /following-sibling::label
+            [@class="btn btn-primary required"]
+            [.="[trans]Name[/trans]"]
+'
+        );
+    }
+
     public function testMultipleChoiceSkipsPlaceholder()
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, ['&a'], [
@@ -1450,7 +1465,7 @@ abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
             '/div
-    [@class="input-group"]
+    [@class="input-group "]
     [
         ./span
             [@class="input-group-text"]

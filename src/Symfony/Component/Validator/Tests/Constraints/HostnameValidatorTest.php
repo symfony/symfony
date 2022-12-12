@@ -207,7 +207,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    protected function createValidator()
+    protected function createValidator(): HostnameValidator
     {
         return new HostnameValidator();
     }

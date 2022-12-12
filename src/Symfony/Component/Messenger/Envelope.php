@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 final class Envelope
 {
     /**
-     * @var array<string, list<StampInterface>>
+     * @var array<class-string<StampInterface>, list<StampInterface>>
      */
     private array $stamps = [];
     private object $message;
@@ -35,7 +35,7 @@ final class Envelope
         $this->message = $message;
 
         foreach ($stamps as $stamp) {
-            $this->stamps[\get_class($stamp)][] = $stamp;
+            $this->stamps[$stamp::class][] = $stamp;
         }
     }
 
@@ -59,7 +59,7 @@ final class Envelope
         $cloned = clone $this;
 
         foreach ($stamps as $stamp) {
-            $cloned->stamps[\get_class($stamp)][] = $stamp;
+            $cloned->stamps[$stamp::class][] = $stamp;
         }
 
         return $cloned;
@@ -106,7 +106,13 @@ final class Envelope
     }
 
     /**
+     * @template TStamp of StampInterface
+     *
+     * @param class-string<TStamp>|null $stampFqcn
+     *
      * @return StampInterface[]|StampInterface[][] The stamps for the specified FQCN, or all stamps by their class name
+     *
+     * @psalm-return ($stampFqcn is string : array<class-string<StampInterface>, list<StampInterface>> ? list<TStamp>)
      */
     public function all(string $stampFqcn = null): array
     {

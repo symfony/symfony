@@ -33,7 +33,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     public static function setUpBeforeClass(): void
     {
         if (!MemcachedAdapter::isSupported()) {
-            throw new SkippedTestSuiteError('Extension memcached '.(\PHP_VERSION_ID >= 80100 ? '> 3.1.5' : '>= 2.2.0').' required.');
+            throw new SkippedTestSuiteError('Extension memcached > 3.1.5 required.');
         }
         self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]);
         self::$client->get('foo');
@@ -142,7 +142,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             'localhost',
             11222,
         ];
-        if (filter_var(\ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(\ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOL)) {
             yield [
                 'memcached://user:password@127.0.0.1?weight=50',
                 '127.0.0.1',
@@ -159,7 +159,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             '/var/local/run/memcached.socket',
             0,
         ];
-        if (filter_var(\ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(\ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOL)) {
             yield [
                 'memcached://user:password@/var/local/run/memcached.socket?weight=25',
                 '/var/local/run/memcached.socket',

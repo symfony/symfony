@@ -222,7 +222,7 @@ class ChoiceFormField extends FormField
             }
 
             // if no option is selected and if it is a simple select box, take the first option as the value
-            if (!$found && !$this->multiple && !empty($this->options)) {
+            if (!$found && !$this->multiple && $this->options) {
                 $this->value = $this->options[0]['value'];
             }
         }

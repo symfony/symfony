@@ -537,7 +537,7 @@ class OptionsResolver implements Options
         }
 
         if ($forcePrepend) {
-            $this->normalizers[$option] = $this->normalizers[$option] ?? [];
+            $this->normalizers[$option] ??= [];
             array_unshift($this->normalizers[$option], $normalizer);
         } else {
             $this->normalizers[$option][] = $normalizer;
@@ -1222,7 +1222,7 @@ class OptionsResolver implements Options
     private function formatValue(mixed $value): string
     {
         if (\is_object($value)) {
-            return \get_class($value);
+            return $value::class;
         }
 
         if (\is_array($value)) {

@@ -44,6 +44,7 @@ final class Mailer implements MailerInterface
             return;
         }
 
+        $stamps = [];
         if (null !== $this->dispatcher) {
             // The dispatched event here has `queued` set to `true`; the goal is NOT to render the message, but to let
             // listeners do something before a message is sent to the queue.
@@ -54,10 +55,11 @@ final class Mailer implements MailerInterface
             $clonedEnvelope = null !== $envelope ? clone $envelope : Envelope::create($clonedMessage);
             $event = new MessageEvent($clonedMessage, $clonedEnvelope, (string) $this->transport, true);
             $this->dispatcher->dispatch($event);
+            $stamps = $event->getStamps();
         }
 
         try {
-            $this->bus->dispatch(new SendEmailMessage($message, $envelope));
+            $this->bus->dispatch(new SendEmailMessage($message, $envelope), $stamps);
         } catch (HandlerFailedException $e) {
             foreach ($e->getNestedExceptions() as $nested) {
                 if ($nested instanceof TransportExceptionInterface) {

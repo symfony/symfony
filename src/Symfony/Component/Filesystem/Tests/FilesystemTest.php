@@ -1768,7 +1768,7 @@ class FilesystemTest extends FilesystemTestCase
             $this->markTestSkipped('This test is specific to Windows.');
         }
 
-        if (($userProfilePath = getenv('USERPROFILE')) === false || !is_dir($userProfilePath)) {
+        if (false === ($userProfilePath = getenv('USERPROFILE')) || !is_dir($userProfilePath)) {
             throw new \RuntimeException('Failed to retrieve user profile path.');
         }
 

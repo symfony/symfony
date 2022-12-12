@@ -38,6 +38,7 @@ class SmtpTransport extends AbstractTransport
     private int $pingThreshold = 100;
     private float $lastMessageTime = 0;
     private AbstractStream $stream;
+    private string $mtaResult = '';
     private string $domain = '[127.0.0.1]';
 
     public function __construct(AbstractStream $stream = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
@@ -146,9 +147,29 @@ class SmtpTransport extends AbstractTransport
             throw $e;
         }
 
+        if ($this->mtaResult && $messageId = $this->parseMessageId($this->mtaResult)) {
+            $message->setMessageId($messageId);
+        }
+
         $this->checkRestartThreshold();
 
         return $message;
+    }
+
+    protected function parseMessageId(string $mtaResult): string
+    {
+        $regexps = [
+            '/250 Ok (?P<id>[0-9a-f-]+)\r?$/mis',
+            '/250 Ok:? queued as (?P<id>[A-Z0-9]+)\r?$/mis',
+        ];
+        $matches = [];
+        foreach ($regexps as $regexp) {
+            if (preg_match($regexp, $mtaResult, $matches)) {
+                return $matches['id'];
+            }
+        }
+
+        return '';
     }
 
     public function __toString(): string
@@ -213,7 +234,7 @@ class SmtpTransport extends AbstractTransport
                 $this->getLogger()->debug(sprintf('Email transport "%s" stopped', __CLASS__));
                 throw $e;
             }
-            $this->executeCommand("\r\n.\r\n", [250]);
+            $this->mtaResult = $this->executeCommand("\r\n.\r\n", [250]);
             $message->appendDebug($this->stream->getDebug());
             $this->lastMessageTime = microtime(true);
         } catch (TransportExceptionInterface $e) {

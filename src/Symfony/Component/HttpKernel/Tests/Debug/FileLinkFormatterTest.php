@@ -29,7 +29,7 @@ class FileLinkFormatterTest extends TestCase
     {
         $sut = unserialize(serialize(new FileLinkFormatter()));
 
-        $this->assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
+        $this->assertSame('file:///kernel/root/src/my/very/best/file.php#L3', $sut->format('/kernel/root/src/my/very/best/file.php', 3));
     }
 
     public function testWhenFileLinkFormatAndNoRequest()

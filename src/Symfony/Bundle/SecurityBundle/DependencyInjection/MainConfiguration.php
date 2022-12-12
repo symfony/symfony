@@ -65,7 +65,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
-                ->booleanNode('enable_authenticator_manager')->defaultTrue()->end()
+                ->booleanNode('enable_authenticator_manager')->setDeprecated('symfony/security-bundle', '6.2', 'The "%node%" option at "%path%" is deprecated.')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -133,6 +133,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->prototype('array')
                         ->fixXmlConfig('ip')
                         ->fixXmlConfig('method')
+                        ->fixXmlConfig('attribute')
                         ->children()
                             ->scalarNode('request_matcher')->defaultNull()->end()
                             ->scalarNode('requires_channel')->defaultNull()->end()
@@ -147,6 +148,11 @@ class MainConfiguration implements ConfigurationInterface
                                 ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                                 ->prototype('scalar')->end()
                             ->end()
+                            ->arrayNode('attributes')
+                                ->useAttributeAsKey('key')
+                                ->prototype('scalar')->end()
+                            ->end()
+                            ->scalarNode('route')->defaultNull()->end()
                             ->arrayNode('methods')
                                 ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()
@@ -210,10 +216,23 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('logout')
                 ->treatTrueLike([])
                 ->canBeUnset()
+                ->beforeNormalization()
+                    ->ifTrue(fn ($v): bool => \is_array($v) && (isset($v['csrf_token_generator']) xor isset($v['enable_csrf'])))
+                    ->then(function (array $v): array {
+                        if (isset($v['csrf_token_generator'])) {
+                            $v['enable_csrf'] = true;
+                        } elseif ($v['enable_csrf']) {
+                            $v['csrf_token_generator'] = 'security.csrf.token_manager';
+                        }
+
+                        return $v;
+                    })
+                ->end()
                 ->children()
-                    ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
-                    ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
+                    ->booleanNode('enable_csrf')->defaultNull()->end()
                     ->scalarNode('csrf_token_id')->defaultValue('logout')->end()
+                    ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
+                    ->scalarNode('csrf_token_generator')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()
                     ->booleanNode('invalidate_session')->defaultTrue()->end()
@@ -244,6 +263,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('provider')->end()
                     ->scalarNode('parameter')->defaultValue('_switch_user')->end()
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
+                    ->scalarNode('target_route')->defaultValue(null)->end()
                 ->end()
             ->end()
             ->arrayNode('required_badges')

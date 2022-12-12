@@ -66,6 +66,69 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testResumeNoMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start(null, 15);
+        $bar->advance();
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '   15 [--------------->------------]'.
+            $this->generateOutput('   16 [---------------->-----------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeWithMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 5000, 0);
+        $bar->start(null, 1000);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            ' 1000/5000 [=====>----------------------]  20%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegularTimeEstimation()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 1_200, 0);
+        $bar->start();
+
+        $bar->advance();
+        $bar->advance();
+
+        sleep(1);
+
+        $this->assertEquals(
+            600.0,
+            $bar->getEstimated()
+        );
+    }
+
+    public function testResumedTimeEstimation()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 1_200, 0);
+        $bar->start(null, 599);
+        $bar->advance();
+
+        sleep(1);
+
+        $this->assertEquals(
+            1_200.0,
+            $bar->getEstimated()
+        );
+
+        $this->assertEquals(
+            600.0,
+            $bar->getRemaining()
+        );
+    }
+
     public function testAdvanceWithStep()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
@@ -798,6 +861,29 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
     }
 
+    public function testAddingInstancePlaceholderFormatter()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
+        $bar->setFormat(' %countdown% [%bar%]');
+        $bar->setPlaceholderFormatter('countdown', $function = function (ProgressBar $bar) {
+            return $bar->getMaxSteps() - $bar->getProgress();
+        });
+
+        $this->assertSame($function, $bar->getPlaceholderFormatter('countdown'));
+
+        $bar->start();
+        $bar->advance();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 3 [>---------------------------]'.
+            $this->generateOutput(' 2 [=========>------------------]').
+            $this->generateOutput(' 0 [============================]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testMultilineFormat()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
@@ -812,8 +898,10 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             ">---------------------------\nfoobar".
             $this->generateOutput("=========>------------------\nfoobar").
-            "\x1B[1G\x1B[2K\x1B[1A\x1B[1G\x1B[2K".
-            $this->generateOutput("============================\nfoobar"),
+            "\x1B[1G\x1B[2K\x1B[1A".
+            $this->generateOutput('').
+            $this->generateOutput('============================').
+            "\nfoobar",
             stream_get_contents($output->getStream())
         );
     }
@@ -1121,6 +1209,31 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $this->generateOutput("1/3\nABC\nFoo").
             $this->generateOutput("2/3\nA\nFoo").
             $this->generateOutput("3/3\nA\nFoo"),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testMultiLineFormatIsFullyCorrectlyWithManuallyCleanup()
+    {
+        ProgressBar::setFormatDefinition('normal_nomax', "[%bar%]\n%message%");
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setMessage('Processing "foobar"...');
+        $bar->start();
+        $bar->clear();
+        $output->writeln('Foo!');
+        $bar->display();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            "[>---------------------------]\n".
+            'Processing "foobar"...'.
+            "\x1B[1G\x1B[2K\x1B[1A".
+            $this->generateOutput('').
+            'Foo!'.\PHP_EOL.
+            $this->generateOutput('[--->------------------------]').
+            "\nProcessing \"foobar\"...".
+            $this->generateOutput("[----->----------------------]\nProcessing \"foobar\"..."),
             stream_get_contents($output->getStream())
         );
     }

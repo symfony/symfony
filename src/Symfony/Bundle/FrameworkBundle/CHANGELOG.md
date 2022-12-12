@@ -1,6 +1,34 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `DomCrawlerAssertionsTrait::assertSelectorCount(int $count, string $selector)`
+
+6.2
+---
+
+ * Add `resolve-env` option to `debug:config` command to display actual values of environment variables in dumped configuration
+ * Add `NotificationAssertionsTrait`
+ * Add option `framework.handle_all_throwables` to allow `Symfony\Component\HttpKernel\HttpKernel` to handle all kinds of `Throwable`
+ * Make `AbstractController::render()` able to deal with forms and deprecate `renderForm()`
+ * Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
+   `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+ * Add service usages list to the `debug:container` command output
+ * Add service and alias deprecation message to `debug:container [<name>]` output
+ * Tag all workflows services with `workflow`, those with type=workflow are
+   tagged with `workflow.workflow`, and those with type=state_machine with
+   `workflow.state_machine`
+ * Add `rate_limiter` configuration option to `messenger.transport` to allow rate limited transports using the RateLimiter component
+ * Remove `@internal` tag from secret vaults to allow them to be used directly outside the framework bundle and custom vaults to be added
+ * Deprecate `framework.form.legacy_error_messages` config node
+ * Add a `framework.router.cache_dir` configuration option to configure the default `Router` `cache_dir` option
+ * Add option `framework.messenger.buses.*.default_middleware.allow_no_senders` to enable throwing when a message doesn't have a sender
+ * Deprecate `AbstractController::renderForm()`, use `render()` instead
+ * Deprecate `FrameworkExtension::registerRateLimiter()`
+
 6.1
 ---
 

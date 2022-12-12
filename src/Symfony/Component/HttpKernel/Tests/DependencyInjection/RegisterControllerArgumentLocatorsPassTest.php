@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
@@ -443,6 +444,20 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
+    public function testResponseArgumentIsIgnored()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('foo', WithResponseArgument::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertEmpty(array_keys($locator), 'Response typed argument is ignored');
+    }
+
     public function testAutowireAttribute()
     {
         if (!class_exists(Autowire::class)) {
@@ -555,6 +570,13 @@ class WithTarget
         ControllerDummy $service1,
         ControllerDummy $service2
     ) {
+    }
+}
+
+class WithResponseArgument
+{
+    public function fooAction(Response $response, ?Response $nullableResponse)
+    {
     }
 }
 

@@ -68,7 +68,7 @@ class Token
             return false;
         }
 
-        if (empty($values)) {
+        if (!$values) {
             return true;
         }
 

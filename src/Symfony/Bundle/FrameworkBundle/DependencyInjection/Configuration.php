@@ -133,6 +133,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('error_controller')
                     ->defaultValue('error_controller')
                 ->end()
+                ->booleanNode('handle_all_throwables')->info('HttpKernel will handle all kinds of \Throwable')->end()
             ->end()
         ;
 
@@ -160,9 +161,9 @@ class Configuration implements ConfigurationInterface
         $this->addRequestSection($rootNode);
         $this->addAssetsSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
-        $this->addValidationSection($rootNode, $enableIfStandalone, $willBeAvailable);
+        $this->addValidationSection($rootNode, $enableIfStandalone);
         $this->addAnnotationsSection($rootNode, $willBeAvailable);
-        $this->addSerializerSection($rootNode, $enableIfStandalone, $willBeAvailable);
+        $this->addSerializerSection($rootNode, $enableIfStandalone);
         $this->addPropertyAccessSection($rootNode, $willBeAvailable);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
@@ -236,8 +237,9 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                             ->end()
                         ->end()
-                        // to be deprecated in Symfony 6.1
-                        ->booleanNode('legacy_error_messages')->end()
+                        ->booleanNode('legacy_error_messages')
+                            ->setDeprecated('symfony/framework-bundle', '6.2')
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -267,6 +269,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('allow_revalidate')->end()
                         ->integerNode('stale_while_revalidate')->end()
                         ->integerNode('stale_if_error')->end()
+                        ->booleanNode('terminate_on_cache_hit')->end()
                     ->end()
                 ->end()
             ->end()
@@ -349,7 +352,7 @@ class Configuration implements ConfigurationInterface
                                     $workflows = [];
                                 }
 
-                                if (1 === \count($workflows) && isset($workflows['workflows']) && !array_is_list($workflows['workflows']) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_marking', 'places', 'transitions']))) {
+                                if (1 === \count($workflows) && isset($workflows['workflows']) && !array_is_list($workflows['workflows']) && array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_marking', 'places', 'transitions'])) {
                                     $workflows = $workflows['workflows'];
                                 }
 
@@ -605,6 +608,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
+                        ->scalarNode('cache_dir')->defaultValue('%kernel.cache_dir%')->end()
                         ->scalarNode('default_uri')
                             ->info('The default URI used to generate URLs in a non-HTTP context')
                             ->defaultNull()
@@ -868,7 +872,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone, callable $willBeAvailable)
+    private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
@@ -978,7 +982,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone, callable $willBeAvailable)
+    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
@@ -1112,7 +1116,7 @@ class Configuration implements ConfigurationInterface
                                     ->booleanNode('public')->defaultFalse()->end()
                                     ->scalarNode('default_lifetime')
                                         ->info('Default lifetime of the pool')
-                                        ->example('"600" for 5 minutes expressed in seconds, "PT5M" for five minutes expressed as ISO 8601 time interval, or "5 minutes" as a date expression')
+                                        ->example('"300" for 5 minutes expressed in seconds, "PT5M" for five minutes expressed as ISO 8601 time interval, or "5 minutes" as a date expression')
                                     ->end()
                                     ->scalarNode('provider')
                                         ->info('Overwrite the setting from the default provider for this adapter.')
@@ -1498,6 +1502,10 @@ class Configuration implements ConfigurationInterface
                                             ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite)')->end()
                                         ->end()
                                     ->end()
+                                    ->scalarNode('rate_limiter')
+                                        ->defaultNull()
+                                        ->info('Rate limiter name to use when processing messages')
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -1516,15 +1524,36 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')
-                            ->defaultValue(['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]])
+                            ->defaultValue(['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]])
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
                                 ->addDefaultsIfNotSet()
                                 ->children()
-                                    ->enumNode('default_middleware')
-                                        ->values([true, false, 'allow_no_handlers'])
-                                        ->defaultTrue()
+                                    ->arrayNode('default_middleware')
+                                        ->beforeNormalization()
+                                            ->ifTrue(function ($defaultMiddleware) { return \is_string($defaultMiddleware) || \is_bool($defaultMiddleware); })
+                                            ->then(function ($defaultMiddleware): array {
+                                                if (\is_string($defaultMiddleware) && 'allow_no_handlers' === $defaultMiddleware) {
+                                                    return [
+                                                        'enabled' => true,
+                                                        'allow_no_handlers' => true,
+                                                        'allow_no_senders' => true,
+                                                    ];
+                                                }
+
+                                                return [
+                                                    'enabled' => $defaultMiddleware,
+                                                    'allow_no_handlers' => false,
+                                                    'allow_no_senders' => true,
+                                                ];
+                                            })
+                                        ->end()
+                                        ->canBeDisabled()
+                                        ->children()
+                                            ->booleanNode('allow_no_handlers')->defaultFalse()->end()
+                                            ->booleanNode('allow_no_senders')->defaultTrue()->end()
+                                        ->end()
                                     ->end()
                                     ->arrayNode('middleware')
                                         ->performNoDeepMerging()
@@ -1985,6 +2014,9 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('notifier')
                     ->info('Notifier configuration')
                     ->{$enableIfStandalone('symfony/notifier', Notifier::class)}()
+                    ->children()
+                        ->scalarNode('message_bus')->defaultNull()->info('The message bus to use. Defaults to the default bus if the Messenger component is installed.')->end()
+                    ->end()
                     ->fixXmlConfig('chatter_transport')
                     ->children()
                         ->arrayNode('chatter_transports')
@@ -2106,7 +2138,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->enumNode('default_uuid_version')
                             ->defaultValue(6)
-                            ->values([6, 4, 1])
+                            ->values([7, 6, 4, 1])
                         ->end()
                         ->enumNode('name_based_uuid_version')
                             ->defaultValue(5)
@@ -2117,7 +2149,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->enumNode('time_based_uuid_version')
                             ->defaultValue(6)
-                            ->values([6, 1])
+                            ->values([7, 6, 1])
                         ->end()
                         ->scalarNode('time_based_uuid_node')
                             ->cannotBeEmpty()

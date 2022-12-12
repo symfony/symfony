@@ -16,9 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class HiddenType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -31,9 +28,6 @@ class HiddenType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'hidden';

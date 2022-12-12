@@ -65,6 +65,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 
@@ -801,6 +802,19 @@ class SerializerTest extends TestCase
         $actual = $serializer->deserialize('{"false":false}', FalseBuiltInDummy::class, 'json');
 
         $this->assertEquals(new FalseBuiltInDummy(), $actual);
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testTrueBuiltInTypes()
+    {
+        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $extractor)], ['json' => new JsonEncoder()]);
+
+        $actual = $serializer->deserialize('{"true":true}', TrueBuiltInDummy::class, 'json');
+
+        $this->assertEquals(new TrueBuiltInDummy(), $actual);
     }
 
     private function serializerWithClassDiscriminator()

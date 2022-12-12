@@ -28,7 +28,17 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
 
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
+    /**
+     * Override the amount of spaces to use for indentation of nested nodes.
+     *
+     * This option only works in the constructor, not in calls to `encode`.
+     */
+    public const YAML_INDENTATION = 'yaml_indentation';
+
     public const YAML_INLINE = 'yaml_inline';
+    /**
+     * Initial indentation for root element.
+     */
     public const YAML_INDENT = 'yaml_indent';
     public const YAML_FLAGS = 'yaml_flags';
 
@@ -46,14 +56,15 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
             throw new RuntimeException('The YamlEncoder class requires the "Yaml" component. Install "symfony/yaml" to use it.');
         }
 
-        $this->dumper = $dumper ?? new Dumper();
+        if (!$dumper) {
+            $dumper = \array_key_exists(self::YAML_INDENTATION, $defaultContext) ? new Dumper($defaultContext[self::YAML_INDENTATION]) : new Dumper();
+        }
+        $this->dumper = $dumper;
         $this->parser = $parser ?? new Parser();
+        unset($defaultContext[self::YAML_INDENTATION]);
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function encode(mixed $data, string $format, array $context = []): string
     {
         $context = array_merge($this->defaultContext, $context);
@@ -65,17 +76,11 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
         return $this->dumper->dump($data, $context[self::YAML_INLINE], $context[self::YAML_INDENT], $context[self::YAML_FLAGS]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsEncoding(string $format): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function decode(string $data, string $format, array $context = []): mixed
     {
         $context = array_merge($this->defaultContext, $context);
@@ -83,9 +88,6 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
         return $this->parser->parse($data, $context[self::YAML_FLAGS]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsDecoding(string $format): bool
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;

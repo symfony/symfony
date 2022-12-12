@@ -14,6 +14,7 @@
             <directory name="src/Symfony/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/Tests" />
             <directory name="src/Symfony/*/*/*/*/Tests" />
+            <directory name="src/Symfony/Component/Intl/Resources/emoji/" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
@@ -35,5 +36,15 @@
                 <referencedClass name="UnitEnum"/>
             </errorLevel>
         </UndefinedDocblockClass>
+        <UndefinedAttributeClass>
+            <errorLevel type="suppress">
+                <!-- These classes have been added in PHP 8.2 -->
+                <referencedClass name="SensitiveParameter"/>
+            </errorLevel>
+        </UndefinedAttributeClass>
     </issueHandlers>
+
+    <forbiddenFunctions>
+        <function name="empty"/>
+    </forbiddenFunctions>
 </psalm>

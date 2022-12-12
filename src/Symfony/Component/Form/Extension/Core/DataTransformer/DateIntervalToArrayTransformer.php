@@ -19,6 +19,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * Transforms between a normalized date interval and an interval string/array.
  *
  * @author Steffen Roßkamp <steffen.rosskamp@gimmickmedia.de>
+ *
+ * @implements DataTransformerInterface<\DateInterval, array>
  */
 class DateIntervalToArrayTransformer implements DataTransformerInterface
 {

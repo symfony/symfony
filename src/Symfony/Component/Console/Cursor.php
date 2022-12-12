@@ -183,11 +183,7 @@ final class Cursor
     {
         static $isTtySupported;
 
-        if (null === $isTtySupported && \function_exists('proc_open')) {
-            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', [['file', '/dev/tty', 'r'], ['file', '/dev/tty', 'w'], ['file', '/dev/tty', 'w']], $pipes);
-        }
-
-        if (!$isTtySupported) {
+        if (!$isTtySupported ??= '/' === \DIRECTORY_SEPARATOR && stream_isatty(\STDOUT)) {
             return [1, 1];
         }
 

@@ -11,15 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\UidController;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV6;
 
-/**
- * @see UidController
- */
 class UidTest extends AbstractWebTestCase
 {
     protected function setUp(): void
@@ -31,10 +27,11 @@ class UidTest extends AbstractWebTestCase
 
     public function testArgumentValueResolverDisabled()
     {
+        $client = $this->createClient(['test_case' => 'Uid', 'root_config' => 'config_disabled.yml']);
+        $client->catchExceptions(false);
+
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\UidController::anyFormat(): Argument #1 ($userId) must be of type Symfony\Component\Uid\UuidV1, string given');
-
-        $client = $this->createClient(['test_case' => 'Uid', 'root_config' => 'config_disabled.yml']);
 
         $client->request('GET', '/1/uuid-v1/'.new UuidV1());
     }

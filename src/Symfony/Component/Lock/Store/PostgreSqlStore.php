@@ -285,6 +285,6 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
     {
         $namespace = spl_object_hash($this->getConnection());
 
-        return self::$storeRegistry[$namespace] ?? self::$storeRegistry[$namespace] = new InMemoryStore();
+        return self::$storeRegistry[$namespace] ??= new InMemoryStore();
     }
 }

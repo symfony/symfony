@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation\Extractor;
 
+trigger_deprecation('symfony/translation', '6.2', '"%s" is deprecated, use "%s" instead.', PhpExtractor::class, PhpAstExtractor::class);
+
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\MessageCatalogue;
 
@@ -18,6 +20,8 @@ use Symfony\Component\Translation\MessageCatalogue;
  * PhpExtractor extracts translation messages from a PHP template.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @deprecated since Symfony 6.2, use the PhpAstExtractor instead
  */
 class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 {
@@ -128,9 +132,6 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function extract(string|iterable $resource, MessageCatalogue $catalog)
     {
         $files = $this->extractFiles($resource);
@@ -141,9 +142,6 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;
@@ -314,9 +312,6 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         return $this->isFile($file) && 'php' === pathinfo($file, \PATHINFO_EXTENSION);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function extractFromDirectory(string|array $directory): iterable
     {
         if (!class_exists(Finder::class)) {

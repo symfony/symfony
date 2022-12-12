@@ -25,10 +25,17 @@ use Symfony\Component\Uid\UuidV4;
 class UidValueResolverTest extends TestCase
 {
     /**
+     * In Symfony 7, keep this test case but remove the call to supports()
+     *
+     * @group legacy
      * @dataProvider provideSupports
      */
     public function testSupports(bool $expected, Request $request, ArgumentMetadata $argument)
     {
+        if (!$expected) {
+            $this->assertSame([], (new UidValueResolver())->resolve($request, $argument));
+        }
+
         $this->assertSame($expected, (new UidValueResolver())->supports($request, $argument));
     }
 
@@ -56,7 +63,7 @@ class UidValueResolverTest extends TestCase
     {
         $this->assertEquals([$expected], (new UidValueResolver())->resolve(
             new Request([], [], ['id' => $requestUid]),
-            new ArgumentMetadata('id', \get_class($expected), false, false, null)
+            new ArgumentMetadata('id', $expected::class, false, false, null)
         ));
     }
 

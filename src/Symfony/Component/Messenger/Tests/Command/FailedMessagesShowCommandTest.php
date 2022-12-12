@@ -238,6 +238,62 @@ EOF;
         $this->assertStringContainsString('Showing first 1 messages.', $tester->getDisplay(true));
     }
 
+    public function testListMessagesReturnsFilteredByClassMessage()
+    {
+        $sentToFailureStamp = new SentToFailureTransportStamp('async');
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp(15),
+            $sentToFailureStamp,
+            new RedeliveryStamp(0),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->method('all')->with()->willReturn([$envelope]);
+
+        $failureTransportName = 'failure_receiver';
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
+        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', $serviceLocator);
+
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+        $this->assertStringContainsString('Things are bad!', $tester->getDisplay(true));
+        $tester->execute(['--class-filter' => 'stdClass']);
+        $this->assertStringContainsString('Things are bad!', $tester->getDisplay(true));
+        $this->assertStringContainsString('Showing 1 message(s).', $tester->getDisplay(true));
+        $this->assertStringContainsString('Displaying only \'stdClass\' messages', $tester->getDisplay(true));
+
+        $tester->execute(['--class-filter' => 'namespace\otherClass']);
+        $this->assertStringContainsString('[OK] No failed messages were found.', $tester->getDisplay(true));
+        $this->assertStringContainsString('Displaying only \'namespace\otherClass\' messages', $tester->getDisplay(true));
+    }
+
+    public function testListMessagesReturnsCountByClassName()
+    {
+        $sentToFailureStamp = new SentToFailureTransportStamp('async');
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp(15),
+            $sentToFailureStamp,
+            new RedeliveryStamp(0),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->method('all')->with()->willReturn([$envelope, $envelope]);
+
+        $failureTransportName = 'failure_receiver';
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
+        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', $serviceLocator);
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--stats' => 1]);
+        $this->assertStringContainsString('stdClass   2', $tester->getDisplay(true));
+    }
+
     public function testInvalidMessagesThrowsExceptionWithServiceLocator()
     {
         $receiver = $this->createMock(ListableReceiverInterface::class);

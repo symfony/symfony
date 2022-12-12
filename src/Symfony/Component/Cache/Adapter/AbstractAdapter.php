@@ -43,7 +43,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s").', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }
-        self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
+        self::$createCacheItem ??= \Closure::bind(
             static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
@@ -56,7 +56,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             null,
             CacheItem::class
         );
-        self::$mergeByLifetime ?? self::$mergeByLifetime = \Closure::bind(
+        self::$mergeByLifetime ??= \Closure::bind(
             static function ($deferred, $namespace, &$expiredIds, $getId, $defaultLifetime) {
                 $byLifetime = [];
                 $now = microtime(true);
@@ -94,11 +94,11 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             $opcache->setLogger($logger);
         }
 
-        if (!self::$apcuSupported = self::$apcuSupported ?? ApcuAdapter::isSupported()) {
+        if (!self::$apcuSupported ??= ApcuAdapter::isSupported()) {
             return $opcache;
         }
 
-        if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL)) {
             return $opcache;
         }
 
@@ -129,9 +129,6 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(): bool
     {
         $ok = true;

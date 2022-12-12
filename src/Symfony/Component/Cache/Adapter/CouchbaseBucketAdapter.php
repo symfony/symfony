@@ -141,24 +141,21 @@ class CouchbaseBucketAdapter extends AbstractAdapter
 
     private static function initOptions(array $options): array
     {
-        $options['username'] = $options['username'] ?? '';
-        $options['password'] = $options['password'] ?? '';
-        $options['operationTimeout'] = $options['operationTimeout'] ?? 0;
-        $options['configTimeout'] = $options['configTimeout'] ?? 0;
-        $options['configNodeTimeout'] = $options['configNodeTimeout'] ?? 0;
-        $options['n1qlTimeout'] = $options['n1qlTimeout'] ?? 0;
-        $options['httpTimeout'] = $options['httpTimeout'] ?? 0;
-        $options['configDelay'] = $options['configDelay'] ?? 0;
-        $options['htconfigIdleTimeout'] = $options['htconfigIdleTimeout'] ?? 0;
-        $options['durabilityInterval'] = $options['durabilityInterval'] ?? 0;
-        $options['durabilityTimeout'] = $options['durabilityTimeout'] ?? 0;
+        $options['username'] ??= '';
+        $options['password'] ??= '';
+        $options['operationTimeout'] ??= 0;
+        $options['configTimeout'] ??= 0;
+        $options['configNodeTimeout'] ??= 0;
+        $options['n1qlTimeout'] ??= 0;
+        $options['httpTimeout'] ??= 0;
+        $options['configDelay'] ??= 0;
+        $options['htconfigIdleTimeout'] ??= 0;
+        $options['durabilityInterval'] ??= 0;
+        $options['durabilityTimeout'] ??= 0;
 
         return $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doFetch(array $ids): iterable
     {
         $resultsCouchbase = $this->bucket->get($ids);
@@ -174,17 +171,11 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         return $results;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doHave(string $id): bool
     {
         return false !== $this->bucket->get($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doClear(string $namespace): bool
     {
         if ('' === $namespace) {
@@ -196,9 +187,6 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDelete(array $ids): bool
     {
         $results = $this->bucket->remove(array_values($ids));
@@ -213,9 +201,6 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         return 0 === \count($results);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doSave(array $values, int $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {

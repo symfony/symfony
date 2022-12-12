@@ -51,7 +51,7 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
         }
 
         return [
-            'serialize' => filter_var($query['serialize'] ?? false, \FILTER_VALIDATE_BOOLEAN),
+            'serialize' => filter_var($query['serialize'] ?? false, \FILTER_VALIDATE_BOOL),
         ];
     }
 }

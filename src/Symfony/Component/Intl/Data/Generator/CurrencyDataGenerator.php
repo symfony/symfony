@@ -48,34 +48,22 @@ class CurrencyDataGenerator extends AbstractDataGenerator
      */
     private array $currencyCodes = [];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array
     {
         return $scanner->scanLocales($sourceDir.'/curr');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
     {
         $compiler->compile($sourceDir.'/curr', $tempDir);
         $compiler->compile($sourceDir.'/misc/currencyNumericCodes.txt', $tempDir);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function preGenerate()
     {
         $this->currencyCodes = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array
     {
         $localeBundle = $reader->read($tempDir, $displayLocale);
@@ -93,9 +81,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         $rootBundle = $reader->read($tempDir, 'root');
@@ -105,9 +90,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
         $supplementalDataBundle = $reader->read($tempDir, 'supplementalData');

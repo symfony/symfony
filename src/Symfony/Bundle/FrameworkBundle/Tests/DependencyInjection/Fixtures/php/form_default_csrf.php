@@ -2,9 +2,6 @@
 
 $container->loadFromExtension('framework', [
     'http_method_override' => false,
-    'form' => [
-        'legacy_error_messages' => false,
-    ],
     'session' => [
         'storage_factory_id' => 'session.storage.factory.native',
         'handler_id' => null,

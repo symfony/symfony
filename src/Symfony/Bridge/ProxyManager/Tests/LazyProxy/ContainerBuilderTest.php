@@ -24,17 +24,18 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * with the ProxyManager bridge.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @group legacy
  */
 class ContainerBuilderTest extends TestCase
 {
     public function testCreateProxyServiceWithRuntimeInstantiator()
     {
         $builder = new ContainerBuilder();
-
         $builder->setProxyInstantiator(new RuntimeInstantiator());
 
         $builder->register('foo1', ProxyManagerBridgeFooClass::class)->setFile(__DIR__.'/Fixtures/includes/foo.php')->setPublic(true);
-        $builder->getDefinition('foo1')->setLazy(true);
+        $builder->getDefinition('foo1')->setLazy(true)->addTag('proxy', ['interface' => ProxyManagerBridgeFooClass::class]);
 
         $builder->compile();
 

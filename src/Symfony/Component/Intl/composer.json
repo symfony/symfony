@@ -27,7 +27,8 @@
         "php": ">=8.1"
     },
     "require-dev": {
-        "symfony/filesystem": "^5.4|^6.0"
+        "symfony/filesystem": "^5.4|^6.0",
+        "symfony/finder": "^5.4|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Intl\\": "" },

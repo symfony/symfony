@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class RangeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): RangeValidator
     {
         return new RangeValidator();
     }

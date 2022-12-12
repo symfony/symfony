@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar_service' => 'getBarServiceService',
@@ -49,9 +51,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBarServiceService()
+    protected static function getBarServiceService($container)
     {
-        return $this->services['bar_service'] = new \stdClass(($this->privates['baz_service'] ?? ($this->privates['baz_service'] = new \stdClass())));
+        return $container->services['bar_service'] = new \stdClass(($container->privates['baz_service'] ??= new \stdClass()));
     }
 
     /**
@@ -59,8 +61,8 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getFooServiceService()
+    protected static function getFooServiceService($container)
     {
-        return $this->services['foo_service'] = new \stdClass(($this->privates['baz_service'] ?? ($this->privates['baz_service'] = new \stdClass())));
+        return $container->services['foo_service'] = new \stdClass(($container->privates['baz_service'] ??= new \stdClass()));
     }
 }

@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,9 +15,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Inline_Self_Ref extends Container
 {
     protected $parameters = [];
+    protected readonly \WeakReference $ref;
 
     public function __construct()
     {
+        $this->ref = \WeakReference::create($this);
         $this->services = $this->privates = [];
         $this->methodMap = [
             'App\\Foo' => 'getFooService',
@@ -41,14 +43,14 @@ class Symfony_DI_PhpDumper_Test_Inline_Self_Ref extends Container
      *
      * @return \App\Foo
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
         $a = new \App\Bar();
 
         $b = new \App\Baz($a);
         $b->bar = $a;
 
-        $this->services['App\\Foo'] = $instance = new \App\Foo($b);
+        $container->services['App\\Foo'] = $instance = new \App\Foo($b);
 
         $a->foo = $instance;
 

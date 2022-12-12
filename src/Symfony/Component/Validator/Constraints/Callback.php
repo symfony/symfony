@@ -43,17 +43,11 @@ class Callback extends Constraint
         parent::__construct($options, $groups, $payload);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOption(): ?string
     {
         return 'callback';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];

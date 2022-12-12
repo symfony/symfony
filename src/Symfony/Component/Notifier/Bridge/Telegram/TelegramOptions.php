@@ -99,4 +99,29 @@ final class TelegramOptions implements MessageOptionsInterface
 
         return $this;
     }
+
+    /**
+     * @return $this
+     */
+    public function edit(int $messageId): static
+    {
+        $this->options['message_id'] = $messageId;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function answerCallbackQuery(string $callbackQueryId, bool $showAlert = false, int $cacheTime = 0): static
+    {
+        $this->options['callback_query_id'] = $callbackQueryId;
+        $this->options['show_alert'] = $showAlert;
+
+        if ($cacheTime > 0) {
+            $this->options['cache_time'] = $cacheTime;
+        }
+
+        return $this;
+    }
 }

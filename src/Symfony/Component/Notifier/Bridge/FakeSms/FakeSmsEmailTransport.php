@@ -64,8 +64,10 @@ final class FakeSmsEmailTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
+        $from = $message->getFrom() ?: $this->from;
+
         $email = (new Email())
-            ->from($this->from)
+            ->from($from)
             ->to($this->to)
             ->subject(sprintf('New SMS on phone number: %s', $message->getPhone()))
             ->html($message->getSubject())

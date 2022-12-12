@@ -21,7 +21,7 @@ jobs:
     name: Tests
 
     env:
-      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis-5.3.4
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis
 
     strategy:
       matrix:
@@ -93,7 +93,7 @@ jobs:
             echo SYMFONY_DEPRECATIONS_HELPER=weak >> $GITHUB_ENV
             cp composer.json composer.json.orig
             echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json
-            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -maxdepth 6 -type f -name composer.json -printf '%h\n')
+            php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -maxdepth 6 -type f -name composer.json -printf '%h\n' | grep -v src/Symfony/Component/Intl/Resources/emoji)
             mv composer.json composer.json.phpunit
             mv composer.json.orig composer.json
           fi

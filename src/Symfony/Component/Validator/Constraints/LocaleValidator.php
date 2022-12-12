@@ -24,9 +24,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class LocaleValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Locale) {

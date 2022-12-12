@@ -87,7 +87,7 @@ class HttpBrowser extends AbstractBrowser
             return [$part->bodyToIterable(), $part->getPreparedHeaders()->toArray()];
         }
 
-        if (empty($fields)) {
+        if (!$fields) {
             return ['', []];
         }
 

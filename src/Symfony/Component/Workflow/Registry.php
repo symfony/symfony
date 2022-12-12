@@ -17,6 +17,8 @@ use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @internal since Symfony 6.2. Inject the workflow where you need it.
  */
 class Registry
 {

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class IssnValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IssnValidator
     {
         return new IssnValidator();
     }

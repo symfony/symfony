@@ -35,7 +35,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature1()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature1']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature1(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', self::class, false, false, null),
@@ -46,7 +46,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature2()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature2']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature2(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', self::class, false, true, null, true),
@@ -57,7 +57,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature3()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature3']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature3(...));
 
         $this->assertEquals([
             new ArgumentMetadata('bar', FakeClassThatDoesNotExist::class, false, false, null),
@@ -67,7 +67,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature4()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature4']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature4(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', null, false, true, 'default'),
@@ -78,7 +78,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature5()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature5']);
+        $arguments = $this->factory->createArgumentMetadata($this->signature5(...));
 
         $this->assertEquals([
             new ArgumentMetadata('foo', 'array', false, true, null, true),
@@ -154,23 +154,23 @@ class ArgumentMetadataFactoryTest extends TestCase
         ], $arguments);
     }
 
-    private function signature1(self $foo, array $bar, callable $baz)
+    public function signature1(self $foo, array $bar, callable $baz)
     {
     }
 
-    private function signature2(self $foo = null, FakeClassThatDoesNotExist $bar = null, ImportedAndFake $baz = null)
+    public function signature2(self $foo = null, FakeClassThatDoesNotExist $bar = null, ImportedAndFake $baz = null)
     {
     }
 
-    private function signature3(FakeClassThatDoesNotExist $bar, ImportedAndFake $baz)
+    public function signature3(FakeClassThatDoesNotExist $bar, ImportedAndFake $baz)
     {
     }
 
-    private function signature4($foo = 'default', $bar = 500, $baz = [])
+    public function signature4($foo = 'default', $bar = 500, $baz = [])
     {
     }
 
-    private function signature5(array $foo = null, $bar = null)
+    public function signature5(array $foo = null, $bar = null)
     {
     }
 }

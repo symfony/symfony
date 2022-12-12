@@ -24,7 +24,7 @@ function choice_callback()
 
 class ChoiceValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): ChoiceValidator
     {
         return new ChoiceValidator();
     }
@@ -341,6 +341,36 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ choices }}', '1, 2, 3')
             ->setInvalidValue('3')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testMatchFalse()
+    {
+        $this->validator->validate('foo', new Choice([
+            'choices' => ['foo', 'bar'],
+            'match' => false,
+        ]));
+
+        $this->buildViolation('The value you selected is not a valid choice.')
+            ->setParameter('{{ value }}', '"foo"')
+            ->setParameter('{{ choices }}', '"foo", "bar"')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testMatchFalseWithMultiple()
+    {
+        $this->validator->validate(['ccc', 'bar', 'zzz'], new Choice([
+            'choices' => ['foo', 'bar'],
+            'multiple' => true,
+            'match' => false,
+        ]));
+
+        $this->buildViolation('One or more of the given values is invalid.')
+            ->setParameter('{{ value }}', '"bar"')
+            ->setParameter('{{ choices }}', '"foo", "bar"')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
+            ->setInvalidValue('bar')
             ->assertRaised();
     }
 }

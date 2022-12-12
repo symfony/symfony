@@ -11,7 +11,15 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -33,6 +41,10 @@ class SecurityTest extends AbstractWebTestCase
         $security = $container->get('functional_test.security.helper');
         $this->assertTrue($security->isGranted('ROLE_USER'));
         $this->assertSame($token, $security->getToken());
+        $request = new Request();
+        $request->server->set('REQUEST_URI', '/main/foo');
+        $this->assertInstanceOf(FirewallConfig::class, $firewallConfig = $security->getFirewallConfig($request));
+        $this->assertSame('main', $firewallConfig->getName());
     }
 
     /**
@@ -77,6 +89,77 @@ class SecurityTest extends AbstractWebTestCase
             ],
         ];
     }
+
+    /**
+     * @testWith    ["form_login"]
+     *              ["Symfony\\Bundle\\SecurityBundle\\Tests\\Functional\\Bundle\\AuthenticatorBundle\\ApiAuthenticator"]
+     */
+    public function testLogin(string $authenticator)
+    {
+        $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml', 'debug' > true]);
+        static::getContainer()->get(ForceLoginController::class)->authenticator = $authenticator;
+        $client->request('GET', '/main/force-login');
+        $response = $client->getResponse();
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @chalasr!'], json_decode($response->getContent(), true));
+        $this->assertSame('chalasr', static::getContainer()->get('security.helper')->getUser()->getUserIdentifier());
+    }
+
+    public function testLogout()
+    {
+        $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml', 'debug' => true]);
+        $client->loginUser(new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']), 'main');
+
+        $client->request('GET', '/main/force-logout');
+        $response = $client->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertNull(static::getContainer()->get('security.helper')->getUser());
+        $this->assertSame(['message' => 'Logout successful'], json_decode($response->getContent(), true));
+    }
+
+    public function testLogoutWithCsrf()
+    {
+        $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config_logout_csrf.yml', 'debug' => true]);
+        $client->loginUser(new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']), 'main');
+
+        // put a csrf token in the storage
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $setCsrfToken = function (RequestEvent $event) {
+            static::getContainer()->get('security.csrf.token_storage')->setToken('logout', 'bar');
+            $event->setResponse(new Response(''));
+        };
+        $eventDispatcher->addListener(KernelEvents::REQUEST, $setCsrfToken);
+        try {
+            $client->request('GET', '/'.uniqid('', true));
+        } finally {
+            $eventDispatcher->removeListener(KernelEvents::REQUEST, $setCsrfToken);
+        }
+
+        static::getContainer()->get(LogoutController::class)->checkCsrf = true;
+        $client->request('GET', '/main/force-logout', ['_csrf_token' => 'bar']);
+        $response = $client->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertNull(static::getContainer()->get('security.helper')->getUser());
+        $this->assertSame(['message' => 'Logout successful'], json_decode($response->getContent(), true));
+    }
+
+    public function testLogoutBypassCsrf()
+    {
+        $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config_logout_csrf.yml']);
+        $client->loginUser(new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']), 'main');
+
+        $client->request('GET', '/main/force-logout');
+        $response = $client->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertNull(static::getContainer()->get('security.helper')->getUser());
+        $this->assertSame(['message' => 'Logout successful'], json_decode($response->getContent(), true));
+    }
 }
 
 final class UserWithoutEquatable implements UserInterface, PasswordAuthenticatedUserInterface
@@ -109,33 +192,21 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
         return $this->getUserIdentifier();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles(): array
     {
         return $this->roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt(): string
     {
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsername(): string
     {
         return $this->username;
@@ -146,42 +217,68 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
         return $this->username;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAccountNonExpired(): bool
     {
         return $this->accountNonExpired;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAccountNonLocked(): bool
     {
         return $this->accountNonLocked;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCredentialsNonExpired(): bool
     {
         return $this->credentialsNonExpired;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEnabled(): bool
     {
         return $this->enabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials(): void
     {
+    }
+}
+
+class ForceLoginController
+{
+    public $authenticator = 'form_login';
+
+    public function __construct(private Security $security)
+    {
+    }
+
+    public function welcome()
+    {
+        $user = new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']);
+        $this->security->login($user, $this->authenticator);
+
+        return new JsonResponse(['message' => sprintf('Welcome @%s!', $this->security->getUser()->getUserIdentifier())]);
+    }
+}
+
+class LogoutController
+{
+    public $checkCsrf = false;
+
+    public function __construct(private Security $security)
+    {
+    }
+
+    public function logout(UserInterface $user)
+    {
+        $this->security->logout($this->checkCsrf);
+
+        return new JsonResponse(['message' => 'Logout successful']);
+    }
+}
+
+class LoggedInController
+{
+    public function __invoke(UserInterface $user)
+    {
+        return new JsonResponse(['message' => sprintf('Welcome back @%s', $user->getUserIdentifier())]);
     }
 }

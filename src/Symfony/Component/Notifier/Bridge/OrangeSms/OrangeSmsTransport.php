@@ -29,7 +29,7 @@ final class OrangeSmsTransport extends AbstractTransport
     private string $from;
     private ?string $senderName;
 
-    public function __construct(string $clientID, string $clientSecret, string $from, string $senderName = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $clientID, #[\SensitiveParameter] string $clientSecret, string $from, string $senderName = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->clientID = $clientID;
         $this->clientSecret = $clientSecret;
@@ -59,7 +59,9 @@ final class OrangeSmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $url = 'https://'.$this->getEndpoint().'/smsmessaging/v1/outbound/'.urlencode('tel:'.$this->from).'/requests';
+        $from = $message->getFrom() ?: $this->from;
+
+        $url = 'https://'.$this->getEndpoint().'/smsmessaging/v1/outbound/'.urlencode('tel:'.$from).'/requests';
         $headers = [
             'Authorization' => 'Bearer '.$this->getAccessToken(),
             'Content-Type' => 'application/json',
@@ -68,7 +70,7 @@ final class OrangeSmsTransport extends AbstractTransport
         $payload = [
             'outboundSMSMessageRequest' => [
                 'address' => 'tel:'.$message->getPhone(),
-                'senderAddress' => 'tel:'.$this->from,
+                'senderAddress' => 'tel:'.$from,
                 'outboundSMSTextMessage' => [
                     'message' => $message->getSubject(),
                 ],

@@ -20,8 +20,10 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -31,9 +33,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  */
 class MessengerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $busIds = [];
@@ -109,6 +108,8 @@ class MessengerPass implements CompilerPassInterface
 
                     if (isset($options['bus'])) {
                         if (!\in_array($options['bus'], $busIds)) {
+                            // @deprecated since Symfony 6.2, in 7.0 change to:
+                            // $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
                             $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
 
                             throw new RuntimeException(sprintf('Invalid configuration "%s" for message "%s": bus "%s" does not exist.', $messageLocation, $message, $options['bus']));
@@ -118,6 +119,8 @@ class MessengerPass implements CompilerPassInterface
                     }
 
                     if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
+                        // @deprecated since Symfony 6.2, in 7.0 change to:
+                        // $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method);
                         $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
 
                         throw new RuntimeException(sprintf('Invalid handler service "%s": class or interface "%s" "%s" not found.', $serviceId, $message, $messageLocation));
@@ -200,7 +203,13 @@ class MessengerPass implements CompilerPassInterface
     private function guessHandledClasses(\ReflectionClass $handlerClass, string $serviceId, string $methodName): iterable
     {
         if ($handlerClass->implementsInterface(MessageSubscriberInterface::class)) {
+            trigger_deprecation('symfony/messenger', '6.2', 'Implementing "%s" is deprecated, use the "%s" attribute instead.', MessageSubscriberInterface::class, AsMessageHandler::class);
+
             return $handlerClass->getName()::getHandledMessages();
+        }
+
+        if ($handlerClass->implementsInterface(MessageHandlerInterface::class)) {
+            trigger_deprecation('symfony/messenger', '6.2', 'Implementing "%s" is deprecated, use the "%s" attribute instead.', MessageHandlerInterface::class, AsMessageHandler::class);
         }
 
         try {
@@ -313,6 +322,11 @@ class MessengerPass implements CompilerPassInterface
 
         if ($container->hasDefinition('console.command.messenger_setup_transports')) {
             $container->getDefinition('console.command.messenger_setup_transports')
+                ->replaceArgument(1, array_values($receiverNames));
+        }
+
+        if ($container->hasDefinition('console.command.messenger_stats')) {
+            $container->getDefinition('console.command.messenger_stats')
                 ->replaceArgument(1, array_values($receiverNames));
         }
 

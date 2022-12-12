@@ -55,7 +55,7 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
         return $this->callController(...);
     }
 
-    public function getArguments(Request $request, callable $controller): array
+    public function getArguments(Request $request, callable $controller, \ReflectionFunctionAbstract $reflector = null): array
     {
         return [$request];
     }

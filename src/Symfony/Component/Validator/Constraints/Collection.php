@@ -41,9 +41,6 @@ class Collection extends Composite
     public $extraFieldsMessage = 'This field was not expected.';
     public $missingFieldsMessage = 'This field is missing.';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(mixed $fields = null, array $groups = null, mixed $payload = null, bool $allowExtraFields = null, bool $allowMissingFields = null, string $extraFieldsMessage = null, string $missingFieldsMessage = null)
     {
         // no known options set? $fields is the fields array
@@ -60,9 +57,6 @@ class Collection extends Composite
         $this->missingFieldsMessage = $missingFieldsMessage ?? $this->missingFieldsMessage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function initializeNestedConstraints()
     {
         parent::initializeNestedConstraints();

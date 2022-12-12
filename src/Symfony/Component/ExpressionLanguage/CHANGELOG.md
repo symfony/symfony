@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add support for null-coalescing syntax
+
 6.1
 ---
 

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Tag\TaggedValue;
+use Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum;
 use Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\Yaml\Yaml;
 
@@ -72,11 +73,43 @@ class InlineTest extends TestCase
         Inline::parse('!php/const WRONG_CONSTANT', Yaml::PARSE_CONSTANT);
     }
 
+    public function testParsePhpEnumThrowsExceptionWhenUndefined()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The enum "SomeEnum::Foo" is not defined');
+        Inline::parse('!php/enum SomeEnum::Foo', Yaml::PARSE_CONSTANT);
+    }
+
+    public function testParsePhpEnumThrowsExceptionWhenNotAnEnum()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The string "PHP_INT_MAX" is not the name of a valid enum');
+        Inline::parse('!php/enum PHP_INT_MAX', Yaml::PARSE_CONSTANT);
+    }
+
+    public function testParsePhpEnumThrowsExceptionWhenNotBacked()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The enum "Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR" defines no value next to its name');
+        Inline::parse('!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR->value', Yaml::PARSE_CONSTANT);
+    }
+
     public function testParsePhpConstantThrowsExceptionOnInvalidType()
     {
+        $this->assertNull(Inline::parse('!php/const PHP_INT_MAX'));
+
         $this->expectException(ParseException::class);
         $this->expectExceptionMessageMatches('#The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#');
         Inline::parse('!php/const PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+    }
+
+    public function testParsePhpEnumThrowsExceptionOnInvalidType()
+    {
+        $this->assertNull(Inline::parse('!php/enum SomeEnum::Foo'));
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('#The string "!php/enum SomeEnum::Foo" could not be parsed as an enum.*#');
+        Inline::parse('!php/enum SomeEnum::Foo', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
     /**
@@ -540,10 +573,10 @@ class InlineTest extends TestCase
      */
     public function testParseTimestampAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond, string $timezone)
     {
-        $expected = new \DateTime($yaml);
-        $expected->setTimeZone(new \DateTimeZone('UTC'));
-        $expected->setDate($year, $month, $day);
-        $expected->setTime($hour, $minute, $second, $microsecond);
+        $expected = (new \DateTime($yaml))
+            ->setTimeZone(new \DateTimeZone('UTC'))
+            ->setDate($year, $month, $day)
+            ->setTime($hour, $minute, $second, $microsecond);
 
         $date = Inline::parse($yaml, Yaml::PARSE_DATETIME);
         $this->assertEquals($expected, $date);
@@ -565,10 +598,10 @@ class InlineTest extends TestCase
      */
     public function testParseNestedTimestampListAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond)
     {
-        $expected = new \DateTime($yaml);
-        $expected->setTimeZone(new \DateTimeZone('UTC'));
-        $expected->setDate($year, $month, $day);
-        $expected->setTime($hour, $minute, $second, $microsecond);
+        $expected = (new \DateTime($yaml))
+            ->setTimeZone(new \DateTimeZone('UTC'))
+            ->setDate($year, $month, $day)
+            ->setTime($hour, $minute, $second, $microsecond);
 
         $expectedNested = ['nested' => [$expected]];
         $yamlNested = "{nested: [$yaml]}";
@@ -589,11 +622,21 @@ class InlineTest extends TestCase
         $this->assertSame("!php/const Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
     }
 
+    public function testParseUnitEnum()
+    {
+        $this->assertSame(FooUnitEnum::BAR, Inline::parse("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Yaml::PARSE_CONSTANT));
+    }
+
+    public function testParseBackedEnumValue()
+    {
+        $this->assertSame(FooBackedEnum::BAR->value, Inline::parse("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR->value", Yaml::PARSE_CONSTANT));
+    }
+
     public function getDateTimeDumpTests()
     {
         $tests = [];
 
-        $dateTime = new \DateTime('2001-12-15 21:59:43', new \DateTimeZone('UTC'));
+        $dateTime = new \DateTimeImmutable('2001-12-15 21:59:43', new \DateTimeZone('UTC'));
         $tests['date-time-utc'] = [$dateTime, '2001-12-15T21:59:43+00:00'];
 
         $dateTime = new \DateTimeImmutable('2001-07-15 21:59:43', new \DateTimeZone('Europe/Berlin'));
@@ -741,6 +784,24 @@ class InlineTest extends TestCase
         $this->assertSame('', $value['foo']->getValue());
     }
 
+    public function testTagWithQuotedInteger()
+    {
+        $value = Inline::parse('!number "5"', Yaml::PARSE_CUSTOM_TAGS);
+
+        $this->assertInstanceOf(TaggedValue::class, $value);
+        $this->assertSame('number', $value->getTag());
+        $this->assertSame('5', $value->getValue());
+    }
+
+    public function testTagWithUnquotedInteger()
+    {
+        $value = Inline::parse('!number 5', Yaml::PARSE_CUSTOM_TAGS);
+
+        $this->assertInstanceOf(TaggedValue::class, $value);
+        $this->assertSame('number', $value->getTag());
+        $this->assertSame(5, $value->getValue());
+    }
+
     public function testUnfinishedInlineMap()
     {
         $this->expectException(ParseException::class);
@@ -816,6 +877,17 @@ class InlineTest extends TestCase
         $this->expectExceptionMessage('Missing value for tag "!php/const" at line 1 (near "!php/const").');
 
         Inline::parse($value, Yaml::PARSE_CONSTANT);
+    }
+
+    /**
+     * @dataProvider phpConstTagWithEmptyValueProvider
+     */
+    public function testPhpEnumTagWithEmptyValue(string $value)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Missing value for tag "!php/enum" at line 1 (near "!php/enum").');
+
+        Inline::parse(str_replace('!php/const', '!php/enum', $value), Yaml::PARSE_CONSTANT);
     }
 
     public function phpConstTagWithEmptyValueProvider()

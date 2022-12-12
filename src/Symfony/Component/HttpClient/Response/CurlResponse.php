@@ -68,7 +68,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->info['http_method'] = $method;
         $this->info['user_data'] = $options['user_data'] ?? null;
         $this->info['max_duration'] = $options['max_duration'] ?? null;
-        $this->info['start_time'] = $this->info['start_time'] ?? microtime(true);
+        $this->info['start_time'] ??= microtime(true);
         $this->info['original_url'] = $originalUrl ?? $this->info['url'] ?? curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL);
         $info = &$this->info;
         $headers = &$this->headers;
@@ -204,9 +204,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getInfo(string $type = null): mixed
     {
         if (!$info = $this->finalInfo) {
@@ -235,9 +232,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         return null !== $type ? $info[$type] ?? null : $info;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent(bool $throw = true): string
     {
         $performing = self::$performing;
@@ -265,9 +259,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private static function schedule(self $response, array &$runningResponses): void
     {
         if (isset($runningResponses[$i = (int) $response->multi->handle])) {
@@ -284,8 +275,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param CurlClientState $multi
      */
     private static function perform(ClientState $multi, array &$responses = null): void
@@ -343,8 +332,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param CurlClientState $multi
      */
     private static function select(ClientState $multi, float $timeout): int

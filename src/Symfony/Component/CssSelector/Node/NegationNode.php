@@ -42,9 +42,6 @@ class NegationNode extends AbstractNode
         return $this->subSelector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSpecificity(): Specificity
     {
         return $this->selector->getSpecificity()->plus($this->subSelector->getSpecificity());

@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  */
 class LdapUserProviderTest extends TestCase
 {
-    public function testLoadUserByUsernameFailsIfCantConnectToLdap()
+    public function testLoadUserByIdentifierFailsIfCantConnectToLdap()
     {
         $this->expectException(ConnectionException::class);
 
@@ -42,7 +42,7 @@ class LdapUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('foo');
     }
 
-    public function testLoadUserByUsernameFailsIfNoLdapEntries()
+    public function testLoadUserByIdentifierFailsIfNoLdapEntries()
     {
         $this->expectException(UserNotFoundException::class);
 
@@ -74,7 +74,7 @@ class LdapUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('foo');
     }
 
-    public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry()
+    public function testLoadUserByIdentifierFailsIfMoreThanOneLdapEntry()
     {
         $this->expectException(UserNotFoundException::class);
 
@@ -106,7 +106,7 @@ class LdapUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('foo');
     }
 
-    public function testLoadUserByUsernameFailsIfMoreThanOneLdapPasswordsInEntry()
+    public function testLoadUserByIdentifierFailsIfMoreThanOneLdapPasswordsInEntry()
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -143,11 +143,11 @@ class LdapUserProviderTest extends TestCase
             ->willReturn($query)
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword');
         $this->assertInstanceOf(LdapUser::class, $provider->loadUserByIdentifier('foo'));
     }
 
-    public function testLoadUserByUsernameShouldNotFailIfEntryHasNoUidKeyAttribute()
+    public function testLoadUserByIdentifierShouldNotFailIfEntryHasNoUidKeyAttribute()
     {
         $result = $this->createMock(CollectionInterface::class);
         $query = $this->createMock(QueryInterface::class);
@@ -179,11 +179,11 @@ class LdapUserProviderTest extends TestCase
             ->willReturn($query)
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})');
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})');
         $this->assertInstanceOf(LdapUser::class, $provider->loadUserByIdentifier('foo'));
     }
 
-    public function testLoadUserByUsernameFailsIfEntryHasNoPasswordAttribute()
+    public function testLoadUserByIdentifierFailsIfEntryHasNoPasswordAttribute()
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -217,11 +217,11 @@ class LdapUserProviderTest extends TestCase
             ->willReturn($query)
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword');
         $this->assertInstanceOf(LdapUser::class, $provider->loadUserByIdentifier('foo'));
     }
 
-    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttribute()
+    public function testLoadUserByIdentifierIsSuccessfulWithoutPasswordAttribute()
     {
         $result = $this->createMock(CollectionInterface::class);
         $query = $this->createMock(QueryInterface::class);
@@ -257,7 +257,7 @@ class LdapUserProviderTest extends TestCase
         $this->assertInstanceOf(LdapUser::class, $provider->loadUserByIdentifier('foo'));
     }
 
-    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttributeAndWrongCase()
+    public function testLoadUserByIdentifierIsSuccessfulWithoutPasswordAttributeAndWrongCase()
     {
         $result = $this->createMock(CollectionInterface::class);
         $query = $this->createMock(QueryInterface::class);
@@ -293,7 +293,7 @@ class LdapUserProviderTest extends TestCase
         $this->assertSame('foo', $provider->loadUserByIdentifier('Foo')->getUserIdentifier());
     }
 
-    public function testLoadUserByUsernameIsSuccessfulWithPasswordAttribute()
+    public function testLoadUserByIdentifierIsSuccessfulWithPasswordAttribute()
     {
         $result = $this->createMock(CollectionInterface::class);
         $query = $this->createMock(QueryInterface::class);
@@ -329,14 +329,14 @@ class LdapUserProviderTest extends TestCase
             ->willReturn($query)
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword', ['email']);
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword', ['email']);
         $this->assertInstanceOf(LdapUser::class, $provider->loadUserByIdentifier('foo'));
     }
 
     public function testRefreshUserShouldReturnUserWithSameProperties()
     {
         $ldap = $this->createMock(LdapInterface::class);
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword', ['email']);
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword', ['email']);
 
         $user = new LdapUser(new Entry('foo'), 'foo', 'bar', ['ROLE_DUMMY'], ['email' => 'foo@symfony.com']);
 

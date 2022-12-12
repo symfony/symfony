@@ -34,7 +34,7 @@ final class MobytTransport extends AbstractTransport
     private string $from;
     private string $typeQuality;
 
-    public function __construct(string $accountSid, string $authToken, string $from, string $typeQuality = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accountSid, #[\SensitiveParameter] string $authToken, string $from, string $typeQuality = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accountSid = $accountSid;
         $this->authToken = $authToken;
@@ -74,7 +74,11 @@ final class MobytTransport extends AbstractTransport
         $options['message'] ??= $message->getSubject();
         $options['recipient'] = [$message->getPhone()];
 
-        $options['sender'] ??= $this->from;
+        if ('' !== $message->getFrom()) {
+            $options['sender'] = $message->getFrom();
+        } else {
+            $options['sender'] ??= $this->from;
+        }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/API/v1.0/REST/sms', [
             'headers' => [

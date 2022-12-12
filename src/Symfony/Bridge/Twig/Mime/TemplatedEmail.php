@@ -67,6 +67,18 @@ class TemplatedEmail extends Email
         return $this->context;
     }
 
+    public function isRendered(): bool
+    {
+        return null === $this->htmlTemplate && null === $this->textTemplate;
+    }
+
+    public function markAsRendered(): void
+    {
+        $this->textTemplate = null;
+        $this->htmlTemplate = null;
+        $this->context = [];
+    }
+
     /**
      * @internal
      */

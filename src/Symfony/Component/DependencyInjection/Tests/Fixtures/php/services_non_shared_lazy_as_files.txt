@@ -19,11 +19,13 @@ class getNonSharedFooService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->factories['non_shared_foo'] = $container->factories['non_shared_foo'] ?? function () use ($container) {
-            return self::do($container);
-        };
+        $containerRef = $container->ref;
 
-        // lazy factory for Bar\FooLazyClass
+        $container->factories['non_shared_foo'] ??= self::do(...);
+
+        if (true === $lazyLoad) {
+            return $container->createProxy('FooLazyClassGhostF814e3a', static fn () => \FooLazyClassGhostF814e3a::createLazyGhost(static fn ($proxy) => self::do($containerRef->get(), $proxy)));
+        }
 
         static $include = true;
 
@@ -33,18 +35,28 @@ class getNonSharedFooService extends ProjectServiceContainer
             $include = false;
         }
 
-        return new \Bar\FooLazyClass();
+        return $lazyLoad;
     }
 }
 
-    [Container%s/proxy.php] => <?php
+    [Container%s/FooLazyClassGhostF814e3a.php] => <?php
 
 namespace Container%s;
 
-// proxy code for Bar\FooLazyClass
+class FooLazyClassGhostF814e3a extends \Bar\FooLazyClass implements \Symfony\Component\VarExporter\LazyObjectInterface
+{
+    use \Symfony\Component\VarExporter\LazyGhostTrait;
 
-if (!\class_exists('proxy', false)) {
-    \class_alias(__NAMESPACE__.'\\proxy', 'proxy', false);
+    private const LAZY_OBJECT_PROPERTY_SCOPES = [];
+}
+
+// Help opcache.preload discover always-needed symbols
+class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
+class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
+
+if (!\class_exists('FooLazyClassGhostF814e3a', false)) {
+    \class_alias(__NAMESPACE__.'\\FooLazyClassGhostF814e3a', 'FooLazyClassGhostF814e3a', false);
 }
 
     [Container%s/ProjectServiceContainer.php] => <?php
@@ -54,8 +66,8 @@ namespace Container%s;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -69,9 +81,11 @@ class ProjectServiceContainer extends Container
     protected $targetDir;
     protected $parameters = [];
     private $buildParameters;
+    protected readonly \WeakReference $ref;
 
     public function __construct(array $buildParameters = [], $containerDir = __DIR__)
     {
+        $this->ref = \WeakReference::create($this);
         $this->buildParameters = $buildParameters;
         $this->containerDir = $containerDir;
         $this->targetDir = \dirname($containerDir);
@@ -131,7 +145,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 
 require dirname(__DIR__, %d).'%svendor/autoload.php';
 (require __DIR__.'/ProjectServiceContainer.php')->set(\Container%s\ProjectServiceContainer::class, null);
-require __DIR__.'/Container%s/proxy.php';
+require __DIR__.'/Container%s/FooLazyClassGhostF814e3a.php';
 require __DIR__.'/Container%s/getNonSharedFooService.php';
 
 $classes = [];

@@ -84,7 +84,7 @@ class TextDescriptor extends Descriptor
             'extension' => 'Extension options',
         ], $formOptions);
 
-        $this->output->title(sprintf('%s (Block prefix: "%s")', \get_class($resolvedFormType->getInnerType()), $resolvedFormType->getInnerType()->getBlockPrefix()));
+        $this->output->title(sprintf('%s (Block prefix: "%s")', $resolvedFormType->getInnerType()::class, $resolvedFormType->getInnerType()->getBlockPrefix()));
 
         if ($formOptions) {
             $this->output->table($tableHeaders, $this->buildTableRows($tableHeaders, $formOptions));
@@ -135,7 +135,7 @@ class TextDescriptor extends Descriptor
         }
         array_pop($rows);
 
-        $this->output->title(sprintf('%s (%s)', \get_class($options['type']), $options['option']));
+        $this->output->title(sprintf('%s (%s)', $options['type']::class, $options['option']));
         $this->output->table([], $rows);
     }
 
@@ -194,9 +194,7 @@ class TextDescriptor extends Descriptor
 
     private function formatClassLink(string $class, string $text = null): string
     {
-        if (null === $text) {
-            $text = $class;
-        }
+        $text ??= $class;
 
         if ('' === $fileLink = $this->getFileLink($class)) {
             return $text;

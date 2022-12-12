@@ -49,8 +49,6 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ExceptionInterface
      */
     public function validate(mixed $value, Constraint $constraint)
@@ -81,7 +79,7 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
         $url = sprintf($this->endpoint, $hashPrefix);
 
         try {
-            $result = $this->httpClient->request('GET', $url)->getContent();
+            $result = $this->httpClient->request('GET', $url, ['headers' => ['Add-Padding' => 'true']])->getContent();
         } catch (ExceptionInterface $e) {
             if ($constraint->skipOnError) {
                 return;

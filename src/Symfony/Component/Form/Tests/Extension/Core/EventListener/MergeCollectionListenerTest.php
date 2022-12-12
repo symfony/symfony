@@ -34,7 +34,7 @@ abstract class MergeCollectionListenerTest extends TestCase
 
     protected function getForm($name = 'name', $propertyPath = null)
     {
-        $propertyPath = $propertyPath ?: $name;
+        $propertyPath ??= $name;
 
         return $this->getBuilder($name)->setAttribute('property_path', $propertyPath)->getForm();
     }

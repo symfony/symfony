@@ -46,9 +46,6 @@ class AppKernel extends Kernel
         parent::__construct($environment, $debug);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContainerClass(): string
     {
         return parent::getContainerClass().substr(md5(implode('', $this->rootConfig)), -16);

@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 
@@ -30,15 +30,15 @@ class LocalizedController implements ServiceSubscriberInterface
     public function loginAction(Request $request)
     {
         // get the login error if there is one
-        if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
+        if ($request->attributes->has(SecurityRequestAttributes::AUTHENTICATION_ERROR)) {
+            $error = $request->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
         } else {
-            $error = $request->getSession()->get(Security::AUTHENTICATION_ERROR);
+            $error = $request->getSession()->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
         }
 
         return new Response($this->container->get('twig')->render('@FormLogin/Localized/login.html.twig', [
             // last username entered by the user
-            'last_username' => $request->getSession()->get(Security::LAST_USERNAME),
+            'last_username' => $request->getSession()->get(SecurityRequestAttributes::LAST_USERNAME),
             'error' => $error,
         ]));
     }
@@ -68,9 +68,6 @@ class LocalizedController implements ServiceSubscriberInterface
         return (new Response('<html><body>Homepage</body></html>'))->setPublic();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices(): array
     {
         return [

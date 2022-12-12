@@ -38,9 +38,6 @@ class UserAuthenticator implements UserAuthenticatorInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
         return $this->getForFirewall()->authenticateUser($user, $authenticator, $request, $badges);

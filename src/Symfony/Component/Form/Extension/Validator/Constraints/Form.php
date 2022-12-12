@@ -31,9 +31,6 @@ class Form extends Constraint
      */
     protected static $errorNames = self::ERROR_NAMES;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

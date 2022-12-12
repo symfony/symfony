@@ -24,9 +24,6 @@ use Symfony\Component\Uid\Ulid;
 #[AsCommand(name: 'ulid:inspect', description: 'Inspect a ULID')]
 class InspectUlidCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -44,9 +41,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
@@ -63,6 +57,7 @@ EOF
             ['toBase32 (canonical)', (string) $ulid],
             ['toBase58', $ulid->toBase58()],
             ['toRfc4122', $ulid->toRfc4122()],
+            ['toHex', $ulid->toHex()],
             new TableSeparator(),
             ['Time', $ulid->getDateTime()->format('Y-m-d H:i:s.v \U\T\C')],
         ]);

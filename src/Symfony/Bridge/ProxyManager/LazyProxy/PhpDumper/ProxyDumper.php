@@ -13,54 +13,57 @@ namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
 
 use Laminas\Code\Generator\ClassGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
+use Symfony\Bridge\ProxyManager\Internal\ProxyGenerator;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
+
+trigger_deprecation('symfony/proxy-manager-bridge', '6.3', 'The "symfony/proxy-manager-bridge" package is deprecated and can be removed from your dependencies.');
 
 /**
  * Generates dumped PHP code of proxies via reflection.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  *
+ * @deprecated since Symfony 6.3
+ *
  * @final
  */
 class ProxyDumper implements DumperInterface
 {
     private string $salt;
-    private LazyLoadingValueHolderGenerator $proxyGenerator;
+    private ProxyGenerator $proxyGenerator;
     private BaseGeneratorStrategy $classGenerator;
 
     public function __construct(string $salt = '')
     {
         $this->salt = $salt;
-        $this->proxyGenerator = new LazyLoadingValueHolderGenerator();
+        $this->proxyGenerator = new ProxyGenerator();
         $this->classGenerator = new BaseGeneratorStrategy();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isProxyCandidate(Definition $definition): bool
+    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null, string $id = null): bool
     {
+        $asGhostObject = false;
+
         return ($definition->isLazy() || $definition->hasTag('proxy')) && $this->proxyGenerator->getProxifiedClass($definition);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode): string
     {
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= sprintf(' $this->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
+            $instantiation .= sprintf(' $container->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
         }
 
-        $proxyClass = $this->getProxyClassName($definition);
+        $proxifiedClass = new \ReflectionClass($this->proxyGenerator->getProxifiedClass($definition));
+        $proxyClass = $this->getProxyClassName($proxifiedClass->name);
 
         return <<<EOF
-        if (\$lazyLoad) {
-            $instantiation \$this->createProxy('$proxyClass', function () {
-                return \\$proxyClass::staticProxyConstructor(function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
+        if (true === \$lazyLoad) {
+            $instantiation \$container->createProxy('$proxyClass', static function () use (\$containerRef) {
+                return \\$proxyClass::staticProxyConstructor(static function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$containerRef) {
+                    \$container = \$containerRef->get();
                     \$wrappedInstance = $factoryCode;
 
                     \$proxy->setProxyInitializer(null);
@@ -74,10 +77,7 @@ class ProxyDumper implements DumperInterface
 EOF;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getProxyCode(Definition $definition): string
+    public function getProxyCode(Definition $definition, string $id = null): string
     {
         $code = $this->classGenerator->generate($this->generateProxyClass($definition));
         $code = preg_replace('/^(class [^ ]++ extends )([^\\\\])/', '$1\\\\$2', $code);
@@ -85,20 +85,15 @@ EOF;
         return $code;
     }
 
-    /**
-     * Produces the proxy class name for the given definition.
-     */
-    private function getProxyClassName(Definition $definition): string
+    private function getProxyClassName(string $class): string
     {
-        $class = $this->proxyGenerator->getProxifiedClass($definition);
-
-        return preg_replace('/^.*\\\\/', '', $class).'_'.$this->getIdentifierSuffix($definition);
+        return preg_replace('/^.*\\\\/', '', $class).'_'.substr(hash('sha256', $class.$this->salt), -7);
     }
 
     private function generateProxyClass(Definition $definition): ClassGenerator
     {
-        $generatedClass = new ClassGenerator($this->getProxyClassName($definition));
         $class = $this->proxyGenerator->getProxifiedClass($definition);
+        $generatedClass = new ClassGenerator($this->getProxyClassName($class));
 
         $this->proxyGenerator->generate(new \ReflectionClass($class), $generatedClass, [
             'fluentSafe' => $definition->hasTag('proxy'),
@@ -106,12 +101,5 @@ EOF;
         ]);
 
         return $generatedClass;
-    }
-
-    private function getIdentifierSuffix(Definition $definition): string
-    {
-        $class = $this->proxyGenerator->getProxifiedClass($definition);
-
-        return substr(hash('sha256', $class.$this->salt), -7);
     }
 }

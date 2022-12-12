@@ -8,7 +8,6 @@
 
     <framework:config http-method-override="false">
         <framework:csrf-protection field-name="_custom_form" />
-        <framework:form legacy-error-messages="false" />
         <framework:session storage-factory-id="session.storage.factory.native" />
     </framework:config>
 </container>

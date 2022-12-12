@@ -49,9 +49,6 @@ class UserPasswordHashCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -100,9 +97,6 @@ EOF
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -149,7 +143,7 @@ EOF
         $hashedPassword = $hasher->hash($password, $salt);
 
         $rows = [
-            ['Hasher used', \get_class($hasher)],
+            ['Hasher used', $hasher::class],
             ['Password hash', $hashedPassword],
         ];
         if (!$emptySalt) {

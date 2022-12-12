@@ -29,9 +29,6 @@ final class AssetExtension extends AbstractExtension
         $this->packages = $packages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [

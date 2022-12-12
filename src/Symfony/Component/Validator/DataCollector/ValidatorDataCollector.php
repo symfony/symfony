@@ -37,9 +37,6 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         $this->reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         // Everything is collected once, on kernel terminate.
@@ -53,9 +50,6 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lateCollect()
     {
         $collected = $this->validator->getCollectedData();
@@ -75,9 +69,6 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         return $this->data['violations_count'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'validator';
@@ -99,7 +90,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
             FormInterface::class => function (FormInterface $f, array $a) {
                 return [
                     Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(\get_class($f->getConfig()->getType()->getInnerType())),
+                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub($f->getConfig()->getType()->getInnerType()::class),
                     Caster::PREFIX_VIRTUAL.'data' => $f->getData(),
                 ];
             },

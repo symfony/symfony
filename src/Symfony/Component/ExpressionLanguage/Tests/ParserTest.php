@@ -163,6 +163,16 @@ class ParserTest extends TestCase
                 'foo?.not()',
                 ['foo'],
             ],
+            [
+                new Node\NullCoalesceNode(new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar', true), new Node\ArgumentsNode(), Node\GetAttrNode::PROPERTY_CALL), new Node\ConstantNode('default')),
+                'foo.bar ?? "default"',
+                ['foo'],
+            ],
+            [
+                new Node\NullCoalesceNode(new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar'), new Node\ArgumentsNode(), Node\GetAttrNode::ARRAY_CALL), new Node\ConstantNode('default')),
+                'foo["bar"] ?? "default"',
+                ['foo'],
+            ],
 
             // chained calls
             [

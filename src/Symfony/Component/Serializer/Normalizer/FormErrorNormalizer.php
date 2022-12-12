@@ -22,9 +22,6 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
     public const TYPE = 'type';
     public const CODE = 'status_code';
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         $data = [
@@ -41,9 +38,6 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $data instanceof FormInterface && $data->isSubmitted() && !$data->isValid();
@@ -72,7 +66,7 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
                 'errors' => $this->convertFormErrorsToArray($child),
             ];
 
-            if (!empty($child->all())) {
+            if ($child->all()) {
                 $childData['children'] = $this->convertFormChildrenToArray($child);
             }
 
@@ -82,9 +76,6 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
         return $children;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

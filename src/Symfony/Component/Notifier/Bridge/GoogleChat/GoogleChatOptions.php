@@ -62,11 +62,25 @@ final class GoogleChatOptions implements MessageOptionsInterface
     }
 
     /**
+     * @deprecated since Symfony 6.3, use "cardV2()" instead
+     *
      * @return $this
      */
     public function card(array $card): static
     {
+        trigger_deprecation('symfony/google-chat-notifier', '6.3', '"%s()" is deprecated, use "cardV2()" instead.', __METHOD__);
+
         $this->options['cards'][] = $card;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function cardV2(array $card): static
+    {
+        $this->options['cardsV2'][] = $card;
 
         return $this;
     }

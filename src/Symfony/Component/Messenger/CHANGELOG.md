@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Deprecate `Symfony\Component\Messenger\Transport\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+
 6.2
 ---
 

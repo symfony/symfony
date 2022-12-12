@@ -11,47 +11,13 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory as BaseInMemoryTransportFactory;
+
+trigger_deprecation('symfony/messenger', '6.3', 'The "%s" class is deprecated, use "%s" instead. ', InMemoryTransportFactory::class, BaseInMemoryTransportFactory::class);
 
 /**
- * @author Gary PEGEOT <garypegeot@gmail.com>
+ * @deprecated since Symfony 6.3, use {@link BaseInMemoryTransportFactory} instead
  */
-class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterface
+class InMemoryTransportFactory extends BaseInMemoryTransportFactory
 {
-    /**
-     * @var InMemoryTransport[]
-     */
-    private array $createdTransports = [];
-
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
-    {
-        ['serialize' => $serialize] = $this->parseDsn($dsn);
-
-        return $this->createdTransports[] = new InMemoryTransport($serialize ? $serializer : null);
-    }
-
-    public function supports(string $dsn, array $options): bool
-    {
-        return str_starts_with($dsn, 'in-memory://');
-    }
-
-    public function reset()
-    {
-        foreach ($this->createdTransports as $transport) {
-            $transport->reset();
-        }
-    }
-
-    private function parseDsn(string $dsn): array
-    {
-        $query = [];
-        if ($queryAsString = strstr($dsn, '?')) {
-            parse_str(ltrim($queryAsString, '?'), $query);
-        }
-
-        return [
-            'serialize' => filter_var($query['serialize'] ?? false, \FILTER_VALIDATE_BOOL),
-        ];
-    }
 }

@@ -660,7 +660,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         if (isset($buildParameters['.container.dumper.inline_factories'])) {
             $inlineFactories = $buildParameters['.container.dumper.inline_factories'];
         } elseif ($container->hasParameter('container.dumper.inline_factories')) {
-            trigger_deprecation('symfony/http-kernel', '6.3', 'Parameter "%s" is deprecated, use ".%$1s" instead.', 'container.dumper.inline_factories');
+            trigger_deprecation('symfony/http-kernel', '6.3', 'Parameter "%s" is deprecated, use ".%1$s" instead.', 'container.dumper.inline_factories');
             $inlineFactories = $container->getParameter('container.dumper.inline_factories');
         }
 
@@ -668,7 +668,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         if (isset($buildParameters['.container.dumper.inline_class_loader'])) {
             $inlineClassLoader = $buildParameters['.container.dumper.inline_class_loader'];
         } elseif ($container->hasParameter('container.dumper.inline_class_loader')) {
-            trigger_deprecation('symfony/http-kernel', '6.3', 'Parameter "%s" is deprecated, use ".%$1s" instead.', 'container.dumper.inline_class_loader');
+            trigger_deprecation('symfony/http-kernel', '6.3', 'Parameter "%s" is deprecated, use ".%1$s" instead.', 'container.dumper.inline_class_loader');
             $inlineClassLoader = $container->getParameter('container.dumper.inline_class_loader');
         }
 

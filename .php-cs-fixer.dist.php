@@ -67,6 +67,7 @@ return (new PhpCsFixer\Config())
             // stop removing spaces on the end of the line in strings
             ->notPath('Symfony/Component/Messenger/Tests/Command/FailedMessagesShowCommandTest.php')
             // auto-generated proxies
+            ->notPath('Symfony/Component/Cache/Traits/RelayProxy.php')
             ->notPath('Symfony/Component/Cache/Traits/Redis5Proxy.php')
             ->notPath('Symfony/Component/Cache/Traits/Redis6Proxy.php')
             ->notPath('Symfony/Component/Cache/Traits/RedisCluster5Proxy.php')

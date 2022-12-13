@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-10-30T11:50:06Z
+
+I have tested this and it fixes the JS issue reported perfectly. Thanks.
+
+However, probably unrelated, there is another bug I see - watch:
+
+https://user-images.githubusercontent.com/400092/198876865-48c123b8-7f1c-4103-8c0c-cf3f94270f41.mov
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-10-30T12:31:43Z
+
+> I have tested this and it fixes the JS issue reported perfectly. Thanks.
+>
+> However, probably unrelated, there is another bug I see - watch:
+>
+>  Screen.Recording.2022-10-30.at.11.49.09.mov
+
+@PhilETaylor Hi, thanks for the feedback. Unfortunately I'm unable to view your video on my computer (probably cause I'm on linux), is there any chance you could describe the issue or send some screenshots or gifs or something?
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2022-10-30T12:35:59Z
+
+Sorry, here it is at Youtube so you should be able to view that right https://youtu.be/h5ztf03Zhjw ? The bug is at 7 seconds in when clicking the `>` next to the foreach loop, which, instead of collapsing the foreach loop next to the `>` goes on to close an unrelated dump in the trace.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-10-31T12:42:12Z
+
+> Sorry, here it is at Youtube so you should be able to view that right https://youtu.be/h5ztf03Zhjw ? The bug is at 7 seconds in when clicking the `>` next to the foreach loop, which, instead of collapsing the foreach loop next to the `>` goes on to close an unrelated dump in the trace.
+
+@PhilETaylor This looks like a javascript issue. I think it was introduced in #33486, but I'd have to look into it a little deeper. In any case, it's not related to this issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-13T10:48:31Z
+
+Oops, can you please have a look at failures on deps=low?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-12-13T11:51:02Z
+
+@nicolas-grekas Sorry about that, must've missed that one, should be good now https://github.com/symfony/symfony/pull/48048/commits/68dc72d421f8f60abd81588e6874cf3bcf23c202 . I've also rebased the branch since it was originally intended for 4.4.

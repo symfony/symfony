@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-11-20T12:40:34Z
+
+Should the `is_callable()` call in `setAttributeValue()` also be changed?
+
+---------------------------------------------------------------------------
+
+by klaussilveira at 2022-11-20T18:59:21Z
+
+@xabbuh denormalization does not seem to be affected.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-20T20:05:52Z
+
+> @xabbuh denormalization does not seem to be affected.
+
+Doe we have a test case for this? Otherwise it could be helpful to add one in this PR
+
+---------------------------------------------------------------------------
+
+by klaussilveira at 2022-11-21T15:02:09Z
+
+I was wrong! Good catch @xabbuh. Managed to reproduce it, but had to take a different approach: `method_exists` does not see protected/private methods, which are expected to be set by the Normalizer during denormalization. So I'm keeping `is_callable`, but catching the exception when Reflection fails to recognize the method existence.

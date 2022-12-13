@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2022-11-21T10:21:30Z
+
+Given that the XSD and the doc were not in sync before, I indeed doubt this is widely used.
+
+But is it possible to keep some BC layer in a `beforeNormalization` instead ? For the XSD, we would then keep a BC type for `framework:exceptions`
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-11-21T10:46:01Z
+
+I’ll give it a try. I guess it would then count as a deprecation?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-11-21T10:47:46Z
+
+Well, the deprecation will need to be added in 6.3, not in 5.4, as we cannot introduce deprecations in patch versions.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-11-21T11:32:39Z
+
+Okay I managed to add a BC layer. This is all `5.4` needs right?
+
+I’m not sure how to test it is now possible to configure `framework.exceptions` with a config builder though :thinking:

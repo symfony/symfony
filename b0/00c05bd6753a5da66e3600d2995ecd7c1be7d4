@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-03T09:04:01Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.2 <!-- see below -->".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by gndk at 2022-12-03T13:08:44Z
+
+> I don't have the time for now to check if the command has tests or not
+
+Tests for the commands are here in the `FramewordBundle`:
+
+[TranslationDebugCommandTest](https://github.com/symfony/symfony/blob/6.2/src/Symfony/Bundle/FrameworkBundle/Tests/Command/TranslationDebugCommandTest.php)
+[TranslationUpdateCommandTest](https://github.com/symfony/symfony/blob/6.2/src/Symfony/Bundle/FrameworkBundle/Tests/Command/TranslationUpdateCommandTest.php)
+
+Curious why they did not catch this 🤔
+
+> The issue is "caused by" https://github.com/symfony/symfony/blob/6.3/src/Symfony/Bridge/Twig/Extension/TranslationExtension.php#L71
+
+Maybe because they are not run with actual twig templates as fixtures?

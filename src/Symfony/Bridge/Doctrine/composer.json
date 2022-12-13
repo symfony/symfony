@@ -35,6 +35,7 @@
         "symfony/doctrine-messenger": "^5.4|^6.0",
         "symfony/property-access": "^5.4|^6.0",
         "symfony/property-info": "^5.4|^6.0",
+        "symfony/proxy-manager-bridge": "^5.4|^6.0",
         "symfony/security-core": "^6.0",
         "symfony/expression-language": "^5.4|^6.0",
         "symfony/uid": "^5.4|^6.0",

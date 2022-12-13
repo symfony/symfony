@@ -659,8 +659,8 @@ EOF
             }
         };
 
-        $this->expectDeprecation('Since symfony/http-kernel 6.3: "container.dumper.inline_factories" is deprecated, use ".container.dumper.inline_factories" instead.');
-        $this->expectDeprecation('Since symfony/http-kernel 6.3: "container.dumper.inline_class_loader" is deprecated, use ".container.dumper.inline_class_loader" instead.');
+        $this->expectDeprecation('Since symfony/http-kernel 6.3: Parameter "container.dumper.inline_factories" is deprecated, use ".container.dumper.inline_factories" instead.');
+        $this->expectDeprecation('Since symfony/http-kernel 6.3: Parameter "container.dumper.inline_class_loader" is deprecated, use ".container.dumper.inline_class_loader" instead.');
 
         $kernel->boot();
     }

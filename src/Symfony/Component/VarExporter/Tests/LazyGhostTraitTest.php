@@ -13,6 +13,7 @@ namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarExporter\Internal\LazyObjectState;
+use Symfony\Component\VarExporter\ProxyHelper;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildMagicClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildTestClass;
@@ -392,5 +393,42 @@ class LazyGhostTraitTest extends TestCase
         $this->assertSame(6, ((array) $instance)["\0".ChildTestClass::class."\0private"]);
         $this->assertSame(3, ((array) $instance)["\0".TestClass::class."\0private"]);
         $this->assertSame(1001, $counter);
+    }
+
+    public function testIndirectModification()
+    {
+        $obj = new class() {
+            public array $foo;
+        };
+        $proxy = $this->createLazyGhost($obj::class, fn () => null);
+
+        $proxy->foo[] = 123;
+
+        $this->assertSame([123], $proxy->foo);
+    }
+
+    /**
+     * @template T
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    private function createLazyGhost(string $class, \Closure|array $initializer, array $skippedProperties = null): object
+    {
+        $r = new \ReflectionClass($class);
+
+        if (str_contains($class, "\0")) {
+            $class = __CLASS__.'\\'.debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'].'_L'.$r->getStartLine();
+            class_alias($r->name, $class);
+        }
+        $proxy = str_replace($r->name, $class, ProxyHelper::generateLazyGhost($r));
+        $class = str_replace('\\', '_', $class).'_'.md5($proxy);
+
+        if (!class_exists($class, false)) {
+            eval((\PHP_VERSION_ID >= 80200 && $r->isReadOnly() ? 'readonly ' : '').'class '.$class.' '.$proxy);
+        }
+
+        return $class::createLazyGhost($initializer, $skippedProperties);
     }
 }

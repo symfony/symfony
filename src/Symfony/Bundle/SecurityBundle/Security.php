@@ -24,6 +24,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\ParameterBagUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -37,6 +38,10 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 class Security extends LegacySecurity
 {
+    public const ACCESS_DENIED_ERROR = SecurityRequestAttributes::ACCESS_DENIED_ERROR;
+    public const AUTHENTICATION_ERROR = SecurityRequestAttributes::AUTHENTICATION_ERROR;
+    public const LAST_USERNAME = SecurityRequestAttributes::LAST_USERNAME;
+
     public function __construct(private readonly ContainerInterface $container, private readonly array $authenticators = [])
     {
         parent::__construct($container, false);
@@ -111,7 +116,7 @@ class Security extends LegacySecurity
 
     private function getAuthenticator(?string $authenticatorName, string $firewallName): AuthenticatorInterface
     {
-        if (!\array_key_exists($firewallName, $this->authenticators)) {
+        if (!isset($this->authenticators[$firewallName])) {
             throw new LogicException(sprintf('No authenticators found for firewall "%s".', $firewallName));
         }
 

@@ -46,5 +46,9 @@ class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtur
     public function mixed() { }
     public function nullableMixed() { }
     public function static() { }
+    public function false() { }
+    public function true() { }
+    public function never() { }
+    public function null() { }
     public function outsideMethod() { }
 }

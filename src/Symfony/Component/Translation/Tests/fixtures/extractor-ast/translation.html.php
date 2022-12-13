@@ -54,3 +54,5 @@ EOF
 <?php echo $view['translator']->trans('variable-assignation-inlined-in-trans-method-call3', [], $domain = 'not_messages'); ?>
 
 <?php echo $view['translator']->trans(domain: $domain = 'not_messages', message: $key = 'variable-assignation-inlined-with-named-arguments-in-trans-method', parameters: $parameters = []); ?>
+
+<?php echo $view['translator']->trans(...); // should not fail ?>

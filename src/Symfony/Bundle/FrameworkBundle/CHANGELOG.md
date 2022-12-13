@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `DomCrawlerAssertionsTrait::assertSelectorCount(int $count, string $selector)`
+ * Allow to avoid `limit` definition in a RateLimiter configuration when using the `no_limit` policy
 
 6.2
 ---

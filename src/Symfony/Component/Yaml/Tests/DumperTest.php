@@ -444,8 +444,11 @@ YAML;
     {
         $data = new TaggedValue('user', ['name' => 'jane']);
 
-        // @todo Fix the dumper, the output should not be ''.
-        $expected = '';
+        $expected = <<<'YAML'
+!user
+name: jane
+
+YAML;
         $yaml = $this->dumper->dump($data, 2);
         $this->assertSame($expected, $yaml);
     }
@@ -454,9 +457,7 @@ YAML;
     {
         $data = new TaggedValue('text', "a\nb\n");
 
-        // @todo Fix the dumper, the output should not be ''.
-        $expected = '';
-        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertSame("!text |\n    a\n    b\n    ", $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     public function testDumpingTaggedValueSpecialCharsInTag()

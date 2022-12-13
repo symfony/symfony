@@ -48,7 +48,7 @@ abstract class AbstractVisitor
 
         $args = $node instanceof Node\Expr\CallLike ? $node->getRawArgs() : $node->args;
 
-        if (\count($args) < $index) {
+        if (\count($args) <= $index) {
             return [];
         }
 

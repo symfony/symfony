@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-12-13T09:13:15Z
+
+I don't know since it's a bugfix to me
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-13T09:55:31Z
+
+Should we add a link to the doc of each options somewhere? Because I would have no idea that I'd need to set this, and what it's for.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-12-13T13:39:59Z
+
+To be honest, I found this in an empiric manner :)
+
+Some ref: https://github.com/php-amqp/php-amqp/blob/master/stubs/AMQPConnection.php#L33-L36

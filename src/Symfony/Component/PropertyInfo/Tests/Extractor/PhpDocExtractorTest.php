@@ -58,8 +58,8 @@ class PhpDocExtractorTest extends TestCase
         return [
             'pub' => ['pub', null, null],
             'stat' => ['stat', null, null],
-            'foo' => ['foo', $this->isPhpDocumentorV5() ? 'Foo.' : null, null],
-            'bar' => ['bar', $this->isPhpDocumentorV5() ? 'Bar.' : null, null],
+            'foo' => ['foo', self::isPhpDocumentorV5() ? 'Foo.' : null, null],
+            'bar' => ['bar', self::isPhpDocumentorV5() ? 'Bar.' : null, null],
         ];
     }
 
@@ -125,10 +125,10 @@ class PhpDocExtractorTest extends TestCase
             ['donotexist', null, null, null],
             ['staticGetter', null, null, null],
             ['staticSetter', null, null, null],
-            ['emptyVar', null, $this->isPhpDocumentorV5() ? 'This should not be removed.' : null, null],
+            ['emptyVar', null, self::isPhpDocumentorV5() ? 'This should not be removed.' : null, null],
             [
                 'arrayWithKeys',
-                $this->isPhpDocumentorV5() ? [
+                self::isPhpDocumentorV5() ? [
                     new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING)),
                 ] : null,
                 null,
@@ -136,7 +136,7 @@ class PhpDocExtractorTest extends TestCase
             ],
             [
                 'arrayOfMixed',
-                $this->isPhpDocumentorV5() ? [
+                self::isPhpDocumentorV5() ? [
                     new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), null),
                 ] : null,
                 null,
@@ -144,7 +144,7 @@ class PhpDocExtractorTest extends TestCase
             ],
             [
                 'listOfStrings',
-                $this->isPhpDocumentorV5() ? [
+                self::isPhpDocumentorV5() ? [
                     new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)),
                 ] : null,
                 null,
@@ -417,7 +417,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'scalar')], $this->extractor->getTypes(PseudoTypeDummy::class, 'unknownPseudoType'));
     }
 
-    protected function isPhpDocumentorV5()
+    protected static function isPhpDocumentorV5()
     {
         if (class_exists(InvalidTag::class)) {
             return true;

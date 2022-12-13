@@ -101,19 +101,19 @@ class HttpCodeActivationStrategyTest extends TestCase
     {
         return [
             ['/test',  ['level' => Logger::ERROR], true],
-            ['/400',   ['level' => Logger::ERROR, 'context' => $this->getContextException(400)], true],
-            ['/400/a', ['level' => Logger::ERROR, 'context' => $this->getContextException(400)], false],
-            ['/400/b', ['level' => Logger::ERROR, 'context' => $this->getContextException(400)], false],
-            ['/400/c', ['level' => Logger::ERROR, 'context' => $this->getContextException(400)], true],
-            ['/401',   ['level' => Logger::ERROR, 'context' => $this->getContextException(401)], true],
-            ['/403',   ['level' => Logger::ERROR, 'context' => $this->getContextException(403)], false],
-            ['/404',   ['level' => Logger::ERROR, 'context' => $this->getContextException(404)], false],
-            ['/405',   ['level' => Logger::ERROR, 'context' => $this->getContextException(405)], false],
-            ['/500',   ['level' => Logger::ERROR, 'context' => $this->getContextException(500)], true],
+            ['/400',   ['level' => Logger::ERROR, 'context' => self::getContextException(400)], true],
+            ['/400/a', ['level' => Logger::ERROR, 'context' => self::getContextException(400)], false],
+            ['/400/b', ['level' => Logger::ERROR, 'context' => self::getContextException(400)], false],
+            ['/400/c', ['level' => Logger::ERROR, 'context' => self::getContextException(400)], true],
+            ['/401',   ['level' => Logger::ERROR, 'context' => self::getContextException(401)], true],
+            ['/403',   ['level' => Logger::ERROR, 'context' => self::getContextException(403)], false],
+            ['/404',   ['level' => Logger::ERROR, 'context' => self::getContextException(404)], false],
+            ['/405',   ['level' => Logger::ERROR, 'context' => self::getContextException(405)], false],
+            ['/500',   ['level' => Logger::ERROR, 'context' => self::getContextException(500)], true],
         ];
     }
 
-    private function getContextException(int $code): array
+    private static function getContextException(int $code): array
     {
         return ['exception' => new HttpException($code)];
     }

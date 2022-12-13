@@ -34,7 +34,7 @@ class DebugProcessorTest extends TestCase
 
     public function providerDatetimeFormatTests(): array
     {
-        $record = $this->getRecord();
+        $record = self::getRecord();
 
         return [
             [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), 1546300860],
@@ -58,7 +58,7 @@ class DebugProcessorTest extends TestCase
 
     public function providerDatetimeRfc3339FormatTests(): array
     {
-        $record = $this->getRecord();
+        $record = self::getRecord();
 
         return [
             [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), '2019-01-01T00:01:00.000+00:00'],
@@ -70,8 +70,8 @@ class DebugProcessorTest extends TestCase
     public function testDebugProcessor()
     {
         $processor = new DebugProcessor();
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(2, $processor->getLogs());
         $this->assertSame(1, $processor->countErrors());
@@ -89,8 +89,8 @@ class DebugProcessorTest extends TestCase
     {
         $stack = new RequestStack();
         $processor = new DebugProcessor($stack);
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(2, $processor->getLogs());
         $this->assertSame(1, $processor->countErrors());
@@ -98,8 +98,8 @@ class DebugProcessorTest extends TestCase
         $request = new Request();
         $stack->push($request);
 
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(4, $processor->getLogs());
         $this->assertSame(2, $processor->countErrors());
@@ -123,7 +123,7 @@ class DebugProcessorTest extends TestCase
         $this->assertEquals(0, $debugProcessorChild->countErrors());
     }
 
-    private function getRecord($level = Logger::WARNING, $message = 'test'): array
+    private static function getRecord($level = Logger::WARNING, $message = 'test'): array
     {
         return [
             'message' => $message,

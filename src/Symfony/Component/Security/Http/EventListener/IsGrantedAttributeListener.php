@@ -77,7 +77,7 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 10]];
+        return [KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 20]];
     }
 
     private function getIsGrantedSubject(string|Expression $subjectRef, Request $request, array $arguments): mixed

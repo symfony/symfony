@@ -101,6 +101,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
 
         $response = $event->getResponse();
         $autoCacheControl = !$response->headers->has(self::NO_AUTO_CACHE_CONTROL_HEADER);
+
         // Always remove the internal header if present
         $response->headers->remove(self::NO_AUTO_CACHE_CONTROL_HEADER);
 
@@ -201,9 +202,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
 
         if ($autoCacheControl) {
             $response
-                ->setExpires(new \DateTime())
                 ->setPrivate()
-                ->setMaxAge(0)
+                ->setMaxAge($response->getMaxAge() ?: 0)
+                ->setExpires((new \DateTime())->modify('+' . $response->getMaxAge() . ' seconds'))
                 ->headers->addCacheControlDirective('must-revalidate');
         }
 

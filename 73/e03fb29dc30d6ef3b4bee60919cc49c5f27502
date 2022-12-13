@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-10-24T17:07:50Z
+
+Could you please add a testcase to avoid further regressions? Thanks
+
+---------------------------------------------------------------------------
+
+by joaopbnogueira at 2022-10-24T20:17:50Z
+
+Hey @OskarStark, now I'm puzzled. This was triggering an error (failure to set the key/value with TTL) and I was able to set a breakpoint (on my project) and observe the `$results` as being `true`, exactly as described by another developer on issue #46384.
+
+Was trying to reproduce it using a test but it seems to be working fine, so I'm unsure about the conditions that trigger the `exec` call to return `true` instead of an array.
+
+The documentation does seem to hint that `exec` might return a bool: https://github.com/phpredis/phpredis/blob/develop/redis.stub.php
+
+I was able to verify that even if the cache set fails (due to this issue), the value is correctly written to Redis.
+
+For further context, I'm running this on a long-lived PHP process and the issue only seems to manifest itself on subsequent requests, but not on the first one.
+
+I've run tests using phpredis 5.3.7 as well as 5.3.4 (the one used on symfony's integration tests) and the results are the same.
+
+Switching to `Predis\Client` solves the issue, but this is less than ideal from a performance standpoint.

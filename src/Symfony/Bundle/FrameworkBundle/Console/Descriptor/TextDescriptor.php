@@ -614,7 +614,7 @@ class TextDescriptor extends Descriptor
             if (str_contains($r->name, '{closure}')) {
                 return 'Closure()';
             }
-            if ($class = $r->getClosureScopeClass()) {
+            if ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
                 return sprintf('%s::%s()', $class->name, $r->name);
             }
 

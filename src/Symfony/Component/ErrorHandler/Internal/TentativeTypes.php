@@ -753,6 +753,7 @@ class TentativeTypes
             'isVariadic' => 'bool',
             'isStatic' => 'bool',
             'getClosureThis' => '?object',
+            'getClosureCalledClass' => '?ReflectionClass',
             'getClosureScopeClass' => '?ReflectionClass',
             'getDocComment' => 'string|false',
             'getEndLine' => 'int|false',

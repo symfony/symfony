@@ -18,6 +18,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -1464,6 +1465,25 @@ class ApplicationTest extends TestCase
         } catch (\Error $e) {
             $this->assertSame('dymerr', $e->getMessage());
         }
+    }
+
+    public function testRunWithFindError()
+    {
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Find exception');
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        // Throws an exception when find fails
+        $commandLoader = $this->createMock(CommandLoaderInterface::class);
+        $commandLoader->method('getNames')->willThrowException(new \Error('Find exception'));
+        $application->setCommandLoader($commandLoader);
+
+        // The exception should not be ignored
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'foo']);
     }
 
     public function testRunAllowsErrorListenersToSilenceTheException()

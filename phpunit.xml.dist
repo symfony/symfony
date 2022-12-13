@@ -13,6 +13,7 @@
         <ini name="intl.default_locale" value="en" />
         <ini name="intl.error_level" value="0" />
         <ini name="memory_limit" value="-1" />
+        <env name="SYMFONY_IDE" value="" force="true" />
         <env name="DUMP_LIGHT_ARRAY" value="" />
         <env name="DUMP_STRING_LENGTH" value="" />
         <env name="LDAP_HOST" value="localhost" />

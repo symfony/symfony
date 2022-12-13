@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-13T14:49:12Z
+
+Did you consider setting IsGrantedAttributeListener's priority to 20 instead?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2022-12-13T15:06:15Z
+
+@nicolas-grekas Actually, come to think of it, I'd prefer that option, [done](https://github.com/symfony/symfony/compare/282eef492df0031e531b431c1a050efca6d30ae2..90eb89f4e9eda5e6d50001961d889b293f4c593e).

@@ -116,7 +116,7 @@ class Security extends LegacySecurity
 
     private function getAuthenticator(?string $authenticatorName, string $firewallName): AuthenticatorInterface
     {
-        if (!\array_key_exists($firewallName, $this->authenticators)) {
+        if (!isset($this->authenticators[$firewallName])) {
             throw new LogicException(sprintf('No authenticators found for firewall "%s".', $firewallName));
         }
 

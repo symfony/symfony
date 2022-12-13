@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-11-22T07:03:27Z
+
+This PR should target 6.3.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-11-22T07:44:00Z
+
+Updated base branch + added the related CHANGELOG.md entry.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2022-11-22T08:23:09Z
+
+This seems like a bugfix to me :thinking:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-11-22T09:53:23Z
+
+@MatTheCat I understand your point of view and went for a bugfix as well at first sight. Fundamentally, the `no_limit` policy works well without this PR. Here, we actually "just" improve the developer experience. I think this is why it is more considered as a feature, rather than a bugfix.

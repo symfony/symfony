@@ -233,6 +233,18 @@ class LazyProxyTraitTest extends TestCase
         $this->assertSame(234, $proxy->foo);
     }
 
+    public function testIndirectModification()
+    {
+        $obj = new class() {
+            public array $foo;
+        };
+        $proxy = $this->createLazyProxy($obj::class, fn () => $obj);
+
+        $proxy->foo[] = 123;
+
+        $this->assertSame([123], $proxy->foo);
+    }
+
     /**
      * @requires PHP 8.2
      */

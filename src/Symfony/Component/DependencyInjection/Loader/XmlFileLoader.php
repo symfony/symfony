@@ -336,7 +336,7 @@ class XmlFileLoader extends FileLoader
         $tags = $this->getChildren($service, 'tag');
 
         foreach ($tags as $tag) {
-            if ('' === $tagName = $tag->hasChildNodes() || '' === $tag->nodeValue ? $tag->getAttribute('name') : $tag->nodeValue) {
+            if ('' === $tagName = $tag->childElementCount || '' === $tag->nodeValue ? $tag->getAttribute('name') : $tag->nodeValue) {
                 throw new InvalidArgumentException(sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', (string) $service->getAttribute('id'), $file));
             }
 

@@ -32,6 +32,9 @@ class Connection
         'x-message-ttl',
     ];
 
+    /**
+     * @see https://github.com/php-amqp/php-amqp/blob/master/amqp_connection_resource.h
+     */
     private const AVAILABLE_OPTIONS = [
         'host',
         'port',
@@ -52,6 +55,7 @@ class Connection
         'write_timeout',
         'confirm_timeout',
         'connect_timeout',
+        'rpc_timeout',
         'cacert',
         'cert',
         'key',

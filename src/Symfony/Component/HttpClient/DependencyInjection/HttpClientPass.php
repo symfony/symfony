@@ -32,7 +32,7 @@ final class HttpClientPass implements CompilerPassInterface
             $container->register('.debug.'.$id, TraceableHttpClient::class)
                 ->setArguments([new Reference('.debug.'.$id.'.inner'), new Reference('debug.stopwatch', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)])
                 ->addTag('kernel.reset', ['method' => 'reset'])
-                ->setDecoratedService($id);
+                ->setDecoratedService($id, null, 5);
             $container->getDefinition('data_collector.http_client')
                 ->addMethodCall('registerClient', [$id, new Reference('.debug.'.$id)]);
         }

@@ -440,6 +440,26 @@ YAML;
         $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
+    public function testDumpingTaggedValueTopLevelAssoc()
+    {
+        $data = new TaggedValue('user', ['name' => 'jane']);
+
+        $expected = <<<'YAML'
+!user
+name: jane
+
+YAML;
+        $yaml = $this->dumper->dump($data, 2);
+        $this->assertSame($expected, $yaml);
+    }
+
+    public function testDumpingTaggedValueTopLevelMultiLine()
+    {
+        $data = new TaggedValue('text', "a\nb\n");
+
+        $this->assertSame("!text |\n    a\n    b\n    ", $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
     public function testDumpingTaggedValueSpecialCharsInTag()
     {
         // @todo Validate the tag name in the TaggedValue constructor.

@@ -37,7 +37,7 @@ final class HandlerDescriptor
         if (str_contains($r->name, '{closure}')) {
             $this->name = 'Closure';
         } elseif (!$handler = $r->getClosureThis()) {
-            $class = $r->getClosureScopeClass();
+            $class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass();
 
             $this->name = ($class ? $class->name.'::' : '').$r->name;
         } else {

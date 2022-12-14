@@ -27,12 +27,8 @@ class DateTimeValidator extends DateValidator
             throw new UnexpectedTypeException($constraint, DateTime::class);
         }
 
-        if (null === $value || '' === $value) {
+        if (null === $value || '' === $value || $value instanceof \DateTimeInterface) {
             return;
-        }
-
-        if ($value instanceof \DateTimeInterface) {
-            $value = $value->format($constraint->format);
         }
 
         if (!\is_scalar($value) && !$value instanceof \Stringable) {

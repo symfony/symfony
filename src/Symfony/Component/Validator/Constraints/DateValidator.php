@@ -39,12 +39,8 @@ class DateValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Date::class);
         }
 
-        if (null === $value || '' === $value) {
+        if (null === $value || '' === $value || $value instanceof \DateTimeInterface) {
             return;
-        }
-
-        if ($value instanceof \DateTimeInterface) {
-            $value = $value->format('Y-m-d');
         }
 
         if (!\is_scalar($value) && !$value instanceof \Stringable) {

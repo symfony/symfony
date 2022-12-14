@@ -48,15 +48,19 @@ class RoundRobinTransport implements TransportInterface
 
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
+        $exception = null;
+
         while ($transport = $this->getNextTransport()) {
             try {
                 return $transport->send($message, $envelope);
-            } catch (TransportExceptionInterface) {
+            } catch (TransportExceptionInterface $e) {
+                $exception ??= new TransportException('All transports failed.');
+                $exception->appendDebug(sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
                 $this->deadTransports[$transport] = microtime(true);
             }
         }
 
-        throw new TransportException('All transports failed.');
+        throw $exception ?? new TransportException('No transports found.');
     }
 
     public function __toString(): string

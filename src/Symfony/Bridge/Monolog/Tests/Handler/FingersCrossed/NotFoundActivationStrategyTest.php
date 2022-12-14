@@ -40,18 +40,18 @@ class NotFoundActivationStrategyTest extends TestCase
     {
         return [
             ['/test',      RecordFactory::create(Logger::DEBUG), false],
-            ['/foo',       RecordFactory::create(Logger::DEBUG, context: $this->getContextException(404)), false],
-            ['/baz/bar',   RecordFactory::create(Logger::ERROR, context: $this->getContextException(404)), false],
-            ['/foo',       RecordFactory::create(Logger::ERROR, context: $this->getContextException(404)), false],
-            ['/foo',       RecordFactory::create(Logger::ERROR, context: $this->getContextException(500)), true],
+            ['/foo',       RecordFactory::create(Logger::DEBUG, context: self::getContextException(404)), false],
+            ['/baz/bar',   RecordFactory::create(Logger::ERROR, context: self::getContextException(404)), false],
+            ['/foo',       RecordFactory::create(Logger::ERROR, context: self::getContextException(404)), false],
+            ['/foo',       RecordFactory::create(Logger::ERROR, context: self::getContextException(500)), true],
 
             ['/test',      RecordFactory::create(Logger::ERROR), true],
-            ['/baz',       RecordFactory::create(Logger::ERROR, context: $this->getContextException(404)), true],
-            ['/baz',       RecordFactory::create(Logger::ERROR, context: $this->getContextException(500)), true],
+            ['/baz',       RecordFactory::create(Logger::ERROR, context: self::getContextException(404)), true],
+            ['/baz',       RecordFactory::create(Logger::ERROR, context: self::getContextException(500)), true],
         ];
     }
 
-    protected function getContextException(int $code): array
+    protected static function getContextException(int $code): array
     {
         return ['exception' => new HttpException($code)];
     }

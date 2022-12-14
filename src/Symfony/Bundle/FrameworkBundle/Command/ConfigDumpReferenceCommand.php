@@ -67,7 +67,7 @@ When the option is not provided, <comment>yaml</comment> is used.
 
 For dumping a specific option, add its path as second argument (only available for the yaml format):
 
-  <info>php %command.full_name% framework profiler.matcher</info>
+  <info>php %command.full_name% framework http_client.default_options</info>
 
 EOF
             )

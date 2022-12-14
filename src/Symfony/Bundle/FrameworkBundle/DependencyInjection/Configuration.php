@@ -1185,35 +1185,31 @@ class Configuration implements ConfigurationInterface
         $logLevels = (new \ReflectionClass(LogLevel::class))->getConstants();
 
         $rootNode
+            ->fixXmlConfig('exception')
             ->children()
                 ->arrayNode('exceptions')
                     ->info('Exception handling configuration')
+                    ->useAttributeAsKey('class')
                     ->beforeNormalization()
+                        // Handle legacy XML configuration
                         ->ifArray()
                         ->then(function (array $v): array {
                             if (!\array_key_exists('exception', $v)) {
                                 return $v;
                             }
 
-                            // Fix XML normalization
-                            $data = isset($v['exception'][0]) ? $v['exception'] : [$v['exception']];
-                            $exceptions = [];
-                            foreach ($data as $exception) {
-                                $config = [];
-                                if (\array_key_exists('log-level', $exception)) {
-                                    $config['log_level'] = $exception['log-level'];
-                                }
-                                if (\array_key_exists('status-code', $exception)) {
-                                    $config['status_code'] = $exception['status-code'];
-                                }
-                                $exceptions[$exception['name']] = $config;
+                            $v = $v['exception'];
+                            unset($v['exception']);
+
+                            foreach ($v as &$exception) {
+                                $exception['class'] = $exception['name'];
+                                unset($exception['name']);
                             }
 
-                            return $exceptions;
+                            return $v;
                         })
                     ->end()
                     ->prototype('array')
-                        ->fixXmlConfig('exception')
                         ->children()
                             ->scalarNode('log_level')
                                 ->info('The level of log message. Null to let Symfony decide.')

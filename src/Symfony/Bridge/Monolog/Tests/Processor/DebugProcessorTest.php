@@ -46,8 +46,8 @@ class DebugProcessorTest extends TestCase
     public function testDebugProcessor()
     {
         $processor = new DebugProcessor();
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(2, $processor->getLogs());
         $this->assertSame(1, $processor->countErrors());
@@ -65,8 +65,8 @@ class DebugProcessorTest extends TestCase
     {
         $stack = new RequestStack();
         $processor = new DebugProcessor($stack);
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(2, $processor->getLogs());
         $this->assertSame(1, $processor->countErrors());
@@ -74,8 +74,8 @@ class DebugProcessorTest extends TestCase
         $request = new Request();
         $stack->push($request);
 
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(4, $processor->getLogs());
         $this->assertSame(2, $processor->countErrors());
@@ -99,7 +99,7 @@ class DebugProcessorTest extends TestCase
         $this->assertEquals(0, $debugProcessorChild->countErrors());
     }
 
-    private function getRecord($level = Logger::WARNING, $message = 'test'): array|LogRecord
+    private static function getRecord($level = Logger::WARNING, $message = 'test'): array|LogRecord
     {
         return RecordFactory::create($level, $message);
     }

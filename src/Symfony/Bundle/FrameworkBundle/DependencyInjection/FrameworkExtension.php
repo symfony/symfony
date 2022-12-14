@@ -2815,10 +2815,14 @@ class FrameworkExtension extends Extension
 
             // Settings
             $def->addMethodCall('forceHttpsUrls', [$sanitizerConfig['force_https_urls']], true);
-            $def->addMethodCall('allowLinkSchemes', [$sanitizerConfig['allowed_link_schemes']], true);
+            if ($sanitizerConfig['allowed_link_schemes']) {
+                $def->addMethodCall('allowLinkSchemes', [$sanitizerConfig['allowed_link_schemes']], true);
+            }
             $def->addMethodCall('allowLinkHosts', [$sanitizerConfig['allowed_link_hosts']], true);
             $def->addMethodCall('allowRelativeLinks', [$sanitizerConfig['allow_relative_links']], true);
-            $def->addMethodCall('allowMediaSchemes', [$sanitizerConfig['allowed_media_schemes']], true);
+            if ($sanitizerConfig['allowed_media_schemes']) {
+                $def->addMethodCall('allowMediaSchemes', [$sanitizerConfig['allowed_media_schemes']], true);
+            }
             $def->addMethodCall('allowMediaHosts', [$sanitizerConfig['allowed_media_hosts']], true);
             $def->addMethodCall('allowRelativeMedias', [$sanitizerConfig['allow_relative_medias']], true);
 

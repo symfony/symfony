@@ -308,6 +308,9 @@ EOF
             if (!$showHidden && str_starts_with($serviceId, '.')) {
                 continue;
             }
+            if (!$showHidden && $builder->hasDefinition($serviceId) && $builder->getDefinition($serviceId)->hasTag('container.excluded')) {
+                continue;
+            }
             if (false !== stripos(str_replace('\\', '', $serviceId), $name)) {
                 $foundServiceIdsIgnoringBackslashes[] = $serviceId;
             }

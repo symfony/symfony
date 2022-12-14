@@ -48,17 +48,11 @@ abstract class AbstractVisitor
 
         $args = $node instanceof Node\Expr\CallLike ? $node->getRawArgs() : $node->args;
 
-        if (\count($args) < $index) {
+        if (!($arg = $args[$index] ?? null) instanceof Node\Arg) {
             return [];
         }
 
-        if (($arg = $args[$index]) instanceof Node\Arg) {
-            if ($result = $this->getStringValue($arg->value)) {
-                return [$result];
-            }
-        }
-
-        return [];
+        return (array) $this->getStringValue($arg->value);
     }
 
     protected function hasNodeNamedArguments(Node\Expr\CallLike|Node\Attribute|Node\Expr\New_ $node): bool

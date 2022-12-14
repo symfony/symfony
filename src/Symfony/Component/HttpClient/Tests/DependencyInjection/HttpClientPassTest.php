@@ -38,7 +38,7 @@ class HttpClientPassTest extends TestCase
         $sut->process($container);
         $this->assertTrue($container->hasDefinition('.debug.foo'));
         $this->assertSame(TraceableHttpClient::class, $container->getDefinition('.debug.foo')->getClass());
-        $this->assertSame(['foo', null, 0], $container->getDefinition('.debug.foo')->getDecoratedService());
+        $this->assertSame(['foo', null, 5], $container->getDefinition('.debug.foo')->getDecoratedService());
     }
 
     public function testItRegistersDebugHttpClientToCollector()

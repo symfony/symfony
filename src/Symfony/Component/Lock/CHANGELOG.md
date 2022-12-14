@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Create migration for lock table when DoctrineDbalStore is used
+ * Add support for Relay PHP extension for Redis
 
 6.0
 ---

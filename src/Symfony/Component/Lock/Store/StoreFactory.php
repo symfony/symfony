@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Store;
 
 use Doctrine\DBAL\Connection;
+use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -27,6 +28,7 @@ class StoreFactory
     {
         switch (true) {
             case $connection instanceof \Redis:
+            case $connection instanceof Relay:
             case $connection instanceof \RedisArray:
             case $connection instanceof \RedisCluster:
             case $connection instanceof \Predis\ClientInterface:

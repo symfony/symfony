@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-12T10:09:00Z
+
+Good catch. I'd suggest being more aggressive and just not list those services, and do it on 6.2. WDYT?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2022-12-12T10:10:21Z
+
+@nicolas-grekas I think your proposal would make even more sense: no point in showing the service details for a class that is not, well, a service. 😄  Will update my PR for that 👍
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2022-12-12T10:21:24Z
+
+@nicolas-grekas so I updated the implementation: now based on 6.2 and I just excluded the services from the choice list.
+
+However a probably better implementation would be to add a `ContainerBuilder::getNonExcludedServiceIds()` (naming tbd) and just use that? This way it would also more or less directly work in the table view of this command.
+
+And if we go that route, should I just look up every definition in this call and check or is there a smarter way?

@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-04T03:31:50Z
+
+Hey!
+
+I think @bhujagendra-ishaya has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by bhujagendra-ishaya at 2022-11-04T10:31:58Z
+
+Hi @maxbeckers
+
+Thanks for the provided fix.
+
+To be able to easier review the fix, would you or @bigfoot90 mind adding a full working code (complete file with imports and stuff) to here or the original issue https://github.com/symfony/symfony/issues/47411? - I'd rather also run the code, than just the tests.
+
+Also, did you consider to include your change mentioned in comment https://github.com/symfony/symfony/issues/47411#issuecomment-1298594094?
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-11-04T10:55:35Z
+
+@bhujagendra-ishaya thanks for your comment.
+
+The change mentioned in the comment can be igored, because it's not a problem. It was my fault because of any issues in my vendor.
+
+here is the reproducer with the fix in vendors:
+[test-48089.zip](https://github.com/symfony/symfony/files/9937499/test-48089.zip)
+
+Just run on CLI: `php testcommand.php` in the root.
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2022-12-14T07:02:12Z
+
+@nicolas-grekas the `ConsoleSectionOutput` is counting it's lines. But when there is a input in the section and the input is confirmed with ENTER, the new line of the ENTER was not added to the section. This is what this fix is doing. Hope this helps to understand this fix.

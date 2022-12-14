@@ -76,6 +76,7 @@
         "phpdocumentor/type-resolver": "<1.4.0",
         "phpunit/phpunit": "<5.4.3",
         "symfony/asset": "<5.4",
+        "symfony/clock": "<6.3",
         "symfony/console": "<5.4",
         "symfony/dotenv": "<5.4",
         "symfony/dom-crawler": "<5.4",

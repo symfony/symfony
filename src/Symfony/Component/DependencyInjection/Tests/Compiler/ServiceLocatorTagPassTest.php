@@ -21,7 +21,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition2;
 
@@ -62,8 +61,8 @@ class ServiceLocatorTagPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('bar', CustomDefinition::class);
-        $container->register('baz', CustomDefinition::class);
+        $container->register('bar', TestDefinition1::class);
+        $container->register('baz', TestDefinition2::class);
 
         $container->register('foo', ServiceLocator::class)
             ->setArguments([[
@@ -79,9 +78,33 @@ class ServiceLocatorTagPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get('foo');
 
-        $this->assertSame(CustomDefinition::class, $locator('bar')::class);
-        $this->assertSame(CustomDefinition::class, $locator('baz')::class);
-        $this->assertSame(CustomDefinition::class, $locator('some.service')::class);
+        $this->assertInstanceOf(TestDefinition1::class, $locator('bar'));
+        $this->assertInstanceOf(TestDefinition2::class, $locator('baz'));
+        $this->assertInstanceOf(TestDefinition1::class, $locator('some.service'));
+    }
+
+    public function testProcessLocatorArgumentValue()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', TestDefinition1::class);
+        $container->register('baz', TestDefinition2::class);
+
+        $container->register('foo', Locator::class)
+            ->addArgument(new ServiceLocatorArgument([
+                new Reference('bar'),
+                'some.service' => new Reference('bar'),
+                new Reference('baz'),
+            ]));
+
+        (new ServiceLocatorTagPass())->process($container);
+
+        /** @var ServiceLocator $locator */
+        $locator = $container->get('foo')->locator;
+
+        $this->assertInstanceOf(TestDefinition1::class, $locator('bar'));
+        $this->assertInstanceOf(TestDefinition1::class, $locator('some.service'));
+        $this->assertInstanceOf(TestDefinition2::class, $locator('baz'));
     }
 
     public function testServiceWithKeyOverwritesPreviousInheritedKey()
@@ -104,7 +127,7 @@ class ServiceLocatorTagPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get('foo');
 
-        $this->assertSame(TestDefinition2::class, $locator('bar')::class);
+        $this->assertInstanceOf(TestDefinition2::class, $locator('bar'));
     }
 
     public function testInheritedKeyOverwritesPreviousServiceWithKey()
@@ -128,8 +151,8 @@ class ServiceLocatorTagPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get('foo');
 
-        $this->assertSame(TestDefinition1::class, $locator('bar')::class);
-        $this->assertSame(TestDefinition2::class, $locator(16)::class);
+        $this->assertInstanceOf(TestDefinition1::class, $locator('bar'));
+        $this->assertInstanceOf(TestDefinition2::class, $locator(16));
     }
 
     public function testBindingsAreCopied()
@@ -164,8 +187,8 @@ class ServiceLocatorTagPassTest extends TestCase
         /** @var ServiceLocator $locator */
         $locator = $container->get('foo');
 
-        $this->assertSame(TestDefinition1::class, $locator('bar')::class);
-        $this->assertSame(TestDefinition2::class, $locator('baz')::class);
+        $this->assertInstanceOf(TestDefinition1::class, $locator('bar'));
+        $this->assertInstanceOf(TestDefinition2::class, $locator('baz'));
     }
 
     public function testIndexedByServiceIdWithDecoration()
@@ -184,19 +207,19 @@ class ServiceLocatorTagPassTest extends TestCase
 
         $container->setDefinition(Service::class, $service);
 
-        $decorated = new Definition(Decorated::class);
+        $decorated = new Definition(DecoratedService::class);
         $decorated->setPublic(true);
         $decorated->setDecoratedService(Service::class);
 
-        $container->setDefinition(Decorated::class, $decorated);
+        $container->setDefinition(DecoratedService::class, $decorated);
 
         $container->compile();
 
         /** @var ServiceLocator $locator */
         $locator = $container->get(Locator::class)->locator;
         static::assertTrue($locator->has(Service::class));
-        static::assertFalse($locator->has(Decorated::class));
-        static::assertInstanceOf(Decorated::class, $locator->get(Service::class));
+        static::assertFalse($locator->has(DecoratedService::class));
+        static::assertInstanceOf(DecoratedService::class, $locator->get(Service::class));
     }
 
     public function testDefinitionOrderIsTheSame()

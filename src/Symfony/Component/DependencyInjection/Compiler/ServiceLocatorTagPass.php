@@ -37,7 +37,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
                 $value->setValues($this->findAndSortTaggedServices($value->getTaggedIteratorArgument(), $this->container));
             }
 
-            return self::register($this->container, $value->getValues());
+            return self::register($this->container, $this->replaceNumericServiceLocatorKeys($value->getValues()));
         }
 
         if ($value instanceof Definition) {
@@ -62,26 +62,15 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
         }
 
-        $i = 0;
+        $services = $this->replaceNumericServiceLocatorKeys($services);
 
         foreach ($services as $k => $v) {
             if ($v instanceof ServiceClosureArgument) {
                 continue;
             }
 
-            if ($i === $k) {
-                if ($v instanceof Reference) {
-                    unset($services[$k]);
-                    $k = (string) $v;
-                }
-                ++$i;
-            } elseif (\is_int($k)) {
-                $i = null;
-            }
-
             $services[$k] = new ServiceClosureArgument($v);
         }
-        ksort($services);
 
         $value->setArgument(0, $services);
 
@@ -98,6 +87,39 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         $this->container->setDefinition($id, $value->setPublic(false));
 
         return new Reference($id);
+    }
+
+    /**
+     * Replaces numeric service IDs with service names.
+     *
+     * @param array<array-key, mixed> $services
+     *
+     * @return array<string, mixed>
+     */
+    private function replaceNumericServiceLocatorKeys(array $services): array
+    {
+        $i = 0;
+
+        foreach ($services as $k => $v) {
+            if ($i === $k && $v instanceof Reference) {
+                unset($services[$k]);
+                $k = (string) $v;
+                ++$i;
+            } elseif (\is_int($k)) {
+                /**
+                 * Not consecutive numbers, so stop replacing names but continue the loop.
+                 *
+                 * @see ServiceLocatorTagPassTest::testInheritedKeyOverwritesPreviousServiceWithKey
+                 */
+                $i = null;
+            }
+
+            $services[$k] = $v;
+        }
+
+        ksort($services);
+
+        return $services;
     }
 
     public static function register(ContainerBuilder $container, array $map, string $callerId = null): Reference

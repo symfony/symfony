@@ -26,7 +26,7 @@ class ConsoleFormatterTest extends TestCase
         self::assertSame($expectedMessage, $formatter->format($record));
     }
 
-    public function providerFormatTests(): array
+    public static function providerFormatTests(): array
     {
         $currentDateTime = new \DateTime();
 

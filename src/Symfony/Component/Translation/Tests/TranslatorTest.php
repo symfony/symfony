@@ -301,7 +301,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
-    public function getFallbackLocales()
+    public static function getFallbackLocales()
     {
         $locales = [
             ['en', 'en_US'],
@@ -456,7 +456,7 @@ class TranslatorTest extends TestCase
         }, $this, Translator::class))();
     }
 
-    public function getTransFileTests()
+    public static function getTransFileTests()
     {
         return [
             ['csv', 'CsvFileLoader'],
@@ -471,7 +471,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function getTransTests()
+    public static function getTransTests()
     {
         return [
             ['Symfony est super !', 'Symfony is great!', 'Symfony est super !', [], 'fr', ''],
@@ -481,7 +481,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function getTransICUTests()
+    public static function getTransICUTests()
     {
         $id = '{apples, plural, =0 {There are no apples} one {There is one apple} other {There are # apples}}';
 
@@ -492,7 +492,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function getFlattenedTransTests()
+    public static function getFlattenedTransTests()
     {
         $messages = [
             'symfony' => [
@@ -515,7 +515,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function getInvalidLocalesTests()
+    public static function getInvalidLocalesTests()
     {
         return [
             ['fr FR'],
@@ -532,7 +532,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function getValidLocalesTests()
+    public static function getValidLocalesTests()
     {
         return [
             [''],

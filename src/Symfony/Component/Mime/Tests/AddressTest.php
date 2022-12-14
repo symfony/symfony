@@ -87,7 +87,7 @@ class AddressTest extends TestCase
         $this->assertSame($mail, (new Address($mail, $name))->toString());
     }
 
-    public function nameEmptyDataProvider(): array
+    public static function nameEmptyDataProvider(): array
     {
         return [[''], [' '], [" \r\n "]];
     }
@@ -115,7 +115,7 @@ class AddressTest extends TestCase
         Address::fromString('Jane Doe <example@example.com');
     }
 
-    public function fromStringProvider()
+    public static function fromStringProvider()
     {
         return [
             [

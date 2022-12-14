@@ -225,7 +225,7 @@ EOF;
         $this->assertSameData($input, $this->parser->parse($expected));
     }
 
-    public function getEscapeSequences()
+    public static function getEscapeSequences()
     {
         return [
             'empty string' => ['', "''"],
@@ -275,7 +275,7 @@ EOF;
         $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
-    public function objectAsMapProvider()
+    public static function objectAsMapProvider()
     {
         $tests = [];
 

@@ -72,7 +72,7 @@ class AccessDecisionManagerTest extends TestCase
         $manager->decide($token, ['ROLE_FOO']);
     }
 
-    public function provideBadVoterResults(): array
+    public static function provideBadVoterResults(): array
     {
         return [
             [3],

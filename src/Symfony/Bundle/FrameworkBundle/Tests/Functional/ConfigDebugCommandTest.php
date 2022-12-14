@@ -138,7 +138,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         }
     }
 
-    public function provideCompletionSuggestions(): \Generator
+    public static function provideCompletionSuggestions(): \Generator
     {
         yield 'name' => [[''], ['default_config_test', 'extension_without_config_test', 'framework', 'test']];
 

@@ -227,7 +227,7 @@ class ContainerBuilderTest extends TestCase
         $builder->setDefinition($id, new Definition('Foo'));
     }
 
-    public function provideBadId()
+    public static function provideBadId()
     {
         return [
             [''],
@@ -1490,7 +1490,7 @@ class ContainerBuilderTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $listener4);
     }
 
-    public function provideAlmostCircular()
+    public static function provideAlmostCircular()
     {
         yield ['public'];
         yield ['private'];

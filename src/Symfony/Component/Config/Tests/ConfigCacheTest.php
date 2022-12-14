@@ -98,7 +98,7 @@ class ConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function debugModes(): array
+    public static function debugModes(): array
     {
         return [
             [true],

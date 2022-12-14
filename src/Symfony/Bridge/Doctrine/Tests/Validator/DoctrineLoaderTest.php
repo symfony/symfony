@@ -209,7 +209,7 @@ class DoctrineLoaderTest extends TestCase
         $this->assertSame($expected, $doctrineLoader->loadClassMetadata($classMetadata));
     }
 
-    public function regexpProvider()
+    public static function regexpProvider()
     {
         return [
             [false, null],

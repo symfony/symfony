@@ -175,7 +175,7 @@ class HttpKernelTest extends TestCase
         $this->assertEquals($expectedStatusCode, $response->getStatusCode());
     }
 
-    public function getSpecificStatusCodes()
+    public static function getSpecificStatusCodes()
     {
         return [
             [200],

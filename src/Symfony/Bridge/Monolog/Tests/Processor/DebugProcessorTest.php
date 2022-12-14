@@ -32,7 +32,7 @@ class DebugProcessorTest extends TestCase
         self::assertSame($expectedTimestamp, $records[0]['timestamp']);
     }
 
-    public function providerDatetimeFormatTests(): array
+    public static function providerDatetimeFormatTests(): array
     {
         $record = self::getRecord();
 
@@ -56,7 +56,7 @@ class DebugProcessorTest extends TestCase
         self::assertSame($expectedTimestamp, $records[0]['timestamp_rfc3339']);
     }
 
-    public function providerDatetimeRfc3339FormatTests(): array
+    public static function providerDatetimeRfc3339FormatTests(): array
     {
         $record = self::getRecord();
 

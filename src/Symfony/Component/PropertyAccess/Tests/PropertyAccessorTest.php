@@ -55,7 +55,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    public function getPathsWithUnexpectedType()
+    public static function getPathsWithUnexpectedType()
     {
         return [
             ['', 'foobar'],
@@ -69,7 +69,7 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    public function getPathsWithMissingProperty()
+    public static function getPathsWithMissingProperty()
     {
         return [
             [(object) ['firstName' => 'Bernhard'], 'lastName'],
@@ -89,7 +89,7 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    public function getPathsWithMissingIndex()
+    public static function getPathsWithMissingIndex()
     {
         return [
             [['firstName' => 'Bernhard'], '[lastName]'],
@@ -660,7 +660,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
-    public function getValidPropertyPaths()
+    public static function getValidPropertyPaths()
     {
         return [
             [['Bernhard', 'Schussek'], '[0]', 'Bernhard'],
@@ -723,7 +723,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame('Updated', $obj->publicProperty['foo']['bar']);
     }
 
-    public function getReferenceChainObjectsForSetValue()
+    public static function getReferenceChainObjectsForSetValue()
     {
         return [
             [['a' => ['b' => ['c' => 'old-value']]], '[a][b][c]', 'new-value'],
@@ -744,7 +744,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals($value, $this->propertyAccessor->getValue($object, $path));
     }
 
-    public function getReferenceChainObjectsForIsWritable()
+    public static function getReferenceChainObjectsForIsWritable()
     {
         return [
             [new TestClassIsWritable(['a' => ['b' => 'old-value']]), 'value[a][b]', false],

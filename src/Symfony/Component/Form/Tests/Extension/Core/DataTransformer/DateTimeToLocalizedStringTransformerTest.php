@@ -52,7 +52,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function dataProvider()
+    public static function dataProvider()
     {
         return [
             [\IntlDateFormatter::SHORT, null, null, '03.02.10, 04:05', '2010-02-03 04:05:00 UTC'],

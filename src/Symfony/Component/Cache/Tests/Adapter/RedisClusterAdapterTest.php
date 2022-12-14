@@ -58,7 +58,7 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTestCase
         RedisAdapter::createConnection($dsn);
     }
 
-    public function provideFailedCreateConnection(): array
+    public static function provideFailedCreateConnection(): array
     {
         return [
             ['redis://localhost:1234?redis_cluster=1'],

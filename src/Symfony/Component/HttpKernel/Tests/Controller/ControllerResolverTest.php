@@ -141,7 +141,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($returnValue, $controller());
     }
 
-    public function getStaticControllers()
+    public static function getStaticControllers()
     {
         return [
             [TestAbstractController::class.'::staticAction', 'foo'],

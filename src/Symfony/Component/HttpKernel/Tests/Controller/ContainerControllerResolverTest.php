@@ -149,7 +149,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame('action', $controller[1]);
     }
 
-    public function getControllers()
+    public static function getControllers()
     {
         return [
             ['\\'.ControllerTestService::class.'::action'],

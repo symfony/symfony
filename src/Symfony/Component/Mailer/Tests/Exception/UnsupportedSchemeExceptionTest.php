@@ -59,7 +59,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         );
     }
 
-    public function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
+    public static function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield ['gmail', 'symfony/google-mailer'];
         yield ['mailgun', 'symfony/mailgun-mailer'];
@@ -83,7 +83,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         );
     }
 
-    public function messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider(): \Generator
+    public static function messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider(): \Generator
     {
         yield [
             'The "somethingElse" scheme is not supported.',

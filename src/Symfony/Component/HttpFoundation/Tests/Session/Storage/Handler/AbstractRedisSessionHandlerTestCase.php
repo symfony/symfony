@@ -140,7 +140,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         }
     }
 
-    public function getOptionFixtures(): array
+    public static function getOptionFixtures(): array
     {
         return [
             [['prefix' => 'session'], true],
@@ -169,7 +169,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->assertGreaterThan($redisTtl, $ttl + 5);
     }
 
-    public function getTtlFixtures(): array
+    public static function getTtlFixtures(): array
     {
         return [
             ['ttl' => 5000],

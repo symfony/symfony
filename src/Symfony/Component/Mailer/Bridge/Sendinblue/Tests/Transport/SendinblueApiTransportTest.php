@@ -34,7 +34,7 @@ class SendinblueApiTransportTest extends TestCase
         $this->assertSame($expected, (string) $transport);
     }
 
-    public function getTransportData()
+    public static function getTransportData()
     {
         yield [
             new SendinblueApiTransport('ACCESS_KEY'),

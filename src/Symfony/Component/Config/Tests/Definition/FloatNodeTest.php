@@ -41,7 +41,7 @@ class FloatNodeTest extends TestCase
         $this->assertSame($value, $node->finalize($value));
     }
 
-    public function getValidValues(): array
+    public static function getValidValues(): array
     {
         return [
             [1798.0],
@@ -65,7 +65,7 @@ class FloatNodeTest extends TestCase
         $node->normalize($value);
     }
 
-    public function getInvalidValues(): array
+    public static function getInvalidValues(): array
     {
         return [
             [null],

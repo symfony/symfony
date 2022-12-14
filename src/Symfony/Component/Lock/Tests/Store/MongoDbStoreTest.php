@@ -97,7 +97,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function provideConstructorArgs()
+    public static function provideConstructorArgs()
     {
         $client = self::getMongoClient();
         yield [$client, ['database' => 'test', 'collection' => 'lock']];
@@ -138,7 +138,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         new MongoDbStore($mongo, $options);
     }
 
-    public function provideInvalidConstructorArgs()
+    public static function provideInvalidConstructorArgs()
     {
         $client = self::getMongoClient();
         yield [$client, ['collection' => 'lock']];
@@ -165,7 +165,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $this->assertSame($driverUri, $uri);
     }
 
-    public function provideUriCollectionStripArgs()
+    public static function provideUriCollectionStripArgs()
     {
         yield ['mongodb://localhost/?collection=lock', ['database' => 'test'], 'mongodb://localhost/'];
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock'], 'mongodb://localhost/'];

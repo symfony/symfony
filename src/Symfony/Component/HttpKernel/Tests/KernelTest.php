@@ -256,7 +256,7 @@ class KernelTest extends TestCase
         $this->assertEquals($expected, $output);
     }
 
-    public function getStripCommentsCodes(): array
+    public static function getStripCommentsCodes(): array
     {
         return [
             ['<?php echo foo();', '<?php echo foo();'],

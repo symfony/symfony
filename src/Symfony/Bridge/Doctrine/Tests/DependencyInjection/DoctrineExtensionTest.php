@@ -84,7 +84,7 @@ class DoctrineExtensionTest extends TestCase
         $method->invoke($this->extension, $emConfigs, $bundles);
     }
 
-    public function getAutomappingData()
+    public static function getAutomappingData()
     {
         return [
             [
@@ -197,7 +197,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertSame($mappingType, \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute');
     }
 
-    public function providerBasicDrivers()
+    public static function providerBasicDrivers()
     {
         return [
             ['doctrine.orm.cache.apc.class',       ['type' => 'apc']],
@@ -276,7 +276,7 @@ class DoctrineExtensionTest extends TestCase
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
     }
 
-    public function providerBundles()
+    public static function providerBundles()
     {
         yield ['AnnotationsBundle', 'annotation', '/Entity'];
         yield ['AnnotationsOneLineBundle', 'annotation', '/Entity'];

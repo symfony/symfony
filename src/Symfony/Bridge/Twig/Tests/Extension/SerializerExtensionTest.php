@@ -41,7 +41,7 @@ class SerializerExtensionTest extends TestCase
         self::assertSame($expectedResult, $twig->render('template', ['object' => new SerializerModelFixture()]));
     }
 
-    public function serializerDataProvider(): \Generator
+    public static function serializerDataProvider(): \Generator
     {
         yield ['{{ object|serialize }}', '{&quot;name&quot;:&quot;howdy&quot;,&quot;title&quot;:&quot;fixture&quot;}'];
         yield ['{{ object|serialize(\'yaml\') }}', '{ name: howdy, title: fixture }'];

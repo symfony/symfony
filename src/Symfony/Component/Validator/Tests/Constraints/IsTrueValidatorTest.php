@@ -49,7 +49,7 @@ class IsTrueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideInvalidConstraints(): iterable
+    public static function provideInvalidConstraints(): iterable
     {
         yield 'Doctrine style' => [new IsTrue([
             'message' => 'myMessage',

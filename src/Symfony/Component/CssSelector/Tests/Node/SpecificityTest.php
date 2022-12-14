@@ -28,7 +28,7 @@ class SpecificityTest extends TestCase
         $this->assertEquals($value + 123, $specificity->plus(new Specificity(1, 2, 3))->getValue());
     }
 
-    public function getValueTestData()
+    public static function getValueTestData()
     {
         return [
             [new Specificity(0, 0, 0), 0],
@@ -45,7 +45,7 @@ class SpecificityTest extends TestCase
         $this->assertEquals($result, $a->compareTo($b));
     }
 
-    public function getCompareTestData()
+    public static function getCompareTestData()
     {
         return [
             [new Specificity(0, 0, 0), new Specificity(0, 0, 0), 0],

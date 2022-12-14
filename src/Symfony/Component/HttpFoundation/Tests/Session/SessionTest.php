@@ -156,7 +156,7 @@ class SessionTest extends TestCase
         $this->assertEquals([], $this->session->all());
     }
 
-    public function setProvider()
+    public static function setProvider()
     {
         return [
             ['foo', 'bar', ['foo' => 'bar']],

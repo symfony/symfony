@@ -68,7 +68,7 @@ EOF;
         $this->assertEquals($header, $signedMessage->getHeaders()->get('DKIM-Signature')->getBody());
     }
 
-    public function getSignData()
+    public static function getSignData()
     {
         yield 'simple/simple' => [
             1591597074, DkimSigner::CANON_SIMPLE, DkimSigner::CANON_SIMPLE,
@@ -132,7 +132,7 @@ EOF;
         $this->assertEquals(\strlen($canonBody), $l);
     }
 
-    public function getCanonicalizeHeaderData()
+    public static function getCanonicalizeHeaderData()
     {
         yield 'simple_empty' => [
             DkimSigner::CANON_SIMPLE, "\r\n", '', \PHP_INT_MAX,

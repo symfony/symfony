@@ -63,7 +63,7 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->assertSame($exception->getStatusText(), $normalized['status_text']);
     }
 
-    public function provideFlattenException(): array
+    public static function provideFlattenException(): array
     {
         return [
             'instance from exception' => [FlattenException::createFromThrowable(new \RuntimeException('foo', 42))],

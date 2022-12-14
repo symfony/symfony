@@ -194,7 +194,7 @@ class PropertyPathBuilderTest extends TestCase
         $this->builder->replace($offset, 1, new PropertyPath('new1[new2].new3'));
     }
 
-    public function provideInvalidOffsets()
+    public static function provideInvalidOffsets()
     {
         return [
             [6],

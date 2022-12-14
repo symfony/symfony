@@ -199,7 +199,7 @@ class TwigExtensionTest extends TestCase
         ], $paths);
     }
 
-    public function getFormats()
+    public static function getFormats()
     {
         return [
             ['php'],
@@ -230,7 +230,7 @@ class TwigExtensionTest extends TestCase
         $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
     }
 
-    public function stopwatchExtensionAvailabilityProvider()
+    public static function stopwatchExtensionAvailabilityProvider()
     {
         return [
             'debug-and-stopwatch-enabled' => [true, true, true],

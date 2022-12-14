@@ -34,7 +34,7 @@ class FixUrlProtocolListenerTest extends TestCase
         $this->assertSame('http://'.$data, $event->getData());
     }
 
-    public function provideUrlToFix()
+    public static function provideUrlToFix()
     {
         return [
             ['www.symfony.com'],
@@ -60,7 +60,7 @@ class FixUrlProtocolListenerTest extends TestCase
         $this->assertSame($url, $event->getData());
     }
 
-    public function provideUrlToSkip()
+    public static function provideUrlToSkip()
     {
         return [
             ['http://www.symfony.com'],

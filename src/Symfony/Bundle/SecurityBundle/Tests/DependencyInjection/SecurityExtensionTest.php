@@ -525,7 +525,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('very', $handler->getArgument(1));
     }
 
-    public function sessionConfigurationProvider()
+    public static function sessionConfigurationProvider()
     {
         return [
             [
@@ -546,7 +546,7 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
-    public function acceptableIpsProvider(): iterable
+    public static function acceptableIpsProvider(): iterable
     {
         yield [['127.0.0.1']];
         yield ['127.0.0.1'];
@@ -657,7 +657,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($entryPointId, (string) $container->getDefinition('security.exception_listener.main')->getArgument(4));
     }
 
-    public function provideEntryPointFirewalls()
+    public static function provideEntryPointFirewalls()
     {
         // only one entry point available
         yield [['http_basic' => true], 'security.authenticator.http_basic.main'];
@@ -697,7 +697,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function provideEntryPointRequiredData()
+    public static function provideEntryPointRequiredData()
     {
         // more than one entry point available and not explicitly set
         yield [
@@ -747,7 +747,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
     }
 
-    public function provideConfigureCustomAuthenticatorData()
+    public static function provideConfigureCustomAuthenticatorData()
     {
         yield [
             ['custom_authenticator' => TestAuthenticator::class],
@@ -827,7 +827,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($expectedUserCheckerClass, $container->findDefinition($userCheckerId)->getClass());
     }
 
-    public function provideUserCheckerConfig()
+    public static function provideUserCheckerConfig()
     {
         yield [[], InMemoryUserChecker::class];
         yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];

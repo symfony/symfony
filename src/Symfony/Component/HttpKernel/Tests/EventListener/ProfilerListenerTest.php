@@ -87,7 +87,7 @@ class ProfilerListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, Kernel::MAIN_REQUEST, $response));
     }
 
-    public function collectRequestProvider(): iterable
+    public static function collectRequestProvider(): iterable
     {
         yield [Request::create('/'), null];
         yield [Request::create('/', 'GET', ['profile' => '1']), true];

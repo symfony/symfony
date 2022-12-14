@@ -36,7 +36,7 @@ class DisallowRobotsIndexingListenerTest extends TestCase
         $this->assertSame($expected, $response->headers->get('X-Robots-Tag'), 'Header doesn\'t match expectations');
     }
 
-    public function provideResponses(): iterable
+    public static function provideResponses(): iterable
     {
         yield 'No header' => ['noindex', []];
 

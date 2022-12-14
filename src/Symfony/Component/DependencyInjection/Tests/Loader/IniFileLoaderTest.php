@@ -58,7 +58,7 @@ class IniFileLoaderTest extends TestCase
         $this->assertSame($value, $expected['parameters'][$key], '->load() converts values to PHP types');
     }
 
-    public function getTypeConversions()
+    public static function getTypeConversions()
     {
         return [
             ['true_comment', true, true],

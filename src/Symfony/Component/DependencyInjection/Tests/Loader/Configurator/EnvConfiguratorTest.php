@@ -24,7 +24,7 @@ final class EnvConfiguratorTest extends TestCase
         $this->assertSame($expected, (string) $envConfigurator);
     }
 
-    public function provide()
+    public static function provide()
     {
         yield ['%env(FOO)%', new EnvConfigurator('FOO')];
         yield ['%env(string:FOO)%', new EnvConfigurator('string:FOO')];

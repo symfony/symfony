@@ -85,7 +85,7 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertSame('dunglas', $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function getTestParameters()
+    public static function getTestParameters()
     {
         return [
             'unauthorized_user_cannot_switch' => ['user_cannot_switch_1', 'user_cannot_switch_1', 'user_cannot_switch_1', 403],
@@ -95,7 +95,7 @@ class SwitchUserTest extends AbstractWebTestCase
         ];
     }
 
-    public function getLegacyTestParameters()
+    public static function getLegacyTestParameters()
     {
         return [
             'legacy_unauthorized_user_cannot_switch' => ['user_cannot_switch_1', 'user_cannot_switch_1', 'user_cannot_switch_1', 403],

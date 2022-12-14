@@ -296,13 +296,13 @@ class FormLoginTest extends AbstractWebTestCase
         }
     }
 
-    public function provideClientOptions()
+    public static function provideClientOptions()
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'enable_authenticator_manager' => true]];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
     }
 
-    public function provideLegacyClientOptions()
+    public static function provideLegacyClientOptions()
     {
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
         yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];

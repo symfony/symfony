@@ -52,7 +52,7 @@ class ResponseFunctionalTest extends TestCase
         $this->assertStringMatchesFormatFile(__DIR__.sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
     }
 
-    public function provideCookie()
+    public static function provideCookie()
     {
         foreach (glob(__DIR__.'/Fixtures/response-functional/*.php') as $file) {
             yield [pathinfo($file, \PATHINFO_FILENAME)];

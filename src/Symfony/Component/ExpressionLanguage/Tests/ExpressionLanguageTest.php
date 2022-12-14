@@ -119,7 +119,7 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage->parse('node.', ['node']);
     }
 
-    public function shortCircuitProviderEvaluate()
+    public static function shortCircuitProviderEvaluate()
     {
         $object = new class(\Closure::fromCallable([static::class, 'fail'])) {
             private $fail;
@@ -143,7 +143,7 @@ class ExpressionLanguageTest extends TestCase
         ];
     }
 
-    public function shortCircuitProviderCompile()
+    public static function shortCircuitProviderCompile()
     {
         return [
             ['false and foo', ['foo' => 'foo'], false],
@@ -267,7 +267,7 @@ class ExpressionLanguageTest extends TestCase
         $registerCallback($el);
     }
 
-    public function getRegisterCallbacks()
+    public static function getRegisterCallbacks()
     {
         return [
             [

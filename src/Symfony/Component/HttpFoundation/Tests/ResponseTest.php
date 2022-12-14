@@ -847,7 +847,7 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals($expectedText, $statusText->getValue($response));
     }
 
-    public function getStatusCodeFixtures()
+    public static function getStatusCodeFixtures()
     {
         return [
             ['200', null, 'OK'],
@@ -1001,7 +1001,7 @@ class ResponseTest extends ResponseTestCase
         $this->addToAssertionCount(1);
     }
 
-    public function validContentProvider()
+    public static function validContentProvider()
     {
         return [
             'obj' => [new StringableObject()],
@@ -1046,7 +1046,7 @@ class ResponseTest extends ResponseTestCase
      * @copyright Copyright (c) 2015-2016 Zend Technologies USA Inc. (http://www.zend.com)
      * @license https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
      */
-    public function ianaCodesReasonPhrasesProvider()
+    public static function ianaCodesReasonPhrasesProvider()
     {
         // XML taken from https://www.iana.org/assignments/http-status-codes/http-status-codes.xml
         // (might not be up-to-date for older Symfony versions)

@@ -49,12 +49,12 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
         ];
     }
 
-    public function transformProvider()
+    public static function transformProvider()
     {
         return self::allProvider();
     }
 
-    public function reverseTransformProvider()
+    public static function reverseTransformProvider()
     {
         return array_merge(self::allProvider(), [
             // format without seconds, as appears in some browsers
@@ -132,7 +132,7 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
         $transformer->reverseTransform($date);
     }
 
-    public function invalidDateStringProvider()
+    public static function invalidDateStringProvider()
     {
         return [
             'invalid month' => ['2010-2010-01'],

@@ -51,7 +51,7 @@ class ContextTest extends TestCase
         $factory();
     }
 
-    public function provideTestThrowsOnEmptyContextLegacyData(): iterable
+    public static function provideTestThrowsOnEmptyContextLegacyData(): iterable
     {
         yield 'doctrine-style: value option as empty array' => [function () { new Context(['value' => []]); }];
         yield 'doctrine-style: context option as empty array' => [function () { new Context(['context' => []]); }];
@@ -70,7 +70,7 @@ class ContextTest extends TestCase
         new Context($options);
     }
 
-    public function provideTestThrowsOnNonArrayContextData(): iterable
+    public static function provideTestThrowsOnNonArrayContextData(): iterable
     {
         yield 'non-array context' => [['context' => 'not_an_array']];
         yield 'non-array normalization context' => [['normalizationContext' => 'not_an_array']];
@@ -136,7 +136,7 @@ class ContextTest extends TestCase
         $this->assertDumpEquals($expectedDump, $factory());
     }
 
-    public function provideValidInputs(): iterable
+    public static function provideValidInputs(): iterable
     {
         yield 'named arguments: with context option' => [
             function () { return new Context(...['context' => ['foo' => 'bar']]); },
@@ -224,7 +224,7 @@ DUMP
         $this->assertDumpEquals($expectedDump, $factory());
     }
 
-    public function provideValidLegacyInputs(): iterable
+    public static function provideValidLegacyInputs(): iterable
     {
         yield 'doctrine-style: with context option' => [
             function () { return new Context(['context' => ['foo' => 'bar']]); },

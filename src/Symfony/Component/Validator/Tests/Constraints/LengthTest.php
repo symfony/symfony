@@ -57,7 +57,7 @@ class LengthTest extends TestCase
         new Length(['allowEmptyString' => $value, 'max' => 5]);
     }
 
-    public function allowEmptyStringOptionData()
+    public static function allowEmptyStringOptionData()
     {
         return [
             [true],

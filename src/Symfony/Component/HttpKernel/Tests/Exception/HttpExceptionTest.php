@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HttpExceptionTest extends TestCase
 {
-    public function headerDataProvider()
+    public static function headerDataProvider()
     {
         return [
             [['X-Test' => 'Test']],

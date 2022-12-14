@@ -31,6 +31,10 @@ class DateTimeValidator extends DateValidator
             return;
         }
 
+        if ($value instanceof \DateTimeInterface) {
+            $value = $value->format($constraint->format);
+        }
+
         if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }

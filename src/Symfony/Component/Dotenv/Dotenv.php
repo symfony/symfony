@@ -243,9 +243,9 @@ final class Dotenv
     /**
      * Parses the contents of an .env file.
      *
-     * @param string $data               The data to be parsed
-     * @param string $path               The original file name where data where stored (used for more meaningful error messages)
-     * @param bool $needsValueResolution true when the value resolution needs to be done automatically
+     * @param string $data                 The data to be parsed
+     * @param string $path                 The original file name where data where stored (used for more meaningful error messages)
+     * @param bool   $needsValueResolution true when the value resolution needs to be done automatically
      *
      * @throws FormatException when a file has a syntax error
      */
@@ -369,7 +369,7 @@ final class Dotenv
                 if ($needsValueResolution) {
                     $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
                 }
-                
+
                 $resolvedValue = $this->resolveCommands($resolvedValue, $loadedVars);
                 $resolvedValue = str_replace('\\\\', '\\', $resolvedValue);
                 $v .= $resolvedValue;
@@ -396,7 +396,7 @@ final class Dotenv
                 if ($needsValueResolution) {
                     $resolvedValue = $this->resolveVariables($resolvedValue, $loadedVars);
                 }
-                
+
                 $resolvedValue = $this->resolveCommands($resolvedValue, $loadedVars);
                 $resolvedValue = str_replace('\\\\', '\\', $resolvedValue);
 
@@ -596,7 +596,7 @@ final class Dotenv
         unset($loadedVars['']);
 
         foreach ($_ENV as $name => $value) {
-            if ($name === 'SYMFONY_DOTENV_VARS') {
+            if ('SYMFONY_DOTENV_VARS' === $name) {
                 continue;
             }
 

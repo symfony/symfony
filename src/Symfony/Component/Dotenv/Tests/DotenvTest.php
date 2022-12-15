@@ -224,6 +224,53 @@ class DotenvTest extends TestCase
         $this->assertSame('BAZ', $bar);
     }
 
+    public function testLoadDynamicVar()
+    {
+        unset($_ENV['VAR_STATIC1']);
+        unset($_ENV['VAR_STATIC2']);
+        unset($_ENV['VAR_DYNAMIC1']);
+        unset($_ENV['VAR_DYNAMIC2']);
+        unset($_ENV['VAR_DYNAMIC3']);
+        unset($_ENV['VAR_DYNAMIC_FAIL']);
+        unset($_SERVER['VAR_STATIC1']);
+        unset($_SERVER['VAR_STATIC2']);
+        unset($_SERVER['VAR_DYNAMIC1']);
+        unset($_SERVER['VAR_DYNAMIC2']);
+        unset($_SERVER['VAR_DYNAMIC3']);
+        unset($_SERVER['VAR_DYNAMIC_FAIL']);
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+        $path3 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, "VAR_STATIC1=env\nVAR_DYNAMIC1=profile:\${VAR_STATIC1}\nVAR_DYNAMIC_FAIL=\$VAR_DYNAMIC1");
+        file_put_contents($path2, "VAR_STATIC1=local");
+        file_put_contents($path3, "VAR_STATIC2=file3\nVAR_DYNAMIC2=\$VAR_STATIC1\nVAR_DYNAMIC3=\$VAR_STATIC2");
+
+        (new Dotenv())->usePutenv()->load($path1, $path2, $path3);
+
+        $static1 = getenv('VAR_STATIC1');
+        $static2 = getenv('VAR_STATIC2');
+        $dynamic1 = getenv('VAR_DYNAMIC1');
+        $dynamic2 = getenv('VAR_DYNAMIC2');
+        $dynamic3 = getenv('VAR_DYNAMIC3');
+        $dynamicFail = getenv('VAR_DYNAMIC_FAIL');
+
+        unlink($path1);
+        unlink($path2);
+        unlink($path3);
+        rmdir($tmpdir);
+
+        $this->assertSame('local', $static1);
+        $this->assertSame('file3', $static2);
+        $this->assertSame('profile:local', $dynamic1);
+        $this->assertSame('local', $dynamic2);
+        $this->assertSame('file3', $dynamic3);
+        $this->assertSame('profile:${VAR_STATIC1}', $dynamicFail);
+    }
+
     public function testLoadEnv()
     {
         $resetContext = static function (): void {
@@ -350,6 +397,38 @@ class DotenvTest extends TestCase
         rmdir($tmpdir);
     }
 
+    public function testLoadEnvDynamicVar()
+    {
+        unset($_ENV['VAR_STATIC1']);
+        unset($_ENV['VAR_DYNAMIC1']);
+        unset($_ENV['VAR_DYNAMIC_FAIL']);
+        unset($_SERVER['VAR_STATIC1']);
+        unset($_SERVER['VAR_DYNAMIC1']);
+        unset($_SERVER['VAR_DYNAMIC_FAIL']);
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $pathEnv = tempnam($tmpdir, 'sf-');
+        $pathLocalEnv = "$pathEnv.local";
+
+        file_put_contents($pathEnv, "VAR_STATIC1=env\nVAR_DYNAMIC1=profile:\${VAR_STATIC1}\nVAR_DYNAMIC_FAIL=\$VAR_DYNAMIC1");
+        file_put_contents($pathLocalEnv, "VAR_STATIC1=local");
+
+        (new Dotenv())->usePutenv()->loadEnv($pathEnv, 'TEST_APP_ENV');
+
+        $static1 = getenv('VAR_STATIC1');
+        $dynamic1 = getenv('VAR_DYNAMIC1');
+		$dynamicFail = getenv('VAR_DYNAMIC_FAIL');
+
+        unlink($pathEnv);
+        unlink($pathLocalEnv);
+        rmdir($tmpdir);
+
+        $this->assertSame('local', $static1);
+        $this->assertSame('profile:local', $dynamic1);
+        $this->assertSame('profile:${VAR_STATIC1}', $dynamicFail);
+    }
+
     public function testOverload()
     {
         unset($_ENV['FOO']);
@@ -383,6 +462,53 @@ class DotenvTest extends TestCase
 
         $this->assertSame('BAR', $foo);
         $this->assertSame('BAZ', $bar);
+    }
+
+    public function testOverloadDynamicVar()
+    {
+        unset($_ENV['VAR_STATIC1']);
+        unset($_ENV['VAR_STATIC2']);
+        unset($_ENV['VAR_DYNAMIC1']);
+        unset($_ENV['VAR_DYNAMIC2']);
+        unset($_ENV['VAR_DYNAMIC3']);
+        unset($_ENV['VAR_DYNAMIC_FAIL']);
+        unset($_SERVER['VAR_STATIC1']);
+        unset($_SERVER['VAR_STATIC2']);
+        unset($_SERVER['VAR_DYNAMIC1']);
+        unset($_SERVER['VAR_DYNAMIC2']);
+        unset($_SERVER['VAR_DYNAMIC3']);
+        unset($_SERVER['VAR_DYNAMIC_FAIL']);
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+        $path3 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, "VAR_STATIC1=env\nVAR_DYNAMIC1=profile:\${VAR_STATIC1}\nVAR_DYNAMIC_FAIL=\$VAR_DYNAMIC1");
+        file_put_contents($path2, "VAR_STATIC1=local");
+        file_put_contents($path3, "VAR_STATIC2=file3\nVAR_DYNAMIC2=\$VAR_STATIC1\nVAR_DYNAMIC3=\$VAR_STATIC2");
+
+        (new Dotenv())->usePutenv()->overload($path1, $path2, $path3);
+
+        $static1 = getenv('VAR_STATIC1');
+        $static2 = getenv('VAR_STATIC2');
+        $dynamic1 = getenv('VAR_DYNAMIC1');
+        $dynamic2 = getenv('VAR_DYNAMIC2');
+        $dynamic3 = getenv('VAR_DYNAMIC3');
+        $dynamicFail = getenv('VAR_DYNAMIC_FAIL');
+
+        unlink($path1);
+        unlink($path2);
+        unlink($path3);
+        rmdir($tmpdir);
+
+        $this->assertSame('local', $static1);
+        $this->assertSame('file3', $static2);
+        $this->assertSame('profile:local', $dynamic1);
+        $this->assertSame('local', $dynamic2);
+        $this->assertSame('file3', $dynamic3);
+        $this->assertSame('profile:${VAR_STATIC1}', $dynamicFail);
     }
 
     public function testLoadDirectory()

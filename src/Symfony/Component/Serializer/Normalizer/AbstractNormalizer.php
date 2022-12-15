@@ -331,8 +331,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             $params = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
+                $attributeContext = $this->getAttributeDenormalizationContext($class, $paramName, $context);
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
-                $attributeContext = $this->getAttributeDenormalizationContext($class, $key, $context);
 
                 $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);

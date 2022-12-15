@@ -1105,10 +1105,19 @@ class ContainerBuilderTest extends TestCase
         $container->addDefinitions([
             'bar' => $fooDefinition,
             'bar_user' => $fooUserDefinition->setPublic(true),
+            'bar_user2' => $fooUserDefinition->setPublic(true),
         ]);
 
         $container->compile();
+        $this->assertNull($container->get('bar', $container::NULL_ON_INVALID_REFERENCE));
         $this->assertInstanceOf(\BarClass::class, $container->get('bar_user')->bar);
+
+        // Ensure that accessing a public service with a shared private service
+        // does not make the private service available.
+        $this->assertNull($container->get('bar', $container::NULL_ON_INVALID_REFERENCE));
+
+        // Ensure the private service is still shared.
+        $this->assertSame($container->get('bar_user')->bar, $container->get('bar_user2')->bar);
     }
 
     public function testThrowsExceptionWhenSetServiceOnACompiledContainer()

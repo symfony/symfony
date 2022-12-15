@@ -1,32 +1,32 @@
 {
-  "name": "symfony/kaz-info-teh-notifier",
-  "type": "symfony-bridge",
-  "description": "Symfony KazInfoTeh Notifier Bridge",
-  "keywords": ["KazInfoTeh", "notifier", "symfony", "sms"],
-  "homepage": "https://symfony.com",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Egor Taranov",
-      "email": "dev@taranovegor.com",
-      "homepage": "https://taranovegor.com/contribution"
+    "name": "symfony/kaz-info-teh-notifier",
+    "type": "symfony-bridge",
+    "description": "Symfony KazInfoTeh Notifier Bridge",
+    "keywords": ["KazInfoTeh", "notifier", "symfony", "sms"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Egor Taranov",
+            "email": "dev@taranovegor.com",
+            "homepage": "https://taranovegor.com/contribution"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-simplexml": "*",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^5.4|^6.0"
     },
-    {
-      "name": "Symfony Community",
-      "homepage": "https://symfony.com/contributors"
-    }
-  ],
-  "require": {
-    "php": ">=8.1",
-    "ext-simplexml": "*",
-    "symfony/http-client": "^5.4|^6.0",
-    "symfony/notifier": "^5.4|^6.0"
-  },
-  "autoload": {
-    "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\KazInfoTeh\\": "" },
-    "exclude-from-classmap": [
-      "/Tests/"
-    ]
-  },
-  "minimum-stability": "dev"
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\KazInfoTeh\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
 }

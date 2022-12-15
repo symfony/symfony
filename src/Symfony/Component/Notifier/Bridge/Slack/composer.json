@@ -20,9 +20,6 @@
         "symfony/http-client": "^5.4|^6.0",
         "symfony/notifier": "^5.4|^6.0"
     },
-    "require-dev": {
-        "symfony/event-dispatcher": "^5.4|^6.0"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Slack\\": "" },
         "exclude-from-classmap": [

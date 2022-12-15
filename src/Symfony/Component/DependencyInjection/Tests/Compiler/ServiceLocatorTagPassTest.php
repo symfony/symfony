@@ -184,19 +184,19 @@ class ServiceLocatorTagPassTest extends TestCase
 
         $container->setDefinition(Service::class, $service);
 
-        $decorated = new Definition(Decorated::class);
+        $decorated = new Definition(DecoratedService::class);
         $decorated->setPublic(true);
         $decorated->setDecoratedService(Service::class);
 
-        $container->setDefinition(Decorated::class, $decorated);
+        $container->setDefinition(DecoratedService::class, $decorated);
 
         $container->compile();
 
         /** @var ServiceLocator $locator */
         $locator = $container->get(Locator::class)->locator;
         static::assertTrue($locator->has(Service::class));
-        static::assertFalse($locator->has(Decorated::class));
-        static::assertInstanceOf(Decorated::class, $locator->get(Service::class));
+        static::assertFalse($locator->has(DecoratedService::class));
+        static::assertInstanceOf(DecoratedService::class, $locator->get(Service::class));
     }
 
     public function testDefinitionOrderIsTheSame()

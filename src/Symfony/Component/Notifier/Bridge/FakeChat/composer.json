@@ -26,9 +26,8 @@
         "symfony/notifier": "^6.2"
     },
     "require-dev": {
-        "symfony/mailer": "^5.4|^6.0",
-        "symfony/event-dispatcher": "^5.4|^6.0",
-        "psr/log": "^1|^2|^3"
+        "psr/log": "^1|^2|^3",
+        "symfony/mailer": "^5.4|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\FakeChat\\": "" },

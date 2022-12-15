@@ -11,10 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @group functional
@@ -31,7 +35,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:autowiring']);
 
-        $this->assertStringContainsString('Symfony\Component\HttpKernel\HttpKernelInterface', $tester->getDisplay());
+        $this->assertStringContainsString(HttpKernelInterface::class, $tester->getDisplay());
         $this->assertStringContainsString('(http_kernel)', $tester->getDisplay());
     }
 
@@ -45,8 +49,8 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:autowiring', 'search' => 'kern']);
 
-        $this->assertStringContainsString('Symfony\Component\HttpKernel\HttpKernelInterface', $tester->getDisplay());
-        $this->assertStringNotContainsString('Symfony\Component\Routing\RouterInterface', $tester->getDisplay());
+        $this->assertStringContainsString(HttpKernelInterface::class, $tester->getDisplay());
+        $this->assertStringNotContainsString(RouterInterface::class, $tester->getDisplay());
     }
 
     public function testSearchIgnoreBackslashWhenFindingService()
@@ -58,7 +62,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:autowiring', 'search' => 'HttpKernelHttpKernelInterface']);
-        $this->assertStringContainsString('Symfony\Component\HttpKernel\HttpKernelInterface', $tester->getDisplay());
+        $this->assertStringContainsString(HttpKernelInterface::class, $tester->getDisplay());
     }
 
     public function testSearchNoResults()
@@ -109,7 +113,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:autowiring', 'search' => 'ClassAlias']);
-        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass', $tester->getDisplay());
+        $this->assertStringContainsString(ClassAliasExampleClass::class, $tester->getDisplay());
     }
 
     /**
@@ -131,6 +135,6 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
 
     public function provideCompletionSuggestions(): \Generator
     {
-        yield 'search' => [[''], ['SessionHandlerInterface', 'Psr\\Log\\LoggerInterface', 'Psr\\Container\\ContainerInterface $parameterBag']];
+        yield 'search' => [[''], ['SessionHandlerInterface', LoggerInterface::class, 'Psr\\Container\\ContainerInterface $parameterBag']];
     }
 }

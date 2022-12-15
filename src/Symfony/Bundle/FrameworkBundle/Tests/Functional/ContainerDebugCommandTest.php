@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @group functional
@@ -273,7 +274,7 @@ TXT
     {
         $serviceId = 'console.command.container_debug';
         $hiddenServiceId = '.console.command.container_debug.lazy';
-        $interfaceServiceId = 'Symfony\Component\HttpKernel\HttpKernelInterface';
+        $interfaceServiceId = HttpKernelInterface::class;
 
         yield 'name' => [
             [''],

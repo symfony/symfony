@@ -8,6 +8,7 @@ CHANGELOG
  * Allow to avoid `limit` definition in a RateLimiter configuration when using the `no_limit` policy
  * Add `--format` option to the `debug:config` command
  * Add support to pass namespace wildcard in `framework.messenger.routing`
+ * Deprecate `framework:exceptions` tag, unwrap it and replace `framework:exception` tags' `name` attribute by `class`
 
 6.2
 ---

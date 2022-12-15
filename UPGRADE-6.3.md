@@ -7,6 +7,37 @@ DependencyInjection
  * Deprecate `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use `inline_factories` and `inline_class_loader` instead
  * Deprecate undefined and numeric keys with `service_locator` config, use string aliases instead
 
+FrameworkBundle
+---------------
+
+ * Deprecate `framework:exceptions` tag, unwrap it and replace `framework:exception` tags' `name` attribute by `class`
+
+   Before:
+   ```xml
+   <!-- config/packages/framework.xml -->
+   <framework:config>
+       <framework:exceptions>
+           <framework:exception
+               name="Symfony\Component\HttpKernel\Exception\BadRequestHttpException"
+               log-level="info"
+               status-code="422"
+           />
+       </framework:exceptions>
+   </framework:config>
+   ```
+
+   After:
+   ```xml
+   <!-- config/packages/framework.xml -->
+   <framework:config>
+       <framework:exception
+           class="Symfony\Component\HttpKernel\Exception\BadRequestHttpException"
+           log-level="info"
+           status-code="422"
+       />
+   </framework:config>
+   ```
+
 HttpKernel
 ----------
 

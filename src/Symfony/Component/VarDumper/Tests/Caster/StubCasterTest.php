@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ArgsStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\LinkStub;
+use Symfony\Component\VarDumper\Caster\ScalarStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -81,6 +82,19 @@ array:1 [
   0 => {
     123
   }
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $args);
+    }
+
+    public function testEmptyStub()
+    {
+        $args = [new ScalarStub('🐛')];
+
+        $expectedDump = <<<'EODUMP'
+array:1 [
+  0 => 🐛
 ]
 EODUMP;
 
@@ -203,7 +217,7 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
-  <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:195" rel="noopener noreferrer"><span class=sf-dump-str title="19 characters">Exception@anonymous</span></a>"
+  <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:209" rel="noopener noreferrer"><span class=sf-dump-str title="19 characters">Exception@anonymous</span></a>"
 </samp>]
 </bar>
 EODUMP;

@@ -24,7 +24,6 @@
         "php": ">=7.2.5",
         "symfony/http-client": "^4.4|^5.2|^6.0",
         "symfony/notifier": "^5.3|^6.0",
-        "symfony/event-dispatcher-contracts": "^2|^3",
         "symfony/mailer": "^5.2|^6.0"
     },
     "autoload": {

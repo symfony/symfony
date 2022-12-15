@@ -221,6 +221,34 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
     }
 
     /**
+     * @return false
+     */
+    public function false()
+    {
+    }
+
+    /**
+     * @return true
+     */
+    public function true()
+    {
+    }
+
+    /**
+     * @return never
+     */
+    public function never()
+    {
+    }
+
+    /**
+     * @return null
+     */
+    public function null()
+    {
+    }
+
+    /**
      * @return int
      */
     public function notExtended()

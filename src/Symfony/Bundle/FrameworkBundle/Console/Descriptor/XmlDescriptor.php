@@ -565,7 +565,7 @@ class XmlDescriptor extends Descriptor
             }
             $callableXML->setAttribute('name', $r->name);
 
-            if ($class = $r->getClosureScopeClass()) {
+            if ($class = \PHP_VERSION_ID >= 80111 ? $r->getClosureCalledClass() : $r->getClosureScopeClass()) {
                 $callableXML->setAttribute('class', $class->name);
                 if (!$r->getClosureThis()) {
                     $callableXML->setAttribute('static', 'true');

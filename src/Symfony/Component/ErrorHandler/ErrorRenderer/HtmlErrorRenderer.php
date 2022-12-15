@@ -50,7 +50,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     {
         $this->debug = \is_bool($debug) ? $debug : $debug(...);
         $this->charset = $charset ?: (\ini_get('default_charset') ?: 'UTF-8');
-        $fileLinkFormat ??= $_SERVER['SYMFONY_IDE'] ?? null;
+        $fileLinkFormat ??= $_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? null;
         $this->fileLinkFormat = \is_string($fileLinkFormat)
             ? (ErrorRendererInterface::IDE_LINK_FORMATS[$fileLinkFormat] ?? $fileLinkFormat ?: false)
             : ($fileLinkFormat ?: \ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: false);

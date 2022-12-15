@@ -453,6 +453,22 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
+    public function testCallMagicMethodDenormalize()
+    {
+        $obj = $this->normalizer->denormalize(['active' => true], ObjectWithMagicMethod::class);
+        $this->assertTrue($obj->isActive());
+    }
+
+    public function testCallMagicMethodNormalize()
+    {
+        $obj = new ObjectWithMagicMethod();
+
+        $this->assertSame(
+            ['active' => true],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     protected function getObjectCollectionWithExpectedArray(): array
     {
         return [[
@@ -720,5 +736,20 @@ class ObjectWithHasGetterDummy
     public function hasFoo()
     {
         return $this->foo;
+    }
+}
+
+class ObjectWithMagicMethod
+{
+    private $active = true;
+
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    public function __call($key, $value)
+    {
+        throw new \RuntimeException('__call should not be called. Called with: '.$key);
     }
 }

@@ -39,4 +39,14 @@ class MessagePartTest extends TestCase
             new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'Subject.eml', 'filename' => 'Subject.eml'])
         ), $p->getPreparedHeaders());
     }
+
+    public function testSerialize()
+    {
+        $email = (new Email())->from('fabien@symfony.com')->to('you@example.com')->text('content');
+        $email->getHeaders()->addIdHeader('Message-ID', $email->generateMessageId());
+
+        $p = new MessagePart($email);
+        $expected = clone $p;
+        $this->assertEquals($expected->toString(), unserialize(serialize($p))->toString());
+    }
 }

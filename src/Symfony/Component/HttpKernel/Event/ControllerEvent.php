@@ -92,7 +92,7 @@ final class ControllerEvent extends KernelEvent
         } elseif (\is_string($this->controller) && false !== $i = strpos($this->controller, '::')) {
             $class = new \ReflectionClass(substr($this->controller, 0, $i));
         } else {
-            $class = str_contains($this->controllerReflector->name, '{closure}') ? null : $this->controllerReflector->getClosureScopeClass();
+            $class = str_contains($this->controllerReflector->name, '{closure}') ? null : (\PHP_VERSION_ID >= 80111 ? $this->controllerReflector->getClosureCalledClass() : $this->controllerReflector->getClosureScopeClass());
         }
         $this->attributes = [];
 

@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -70,6 +71,7 @@ use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -1409,7 +1411,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $argument = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
 
         $this->assertCount(2, $argument);
-        $this->assertEquals('Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader', $argument[0]->getClass());
+        $this->assertEquals(AnnotationLoader::class, $argument[0]->getClass());
         $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.name_converter.metadata_aware')->getArgument(1));
         $this->assertEquals(new Reference('property_info', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $container->getDefinition('serializer.normalizer.object')->getArgument(3));
         $this->assertArrayHasKey('circular_reference_handler', $container->getDefinition('serializer.normalizer.object')->getArgument(6));
@@ -1491,7 +1493,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $definition = $container->getDefinition('serializer.normalizer.object');
         $tag = $definition->getTag('serializer.normalizer');
 
-        $this->assertEquals('Symfony\Component\Serializer\Normalizer\ObjectNormalizer', $definition->getClass());
+        $this->assertEquals(ObjectNormalizer::class, $definition->getClass());
         $this->assertEquals(-1000, $tag[0]['priority']);
     }
 
@@ -2217,7 +2219,7 @@ abstract class FrameworkExtensionTest extends TestCase
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([
-            'kernel.bundles' => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],
+            'kernel.bundles' => ['FrameworkBundle' => FrameworkBundle::class],
             'kernel.bundles_metadata' => ['FrameworkBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..']],
             'kernel.cache_dir' => __DIR__,
             'kernel.build_dir' => __DIR__,

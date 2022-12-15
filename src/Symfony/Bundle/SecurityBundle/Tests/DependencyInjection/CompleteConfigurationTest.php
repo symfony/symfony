@@ -30,6 +30,7 @@ use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
@@ -240,7 +241,7 @@ abstract class CompleteConfigurationTest extends TestCase
             ],
         ], $listeners);
 
-        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
+        $this->assertFalse($container->hasAlias(UserCheckerInterface::class, 'No user checker alias is registered when custom user checker services are registered'));
     }
 
     public function testFirewallRequestMatchers()
@@ -280,8 +281,8 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('no_custom_user_checker');
 
-        $this->assertTrue($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'Alias for user checker is registered when no custom user checker service is registered'));
-        $this->assertFalse($container->getAlias('Symfony\Component\Security\Core\User\UserCheckerInterface')->isPublic());
+        $this->assertTrue($container->hasAlias(UserCheckerInterface::class, 'Alias for user checker is registered when no custom user checker service is registered'));
+        $this->assertFalse($container->getAlias(UserCheckerInterface::class)->isPublic());
     }
 
     public function testAccess()

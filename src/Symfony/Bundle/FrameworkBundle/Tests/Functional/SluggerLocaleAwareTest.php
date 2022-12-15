@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Slugger\SlugConstructArgService;
+
 /**
  * @group functional
  */
@@ -24,7 +26,7 @@ class SluggerLocaleAwareTest extends AbstractWebTestCase
         $kernel = static::createKernel(['test_case' => 'Slugger', 'root_config' => 'config.yml']);
         $kernel->boot();
 
-        $service = $kernel->getContainer()->get('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Slugger\SlugConstructArgService');
+        $service = $kernel->getContainer()->get(SlugConstructArgService::class);
 
         $this->assertSame('Stoinostta-tryabva-da-bude-luzha', $service->hello());
     }

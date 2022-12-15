@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2022-12-02T11:34:49Z
+
+Oh, I like this so much. Can we leverage this, to be able to configuration the dumper? (may be in another PR). I would love to do something like
+
+```
+dd($value, max_depth: 4);
+```
+to automatically expand the 4 depth level
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-12-02T12:28:08Z
+
+Big yes to me, @lyrixx! When talking about this idea, Nicolas seemed to have a few other ones that could definitely fit with this evolution in future PRs. A set of "reserved" named parameters to tweak `dump()` and `dd()` behaviours sounds great!
+
+---------------------------------------------------------------------------
+
+by drupol at 2022-12-02T22:44:16Z
+
+Nice feature !
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-04T23:42:38Z
+
+> I like the idea of using special names to configure the dump.
+> …
+> Anyway, I'd just suggest considering this in a follow up PR to keep this one focused.
+
+Let's discuss this other feature in https://github.com/symfony/symfony/issues/48474
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-12-15T16:23:33Z
+
+Everything has been updated according to your feedback. Thanks!
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-15T16:39:40Z
+
+Names starting with `_` should be forbidden and reserved to the futur options.

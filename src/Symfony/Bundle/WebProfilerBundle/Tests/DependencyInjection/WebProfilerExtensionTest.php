@@ -22,6 +22,11 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -55,10 +60,10 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->register('data_collector.dump', DumpDataCollector::class)->setPublic(true);
         $this->container->register('error_handler.error_renderer.html', HtmlErrorRenderer::class)->setPublic(true);
         $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
-        $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'))->setPublic(true);
-        $this->container->register('twig', 'Twig\Environment')->setPublic(true);
-        $this->container->register('twig_loader', 'Twig\Loader\ArrayLoader')->addArgument([])->setPublic(true);
-        $this->container->register('twig', 'Twig\Environment')->addArgument(new Reference('twig_loader'))->setPublic(true);
+        $this->container->register('router', $this->getMockClass(RouterInterface::class))->setPublic(true);
+        $this->container->register('twig', Environment::class)->setPublic(true);
+        $this->container->register('twig_loader', ArrayLoader::class)->addArgument([])->setPublic(true);
+        $this->container->register('twig', Environment::class)->addArgument(new Reference('twig_loader'))->setPublic(true);
         $this->container->setParameter('kernel.bundles', []);
         $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.build_dir', __DIR__);
@@ -66,10 +71,10 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('kernel.project_dir', __DIR__);
         $this->container->setParameter('kernel.charset', 'UTF-8');
         $this->container->setParameter('debug.file_link_format', null);
-        $this->container->setParameter('profiler.class', ['Symfony\\Component\\HttpKernel\\Profiler\\Profiler']);
-        $this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
+        $this->container->setParameter('profiler.class', [Profiler::class]);
+        $this->container->register('profiler', $this->getMockClass(Profiler::class))
             ->setPublic(true)
-            ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
+            ->addArgument(new Definition($this->getMockClass(ProfilerStorageInterface::class)));
         $this->container->setParameter('data_collector.templates', []);
         $this->container->set('kernel', $this->kernel);
         $this->container->addCompilerPass(new RegisterListenersPass());

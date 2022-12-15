@@ -246,7 +246,7 @@ class DotenvTest extends TestCase
         $path3 = tempnam($tmpdir, 'sf-');
 
         file_put_contents($path1, "VAR_STATIC1=env\nVAR_DYNAMIC1=profile:\${VAR_STATIC1}\nVAR_DYNAMIC_FAIL=\$VAR_DYNAMIC1");
-        file_put_contents($path2, "VAR_STATIC1=local");
+        file_put_contents($path2, 'VAR_STATIC1=local');
         file_put_contents($path3, "VAR_STATIC2=file3\nVAR_DYNAMIC2=\$VAR_STATIC1\nVAR_DYNAMIC3=\$VAR_STATIC2");
 
         (new Dotenv())->usePutenv()->load($path1, $path2, $path3);
@@ -412,13 +412,13 @@ class DotenvTest extends TestCase
         $pathLocalEnv = "$pathEnv.local";
 
         file_put_contents($pathEnv, "VAR_STATIC1=env\nVAR_DYNAMIC1=profile:\${VAR_STATIC1}\nVAR_DYNAMIC_FAIL=\$VAR_DYNAMIC1");
-        file_put_contents($pathLocalEnv, "VAR_STATIC1=local");
+        file_put_contents($pathLocalEnv, 'VAR_STATIC1=local');
 
         (new Dotenv())->usePutenv()->loadEnv($pathEnv, 'TEST_APP_ENV');
 
         $static1 = getenv('VAR_STATIC1');
         $dynamic1 = getenv('VAR_DYNAMIC1');
-		$dynamicFail = getenv('VAR_DYNAMIC_FAIL');
+        $dynamicFail = getenv('VAR_DYNAMIC_FAIL');
 
         unlink($pathEnv);
         unlink($pathLocalEnv);
@@ -486,7 +486,7 @@ class DotenvTest extends TestCase
         $path3 = tempnam($tmpdir, 'sf-');
 
         file_put_contents($path1, "VAR_STATIC1=env\nVAR_DYNAMIC1=profile:\${VAR_STATIC1}\nVAR_DYNAMIC_FAIL=\$VAR_DYNAMIC1");
-        file_put_contents($path2, "VAR_STATIC1=local");
+        file_put_contents($path2, 'VAR_STATIC1=local');
         file_put_contents($path3, "VAR_STATIC2=file3\nVAR_DYNAMIC2=\$VAR_STATIC1\nVAR_DYNAMIC3=\$VAR_STATIC2");
 
         (new Dotenv())->usePutenv()->overload($path1, $path2, $path3);

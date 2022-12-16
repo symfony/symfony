@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2022-12-15T13:41:04Z
+
+It is quite strange that it do the exact opposite of what https://github.com/symfony/symfony/pull/46847 does
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-15T13:42:55Z
+
+Let's add a test case that covers the target behavior in #46847, this might help sort this out.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2022-12-15T14:01:24Z
+
+@nicolas-grekas code style fixed :+1:
+
+I'm not sure what else to test. https://github.com/symfony/symfony/pull/46847  says:
+> I realized we can't use the Context attribute context in an `AdvancedNameConverterInterface::denormalize()`
+
+but we only pass through `AdvancedNameConverterInterface::normalize()` here.
+
+And the PR mentions #46525 which says:
+> Property specific denormalization context doesn't work when property name in the array being denormalized is different from property name in the class.
+
+which is exactly what my PR does and tests...

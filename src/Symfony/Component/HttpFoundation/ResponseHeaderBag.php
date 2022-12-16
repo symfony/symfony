@@ -244,7 +244,7 @@ class ResponseHeaderBag extends HeaderBag
             }
 
             // conservative by default
-            return 'no-cache, private';
+            return 'no-store, private';
         }
 
         $header = $this->getCacheControlHeader();

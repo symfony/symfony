@@ -101,6 +101,7 @@ use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory as
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
+use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
 use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
@@ -2455,6 +2456,7 @@ class FrameworkExtension extends Extension
             InfobipMailerTransportFactory::class => 'mailer.transport_factory.infobip',
             MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
             MailjetTransportFactory::class => 'mailer.transport_factory.mailjet',
+            MailPaceTransportFactory::class => 'mailer.transport_factory.mailpace',
             MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
             OhMySmtpTransportFactory::class => 'mailer.transport_factory.ohmysmtp',
             PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',

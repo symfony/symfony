@@ -33,8 +33,12 @@ class WebProfilerExtensionTest extends TestCase
 
     public static function assertSaneContainer(Container $container)
     {
+        $removedIds = $container->getRemovedIds();
         $errors = [];
         foreach ($container->getServiceIds() as $id) {
+            if (isset($removedIds[$id])) {
+                continue;
+            }
             try {
                 $container->get($id);
             } catch (\Exception $e) {

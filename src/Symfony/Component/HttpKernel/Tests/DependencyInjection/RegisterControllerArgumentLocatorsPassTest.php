@@ -467,7 +467,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
 
-        $container->register('some.id', \stdClass::class);
+        $container->register('some.id', \stdClass::class)->setPublic(true);
         $container->setParameter('some.parameter', 'foo');
 
         $container->register('foo', WithAutowireAttribute::class)

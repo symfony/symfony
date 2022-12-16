@@ -105,14 +105,6 @@ class ConsoleSectionOutput extends StreamOutput
     /**
      * @internal
      */
-    public function incrementLines()
-    {
-        ++$this->lines;
-    }
-
-    /**
-     * @internal
-     */
     public function addContent(string $input, bool $newline = true): int
     {
         $width = $this->terminal->getWidth();

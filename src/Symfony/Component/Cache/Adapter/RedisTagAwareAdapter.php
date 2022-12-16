@@ -65,7 +65,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, get_debug_type($redis->getConnection())));
         }
 
-        if (\defined('Redis::OPT_COMPRESSION') && ($redis instanceof \Redis || $redis instanceof \RedisArray || $redis instanceof \RedisCluster)) {
+        if (\defined('Redis::OPT_COMPRESSION') && \in_array($redis::class, [\Redis::class, \RedisArray::class, \RedisCluster::class], true)) {
             $compression = $redis->getOption(\Redis::OPT_COMPRESSION);
 
             foreach (\is_array($compression) ? $compression : [$compression] as $c) {

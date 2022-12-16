@@ -560,10 +560,13 @@ class SessionListenerTest extends TestCase
     public function testResponseHeadersMaxAgeAndExpiresNotBeOverridenIfSessionStarted()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
+        $session->expects($this->once())->method('getName')->willReturn('foo');
+        $sessionFactory = $this->createMock(SessionFactory::class);
+        $sessionFactory->expects($this->once())->method('createSession')->willReturn($session);
 
         $container = new Container();
-        $container->set('initialized_session', $session);
+        $container->set('session_factory', $sessionFactory);
 
         $listener = new SessionListener($container);
         $kernel = $this->createMock(HttpKernelInterface::class);
@@ -571,11 +574,13 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
+        $request->getSession();
+
         $response = new Response();
         $response->setPrivate();
         $expiresHeader = gmdate('D, d M Y H:i:s', time() + 600).' GMT';
         $response->setMaxAge(600);
-        $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $this->assertTrue($response->headers->has('expires'));
         $this->assertSame($expiresHeader, $response->headers->get('expires'));
@@ -590,20 +595,20 @@ class SessionListenerTest extends TestCase
     public function testResponseHeadersMaxAgeAndExpiresDefaultValuesIfSessionStarted()
     {
         $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
 
         $container = new Container();
-        $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container);
         $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
+        $request->setSession($session);
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
         $response = new Response();
         $expiresHeader = gmdate('D, d M Y H:i:s', time()).' GMT';
-        $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $this->assertTrue($response->headers->has('expires'));
         $this->assertSame($expiresHeader, $response->headers->get('expires'));

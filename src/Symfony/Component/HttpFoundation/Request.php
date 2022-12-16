@@ -1436,6 +1436,7 @@ class Request
      * @param bool $asResource If true, a resource will be returned
      *
      * @return string|resource
+     *
      * @psalm-return ($asResource is true ? resource : string)
      */
     public function getContent(bool $asResource = false)

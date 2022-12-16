@@ -27,7 +27,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
     /**
      * Cache-Control headers that are sent to the final response if they appear in ANY of the responses.
      */
-    private const OVERRIDE_DIRECTIVES = ['private', 'no-cache', 'no-store', 'no-transform', 'must-revalidate', 'proxy-revalidate'];
+    private const OVERRIDE_DIRECTIVES = ['private', 'no-store', 'no-store', 'no-transform', 'must-revalidate', 'proxy-revalidate'];
 
     /**
      * Cache-Control headers that are sent to the final response if they appear in ALL of the responses.
@@ -39,7 +39,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
     private int $age = 0;
     private \DateTimeInterface|null|false $lastModified = null;
     private array $flagDirectives = [
-        'no-cache' => null,
+        'no-store' => null,
         'no-store' => null,
         'no-transform' => null,
         'must-revalidate' => null,
@@ -113,9 +113,9 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
             $response->setLastModified(null);
 
             if ($this->flagDirectives['no-store']) {
-                $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+                $response->headers->set('Cache-Control', 'no-store, no-store, must-revalidate');
             } else {
-                $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
+                $response->headers->set('Cache-Control', 'no-store, must-revalidate');
             }
 
             return;
@@ -126,7 +126,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
         $flags = array_filter($this->flagDirectives);
 
         if (isset($flags['must-revalidate'])) {
-            $flags['no-cache'] = true;
+            $flags['no-store'] = true;
         }
 
         $response->headers->set('Cache-Control', implode(', ', array_keys($flags)));
@@ -162,7 +162,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
     {
         // RFC2616: A response received with a status code of 200, 203, 300, 301 or 410
         // MAY be stored by a cache […] unless a cache-control directive prohibits caching.
-        if ($response->headers->hasCacheControlDirective('no-cache')
+        if ($response->headers->hasCacheControlDirective('no-store')
             || $response->headers->hasCacheControlDirective('no-store')
         ) {
             return true;

@@ -84,7 +84,7 @@ class ResponseCacheStrategyTest extends TestCase
         $mainResponse->setSharedMaxAge(3600);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-store'));
         $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertFalse($mainResponse->isFresh());
     }
@@ -108,7 +108,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($mainResponse->isValidateable());
         $this->assertFalse($mainResponse->headers->has('Last-Modified'));
         $this->assertFalse($mainResponse->headers->has('ETag'));
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-store'));
         $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
     }
 
@@ -172,7 +172,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->add($embeddedResponse);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-store'));
         $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertFalse($mainResponse->isFresh());
     }
@@ -353,11 +353,11 @@ class ResponseCacheStrategyTest extends TestCase
             ],
         ];
 
-        yield 'inherits no-cache from surrogates' => [
-            ['no-cache' => true, 'public' => false],
+        yield 'inherits no-store from surrogates' => [
+            ['no-store' => true, 'public' => false],
             ['public' => true],
             [
-                ['no-cache' => true],
+                ['no-store' => true],
             ],
         ];
 
@@ -436,7 +436,7 @@ class ResponseCacheStrategyTest extends TestCase
         ];
 
         yield 'result is private when combining private responses' => [
-            ['no-cache' => false, 'must-revalidate' => false, 'private' => true],
+            ['no-store' => false, 'must-revalidate' => false, 'private' => true],
             ['s-maxage' => 60, 'private' => true],
             [
                 ['s-maxage' => 60, 'private' => true],

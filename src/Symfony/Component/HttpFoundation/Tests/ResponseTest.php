@@ -25,7 +25,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $response = explode("\r\n", $response);
         $this->assertEquals('HTTP/1.0 200 OK', $response[0]);
-        $this->assertEquals('Cache-Control: no-cache, private', $response[1]);
+        $this->assertEquals('Cache-Control: no-store, private', $response[1]);
     }
 
     public function testClone()
@@ -650,7 +650,7 @@ class ResponseTest extends ResponseTestCase
 
         $response = new Response('foo');
         $response->prepare($request);
-        $this->assertEquals('no-cache', $response->headers->get('pragma'));
+        $this->assertEquals('no-store', $response->headers->get('pragma'));
         $this->assertEquals('-1', $response->headers->get('expires'));
 
         $response = new Response('foo');

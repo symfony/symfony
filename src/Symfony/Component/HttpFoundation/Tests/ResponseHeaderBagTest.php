@@ -43,17 +43,17 @@ class ResponseHeaderBagTest extends TestCase
     public function testCacheControlHeader()
     {
         $bag = new ResponseHeaderBag([]);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        $this->assertEquals('no-store, private', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-store'));
 
         $bag = new ResponseHeaderBag(['Cache-Control' => 'public']);
         $this->assertEquals('public', $bag->get('Cache-Control'));
         $this->assertTrue($bag->hasCacheControlDirective('public'));
 
         $bag = new ResponseHeaderBag(['ETag' => 'abcde']);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
+        $this->assertEquals('no-store, private', $bag->get('Cache-Control'));
         $this->assertTrue($bag->hasCacheControlDirective('private'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-store'));
         $this->assertFalse($bag->hasCacheControlDirective('max-age'));
 
         $bag = new ResponseHeaderBag(['Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT']);
@@ -139,8 +139,8 @@ class ResponseHeaderBagTest extends TestCase
     public function testReplace()
     {
         $bag = new ResponseHeaderBag([]);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        $this->assertEquals('no-store, private', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-store'));
 
         $bag->replace(['Cache-Control' => 'public']);
         $this->assertEquals('public', $bag->get('Cache-Control'));
@@ -150,13 +150,13 @@ class ResponseHeaderBagTest extends TestCase
     public function testReplaceWithRemove()
     {
         $bag = new ResponseHeaderBag([]);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        $this->assertEquals('no-store, private', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-store'));
 
         $bag->remove('Cache-Control');
         $bag->replace([]);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        $this->assertEquals('no-store, private', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-store'));
     }
 
     public function testCookiesWithSameNames()

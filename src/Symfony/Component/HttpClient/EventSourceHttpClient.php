@@ -45,7 +45,7 @@ final class EventSourceHttpClient implements HttpClientInterface, ResetInterface
             'buffer' => false,
             'headers' => [
                 'Accept' => 'text/event-stream',
-                'Cache-Control' => 'no-cache',
+                'Cache-Control' => 'no-store',
             ],
         ], true));
     }

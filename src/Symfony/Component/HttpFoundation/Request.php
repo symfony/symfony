@@ -1510,7 +1510,7 @@ class Request
 
     public function isNoCache(): bool
     {
-        return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
+        return $this->headers->hasCacheControlDirective('no-store') || 'no-store' == $this->headers->get('Pragma');
     }
 
     /**

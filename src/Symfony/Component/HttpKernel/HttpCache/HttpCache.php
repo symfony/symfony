@@ -61,7 +61,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *                            public or private via a Cache-Control directive. (default: Authorization and Cookie)
      *
      *   * allow_reload           Specifies whether the client can force a cache reload by including a
-     *                            Cache-Control "no-cache" directive in the request. Set it to ``true``
+     *                            Cache-Control "no-store" directive in the request. Set it to ``true``
      *                            for compliance with RFC 2616. (default: false)
      *
      *   * allow_revalidate       Specifies whether the client can force a cache revalidate by including
@@ -206,7 +206,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $response = $this->pass($request, $catch);
         } elseif ($this->options['allow_reload'] && $request->isNoCache()) {
             /*
-                If allow_reload is configured and the client requests "Cache-Control: no-cache",
+                If allow_reload is configured and the client requests "Cache-Control: no-store",
                 reload the cache by fetching a fresh response and caching it (if possible).
             */
             $this->record($request, 'reload');
@@ -343,7 +343,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             return $this->validate($request, $entry, $catch);
         }
 
-        if ($entry->headers->hasCacheControlDirective('no-cache')) {
+        if ($entry->headers->hasCacheControlDirective('no-store')) {
             return $this->validate($request, $entry, $catch);
         }
 
@@ -469,7 +469,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
          * Cache-Control directives) that
          *
          *      A cache MUST NOT generate a stale response if it is prohibited by an
-         *      explicit in-protocol directive (e.g., by a "no-store" or "no-cache"
+         *      explicit in-protocol directive (e.g., by a "no-store" or "no-store"
          *      cache directive, a "must-revalidate" cache-response-directive, or an
          *      applicable "s-maxage" or "proxy-revalidate" cache-response-directive;
          *      see Section 5.2.2).
@@ -481,7 +481,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
          */
         if (null !== $entry
             && \in_array($response->getStatusCode(), [500, 502, 503, 504])
-            && !$entry->headers->hasCacheControlDirective('no-cache')
+            && !$entry->headers->hasCacheControlDirective('no-store')
             && !$entry->mustRevalidate()
         ) {
             if (null === $age = $entry->headers->getCacheControlDirective('stale-if-error')) {

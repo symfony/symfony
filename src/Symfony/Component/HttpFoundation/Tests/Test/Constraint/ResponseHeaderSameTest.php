@@ -21,7 +21,7 @@ class ResponseHeaderSameTest extends TestCase
 {
     public function testConstraint()
     {
-        $constraint = new ResponseHeaderSame('Cache-Control', 'no-cache, private');
+        $constraint = new ResponseHeaderSame('Cache-Control', 'no-store, private');
         $this->assertTrue($constraint->evaluate(new Response(), '', true));
         $constraint = new ResponseHeaderSame('Cache-Control', 'public');
         $this->assertFalse($constraint->evaluate(new Response(), '', true));

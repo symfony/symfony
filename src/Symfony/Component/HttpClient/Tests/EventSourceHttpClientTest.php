@@ -68,7 +68,7 @@ TXT;
         })());
 
         $hasCorrectHeaders = function ($options) {
-            $this->assertSame(['Accept: text/event-stream', 'Cache-Control: no-cache'], $options['headers']);
+            $this->assertSame(['Accept: text/event-stream', 'Cache-Control: no-store'], $options['headers']);
 
             return true;
         };
@@ -124,7 +124,7 @@ TXT;
         })());
 
         $hasCorrectHeaders = function ($options) {
-            $this->assertSame(['Accept: text/event-stream', 'Cache-Control: no-cache'], $options['headers']);
+            $this->assertSame(['Accept: text/event-stream', 'Cache-Control: no-store'], $options['headers']);
 
             return true;
         };

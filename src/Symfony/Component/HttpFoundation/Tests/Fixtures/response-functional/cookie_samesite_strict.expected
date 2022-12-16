@@ -2,7 +2,7 @@
 Array
 (
     [0] => Content-Type: text/plain; charset=utf-8
-    [1] => Cache-Control: no-cache, private
+    [1] => Cache-Control: no-store, private
     [2] => Date: Sat, 12 Nov 1955 20:04:00 GMT
     [3] => Set-Cookie: CookieSamesiteStrictTest=StrictValue; path=/; httponly; samesite=strict
 )

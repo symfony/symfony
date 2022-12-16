@@ -362,7 +362,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $time = \DateTimeImmutable::createFromFormat('U', time() + 5);
 
         $this->setNextResponse(200, ['Cache-Control' => 'public', 'Expires' => $time->format(\DATE_RFC2822)]);
-        $this->request('GET', '/', ['HTTP_CACHE_CONTROL' => 'no-cache']);
+        $this->request('GET', '/', ['HTTP_CACHE_CONTROL' => 'no-store']);
 
         $this->assertHttpKernelIsCalled();
         $this->assertTraceContains('store');
@@ -389,7 +389,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
 
         $this->cacheConfig['allow_reload'] = true;
-        $this->request('GET', '/', ['HTTP_CACHE_CONTROL' => 'no-cache']);
+        $this->request('GET', '/', ['HTTP_CACHE_CONTROL' => 'no-store']);
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertEquals('Goodbye World', $this->response->getContent());
         $this->assertTraceContains('reload');
@@ -416,12 +416,12 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
 
         $this->cacheConfig['allow_reload'] = false;
-        $this->request('GET', '/', ['HTTP_CACHE_CONTROL' => 'no-cache']);
+        $this->request('GET', '/', ['HTTP_CACHE_CONTROL' => 'no-store']);
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertEquals('Hello World', $this->response->getContent());
         $this->assertTraceNotContains('reload');
 
-        $this->request('GET', '/', ['HTTP_CACHE_CONTROL' => 'no-cache']);
+        $this->request('GET', '/', ['HTTP_CACHE_CONTROL' => 'no-store']);
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertEquals('Hello World', $this->response->getContent());
         $this->assertTraceNotContains('reload');
@@ -540,7 +540,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testCachesResponsesWithExplicitNoCacheDirective()
     {
         $time = \DateTimeImmutable::createFromFormat('U', time() + 5);
-        $this->setNextResponse(200, ['Expires' => $time->format(\DATE_RFC2822), 'Cache-Control' => 'public, no-cache']);
+        $this->setNextResponse(200, ['Expires' => $time->format(\DATE_RFC2822), 'Cache-Control' => 'public, no-store']);
 
         $this->request('GET', '/');
         $this->assertTraceContains('store');
@@ -549,15 +549,15 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testRevalidatesResponsesWithNoCacheDirectiveEvenIfFresh()
     {
-        $this->setNextResponse(200, ['Cache-Control' => 'public, no-cache, max-age=10', 'ETag' => 'some-etag'], 'OK');
+        $this->setNextResponse(200, ['Cache-Control' => 'public, no-store, max-age=10', 'ETag' => 'some-etag'], 'OK');
         $this->request('GET', '/'); // warm the cache
 
         sleep(5);
 
-        $this->setNextResponse(304, ['Cache-Control' => 'public, no-cache, max-age=10', 'ETag' => 'some-etag']);
+        $this->setNextResponse(304, ['Cache-Control' => 'public, no-store, max-age=10', 'ETag' => 'some-etag']);
         $this->request('GET', '/');
 
-        $this->assertHttpKernelIsCalled(); // no-cache -> MUST have revalidated at origin
+        $this->assertHttpKernelIsCalled(); // no-store -> MUST have revalidated at origin
         $this->assertTraceContains('valid');
         $this->assertEquals('OK', $this->response->getContent());
         $this->assertEquals(0, $this->response->getAge());
@@ -1257,7 +1257,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->setNextResponse();
         $this->cacheConfig['allow_reload'] = true;
-        $this->request('GET', '/', [], [], false, ['Pragma' => 'no-cache']);
+        $this->request('GET', '/', [], [], false, ['Pragma' => 'no-store']);
 
         $this->assertExceptionsAreCaught();
     }
@@ -1358,7 +1358,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
         $this->assertNull($this->response->getTtl());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
-        $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
     public function testEsiCacheForceValidationForHeadRequests()
@@ -1388,7 +1388,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEmpty($this->response->getContent());
         $this->assertNull($this->response->getTtl());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
-        $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
+        $this->assertTrue($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
     public function testEsiRecalculateContentLengthHeader()
@@ -1751,8 +1751,8 @@ class HttpCacheTest extends HttpCacheTestCase
         // Cache-control values that prohibit serving stale responses or responses without positive validation -
         // see https://tools.ietf.org/html/rfc7234#section-4.2.4 and
         // https://tools.ietf.org/html/rfc7234#section-5.2.2
-        yield 'no-cache requires positive validation' => [['Cache-Control' => 'public, no-cache', 'ETag' => 'some-etag']];
-        yield 'no-cache requires positive validation, even if fresh' => [['Cache-Control' => 'public, no-cache, max-age=10']];
+        yield 'no-store requires positive validation' => [['Cache-Control' => 'public, no-store', 'ETag' => 'some-etag']];
+        yield 'no-store requires positive validation, even if fresh' => [['Cache-Control' => 'public, no-store, max-age=10']];
         yield 'must-revalidate requires positive validation once stale' => [['Cache-Control' => 'public, max-age=10, must-revalidate'], 15];
         yield 'proxy-revalidate requires positive validation once stale' => [['Cache-Control' => 'public, max-age=10, proxy-revalidate'], 15];
     }

@@ -89,7 +89,7 @@ class Psr18ClientTest extends TestCase
         $responseHeaders = [
             // space in header name not allowed in RFC 7230
             ' X-XSS-Protection' => '0',
-            'Cache-Control' => 'no-cache',
+            'Cache-Control' => 'no-store',
         ];
         $response = new MockResponse('body', ['response_headers' => $responseHeaders]);
         $this->assertArrayHasKey(' x-xss-protection', $response->getHeaders());

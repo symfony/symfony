@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHand
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MarshallingSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeMemcachedSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeRedisSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
@@ -73,6 +75,18 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 inline_service(NativeFileSessionHandler::class)
                     ->args([param('session.save_path')]),
+            ])
+
+        ->set('session.handler.native_memcached', StrictSessionHandler::class)
+            ->args([
+                inline_service(NativeMemcachedSessionHandler::class)
+                    ->args([param('session.save_path'), param('session.storage.options')]),
+            ])
+
+        ->set('session.handler.native_redis', StrictSessionHandler::class)
+            ->args([
+                inline_service(NativeRedisSessionHandler::class)
+                    ->args([param('session.save_path'), param('session.storage.options')]),
             ])
 
         ->set('session.abstract_handler', AbstractSessionHandler::class)

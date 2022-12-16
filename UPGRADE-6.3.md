@@ -5,6 +5,7 @@ DependencyInjection
 -------------------
 
  * Deprecate `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`, use `inline_factories` and `inline_class_loader` instead
+ * Deprecate undefined and numeric keys with `service_locator` config, use string aliases instead
 
 HttpKernel
 ----------

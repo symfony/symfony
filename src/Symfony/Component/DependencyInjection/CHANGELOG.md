@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate `PhpDumper` options `inline_factories_parameter` and `inline_class_loader_parameter`
  * Add `RemoveBuildParametersPass`, which removes parameters starting with a dot during compilation
  * Add support for nesting autowiring-related attributes into `#[Autowire(...)]`
+ * Deprecate undefined and numeric keys with `service_locator` config
 
 6.2
 ---

@@ -123,7 +123,13 @@ function inline_service(string $class = null): InlineServiceConfigurator
  */
 function service_locator(array $values): ServiceLocatorArgument
 {
-    return new ServiceLocatorArgument(AbstractConfigurator::processValue($values, true));
+    $values = AbstractConfigurator::processValue($values, true);
+
+    if (isset($values[0])) {
+        trigger_deprecation('symfony/dependency-injection', '6.3', 'Using integers as keys in a "service_locator()" argument is deprecated. The keys will default to the IDs of the original services in 7.0.');
+    }
+
+    return new ServiceLocatorArgument($values);
 }
 
 /**

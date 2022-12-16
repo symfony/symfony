@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <services>
+    <service id="foo_service" class="stdClass"/>
+
+    <service id="bar_service" class="stdClass"/>
+
+    <service id="locator_dependent_service_indexed" class="ArrayObject">
+      <argument type="service_locator">
+        <argument key="foo" type="service" id="foo_service"/>
+        <argument key="bar" type="service" id="bar_service"/>
+      </argument>
+    </service>
+
+    <service id="locator_dependent_service_not_indexed" class="ArrayObject">
+      <argument type="service_locator">
+        <argument type="service" id="foo_service"/>
+        <argument type="service" id="bar_service"/>
+      </argument>
+    </service>
+
+    <service id="locator_dependent_service_mixed" class="ArrayObject">
+      <argument type="service_locator">
+        <argument key="foo" type="service" id="foo_service"/>
+        <argument type="service" id="bar_service"/>
+      </argument>
+    </service>
+  </services>
+</container>

@@ -11,6 +11,14 @@ HttpKernel
 
  * Deprecate parameters `container.dumper.inline_factories` and `container.dumper.inline_class_loader`, use `.container.dumper.inline_factories` and `.container.dumper.inline_class_loader` instead
 
+Messenger
+---------
+
+ * Deprecate `Symfony\Component\Messenger\Transport\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
+   `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+
 SecurityBundle
 --------------
 

@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Transport;
+namespace Symfony\Component\Messenger\Tests\Transport\InMemory;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
-use Symfony\Component\Messenger\Transport\InMemoryTransportFactory;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**

@@ -103,7 +103,7 @@ class WebTestCaseTest extends TestCase
 
     public function testAssertResponseHeaderSame()
     {
-        $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'no-cache, private');
+        $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'no-store, private');
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Response has header "Cache-Control" with value "public".');
         $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'public');
@@ -113,8 +113,8 @@ class WebTestCaseTest extends TestCase
     {
         $this->getResponseTester(new Response())->assertResponseHeaderNotSame('Cache-Control', 'public');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that the Response does not have header "Cache-Control" with value "no-cache, private".');
-        $this->getResponseTester(new Response())->assertResponseHeaderNotSame('Cache-Control', 'no-cache, private');
+        $this->expectExceptionMessage('Failed asserting that the Response does not have header "Cache-Control" with value "no-store, private".');
+        $this->getResponseTester(new Response())->assertResponseHeaderNotSame('Cache-Control', 'no-store, private');
     }
 
     public function testAssertResponseHasCookie()

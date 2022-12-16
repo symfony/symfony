@@ -553,7 +553,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $text = $this->getNode(0)->nodeValue;
 
         if ($normalizeWhitespace) {
-            return trim(preg_replace("/(?:[ \n\r\t\x0C]{2,}+|[\n\r\t\x0C])/", ' ', $text), " \n\r\t\x0C");
+            return $this->normalizeWhitespace($text);
         }
 
         return $text;
@@ -561,10 +561,26 @@ class Crawler implements \Countable, \IteratorAggregate
 
     /**
      * Returns only the inner text that is the direct descendent of the current node, excluding any child nodes.
+     *
+     * @param bool $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      */
-    public function innerText(): string
+    public function innerText(/* bool $normalizeWhitespace = true */): string
     {
-        return $this->filterXPath('.//text()')->text();
+        $normalizeWhitespace = 1 <= \func_num_args() ? func_get_arg(0) : true;
+
+        foreach ($this->getNode(0)->childNodes as $childNode) {
+            if (\XML_TEXT_NODE !== $childNode->nodeType) {
+                continue;
+            }
+            if (!$normalizeWhitespace) {
+                return $childNode->nodeValue;
+            }
+            if ('' !== trim($childNode->nodeValue)) {
+                return $this->normalizeWhitespace($childNode->nodeValue);
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -1188,5 +1204,10 @@ class Crawler implements \Countable, \IteratorAggregate
     private function isValidHtml5Heading(string $heading): bool
     {
         return 1 === preg_match('/^\x{FEFF}?\s*(<!--[^>]*?-->\s*)*$/u', $heading);
+    }
+
+    private function normalizeWhitespace(string $string): string
+    {
+        return trim(preg_replace("/(?:[ \n\r\t\x0C]{2,}+|[\n\r\t\x0C])/", ' ', $string), " \n\r\t\x0C");
     }
 }

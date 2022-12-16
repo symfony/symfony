@@ -348,12 +348,56 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
-    public function testInnerText()
+    public function provideInnerTextExamples()
     {
-        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element"]'));
+        return [
+            [
+                '//*[@id="complex-elements"]/*[@class="one"]',     // XPath query
+                'Parent text Child text',                       // Result of Crawler::text()
+                'Parent text',                                  // Result of Crawler::innerText()
+                ' Parent text ',                                // Result of Crawler::innerText(false)
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="two"]',
+                'Child text Parent text',
+                'Parent text',
+                ' ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="three"]',
+                'Parent text Child text Parent text',
+                'Parent text',
+                ' Parent text ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="four"]',
+                'Child text',
+                '',
+                '  ',
+            ],
+            [
+                '//*[@id="complex-elements"]/*[@class="five"]',
+                'Child text Another child',
+                '',
+                '  ',
+            ],
+        ];
+    }
 
-        self::assertSame('Parent text Child text', $crawler->text());
-        self::assertSame('Parent text', $crawler->innerText());
+    /**
+     * @dataProvider provideInnerTextExamples
+     */
+    public function testInnerText(
+        string $xPathQuery,
+        string $expectedText,
+        string $expectedInnerText,
+        string $expectedInnerTextNormalizeWhitespaceFalse,
+    ) {
+        self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath($xPathQuery));
+
+        self::assertSame($expectedText, $crawler->text());
+        self::assertSame($expectedInnerText, $crawler->innerText());
+        self::assertSame($expectedInnerTextNormalizeWhitespaceFalse, $crawler->innerText(false));
     }
 
     public function testHtml()
@@ -1265,9 +1309,12 @@ HTML;
                         <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
                     <div id="sibling"><img /></div>
-                    <div id="complex-element">
-                        Parent text
-                        <span>Child text</span>
+                    <div id="complex-elements">
+                        <div class="one"> Parent text <span>Child text</span> </div>
+                        <div class="two"> <span>Child text</span> Parent text </div>
+                        <div class="three"> Parent text <span>Child text</span> Parent text </div>
+                        <div class="four">  <span>Child text</span>  </div>
+                        <div class="five"><span>Child text</span>  <span>Another child</span></div>
                     </div>
                 </body>
             </html>

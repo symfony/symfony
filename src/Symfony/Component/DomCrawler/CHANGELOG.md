@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add `CrawlerSelectorCount` test constraint
+ * Add argument `$normalizeWhitespace` to `Crawler::innerText()`
+ * Make `Crawler::innerText()` return the first non-empty text
 
 6.0
 ---

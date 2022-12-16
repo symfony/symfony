@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Component\HttpFoundation\Request;
+
 abstract class AbstractAttributeRoutingTest extends AbstractWebTestCase
 {
     /**
@@ -32,7 +34,7 @@ abstract class AbstractAttributeRoutingTest extends AbstractWebTestCase
     public function getRoutes(): array
     {
         return [
-            ['/null_request', 'Symfony\Component\HttpFoundation\Request'],
+            ['/null_request', Request::class],
             ['/null_argument', ''],
             ['/null_argument_with_route_param', ''],
             ['/null_argument_with_route_param/value', 'value'],

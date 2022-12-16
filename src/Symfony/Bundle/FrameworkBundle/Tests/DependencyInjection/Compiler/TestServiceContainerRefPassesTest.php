@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -58,7 +59,7 @@ class TestServiceContainerRefPassesTest extends TestCase
         ];
 
         $privateServices = $container->getDefinition('test.private_services_locator')->getArgument(0);
-        unset($privateServices['Symfony\Component\DependencyInjection\ContainerInterface'], $privateServices['Psr\Container\ContainerInterface']);
+        unset($privateServices[\Symfony\Component\DependencyInjection\ContainerInterface::class], $privateServices[ContainerInterface::class]);
 
         $this->assertEquals($expected, $privateServices);
         $this->assertFalse($container->getDefinition('Test\private_used_non_shared_service')->isShared());

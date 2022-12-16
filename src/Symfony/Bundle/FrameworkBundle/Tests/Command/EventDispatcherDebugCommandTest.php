@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mailer\Event\MessageEvent;
 
 class EventDispatcherDebugCommandTest extends TestCase
 {
@@ -33,7 +34,7 @@ class EventDispatcherDebugCommandTest extends TestCase
 
     public function provideCompletionSuggestions()
     {
-        yield 'event' => [[''], ['Symfony\Component\Mailer\Event\MessageEvent', 'console.command']];
+        yield 'event' => [[''], [MessageEvent::class, 'console.command']];
         yield 'event for other dispatcher' => [['--dispatcher', 'other_event_dispatcher', ''], ['other_event', 'App\OtherEvent']];
         yield 'dispatcher' => [['--dispatcher='], ['event_dispatcher', 'other_event_dispatcher']];
         yield 'format' => [['--format='], ['txt', 'xml', 'json', 'md']];
@@ -44,7 +45,7 @@ class EventDispatcherDebugCommandTest extends TestCase
         $dispatchers = new ServiceLocator([
             'event_dispatcher' => function () {
                 $dispatcher = new EventDispatcher();
-                $dispatcher->addListener('Symfony\Component\Mailer\Event\MessageEvent', 'var_dump');
+                $dispatcher->addListener(MessageEvent::class, 'var_dump');
                 $dispatcher->addListener('console.command', 'var_dump');
 
                 return $dispatcher;

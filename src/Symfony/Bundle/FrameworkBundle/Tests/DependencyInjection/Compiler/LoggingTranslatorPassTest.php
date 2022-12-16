@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Translation\Translator;
 
 class LoggingTranslatorPassTest extends TestCase
 {
@@ -22,7 +23,7 @@ class LoggingTranslatorPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('translator.logging', true);
-        $container->setParameter('translator.class', 'Symfony\Component\Translation\Translator');
+        $container->setParameter('translator.class', Translator::class);
         $container->register('monolog.logger');
         $container->setAlias('logger', 'monolog.logger');
         $container->register('translator.default', '%translator.class%');

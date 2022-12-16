@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -39,9 +42,9 @@ class UserLoginType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('password', 'Symfony\Component\Form\Extension\Core\Type\PasswordType')
-            ->add('_target_path', 'Symfony\Component\Form\Extension\Core\Type\HiddenType')
+            ->add('username', TextType::class)
+            ->add('password', PasswordType::class)
+            ->add('_target_path', HiddenType::class)
         ;
 
         $request = $this->requestStack->getCurrentRequest();

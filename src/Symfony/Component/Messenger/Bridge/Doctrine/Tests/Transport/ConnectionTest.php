@@ -422,7 +422,7 @@ class ConnectionTest extends TestCase
         $schema = new Schema();
 
         $connection = new Connection([], $driverConnection);
-        $connection->configureSchema($schema, $driverConnection2, fn() => true);
+        $connection->configureSchema($schema, $driverConnection2, fn() => false);
         $this->assertFalse($schema->hasTable('messenger_messages'));
     }
 

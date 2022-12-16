@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class SlackOptions implements MessageOptionsInterface
+class SlackOptions implements MessageOptionsInterface
 {
     private const MAX_BLOCKS = 50;
 

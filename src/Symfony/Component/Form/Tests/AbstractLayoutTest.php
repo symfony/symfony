@@ -146,7 +146,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testLabel()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $view = $form->createView();
         $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);
@@ -162,6 +164,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testLabelWithoutTranslation()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'translation_domain' => false,
         ]);
 
@@ -191,6 +194,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testLabelWithCustomTextPassedAsOption()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => 'Custom label',
         ]);
         $html = $this->renderLabel($form->createView());
@@ -205,7 +209,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testLabelWithCustomTextPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), 'Custom label');
 
         $this->assertMatchesXpath($html,
@@ -219,6 +225,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testLabelWithCustomTextPassedAsOptionAndDirectly()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => 'Custom label',
         ]);
         $html = $this->renderLabel($form->createView(), 'Overridden label');
@@ -233,7 +240,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testLabelDoesNotRenderFieldAttributes()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), null, [
             'attr' => [
                 'class' => 'my&class',
@@ -250,7 +259,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testLabelWithCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), null, [
             'label_attr' => [
                 'class' => 'my&class',
@@ -267,7 +278,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+            ]);
         $html = $this->renderLabel($form->createView(), 'Custom label', [
             'label_attr' => [
                 'class' => 'my&class',
@@ -287,6 +300,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => 'Custom label',
         ]);
         $html = $this->renderLabel($form->createView(), null, [
@@ -307,7 +321,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testLabelFormatName()
     {
         $form = $this->factory->createNamedBuilder('myform')
-            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
             ->getForm();
         $view = $form->get('myfield')->createView();
         $html = $this->renderLabel($view, null, ['label_format' => 'form.%name%']);
@@ -323,7 +339,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testLabelFormatId()
     {
         $form = $this->factory->createNamedBuilder('myform')
-            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
             ->getForm();
         $view = $form->get('myfield')->createView();
         $html = $this->renderLabel($view, null, ['label_format' => 'form.%id%']);
@@ -341,7 +359,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $options = ['label_format' => 'form.%name%'];
 
         $form = $this->factory->createNamedBuilder('myform', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, $options)
-            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
             ->getForm();
         $view = $form->get('myfield')->createView();
         $html = $this->renderLabel($view);
@@ -359,7 +379,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $options = ['label_format' => 'form.%name%'];
 
         $form = $this->factory->createNamedBuilder('myform', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, $options)
-            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['label_format' => 'field.%name%'])
+            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+                'label_format' => 'field.%name%',
+            ])
             ->getForm();
         $view = $form->get('myfield')->createView();
         $html = $this->renderLabel($view);
@@ -428,6 +451,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testHelp()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help text test!',
         ]);
         $view = $form->createView();
@@ -444,7 +468,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testHelpNotSet()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $view = $form->createView();
         $html = $this->renderHelp($view);
 
@@ -454,6 +480,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testHelpSetLinkFromWidget()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help text test!',
         ]);
         $view = $form->createView();
@@ -471,7 +498,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testHelpNotSetNotLinkedFromWidget()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $view = $form->createView();
         $html = $this->renderRow($view);
 
@@ -487,7 +516,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testErrors()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $form->addError(new FormError('[trans]Error 1[/trans]'));
         $form->addError(new FormError('[trans]Error 2[/trans]'));
         $view = $form->createView();
@@ -507,7 +538,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testOverrideWidgetBlock()
     {
         // see custom_widgets.html.twig
-        $form = $this->factory->createNamed('text_id', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('text_id', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderWidget($form->createView());
 
         $this->assertMatchesXpath($html,
@@ -1718,7 +1751,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testEmail()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', 'foo&bar', [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -1733,6 +1768,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testEmailWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', 'foo&bar', [
+            'empty_data' => null,
             'attr' => ['maxlength' => 123],
         ]);
 
@@ -1773,6 +1809,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testDisabled()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'disabled' => true,
         ]);
 
@@ -1887,7 +1924,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testPassword()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar', [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -1900,6 +1939,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testPasswordSubmittedWithNotAlwaysEmpty()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', null, [
+            'empty_data' => null,
             'always_empty' => false,
         ]);
         $form->submit('foo&bar');
@@ -1916,6 +1956,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testPasswordWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar', [
+            'empty_data' => null,
             'attr' => ['maxlength' => 123],
         ]);
 
@@ -2016,7 +2057,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testRange()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, ['attr' => ['min' => 5]]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, [
+            'empty_data' => null,
+            'attr' => ['min' => 5],
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2030,7 +2074,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testRangeWithMinMaxValues()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, ['attr' => ['min' => 5, 'max' => 57]]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, [
+            'empty_data' => null,
+            'attr' => ['min' => 5, 'max' => 57],
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2046,6 +2093,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testTextarea()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextareaType', 'foo&bar', [
+            'empty_data' => null,
             'attr' => ['pattern' => 'foo'],
         ]);
 
@@ -2060,7 +2108,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testText()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'foo&bar', [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2075,6 +2125,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testTextWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'foo&bar', [
+            'empty_data' => null,
             'attr' => ['maxlength' => 123],
         ]);
 
@@ -2090,7 +2141,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testSearch()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\SearchType', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\SearchType', 'foo&bar', [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2298,7 +2351,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testUrlWithDefaultProtocol()
     {
         $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => 'http']);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, [
+            'empty_data' => null,
+            'default_protocol' => 'http',
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2313,7 +2369,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testUrlWithoutDefaultProtocol()
     {
         $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => null]);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, [
+            'empty_data' => null,
+            'default_protocol' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2327,7 +2386,12 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testCollectionPrototype()
     {
         $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', ['items' => ['one', 'two', 'three']])
-            ->add('items', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', ['allow_add' => true])
+            ->add('items', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', [
+                'entry_options' => [
+                    'empty_data' => null,
+                ],
+                'allow_add' => true,
+            ])
             ->getForm()
             ->createView();
 
@@ -2343,7 +2407,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testEmptyRootFormName()
     {
         $form = $this->factory->createNamedBuilder('', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
             ->getForm();
 
         $this->assertMatchesXpath($this->renderWidget($form->createView()),
@@ -2472,6 +2538,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testWidgetAttributes()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
+            'empty_data' => null,
             'required' => true,
             'disabled' => true,
             'attr' => ['readonly' => true, 'maxlength' => 10, 'pattern' => '\d+', 'class' => 'foobar', 'data-foo' => 'bar'],
@@ -2486,6 +2553,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testWidgetAttributeNameRepeatedIfTrue()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
+            'empty_data' => null,
             'attr' => ['foo' => true],
         ]);
 
@@ -2498,6 +2566,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testWidgetAttributeHiddenIfFalse()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
+            'empty_data' => null,
             'attr' => ['foo' => false],
         ]);
 
@@ -2544,7 +2613,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testTextareaWithWhitespaceOnlyContentRetainsValue()
     {
-        $form = $this->factory->createNamed('textarea', 'Symfony\Component\Form\Extension\Core\Type\TextareaType', '  ');
+        $form = $this->factory->createNamed('textarea', 'Symfony\Component\Form\Extension\Core\Type\TextareaType', '  ', [
+            'empty_data' => null,
+        ]);
 
         $html = $this->renderWidget($form->createView());
 
@@ -2554,7 +2625,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testTextareaWithWhitespaceOnlyContentRetainsValueWhenRenderingForm()
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', ['textarea' => '  '])
-            ->add('textarea', 'Symfony\Component\Form\Extension\Core\Type\TextareaType')
+            ->add('textarea', 'Symfony\Component\Form\Extension\Core\Type\TextareaType', [
+                'empty_data' => null,
+            ])
             ->getForm();
 
         $html = $this->renderForm($form->createView());
@@ -2577,8 +2650,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testTranslatedAttributes()
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['title' => 'Foo']])
-            ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['placeholder' => 'Bar']])
+            ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+                'attr' => ['title' => 'Foo'],
+            ])
+            ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+                'attr' => ['placeholder' => 'Bar'],
+            ])
             ->getForm()
             ->createView();
 
@@ -2593,8 +2672,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
                 'translation_domain' => false,
             ])
-            ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['title' => 'Foo']])
-            ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['placeholder' => 'Bar']])
+            ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+                'attr' => ['title' => 'Foo'],
+            ])
+            ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+                'attr' => ['placeholder' => 'Bar'],
+            ])
             ->getForm()
             ->createView();
 
@@ -2607,7 +2692,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testTel()
     {
         $tel = '0102030405';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelType', $tel);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelType', $tel, [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2621,7 +2708,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testColor()
     {
         $color = '#0000ff';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ColorType', $color);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ColorType', $color, [
+            'empty_data' => null,
+        ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/input
@@ -2636,7 +2725,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->requiresFeatureSet(403);
 
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
+        ]);
         $html = $this->renderLabel($form->createView(), 'Address is %address%', [
             'label_translation_parameters' => [
                 '%address%' => 'Paris, rue de la Paix',
@@ -2656,6 +2747,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->requiresFeatureSet(403);
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'for company %company%',
             'help_translation_parameters' => [
                 '%company%' => 'ACME Ltd.',
@@ -2674,6 +2766,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testLabelWithTranslatableMessage()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => new TranslatableMessage('foo'),
         ]);
         $html = $this->renderLabel($form->createView());
@@ -2689,6 +2782,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testHelpWithTranslatableMessage()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => new TranslatableMessage('foo'),
         ]);
         $html = $this->renderHelp($form->createView());
@@ -2711,6 +2805,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         };
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => $message,
         ]);
         $html = $this->renderHelp($form->createView());
@@ -2728,6 +2823,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->requiresFeatureSet(403);
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'attr' => [
                 'title' => 'Message to %company%',
                 'placeholder' => 'Enter a message to %company%',

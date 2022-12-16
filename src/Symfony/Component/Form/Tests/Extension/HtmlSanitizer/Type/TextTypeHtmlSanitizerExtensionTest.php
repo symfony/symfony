@@ -45,7 +45,10 @@ class TextTypeHtmlSanitizerExtensionTest extends TypeTestCase
     public function testSanitizer()
     {
         $form = $this->factory->createBuilder(FormType::class, ['data' => null])
-            ->add('data', TextType::class, ['sanitize_html' => true])
+            ->add('data', TextType::class, [
+                'empty_data' => null,
+                'sanitize_html' => true,
+            ])
             ->getForm()
         ;
         $form->submit(['data' => 'foobar']);
@@ -53,7 +56,11 @@ class TextTypeHtmlSanitizerExtensionTest extends TypeTestCase
         $this->assertSame(['data' => 'foo'], $form->getData());
 
         $form = $this->factory->createBuilder(FormType::class, ['data' => null])
-            ->add('data', TextType::class, ['sanitize_html' => true, 'sanitizer' => 'bar'])
+            ->add('data', TextType::class, [
+                'empty_data' => null,
+                'sanitize_html' => true,
+                'sanitizer' => 'bar',
+            ])
             ->getForm()
         ;
         $form->submit(['data' => 'foobar']);

@@ -102,7 +102,9 @@ class FormFactoryTest extends TestCase
 
     public function testCreateBuilderForPropertyWithoutTypeGuesser()
     {
-        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertSame('firstName', $builder->getName());
     }
@@ -112,7 +114,9 @@ class FormFactoryTest extends TestCase
         $this->guesser1->configureTypeGuess(TextType::class, ['attr' => ['maxlength' => 10]], Guess::MEDIUM_CONFIDENCE);
         $this->guesser2->configureTypeGuess(PasswordType::class, ['attr' => ['maxlength' => 7]], Guess::HIGH_CONFIDENCE);
 
-        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertSame('firstName', $builder->getName());
         $this->assertSame(['maxlength' => 7], $builder->getOption('attr'));
@@ -121,7 +125,9 @@ class FormFactoryTest extends TestCase
 
     public function testCreateBuilderCreatesTextFormIfNoGuess()
     {
-        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertSame('firstName', $builder->getName());
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
@@ -131,7 +137,10 @@ class FormFactoryTest extends TestCase
     {
         $this->guesser1->configureTypeGuess(TextType::class, ['attr' => ['class' => 'foo', 'maxlength' => 10]], Guess::MEDIUM_CONFIDENCE);
 
-        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, ['attr' => ['maxlength' => 11]]);
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, [
+            'empty_data' => null,
+            'attr' => ['maxlength' => 11],
+        ]);
 
         $this->assertSame('firstName', $builder->getName());
         $this->assertSame(['class' => 'foo', 'maxlength' => 11], $builder->getOption('attr'));
@@ -143,7 +152,9 @@ class FormFactoryTest extends TestCase
         $this->guesser1->configureMaxLengthGuess(15, Guess::MEDIUM_CONFIDENCE);
         $this->guesser2->configureMaxLengthGuess(20, Guess::HIGH_CONFIDENCE);
 
-        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertSame('firstName', $builder->getName());
         $this->assertSame(['maxlength' => 20], $builder->getOption('attr'));
@@ -155,7 +166,10 @@ class FormFactoryTest extends TestCase
         $this->guesser1->configureMaxLengthGuess(20, Guess::HIGH_CONFIDENCE);
         $this->guesser2->configurePatternGuess('.{5,}', Guess::HIGH_CONFIDENCE);
 
-        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, ['attr' => ['class' => 'tinymce']]);
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, [
+            'empty_data' => null,
+            'attr' => ['class' => 'tinymce']
+        ]);
 
         $this->assertSame('firstName', $builder->getName());
         $this->assertSame(['maxlength' => 20, 'pattern' => '.{5,}', 'class' => 'tinymce'], $builder->getOption('attr'));
@@ -167,7 +181,9 @@ class FormFactoryTest extends TestCase
         $this->guesser1->configureRequiredGuess(true, Guess::MEDIUM_CONFIDENCE);
         $this->guesser2->configureRequiredGuess(false, Guess::HIGH_CONFIDENCE);
 
-        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertSame('firstName', $builder->getName());
         $this->assertFalse($builder->getOption('required'));
@@ -179,7 +195,9 @@ class FormFactoryTest extends TestCase
         $this->guesser1->configurePatternGuess('[a-z]', Guess::MEDIUM_CONFIDENCE);
         $this->guesser2->configurePatternGuess('[a-zA-Z]', Guess::HIGH_CONFIDENCE);
 
-        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertSame('firstName', $builder->getName());
         $this->assertSame(['pattern' => '[a-zA-Z]'], $builder->getOption('attr'));

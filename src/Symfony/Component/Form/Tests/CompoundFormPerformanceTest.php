@@ -29,8 +29,12 @@ class CompoundFormPerformanceTest extends FormPerformanceTestCase
 
         for ($i = 0; $i < 40; ++$i) {
             $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType')
-                ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-                ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+                ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                    'empty_data' => null,
+                ])
+                ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                    'empty_data' => null,
+                ])
                 ->add('color', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', [
                     'choices' => ['red' => 'Red', 'blue' => 'Blue'],
                     'required' => false,

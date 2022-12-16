@@ -80,6 +80,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     public function testHelpAttr()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help text test!',
             'help_attr' => [
                 'class' => 'class-test',
@@ -100,6 +101,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     public function testHelpHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
         ]);
 
@@ -127,6 +129,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     public function testHelpHtmlIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
             'help_html' => false,
         ]);
@@ -155,6 +158,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     public function testHelpHtmlIsTrue()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'help' => 'Help <b>text</b> test!',
             'help_html' => true,
         ]);
@@ -183,6 +187,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     public function testLabelHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => '<b>Bolded label</b>',
         ]);
 
@@ -199,6 +204,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     public function testLabelHtmlIsTrue()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'empty_data' => null,
             'label' => '<b>Bolded label</b>',
             'label_html' => true,
         ]);

@@ -56,21 +56,28 @@ class FormBuilderTest extends TestCase
 
     public function testAddIsFluent()
     {
-        $builder = $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['bar' => 'baz']);
+        $builder = $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+            'bar' => 'baz',
+        ]);
         $this->assertSame($builder, $this->builder);
     }
 
     public function testAdd()
     {
         $this->assertFalse($this->builder->has('foo'));
-        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
         $this->assertTrue($this->builder->has('foo'));
     }
 
     public function testAddIntegerName()
     {
         $this->assertFalse($this->builder->has(0));
-        $this->builder->add(0, 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add(0, 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
         $this->assertTrue($this->builder->has(0));
     }
 
@@ -79,7 +86,9 @@ class FormBuilderTest extends TestCase
         $this->assertCount(0, $this->builder->all());
         $this->assertFalse($this->builder->has('foo'));
 
-        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
         $children = $this->builder->all();
 
         $this->assertTrue($this->builder->has('foo'));
@@ -92,9 +101,13 @@ class FormBuilderTest extends TestCase
      */
     public function testMaintainOrderOfLazyAndExplicitChildren()
     {
-        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
         $this->builder->add(new FormBuilder('bar', null, new EventDispatcher(), $this->factory));
-        $this->builder->add('baz', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add('baz', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
 
         $children = $this->builder->all();
 
@@ -103,7 +116,9 @@ class FormBuilderTest extends TestCase
 
     public function testRemove()
     {
-        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
         $this->builder->remove('foo');
         $this->assertFalse($this->builder->has('foo'));
     }
@@ -117,7 +132,9 @@ class FormBuilderTest extends TestCase
     // https://github.com/symfony/symfony/pull/4826
     public function testRemoveAndGetForm()
     {
-        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
         $this->builder->remove('foo');
         $form = $this->builder->getForm();
         $this->assertInstanceOf(Form::class, $form);
@@ -125,7 +142,9 @@ class FormBuilderTest extends TestCase
 
     public function testCreateNoTypeNo()
     {
-        $builder = $this->builder->create('foo');
+        $builder = $this->builder->create('foo', null, [
+            'empty_data' => null,
+        ]);
 
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
@@ -148,7 +167,9 @@ class FormBuilderTest extends TestCase
 
     public function testGetExplicitType()
     {
-        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
         $builder = $this->builder->get('foo');
 
         $this->assertNotSame($builder, $this->builder);
@@ -157,7 +178,9 @@ class FormBuilderTest extends TestCase
     public function testGetGuessedType()
     {
         $rootFormBuilder = new FormBuilder('name', 'stdClass', new EventDispatcher(), $this->factory);
-        $rootFormBuilder->add('foo');
+        $rootFormBuilder->add('foo', null, [
+            'empty_data' => null,
+        ]);
         $fooBuilder = $rootFormBuilder->get('foo');
 
         $this->assertNotSame($fooBuilder, $rootFormBuilder);

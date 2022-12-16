@@ -56,6 +56,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
 
         $form = $this->factory->createNamedBuilder('register', FormType::class, $data)
             ->add('username', TextType::class, [
+                'empty_data' => null,
                 'label' => 'base.username',
                 'label_translation_parameters' => ['%label_brand%' => 'Symfony'],
                 'help' => 'base.username_help',

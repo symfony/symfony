@@ -11,9 +11,16 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+
 class TextTypeTest extends BaseTypeTest
 {
+    use ExpectDeprecationTrait;
+
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
+    public const TESTED_TYPE_OPTIONS = [
+        'empty_data' => null,
+    ];
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
@@ -22,13 +29,28 @@ class TextTypeTest extends BaseTypeTest
 
     public function testSubmitNullReturnsNullWithEmptyDataAsString()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, 'name', [
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => '',
         ]);
 
         $form->submit(null);
         $this->assertSame('', $form->getData());
         $this->assertSame('', $form->getNormData());
+        $this->assertSame('', $form->getViewData());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDefaultEmptyDataCallback()
+    {
+        $this->expectDeprecation('Since symfony/form 6.1: The default value of "empty_data" option in "Symfony\Component\Form\Extension\Core\Type\TextType" will be changed to empty string. Declare "NULL" as value for "empty_data" if you still want use "NULL" as data.');
+
+        $form = $this->factory->create(static::TESTED_TYPE);
+
+        $form->submit(null);
+        $this->assertNull($form->getData());
+        $this->assertNull($form->getNormData());
         $this->assertSame('', $form->getViewData());
     }
 
@@ -48,7 +70,7 @@ class TextTypeTest extends BaseTypeTest
      */
     public function testSetDataThroughParamsWithZero($data, $dataAsString)
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
+        $form = $this->factory->create(static::TESTED_TYPE, null, $this->getTestedTypeOptions() + [
             'data' => $data,
         ]);
         $view = $form->createView();

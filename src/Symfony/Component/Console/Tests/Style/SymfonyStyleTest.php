@@ -16,13 +16,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -182,39 +180,5 @@ class SymfonyStyleTest extends TestCase
         }
 
         $this->assertSame(0, memory_get_usage() - $start);
-    }
-
-    public function testAskAndClearExpectFullSectionCleared()
-    {
-        $answer = 'Answer';
-        $inputStream = fopen('php://memory', 'r+');
-        fwrite($inputStream, $answer.\PHP_EOL);
-        rewind($inputStream);
-        $input = $this->createMock(Input::class);
-        $sections = [];
-        $output = new ConsoleSectionOutput(fopen('php://memory', 'r+', false), $sections, StreamOutput::VERBOSITY_NORMAL, true, new OutputFormatter());
-        $input
-            ->method('isInteractive')
-            ->willReturn(true);
-        $input
-            ->method('getStream')
-            ->willReturn($inputStream);
-
-        $style = new SymfonyStyle($input, $output);
-
-        $style->write('foo');
-        $givenAnswer = $style->ask('Dummy question?');
-        $output->write('bar');
-        $output->clear();
-
-        rewind($output->getStream());
-        $this->assertEquals($answer, $givenAnswer);
-        $this->assertEquals(
-            'foo'.\PHP_EOL. // write foo
-            \PHP_EOL.\PHP_EOL.\PHP_EOL." \033[32mDummy question?\033[39m:".\PHP_EOL.' > '.\PHP_EOL.\PHP_EOL.\PHP_EOL. // question
-            'bar'.\PHP_EOL. // write bar
-            "\033[10A\033[0J", // clear 10 lines (9 output lines and one from the answer input return)
-            stream_get_contents($output->getStream())
-        );
     }
 }

@@ -88,14 +88,6 @@ class ConsoleSectionOutput extends StreamOutput
     }
 
     /**
-     * @internal
-     */
-    public function incrementLines()
-    {
-        ++$this->lines;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function doWrite(string $message, bool $newline)

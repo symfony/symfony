@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add a "role=img" and an explicit title in the .svg file used by the web debug toolbar
+   to improve accessibility with screen readers for blind users
+
 6.1
 ---
 

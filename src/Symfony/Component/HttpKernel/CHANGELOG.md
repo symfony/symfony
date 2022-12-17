@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate parameters `container.dumper.inline_factories` and `container.dumper.inline_class_loader`, use `.container.dumper.inline_factories` and `.container.dumper.inline_class_loader` instead
- * `FileProfilerStorage` removes profiles automatically after one day
+ * `FileProfilerStorage` removes profiles automatically after two days
 
 6.2
 ---

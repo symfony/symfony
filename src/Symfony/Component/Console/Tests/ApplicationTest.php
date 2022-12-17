@@ -2036,6 +2036,10 @@ class ApplicationTest extends TestCase
 
     public function testSignalableCommandDoesNotInterruptedOnTermSignals()
     {
+        if (!\defined('SIGINT')) {
+            $this->markTestSkipped('SIGINT not available');
+        }
+
         $command = new TerminatableCommand(true, \SIGINT);
         $command->exitCode = 129;
 

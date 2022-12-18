@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-10-30T10:07:10Z
+
+Hey!
+
+I think @TimoBakx has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-31T13:40:36Z
+
+Thanks for the PR.
+As it's too late for 6.2, this PR should be rebased on the 6.3 branch (and the changelog entry be moved accordingly) once that branch is created, when 6.2.0 stable is released.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-11-26T13:51:19Z
+
+I rebased on branch 6.3 :smile:
+
+---------------------------------------------------------------------------
+
+by stof at 2022-12-02T12:01:11Z
+
+This looks wrong to me. Something else than the Firewall could still be using the session.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2022-12-02T12:11:15Z
+
+@stof Sure, but that's why you want a warning IMO. If the firewall is stateless then you *shouldn't* rely on the session and opening one will most likely result in data loss or at least inefficiencies in the code as it reads from session storage for nothing.

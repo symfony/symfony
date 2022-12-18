@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-04T22:01:47Z
+
+The command could fallback to json when the Yaml class is not available, the format is very similar (a little more verbose). You can add an option `format` to make the switch, like we did in `config:dump-reference`.
+
+---------------------------------------------------------------------------
+
+by alamirault at 2022-12-05T13:10:43Z
+
+> and could fallback to json when the Yaml class is not available, the format is very similar (a little more verbose). You can add an option `format` to make the switch, like we did in `config:dump-reference`.
+
+Indeed it's better to have option like other comment ! I will rework PR to add it

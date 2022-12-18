@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-10T17:33:13Z
+
+Neat!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-18T14:31:54Z
+
+Merging now to help moving forward in #48272.
+Side note: I think we'll need to double-check that the webprofiler isn't broken when there's no provider, and also maybe improve the security panel by making it expose the statelessness of the authenticator.

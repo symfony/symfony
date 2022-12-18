@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add caster for `WeakMap`
  * Add support of named arguments to `dd()` and `dump()` to display the argument name
+ * Add support for `Relay\Relay`
 
 6.2
 ---

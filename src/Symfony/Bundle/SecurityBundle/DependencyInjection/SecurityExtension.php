@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -615,6 +616,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     throw new InvalidConfigurationException(sprintf('Authenticator factory "%s" ("%s") must implement "%s".', get_debug_type($factory), $key, AuthenticatorFactoryInterface::class));
                 }
 
+                if (null === $userProvider && !$factory instanceof StatelessAuthenticatorFactoryInterface) {
+                    $userProvider = $this->createMissingUserProvider($container, $id, $key);
+                }
+
                 $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
                 if (\is_array($authenticators)) {
                     foreach ($authenticators as $authenticator) {
@@ -641,7 +646,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return [$listeners, $defaultEntryPoint];
     }
 
-    private function getUserProvider(ContainerBuilder $container, string $id, array $firewall, string $factoryKey, ?string $defaultProvider, array $providerIds, ?string $contextListenerId): string
+    private function getUserProvider(ContainerBuilder $container, string $id, array $firewall, string $factoryKey, ?string $defaultProvider, array $providerIds, ?string $contextListenerId): ?string
     {
         if (isset($firewall[$factoryKey]['provider'])) {
             if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall[$factoryKey]['provider'])])) {
@@ -660,13 +665,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         if (!$providerIds) {
-            $userProvider = sprintf('security.user.provider.missing.%s', $factoryKey);
-            $container->setDefinition(
-                $userProvider,
-                (new ChildDefinition('security.user.provider.missing'))->replaceArgument(0, $id)
-            );
+            if ($firewall['stateless'] ?? false) {
+                return null;
+            }
 
-            return $userProvider;
+            return $this->createMissingUserProvider($container, $id, $factoryKey);
         }
 
         if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey || 'custom_authenticators' === $factoryKey) {
@@ -678,6 +681,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" authenticator on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $id));
+    }
+
+    private function createMissingUserProvider(ContainerBuilder $container, string $id, string $factoryKey): string
+    {
+        $userProvider = sprintf('security.user.provider.missing.%s', $factoryKey);
+        $container->setDefinition(
+            $userProvider,
+            (new ChildDefinition('security.user.provider.missing'))->replaceArgument(0, $id)
+        );
+
+        return $userProvider;
     }
 
     private function createHashers(array $hashers, ContainerBuilder $container)

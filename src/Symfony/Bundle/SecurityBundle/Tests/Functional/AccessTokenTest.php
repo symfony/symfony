@@ -315,4 +315,16 @@ class AccessTokenTest extends AbstractWebTestCase
     {
         yield ['/foo?protection_token=INVALID_ACCESS_TOKEN'];
     }
+
+    public function testSelfContainedTokens()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_self_contained_token.yml']);
+        $client->catchExceptions(false);
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => 'Bearer SELF_CONTAINED_ACCESS_TOKEN']);
+        $response = $client->getResponse();
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
+    }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
+use Relay\Relay;
+use Relay\Sentinel;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -43,7 +45,7 @@ class Connection
         'claim_interval' => 60000, // Interval by which pending/abandoned messages should be checked
         'lazy' => false,
         'auth' => null,
-        'serializer' => \Redis::SERIALIZER_PHP,
+        'serializer' => 1, // see \Redis::SERIALIZER_PHP,
         'sentinel_master' => null, // String, master to look for (optional, default is NULL meaning Sentinel support is disabled)
         'timeout' => 0.0, // Float, value in seconds (optional, default is 0 meaning unlimited)
         'read_timeout' => 0.0, //  Float, value in seconds (optional, default is 0 meaning unlimited)
@@ -52,7 +54,7 @@ class Connection
         'ssl' => null, // see https://php.net/context.ssl
     ];
 
-    private \Redis|\RedisCluster|\Closure $redis;
+    private \Redis|Relay|\RedisCluster|\Closure $redis;
     private string $stream;
     private string $queue;
     private string $group;
@@ -66,7 +68,7 @@ class Connection
     private bool $deleteAfterReject;
     private bool $couldHavePendingMessages = true;
 
-    public function __construct(array $options, \Redis|\RedisCluster $redis = null)
+    public function __construct(array $options, \Redis|Relay|\RedisCluster $redis = null)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '<')) {
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
@@ -78,8 +80,8 @@ class Connection
         $auth = $options['auth'];
         $sentinelMaster = $options['sentinel_master'];
 
-        if (null !== $sentinelMaster && !class_exists(\RedisSentinel::class)) {
-            throw new InvalidArgumentException('Redis Sentinel support requires the "redis" extension v5.2 or higher.');
+        if (null !== $sentinelMaster && !class_exists(\RedisSentinel::class) && !class_exists(Sentinel::class)) {
+            throw new InvalidArgumentException('Redis Sentinel support requires ext-redis>=5.2, or ext-relay.');
         }
 
         if (null !== $sentinelMaster && ($redis instanceof \RedisCluster || \is_array($host))) {
@@ -91,7 +93,8 @@ class Connection
             $this->redis = static fn () => self::initializeRedisCluster($redis, $hosts, $auth, $options);
         } else {
             if (null !== $sentinelMaster) {
-                $sentinelClient = new \RedisSentinel($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+                $sentinelClass = \extension_loaded('redis') ? \RedisSentinel::class : Sentinel::class;
+                $sentinelClient = new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
 
                 if (!$address = $sentinelClient->getMasterAddrByName($sentinelMaster)) {
                     throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $sentinelMaster, $host, $port));
@@ -100,7 +103,7 @@ class Connection
                 [$host, $port] = $address;
             }
 
-            $this->redis = static fn () => self::initializeRedis($redis ?? new \Redis(), $host, $port, $auth, $options);
+            $this->redis = static fn () => self::initializeRedis($redis ?? (\extension_loaded('redis') ? new \Redis() : new Relay()), $host, $port, $auth, $options);
         }
 
         if (!$options['lazy']) {
@@ -128,12 +131,12 @@ class Connection
     /**
      * @param string|string[]|null $auth
      */
-    private static function initializeRedis(\Redis $redis, string $host, int $port, string|array|null $auth, array $params): \Redis
+    private static function initializeRedis(\Redis|Relay $redis, string $host, int $port, string|array|null $auth, array $params): \Redis|Relay
     {
         $connect = isset($params['persistent_id']) ? 'pconnect' : 'connect';
-        $redis->{$connect}($host, $port, $params['timeout'], $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...\defined('Redis::SCAN_PREFIX') ? [['stream' => $params['ssl'] ?? null]] : []);
+        $redis->{$connect}($host, $port, $params['timeout'], $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...(\defined('Redis::SCAN_PREFIX') || \extension_loaded('relay')) ? [['stream' => $params['ssl'] ?? null]] : []);
 
-        $redis->setOption(\Redis::OPT_SERIALIZER, $params['serializer']);
+        $redis->setOption($redis instanceof \Redis ? \Redis::OPT_SERIALIZER : Relay::OPT_SERIALIZER, $params['serializer']);
 
         if (null !== $auth && !$redis->auth($auth)) {
             throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
@@ -157,7 +160,7 @@ class Connection
         return $redis;
     }
 
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], \Redis|\RedisCluster $redis = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], \Redis|Relay|\RedisCluster $redis = null): self
     {
         if (!str_contains($dsn, ',')) {
             $parsedUrl = self::parseDsn($dsn, $options);
@@ -265,7 +268,7 @@ class Connection
             // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or
             // https://github.com/antirez/redis/issues/6256
             $pendingMessages = $this->getRedis()->xpending($this->stream, $this->group, '-', '+', 1);
-        } catch (\RedisException $e) {
+        } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -294,7 +297,7 @@ class Connection
                 );
 
                 $this->couldHavePendingMessages = true;
-            } catch (\RedisException $e) {
+            } catch (\RedisException|\Relay\Exception $e) {
                 throw new TransportException($e->getMessage(), 0, $e);
             }
         }
@@ -352,7 +355,7 @@ class Connection
                 [$this->stream => $messageId],
                 1
             );
-        } catch (\RedisException $e) {
+        } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -390,7 +393,7 @@ class Connection
             if ($this->deleteAfterAck) {
                 $acknowledged = $redis->xdel($this->stream, [$id]);
             }
-        } catch (\RedisException $e) {
+        } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -411,7 +414,7 @@ class Connection
             if ($this->deleteAfterReject) {
                 $deleted = $redis->xdel($this->stream, [$id]) && $deleted;
             }
-        } catch (\RedisException $e) {
+        } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -474,7 +477,7 @@ class Connection
 
                 $id = $added;
             }
-        } catch (\RedisException $e) {
+        } catch (\RedisException|\Relay\Exception $e) {
             if ($error = $redis->getLastError() ?: null) {
                 $redis->clearLastError();
             }
@@ -497,7 +500,7 @@ class Connection
 
         try {
             $redis->xgroup('CREATE', $this->stream, $this->group, 0, true);
-        } catch (\RedisException $e) {
+        } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -600,7 +603,7 @@ class Connection
             } else {
                 $result = $redis->rawCommand($command, $this->queue, ...$arguments);
             }
-        } catch (\RedisException $e) {
+        } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -614,7 +617,7 @@ class Connection
         return $result;
     }
 
-    private function getRedis(): \Redis|\RedisCluster
+    private function getRedis(): \Redis|Relay|\RedisCluster
     {
         if ($this->redis instanceof \Closure) {
             $this->redis = ($this->redis)();

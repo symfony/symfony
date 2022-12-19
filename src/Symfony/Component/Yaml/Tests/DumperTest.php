@@ -817,6 +817,96 @@ YAML;
         $this->assertSame('{ foo: ~ }', $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_TILDE));
     }
 
+    /**
+     * @dataProvider getNumericKeyData
+     */
+    public function testDumpInlineNumericKeyAsString(array $input, bool $inline, int $flags, string $expected)
+    {
+        $this->assertSame($expected, $this->dumper->dump($input, $inline ? 0 : 4, 0, $flags));
+    }
+
+    public function getNumericKeyData()
+    {
+        yield 'Int key with flag inline' => [
+            [200 => 'foo'],
+            true,
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            "{ '200': foo }",
+        ];
+
+        yield 'Int key without flag inline' => [
+            [200 => 'foo'],
+            true,
+            0,
+            '{ 200: foo }',
+        ];
+
+        $expected = <<<'YAML'
+        '200': foo
+
+        YAML;
+
+        yield 'Int key with flag' => [
+            [200 => 'foo'],
+            false,
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            $expected,
+        ];
+
+        $expected = <<<'YAML'
+        200: foo
+
+        YAML;
+
+        yield 'Int key without flag' => [
+            [200 => 'foo'],
+            false,
+            0,
+            $expected,
+        ];
+
+        $expected = <<<'YAML'
+        - 200
+        - foo
+
+        YAML;
+
+        yield 'List array with flag' => [
+            [200, 'foo'],
+            false,
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            $expected,
+        ];
+
+        $expected = <<<'YAML'
+        '200': !number 5
+
+        YAML;
+
+        yield 'Int tagged value with flag' => [
+            [
+                200 => new TaggedValue('number', 5),
+            ],
+            false,
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+            $expected,
+        ];
+
+        $expected = <<<'YAML'
+        200: !number 5
+
+        YAML;
+
+        yield 'Int tagged value without flag' => [
+            [
+                200 => new TaggedValue('number', 5),
+            ],
+            false,
+            0,
+            $expected,
+        ];
+    }
+
     public function testDumpIdeographicSpaces()
     {
         $expected = <<<YAML

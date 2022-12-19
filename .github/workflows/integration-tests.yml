@@ -48,7 +48,7 @@ jobs:
         ports:
           - 16379:6379
       redis-cluster:
-        image: grokzen/redis-cluster:5.0.4
+        image: bitnami/redis-cluster:7.0
         ports:
           - 7000:7000
           - 7001:7001
@@ -58,7 +58,7 @@ jobs:
           - 7005:7005
           - 7006:7006
         env:
-          STANDALONE: 1
+          ALLOW_EMPTY_PASSWORD: 1
       redis-sentinel:
         image: bitnami/redis-sentinel:6.0
         ports:

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+* Add limited generics support to `PhpStanExtractor`
+
 6.1
 ---
 

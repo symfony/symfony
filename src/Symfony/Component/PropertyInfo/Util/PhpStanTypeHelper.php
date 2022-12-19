@@ -119,6 +119,14 @@ final class PhpStanTypeHelper
                 return [new Type(Type::BUILTIN_TYPE_STRING)];
             }
 
+            // Generics of iterable types are extracted as collection to maintain BC
+            if(
+                !\in_array($node->type->name, [...Type::$builtinCollectionTypes, 'list', 'non-empty-list','non-empty-array'])
+                && !is_subclass_of($nameScope->resolveStringName($node->type->name), \Traversable::class)
+            ) {
+                return $this->extractTypes($node->type, $nameScope);
+            }
+
             [$mainType] = $this->extractTypes($node->type, $nameScope);
 
             if (Type::BUILTIN_TYPE_INT === $mainType->getBuiltinType()) {

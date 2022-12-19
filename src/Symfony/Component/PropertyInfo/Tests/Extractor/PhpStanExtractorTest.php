@@ -16,12 +16,14 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\GenericDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TypeVariableDummy;
 use Symfony\Component\PropertyInfo\Type;
 
 require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
@@ -381,7 +383,7 @@ class PhpStanExtractorTest extends TestCase
             ['b', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)])]],
             ['c', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)])]],
             ['d', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING)])])]],
-            ['e', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class, true, [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING)])], [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_STRING, false, null, true, [], [new Type(Type::BUILTIN_TYPE_OBJECT, false, DefaultValue::class)])])]), new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
+            ['e', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class, false, [], []), new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
             ['f', null],
             ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)])]],
         ];
@@ -417,6 +419,42 @@ class PhpStanExtractorTest extends TestCase
             ['numeric', [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT), new Type(Type::BUILTIN_TYPE_STRING)]],
             ['arrayKey', [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)]],
             ['double', [new Type(Type::BUILTIN_TYPE_FLOAT)]],
+        ];
+    }
+
+    /**
+     * @dataProvider genericTypeProvider
+     */
+    public function testGenericTypes(string $outerClassProperty,string $innerClassProperty, bool $isNullableProperty, array $type)
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, $isNullableProperty, TypeVariableDummy::class)], $this->extractor->getTypes(GenericDummy::class, $outerClassProperty));
+        $this->assertEquals($type, $this->extractor->getTypes(TypeVariableDummy::class, $innerClassProperty, ['normalization_outer_class_property' => GenericDummy::class.'::'.$outerClassProperty]));
+    }
+
+    public function genericTypeProvider(): array
+    {
+        return [
+            ['stringProperty', 'property', false, [new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['objectProperty', 'property', false, [new Type(Type::BUILTIN_TYPE_OBJECT, false, \stdClass::class)]],
+            ['nullableObjectProperty', 'property', true, [new Type(Type::BUILTIN_TYPE_OBJECT, false, \stdClass::class)]],
+            ['getterPropertyWithClassLevelTemplateReturnString', 'classLevelTemplateDeclaration', false, [new Type(Type::BUILTIN_TYPE_STRING)]],
+        ];
+    }
+
+    /**
+     * @dataProvider genericTypePropertyDeclarationProvider
+     */
+    public function testGenericTypeOnDifferentPropertyDeclaration(string $property)
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_STRING)], $this->extractor->getTypes(TypeVariableDummy::class, $property, ['normalization_outer_class_property' => 'Symfony\Component\PropertyInfo\Tests\Fixtures\GenericDummy::stringProperty']));
+    }
+
+    public function genericTypePropertyDeclarationProvider(): array
+    {
+        return [
+            ['property'],
+            ['promotedPropertyWithParamTypeDeclaration'],
+            ['promotedPropertyWithVarTypeDeclaration']
         ];
     }
 

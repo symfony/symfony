@@ -362,7 +362,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            $types = $this->getTypes($resolvedClass, $attribute);
+            $types = $this->getTypes($resolvedClass, $attribute, $context);
 
             if (null !== $types) {
                 try {
@@ -533,6 +533,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     }
 
                     $childContext = $this->createChildContext($context, $attribute, $format);
+                    $childContext['normalization_outer_class_property'] = $currentClass.'::'.$attribute;
+
                     if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
                         return $this->serializer->denormalize($data, $class, $format, $childContext);
                     }
@@ -606,18 +608,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * @return Type[]|null
      */
-    private function getTypes(string $currentClass, string $attribute): ?array
+    private function getTypes(string $currentClass, string $attribute, array $context = []): ?array
     {
         if (null === $this->propertyTypeExtractor) {
             return null;
         }
 
-        $key = $currentClass.'::'.$attribute;
+        $key = $currentClass.'::'.$attribute.'|'.($context['normalization_outer_class_property'] ?? '');
         if (isset($this->typesCache[$key])) {
             return false === $this->typesCache[$key] ? null : $this->typesCache[$key];
         }
 
-        if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
+        if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute, $context)) {
             return $this->typesCache[$key] = $types;
         }
 

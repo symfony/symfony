@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Annotation\SerializedPath;
@@ -32,6 +33,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -41,6 +43,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummyWithContextAttribute;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
@@ -524,6 +527,20 @@ class AbstractObjectNormalizerTest extends TestCase
         $obj = $serializer->denormalize(['inner' => 'foo'], ObjectOuter::class);
 
         $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
+    }
+
+    public function testDenormalizeUsesContextAttributeForPropertiesInConstructorWithSeralizedName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor);
+        $serializer = new Serializer([new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'd-m-Y']), $normalizer]);
+
+        /** @var ObjectDummyWithContextAttribute $obj */
+        $obj = $serializer->denormalize(['property_with_serialized_name' => '01-02-2022', 'propertyWithoutSerializedName' => '01-02-2022'], ObjectDummyWithContextAttribute::class);
+
+        $this->assertSame($obj->propertyWithSerializedName->format('Y-m-d'), $obj->propertyWithoutSerializedName->format('Y-m-d'));
     }
 }
 

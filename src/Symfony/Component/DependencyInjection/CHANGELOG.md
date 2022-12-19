@@ -9,6 +9,7 @@ CHANGELOG
  * Add `RemoveBuildParametersPass`, which removes parameters starting with a dot during compilation
  * Add support for nesting autowiring-related attributes into `#[Autowire(...)]`
  * Deprecate undefined and numeric keys with `service_locator` config
+ * Fail if Target attribute does not exist during compilation
 
 6.2
 ---

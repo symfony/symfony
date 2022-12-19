@@ -10,7 +10,6 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
-        <env name="SYMFONY_IDE" value="" force="true" />
     </php>
 
     <testsuites>

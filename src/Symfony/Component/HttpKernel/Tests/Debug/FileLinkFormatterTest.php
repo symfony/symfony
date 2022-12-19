@@ -27,9 +27,17 @@ class FileLinkFormatterTest extends TestCase
 
     public function testAfterUnserialize()
     {
+        $ide = $_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? null;
+        $_ENV['SYMFONY_IDE'] = $_SERVER['SYMFONY_IDE'] = null;
         $sut = unserialize(serialize(new FileLinkFormatter()));
 
         $this->assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
+
+        if (null === $ide) {
+            unset($_ENV['SYMFONY_IDE'], $_SERVER['SYMFONY_IDE']);
+        } else {
+            $_ENV['SYMFONY_IDE'] = $_SERVER['SYMFONY_IDE'] = $ide;
+        }
     }
 
     public function testWhenFileLinkFormatAndNoRequest()

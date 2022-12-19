@@ -10,7 +10,6 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
-        <env name="SYMFONY_IDE" value="" force="true" />
         <env name="REDIS_HOST" value="localhost" />
         <env name="MEMCACHED_HOST" value="localhost" />
     </php>

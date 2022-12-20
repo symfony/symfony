@@ -92,7 +92,7 @@ EOF
 
             $errorIo->comment([
                 'Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)',
-                'For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>config:dump-reference FrameworkBundle profiler.matcher</comment> to dump the <comment>framework.profiler.matcher</comment> configuration)',
+                'For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>config:dump-reference FrameworkBundle http_client.default_options</comment> to dump the <comment>framework.http_client.default_options</comment> configuration)',
             ]);
 
             return 0;

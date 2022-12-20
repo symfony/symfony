@@ -2005,6 +2005,10 @@ class ApplicationTest extends TestCase
 
     public function testSignalableCommandInterfaceWithoutSignals()
     {
+        if (!\defined('SIGUSR1')) {
+            $this->markTestSkipped('SIGUSR1 not available');
+        }
+
         $command = new SignableCommand(false);
 
         $dispatcher = new EventDispatcher();

@@ -133,7 +133,7 @@ class SymfonyTestsListenerTrait
             if (!class_exists(AnnotationRegistry::class, false) && class_exists(AnnotationRegistry::class)) {
                 if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
                     AnnotationRegistry::registerUniqueLoader('class_exists');
-                } else {
+                } elseif (method_exists(AnnotationRegistry::class, 'registerLoader')) {
                     AnnotationRegistry::registerLoader('class_exists');
                 }
             }

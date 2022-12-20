@@ -26,7 +26,9 @@ class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTest
             {
             }
         };
-        AnnotationRegistry::registerLoader('class_exists');
+        if (method_exists(AnnotationRegistry::class, 'registerLoader')) {
+            AnnotationRegistry::registerLoader('class_exists');
+        }
     }
 
     public function testDefaultRouteName()

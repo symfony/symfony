@@ -41,7 +41,7 @@
         "symfony/property-access": "^4.4|^5.0|^6.0",
         "symfony/property-info": "^5.3|^6.0",
         "symfony/translation": "^4.4|^5.0|^6.0",
-        "doctrine/annotations": "^1.13",
+        "doctrine/annotations": "^1.13|^2",
         "doctrine/cache": "^1.11|^2.0",
         "egulias/email-validator": "^2.1.10|^3"
     },

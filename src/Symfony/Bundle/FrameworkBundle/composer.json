@@ -34,7 +34,7 @@
         "symfony/routing": "^5.3|^6.0"
     },
     "require-dev": {
-        "doctrine/annotations": "^1.13.1",
+        "doctrine/annotations": "^1.13.1|^2",
         "doctrine/cache": "^1.11|^2.0",
         "doctrine/persistence": "^1.3|^2|^3",
         "symfony/asset": "^5.3|^6.0",

@@ -29,7 +29,7 @@ class RateLimiterFactoryTest extends TestCase
     {
         $factory = new RateLimiterFactory($config, new InMemoryStorage());
         $rateLimiter = $factory->create('key');
-        $this->assertInstanceOf($expectedClass, $rateLimiter);
+        self::assertInstanceOf($expectedClass, $rateLimiter);
     }
 
     public function validConfigProvider()
@@ -65,7 +65,7 @@ class RateLimiterFactoryTest extends TestCase
      */
     public function testInvalidConfig(string $exceptionClass, array $config)
     {
-        $this->expectException($exceptionClass);
+        self::expectException($exceptionClass);
         $factory = new RateLimiterFactory($config, new InMemoryStorage());
         $factory->create('key');
     }

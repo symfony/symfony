@@ -19,10 +19,10 @@ class LazyIteratorTest extends TestCase
     public function testLazy()
     {
         new LazyIterator(function () {
-            $this->markTestFailed('lazyIterator should not be called');
+            self::markTestFailed('lazyIterator should not be called');
         });
 
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
     }
 
     public function testDelegate()
@@ -31,7 +31,7 @@ class LazyIteratorTest extends TestCase
             return new Iterator(['foo', 'bar']);
         });
 
-        $this->assertCount(2, $iterator);
+        self::assertCount(2, $iterator);
     }
 
     public function testInnerDestructedAtTheEnd()
@@ -45,9 +45,9 @@ class LazyIteratorTest extends TestCase
 
         foreach ($iterator as $x) {
         }
-        $this->assertSame(1, $count);
+        self::assertSame(1, $count);
         foreach ($iterator as $x) {
         }
-        $this->assertSame(2, $count);
+        self::assertSame(2, $count);
     }
 }

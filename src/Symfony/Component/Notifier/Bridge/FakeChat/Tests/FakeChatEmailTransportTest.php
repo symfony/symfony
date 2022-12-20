@@ -27,7 +27,7 @@ final class FakeChatEmailTransportTest extends TransportTestCase
 {
     public function createTransport(HttpClientInterface $client = null, string $transportName = null): TransportInterface
     {
-        $transport = (new FakeChatEmailTransport($this->createMock(MailerInterface::class), 'recipient@email.net', 'sender@email.net', $client ?? $this->createMock(HttpClientInterface::class)));
+        $transport = (new FakeChatEmailTransport(self::createMock(MailerInterface::class), 'recipient@email.net', 'sender@email.net', $client ?? self::createMock(HttpClientInterface::class)));
 
         if (null !== $transportName) {
             $transport->setHost($transportName);
@@ -50,7 +50,7 @@ final class FakeChatEmailTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSendWithDefaultTransportAndWithRecipient()
@@ -68,12 +68,12 @@ final class FakeChatEmailTransportTest extends TransportTestCase
 
         /** @var Email $sentEmail */
         $sentEmail = $mailer->getSentEmail();
-        $this->assertInstanceOf(Email::class, $sentEmail);
-        $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
-        $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame(sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
-        $this->assertSame($subject, $sentEmail->getTextBody());
-        $this->assertFalse($sentEmail->getHeaders()->has('X-Transport'));
+        self::assertInstanceOf(Email::class, $sentEmail);
+        self::assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
+        self::assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
+        self::assertSame(sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
+        self::assertSame($subject, $sentEmail->getTextBody());
+        self::assertFalse($sentEmail->getHeaders()->has('X-Transport'));
     }
 
     public function testSendWithDefaultTransportAndWithoutRecipient()
@@ -91,12 +91,12 @@ final class FakeChatEmailTransportTest extends TransportTestCase
 
         /** @var Email $sentEmail */
         $sentEmail = $mailer->getSentEmail();
-        $this->assertInstanceOf(Email::class, $sentEmail);
-        $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
-        $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame('New Chat message without specified recipient!', $sentEmail->getSubject());
-        $this->assertSame($subject, $sentEmail->getTextBody());
-        $this->assertFalse($sentEmail->getHeaders()->has('X-Transport'));
+        self::assertInstanceOf(Email::class, $sentEmail);
+        self::assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
+        self::assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
+        self::assertSame('New Chat message without specified recipient!', $sentEmail->getSubject());
+        self::assertSame($subject, $sentEmail->getTextBody());
+        self::assertFalse($sentEmail->getHeaders()->has('X-Transport'));
     }
 
     public function testSendWithCustomTransportAndWithRecipient()
@@ -114,13 +114,13 @@ final class FakeChatEmailTransportTest extends TransportTestCase
 
         /** @var Email $sentEmail */
         $sentEmail = $mailer->getSentEmail();
-        $this->assertInstanceOf(Email::class, $sentEmail);
-        $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
-        $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame(sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
-        $this->assertSame($subject, $sentEmail->getTextBody());
-        $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
-        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
+        self::assertInstanceOf(Email::class, $sentEmail);
+        self::assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
+        self::assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
+        self::assertSame(sprintf('New Chat message for recipient: %s', $recipient), $sentEmail->getSubject());
+        self::assertSame($subject, $sentEmail->getTextBody());
+        self::assertTrue($sentEmail->getHeaders()->has('X-Transport'));
+        self::assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 
     public function testSendWithCustomTransportAndWithoutRecipient()
@@ -138,12 +138,12 @@ final class FakeChatEmailTransportTest extends TransportTestCase
 
         /** @var Email $sentEmail */
         $sentEmail = $mailer->getSentEmail();
-        $this->assertInstanceOf(Email::class, $sentEmail);
-        $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
-        $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
-        $this->assertSame('New Chat message without specified recipient!', $sentEmail->getSubject());
-        $this->assertSame($subject, $sentEmail->getTextBody());
-        $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
-        $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
+        self::assertInstanceOf(Email::class, $sentEmail);
+        self::assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
+        self::assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
+        self::assertSame('New Chat message without specified recipient!', $sentEmail->getSubject());
+        self::assertSame($subject, $sentEmail->getTextBody());
+        self::assertTrue($sentEmail->getHeaders()->has('X-Transport'));
+        self::assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 }

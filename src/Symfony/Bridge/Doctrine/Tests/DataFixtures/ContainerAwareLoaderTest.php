@@ -20,12 +20,12 @@ class ContainerAwareLoaderTest extends TestCase
 {
     public function testShouldSetContainerOnContainerAwareFixture()
     {
-        $container = $this->createMock(ContainerInterface::class);
+        $container = self::createMock(ContainerInterface::class);
         $loader = new ContainerAwareLoader($container);
         $fixture = new ContainerAwareFixture();
 
         $loader->addFixture($fixture);
 
-        $this->assertSame($container, $fixture->container);
+        self::assertSame($container, $fixture->container);
     }
 }

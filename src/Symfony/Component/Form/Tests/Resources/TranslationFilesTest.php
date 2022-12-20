@@ -26,7 +26,7 @@ class TranslationFilesTest extends TestCase
 
         $errors = XliffUtils::validateSchema($document);
 
-        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+        self::assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
     /**
@@ -43,7 +43,7 @@ class TranslationFilesTest extends TestCase
 
         $errors = XliffUtils::validateSchema($document);
 
-        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+        self::assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
     public function provideTranslationFiles()
@@ -56,10 +56,6 @@ class TranslationFilesTest extends TestCase
 
     public function testNorwegianAlias()
     {
-        $this->assertFileEquals(
-            \dirname(__DIR__, 2).'/Resources/translations/validators.nb.xlf',
-            \dirname(__DIR__, 2).'/Resources/translations/validators.no.xlf',
-            'The NO locale should be an alias for the NB variant of the Norwegian language.'
-        );
+        self::assertFileEquals(\dirname(__DIR__, 2).'/Resources/translations/validators.nb.xlf', \dirname(__DIR__, 2).'/Resources/translations/validators.no.xlf', 'The NO locale should be an alias for the NB variant of the Norwegian language.');
     }
 }

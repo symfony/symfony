@@ -30,7 +30,7 @@ class SesHttpTransportTest extends TestCase
      */
     public function testToString(SesHttpTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -58,26 +58,26 @@ class SesHttpTransportTest extends TestCase
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://email.eu-west-1.amazonaws.com:8984/', $url);
-            $this->assertStringContainsString('AWS3-HTTPS AWSAccessKeyId=ACCESS_KEY,Algorithm=HmacSHA256,Signature=', $options['headers'][0] ?? $options['request_headers'][0]);
+            self::assertSame('POST', $method);
+            self::assertSame('https://email.eu-west-1.amazonaws.com:8984/', $url);
+            self::assertStringContainsString('AWS3-HTTPS AWSAccessKeyId=ACCESS_KEY,Algorithm=HmacSHA256,Signature=', $options['headers'][0] ?? $options['request_headers'][0]);
 
             parse_str($options['body'], $body);
 
-            $this->assertArrayHasKey('Destinations_member_1', $body);
-            $this->assertSame('saif.gmati@symfony.com', $body['Destinations_member_1']);
-            $this->assertArrayHasKey('Destinations_member_2', $body);
-            $this->assertSame('jeremy@derusse.com', $body['Destinations_member_2']);
+            self::assertArrayHasKey('Destinations_member_1', $body);
+            self::assertSame('saif.gmati@symfony.com', $body['Destinations_member_1']);
+            self::assertArrayHasKey('Destinations_member_2', $body);
+            self::assertSame('jeremy@derusse.com', $body['Destinations_member_2']);
 
             $content = base64_decode($body['RawMessage_Data']);
 
-            $this->assertStringContainsString('Hello!', $content);
-            $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
-            $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
-            $this->assertStringContainsString('Hello There!', $content);
+            self::assertStringContainsString('Hello!', $content);
+            self::assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
+            self::assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
+            self::assertStringContainsString('Hello There!', $content);
 
-            $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
-            $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
+            self::assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
+            self::assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
 
             $xml = '<SendEmailResponse xmlns="https://email.amazonaws.com/doc/2010-03-31/">
   <SendRawEmailResult>
@@ -104,7 +104,7 @@ class SesHttpTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        self::assertSame('foobar', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()
@@ -129,8 +129,8 @@ class SesHttpTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
     }
 }

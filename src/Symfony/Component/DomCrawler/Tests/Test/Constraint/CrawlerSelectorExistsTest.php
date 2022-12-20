@@ -22,18 +22,18 @@ class CrawlerSelectorExistsTest extends TestCase
     public function testConstraint()
     {
         $constraint = new CrawlerSelectorExists('title');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
+        self::assertTrue($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
         $constraint = new CrawlerSelectorExists('h1');
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
+        self::assertFalse($constraint->evaluate(new Crawler('<html><head><title>'), '', true));
 
         try {
             $constraint->evaluate(new Crawler('<html><head><title>'));
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler matches selector \"h1\".\n", TestFailure::exceptionToString($e));
+            self::assertEquals("Failed asserting that the Crawler matches selector \"h1\".\n", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 }

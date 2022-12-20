@@ -27,10 +27,10 @@ class LinkTest extends TestCase
             ->withAttribute('me', 'you')
         ;
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
-        $this->assertContains('next', $link->getRels());
-        $this->assertArrayHasKey('me', $link->getAttributes());
-        $this->assertEquals('you', $link->getAttributes()['me']);
+        self::assertEquals('http://www.google.com', $link->getHref());
+        self::assertContains('next', $link->getRels());
+        self::assertArrayHasKey('me', $link->getAttributes());
+        self::assertEquals('you', $link->getAttributes()['me']);
     }
 
     public function testCanRemoveValues()
@@ -44,9 +44,9 @@ class LinkTest extends TestCase
         $link = $link->withoutAttribute('me')
             ->withoutRel('next');
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
-        $this->assertFalse(\in_array('next', $link->getRels()));
-        $this->assertArrayNotHasKey('me', $link->getAttributes());
+        self::assertEquals('http://www.google.com', $link->getHref());
+        self::assertFalse(\in_array('next', $link->getRels()));
+        self::assertArrayNotHasKey('me', $link->getAttributes());
     }
 
     public function testMultipleRels()
@@ -56,17 +56,17 @@ class LinkTest extends TestCase
             ->withRel('next')
             ->withRel('reference');
 
-        $this->assertCount(2, $link->getRels());
-        $this->assertContains('next', $link->getRels());
-        $this->assertContains('reference', $link->getRels());
+        self::assertCount(2, $link->getRels());
+        self::assertContains('next', $link->getRels());
+        self::assertContains('reference', $link->getRels());
     }
 
     public function testConstructor()
     {
         $link = new Link('next', 'http://www.google.com');
 
-        $this->assertEquals('http://www.google.com', $link->getHref());
-        $this->assertContains('next', $link->getRels());
+        self::assertEquals('http://www.google.com', $link->getHref());
+        self::assertContains('next', $link->getRels());
     }
 
     /**
@@ -77,7 +77,7 @@ class LinkTest extends TestCase
         $link = (new Link())
             ->withHref($href);
 
-        $this->assertTrue($link->isTemplated());
+        self::assertTrue($link->isTemplated());
     }
 
     /**
@@ -88,7 +88,7 @@ class LinkTest extends TestCase
         $link = (new Link())
             ->withHref($href);
 
-        $this->assertFalse($link->isTemplated());
+        self::assertFalse($link->isTemplated());
     }
 
     public function templatedHrefProvider()

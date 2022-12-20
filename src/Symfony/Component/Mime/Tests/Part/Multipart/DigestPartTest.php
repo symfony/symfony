@@ -21,8 +21,8 @@ class DigestPartTest extends TestCase
     public function testConstructor()
     {
         $r = new DigestPart($a = new MessagePart(new Message()), $b = new MessagePart(new Message()));
-        $this->assertEquals('multipart', $r->getMediaType());
-        $this->assertEquals('digest', $r->getMediaSubtype());
-        $this->assertEquals([$a, $b], $r->getParts());
+        self::assertEquals('multipart', $r->getMediaType());
+        self::assertEquals('digest', $r->getMediaSubtype());
+        self::assertEquals([$a, $b], $r->getParts());
     }
 }

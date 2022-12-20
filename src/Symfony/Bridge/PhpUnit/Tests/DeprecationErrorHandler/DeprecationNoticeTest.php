@@ -16,20 +16,20 @@ final class DeprecationNoticeTest extends TestCase
 
         $countsByCaller = $notice->getCountsByCaller();
 
-        $this->assertCount(2, $countsByCaller);
-        $this->assertArrayHasKey('MyAction::__invoke', $countsByCaller);
-        $this->assertArrayHasKey('MyOtherAction::__invoke', $countsByCaller);
-        $this->assertSame(2, $countsByCaller['MyAction::__invoke']);
-        $this->assertSame(1, $countsByCaller['MyOtherAction::__invoke']);
+        self::assertCount(2, $countsByCaller);
+        self::assertArrayHasKey('MyAction::__invoke', $countsByCaller);
+        self::assertArrayHasKey('MyOtherAction::__invoke', $countsByCaller);
+        self::assertSame(2, $countsByCaller['MyAction::__invoke']);
+        self::assertSame(1, $countsByCaller['MyOtherAction::__invoke']);
     }
 
     public function testItCountsBothTypesOfOccurrences()
     {
         $notice = new DeprecationNotice();
         $notice->addObjectOccurrence('MyAction', '__invoke');
-        $this->assertSame(1, $notice->count());
+        self::assertSame(1, $notice->count());
 
         $notice->addProceduralOccurrence();
-        $this->assertSame(2, $notice->count());
+        self::assertSame(2, $notice->count());
     }
 }

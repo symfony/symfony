@@ -26,18 +26,18 @@ class FileTest extends TestCase
     {
         $file = new File(['maxSize' => $maxSize]);
 
-        $this->assertSame($bytes, $file->maxSize);
-        $this->assertSame($binaryFormat, $file->binaryFormat);
-        $this->assertTrue($file->__isset('maxSize'));
+        self::assertSame($bytes, $file->maxSize);
+        self::assertSame($binaryFormat, $file->binaryFormat);
+        self::assertTrue($file->__isset('maxSize'));
     }
 
     public function testMagicIsset()
     {
         $file = new File(['maxSize' => 1]);
 
-        $this->assertTrue($file->__isset('maxSize'));
-        $this->assertTrue($file->__isset('groups'));
-        $this->assertFalse($file->__isset('toto'));
+        self::assertTrue($file->__isset('maxSize'));
+        self::assertTrue($file->__isset('groups'));
+        self::assertFalse($file->__isset('toto'));
     }
 
     /**
@@ -48,8 +48,8 @@ class FileTest extends TestCase
         $file = new File();
         $file->maxSize = $maxSize;
 
-        $this->assertSame($bytes, $file->maxSize);
-        $this->assertSame($binaryFormat, $file->binaryFormat);
+        self::assertSame($bytes, $file->maxSize);
+        self::assertSame($binaryFormat, $file->binaryFormat);
     }
 
     /**
@@ -57,7 +57,7 @@ class FileTest extends TestCase
      */
     public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $file = new File(['maxSize' => 1000]);
         $file->maxSize = $maxSize;
     }
@@ -74,7 +74,7 @@ class FileTest extends TestCase
         } catch (ConstraintDefinitionException $e) {
         }
 
-        $this->assertSame(1000, $file->maxSize);
+        self::assertSame(1000, $file->maxSize);
     }
 
     /**
@@ -82,7 +82,7 @@ class FileTest extends TestCase
      */
     public function testInvalidMaxSize($maxSize)
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         new File(['maxSize' => $maxSize]);
     }
 
@@ -123,7 +123,7 @@ class FileTest extends TestCase
     {
         $file = new File(['maxSize' => $maxSize, 'binaryFormat' => $guessedFormat]);
 
-        $this->assertSame($binaryFormat, $file->binaryFormat);
+        self::assertSame($binaryFormat, $file->binaryFormat);
     }
 
     public function provideFormats()

@@ -28,24 +28,24 @@ class NullOutputTest extends TestCase
         $output->write('foo');
         $buffer = ob_get_clean();
 
-        $this->assertSame('', $buffer, '->write() does nothing (at least nothing is printed)');
-        $this->assertFalse($output->isDecorated(), '->isDecorated() returns false');
+        self::assertSame('', $buffer, '->write() does nothing (at least nothing is printed)');
+        self::assertFalse($output->isDecorated(), '->isDecorated() returns false');
     }
 
     public function testVerbosity()
     {
         $output = new NullOutput();
-        $this->assertSame(OutputInterface::VERBOSITY_QUIET, $output->getVerbosity(), '->getVerbosity() returns VERBOSITY_QUIET for NullOutput by default');
+        self::assertSame(OutputInterface::VERBOSITY_QUIET, $output->getVerbosity(), '->getVerbosity() returns VERBOSITY_QUIET for NullOutput by default');
 
         $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
-        $this->assertSame(OutputInterface::VERBOSITY_QUIET, $output->getVerbosity(), '->getVerbosity() always returns VERBOSITY_QUIET for NullOutput');
+        self::assertSame(OutputInterface::VERBOSITY_QUIET, $output->getVerbosity(), '->getVerbosity() always returns VERBOSITY_QUIET for NullOutput');
     }
 
     public function testGetFormatter()
     {
         $output = new NullOutput();
-        $this->assertInstanceof(NullOutputFormatter::class, $formatter = $output->getFormatter());
-        $this->assertSame($formatter, $output->getFormatter());
+        self::assertInstanceof(NullOutputFormatter::class, $formatter = $output->getFormatter());
+        self::assertSame($formatter, $output->getFormatter());
     }
 
     public function testSetFormatter()
@@ -53,44 +53,44 @@ class NullOutputTest extends TestCase
         $output = new NullOutput();
         $outputFormatter = new OutputFormatter();
         $output->setFormatter($outputFormatter);
-        $this->assertNotSame($outputFormatter, $output->getFormatter());
+        self::assertNotSame($outputFormatter, $output->getFormatter());
     }
 
     public function testSetVerbosity()
     {
         $output = new NullOutput();
         $output->setVerbosity(Output::VERBOSITY_NORMAL);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity());
+        self::assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity());
     }
 
     public function testSetDecorated()
     {
         $output = new NullOutput();
         $output->setDecorated(true);
-        $this->assertFalse($output->isDecorated());
+        self::assertFalse($output->isDecorated());
     }
 
     public function testIsQuiet()
     {
         $output = new NullOutput();
-        $this->assertTrue($output->isQuiet());
+        self::assertTrue($output->isQuiet());
     }
 
     public function testIsVerbose()
     {
         $output = new NullOutput();
-        $this->assertFalse($output->isVerbose());
+        self::assertFalse($output->isVerbose());
     }
 
     public function testIsVeryVerbose()
     {
         $output = new NullOutput();
-        $this->assertFalse($output->isVeryVerbose());
+        self::assertFalse($output->isVeryVerbose());
     }
 
     public function testIsDebug()
     {
         $output = new NullOutput();
-        $this->assertFalse($output->isDebug());
+        self::assertFalse($output->isDebug());
     }
 }

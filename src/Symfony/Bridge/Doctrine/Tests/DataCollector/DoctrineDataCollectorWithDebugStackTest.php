@@ -44,7 +44,7 @@ class DoctrineDataCollectorWithDebugStackTest extends TestCase
         $c->collect(new Request(), new Response());
         $c = unserialize(serialize($c));
 
-        $this->assertEquals(['default' => []], $c->getQueries());
+        self::assertEquals(['default' => []], $c->getQueries());
     }
 
     /**
@@ -66,15 +66,15 @@ class DoctrineDataCollectorWithDebugStackTest extends TestCase
             $dumper = new CliDumper($out = fopen('php://memory', 'r+'));
             $dumper->setColors(false);
             $collectedParam->dump($dumper);
-            $this->assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
+            self::assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
         } elseif (\is_string($expected)) {
-            $this->assertStringMatchesFormat($expected, $collectedParam);
+            self::assertStringMatchesFormat($expected, $collectedParam);
         } else {
-            $this->assertEquals($expected, $collectedParam);
+            self::assertEquals($expected, $collectedParam);
         }
 
-        $this->assertEquals($explainable, $collectedQueries['default'][0]['explainable']);
-        $this->assertSame($runnable, $collectedQueries['default'][0]['runnable']);
+        self::assertEquals($explainable, $collectedQueries['default'][0]['explainable']);
+        self::assertSame($runnable, $collectedQueries['default'][0]['runnable']);
     }
 
     /**
@@ -96,15 +96,15 @@ class DoctrineDataCollectorWithDebugStackTest extends TestCase
             $dumper = new CliDumper($out = fopen('php://memory', 'r+'));
             $dumper->setColors(false);
             $collectedParam->dump($dumper);
-            $this->assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
+            self::assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
         } elseif (\is_string($expected)) {
-            $this->assertStringMatchesFormat($expected, $collectedParam);
+            self::assertStringMatchesFormat($expected, $collectedParam);
         } else {
-            $this->assertEquals($expected, $collectedParam);
+            self::assertEquals($expected, $collectedParam);
         }
 
-        $this->assertEquals($explainable, $collectedQueries['default'][0]['explainable']);
-        $this->assertSame($runnable, $collectedQueries['default'][0]['runnable']);
+        self::assertEquals($explainable, $collectedQueries['default'][0]['explainable']);
+        self::assertSame($runnable, $collectedQueries['default'][0]['runnable']);
     }
 
     public function paramProvider(): array
@@ -157,28 +157,28 @@ EOTXT
 
     private function createCollector(array $queries): DoctrineDataCollector
     {
-        $connection = $this->getMockBuilder(Connection::class)
+        $connection = self::getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $connection->expects($this->any())
+        $connection->expects(self::any())
             ->method('getDatabasePlatform')
             ->willReturn(new MySqlPlatform());
 
-        $registry = $this->createMock(ManagerRegistry::class);
+        $registry = self::createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getConnectionNames')
             ->willReturn(['default' => 'doctrine.dbal.default_connection']);
         $registry
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getManagerNames')
             ->willReturn(['default' => 'doctrine.orm.default_entity_manager']);
-        $registry->expects($this->any())
+        $registry->expects(self::any())
             ->method('getConnection')
             ->willReturn($connection);
 
         $collector = new DoctrineDataCollector($registry);
-        $logger = $this->createMock(DebugStack::class);
+        $logger = self::createMock(DebugStack::class);
         $logger->queries = $queries;
         $collector->addLogger('default', $logger);
 

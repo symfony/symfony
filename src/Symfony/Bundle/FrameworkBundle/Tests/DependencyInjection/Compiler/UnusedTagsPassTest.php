@@ -29,16 +29,16 @@ class UnusedTagsPassTest extends TestCase
 
         $pass->process($container);
 
-        $this->assertSame([sprintf('%s: Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?', UnusedTagsPass::class)], $container->getCompiler()->getLog());
+        self::assertSame([sprintf('%s: Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?', UnusedTagsPass::class)], $container->getCompiler()->getLog());
     }
 
     public function testMissingKnownTags()
     {
         if (\dirname((new \ReflectionClass(ContainerBuilder::class))->getFileName(), 3) !== \dirname(__DIR__, 5)) {
-            $this->markTestSkipped('Tests are not run from the root symfony/symfony metapackage.');
+            self::markTestSkipped('Tests are not run from the root symfony/symfony metapackage.');
         }
 
-        $this->assertSame(UnusedTagsPassUtils::getDefinedTags(), $this->getKnownTags(), 'The src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php file must be updated; run src/Symfony/Bundle/FrameworkBundle/Resources/bin/check-unused-known-tags.php.');
+        self::assertSame(UnusedTagsPassUtils::getDefinedTags(), $this->getKnownTags(), 'The src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/UnusedTagsPass.php file must be updated; run src/Symfony/Bundle/FrameworkBundle/Resources/bin/check-unused-known-tags.php.');
     }
 
     private function getKnownTags(): array

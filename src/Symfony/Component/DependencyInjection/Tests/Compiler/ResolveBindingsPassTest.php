@@ -64,8 +64,8 @@ class ResolveBindingsPassTest extends TestCase
             3 => new ServiceLocatorArgument([]),
             4 => new TaggedIteratorArgument('tag.name'),
         ];
-        $this->assertEquals($expected, $definition->getArguments());
-        $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
+        self::assertEquals($expected, $definition->getArguments());
+        self::assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
     /**
@@ -86,13 +86,13 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
 
         $expected = [FooUnitEnum::BAR];
-        $this->assertEquals($expected, $definition->getArguments());
+        self::assertEquals($expected, $definition->getArguments());
     }
 
     public function testUnusedBinding()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A binding is configured for an argument named "$quz" for service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy", but no corresponding argument has been found. It may be unused and should be removed, or it may have a typo.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('A binding is configured for an argument named "$quz" for service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy", but no corresponding argument has been found. It may be unused and should be removed, or it may have a typo.');
         $container = new ContainerBuilder();
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
@@ -104,8 +104,8 @@ class ResolveBindingsPassTest extends TestCase
 
     public function testMissingParent()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A binding is configured for an argument named "$quz" for service "Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists", but no corresponding argument has been found. It may be unused and should be removed, or it may have a typo.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('A binding is configured for an argument named "$quz" for service "Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists", but no corresponding argument has been found. It may be unused and should be removed, or it may have a typo.');
 
         $container = new ContainerBuilder();
 
@@ -141,9 +141,9 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $this->assertEquals([$typedRef], $container->getDefinition('def1')->getArguments());
-        $this->assertEquals([new Reference('foo')], $container->getDefinition('def2')->getArguments());
-        $this->assertEquals([new Reference('bar')], $container->getDefinition('def3')->getArguments());
+        self::assertEquals([$typedRef], $container->getDefinition('def1')->getArguments());
+        self::assertEquals([new Reference('foo')], $container->getDefinition('def2')->getArguments());
+        self::assertEquals([new Reference('bar')], $container->getDefinition('def3')->getArguments());
     }
 
     public function testScalarSetter()
@@ -156,13 +156,13 @@ class ResolveBindingsPassTest extends TestCase
         (new AutowireRequiredMethodsPass())->process($container);
         (new ResolveBindingsPass())->process($container);
 
-        $this->assertEquals([['setDefaultLocale', ['fr']]], $definition->getMethodCalls());
+        self::assertEquals([['setDefaultLocale', ['fr']]], $definition->getMethodCalls());
     }
 
     public function testWithNonExistingSetterAndBinding()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "setLogger()" does not exist.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "setLogger()" does not exist.');
         $container = new ContainerBuilder();
 
         $bindings = [
@@ -195,13 +195,13 @@ class ResolveBindingsPassTest extends TestCase
         (new ResolveBindingsPass())->process($container);
         (new DefinitionErrorExceptionPass())->process($container);
 
-        $this->assertSame([1 => 'bar'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+        self::assertSame([1 => 'bar'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
     }
 
     public function testEmptyBindingTypehint()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Did you forget to add the type "string" to argument "$apiKey" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy::__construct()"?');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Did you forget to add the type "string" to argument "$apiKey" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy::__construct()"?');
 
         $container = new ContainerBuilder();
         $bindings = [
@@ -230,7 +230,7 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $this->assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('bar')->getArgument(0));
+        self::assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('bar')->getArgument(0));
 
         spl_autoload_unregister($autoloader);
     }
@@ -247,6 +247,6 @@ class ResolveBindingsPassTest extends TestCase
 
         (new ResolveBindingsPass())->process($container);
 
-        $this->assertSame('bar', (string) $container->getDefinition('with_target')->getArgument(0));
+        self::assertSame('bar', (string) $container->getDefinition('with_target')->getArgument(0));
     }
 }

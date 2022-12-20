@@ -20,12 +20,12 @@ class PathHeaderTest extends TestCase
     public function testSingleAddressCanBeSetAndFetched()
     {
         $header = new PathHeader('Return-Path', $address = new Address('chris@swiftmailer.org'));
-        $this->assertEquals($address, $header->getAddress());
+        self::assertEquals($address, $header->getAddress());
     }
 
     public function testAddressMustComplyWithRfc2822()
     {
-        $this->expectException(\Exception::class);
+        self::expectException(\Exception::class);
         new PathHeader('Return-Path', new Address('chr is@swiftmailer.org'));
     }
 
@@ -40,37 +40,37 @@ class PathHeaderTest extends TestCase
          */
 
         $header = new PathHeader('Return-Path', new Address('chris@swiftmailer.org'));
-        $this->assertEquals('<chris@swiftmailer.org>', $header->getBodyAsString());
+        self::assertEquals('<chris@swiftmailer.org>', $header->getBodyAsString());
     }
 
     public function testAddressIsIdnEncoded()
     {
         $header = new PathHeader('Return-Path', new Address('chris@swïftmailer.org'));
-        $this->assertEquals('<chris@xn--swftmailer-78a.org>', $header->getBodyAsString());
+        self::assertEquals('<chris@xn--swftmailer-78a.org>', $header->getBodyAsString());
     }
 
     public function testAddressMustBeEncodableWithUtf8CharsInLocalPart()
     {
         $header = new PathHeader('Return-Path', new Address('chrïs@swiftmailer.org'));
-        $this->assertSame('<chrïs@swiftmailer.org>', $header->getBodyAsString());
+        self::assertSame('<chrïs@swiftmailer.org>', $header->getBodyAsString());
     }
 
     public function testSetBody()
     {
         $header = new PathHeader('Return-Path', new Address('foo@example.com'));
         $header->setBody($address = new Address('foo@bar.tld'));
-        $this->assertEquals($address, $header->getAddress());
+        self::assertEquals($address, $header->getAddress());
     }
 
     public function testGetBody()
     {
         $header = new PathHeader('Return-Path', $address = new Address('foo@bar.tld'));
-        $this->assertEquals($address, $header->getBody());
+        self::assertEquals($address, $header->getBody());
     }
 
     public function testToString()
     {
         $header = new PathHeader('Return-Path', new Address('chris@swiftmailer.org'));
-        $this->assertEquals('Return-Path: <chris@swiftmailer.org>', $header->toString());
+        self::assertEquals('Return-Path: <chris@swiftmailer.org>', $header->toString());
     }
 }

@@ -19,6 +19,6 @@ class NullTransportTest extends TestCase
     public function testToString()
     {
         $t = new NullTransport();
-        $this->assertEquals('null://', (string) $t);
+        self::assertEquals('null://', (string) $t);
     }
 }

@@ -37,7 +37,7 @@ class SignalRegistryTest extends TestCase
 
         posix_kill(posix_getpid(), \SIGUSR1);
 
-        $this->assertTrue($isHandled);
+        self::assertTrue($isHandled);
     }
 
     public function testTwoCallbacksForASignalBothCallbacksAreCalled()
@@ -56,8 +56,8 @@ class SignalRegistryTest extends TestCase
 
         posix_kill(posix_getpid(), \SIGUSR1);
 
-        $this->assertTrue($isHandled1);
-        $this->assertTrue($isHandled2);
+        self::assertTrue($isHandled1);
+        self::assertTrue($isHandled2);
     }
 
     public function testTwoSignalsSignalsAreHandled()
@@ -73,8 +73,8 @@ class SignalRegistryTest extends TestCase
 
         posix_kill(posix_getpid(), \SIGUSR1);
 
-        $this->assertTrue($isHandled1);
-        $this->assertFalse($isHandled2);
+        self::assertTrue($isHandled1);
+        self::assertFalse($isHandled2);
 
         $signalRegistry->register(\SIGUSR2, function () use (&$isHandled2) {
             $isHandled2 = true;
@@ -82,7 +82,7 @@ class SignalRegistryTest extends TestCase
 
         posix_kill(posix_getpid(), \SIGUSR2);
 
-        $this->assertTrue($isHandled2);
+        self::assertTrue($isHandled2);
     }
 
     public function testTwoCallbacksForASignalPreviousAndRegisteredCallbacksWereCalled()
@@ -101,8 +101,8 @@ class SignalRegistryTest extends TestCase
 
         posix_kill(posix_getpid(), \SIGUSR1);
 
-        $this->assertTrue($isHandled1);
-        $this->assertTrue($isHandled2);
+        self::assertTrue($isHandled1);
+        self::assertTrue($isHandled2);
     }
 
     public function testTwoCallbacksForASignalPreviousCallbackFromAnotherRegistry()
@@ -123,7 +123,7 @@ class SignalRegistryTest extends TestCase
 
         posix_kill(posix_getpid(), \SIGUSR1);
 
-        $this->assertTrue($isHandled1);
-        $this->assertTrue($isHandled2);
+        self::assertTrue($isHandled1);
+        self::assertTrue($isHandled2);
     }
 }

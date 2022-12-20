@@ -36,7 +36,7 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
         $properties = $container->getDefinition('d')->getProperties();
         $expected = new TaggedIteratorArgument('foo');
         $expected->setValues([new Reference('b'), new Reference('c'), new Reference('a')]);
-        $this->assertEquals($expected, $properties['foos']);
+        self::assertEquals($expected, $properties['foos']);
     }
 
     public function testProcessWithIndexes()
@@ -52,6 +52,6 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
 
         $expected = new TaggedIteratorArgument('foo', 'key');
         $expected->setValues(['1' => new TypedReference('service_a', 'stdClass'), '2' => new TypedReference('service_b', 'stdClass')]);
-        $this->assertEquals($expected, $properties['foos']);
+        self::assertEquals($expected, $properties['foos']);
     }
 }

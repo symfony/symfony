@@ -34,7 +34,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
 
-        $this->assertEquals(self::getBundleDefaultConfig(), $config);
+        self::assertEquals(self::getBundleDefaultConfig(), $config);
     }
 
     public function getTestValidSessionName()
@@ -52,7 +52,7 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidSessionName($sessionName)
     {
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $processor = new Processor();
         $processor->processConfiguration(
             new Configuration(true),
@@ -90,7 +90,7 @@ class ConfigurationTest extends TestCase
             'strict_mode' => false,
         ];
 
-        $this->assertEquals($defaultConfig, $config['assets']);
+        self::assertEquals($defaultConfig, $config['assets']);
     }
 
     /**
@@ -110,7 +110,7 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertArrayHasKey($packageName, $config['assets']['packages']);
+        self::assertArrayHasKey($packageName, $config['assets']['packages']);
     }
 
     public function provideValidAssetsPackageNameConfigurationTests()
@@ -127,8 +127,8 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage($expectedMessage);
 
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -187,9 +187,9 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertArrayHasKey('lock', $config);
+        self::assertArrayHasKey('lock', $config);
 
-        $this->assertEquals($processedConfig, $config['lock']);
+        self::assertEquals($processedConfig, $config['lock']);
     }
 
     public function provideValidLockConfigurationTests()
@@ -254,22 +254,19 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(
-            [
-                'enabled' => true,
-                'resources' => [
-                    'payload' => ['semaphore'],
-                ],
+        self::assertEquals([
+            'enabled' => true,
+            'resources' => [
+                'payload' => ['semaphore'],
             ],
-            $config['lock']
-        );
+        ], $config['lock']);
     }
 
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage($expectedMessage);
         $processor = new Processor();
         $configuration = new Configuration(true);
 
@@ -319,29 +316,26 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(
-            [
-                'existing_bus' => [
-                    'default_middleware' => true,
-                    'middleware' => [
-                        ['id' => 'existing_bus.middleware', 'arguments' => []],
-                    ],
-                ],
-                'common_bus' => [
-                    'default_middleware' => false,
-                    'middleware' => [
-                        ['id' => 'common_bus.new_middleware', 'arguments' => []],
-                    ],
-                ],
-                'new_bus' => [
-                    'default_middleware' => true,
-                    'middleware' => [
-                        ['id' => 'new_bus.middleware', 'arguments' => []],
-                    ],
+        self::assertEquals([
+            'existing_bus' => [
+                'default_middleware' => true,
+                'middleware' => [
+                    ['id' => 'existing_bus.middleware', 'arguments' => []],
                 ],
             ],
-            $config['messenger']['buses']
-        );
+            'common_bus' => [
+                'default_middleware' => false,
+                'middleware' => [
+                    ['id' => 'common_bus.new_middleware', 'arguments' => []],
+                ],
+            ],
+            'new_bus' => [
+                'default_middleware' => true,
+                'middleware' => [
+                    ['id' => 'new_bus.middleware', 'arguments' => []],
+                ],
+            ],
+        ], $config['messenger']['buses']);
     }
 
     public function testItErrorsWhenDefaultBusDoesNotExist()
@@ -349,8 +343,8 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
 
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The specified default bus "foo" is not configured. Available buses are "bar", "baz".');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('The specified default bus "foo" is not configured. Available buses are "bar", "baz".');
 
         $processor->processConfiguration($configuration, [
             [
@@ -374,7 +368,7 @@ class ConfigurationTest extends TestCase
             ['lock' => ['enabled' => false]],
         ]);
 
-        $this->assertFalse($config['lock']['enabled']);
+        self::assertFalse($config['lock']['enabled']);
     }
 
     public function testEnabledLockNeedsResources()
@@ -382,8 +376,8 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
 
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
 
         $processor->processConfiguration($configuration, [
             ['lock' => ['enabled' => true]],

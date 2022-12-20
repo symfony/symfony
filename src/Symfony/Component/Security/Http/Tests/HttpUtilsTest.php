@@ -30,8 +30,8 @@ class HttpUtilsTest extends TestCase
         $utils = new HttpUtils($this->getUrlGenerator());
         $response = $utils->createRedirectResponse($this->getRequest(), '/foobar');
 
-        $this->assertTrue($response->isRedirect('http://localhost/foobar'));
-        $this->assertEquals(302, $response->getStatusCode());
+        self::assertTrue($response->isRedirect('http://localhost/foobar'));
+        self::assertEquals(302, $response->getStatusCode());
     }
 
     public function testCreateRedirectResponseWithAbsoluteUrl()
@@ -39,7 +39,7 @@ class HttpUtilsTest extends TestCase
         $utils = new HttpUtils($this->getUrlGenerator());
         $response = $utils->createRedirectResponse($this->getRequest(), 'http://symfony.com/');
 
-        $this->assertTrue($response->isRedirect('http://symfony.com/'));
+        self::assertTrue($response->isRedirect('http://symfony.com/'));
     }
 
     public function testCreateRedirectResponseWithDomainRegexp()
@@ -47,7 +47,7 @@ class HttpUtilsTest extends TestCase
         $utils = new HttpUtils($this->getUrlGenerator(), null, '#^https?://symfony\.com$#i');
         $response = $utils->createRedirectResponse($this->getRequest(), 'http://symfony.com/blog');
 
-        $this->assertTrue($response->isRedirect('http://symfony.com/blog'));
+        self::assertTrue($response->isRedirect('http://symfony.com/blog'));
     }
 
     public function testCreateRedirectResponseWithRequestsDomain()
@@ -55,7 +55,7 @@ class HttpUtilsTest extends TestCase
         $utils = new HttpUtils($this->getUrlGenerator(), null, '#^https?://%s$#i');
         $response = $utils->createRedirectResponse($this->getRequest(), 'http://localhost/blog');
 
-        $this->assertTrue($response->isRedirect('http://localhost/blog'));
+        self::assertTrue($response->isRedirect('http://localhost/blog'));
     }
 
     /**
@@ -66,7 +66,7 @@ class HttpUtilsTest extends TestCase
         $utils = new HttpUtils($this->getUrlGenerator(), null, '#^https?://%s$#i');
         $response = $utils->createRedirectResponse($this->getRequest(), $url);
 
-        $this->assertTrue($response->isRedirect('http://localhost/'));
+        self::assertTrue($response->isRedirect('http://localhost/'));
     }
 
     public function badRequestDomainUrls()
@@ -85,28 +85,28 @@ class HttpUtilsTest extends TestCase
         $utils = new HttpUtils($this->getUrlGenerator(), null, '#^https?://%s$#i');
         $response = $utils->createRedirectResponse($this->getRequest(), '//evil.com/do-bad-things');
 
-        $this->assertTrue($response->isRedirect('http://localhost//evil.com/do-bad-things'), 'Protocol-relative redirection should not be supported for security reasons');
+        self::assertTrue($response->isRedirect('http://localhost//evil.com/do-bad-things'), 'Protocol-relative redirection should not be supported for security reasons');
     }
 
     public function testCreateRedirectResponseWithRouteName()
     {
-        $utils = new HttpUtils($urlGenerator = $this->createMock(UrlGeneratorInterface::class));
+        $utils = new HttpUtils($urlGenerator = self::createMock(UrlGeneratorInterface::class));
 
         $urlGenerator
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('generate')
             ->with('foobar', [], UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn('http://localhost/foo/bar')
         ;
         $urlGenerator
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getContext')
-            ->willReturn($this->createMock(RequestContext::class))
+            ->willReturn(self::createMock(RequestContext::class))
         ;
 
         $response = $utils->createRedirectResponse($this->getRequest(), 'foobar');
 
-        $this->assertTrue($response->isRedirect('http://localhost/foo/bar'));
+        self::assertTrue($response->isRedirect('http://localhost/foo/bar'));
     }
 
     public function testCreateRequestWithPath()
@@ -117,48 +117,48 @@ class HttpUtilsTest extends TestCase
         $utils = new HttpUtils($this->getUrlGenerator());
         $subRequest = $utils->createRequest($request, '/foobar');
 
-        $this->assertEquals('GET', $subRequest->getMethod());
-        $this->assertEquals('/foobar', $subRequest->getPathInfo());
-        $this->assertEquals('bar', $subRequest->server->get('Foo'));
+        self::assertEquals('GET', $subRequest->getMethod());
+        self::assertEquals('/foobar', $subRequest->getPathInfo());
+        self::assertEquals('bar', $subRequest->server->get('Foo'));
     }
 
     public function testCreateRequestWithRouteName()
     {
-        $utils = new HttpUtils($urlGenerator = $this->createMock(UrlGeneratorInterface::class));
+        $utils = new HttpUtils($urlGenerator = self::createMock(UrlGeneratorInterface::class));
 
         $urlGenerator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('generate')
             ->willReturn('/foo/bar')
         ;
         $urlGenerator
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getContext')
-            ->willReturn($this->createMock(RequestContext::class))
+            ->willReturn(self::createMock(RequestContext::class))
         ;
 
         $subRequest = $utils->createRequest($this->getRequest(), 'foobar');
 
-        $this->assertEquals('/foo/bar', $subRequest->getPathInfo());
+        self::assertEquals('/foo/bar', $subRequest->getPathInfo());
     }
 
     public function testCreateRequestWithAbsoluteUrl()
     {
-        $utils = new HttpUtils($this->createMock(UrlGeneratorInterface::class));
+        $utils = new HttpUtils(self::createMock(UrlGeneratorInterface::class));
         $subRequest = $utils->createRequest($this->getRequest(), 'http://symfony.com/');
 
-        $this->assertEquals('/', $subRequest->getPathInfo());
+        self::assertEquals('/', $subRequest->getPathInfo());
     }
 
     public function testCreateRequestPassesSessionToTheNewRequest()
     {
         $request = $this->getRequest();
-        $request->setSession($session = $this->createMock(SessionInterface::class));
+        $request->setSession($session = self::createMock(SessionInterface::class));
 
         $utils = new HttpUtils($this->getUrlGenerator());
         $subRequest = $utils->createRequest($request, '/foobar');
 
-        $this->assertSame($session, $subRequest->getSession());
+        self::assertSame($session, $subRequest->getSession());
     }
 
     /**
@@ -172,7 +172,7 @@ class HttpUtilsTest extends TestCase
         $utils = new HttpUtils($this->getUrlGenerator());
         $subRequest = $utils->createRequest($request, '/foobar');
 
-        $this->assertSame('foo', $subRequest->attributes->get($attribute));
+        self::assertSame('foo', $subRequest->attributes->get($attribute));
     }
 
     public function provideSecurityContextAttributes()
@@ -188,79 +188,79 @@ class HttpUtilsTest extends TestCase
     {
         $utils = new HttpUtils($this->getUrlGenerator());
 
-        $this->assertTrue($utils->checkRequestPath($this->getRequest(), '/'));
-        $this->assertFalse($utils->checkRequestPath($this->getRequest(), '/foo'));
-        $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo%20bar'), '/foo bar'));
+        self::assertTrue($utils->checkRequestPath($this->getRequest(), '/'));
+        self::assertFalse($utils->checkRequestPath($this->getRequest(), '/foo'));
+        self::assertTrue($utils->checkRequestPath($this->getRequest('/foo%20bar'), '/foo bar'));
         // Plus must not decoded to space
-        $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo+bar'), '/foo+bar'));
+        self::assertTrue($utils->checkRequestPath($this->getRequest('/foo+bar'), '/foo+bar'));
         // Checking unicode
-        $this->assertTrue($utils->checkRequestPath($this->getRequest('/'.urlencode('вход')), '/вход'));
+        self::assertTrue($utils->checkRequestPath($this->getRequest('/'.urlencode('вход')), '/вход'));
     }
 
     public function testCheckRequestPathWithUrlMatcherAndResourceNotFound()
     {
-        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+        $urlMatcher = self::createMock(UrlMatcherInterface::class);
         $urlMatcher
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('match')
             ->with('/')
             ->willThrowException(new ResourceNotFoundException())
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
-        $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'foobar'));
+        self::assertFalse($utils->checkRequestPath($this->getRequest(), 'foobar'));
     }
 
     public function testCheckRequestPathWithUrlMatcherAndMethodNotAllowed()
     {
         $request = $this->getRequest();
-        $urlMatcher = $this->createMock(RequestMatcherInterface::class);
+        $urlMatcher = self::createMock(RequestMatcherInterface::class);
         $urlMatcher
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('matchRequest')
             ->with($request)
             ->willThrowException(new MethodNotAllowedException([]))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
-        $this->assertFalse($utils->checkRequestPath($request, 'foobar'));
+        self::assertFalse($utils->checkRequestPath($request, 'foobar'));
     }
 
     public function testCheckRequestPathWithUrlMatcherAndResourceFoundByUrl()
     {
-        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+        $urlMatcher = self::createMock(UrlMatcherInterface::class);
         $urlMatcher
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('match')
             ->with('/foo/bar')
             ->willReturn(['_route' => 'foobar'])
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
-        $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo/bar'), 'foobar'));
+        self::assertTrue($utils->checkRequestPath($this->getRequest('/foo/bar'), 'foobar'));
     }
 
     public function testCheckRequestPathWithUrlMatcherAndResourceFoundByRequest()
     {
         $request = $this->getRequest();
-        $urlMatcher = $this->createMock(RequestMatcherInterface::class);
+        $urlMatcher = self::createMock(RequestMatcherInterface::class);
         $urlMatcher
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('matchRequest')
             ->with($request)
             ->willReturn(['_route' => 'foobar'])
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
-        $this->assertTrue($utils->checkRequestPath($request, 'foobar'));
+        self::assertTrue($utils->checkRequestPath($request, 'foobar'));
     }
 
     public function testCheckRequestPathWithUrlMatcherLoadingException()
     {
-        $this->expectException(\RuntimeException::class);
-        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+        self::expectException(\RuntimeException::class);
+        $urlMatcher = self::createMock(UrlMatcherInterface::class);
         $urlMatcher
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('match')
             ->willThrowException(new \RuntimeException())
         ;
@@ -271,55 +271,55 @@ class HttpUtilsTest extends TestCase
 
     public function testCheckPathWithoutRouteParam()
     {
-        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+        $urlMatcher = self::createMock(UrlMatcherInterface::class);
         $urlMatcher
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('match')
             ->willReturn(['_controller' => 'PathController'])
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
-        $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'path/index.html'));
+        self::assertFalse($utils->checkRequestPath($this->getRequest(), 'path/index.html'));
     }
 
     public function testUrlMatcher()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface');
         new HttpUtils($this->getUrlGenerator(), new \stdClass());
     }
 
     public function testGenerateUriRemovesQueryString()
     {
         $utils = new HttpUtils($this->getUrlGenerator('/foo/bar'));
-        $this->assertEquals('/foo/bar', $utils->generateUri(new Request(), 'route_name'));
+        self::assertEquals('/foo/bar', $utils->generateUri(new Request(), 'route_name'));
 
         $utils = new HttpUtils($this->getUrlGenerator('/foo/bar?param=value'));
-        $this->assertEquals('/foo/bar', $utils->generateUri(new Request(), 'route_name'));
+        self::assertEquals('/foo/bar', $utils->generateUri(new Request(), 'route_name'));
     }
 
     public function testGenerateUriPreservesFragment()
     {
         $utils = new HttpUtils($this->getUrlGenerator('/foo/bar?param=value#fragment'));
-        $this->assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
+        self::assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
 
         $utils = new HttpUtils($this->getUrlGenerator('/foo/bar#fragment'));
-        $this->assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
+        self::assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
     }
 
     public function testUrlGeneratorIsRequiredToGenerateUrl()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('You must provide a UrlGeneratorInterface instance to be able to use routes.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         $utils = new HttpUtils();
         $utils->generateUri(new Request(), 'route_name');
     }
 
     private function getUrlGenerator($generatedUrl = '/foo/bar')
     {
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
         $urlGenerator
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('generate')
             ->willReturn($generatedUrl)
         ;

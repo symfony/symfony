@@ -28,7 +28,7 @@ class TranslationDumperPassTest extends TestCase
         $translationDumperPass = new TranslationDumperPass();
         $translationDumperPass->process($container);
 
-        $this->assertEquals([['addDumper', ['bar.alias', new Reference('foo.id')]]], $writerDefinition->getMethodCalls());
+        self::assertEquals([['addDumper', ['bar.alias', new Reference('foo.id')]]], $writerDefinition->getMethodCalls());
     }
 
     public function testProcessNoDefinitionFound()
@@ -42,7 +42,7 @@ class TranslationDumperPassTest extends TestCase
         $translationDumperPass->process($container);
 
         // the container is untouched (i.e. no new definitions or aliases)
-        $this->assertCount($definitionsBefore, $container->getDefinitions());
-        $this->assertCount($aliasesBefore, $container->getAliases());
+        self::assertCount($definitionsBefore, $container->getDefinitions());
+        self::assertCount($aliasesBefore, $container->getAliases());
     }
 }

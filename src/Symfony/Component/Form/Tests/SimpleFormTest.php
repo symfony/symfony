@@ -83,7 +83,7 @@ class SimpleFormTest extends TestCase
         $config = new FormConfigBuilder($name, null, new EventDispatcher());
         $form = new Form($config);
 
-        $this->assertEquals($propertyPath, $form->getPropertyPath());
+        self::assertEquals($propertyPath, $form->getPropertyPath());
     }
 
     public function provideFormNames()
@@ -110,15 +110,15 @@ class SimpleFormTest extends TestCase
         $config->setData('default');
         $form = new Form($config);
 
-        $this->assertSame('default', $form->getData());
-        $this->assertSame('foo', $form->getNormData());
-        $this->assertSame('bar', $form->getViewData());
+        self::assertSame('default', $form->getData());
+        self::assertSame('foo', $form->getNormData());
+        self::assertSame('bar', $form->getViewData());
     }
 
     public function testDataTransformationFailure()
     {
-        $this->expectException(TransformationFailedException::class);
-        $this->expectExceptionMessage('Unable to transform data for property path "name": No mapping for value "arg"');
+        self::expectException(TransformationFailedException::class);
+        self::expectExceptionMessage('Unable to transform data for property path "name": No mapping for value "arg"');
         $model = new FixedDataTransformer([
             'default' => 'foo',
         ]);
@@ -158,8 +158,8 @@ class SimpleFormTest extends TestCase
 
         $form->submit('foobar');
 
-        $this->assertTrue($preSetData);
-        $this->assertTrue($preSubmit);
+        self::assertTrue($preSetData);
+        self::assertTrue($preSubmit);
     }
 
     // https://github.com/symfony/symfony/pull/7789
@@ -175,14 +175,14 @@ class SimpleFormTest extends TestCase
 
         $form->submit(false);
 
-        $this->assertTrue($passedDataIsNull);
-        $this->assertTrue($form->isValid());
-        $this->assertNull($form->getData());
+        self::assertTrue($passedDataIsNull);
+        self::assertTrue($form->isValid());
+        self::assertNull($form->getData());
     }
 
     public function testSubmitThrowsExceptionIfAlreadySubmitted()
     {
-        $this->expectException(AlreadySubmittedException::class);
+        self::expectException(AlreadySubmittedException::class);
         $this->form->submit([]);
         $this->form->submit([]);
     }
@@ -196,8 +196,8 @@ class SimpleFormTest extends TestCase
 
         $form->submit('new');
 
-        $this->assertEquals('initial', $form->getData());
-        $this->assertTrue($form->isSubmitted());
+        self::assertEquals('initial', $form->getData());
+        self::assertTrue($form->isSubmitted());
     }
 
     public function testNeverRequiredIfParentNotRequired()
@@ -207,7 +207,7 @@ class SimpleFormTest extends TestCase
 
         $child->setParent($parent);
 
-        $this->assertFalse($child->isRequired());
+        self::assertFalse($child->isRequired());
     }
 
     public function testRequired()
@@ -217,7 +217,7 @@ class SimpleFormTest extends TestCase
 
         $child->setParent($parent);
 
-        $this->assertTrue($child->isRequired());
+        self::assertTrue($child->isRequired());
     }
 
     public function testNotRequired()
@@ -227,7 +227,7 @@ class SimpleFormTest extends TestCase
 
         $child->setParent($parent);
 
-        $this->assertFalse($child->isRequired());
+        self::assertFalse($child->isRequired());
     }
 
     /**
@@ -240,7 +240,7 @@ class SimpleFormTest extends TestCase
 
         $child->setParent($parent);
 
-        $this->assertSame($result, $child->isDisabled());
+        self::assertSame($result, $child->isDisabled());
     }
 
     public function getDisabledStates()
@@ -263,19 +263,19 @@ class SimpleFormTest extends TestCase
 
         $this->form->setParent($parent);
 
-        $this->assertSame($root, $this->form->getRoot());
+        self::assertSame($root, $this->form->getRoot());
     }
 
     public function testGetRootReturnsSelfIfNoParent()
     {
-        $this->assertSame($this->form, $this->form->getRoot());
+        self::assertSame($this->form, $this->form->getRoot());
     }
 
     public function testEmptyIfEmptyArray()
     {
         $this->form->setData([]);
 
-        $this->assertTrue($this->form->isEmpty());
+        self::assertTrue($this->form->isEmpty());
     }
 
     public function testEmptyIfEmptyCountable()
@@ -284,7 +284,7 @@ class SimpleFormTest extends TestCase
 
         $this->form->setData(new SimpleFormTest_Countable(0));
 
-        $this->assertTrue($this->form->isEmpty());
+        self::assertTrue($this->form->isEmpty());
     }
 
     public function testNotEmptyIfFilledCountable()
@@ -293,7 +293,7 @@ class SimpleFormTest extends TestCase
 
         $this->form->setData(new SimpleFormTest_Countable(1));
 
-        $this->assertFalse($this->form->isEmpty());
+        self::assertFalse($this->form->isEmpty());
     }
 
     public function testEmptyIfEmptyTraversable()
@@ -302,7 +302,7 @@ class SimpleFormTest extends TestCase
 
         $this->form->setData(new SimpleFormTest_Traversable(0));
 
-        $this->assertTrue($this->form->isEmpty());
+        self::assertTrue($this->form->isEmpty());
     }
 
     public function testNotEmptyIfFilledTraversable()
@@ -311,28 +311,28 @@ class SimpleFormTest extends TestCase
 
         $this->form->setData(new SimpleFormTest_Traversable(1));
 
-        $this->assertFalse($this->form->isEmpty());
+        self::assertFalse($this->form->isEmpty());
     }
 
     public function testEmptyIfNull()
     {
         $this->form->setData(null);
 
-        $this->assertTrue($this->form->isEmpty());
+        self::assertTrue($this->form->isEmpty());
     }
 
     public function testEmptyIfEmptyString()
     {
         $this->form->setData('');
 
-        $this->assertTrue($this->form->isEmpty());
+        self::assertTrue($this->form->isEmpty());
     }
 
     public function testNotEmptyIfText()
     {
         $this->form->setData('foobar');
 
-        $this->assertFalse($this->form->isEmpty());
+        self::assertFalse($this->form->isEmpty());
     }
 
     public function testValidIfSubmitted()
@@ -340,7 +340,7 @@ class SimpleFormTest extends TestCase
         $form = $this->getBuilder()->getForm();
         $form->submit('foobar');
 
-        $this->assertTrue($form->isValid());
+        self::assertTrue($form->isValid());
     }
 
     public function testValidIfSubmittedAndDisabled()
@@ -348,7 +348,7 @@ class SimpleFormTest extends TestCase
         $form = $this->getBuilder()->setDisabled(true)->getForm();
         $form->submit('foobar');
 
-        $this->assertTrue($form->isValid());
+        self::assertTrue($form->isValid());
     }
 
     public function testNotValidIfErrors()
@@ -357,24 +357,24 @@ class SimpleFormTest extends TestCase
         $form->submit('foobar');
         $form->addError(new FormError('Error!'));
 
-        $this->assertFalse($form->isValid());
+        self::assertFalse($form->isValid());
     }
 
     public function testHasErrors()
     {
         $this->form->addError(new FormError('Error!'));
 
-        $this->assertCount(1, $this->form->getErrors());
+        self::assertCount(1, $this->form->getErrors());
     }
 
     public function testHasNoErrors()
     {
-        $this->assertCount(0, $this->form->getErrors());
+        self::assertCount(0, $this->form->getErrors());
     }
 
     public function testSetParentThrowsExceptionIfAlreadySubmitted()
     {
-        $this->expectException(AlreadySubmittedException::class);
+        self::expectException(AlreadySubmittedException::class);
         $this->form->submit([]);
         $this->form->setParent($this->getBuilder('parent')->getForm());
     }
@@ -384,17 +384,17 @@ class SimpleFormTest extends TestCase
         $form = $this->getBuilder()->getForm();
         $form->submit('foobar');
 
-        $this->assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSubmitted());
     }
 
     public function testNotSubmitted()
     {
-        $this->assertFalse($this->form->isSubmitted());
+        self::assertFalse($this->form->isSubmitted());
     }
 
     public function testSetDataThrowsExceptionIfAlreadySubmitted()
     {
-        $this->expectException(AlreadySubmittedException::class);
+        self::expectException(AlreadySubmittedException::class);
         $this->form->submit([]);
         $this->form->setData(null);
     }
@@ -405,8 +405,8 @@ class SimpleFormTest extends TestCase
         $form = $this->getBuilder('name', \stdClass::class)->setByReference(false)->getForm();
         $form->setData($data);
 
-        $this->assertNotSame($data, $form->getData());
-        $this->assertEquals($data, $form->getData());
+        self::assertNotSame($data, $form->getData());
+        self::assertEquals($data, $form->getData());
     }
 
     public function testSetDataDoesNotCloneObjectIfByReference()
@@ -415,7 +415,7 @@ class SimpleFormTest extends TestCase
         $form = $this->getBuilder('name', \stdClass::class)->setByReference(true)->getForm();
         $form->setData($data);
 
-        $this->assertSame($data, $form->getData());
+        self::assertSame($data, $form->getData());
     }
 
     public function testSetDataExecutesTransformationChain()
@@ -439,9 +439,9 @@ class SimpleFormTest extends TestCase
 
         $form->setData('app');
 
-        $this->assertEquals('filtered', $form->getData());
-        $this->assertEquals('norm', $form->getNormData());
-        $this->assertEquals('client', $form->getViewData());
+        self::assertEquals('filtered', $form->getData());
+        self::assertEquals('norm', $form->getNormData());
+        self::assertEquals('client', $form->getViewData());
     }
 
     public function testSetDataExecutesViewTransformersInOrder()
@@ -459,7 +459,7 @@ class SimpleFormTest extends TestCase
 
         $form->setData('first');
 
-        $this->assertEquals('third', $form->getViewData());
+        self::assertEquals('third', $form->getViewData());
     }
 
     public function testSetDataExecutesModelTransformersInReverseOrder()
@@ -477,7 +477,7 @@ class SimpleFormTest extends TestCase
 
         $form->setData('first');
 
-        $this->assertEquals('third', $form->getNormData());
+        self::assertEquals('third', $form->getNormData());
     }
 
     /*
@@ -490,9 +490,9 @@ class SimpleFormTest extends TestCase
 
         $form->setData(1);
 
-        $this->assertSame('1', $form->getData());
-        $this->assertSame('1', $form->getNormData());
-        $this->assertSame('1', $form->getViewData());
+        self::assertSame('1', $form->getData());
+        self::assertSame('1', $form->getNormData());
+        self::assertSame('1', $form->getViewData());
     }
 
     /*
@@ -510,9 +510,9 @@ class SimpleFormTest extends TestCase
 
         $form->setData(1);
 
-        $this->assertSame(1, $form->getData());
-        $this->assertSame(23, $form->getNormData());
-        $this->assertSame('23', $form->getViewData());
+        self::assertSame(1, $form->getData());
+        self::assertSame(23, $form->getNormData());
+        self::assertSame('23', $form->getViewData());
     }
 
     /*
@@ -525,9 +525,9 @@ class SimpleFormTest extends TestCase
 
         $form->setData(null);
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getViewData());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertSame('', $form->getViewData());
     }
 
     public function testSetDataIsIgnoredIfDataIsLocked()
@@ -539,7 +539,7 @@ class SimpleFormTest extends TestCase
 
         $form->setData('foobar');
 
-        $this->assertSame('default', $form->getData());
+        self::assertSame('default', $form->getData());
     }
 
     public function testPreSetDataChangesDataIfDataIsLocked()
@@ -553,9 +553,9 @@ class SimpleFormTest extends TestCase
             });
         $form = new Form($config);
 
-        $this->assertSame('foobar', $form->getData());
-        $this->assertSame('foobar', $form->getNormData());
-        $this->assertSame('foobar', $form->getViewData());
+        self::assertSame('foobar', $form->getData());
+        self::assertSame('foobar', $form->getNormData());
+        self::assertSame('foobar', $form->getViewData());
     }
 
     public function testSubmitConvertsEmptyToNullIfNoTransformer()
@@ -564,9 +564,9 @@ class SimpleFormTest extends TestCase
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getViewData());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertSame('', $form->getViewData());
     }
 
     public function testSubmitExecutesTransformationChain()
@@ -596,9 +596,9 @@ class SimpleFormTest extends TestCase
 
         $form->submit('client');
 
-        $this->assertEquals('app', $form->getData());
-        $this->assertEquals('filterednorm', $form->getNormData());
-        $this->assertEquals('cleanedclient', $form->getViewData());
+        self::assertEquals('app', $form->getData());
+        self::assertEquals('filterednorm', $form->getNormData());
+        self::assertEquals('cleanedclient', $form->getViewData());
     }
 
     public function testSubmitExecutesViewTransformersInReverseOrder()
@@ -616,7 +616,7 @@ class SimpleFormTest extends TestCase
 
         $form->submit('first');
 
-        $this->assertEquals('third', $form->getNormData());
+        self::assertEquals('third', $form->getNormData());
     }
 
     public function testSubmitExecutesModelTransformersInOrder()
@@ -634,19 +634,19 @@ class SimpleFormTest extends TestCase
 
         $form->submit('first');
 
-        $this->assertEquals('third', $form->getData());
+        self::assertEquals('third', $form->getData());
     }
 
     public function testSynchronizedByDefault()
     {
-        $this->assertTrue($this->form->isSynchronized());
+        self::assertTrue($this->form->isSynchronized());
     }
 
     public function testSynchronizedAfterSubmission()
     {
         $this->form->submit('foobar');
 
-        $this->assertTrue($this->form->isSynchronized());
+        self::assertTrue($this->form->isSynchronized());
     }
 
     public function testNotSynchronizedIfViewReverseTransformationFailed()
@@ -657,7 +657,7 @@ class SimpleFormTest extends TestCase
 
         $form->submit('foobar');
 
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testNotSynchronizedIfModelReverseTransformationFailed()
@@ -668,7 +668,7 @@ class SimpleFormTest extends TestCase
 
         $form->submit('foobar');
 
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testEmptyDataCreatedBeforeTransforming()
@@ -684,7 +684,7 @@ class SimpleFormTest extends TestCase
 
         $form->submit('');
 
-        $this->assertEquals('bar', $form->getData());
+        self::assertEquals('bar', $form->getData());
     }
 
     public function testEmptyDataFromClosure()
@@ -693,7 +693,7 @@ class SimpleFormTest extends TestCase
             ->setEmptyData(function ($form) {
                 // the form instance is passed to the closure to allow use
                 // of form data when creating the empty value
-                $this->assertInstanceOf(FormInterface::class, $form);
+                self::assertInstanceOf(FormInterface::class, $form);
 
                 return 'foo';
             })
@@ -706,7 +706,7 @@ class SimpleFormTest extends TestCase
 
         $form->submit('');
 
-        $this->assertEquals('bar', $form->getData());
+        self::assertEquals('bar', $form->getData());
     }
 
     public function testSubmitResetsErrors()
@@ -714,65 +714,65 @@ class SimpleFormTest extends TestCase
         $this->form->addError(new FormError('Error!'));
         $this->form->submit('foobar');
 
-        $this->assertCount(0, $this->form->getErrors());
+        self::assertCount(0, $this->form->getErrors());
     }
 
     public function testCreateView()
     {
-        $type = $this->createMock(ResolvedFormTypeInterface::class);
+        $type = self::createMock(ResolvedFormTypeInterface::class);
         $view = new FormView();
         $form = $this->getBuilder()->setType($type)->getForm();
 
-        $type->expects($this->once())
+        $type->expects(self::once())
             ->method('createView')
             ->with($form)
             ->willReturn($view);
 
-        $this->assertSame($view, $form->createView());
+        self::assertSame($view, $form->createView());
     }
 
     public function testCreateViewWithParent()
     {
-        $type = $this->createMock(ResolvedFormTypeInterface::class);
+        $type = self::createMock(ResolvedFormTypeInterface::class);
         $view = new FormView();
-        $parentType = $this->createMock(ResolvedFormTypeInterface::class);
+        $parentType = self::createMock(ResolvedFormTypeInterface::class);
         $parentForm = $this->getBuilder()->setType($parentType)->getForm();
         $parentView = new FormView();
         $form = $this->getBuilder()->setType($type)->getForm();
         $form->setParent($parentForm);
 
-        $parentType->expects($this->once())
+        $parentType->expects(self::once())
             ->method('createView')
             ->willReturn($parentView);
 
-        $type->expects($this->once())
+        $type->expects(self::once())
             ->method('createView')
             ->with($form, $parentView)
             ->willReturn($view);
 
-        $this->assertSame($view, $form->createView());
+        self::assertSame($view, $form->createView());
     }
 
     public function testCreateViewWithExplicitParent()
     {
-        $type = $this->createMock(ResolvedFormTypeInterface::class);
+        $type = self::createMock(ResolvedFormTypeInterface::class);
         $view = new FormView();
         $parentView = new FormView();
         $form = $this->getBuilder()->setType($type)->getForm();
 
-        $type->expects($this->once())
+        $type->expects(self::once())
             ->method('createView')
             ->with($form, $parentView)
             ->willReturn($view);
 
-        $this->assertSame($view, $form->createView($parentView));
+        self::assertSame($view, $form->createView($parentView));
     }
 
     public function testFormCanHaveEmptyName()
     {
         $form = $this->getBuilder('')->getForm();
 
-        $this->assertEquals('', $form->getName());
+        self::assertEquals('', $form->getName());
     }
 
     public function testSetNullParentWorksWithEmptyName()
@@ -780,13 +780,13 @@ class SimpleFormTest extends TestCase
         $form = $this->getBuilder('')->getForm();
         $form->setParent(null);
 
-        $this->assertNull($form->getParent());
+        self::assertNull($form->getParent());
     }
 
     public function testFormCannotHaveEmptyNameNotInRootLevel()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('A form with an empty name cannot have a parent form.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('A form with an empty name cannot have a parent form.');
         $this->getBuilder()
             ->setCompound(true)
             ->setDataMapper(new DataMapper())
@@ -798,7 +798,7 @@ class SimpleFormTest extends TestCase
     {
         $form = $this->getBuilder()->setPropertyPath('address.street')->getForm();
 
-        $this->assertEquals(new PropertyPath('address.street'), $form->getPropertyPath());
+        self::assertEquals(new PropertyPath('address.street'), $form->getPropertyPath());
     }
 
     // see https://github.com/symfony/symfony/issues/3903
@@ -811,7 +811,7 @@ class SimpleFormTest extends TestCase
         $form = $this->getBuilder('name')->getForm();
         $parent->add($form);
 
-        $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
+        self::assertEquals(new PropertyPath('name'), $form->getPropertyPath());
     }
 
     // see https://github.com/symfony/symfony/issues/3903
@@ -824,7 +824,7 @@ class SimpleFormTest extends TestCase
         $form = $this->getBuilder('name')->getForm();
         $parent->add($form);
 
-        $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
+        self::assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
     }
 
     public function testGetPropertyPathDefaultsToNameIfFirstParentWithoutInheritDataHasDataClass()
@@ -842,7 +842,7 @@ class SimpleFormTest extends TestCase
         $grandParent->add($parent);
         $parent->add($form);
 
-        $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
+        self::assertEquals(new PropertyPath('name'), $form->getPropertyPath());
     }
 
     public function testGetPropertyPathDefaultsToIndexedNameIfDataClassOfFirstParentWithoutInheritDataIsNull()
@@ -860,7 +860,7 @@ class SimpleFormTest extends TestCase
         $grandParent->add($parent);
         $parent->add($form);
 
-        $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
+        self::assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
     }
 
     public function testViewDataMayBeObjectIfDataClassIsNull()
@@ -875,7 +875,7 @@ class SimpleFormTest extends TestCase
 
         $form->setData('foo');
 
-        $this->assertSame($object, $form->getViewData());
+        self::assertSame($object, $form->getViewData());
     }
 
     public function testViewDataMayBeArrayAccessIfDataClassIsNull()
@@ -890,12 +890,12 @@ class SimpleFormTest extends TestCase
 
         $form->setData('foo');
 
-        $this->assertSame($arrayAccess, $form->getViewData());
+        self::assertSame($arrayAccess, $form->getViewData());
     }
 
     public function testViewDataMustBeObjectIfDataClassIsSet()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
         $config = new FormConfigBuilder('name', 'stdClass', new EventDispatcher());
         $config->addViewTransformer(new FixedDataTransformer([
             '' => '',
@@ -908,8 +908,8 @@ class SimpleFormTest extends TestCase
 
     public function testSetDataCannotInvokeItself()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.');
         // Cycle detection to prevent endless loops
         $config = new FormConfigBuilder('name', 'stdClass', new EventDispatcher());
         $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
@@ -937,22 +937,22 @@ class SimpleFormTest extends TestCase
 
         $parent->submit('not-an-array');
 
-        $this->assertSame(0, $called, 'PRE_SUBMIT event listeners are not called for wrong data');
+        self::assertSame(0, $called, 'PRE_SUBMIT event listeners are not called for wrong data');
     }
 
     public function testHandleRequestForwardsToRequestHandler()
     {
-        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler = self::createMock(RequestHandlerInterface::class);
 
         $form = $this->getBuilder()
             ->setRequestHandler($handler)
             ->getForm();
 
-        $handler->expects($this->once())
+        $handler->expects(self::once())
             ->method('handleRequest')
-            ->with($this->identicalTo($form), 'REQUEST');
+            ->with(self::identicalTo($form), 'REQUEST');
 
-        $this->assertSame($form, $form->handleRequest('REQUEST'));
+        self::assertSame($form, $form->handleRequest('REQUEST'));
     }
 
     public function testFormInheritsParentData()
@@ -972,17 +972,17 @@ class SimpleFormTest extends TestCase
         $rootForm->add($nameForm);
         $rootForm->setData(['firstName' => 'Christian', 'lastName' => 'Flothmann']);
 
-        $this->assertSame('Christian', $firstNameForm->getData());
-        $this->assertSame('Christian', $firstNameForm->getNormData());
-        $this->assertSame('Christian', $firstNameForm->getViewData());
-        $this->assertSame('Flothmann', $lastNameForm->getData());
-        $this->assertSame('Flothmann', $lastNameForm->getNormData());
-        $this->assertSame('Flothmann', $lastNameForm->getViewData());
+        self::assertSame('Christian', $firstNameForm->getData());
+        self::assertSame('Christian', $firstNameForm->getNormData());
+        self::assertSame('Christian', $firstNameForm->getViewData());
+        self::assertSame('Flothmann', $lastNameForm->getData());
+        self::assertSame('Flothmann', $lastNameForm->getNormData());
+        self::assertSame('Flothmann', $lastNameForm->getViewData());
     }
 
     public function testInheritDataDisallowsSetData()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $form = $this->getBuilder()
             ->setInheritData(true)
             ->getForm();
@@ -992,7 +992,7 @@ class SimpleFormTest extends TestCase
 
     public function testGetDataRequiresParentToBeSetIfInheritData()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $form = $this->getBuilder()
             ->setInheritData(true)
             ->getForm();
@@ -1002,7 +1002,7 @@ class SimpleFormTest extends TestCase
 
     public function testGetNormDataRequiresParentToBeSetIfInheritData()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $form = $this->getBuilder()
             ->setInheritData(true)
             ->getForm();
@@ -1012,7 +1012,7 @@ class SimpleFormTest extends TestCase
 
     public function testGetViewDataRequiresParentToBeSetIfInheritData()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $form = $this->getBuilder()
             ->setInheritData(true)
             ->getForm();
@@ -1024,7 +1024,7 @@ class SimpleFormTest extends TestCase
     {
         $form = $this->getBuilder()
             ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-                $this->assertNull($event->getData());
+                self::assertNull($event->getData());
             })
             ->setInheritData(true)
             ->getForm();
@@ -1044,7 +1044,7 @@ class SimpleFormTest extends TestCase
 
         $form->submit('foo');
 
-        $this->assertSame(0, $called, 'The SUBMIT event is not fired when data are inherited from the parent form');
+        self::assertSame(0, $called, 'The SUBMIT event is not fired when data are inherited from the parent form');
     }
 
     public function testInitializeSetsDefaultData()
@@ -1055,12 +1055,12 @@ class SimpleFormTest extends TestCase
         /* @var Form $form */
         $form->initialize();
 
-        $this->assertSame('DEFAULT', $form->getData());
+        self::assertSame('DEFAULT', $form->getData());
     }
 
     public function testInitializeFailsIfParent()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $parent = $this->getBuilder()->setRequired(false)->getForm();
         $child = $this->getBuilder()->setRequired(true)->getForm();
 
@@ -1071,8 +1071,8 @@ class SimpleFormTest extends TestCase
 
     public function testCannotCallGetDataInPreSetDataListenerIfDataHasNotAlreadyBeenSet()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A cycle was detected. Listeners to the PRE_SET_DATA event must not call getData() if the form data has not already been set. You should call getData() on the FormEvent object instead.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('A cycle was detected. Listeners to the PRE_SET_DATA event must not call getData() if the form data has not already been set. You should call getData() on the FormEvent object instead.');
         $config = new FormConfigBuilder('name', 'stdClass', new EventDispatcher());
         $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $event->getForm()->getData();
@@ -1084,8 +1084,8 @@ class SimpleFormTest extends TestCase
 
     public function testCannotCallGetNormDataInPreSetDataListener()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A cycle was detected. Listeners to the PRE_SET_DATA event must not call getNormData() if the form data has not already been set.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('A cycle was detected. Listeners to the PRE_SET_DATA event must not call getNormData() if the form data has not already been set.');
         $config = new FormConfigBuilder('name', 'stdClass', new EventDispatcher());
         $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $event->getForm()->getNormData();
@@ -1097,8 +1097,8 @@ class SimpleFormTest extends TestCase
 
     public function testCannotCallGetViewDataInPreSetDataListener()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A cycle was detected. Listeners to the PRE_SET_DATA event must not call getViewData() if the form data has not already been set.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('A cycle was detected. Listeners to the PRE_SET_DATA event must not call getViewData() if the form data has not already been set.');
         $config = new FormConfigBuilder('name', 'stdClass', new EventDispatcher());
         $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $event->getForm()->getViewData();
@@ -1115,12 +1115,12 @@ class SimpleFormTest extends TestCase
         $config->setIsEmptyCallback(function ($modelData): bool { return 'ccc' === $modelData; });
         $form = new Form($config);
         $form->setData('ccc');
-        $this->assertTrue($form->isEmpty());
+        self::assertTrue($form->isEmpty());
 
         $config->setIsEmptyCallback(function (): bool { return false; });
         $form = new Form($config);
         $form->setData(null);
-        $this->assertFalse($form->isEmpty());
+        self::assertFalse($form->isEmpty());
     }
 
     private function createForm(): FormInterface

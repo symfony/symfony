@@ -27,16 +27,16 @@ class BinaryFileResponseTest extends ResponseTestCase
     {
         $file = __DIR__.'/../README.md';
         $response = new BinaryFileResponse($file, 404, ['X-Header' => 'Foo'], true, null, true, true);
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertEquals('Foo', $response->headers->get('X-Header'));
-        $this->assertTrue($response->headers->has('ETag'));
-        $this->assertTrue($response->headers->has('Last-Modified'));
-        $this->assertFalse($response->headers->has('Content-Disposition'));
+        self::assertEquals(404, $response->getStatusCode());
+        self::assertEquals('Foo', $response->headers->get('X-Header'));
+        self::assertTrue($response->headers->has('ETag'));
+        self::assertTrue($response->headers->has('Last-Modified'));
+        self::assertFalse($response->headers->has('Content-Disposition'));
 
         $response = new BinaryFileResponse($file, 404, [], true, ResponseHeaderBag::DISPOSITION_INLINE);
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertFalse($response->headers->has('ETag'));
-        $this->assertEquals('inline; filename=README.md', $response->headers->get('Content-Disposition'));
+        self::assertEquals(404, $response->getStatusCode());
+        self::assertFalse($response->headers->has('ETag'));
+        self::assertEquals('inline; filename=README.md', $response->headers->get('Content-Disposition'));
     }
 
     /**
@@ -47,16 +47,16 @@ class BinaryFileResponseTest extends ResponseTestCase
         $file = __DIR__.'/../README.md';
         $this->expectDeprecation('Since symfony/http-foundation 5.2: The "Symfony\Component\HttpFoundation\BinaryFileResponse::create()" method is deprecated, use "new Symfony\Component\HttpFoundation\BinaryFileResponse()" instead.');
         $response = BinaryFileResponse::create($file, 404, ['X-Header' => 'Foo'], true, null, true, true);
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertEquals('Foo', $response->headers->get('X-Header'));
-        $this->assertTrue($response->headers->has('ETag'));
-        $this->assertTrue($response->headers->has('Last-Modified'));
-        $this->assertFalse($response->headers->has('Content-Disposition'));
+        self::assertEquals(404, $response->getStatusCode());
+        self::assertEquals('Foo', $response->headers->get('X-Header'));
+        self::assertTrue($response->headers->has('ETag'));
+        self::assertTrue($response->headers->has('Last-Modified'));
+        self::assertFalse($response->headers->has('Content-Disposition'));
 
         $response = BinaryFileResponse::create($file, 404, [], true, ResponseHeaderBag::DISPOSITION_INLINE);
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertFalse($response->headers->has('ETag'));
-        $this->assertEquals('inline; filename=README.md', $response->headers->get('Content-Disposition'));
+        self::assertEquals(404, $response->getStatusCode());
+        self::assertFalse($response->headers->has('ETag'));
+        self::assertEquals('inline; filename=README.md', $response->headers->get('Content-Disposition'));
     }
 
     public function testConstructWithNonAsciiFilename()
@@ -67,12 +67,12 @@ class BinaryFileResponseTest extends ResponseTestCase
 
         @unlink(sys_get_temp_dir().'/fööö.html');
 
-        $this->assertSame('fööö.html', $response->getFile()->getFilename());
+        self::assertSame('fööö.html', $response->getFile()->getFilename());
     }
 
     public function testSetContent()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $response = new BinaryFileResponse(__FILE__);
         $response->setContent('foo');
     }
@@ -80,7 +80,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     public function testGetContent()
     {
         $response = new BinaryFileResponse(__FILE__);
-        $this->assertFalse($response->getContent());
+        self::assertFalse($response->getContent());
     }
 
     public function testSetContentDispositionGeneratesSafeFallbackFilename()
@@ -88,7 +88,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response = new BinaryFileResponse(__FILE__);
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'föö.html');
 
-        $this->assertSame('attachment; filename=f__.html; filename*=utf-8\'\'f%C3%B6%C3%B6.html', $response->headers->get('Content-Disposition'));
+        self::assertSame('attachment; filename=f__.html; filename*=utf-8\'\'f%C3%B6%C3%B6.html', $response->headers->get('Content-Disposition'));
     }
 
     public function testSetContentDispositionGeneratesSafeFallbackFilenameForWronglyEncodedFilename()
@@ -99,7 +99,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $iso88591EncodedFilename);
 
         // the parameter filename* is invalid in this case (rawurldecode('f%F6%F6') does not provide a UTF-8 string but an ISO-8859-1 encoded one)
-        $this->assertSame('attachment; filename=f__.html; filename*=utf-8\'\'f%F6%F6.html', $response->headers->get('Content-Disposition'));
+        self::assertSame('attachment; filename=f__.html; filename*=utf-8\'\'f%F6%F6.html', $response->headers->get('Content-Disposition'));
     }
 
     /**
@@ -124,14 +124,14 @@ class BinaryFileResponseTest extends ResponseTestCase
         $data = fread($file, $length);
         fclose($file);
 
-        $this->expectOutputString($data);
+        self::expectOutputString($data);
         $response = clone $response;
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertEquals(206, $response->getStatusCode());
-        $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
-        $this->assertSame((string) $length, $response->headers->get('Content-Length'));
+        self::assertEquals(206, $response->getStatusCode());
+        self::assertEquals($responseRange, $response->headers->get('Content-Range'));
+        self::assertSame((string) $length, $response->headers->get('Content-Length'));
     }
 
     /**
@@ -156,13 +156,13 @@ class BinaryFileResponseTest extends ResponseTestCase
         $data = fread($file, $length);
         fclose($file);
 
-        $this->expectOutputString($data);
+        self::expectOutputString($data);
         $response = clone $response;
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertEquals(206, $response->getStatusCode());
-        $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
+        self::assertEquals(206, $response->getStatusCode());
+        self::assertEquals($responseRange, $response->headers->get('Content-Range'));
     }
 
     public function provideRanges()
@@ -187,13 +187,13 @@ class BinaryFileResponseTest extends ResponseTestCase
         $request->headers->set('If-Range', date('D, d M Y H:i:s').' GMT');
         $request->headers->set('Range', 'bytes=1-4');
 
-        $this->expectOutputString(file_get_contents(__DIR__.'/File/Fixtures/test.gif'));
+        self::expectOutputString(file_get_contents(__DIR__.'/File/Fixtures/test.gif'));
         $response = clone $response;
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertNull($response->headers->get('Content-Range'));
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertNull($response->headers->get('Content-Range'));
     }
 
     /**
@@ -211,12 +211,12 @@ class BinaryFileResponseTest extends ResponseTestCase
         $data = fread($file, 35);
         fclose($file);
 
-        $this->expectOutputString($data);
+        self::expectOutputString($data);
         $response = clone $response;
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertEquals(200, $response->getStatusCode());
     }
 
     public function provideFullFileRanges()
@@ -243,14 +243,14 @@ class BinaryFileResponseTest extends ResponseTestCase
         $data = fread($file, 35);
         fclose($file);
 
-        $this->expectOutputString($data);
+        self::expectOutputString($data);
         $response = clone $response;
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('35', $response->headers->get('Content-Length'));
-        $this->assertNull($response->headers->get('Content-Range'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('35', $response->headers->get('Content-Length'));
+        self::assertNull($response->headers->get('Content-Range'));
     }
 
     public function testUnpreparedResponseSendsFullFile()
@@ -259,11 +259,11 @@ class BinaryFileResponseTest extends ResponseTestCase
 
         $data = file_get_contents(__DIR__.'/File/Fixtures/test.gif');
 
-        $this->expectOutputString($data);
+        self::expectOutputString($data);
         $response = clone $response;
         $response->sendContent();
 
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertEquals(200, $response->getStatusCode());
     }
 
     /**
@@ -281,8 +281,8 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertEquals(416, $response->getStatusCode());
-        $this->assertEquals('bytes */35', $response->headers->get('Content-Range'));
+        self::assertEquals(416, $response->getStatusCode());
+        self::assertEquals('bytes */35', $response->headers->get('Content-Range'));
     }
 
     public function provideInvalidRanges()
@@ -305,10 +305,10 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response = new BinaryFileResponse($file, 200, ['Content-Type' => 'application/octet-stream']);
         $response->prepare($request);
 
-        $this->expectOutputString('');
+        self::expectOutputString('');
         $response->sendContent();
 
-        $this->assertStringContainsString('README.md', $response->headers->get('X-Sendfile'));
+        self::assertStringContainsString('README.md', $response->headers->get('X-Sendfile'));
     }
 
     public function provideXSendfileFiles()
@@ -338,7 +338,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $property->setValue($response, $file);
 
         $response->prepare($request);
-        $this->assertEquals($virtual, $response->headers->get('X-Accel-Redirect'));
+        self::assertEquals($virtual, $response->headers->get('X-Accel-Redirect'));
     }
 
     public function testDeleteFileAfterSend()
@@ -348,7 +348,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $path = __DIR__.'/File/Fixtures/to_delete';
         touch($path);
         $realPath = realpath($path);
-        $this->assertFileExists($realPath);
+        self::assertFileExists($realPath);
 
         $response = new BinaryFileResponse($realPath, 200, ['Content-Type' => 'application/octet-stream']);
         $response->deleteFileAfterSend(true);
@@ -356,7 +356,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->prepare($request);
         $response->sendContent();
 
-        $this->assertFileDoesNotExist($path);
+        self::assertFileDoesNotExist($path);
     }
 
     public function testAcceptRangeOnUnsafeMethods()
@@ -365,7 +365,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
         $response->prepare($request);
 
-        $this->assertEquals('none', $response->headers->get('Accept-Ranges'));
+        self::assertEquals('none', $response->headers->get('Accept-Ranges'));
     }
 
     public function testAcceptRangeNotOverriden()
@@ -375,7 +375,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->headers->set('Accept-Ranges', 'foo');
         $response->prepare($request);
 
-        $this->assertEquals('foo', $response->headers->get('Accept-Ranges'));
+        self::assertEquals('foo', $response->headers->get('Accept-Ranges'));
     }
 
     public function getSampleXAccelMappings()
@@ -394,7 +394,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response = new BinaryFileResponse(new Stream(__DIR__.'/../README.md'), 200, ['Content-Type' => 'text/plain']);
         $response->prepare($request);
 
-        $this->assertNull($response->headers->get('Content-Length'));
+        self::assertNull($response->headers->get('Content-Length'));
     }
 
     public function testPrepareNotAddingContentTypeHeaderIfNoContentResponse()
@@ -408,8 +408,8 @@ class BinaryFileResponseTest extends ResponseTestCase
 
         $response->prepare($request);
 
-        $this->assertSame(BinaryFileResponse::HTTP_NOT_MODIFIED, $response->getStatusCode());
-        $this->assertFalse($response->headers->has('Content-Type'));
+        self::assertSame(BinaryFileResponse::HTTP_NOT_MODIFIED, $response->getStatusCode());
+        self::assertFalse($response->headers->has('Content-Type'));
     }
 
     public function testContentTypeIsCorrectlyDetected()
@@ -419,7 +419,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         try {
             $file->getMimeType();
         } catch (\LogicException $e) {
-            $this->markTestSkipped('Guessing the mime type is not possible');
+            self::markTestSkipped('Guessing the mime type is not possible');
         }
 
         $response = new BinaryFileResponse($file);
@@ -427,8 +427,8 @@ class BinaryFileResponseTest extends ResponseTestCase
         $request = Request::create('/');
         $response->prepare($request);
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('image/gif', $response->headers->get('Content-Type'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/gif', $response->headers->get('Content-Type'));
     }
 
     public function testContentTypeIsNotGuessedWhenTheFileWasNotModified()
@@ -439,11 +439,11 @@ class BinaryFileResponseTest extends ResponseTestCase
         $request = Request::create('/');
         $request->headers->set('If-Modified-Since', $response->getLastModified()->format('D, d M Y H:i:s').' GMT');
         $isNotModified = $response->isNotModified($request);
-        $this->assertTrue($isNotModified);
+        self::assertTrue($isNotModified);
         $response->prepare($request);
 
-        $this->assertSame(304, $response->getStatusCode());
-        $this->assertFalse($response->headers->has('Content-Type'));
+        self::assertSame(304, $response->getStatusCode());
+        self::assertFalse($response->headers->has('Content-Type'));
     }
 
     protected function provideResponse()

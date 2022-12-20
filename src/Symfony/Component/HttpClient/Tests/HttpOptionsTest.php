@@ -32,11 +32,11 @@ class HttpOptionsTest extends TestCase
      */
     public function testSetAuthBasic(string $expected, string $user, string $password = '')
     {
-        $this->assertSame($expected, (new HttpOptions())->setAuthBasic($user, $password)->toArray()['auth_basic']);
+        self::assertSame($expected, (new HttpOptions())->setAuthBasic($user, $password)->toArray()['auth_basic']);
     }
 
     public function testSetAuthBearer()
     {
-        $this->assertSame('foobar', (new HttpOptions())->setAuthBearer('foobar')->toArray()['auth_bearer']);
+        self::assertSame('foobar', (new HttpOptions())->setAuthBearer('foobar')->toArray()['auth_bearer']);
     }
 }

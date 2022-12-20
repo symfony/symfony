@@ -68,7 +68,7 @@ class Psr16CacheTest extends SimpleCacheTest
     public function testDefaultLifeTime()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createSimpleCache(2);
@@ -77,10 +77,10 @@ class Psr16CacheTest extends SimpleCacheTest
         $cache->set('key.dlt', 'value');
         sleep(1);
 
-        $this->assertSame('value', $cache->get('key.dlt'));
+        self::assertSame('value', $cache->get('key.dlt'));
 
         sleep(2);
-        $this->assertNull($cache->get('key.dlt'));
+        self::assertNull($cache->get('key.dlt'));
 
         $cache->clear();
     }
@@ -88,7 +88,7 @@ class Psr16CacheTest extends SimpleCacheTest
     public function testNotUnserializable()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createSimpleCache();
@@ -96,13 +96,13 @@ class Psr16CacheTest extends SimpleCacheTest
 
         $cache->set('foo', new NotUnserializable());
 
-        $this->assertNull($cache->get('foo'));
+        self::assertNull($cache->get('foo'));
 
         $cache->setMultiple(['foo' => new NotUnserializable()]);
 
         foreach ($cache->getMultiple(['foo']) as $value) {
         }
-        $this->assertNull($value);
+        self::assertNull($value);
 
         $cache->clear();
     }
@@ -110,7 +110,7 @@ class Psr16CacheTest extends SimpleCacheTest
     public function testPrune()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         /** @var PruneableInterface|CacheInterface $cache */
@@ -124,10 +124,10 @@ class Psr16CacheTest extends SimpleCacheTest
 
         sleep(30);
         $cache->prune();
-        $this->assertTrue($this->isPruned($cache, 'foo'));
-        $this->assertTrue($this->isPruned($cache, 'bar'));
-        $this->assertTrue($this->isPruned($cache, 'baz'));
-        $this->assertTrue($this->isPruned($cache, 'qux'));
+        self::assertTrue($this->isPruned($cache, 'foo'));
+        self::assertTrue($this->isPruned($cache, 'bar'));
+        self::assertTrue($this->isPruned($cache, 'baz'));
+        self::assertTrue($this->isPruned($cache, 'qux'));
 
         $cache->set('foo', 'foo-val');
         $cache->set('bar', 'bar-val', new \DateInterval('PT20S'));
@@ -135,28 +135,28 @@ class Psr16CacheTest extends SimpleCacheTest
         $cache->set('qux', 'qux-val', new \DateInterval('PT80S'));
 
         $cache->prune();
-        $this->assertFalse($this->isPruned($cache, 'foo'));
-        $this->assertFalse($this->isPruned($cache, 'bar'));
-        $this->assertFalse($this->isPruned($cache, 'baz'));
-        $this->assertFalse($this->isPruned($cache, 'qux'));
+        self::assertFalse($this->isPruned($cache, 'foo'));
+        self::assertFalse($this->isPruned($cache, 'bar'));
+        self::assertFalse($this->isPruned($cache, 'baz'));
+        self::assertFalse($this->isPruned($cache, 'qux'));
 
         sleep(30);
         $cache->prune();
-        $this->assertFalse($this->isPruned($cache, 'foo'));
-        $this->assertTrue($this->isPruned($cache, 'bar'));
-        $this->assertFalse($this->isPruned($cache, 'baz'));
-        $this->assertFalse($this->isPruned($cache, 'qux'));
+        self::assertFalse($this->isPruned($cache, 'foo'));
+        self::assertTrue($this->isPruned($cache, 'bar'));
+        self::assertFalse($this->isPruned($cache, 'baz'));
+        self::assertFalse($this->isPruned($cache, 'qux'));
 
         sleep(30);
         $cache->prune();
-        $this->assertFalse($this->isPruned($cache, 'foo'));
-        $this->assertTrue($this->isPruned($cache, 'baz'));
-        $this->assertFalse($this->isPruned($cache, 'qux'));
+        self::assertFalse($this->isPruned($cache, 'foo'));
+        self::assertTrue($this->isPruned($cache, 'baz'));
+        self::assertFalse($this->isPruned($cache, 'qux'));
 
         sleep(30);
         $cache->prune();
-        $this->assertFalse($this->isPruned($cache, 'foo'));
-        $this->assertTrue($this->isPruned($cache, 'qux'));
+        self::assertFalse($this->isPruned($cache, 'foo'));
+        self::assertTrue($this->isPruned($cache, 'qux'));
 
         $cache->clear();
     }
@@ -164,7 +164,7 @@ class Psr16CacheTest extends SimpleCacheTest
     protected function isPruned(CacheInterface $cache, string $name): bool
     {
         if (Psr16Cache::class !== \get_class($cache)) {
-            $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
+            self::fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 
         $pool = ((array) $cache)[sprintf("\0%s\0pool", Psr16Cache::class)];

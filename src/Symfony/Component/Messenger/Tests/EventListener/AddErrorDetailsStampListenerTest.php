@@ -30,7 +30,7 @@ final class AddErrorDetailsStampListenerTest extends TestCase
 
         $listener->onMessageFailed($event);
 
-        $this->assertEquals($expectedStamp, $event->getEnvelope()->last(ErrorDetailsStamp::class));
+        self::assertEquals($expectedStamp, $event->getEnvelope()->last(ErrorDetailsStamp::class));
     }
 
     public function testWorkerAddsNewErrorDetailsStampOnFailure()
@@ -47,8 +47,8 @@ final class AddErrorDetailsStampListenerTest extends TestCase
 
         $listener->onMessageFailed($event);
 
-        $this->assertEquals($expectedStamp, $event->getEnvelope()->last(ErrorDetailsStamp::class));
-        $this->assertCount(2, $event->getEnvelope()->all(ErrorDetailsStamp::class));
+        self::assertEquals($expectedStamp, $event->getEnvelope()->last(ErrorDetailsStamp::class));
+        self::assertCount(2, $event->getEnvelope()->all(ErrorDetailsStamp::class));
     }
 
     public function testWorkerDoesNotAddDuplicateErrorDetailsStampOnFailure()
@@ -60,6 +60,6 @@ final class AddErrorDetailsStampListenerTest extends TestCase
 
         $listener->onMessageFailed($event);
 
-        $this->assertCount(1, $event->getEnvelope()->all(ErrorDetailsStamp::class));
+        self::assertCount(1, $event->getEnvelope()->all(ErrorDetailsStamp::class));
     }
 }

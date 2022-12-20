@@ -24,30 +24,30 @@ class SessionTest extends AbstractWebTestCase
      */
     public function testWelcome($config, $insulate)
     {
-        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        $client = self::createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client->insulate();
         }
 
         // no session
         $crawler = $client->request('GET', '/session');
-        $this->assertStringContainsString('You are new here and gave no name.', $crawler->text());
+        self::assertStringContainsString('You are new here and gave no name.', $crawler->text());
 
         // remember name
         $crawler = $client->request('GET', '/session/drak');
-        $this->assertStringContainsString('Hello drak, nice to meet you.', $crawler->text());
+        self::assertStringContainsString('Hello drak, nice to meet you.', $crawler->text());
 
         // prove remembered name
         $crawler = $client->request('GET', '/session');
-        $this->assertStringContainsString('Welcome back drak, nice to meet you.', $crawler->text());
+        self::assertStringContainsString('Welcome back drak, nice to meet you.', $crawler->text());
 
         // clear session
         $crawler = $client->request('GET', '/session_logout');
-        $this->assertStringContainsString('Session cleared.', $crawler->text());
+        self::assertStringContainsString('Session cleared.', $crawler->text());
 
         // prove cleared session
         $crawler = $client->request('GET', '/session');
-        $this->assertStringContainsString('You are new here and gave no name.', $crawler->text());
+        self::assertStringContainsString('You are new here and gave no name.', $crawler->text());
     }
 
     /**
@@ -57,7 +57,7 @@ class SessionTest extends AbstractWebTestCase
      */
     public function testFlash($config, $insulate)
     {
-        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        $client = self::createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client->insulate();
         }
@@ -66,11 +66,11 @@ class SessionTest extends AbstractWebTestCase
         $client->request('GET', '/session_setflash/Hello%20world.');
 
         // check flash displays on redirect
-        $this->assertStringContainsString('Hello world.', $client->followRedirect()->text());
+        self::assertStringContainsString('Hello world.', $client->followRedirect()->text());
 
         // check flash is gone
         $crawler = $client->request('GET', '/session_showflash');
-        $this->assertStringContainsString('No flash was set.', $crawler->text());
+        self::assertStringContainsString('No flash was set.', $crawler->text());
     }
 
     /**
@@ -83,7 +83,7 @@ class SessionTest extends AbstractWebTestCase
     {
         $this->expectDeprecation('Since symfony/framework-bundle 5.1: The "session.flash_bag" service is deprecated, use "$session->getFlashBag()" instead.');
 
-        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        $client = self::createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client->insulate();
         }
@@ -92,11 +92,11 @@ class SessionTest extends AbstractWebTestCase
         $client->request('GET', '/injected_flashbag/session_setflash/Hello%20world.');
 
         // check flash displays on redirect
-        $this->assertStringContainsString('Hello world.', $client->followRedirect()->text());
+        self::assertStringContainsString('Hello world.', $client->followRedirect()->text());
 
         // check flash is gone
         $crawler = $client->request('GET', '/session_showflash');
-        $this->assertStringContainsString('No flash was set.', $crawler->text());
+        self::assertStringContainsString('No flash was set.', $crawler->text());
     }
 
     /**
@@ -107,7 +107,7 @@ class SessionTest extends AbstractWebTestCase
     {
         $this->expectDeprecation('Since symfony/framework-bundle 5.3: The "session" service and "SessionInterface" alias are deprecated, use "$requestStack->getSession()" instead.');
 
-        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        $client = self::createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client->insulate();
         }
@@ -116,7 +116,7 @@ class SessionTest extends AbstractWebTestCase
         $crawler = $client->request('GET', '/deprecated_session/trigger');
 
         // check response
-        $this->assertStringContainsString('done', $crawler->text());
+        self::assertStringContainsString('done', $crawler->text());
     }
 
     /**
@@ -128,54 +128,54 @@ class SessionTest extends AbstractWebTestCase
     public function testTwoClients($config, $insulate)
     {
         // start first client
-        $client1 = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        $client1 = self::createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client1->insulate();
         }
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
         // start second client
-        $client2 = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        $client2 = self::createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client2->insulate();
         }
 
         // new session, so no name set.
         $crawler1 = $client1->request('GET', '/session');
-        $this->assertStringContainsString('You are new here and gave no name.', $crawler1->text());
+        self::assertStringContainsString('You are new here and gave no name.', $crawler1->text());
 
         // set name of client1
         $crawler1 = $client1->request('GET', '/session/client1');
-        $this->assertStringContainsString('Hello client1, nice to meet you.', $crawler1->text());
+        self::assertStringContainsString('Hello client1, nice to meet you.', $crawler1->text());
 
         // no session for client2
         $crawler2 = $client2->request('GET', '/session');
-        $this->assertStringContainsString('You are new here and gave no name.', $crawler2->text());
+        self::assertStringContainsString('You are new here and gave no name.', $crawler2->text());
 
         // remember name client2
         $crawler2 = $client2->request('GET', '/session/client2');
-        $this->assertStringContainsString('Hello client2, nice to meet you.', $crawler2->text());
+        self::assertStringContainsString('Hello client2, nice to meet you.', $crawler2->text());
 
         // prove remembered name of client1
         $crawler1 = $client1->request('GET', '/session');
-        $this->assertStringContainsString('Welcome back client1, nice to meet you.', $crawler1->text());
+        self::assertStringContainsString('Welcome back client1, nice to meet you.', $crawler1->text());
 
         // prove remembered name of client2
         $crawler2 = $client2->request('GET', '/session');
-        $this->assertStringContainsString('Welcome back client2, nice to meet you.', $crawler2->text());
+        self::assertStringContainsString('Welcome back client2, nice to meet you.', $crawler2->text());
 
         // clear client1
         $crawler1 = $client1->request('GET', '/session_logout');
-        $this->assertStringContainsString('Session cleared.', $crawler1->text());
+        self::assertStringContainsString('Session cleared.', $crawler1->text());
 
         // prove client1 data is cleared
         $crawler1 = $client1->request('GET', '/session');
-        $this->assertStringContainsString('You are new here and gave no name.', $crawler1->text());
+        self::assertStringContainsString('You are new here and gave no name.', $crawler1->text());
 
         // prove remembered name of client2 remains untouched.
         $crawler2 = $client2->request('GET', '/session');
-        $this->assertStringContainsString('Welcome back client2, nice to meet you.', $crawler2->text());
+        self::assertStringContainsString('Welcome back client2, nice to meet you.', $crawler2->text());
     }
 
     /**
@@ -183,7 +183,7 @@ class SessionTest extends AbstractWebTestCase
      */
     public function testCorrectCacheControlHeadersForCacheableAction($config, $insulate)
     {
-        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        $client = self::createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client->insulate();
         }
@@ -191,7 +191,7 @@ class SessionTest extends AbstractWebTestCase
         $client->request('GET', '/cacheable');
 
         $response = $client->getResponse();
-        $this->assertSame('public, s-maxage=100', $response->headers->get('cache-control'));
+        self::assertSame('public, s-maxage=100', $response->headers->get('cache-control'));
     }
 
     public function getConfigs()

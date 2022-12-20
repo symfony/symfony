@@ -23,19 +23,19 @@ class TemplateControllerTest extends TestCase
 {
     public function testTwig()
     {
-        $twig = $this->createMock(Environment::class);
-        $twig->expects($this->exactly(2))->method('render')->willReturn('bar');
+        $twig = self::createMock(Environment::class);
+        $twig->expects(self::exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController($twig);
 
-        $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
-        $this->assertEquals('bar', $controller('mytemplate')->getContent());
+        self::assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
+        self::assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
     public function testNoTwig()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('You cannot use the TemplateController if the Twig Bundle is not available.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('You cannot use the TemplateController if the Twig Bundle is not available.');
         $controller = new TemplateController();
 
         $controller->templateAction('mytemplate')->getContent();
@@ -56,8 +56,8 @@ class TemplateControllerTest extends TestCase
         $twig = new Environment($loader);
         $controller = new TemplateController($twig);
 
-        $this->assertEquals($expected, $controller->templateAction($templateName, null, null, null, $context)->getContent());
-        $this->assertEquals($expected, $controller($templateName, null, null, null, $context)->getContent());
+        self::assertEquals($expected, $controller->templateAction($templateName, null, null, null, $context)->getContent());
+        self::assertEquals($expected, $controller($templateName, null, null, null, $context)->getContent());
     }
 
     public function testStatusCode()
@@ -71,7 +71,7 @@ class TemplateControllerTest extends TestCase
         $twig = new Environment($loader);
         $controller = new TemplateController($twig);
 
-        $this->assertSame(201, $controller->templateAction($templateName, null, null, null, [], $statusCode)->getStatusCode());
-        $this->assertSame(200, $controller->templateAction($templateName)->getStatusCode());
+        self::assertSame(201, $controller->templateAction($templateName, null, null, null, [], $statusCode)->getStatusCode());
+        self::assertSame(200, $controller->templateAction($templateName)->getStatusCode());
     }
 }

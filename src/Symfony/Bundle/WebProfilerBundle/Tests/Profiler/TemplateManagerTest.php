@@ -43,7 +43,7 @@ class TemplateManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->profiler = $this->createMock(Profiler::class);
+        $this->profiler = self::createMock(Profiler::class);
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = [
             'data_collector.foo' => ['foo', '@Foo/Collector/foo.html.twig'],
@@ -56,7 +56,7 @@ class TemplateManagerTest extends TestCase
 
     public function testGetNameOfInvalidTemplate()
     {
-        $this->expectException(NotFoundHttpException::class);
+        self::expectException(NotFoundHttpException::class);
         $this->templateManager->getName(new Profile('token'), 'notexistingpanel');
     }
 
@@ -65,12 +65,12 @@ class TemplateManagerTest extends TestCase
      */
     public function testGetNameValidTemplate()
     {
-        $this->profiler->expects($this->any())
+        $this->profiler->expects(self::any())
             ->method('has')
             ->withAnyParameters()
             ->willReturnCallback([$this, 'profilerHasCallback']);
 
-        $this->assertEquals('@Foo/Collector/foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
+        self::assertEquals('@Foo/Collector/foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
     }
 
     public function profilerHasCallback($panel)
@@ -97,15 +97,15 @@ class TemplateManagerTest extends TestCase
 
     protected function mockTwigEnvironment()
     {
-        $this->twigEnvironment = $this->createMock(Environment::class);
+        $this->twigEnvironment = self::createMock(Environment::class);
 
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
         $loader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('exists')
             ->willReturn(true);
 
-        $this->twigEnvironment->expects($this->any())->method('getLoader')->willReturn($loader);
+        $this->twigEnvironment->expects(self::any())->method('getLoader')->willReturn($loader);
 
         return $this->twigEnvironment;
     }

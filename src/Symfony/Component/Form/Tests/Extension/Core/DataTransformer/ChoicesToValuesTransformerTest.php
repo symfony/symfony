@@ -41,22 +41,22 @@ class ChoicesToValuesTransformerTest extends TestCase
         $in = ['', false, 'X'];
         $out = ['', '0', 'X'];
 
-        $this->assertSame($out, $this->transformer->transform($in));
+        self::assertSame($out, $this->transformer->transform($in));
 
         $in[] = null;
         $outWithNull = ['0', '1', '2', '3'];
 
-        $this->assertSame($outWithNull, $this->transformerWithNull->transform($in));
+        self::assertSame($outWithNull, $this->transformerWithNull->transform($in));
     }
 
     public function testTransformNull()
     {
-        $this->assertSame([], $this->transformer->transform(null));
+        self::assertSame([], $this->transformer->transform(null));
     }
 
     public function testTransformExpectsArray()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $this->transformer->transform('foobar');
     }
 
@@ -66,23 +66,23 @@ class ChoicesToValuesTransformerTest extends TestCase
         $in = ['', '0', 'X'];
         $out = ['', false, 'X'];
 
-        $this->assertSame($out, $this->transformer->reverseTransform($in));
+        self::assertSame($out, $this->transformer->reverseTransform($in));
         // values are expected to be valid choices and stay the same
         $inWithNull = ['0', '1', '2', '3'];
         $out[] = null;
 
-        $this->assertSame($out, $this->transformerWithNull->reverseTransform($inWithNull));
+        self::assertSame($out, $this->transformerWithNull->reverseTransform($inWithNull));
     }
 
     public function testReverseTransformNull()
     {
-        $this->assertSame([], $this->transformer->reverseTransform(null));
-        $this->assertSame([], $this->transformerWithNull->reverseTransform(null));
+        self::assertSame([], $this->transformer->reverseTransform(null));
+        self::assertSame([], $this->transformerWithNull->reverseTransform(null));
     }
 
     public function testReverseTransformExpectsArray()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform('foobar');
     }
 }

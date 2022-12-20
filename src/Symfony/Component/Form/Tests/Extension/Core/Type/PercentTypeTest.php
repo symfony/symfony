@@ -51,7 +51,7 @@ class PercentTypeTest extends TypeTestCase
 
         $form->submit('1.23456');
 
-        $this->assertEquals(0.0124, $form->getData());
+        self::assertEquals(0.0124, $form->getData());
     }
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 0.1)
@@ -62,9 +62,9 @@ class PercentTypeTest extends TypeTestCase
         ]);
         $form->submit(null);
 
-        $this->assertSame($emptyData, $form->getViewData());
-        $this->assertSame($expectedData, $form->getNormData());
-        $this->assertSame($expectedData, $form->getData());
+        self::assertSame($emptyData, $form->getViewData());
+        self::assertSame($expectedData, $form->getNormData());
+        self::assertSame($expectedData, $form->getData());
     }
 
     public function testHtml5EnablesSpecificFormatting()
@@ -79,8 +79,8 @@ class PercentTypeTest extends TypeTestCase
         ]);
         $form->setData('1234.56');
 
-        $this->assertSame('1234.56', $form->createView()->vars['value']);
-        $this->assertSame('number', $form->createView()->vars['type']);
+        self::assertSame('1234.56', $form->createView()->vars['value']);
+        self::assertSame('number', $form->createView()->vars['type']);
     }
 
     /**
@@ -96,7 +96,7 @@ class PercentTypeTest extends TypeTestCase
 
         $form->submit('1.23456');
 
-        $this->assertEqualsWithDelta(0.0123456, $form->getData(), \PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0123456, $form->getData(), \PHP_FLOAT_EPSILON);
     }
 
     /**
@@ -113,6 +113,6 @@ class PercentTypeTest extends TypeTestCase
 
         $form->submit('1.23456');
 
-        $this->assertEqualsWithDelta(0.0123456, $form->getData(), \PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta(0.0123456, $form->getData(), \PHP_FLOAT_EPSILON);
     }
 }

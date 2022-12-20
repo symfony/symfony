@@ -27,16 +27,16 @@ class UsageTrackingTokenStorageTest extends TestCase
     {
         $sessionAccess = 0;
         $sessionLocator = new class(['request_stack' => function () use (&$sessionAccess) {
-            $session = $this->createMock(SessionInterface::class);
+            $session = self::createMock(SessionInterface::class);
 
             $request = new Request();
             $request->setSession($session);
-            $requestStack = $this->getMockBuilder(RequestStack::class)->setMethods(['getSession'])->getMock();
+            $requestStack = self::getMockBuilder(RequestStack::class)->setMethods(['getSession'])->getMock();
             $requestStack->push($request);
-            $requestStack->expects($this->any())->method('getSession')->willReturnCallback(function () use ($session, &$sessionAccess) {
+            $requestStack->expects(self::any())->method('getSession')->willReturnCallback(function () use ($session, &$sessionAccess) {
                 ++$sessionAccess;
 
-                $session->expects($this->once())
+                $session->expects(self::once())
                         ->method('getMetadataBag');
 
                 return $session;
@@ -49,21 +49,21 @@ class UsageTrackingTokenStorageTest extends TestCase
         $tokenStorage = new TokenStorage();
         $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $sessionLocator);
 
-        $this->assertNull($trackingStorage->getToken());
+        self::assertNull($trackingStorage->getToken());
         $token = new NullToken();
 
         $trackingStorage->setToken($token);
-        $this->assertSame($token, $trackingStorage->getToken());
-        $this->assertSame($token, $tokenStorage->getToken());
-        $this->assertSame(0, $sessionAccess);
+        self::assertSame($token, $trackingStorage->getToken());
+        self::assertSame($token, $tokenStorage->getToken());
+        self::assertSame(0, $sessionAccess);
 
         $trackingStorage->enableUsageTracking();
-        $this->assertSame($token, $trackingStorage->getToken());
-        $this->assertSame(1, $sessionAccess);
+        self::assertSame($token, $trackingStorage->getToken());
+        self::assertSame(1, $sessionAccess);
 
         $trackingStorage->disableUsageTracking();
-        $this->assertSame($token, $trackingStorage->getToken());
-        $this->assertSame(1, $sessionAccess);
+        self::assertSame($token, $trackingStorage->getToken());
+        self::assertSame(1, $sessionAccess);
     }
 
     public function testWithoutMainRequest()
@@ -77,6 +77,6 @@ class UsageTrackingTokenStorageTest extends TestCase
         $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $locator);
         $trackingStorage->enableUsageTracking();
 
-        $this->assertNull($trackingStorage->getToken());
+        self::assertNull($trackingStorage->getToken());
     }
 }

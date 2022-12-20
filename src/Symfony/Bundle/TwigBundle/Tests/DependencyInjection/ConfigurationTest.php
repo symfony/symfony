@@ -26,7 +26,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(), [$input]);
 
-        $this->assertEquals(['form_div_layout.html.twig'], $config['form_themes']);
+        self::assertEquals(['form_div_layout.html.twig'], $config['form_themes']);
     }
 
     public function testGlobalsAreNotNormalized()
@@ -38,7 +38,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(), [$input]);
 
-        $this->assertSame(['some-global' => ['value' => true]], $config['globals']);
+        self::assertSame(['some-global' => ['value' => true]], $config['globals']);
     }
 
     public function testArrayKeysInGlobalsAreNotNormalized()
@@ -50,6 +50,6 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(), [$input]);
 
-        $this->assertSame(['global' => ['value' => ['some-key' => 'some-value']]], $config['globals']);
+        self::assertSame(['global' => ['value' => ['some-key' => 'some-value']]], $config['globals']);
     }
 }

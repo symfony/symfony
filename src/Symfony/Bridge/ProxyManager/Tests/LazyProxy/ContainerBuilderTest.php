@@ -42,21 +42,21 @@ class ContainerBuilderTest extends TestCase
         $foo1 = $builder->get('foo1');
 
         $foo1->__destruct();
-        $this->assertSame(0, $foo1::$destructorCount);
+        self::assertSame(0, $foo1::$destructorCount);
 
-        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
-        $this->assertInstanceOf(ProxyManagerBridgeFooClass::class, $foo1);
-        $this->assertInstanceOf(LazyLoadingInterface::class, $foo1);
-        $this->assertFalse($foo1->isProxyInitialized());
+        self::assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
+        self::assertInstanceOf(ProxyManagerBridgeFooClass::class, $foo1);
+        self::assertInstanceOf(LazyLoadingInterface::class, $foo1);
+        self::assertFalse($foo1->isProxyInitialized());
 
         $foo1->initializeProxy();
 
-        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved after initialization');
-        $this->assertTrue($foo1->isProxyInitialized());
-        $this->assertInstanceOf(ProxyManagerBridgeFooClass::class, $foo1->getWrappedValueHolderValue());
-        $this->assertNotInstanceOf(LazyLoadingInterface::class, $foo1->getWrappedValueHolderValue());
+        self::assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved after initialization');
+        self::assertTrue($foo1->isProxyInitialized());
+        self::assertInstanceOf(ProxyManagerBridgeFooClass::class, $foo1->getWrappedValueHolderValue());
+        self::assertNotInstanceOf(LazyLoadingInterface::class, $foo1->getWrappedValueHolderValue());
 
         $foo1->__destruct();
-        $this->assertSame(1, $foo1::$destructorCount);
+        self::assertSame(1, $foo1::$destructorCount);
     }
 }

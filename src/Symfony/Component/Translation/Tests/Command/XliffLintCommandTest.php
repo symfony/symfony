@@ -39,7 +39,7 @@ class XliffLintCommandTest extends TestCase
         );
 
         $tester->assertCommandIsSuccessful('Returns 0 in case of success');
-        $this->assertStringContainsString('OK', trim($tester->getDisplay()));
+        self::assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
     public function testLintCorrectFiles()
@@ -54,7 +54,7 @@ class XliffLintCommandTest extends TestCase
         );
 
         $tester->assertCommandIsSuccessful('Returns 0 in case of success');
-        $this->assertStringContainsString('OK', trim($tester->getDisplay()));
+        self::assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
     /**
@@ -70,8 +70,8 @@ class XliffLintCommandTest extends TestCase
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
-        $this->assertEquals($mustFail ? 1 : 0, $tester->getStatusCode());
-        $this->assertStringContainsString($mustFail ? '[WARNING] 0 XLIFF files have valid syntax and 1 contain errors.' : '[OK] All 1 XLIFF files contain valid syntax.', $tester->getDisplay());
+        self::assertEquals($mustFail ? 1 : 0, $tester->getStatusCode());
+        self::assertStringContainsString($mustFail ? '[WARNING] 0 XLIFF files have valid syntax and 1 contain errors.' : '[OK] All 1 XLIFF files contain valid syntax.', $tester->getDisplay());
     }
 
     public function testLintIncorrectXmlSyntax()
@@ -81,8 +81,8 @@ class XliffLintCommandTest extends TestCase
 
         $tester->execute(['filename' => $filename], ['decorated' => false]);
 
-        $this->assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
-        $this->assertStringContainsString('Opening and ending tag mismatch: target line 6 and source', trim($tester->getDisplay()));
+        self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+        self::assertStringContainsString('Opening and ending tag mismatch: target line 6 and source', trim($tester->getDisplay()));
     }
 
     public function testLintIncorrectTargetLanguage()
@@ -92,8 +92,8 @@ class XliffLintCommandTest extends TestCase
 
         $tester->execute(['filename' => $filename], ['decorated' => false]);
 
-        $this->assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
-        $this->assertStringContainsString('There is a mismatch between the language included in the file name ("messages.en.xlf") and the "es" value used in the "target-language" attribute of the file.', trim($tester->getDisplay()));
+        self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+        self::assertStringContainsString('There is a mismatch between the language included in the file name ("messages.en.xlf") and the "es" value used in the "target-language" attribute of the file.', trim($tester->getDisplay()));
     }
 
     public function testLintTargetLanguageIsCaseInsensitive()
@@ -104,7 +104,7 @@ class XliffLintCommandTest extends TestCase
         $tester->execute(['filename' => $filename], ['decorated' => false]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
     }
 
     public function testLintSucceedsWhenLocaleInFileAndInTargetLanguageNameUsesDashesInsteadOfUnderscores()
@@ -115,12 +115,12 @@ class XliffLintCommandTest extends TestCase
         $tester->execute(['filename' => $filename], ['decorated' => false]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
     }
 
     public function testLintFileNotReadable()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
         $filename = $this->createFile();
         unlink($filename);
@@ -139,7 +139,7 @@ Or of a whole directory:
 
 EOF;
 
-        $this->assertStringContainsString($expected, $command->getHelp());
+        self::assertStringContainsString($expected, $command->getHelp());
     }
 
     public function testLintIncorrectFileWithGithubFormat()
@@ -259,7 +259,7 @@ XLIFF;
     {
         $tester = new CommandCompletionTester($this->createCommand());
 
-        $this->assertSame($expectedSuggestions, $tester->complete($input));
+        self::assertSame($expectedSuggestions, $tester->complete($input));
     }
 
     public function provideCompletionSuggestions()

@@ -52,13 +52,13 @@ class DateIntervalNormalizerTest extends TestCase
 
     public function testSupportsNormalization()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new \DateInterval('P00Y00M00DT00H00M00S')));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertTrue($this->normalizer->supportsNormalization(new \DateInterval('P00Y00M00DT00H00M00S')));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     public function testNormalize()
     {
-        $this->assertEquals('P0Y0M0DT0H0M0S', $this->normalizer->normalize(new \DateInterval('PT0S')));
+        self::assertEquals('P0Y0M0DT0H0M0S', $this->normalizer->normalize(new \DateInterval('PT0S')));
     }
 
     /**
@@ -66,7 +66,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testNormalizeUsingFormatPassedInContext($format, $output, $input)
     {
-        $this->assertEquals($output, $this->normalizer->normalize($this->getInterval($input), null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
+        self::assertEquals($output, $this->normalizer->normalize($this->getInterval($input), null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
     }
 
     /**
@@ -75,20 +75,20 @@ class DateIntervalNormalizerTest extends TestCase
     public function testNormalizeUsingFormatPassedInConstructor($format, $output, $input)
     {
         $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
-        $this->assertEquals($output, $normalizer->normalize($this->getInterval($input)));
+        self::assertEquals($output, $normalizer->normalize($this->getInterval($input)));
     }
 
     public function testNormalizeInvalidObjectThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The object must be an instance of "\DateInterval".');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The object must be an instance of "\DateInterval".');
         $this->normalizer->normalize(new \stdClass());
     }
 
     public function testSupportsDenormalization()
     {
-        $this->assertTrue($this->normalizer->supportsDenormalization('P00Y00M00DT00H00M00S', \DateInterval::class));
-        $this->assertFalse($this->normalizer->supportsDenormalization('foo', 'Bar'));
+        self::assertTrue($this->normalizer->supportsDenormalization('P00Y00M00DT00H00M00S', \DateInterval::class));
+        self::assertFalse($this->normalizer->supportsDenormalization('foo', 'Bar'));
     }
 
     public function testDenormalize()
@@ -123,32 +123,32 @@ class DateIntervalNormalizerTest extends TestCase
 
     public function testDenormalizeExpectsString()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $this->normalizer->denormalize(1234, \DateInterval::class);
     }
 
     public function testDenormalizeNonISO8601IntervalStringThrowsException()
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected a valid ISO 8601 interval string.');
+        self::expectException(UnexpectedValueException::class);
+        self::expectExceptionMessage('Expected a valid ISO 8601 interval string.');
         $this->normalizer->denormalize('10 years 2 months 3 days', \DateInterval::class, null);
     }
 
     public function testDenormalizeInvalidDataThrowsException()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('invalid interval', \DateInterval::class);
     }
 
     public function testDenormalizeFormatMismatchThrowsException()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => 'P%yY%mM%dD']);
     }
 
     private function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
     {
-        $this->assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
+        self::assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
     }
 
     private function getInterval($data)

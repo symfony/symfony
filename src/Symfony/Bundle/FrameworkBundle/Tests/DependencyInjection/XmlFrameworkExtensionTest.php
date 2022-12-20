@@ -25,12 +25,12 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testAssetsHelperIsRemovedWhenPhpTemplatingEngineIsEnabledAndAssetsAreDisabled()
     {
-        $this->markTestSkipped('The assets key cannot be set to false using the XML configuration format.');
+        self::markTestSkipped('The assets key cannot be set to false using the XML configuration format.');
     }
 
     public function testMessengerMiddlewareFactoryErroneousFormat()
     {
-        $this->markTestSkipped('XML configuration will not allow erroneous format.');
+        self::markTestSkipped('XML configuration will not allow erroneous format.');
     }
 
     public function testLegacyExceptionsConfig()
@@ -39,29 +39,29 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTest
 
         $configuration = $container->getDefinition('exception_listener')->getArgument(3);
 
-        $this->assertSame([
+        self::assertSame([
             \Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class,
             \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class,
             \Symfony\Component\HttpKernel\Exception\ConflictHttpException::class,
             \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException::class,
         ], array_keys($configuration));
 
-        $this->assertEqualsCanonicalizing([
+        self::assertEqualsCanonicalizing([
             'log_level' => 'info',
             'status_code' => 422,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class]);
 
-        $this->assertEqualsCanonicalizing([
+        self::assertEqualsCanonicalizing([
             'log_level' => 'info',
             'status_code' => null,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class]);
 
-        $this->assertEqualsCanonicalizing([
+        self::assertEqualsCanonicalizing([
             'log_level' => 'info',
             'status_code' => null,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\ConflictHttpException::class]);
 
-        $this->assertEqualsCanonicalizing([
+        self::assertEqualsCanonicalizing([
             'log_level' => null,
             'status_code' => 500,
         ], $configuration[\Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException::class]);

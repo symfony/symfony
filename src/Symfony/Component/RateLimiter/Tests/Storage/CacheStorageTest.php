@@ -24,17 +24,17 @@ class CacheStorageTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->pool = $this->createMock(CacheItemPoolInterface::class);
+        $this->pool = self::createMock(CacheItemPoolInterface::class);
         $this->storage = new CacheStorage($this->pool);
     }
 
     public function testSave()
     {
-        $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->exactly(2))->method('expiresAfter')->with(10);
+        $cacheItem = self::createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::exactly(2))->method('expiresAfter')->with(10);
 
-        $this->pool->expects($this->any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
-        $this->pool->expects($this->exactly(2))->method('save')->with($cacheItem);
+        $this->pool->expects(self::any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
+        $this->pool->expects(self::exactly(2))->method('save')->with($cacheItem);
 
         $window = new Window('test', 10, 20);
         $this->storage->save($window);
@@ -45,41 +45,41 @@ class CacheStorageTest extends TestCase
 
     public function testFetchExistingState()
     {
-        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem = self::createMock(CacheItemInterface::class);
         $window = new Window('test', 10, 20);
-        $cacheItem->expects($this->any())->method('get')->willReturn($window);
-        $cacheItem->expects($this->any())->method('isHit')->willReturn(true);
+        $cacheItem->expects(self::any())->method('get')->willReturn($window);
+        $cacheItem->expects(self::any())->method('isHit')->willReturn(true);
 
-        $this->pool->expects($this->any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
+        $this->pool->expects(self::any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
 
-        $this->assertEquals($window, $this->storage->fetch('test'));
+        self::assertEquals($window, $this->storage->fetch('test'));
     }
 
     public function testFetchExistingJunk()
     {
-        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem = self::createMock(CacheItemInterface::class);
 
-        $cacheItem->expects($this->any())->method('get')->willReturn('junk');
-        $cacheItem->expects($this->any())->method('isHit')->willReturn(true);
+        $cacheItem->expects(self::any())->method('get')->willReturn('junk');
+        $cacheItem->expects(self::any())->method('isHit')->willReturn(true);
 
-        $this->pool->expects($this->any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
+        $this->pool->expects(self::any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
 
-        $this->assertNull($this->storage->fetch('test'));
+        self::assertNull($this->storage->fetch('test'));
     }
 
     public function testFetchNonExistingState()
     {
-        $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->any())->method('isHit')->willReturn(false);
+        $cacheItem = self::createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::any())->method('isHit')->willReturn(false);
 
-        $this->pool->expects($this->any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
+        $this->pool->expects(self::any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
 
-        $this->assertNull($this->storage->fetch('test'));
+        self::assertNull($this->storage->fetch('test'));
     }
 
     public function testDelete()
     {
-        $this->pool->expects($this->once())->method('deleteItem')->with(sha1('test'))->willReturn(true);
+        $this->pool->expects(self::once())->method('deleteItem')->with(sha1('test'))->willReturn(true);
 
         $this->storage->delete('test');
     }

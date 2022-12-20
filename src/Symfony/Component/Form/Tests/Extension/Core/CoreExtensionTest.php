@@ -28,6 +28,6 @@ class CoreExtensionTest extends TestCase
             ->getForm();
         $form->submit('foo');
 
-        $this->assertFalse($form->isValid());
+        self::assertFalse($form->isValid());
     }
 }

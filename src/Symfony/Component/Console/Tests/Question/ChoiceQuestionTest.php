@@ -35,7 +35,7 @@ class ChoiceQuestionTest extends TestCase
             $validator = $question->getValidator();
             $actual = $validator($answer);
 
-            $this->assertEquals($actual, $expected, $message);
+            self::assertEquals($actual, $expected, $message);
         }
     }
 
@@ -97,11 +97,11 @@ class ChoiceQuestionTest extends TestCase
         ]);
         $question->setTrimmable(false);
 
-        $this->assertSame('  Third response  ', $question->getValidator()('  Third response  '));
+        self::assertSame('  Third response  ', $question->getValidator()('  Third response  '));
 
         $question->setMultiselect(true);
 
-        $this->assertSame(['First response ', ' Second response'], $question->getValidator()('First response , Second response'));
+        self::assertSame(['First response ', ' Second response'], $question->getValidator()('First response , Second response'));
     }
 
     /**
@@ -116,7 +116,7 @@ class ChoiceQuestionTest extends TestCase
             'string object' => new StringChoice('String Object'),
         ]);
 
-        $this->assertSame($expectedValue, $question->getValidator()($providedAnswer));
+        self::assertSame($expectedValue, $question->getValidator()($providedAnswer));
     }
 
     public function selectAssociativeChoicesProvider()
@@ -141,12 +141,12 @@ class ChoiceQuestionTest extends TestCase
             $result3 = new StringChoice('baz'),
         ]);
 
-        $this->assertSame($result1, $question->getValidator()('foo'), 'answer can be selected by its string value');
-        $this->assertSame($result1, $question->getValidator()(0), 'answer can be selected by index');
+        self::assertSame($result1, $question->getValidator()('foo'), 'answer can be selected by its string value');
+        self::assertSame($result1, $question->getValidator()(0), 'answer can be selected by index');
 
         $question->setMultiselect(true);
 
-        $this->assertSame([$result3, $result2], $question->getValidator()('baz, bar'));
+        self::assertSame([$result3, $result2], $question->getValidator()('baz, bar'));
     }
 }
 

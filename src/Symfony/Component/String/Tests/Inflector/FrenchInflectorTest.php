@@ -132,9 +132,9 @@ class FrenchInflectorTest extends TestCase
      */
     public function testSingularize(string $singular, string $plural)
     {
-        $this->assertSame([$singular], (new FrenchInflector())->singularize($plural));
+        self::assertSame([$singular], (new FrenchInflector())->singularize($plural));
         // test casing: if the first letter was uppercase, it should remain so
-        $this->assertSame([ucfirst($singular)], (new FrenchInflector())->singularize(ucfirst($plural)));
+        self::assertSame([ucfirst($singular)], (new FrenchInflector())->singularize(ucfirst($plural)));
     }
 
     /**
@@ -142,8 +142,8 @@ class FrenchInflectorTest extends TestCase
      */
     public function testPluralize(string $singular, string $plural)
     {
-        $this->assertSame([$plural], (new FrenchInflector())->pluralize($singular));
+        self::assertSame([$plural], (new FrenchInflector())->pluralize($singular));
         // test casing: if the first letter was uppercase, it should remain so
-        $this->assertSame([ucfirst($plural)], (new FrenchInflector())->pluralize(ucfirst($singular)));
+        self::assertSame([ucfirst($plural)], (new FrenchInflector())->pluralize(ucfirst($singular)));
     }
 }

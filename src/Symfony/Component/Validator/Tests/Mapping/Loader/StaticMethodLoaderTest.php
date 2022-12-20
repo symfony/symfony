@@ -35,7 +35,7 @@ class StaticMethodLoaderTest extends TestCase
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(StaticLoaderEntity::class);
 
-        $this->assertTrue($loader->loadClassMetadata($metadata));
+        self::assertTrue($loader->loadClassMetadata($metadata));
     }
 
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
@@ -43,7 +43,7 @@ class StaticMethodLoaderTest extends TestCase
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata('\stdClass');
 
-        $this->assertFalse($loader->loadClassMetadata($metadata));
+        self::assertFalse($loader->loadClassMetadata($metadata));
     }
 
     public function testLoadClassMetadata()
@@ -53,7 +53,7 @@ class StaticMethodLoaderTest extends TestCase
 
         $loader->loadClassMetadata($metadata);
 
-        $this->assertEquals(StaticLoaderEntity::$invokedWith, $metadata);
+        self::assertEquals(StaticLoaderEntity::$invokedWith, $metadata);
     }
 
     public function testLoadClassMetadataDoesNotRepeatLoadWithParentClasses()
@@ -61,12 +61,12 @@ class StaticMethodLoaderTest extends TestCase
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(StaticLoaderDocument::class);
         $loader->loadClassMetadata($metadata);
-        $this->assertCount(0, $metadata->getConstraints());
+        self::assertCount(0, $metadata->getConstraints());
 
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(BaseStaticLoaderDocument::class);
         $loader->loadClassMetadata($metadata);
-        $this->assertCount(1, $metadata->getConstraints());
+        self::assertCount(1, $metadata->getConstraints());
     }
 
     public function testLoadClassMetadataIgnoresInterfaces()
@@ -76,7 +76,7 @@ class StaticMethodLoaderTest extends TestCase
 
         $loader->loadClassMetadata($metadata);
 
-        $this->assertCount(0, $metadata->getConstraints());
+        self::assertCount(0, $metadata->getConstraints());
     }
 
     public function testLoadClassMetadataInAbstractClasses()
@@ -86,7 +86,7 @@ class StaticMethodLoaderTest extends TestCase
 
         $loader->loadClassMetadata($metadata);
 
-        $this->assertCount(1, $metadata->getConstraints());
+        self::assertCount(1, $metadata->getConstraints());
     }
 
     public function testLoadClassMetadataIgnoresAbstractMethods()
@@ -100,7 +100,7 @@ class StaticMethodLoaderTest extends TestCase
         $loader = new StaticMethodLoader('loadMetadata');
         $loader->loadClassMetadata($metadata);
 
-        $this->assertCount(0, $metadata->getConstraints());
+        self::assertCount(0, $metadata->getConstraints());
     }
 }
 

@@ -50,14 +50,14 @@ class TerminalTest extends TestCase
         putenv('COLUMNS=100');
         putenv('LINES=50');
         $terminal = new Terminal();
-        $this->assertSame(100, $terminal->getWidth());
-        $this->assertSame(50, $terminal->getHeight());
+        self::assertSame(100, $terminal->getWidth());
+        self::assertSame(50, $terminal->getHeight());
 
         putenv('COLUMNS=120');
         putenv('LINES=60');
         $terminal = new Terminal();
-        $this->assertSame(120, $terminal->getWidth());
-        $this->assertSame(60, $terminal->getHeight());
+        self::assertSame(120, $terminal->getWidth());
+        self::assertSame(60, $terminal->getHeight());
     }
 
     public function testZeroValues()
@@ -67,24 +67,24 @@ class TerminalTest extends TestCase
 
         $terminal = new Terminal();
 
-        $this->assertSame(0, $terminal->getWidth());
-        $this->assertSame(0, $terminal->getHeight());
+        self::assertSame(0, $terminal->getWidth());
+        self::assertSame(0, $terminal->getHeight());
     }
 
     public function testSttyOnWindows()
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Must be on windows');
+            self::markTestSkipped('Must be on windows');
         }
 
         $sttyString = exec('(stty -a | grep columns) 2>&1', $output, $exitcode);
         if (0 !== $exitcode) {
-            $this->markTestSkipped('Must have stty support');
+            self::markTestSkipped('Must have stty support');
         }
 
         $matches = [];
         if (0 === preg_match('/columns.(\d+)/i', $sttyString, $matches)) {
-            $this->fail('Could not determine existing stty columns');
+            self::fail('Could not determine existing stty columns');
         }
 
         putenv('COLUMNS');
@@ -92,6 +92,6 @@ class TerminalTest extends TestCase
         putenv('ANSICON');
 
         $terminal = new Terminal();
-        $this->assertSame((int) $matches[1], $terminal->getWidth());
+        self::assertSame((int) $matches[1], $terminal->getWidth());
     }
 }

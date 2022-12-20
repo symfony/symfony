@@ -25,7 +25,7 @@ class JsonManifestVersionStrategyTest extends TestCase
      */
     public function testGetVersion(JsonManifestVersionStrategy $strategy)
     {
-        $this->assertSame('main.123abc.js', $strategy->getVersion('main.js'));
+        self::assertSame('main.123abc.js', $strategy->getVersion('main.js'));
     }
 
     /**
@@ -33,7 +33,7 @@ class JsonManifestVersionStrategyTest extends TestCase
      */
     public function testApplyVersion(JsonManifestVersionStrategy $strategy)
     {
-        $this->assertSame('css/styles.555def.css', $strategy->applyVersion('css/styles.css'));
+        self::assertSame('css/styles.555def.css', $strategy->applyVersion('css/styles.css'));
     }
 
     /**
@@ -41,7 +41,7 @@ class JsonManifestVersionStrategyTest extends TestCase
      */
     public function testApplyVersionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy)
     {
-        $this->assertSame('css/other.css', $strategy->applyVersion('css/other.css'));
+        self::assertSame('css/other.css', $strategy->applyVersion('css/other.css'));
     }
 
     /**
@@ -49,8 +49,8 @@ class JsonManifestVersionStrategyTest extends TestCase
      */
     public function testStrictExceptionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy, $path, $message)
     {
-        $this->expectException(AssetNotFoundException::class);
-        $this->expectExceptionMessageMatches($message);
+        self::expectException(AssetNotFoundException::class);
+        self::expectExceptionMessageMatches($message);
 
         $strategy->getVersion($path);
     }
@@ -60,7 +60,7 @@ class JsonManifestVersionStrategyTest extends TestCase
      */
     public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy)
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $strategy->getVersion('main.js');
     }
 
@@ -69,15 +69,15 @@ class JsonManifestVersionStrategyTest extends TestCase
      */
     public function testManifestFileWithBadJSONThrowsException(JsonManifestVersionStrategy $strategy)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Error parsing JSON');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Error parsing JSON');
         $strategy->getVersion('main.js');
     }
 
     public function testRemoteManifestFileWithoutHttpClient()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(sprintf('The "%s" class needs an HTTP client to use a remote manifest. Try running "composer require symfony/http-client".', JsonManifestVersionStrategy::class));
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage(sprintf('The "%s" class needs an HTTP client to use a remote manifest. Try running "composer require symfony/http-client".', JsonManifestVersionStrategy::class));
 
         new JsonManifestVersionStrategy('https://cdn.example.com/manifest.json');
     }

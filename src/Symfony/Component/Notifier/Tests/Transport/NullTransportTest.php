@@ -22,16 +22,16 @@ class NullTransportTest extends TestCase
 {
     public function testToString()
     {
-        $this->assertEquals('null', (string) (new NullTransport()));
+        self::assertEquals('null', (string) (new NullTransport()));
     }
 
     public function testSend()
     {
         $nullTransport = new NullTransport(
-            $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class)
+            $eventDispatcherMock = self::createMock(EventDispatcherInterface::class)
         );
 
-        $eventDispatcherMock->expects($this->exactly(2))->method('dispatch');
+        $eventDispatcherMock->expects(self::exactly(2))->method('dispatch');
         $nullTransport->send(new DummyMessage());
     }
 }

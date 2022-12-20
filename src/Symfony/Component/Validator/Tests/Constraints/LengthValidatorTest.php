@@ -58,7 +58,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Length(['value' => 5]));
     }
 

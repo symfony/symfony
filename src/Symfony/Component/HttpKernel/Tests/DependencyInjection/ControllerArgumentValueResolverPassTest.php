@@ -46,11 +46,11 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $container->setParameter('kernel.debug', false);
 
         (new ControllerArgumentValueResolverPass())->process($container);
-        $this->assertEquals($expected, $definition->getArgument(1)->getValues());
+        self::assertEquals($expected, $definition->getArgument(1)->getValues());
 
-        $this->assertFalse($container->hasDefinition('n1.traceable'));
-        $this->assertFalse($container->hasDefinition('n2.traceable'));
-        $this->assertFalse($container->hasDefinition('n3.traceable'));
+        self::assertFalse($container->hasDefinition('n1.traceable'));
+        self::assertFalse($container->hasDefinition('n2.traceable'));
+        self::assertFalse($container->hasDefinition('n3.traceable'));
     }
 
     public function testInDebugWithStopWatchDefinition()
@@ -79,15 +79,15 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $container->setParameter('kernel.debug', true);
 
         (new ControllerArgumentValueResolverPass())->process($container);
-        $this->assertEquals($expected, $definition->getArgument(1)->getValues());
+        self::assertEquals($expected, $definition->getArgument(1)->getValues());
 
-        $this->assertTrue($container->hasDefinition('debug.n1'));
-        $this->assertTrue($container->hasDefinition('debug.n2'));
-        $this->assertTrue($container->hasDefinition('debug.n3'));
+        self::assertTrue($container->hasDefinition('debug.n1'));
+        self::assertTrue($container->hasDefinition('debug.n2'));
+        self::assertTrue($container->hasDefinition('debug.n3'));
 
-        $this->assertTrue($container->hasDefinition('n1'));
-        $this->assertTrue($container->hasDefinition('n2'));
-        $this->assertTrue($container->hasDefinition('n3'));
+        self::assertTrue($container->hasDefinition('n1'));
+        self::assertTrue($container->hasDefinition('n2'));
+        self::assertTrue($container->hasDefinition('n3'));
     }
 
     public function testInDebugWithouStopWatchDefinition()
@@ -102,10 +102,10 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $container->setParameter('kernel.debug', true);
 
         (new ControllerArgumentValueResolverPass())->process($container);
-        $this->assertEquals($expected, $definition->getArgument(1)->getValues());
+        self::assertEquals($expected, $definition->getArgument(1)->getValues());
 
-        $this->assertFalse($container->hasDefinition('debug.n1'));
-        $this->assertTrue($container->hasDefinition('n1'));
+        self::assertFalse($container->hasDefinition('debug.n1'));
+        self::assertTrue($container->hasDefinition('n1'));
     }
 
     public function testReturningEmptyArrayWhenNoService()
@@ -117,7 +117,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $container->setParameter('kernel.debug', false);
 
         (new ControllerArgumentValueResolverPass())->process($container);
-        $this->assertEquals([], $definition->getArgument(1)->getValues());
+        self::assertEquals([], $definition->getArgument(1)->getValues());
     }
 
     public function testNoArgumentResolver()
@@ -126,6 +126,6 @@ class ControllerArgumentValueResolverPassTest extends TestCase
 
         (new ControllerArgumentValueResolverPass())->process($container);
 
-        $this->assertFalse($container->hasDefinition('argument_resolver'));
+        self::assertFalse($container->hasDefinition('argument_resolver'));
     }
 }

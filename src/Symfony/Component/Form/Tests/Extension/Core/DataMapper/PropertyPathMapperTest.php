@@ -65,7 +65,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapDataToForms($car, [$form]);
 
-        $this->assertSame($engine, $form->getData());
+        self::assertSame($engine, $form->getData());
     }
 
     public function testMapDataToFormsPassesObjectCloneIfNotByReference()
@@ -83,8 +83,8 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapDataToForms($car, [$form]);
 
-        $this->assertNotSame($engine, $form->getData());
-        $this->assertEquals($engine, $form->getData());
+        self::assertNotSame($engine, $form->getData());
+        self::assertEquals($engine, $form->getData());
     }
 
     public function testMapDataToFormsIgnoresEmptyPropertyPath()
@@ -95,11 +95,11 @@ class PropertyPathMapperTest extends TestCase
         $config->setByReference(true);
         $form = new Form($config);
 
-        $this->assertNull($form->getPropertyPath());
+        self::assertNull($form->getPropertyPath());
 
         $this->mapper->mapDataToForms($car, [$form]);
 
-        $this->assertNull($form->getData());
+        self::assertNull($form->getData());
     }
 
     public function testMapDataToFormsIgnoresUnmapped()
@@ -116,7 +116,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapDataToForms($car, [$form]);
 
-        $this->assertNull($form->getData());
+        self::assertNull($form->getData());
     }
 
     /**
@@ -132,8 +132,8 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapDataToForms($car, [$engineForm, $colorForm]);
 
-        $this->assertSame($car->engine, $engineForm->getData());
-        $this->assertNull($colorForm->getData());
+        self::assertSame($car->engine, $engineForm->getData());
+        self::assertNull($colorForm->getData());
     }
 
     public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()
@@ -150,7 +150,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapDataToForms(null, [$form]);
 
-        $this->assertSame($default, $form->getData());
+        self::assertSame($default, $form->getData());
     }
 
     public function testMapDataToFormsSetsDefaultDataIfPassedDataIsEmptyArray()
@@ -167,7 +167,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapDataToForms([], [$form]);
 
-        $this->assertSame($default, $form->getData());
+        self::assertSame($default, $form->getData());
     }
 
     public function testMapFormsToDataWritesBackIfNotByReference()
@@ -186,8 +186,8 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertEquals($engine, $car->engine);
-        $this->assertNotSame($engine, $car->engine);
+        self::assertEquals($engine, $car->engine);
+        self::assertNotSame($engine, $car->engine);
     }
 
     public function testMapFormsToDataWritesBackIfByReferenceButNoReference()
@@ -205,7 +205,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertSame($engine, $car->engine);
+        self::assertSame($engine, $car->engine);
     }
 
     public function testMapFormsToDataWritesBackIfByReferenceAndReference()
@@ -224,7 +224,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertSame('Rolls-Royce', $car->engine);
+        self::assertSame('Rolls-Royce', $car->engine);
     }
 
     public function testMapFormsToDataIgnoresUnmapped()
@@ -244,7 +244,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertSame($initialEngine, $car->engine);
+        self::assertSame($initialEngine, $car->engine);
     }
 
     public function testMapFormsToDataIgnoresUnsubmittedForms()
@@ -263,7 +263,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertSame($initialEngine, $car->engine);
+        self::assertSame($initialEngine, $car->engine);
     }
 
     public function testMapFormsToDataIgnoresEmptyData()
@@ -281,7 +281,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertSame($initialEngine, $car->engine);
+        self::assertSame($initialEngine, $car->engine);
     }
 
     public function testMapFormsToDataIgnoresUnsynchronized()
@@ -300,7 +300,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertSame($initialEngine, $car->engine);
+        self::assertSame($initialEngine, $car->engine);
     }
 
     public function testMapFormsToDataIgnoresDisabled()
@@ -320,7 +320,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertSame($initialEngine, $car->engine);
+        self::assertSame($initialEngine, $car->engine);
     }
 
     /**
@@ -335,7 +335,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $car);
 
-        $this->assertSame('BMW', $car->engine);
+        self::assertSame('BMW', $car->engine);
     }
 
     /**
@@ -357,7 +357,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->mapper->mapFormsToData([$form], $article);
 
-        $this->assertSame($publishedAtValue, $article['publishedAt']);
+        self::assertSame($publishedAtValue, $article['publishedAt']);
     }
 
     public function provideDate()
@@ -389,6 +389,6 @@ class PropertyPathMapperTest extends TestCase
             'date' => '04/08/2022',
         ]);
 
-        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
+        self::assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 }

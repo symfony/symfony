@@ -19,6 +19,6 @@ class AbstractArgumentTest extends TestCase
     public function testAbstractArgumentGetters()
     {
         $argument = new AbstractArgument('should be defined by Pass');
-        $this->assertSame('should be defined by Pass', $argument->getText());
+        self::assertSame('should be defined by Pass', $argument->getText());
     }
 }

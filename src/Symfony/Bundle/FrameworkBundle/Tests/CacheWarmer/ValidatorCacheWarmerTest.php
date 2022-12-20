@@ -34,12 +34,12 @@ class ValidatorCacheWarmerTest extends TestCase
         $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
         $warmer->warmUp(\dirname($file));
 
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
 
         $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
 
-        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
+        self::assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
+        self::assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
     }
 
     public function testWarmUpWithAnnotations()
@@ -54,14 +54,14 @@ class ValidatorCacheWarmerTest extends TestCase
         $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
         $warmer->warmUp(\dirname($file));
 
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
 
         $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
 
         $item = $arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category');
-        $this->assertTrue($item->isHit());
+        self::assertTrue($item->isHit());
 
-        $this->assertInstanceOf(ClassMetadata::class, $item->get());
+        self::assertInstanceOf(ClassMetadata::class, $item->get());
     }
 
     public function testWarmUpWithoutLoader()
@@ -74,7 +74,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
         $warmer->warmUp(\dirname($file));
 
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
     }
 
     /**
@@ -83,7 +83,7 @@ class ValidatorCacheWarmerTest extends TestCase
      */
     public function testClassAutoloadException()
     {
-        $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
+        self::assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
 
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
@@ -106,10 +106,10 @@ class ValidatorCacheWarmerTest extends TestCase
      */
     public function testClassAutoloadExceptionWithUnrelatedException()
     {
-        $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage('This exception should not be caught by the warmer.');
+        self::expectException(\DomainException::class);
+        self::expectExceptionMessage('This exception should not be caught by the warmer.');
 
-        $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
+        self::assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
 
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');

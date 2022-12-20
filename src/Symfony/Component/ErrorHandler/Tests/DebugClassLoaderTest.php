@@ -52,24 +52,24 @@ class DebugClassLoaderTest extends TestCase
                 $reflProp = $reflClass->getProperty('classLoader');
                 $reflProp->setAccessible(true);
 
-                $this->assertNotInstanceOf(DebugClassLoader::class, $reflProp->getValue($function[0]));
+                self::assertNotInstanceOf(DebugClassLoader::class, $reflProp->getValue($function[0]));
 
                 return;
             }
         }
 
-        $this->fail('DebugClassLoader did not register');
+        self::fail('DebugClassLoader did not register');
     }
 
     public function testThrowingClass()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('boo');
+        self::expectException(\Exception::class);
+        self::expectExceptionMessage('boo');
         try {
             class_exists(Fixtures\Throwing::class);
-            $this->fail('Exception expected');
+            self::fail('Exception expected');
         } catch (\Exception $e) {
-            $this->assertSame('boo', $e->getMessage());
+            self::assertSame('boo', $e->getMessage());
         }
 
         // the second call also should throw
@@ -78,17 +78,17 @@ class DebugClassLoaderTest extends TestCase
 
     public function testNameCaseMismatch()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Case mismatch between loaded and declared class names');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Case mismatch between loaded and declared class names');
         class_exists(TestingCaseMismatch::class, true);
     }
 
     public function testFileCaseMismatch()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Case mismatch between class and real file names');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Case mismatch between class and real file names');
         if (!file_exists(__DIR__.'/Fixtures/CaseMismatch.php')) {
-            $this->markTestSkipped('Can only be run on case insensitive filesystems');
+            self::markTestSkipped('Can only be run on case insensitive filesystems');
         }
 
         class_exists(Fixtures\CaseMismatch::class, true);
@@ -96,24 +96,24 @@ class DebugClassLoaderTest extends TestCase
 
     public function testPsr4CaseMismatch()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Case mismatch between loaded and declared class names');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Case mismatch between loaded and declared class names');
         class_exists(__NAMESPACE__.'\Fixtures\Psr4CaseMismatch', true);
     }
 
     public function testNotPsr0()
     {
-        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0', true));
+        self::assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0', true));
     }
 
     public function testNotPsr0Bis()
     {
-        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0bis', true));
+        self::assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0bis', true));
     }
 
     public function testClassAlias()
     {
-        $this->assertTrue(class_exists(Fixtures\ClassAlias::class, true));
+        self::assertTrue(class_exists(Fixtures\ClassAlias::class, true));
     }
 
     /**
@@ -138,7 +138,7 @@ class DebugClassLoaderTest extends TestCase
             'message' => 'The "Test\Symfony\Component\ErrorHandler\Tests\\'.$class.'" class '.$type.' "Symfony\Component\ErrorHandler\Tests\Fixtures\\'.$super.'" that is deprecated but this is a test deprecation notice.',
         ];
 
-        $this->assertSame($xError, $lastError);
+        self::assertSame($xError, $lastError);
     }
 
     public function provideDeprecatedSuper(): array
@@ -168,7 +168,7 @@ class DebugClassLoaderTest extends TestCase
             'message' => '',
         ];
 
-        $this->assertSame($xError, $lastError);
+        self::assertSame($xError, $lastError);
     }
 
     public function testDeprecatedSuperInSameNamespace()
@@ -190,7 +190,7 @@ class DebugClassLoaderTest extends TestCase
             'message' => '',
         ];
 
-        $this->assertSame($xError, $lastError);
+        self::assertSame($xError, $lastError);
     }
 
     public function testExtendedFinalClass()
@@ -210,7 +210,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame([
+        self::assertSame([
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalClass1" class is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorHandler\Tests\ExtendsFinalClass1".',
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalClass2" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorHandler\Tests\ExtendsFinalClass2".',
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalClass3" class is considered final comment with @@@ and ***. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorHandler\Tests\ExtendsFinalClass3".',
@@ -238,7 +238,7 @@ class DebugClassLoaderTest extends TestCase
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\FinalMethod::finalMethod2()" method is considered final. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\ErrorHandler\Tests\Fixtures\ExtendedFinalMethod".',
         ];
 
-        $this->assertSame($xError, $deprecations);
+        self::assertSame($xError, $deprecations);
     }
 
     public function testExtendedDeprecatedMethodDoesntTriggerAnyNotice()
@@ -255,7 +255,7 @@ class DebugClassLoaderTest extends TestCase
         $lastError = error_get_last();
         unset($lastError['file'], $lastError['line']);
 
-        $this->assertSame(['type' => E_USER_NOTICE, 'message' => ''], $lastError);
+        self::assertSame(['type' => E_USER_NOTICE, 'message' => ''], $lastError);
     }
 
     public function testInternalsUse()
@@ -269,7 +269,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame([
+        self::assertSame([
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\InternalInterface" interface is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\ErrorHandler\Tests\ExtendsInternalsParent".',
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\InternalClass" class is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\ErrorHandler\Tests\ExtendsInternalsParent".',
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\InternalTrait" trait is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\ErrorHandler\Tests\ExtendsInternals".',
@@ -288,7 +288,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame([
+        self::assertSame([
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\SubClassWithAnnotatedParameters::quzMethod()" method will require a new "Quz $quz" argument in the next major version of its parent class "Symfony\Component\ErrorHandler\Tests\Fixtures\ClassWithAnnotatedParameters", not defining it is deprecated.',
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\SubClassWithAnnotatedParameters::whereAmI()" method will require a new "bool $matrix" argument in the next major version of its interface "Symfony\Component\ErrorHandler\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
             'The "Symfony\Component\ErrorHandler\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "$noType" argument in the next major version of its interface "Symfony\Component\ErrorHandler\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
@@ -310,7 +310,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame([], $deprecations);
+        self::assertSame([], $deprecations);
     }
 
     public function testVirtualUse()
@@ -324,7 +324,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame(array_merge(
+        self::assertSame(array_merge(
         \PHP_VERSION_ID >= 80000 ? [
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualInterface::staticMethod()" might add "Foo&Bar" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualAbstract" now to avoid errors or add an explicit @return annotation to suppress this message.',
         ] : [], [
@@ -356,12 +356,12 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame([], $deprecations);
+        self::assertSame([], $deprecations);
     }
 
     public function testEvaluatedCode()
     {
-        $this->assertTrue(class_exists(Fixtures\DefinitionInEvaluatedCode::class, true));
+        self::assertTrue(class_exists(Fixtures\DefinitionInEvaluatedCode::class, true));
     }
 
     public function testReturnType()
@@ -375,7 +375,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame(array_merge([
+        self::assertSame(array_merge([
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeGrandParent::returnTypeGrandParent()" might add "string" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParentInterface::returnTypeParentInterface()" might add "string" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeInterface::returnTypeInterface()" might add "string" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',

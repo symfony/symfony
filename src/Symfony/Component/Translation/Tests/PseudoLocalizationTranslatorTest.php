@@ -23,7 +23,7 @@ final class PseudoLocalizationTranslatorTest extends TestCase
     public function testTrans(string $expected, string $input, array $options = [])
     {
         mt_srand(987);
-        $this->assertSame($expected, (new PseudoLocalizationTranslator(new IdentityTranslator(), $options))->trans($input));
+        self::assertSame($expected, (new PseudoLocalizationTranslator(new IdentityTranslator(), $options))->trans($input));
     }
 
     public function provideTrans(): array
@@ -52,8 +52,8 @@ final class PseudoLocalizationTranslatorTest extends TestCase
      */
     public function testInvalidExpansionFactor(float $expansionFactor)
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The expansion factor must be greater than or equal to 1.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The expansion factor must be greater than or equal to 1.');
 
         new PseudoLocalizationTranslator(new IdentityTranslator(), [
             'expansion_factor' => $expansionFactor,

@@ -21,12 +21,11 @@ class NodeTest extends TestCase
     {
         $node = new Node([new ConstantNode('foo')]);
 
-        $this->assertEquals(<<<'EOF'
+        self::assertEquals(<<<'EOF'
 Node(
     ConstantNode(value: 'foo')
 )
-EOF
-            , (string) $node);
+EOF, (string) $node);
     }
 
     public function testSerialization()
@@ -36,6 +35,6 @@ EOF
         $serializedNode = serialize($node);
         $unserializedNode = unserialize($serializedNode);
 
-        $this->assertEquals($node, $unserializedNode);
+        self::assertEquals($node, $unserializedNode);
     }
 }

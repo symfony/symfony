@@ -39,7 +39,7 @@ class SodiumMarshallerTest extends TestCase
         $sodiumResult = $sodiumMarshaller->marshall($values, $failed);
         $sodiumResult['a'] = sodium_crypto_box_seal_open($sodiumResult['a'], $this->decryptionKey);
 
-        $this->assertSame($defaultResult, $sodiumResult);
+        self::assertSame($defaultResult, $sodiumResult);
     }
 
     public function testUnmarshall()
@@ -53,12 +53,12 @@ class SodiumMarshallerTest extends TestCase
         $sodiumResult = $sodiumMarshaller->marshall($values, $failed);
         $defaultResult = $defaultMarshaller->marshall($values, $failed);
 
-        $this->assertSame($values['a'], $sodiumMarshaller->unmarshall($sodiumResult['a']));
-        $this->assertSame($values['a'], $sodiumMarshaller->unmarshall($defaultResult['a']));
+        self::assertSame($values['a'], $sodiumMarshaller->unmarshall($sodiumResult['a']));
+        self::assertSame($values['a'], $sodiumMarshaller->unmarshall($defaultResult['a']));
 
         $sodiumMarshaller = new SodiumMarshaller([sodium_crypto_box_keypair(), $this->decryptionKey], $defaultMarshaller);
 
-        $this->assertSame($values['a'], $sodiumMarshaller->unmarshall($sodiumResult['a']));
-        $this->assertSame($values['a'], $sodiumMarshaller->unmarshall($defaultResult['a']));
+        self::assertSame($values['a'], $sodiumMarshaller->unmarshall($sodiumResult['a']));
+        self::assertSame($values['a'], $sodiumMarshaller->unmarshall($defaultResult['a']));
     }
 }

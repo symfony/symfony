@@ -31,15 +31,15 @@ class MockHttpClientTest extends HttpClientTestCase
     public function testMocking($factory, array $expectedResponses)
     {
         $client = new MockHttpClient($factory);
-        $this->assertSame(0, $client->getRequestsCount());
+        self::assertSame(0, $client->getRequestsCount());
 
         $urls = ['/foo', '/bar'];
         foreach ($urls as $i => $url) {
             $response = $client->request('POST', $url, ['body' => 'payload']);
-            $this->assertEquals($expectedResponses[$i], $response->getContent());
+            self::assertEquals($expectedResponses[$i], $response->getContent());
         }
 
-        $this->assertSame(2, $client->getRequestsCount());
+        self::assertSame(2, $client->getRequestsCount());
     }
 
     public function mockingProvider(): iterable
@@ -109,7 +109,7 @@ class MockHttpClientTest extends HttpClientTestCase
     {
         (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function validResponseFactoryProvider()
@@ -134,7 +134,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $client->request('POST', '/foo');
         $client->request('POST', '/foo');
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
         $client->request('POST', '/foo');
     }
 
@@ -173,8 +173,8 @@ class MockHttpClientTest extends HttpClientTestCase
      */
     public function testInvalidResponseFactory($responseFactory, string $expectedExceptionMessage)
     {
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage($expectedExceptionMessage);
 
         (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
     }
@@ -192,7 +192,7 @@ class MockHttpClientTest extends HttpClientTestCase
     {
         $client = new MockHttpClient(new MockResponse('', ['response_headers' => ['HTTP/1.1 000 ']]));
         $response = $client->request('GET', 'https://foo.bar');
-        $this->assertSame(0, $response->getStatusCode());
+        self::assertSame(0, $response->getStatusCode());
     }
 
     public function testFixContentLength()
@@ -205,16 +205,16 @@ class MockHttpClientTest extends HttpClientTestCase
         ]);
 
         $requestOptions = $response->getRequestOptions();
-        $this->assertSame('Content-Length: 7', $requestOptions['headers'][0]);
-        $this->assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
+        self::assertSame('Content-Length: 7', $requestOptions['headers'][0]);
+        self::assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
 
         $response = $client->request('POST', 'http://localhost:8057/post', [
             'body' => 'abc=def',
         ]);
 
         $requestOptions = $response->getRequestOptions();
-        $this->assertSame('Content-Length: 7', $requestOptions['headers'][1]);
-        $this->assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
+        self::assertSame('Content-Length: 7', $requestOptions['headers'][1]);
+        self::assertSame(['Content-Length: 7'], $requestOptions['normalized_headers']['content-length']);
 
         $response = $client->request('POST', 'http://localhost:8057/post', [
             'body' => "8\r\nSymfony \r\n5\r\nis aw\r\n6\r\nesome!\r\n0\r\n\r\n",
@@ -222,14 +222,14 @@ class MockHttpClientTest extends HttpClientTestCase
         ]);
 
         $requestOptions = $response->getRequestOptions();
-        $this->assertSame(['Content-Length: 19'], $requestOptions['normalized_headers']['content-length']);
+        self::assertSame(['Content-Length: 19'], $requestOptions['normalized_headers']['content-length']);
 
         $response = $client->request('POST', 'http://localhost:8057/post', [
             'body' => '',
         ]);
 
         $requestOptions = $response->getRequestOptions();
-        $this->assertFalse(isset($requestOptions['normalized_headers']['content-length']));
+        self::assertFalse(isset($requestOptions['normalized_headers']['content-length']));
     }
 
     public function testThrowExceptionInBodyGenerator()
@@ -247,10 +247,10 @@ class MockHttpClientTest extends HttpClientTestCase
 
         try {
             $mockHttpClient->request('GET', 'https://symfony.com', [])->getContent();
-            $this->fail();
+            self::fail();
         } catch (TransportException $e) {
-            $this->assertEquals(new TransportException('foo ccc'), $e->getPrevious());
-            $this->assertSame('foo ccc', $e->getMessage());
+            self::assertEquals(new TransportException('foo ccc'), $e->getPrevious());
+            self::assertSame('foo ccc', $e->getMessage());
         }
 
         $chunks = [];
@@ -258,26 +258,26 @@ class MockHttpClientTest extends HttpClientTestCase
             foreach ($mockHttpClient->stream($mockHttpClient->request('GET', 'https://symfony.com', [])) as $chunk) {
                 $chunks[] = $chunk;
             }
-            $this->fail();
+            self::fail();
         } catch (TransportException $e) {
-            $this->assertEquals(new \RuntimeException('bar ccc'), $e->getPrevious());
-            $this->assertSame('bar ccc', $e->getMessage());
+            self::assertEquals(new \RuntimeException('bar ccc'), $e->getPrevious());
+            self::assertSame('bar ccc', $e->getMessage());
         }
 
-        $this->assertCount(3, $chunks);
-        $this->assertEquals(new FirstChunk(0, ''), $chunks[0]);
-        $this->assertEquals(new DataChunk(0, 'bar'), $chunks[1]);
-        $this->assertInstanceOf(ErrorChunk::class, $chunks[2]);
-        $this->assertSame(3, $chunks[2]->getOffset());
-        $this->assertSame('bar ccc', $chunks[2]->getError());
+        self::assertCount(3, $chunks);
+        self::assertEquals(new FirstChunk(0, ''), $chunks[0]);
+        self::assertEquals(new DataChunk(0, 'bar'), $chunks[1]);
+        self::assertInstanceOf(ErrorChunk::class, $chunks[2]);
+        self::assertSame(3, $chunks[2]->getOffset());
+        self::assertSame('bar ccc', $chunks[2]->getError());
     }
 
     public function testMergeDefaultOptions()
     {
         $mockHttpClient = new MockHttpClient(null, 'https://example.com');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid URL: scheme is missing');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid URL: scheme is missing');
         $mockHttpClient->request('GET', '/foo', ['base_uri' => null]);
     }
 
@@ -312,47 +312,47 @@ class MockHttpClientTest extends HttpClientTestCase
 
                         return new MockResponse($content, $response->getInfo());
                     } catch (\Throwable $e) {
-                        $this->fail($e->getMessage());
+                        self::fail($e->getMessage());
                     }
                 });
 
             case 'testUnsupportedOption':
-                $this->markTestSkipped('MockHttpClient accepts any options by default');
+                self::markTestSkipped('MockHttpClient accepts any options by default');
                 break;
 
             case 'testChunkedEncoding':
-                $this->markTestSkipped("MockHttpClient doesn't dechunk");
+                self::markTestSkipped("MockHttpClient doesn't dechunk");
                 break;
 
             case 'testGzipBroken':
-                $this->markTestSkipped("MockHttpClient doesn't unzip");
+                self::markTestSkipped("MockHttpClient doesn't unzip");
                 break;
 
             case 'testTimeoutWithActiveConcurrentStream':
-                $this->markTestSkipped('Real transport required');
+                self::markTestSkipped('Real transport required');
                 break;
 
             case 'testTimeoutOnInitialize':
             case 'testTimeoutOnDestruct':
-                $this->markTestSkipped('Real transport required');
+                self::markTestSkipped('Real transport required');
                 break;
 
             case 'testDestruct':
-                $this->markTestSkipped("MockHttpClient doesn't timeout on destruct");
+                self::markTestSkipped("MockHttpClient doesn't timeout on destruct");
                 break;
 
             case 'testHandleIsRemovedOnException':
-                $this->markTestSkipped("MockHttpClient doesn't cache handles");
+                self::markTestSkipped("MockHttpClient doesn't cache handles");
                 break;
 
             case 'testPause':
             case 'testPauseReplace':
             case 'testPauseDuringBody':
-                $this->markTestSkipped("MockHttpClient doesn't support pauses by default");
+                self::markTestSkipped("MockHttpClient doesn't support pauses by default");
                 break;
 
             case 'testDnsFailure':
-                $this->markTestSkipped("MockHttpClient doesn't use a DNS");
+                self::markTestSkipped("MockHttpClient doesn't use a DNS");
                 break;
 
             case 'testGetRequest':
@@ -408,7 +408,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testInformationalResponseStream':
-                $client = $this->createMock(HttpClientInterface::class);
+                $client = self::createMock(HttpClientInterface::class);
                 $response = new MockResponse('Here the body', ['response_headers' => [
                     'HTTP/1.1 103 ',
                     'Link: </style.css>; rel=preload; as=style',
@@ -418,23 +418,23 @@ class MockHttpClientTest extends HttpClientTestCase
                 ]]);
                 $client->method('request')->willReturn($response);
                 $client->method('stream')->willReturn(new ResponseStream((function () use ($response) {
-                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk = self::createMock(ChunkInterface::class);
                     $chunk->method('getInformationalStatus')
                         ->willReturn([103, ['link' => ['</style.css>; rel=preload; as=style', '</script.js>; rel=preload; as=script']]]);
 
                     yield $response => $chunk;
 
-                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk = self::createMock(ChunkInterface::class);
                     $chunk->method('isFirst')->willReturn(true);
 
                     yield $response => $chunk;
 
-                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk = self::createMock(ChunkInterface::class);
                     $chunk->method('getContent')->willReturn('Here the body');
 
                     yield $response => $chunk;
 
-                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk = self::createMock(ChunkInterface::class);
                     $chunk->method('isLast')->willReturn(true);
 
                     yield $response => $chunk;
@@ -457,12 +457,12 @@ class MockHttpClientTest extends HttpClientTestCase
 
     public function testHttp2PushVulcain()
     {
-        $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+        self::markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
     }
 
     public function testHttp2PushVulcainWithUnusedResponse()
     {
-        $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+        self::markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
     }
 
     public function testChangeResponseFactory()
@@ -474,7 +474,7 @@ class MockHttpClientTest extends HttpClientTestCase
 
         $response = $client->request('GET', 'http://localhost:8057');
 
-        $this->assertSame($expectedBody, $response->getContent());
+        self::assertSame($expectedBody, $response->getContent());
     }
 
     public function testStringableBodyParam()
@@ -492,18 +492,18 @@ class MockHttpClientTest extends HttpClientTestCase
             'body' => ['foo' => $param],
         ]);
 
-        $this->assertSame('foo=bar', $response->getRequestOptions()['body']);
+        self::assertSame('foo=bar', $response->getRequestOptions()['body']);
     }
 
     public function testResetsRequestCount()
     {
         $client = new MockHttpClient([new MockResponse()]);
-        $this->assertSame(0, $client->getRequestsCount());
+        self::assertSame(0, $client->getRequestsCount());
 
         $client->request('POST', '/url', ['body' => 'payload']);
 
-        $this->assertSame(1, $client->getRequestsCount());
+        self::assertSame(1, $client->getRequestsCount());
         $client->reset();
-        $this->assertSame(0, $client->getRequestsCount());
+        self::assertSame(0, $client->getRequestsCount());
     }
 }

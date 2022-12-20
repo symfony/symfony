@@ -38,9 +38,9 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUserWhenProviderDoesNotReturnAnUserInterface()
     {
-        $this->expectException(AuthenticationServiceException::class);
-        $userProvider = $this->createMock(DaoAuthenticationProviderTest_UserProvider::class);
-        $userProvider->expects($this->once())
+        self::expectException(AuthenticationServiceException::class);
+        $userProvider = self::createMock(DaoAuthenticationProviderTest_UserProvider::class);
+        $userProvider->expects(self::once())
                      ->method('loadUserByUsername')
                      ->willReturn('fabien')
         ;
@@ -55,10 +55,10 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUserWhenUsernameIsNotFoundWithLegacyEncoderFactory()
     {
-        $this->expectException(UserNotFoundException::class);
+        self::expectException(UserNotFoundException::class);
         $userProvider = new InMemoryUserProvider();
 
-        $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(EncoderFactoryInterface::class));
+        $provider = new DaoAuthenticationProvider($userProvider, self::createMock(UserCheckerInterface::class), 'key', self::createMock(EncoderFactoryInterface::class));
         $method = new \ReflectionMethod($provider, 'retrieveUser');
         $method->setAccessible(true);
 
@@ -67,10 +67,10 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUserWhenUsernameIsNotFound()
     {
-        $this->expectException(UserNotFoundException::class);
+        self::expectException(UserNotFoundException::class);
         $userProvider = new InMemoryUserProvider();
 
-        $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(PasswordHasherFactoryInterface::class));
+        $provider = new DaoAuthenticationProvider($userProvider, self::createMock(UserCheckerInterface::class), 'key', self::createMock(PasswordHasherFactoryInterface::class));
         $method = new \ReflectionMethod($provider, 'retrieveUser');
         $method->setAccessible(true);
 
@@ -79,14 +79,14 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUserWhenAnExceptionOccurs()
     {
-        $this->expectException(AuthenticationServiceException::class);
-        $userProvider = $this->createMock(InMemoryUserProvider::class);
-        $userProvider->expects($this->once())
+        self::expectException(AuthenticationServiceException::class);
+        $userProvider = self::createMock(InMemoryUserProvider::class);
+        $userProvider->expects(self::once())
                      ->method('loadUserByIdentifier')
                      ->willThrowException(new \RuntimeException())
         ;
 
-        $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(PasswordHasherFactoryInterface::class));
+        $provider = new DaoAuthenticationProvider($userProvider, self::createMock(UserCheckerInterface::class), 'key', self::createMock(PasswordHasherFactoryInterface::class));
         $method = new \ReflectionMethod($provider, 'retrieveUser');
         $method->setAccessible(true);
 
@@ -95,43 +95,43 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUserReturnsUserFromTokenOnReauthentication()
     {
-        $userProvider = $this->createMock(InMemoryUserProvider::class);
-        $userProvider->expects($this->never())
+        $userProvider = self::createMock(InMemoryUserProvider::class);
+        $userProvider->expects(self::never())
                      ->method('loadUserByIdentifier')
         ;
 
         $user = new TestUser();
         $token = $this->getSupportedToken();
-        $token->expects($this->once())
+        $token->expects(self::once())
               ->method('getUser')
               ->willReturn($user)
         ;
 
-        $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(PasswordHasherFactoryInterface::class));
+        $provider = new DaoAuthenticationProvider($userProvider, self::createMock(UserCheckerInterface::class), 'key', self::createMock(PasswordHasherFactoryInterface::class));
         $reflection = new \ReflectionMethod($provider, 'retrieveUser');
         $reflection->setAccessible(true);
         $result = $reflection->invoke($provider, 'someUser', $token);
 
-        $this->assertSame($user, $result);
+        self::assertSame($user, $result);
     }
 
     public function testRetrieveUser()
     {
         $userProvider = new InMemoryUserProvider(['fabien' => []]);
 
-        $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(PasswordHasherFactoryInterface::class));
+        $provider = new DaoAuthenticationProvider($userProvider, self::createMock(UserCheckerInterface::class), 'key', self::createMock(PasswordHasherFactoryInterface::class));
         $method = new \ReflectionMethod($provider, 'retrieveUser');
         $method->setAccessible(true);
 
-        $this->assertEquals('fabien', $method->invoke($provider, 'fabien', $this->getSupportedToken())->getUserIdentifier());
+        self::assertEquals('fabien', $method->invoke($provider, 'fabien', $this->getSupportedToken())->getUserIdentifier());
     }
 
     public function testCheckAuthenticationWhenCredentialsAreEmpty()
     {
-        $this->expectException(BadCredentialsException::class);
-        $hasher = $this->getMockBuilder(PasswordHasherInterface::class)->getMock();
+        self::expectException(BadCredentialsException::class);
+        $hasher = self::getMockBuilder(PasswordHasherInterface::class)->getMock();
         $hasher
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('verify')
         ;
 
@@ -141,7 +141,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
         $token = $this->getSupportedToken();
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getCredentials')
             ->willReturn('')
         ;
@@ -151,9 +151,9 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testCheckAuthenticationWhenCredentialsAre0()
     {
-        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher = self::createMock(PasswordHasherInterface::class);
         $hasher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('verify')
             ->willReturn(true)
         ;
@@ -164,7 +164,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
         $token = $this->getSupportedToken();
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getCredentials')
             ->willReturn('0')
         ;
@@ -178,9 +178,9 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testCheckAuthenticationWhenCredentialsAreNotValid()
     {
-        $this->expectException(BadCredentialsException::class);
-        $hasher = $this->createMock(PasswordHasherInterface::class);
-        $hasher->expects($this->once())
+        self::expectException(BadCredentialsException::class);
+        $hasher = self::createMock(PasswordHasherInterface::class);
+        $hasher->expects(self::once())
                 ->method('verify')
                 ->willReturn(false)
         ;
@@ -190,7 +190,7 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->setAccessible(true);
 
         $token = $this->getSupportedToken();
-        $token->expects($this->once())
+        $token->expects(self::once())
               ->method('getCredentials')
               ->willReturn('foo')
         ;
@@ -200,20 +200,20 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
     {
-        $this->expectException(BadCredentialsException::class);
-        $user = $this->createMock(UserInterface::class);
-        $user->expects($this->once())
+        self::expectException(BadCredentialsException::class);
+        $user = self::createMock(UserInterface::class);
+        $user->expects(self::once())
              ->method('getPassword')
              ->willReturn('foo')
         ;
 
         $token = $this->getSupportedToken();
-        $token->expects($this->once())
+        $token->expects(self::once())
               ->method('getUser')
               ->willReturn($user);
 
-        $dbUser = $this->createMock(UserInterface::class);
-        $dbUser->expects($this->once())
+        $dbUser = self::createMock(UserInterface::class);
+        $dbUser->expects(self::once())
                ->method('getPassword')
                ->willReturn('newFoo')
         ;
@@ -226,19 +226,19 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testCheckAuthenticationWhenTokenNeedsReauthenticationWorksWithoutOriginalCredentials()
     {
-        $user = $this->createMock(UserInterface::class);
-        $user->expects($this->once())
+        $user = self::createMock(UserInterface::class);
+        $user->expects(self::once())
              ->method('getPassword')
              ->willReturn('foo')
         ;
 
         $token = $this->getSupportedToken();
-        $token->expects($this->once())
+        $token->expects(self::once())
               ->method('getUser')
               ->willReturn($user);
 
-        $dbUser = $this->createMock(UserInterface::class);
-        $dbUser->expects($this->once())
+        $dbUser = self::createMock(UserInterface::class);
+        $dbUser->expects(self::once())
                ->method('getPassword')
                ->willReturn('foo')
         ;
@@ -251,8 +251,8 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testCheckAuthentication()
     {
-        $hasher = $this->createMock(PasswordHasherInterface::class);
-        $hasher->expects($this->once())
+        $hasher = self::createMock(PasswordHasherInterface::class);
+        $hasher->expects(self::once())
                 ->method('verify')
                 ->willReturn(true)
         ;
@@ -262,7 +262,7 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->setAccessible(true);
 
         $token = $this->getSupportedToken();
-        $token->expects($this->once())
+        $token->expects(self::once())
               ->method('getCredentials')
               ->willReturn('foo')
         ;
@@ -274,16 +274,16 @@ class DaoAuthenticationProviderTest extends TestCase
     {
         $user = new InMemoryUser('user', 'pwd');
 
-        $hasher = $this->createMock(PasswordHasherInterface::class);
-        $hasher->expects($this->once())
+        $hasher = self::createMock(PasswordHasherInterface::class);
+        $hasher->expects(self::once())
                 ->method('verify')
                 ->willReturn(true)
         ;
-        $hasher->expects($this->once())
+        $hasher->expects(self::once())
                 ->method('hash')
                 ->willReturn('foobar')
         ;
-        $hasher->expects($this->once())
+        $hasher->expects(self::once())
                 ->method('needsRehash')
                 ->willReturn(true)
         ;
@@ -291,7 +291,7 @@ class DaoAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider(null, null, $hasher);
 
         $userProvider = ((array) $provider)[sprintf("\0%s\0userProvider", DaoAuthenticationProvider::class)];
-        $userProvider->expects($this->once())
+        $userProvider->expects(self::once())
             ->method('upgradePassword')
             ->with($user, 'foobar')
         ;
@@ -300,7 +300,7 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->setAccessible(true);
 
         $token = $this->getSupportedToken();
-        $token->expects($this->once())
+        $token->expects(self::once())
               ->method('getCredentials')
               ->willReturn('foo')
         ;
@@ -310,9 +310,9 @@ class DaoAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken()
     {
-        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->setMethods(['getCredentials', 'getUser', 'getProviderKey'])->disableOriginalConstructor()->getMock();
+        $mock = self::getMockBuilder(UsernamePasswordToken::class)->setMethods(['getCredentials', 'getUser', 'getProviderKey'])->disableOriginalConstructor()->getMock();
         $mock
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getProviderKey')
             ->willReturn('key')
         ;
@@ -323,9 +323,9 @@ class DaoAuthenticationProviderTest extends TestCase
     protected function getProvider($user = null, $userChecker = null, $passwordHasher = null, $userProvider = null)
     {
         if (null === $userProvider) {
-            $userProvider = $this->createMock(PasswordUpgraderProvider::class);
+            $userProvider = self::createMock(PasswordUpgraderProvider::class);
             if (null !== $user) {
-                $userProvider->expects($this->once())
+                $userProvider->expects(self::once())
                              ->method('loadUserByIdentifier')
                              ->willReturn($user)
                 ;
@@ -333,16 +333,16 @@ class DaoAuthenticationProviderTest extends TestCase
         }
 
         if (null === $userChecker) {
-            $userChecker = $this->createMock(UserCheckerInterface::class);
+            $userChecker = self::createMock(UserCheckerInterface::class);
         }
 
         if (null === $passwordHasher) {
             $passwordHasher = new PlaintextPasswordHasher();
         }
 
-        $hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
+        $hasherFactory = self::createMock(PasswordHasherFactoryInterface::class);
         $hasherFactory
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPasswordHasher')
             ->willReturn($passwordHasher)
         ;

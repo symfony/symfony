@@ -30,7 +30,7 @@ class ResolveFactoryClassPassTest extends TestCase
         $pass = new ResolveFactoryClassPass();
         $pass->process($container);
 
-        $this->assertSame(['Foo\Bar', 'create'], $factory->getFactory());
+        self::assertSame(['Foo\Bar', 'create'], $factory->getFactory());
     }
 
     public function testInlinedDefinitionFactoryIsProcessed()
@@ -43,7 +43,7 @@ class ResolveFactoryClassPassTest extends TestCase
         $pass = new ResolveFactoryClassPass();
         $pass->process($container);
 
-        $this->assertSame(['Baz\Qux', 'getInstance'], $factory->getFactory()[0]->getFactory());
+        self::assertSame(['Baz\Qux', 'getInstance'], $factory->getFactory()[0]->getFactory());
     }
 
     public function provideFulfilledFactories()
@@ -69,13 +69,13 @@ class ResolveFactoryClassPassTest extends TestCase
         $pass = new ResolveFactoryClassPass();
         $pass->process($container);
 
-        $this->assertSame($factory, $container->getDefinition('factory')->getFactory());
+        self::assertSame($factory, $container->getDefinition('factory')->getFactory());
     }
 
     public function testNotAnyClassThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The "factory" service is defined to be created by a factory, but is missing the factory class. Did you forget to define the factory or service class?');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('The "factory" service is defined to be created by a factory, but is missing the factory class. Did you forget to define the factory or service class?');
         $container = new ContainerBuilder();
 
         $factory = $container->register('factory');

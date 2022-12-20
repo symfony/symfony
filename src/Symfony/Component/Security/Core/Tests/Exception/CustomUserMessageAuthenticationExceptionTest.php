@@ -39,9 +39,9 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
     {
         $e = new CustomUserMessageAuthenticationException('SAFE MESSAGE', ['foo' => true]);
 
-        $this->assertEquals('SAFE MESSAGE', $e->getMessageKey());
-        $this->assertEquals(['foo' => true], $e->getMessageData());
-        $this->assertEquals('SAFE MESSAGE', $e->getMessage());
+        self::assertEquals('SAFE MESSAGE', $e->getMessageKey());
+        self::assertEquals(['foo' => true], $e->getMessageData());
+        self::assertEquals('SAFE MESSAGE', $e->getMessage());
     }
 
     public function testSharedSerializedData()
@@ -53,9 +53,9 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
         $exception->setSafeMessage('message', ['token' => $token]);
 
         $processed = unserialize(serialize($exception));
-        $this->assertEquals($token, $processed->getToken());
-        $this->assertEquals($token, $processed->getMessageData()['token']);
-        $this->assertSame($processed->getToken(), $processed->getMessageData()['token']);
+        self::assertEquals($token, $processed->getToken());
+        self::assertEquals($token, $processed->getMessageData()['token']);
+        self::assertSame($processed->getToken(), $processed->getMessageData()['token']);
     }
 
     public function testSharedSerializedDataFromChild()
@@ -67,8 +67,8 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
         $exception->setToken($token);
 
         $processed = unserialize(serialize($exception));
-        $this->assertEquals($token, $processed->childMember);
-        $this->assertEquals($token, $processed->getToken());
-        $this->assertSame($processed->getToken(), $processed->childMember);
+        self::assertEquals($token, $processed->childMember);
+        self::assertEquals($token, $processed->getToken());
+        self::assertSame($processed->getToken(), $processed->childMember);
     }
 }

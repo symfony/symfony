@@ -23,16 +23,16 @@ class LazyLoadingFragmentHandlerTest extends TestCase
 {
     public function testRender()
     {
-        $renderer = $this->createMock(FragmentRendererInterface::class);
-        $renderer->expects($this->once())->method('getName')->willReturn('foo');
-        $renderer->expects($this->any())->method('render')->willReturn(new Response());
+        $renderer = self::createMock(FragmentRendererInterface::class);
+        $renderer->expects(self::once())->method('getName')->willReturn('foo');
+        $renderer->expects(self::any())->method('render')->willReturn(new Response());
 
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn(Request::create('/'));
+        $requestStack = self::createMock(RequestStack::class);
+        $requestStack->expects(self::any())->method('getCurrentRequest')->willReturn(Request::create('/'));
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->once())->method('has')->with('foo')->willReturn(true);
-        $container->expects($this->once())->method('get')->willReturn($renderer);
+        $container = self::createMock(ContainerInterface::class);
+        $container->expects(self::once())->method('has')->with('foo')->willReturn(true);
+        $container->expects(self::once())->method('get')->willReturn($renderer);
 
         $handler = new LazyLoadingFragmentHandler($container, $requestStack, false);
 

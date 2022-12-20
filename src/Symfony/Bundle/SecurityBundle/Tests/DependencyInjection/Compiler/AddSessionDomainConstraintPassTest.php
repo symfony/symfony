@@ -31,12 +31,12 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
 
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
     public function testSessionNoDomain()
@@ -46,12 +46,12 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
 
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
     public function testSessionNoSecure()
@@ -61,12 +61,12 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
 
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
     public function testSessionNoSecureAndNoDomain()
@@ -76,13 +76,13 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
 
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://localhost/foo')->isRedirect('http://localhost/foo'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://localhost/foo')->isRedirect('http://localhost/foo'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
     public function testNoSession()
@@ -92,12 +92,12 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
 
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('https://www.localhost/foo'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://pirate.com/foo'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://localhost/foo')->isRedirect('https://localhost/foo'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.localhost/foo')->isRedirect('https://www.localhost/foo'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://pirate.com/foo'));
     }
 
     public function testSessionAutoSecure()
@@ -107,17 +107,17 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
 
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
 
         $container->get('router.request_context')->setScheme('https');
 
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
-        $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://symfony.com/blog')->isRedirect('https://symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'https://www.symfony.com/blog')->isRedirect('https://www.symfony.com/blog'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://symfony.com/blog')->isRedirect('http://localhost/'));
+        self::assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
     private function createContainer($sessionStorageOptions)

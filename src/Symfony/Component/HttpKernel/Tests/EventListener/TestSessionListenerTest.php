@@ -44,9 +44,9 @@ class TestSessionListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->listener = $this->getMockForAbstractClass(AbstractTestSessionListener::class);
+        $this->listener = self::getMockForAbstractClass(AbstractTestSessionListener::class);
         $this->session = $this->getSession();
-        $this->listener->expects($this->any())
+        $this->listener->expects(self::any())
              ->method('getSession')
              ->willReturn($this->session);
     }
@@ -75,7 +75,7 @@ class TestSessionListenerTest extends TestCase
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MAIN_REQUEST);
         $cookies = $response->headers->getCookies();
 
-        $this->assertEquals(0, reset($cookies)->getExpiresTime());
+        self::assertEquals(0, reset($cookies)->getExpiresTime());
     }
 
     /**
@@ -88,7 +88,7 @@ class TestSessionListenerTest extends TestCase
 
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MAIN_REQUEST);
 
-        $this->assertSame([], $response->headers->getCookies());
+        self::assertSame([], $response->headers->getCookies());
     }
 
     public function testEmptySessionWithNewSessionIdDoesSendCookie()
@@ -97,7 +97,7 @@ class TestSessionListenerTest extends TestCase
         $this->sessionIsEmpty();
         $this->fixSessionId('456');
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
         $request->setSession($this->getSession());
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
@@ -105,7 +105,7 @@ class TestSessionListenerTest extends TestCase
 
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MAIN_REQUEST);
 
-        $this->assertNotEmpty($response->headers->getCookies());
+        self::assertNotEmpty($response->headers->getCookies());
     }
 
     /**
@@ -117,7 +117,7 @@ class TestSessionListenerTest extends TestCase
         $this->sessionIsEmpty();
         $this->fixSessionId('456');
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
         $request->setSession($this->getSession());
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
@@ -127,7 +127,7 @@ class TestSessionListenerTest extends TestCase
 
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
 
-        $this->assertSame($expected, $response->headers->all()['set-cookie']);
+        self::assertSame($expected, $response->headers->all()['set-cookie']);
     }
 
     public function anotherCookieProvider()
@@ -149,72 +149,72 @@ class TestSessionListenerTest extends TestCase
 
     public function testDoesNotThrowIfRequestDoesNotHaveASession()
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, new Response());
 
         $this->listener->onKernelResponse($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     private function filterResponse(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, Response $response = null)
     {
         $request->setSession($this->session);
         $response = $response ?? new Response();
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $event = new ResponseEvent($kernel, $request, $type, $response);
 
         $this->listener->onKernelResponse($event);
 
-        $this->assertSame($response, $event->getResponse());
+        self::assertSame($response, $event->getResponse());
 
         return $response;
     }
 
     private function sessionMustNotBeSaved()
     {
-        $this->session->expects($this->never())
+        $this->session->expects(self::never())
             ->method('save');
     }
 
     private function sessionMustBeSaved()
     {
-        $this->session->expects($this->once())
+        $this->session->expects(self::once())
             ->method('save');
     }
 
     private function sessionHasBeenStarted()
     {
-        $this->session->expects($this->once())
+        $this->session->expects(self::once())
             ->method('isStarted')
             ->willReturn(true);
     }
 
     private function sessionHasNotBeenStarted()
     {
-        $this->session->expects($this->once())
+        $this->session->expects(self::once())
             ->method('isStarted')
             ->willReturn(false);
     }
 
     private function sessionIsEmpty()
     {
-        $this->session->expects($this->once())
+        $this->session->expects(self::once())
             ->method('isEmpty')
             ->willReturn(true);
     }
 
     private function fixSessionId($sessionId)
     {
-        $this->session->expects($this->any())
+        $this->session->expects(self::any())
             ->method('getId')
             ->willReturn($sessionId);
     }
 
     private function getSession()
     {
-        $mock = $this->createMock(Session::class);
-        $mock->expects($this->any())->method('getName')->willReturn('MOCKSESSID');
+        $mock = self::createMock(Session::class);
+        $mock->expects(self::any())->method('getName')->willReturn('MOCKSESSID');
 
         return $mock;
     }

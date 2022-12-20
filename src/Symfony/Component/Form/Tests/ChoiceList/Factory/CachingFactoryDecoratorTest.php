@@ -43,9 +43,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromChoices([]);
         $list2 = $this->factory->createListFromChoices([]);
 
-        $this->assertSame($list1, $list2);
-        $this->assertEquals(new ArrayChoiceList([]), $list1);
-        $this->assertEquals(new ArrayChoiceList([]), $list2);
+        self::assertSame($list1, $list2);
+        self::assertEquals(new ArrayChoiceList([]), $list1);
+        self::assertEquals(new ArrayChoiceList([]), $list2);
     }
 
     public function testCreateFromChoicesComparesTraversableChoicesAsArray()
@@ -57,9 +57,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromChoices($choices1);
         $list2 = $this->factory->createListFromChoices($choices2);
 
-        $this->assertSame($list1, $list2);
-        $this->assertEquals(new ArrayChoiceList(['A' => 'a']), $list1);
-        $this->assertEquals(new ArrayChoiceList(['A' => 'a']), $list2);
+        self::assertSame($list1, $list2);
+        self::assertEquals(new ArrayChoiceList(['A' => 'a']), $list1);
+        self::assertEquals(new ArrayChoiceList(['A' => 'a']), $list2);
     }
 
     public function testCreateFromChoicesGroupedChoices()
@@ -69,9 +69,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromChoices($choices1);
         $list2 = $this->factory->createListFromChoices($choices2);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals(new ArrayChoiceList(['key' => ['A' => 'a']]), $list1);
-        $this->assertEquals(new ArrayChoiceList(['A' => 'a']), $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals(new ArrayChoiceList(['key' => ['A' => 'a']]), $list1);
+        self::assertEquals(new ArrayChoiceList(['A' => 'a']), $list2);
     }
 
     /**
@@ -82,9 +82,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromChoices([$choice1]);
         $list2 = $this->factory->createListFromChoices([$choice2]);
 
-        $this->assertSame($list1, $list2);
-        $this->assertEquals(new ArrayChoiceList([$choice1]), $list1);
-        $this->assertEquals(new ArrayChoiceList([$choice2]), $list2);
+        self::assertSame($list1, $list2);
+        self::assertEquals(new ArrayChoiceList([$choice1]), $list1);
+        self::assertEquals(new ArrayChoiceList([$choice2]), $list2);
     }
 
     /**
@@ -95,9 +95,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromChoices([$choice1]);
         $list2 = $this->factory->createListFromChoices([$choice2]);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals(new ArrayChoiceList([$choice1]), $list1);
-        $this->assertEquals(new ArrayChoiceList([$choice2]), $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals(new ArrayChoiceList([$choice1]), $list1);
+        self::assertEquals(new ArrayChoiceList([$choice2]), $list2);
     }
 
     public function testCreateFromChoicesSameValueClosure()
@@ -108,9 +108,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromChoices($choices, $closure);
         $list2 = $this->factory->createListFromChoices($choices, $closure);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals(new ArrayChoiceList($choices, $closure), $list1);
-        $this->assertEquals(new ArrayChoiceList($choices, $closure), $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals(new ArrayChoiceList($choices, $closure), $list1);
+        self::assertEquals(new ArrayChoiceList($choices, $closure), $list2);
     }
 
     public function testCreateFromChoicesSameValueClosureUseCache()
@@ -122,9 +122,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromChoices($choices, ChoiceList::value($formType, $valueCallback));
         $list2 = $this->factory->createListFromChoices($choices, ChoiceList::value($formType, function () {}));
 
-        $this->assertSame($list1, $list2);
-        $this->assertEquals(new ArrayChoiceList($choices, $valueCallback), $list1);
-        $this->assertEquals(new ArrayChoiceList($choices, function () {}), $list2);
+        self::assertSame($list1, $list2);
+        self::assertEquals(new ArrayChoiceList($choices, $valueCallback), $list1);
+        self::assertEquals(new ArrayChoiceList($choices, function () {}), $list2);
     }
 
     public function testCreateFromChoicesDifferentValueClosure()
@@ -135,9 +135,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromChoices($choices, $closure1);
         $list2 = $this->factory->createListFromChoices($choices, $closure2);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals(new ArrayChoiceList($choices, $closure1), $list1);
-        $this->assertEquals(new ArrayChoiceList($choices, $closure2), $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals(new ArrayChoiceList($choices, $closure1), $list1);
+        self::assertEquals(new ArrayChoiceList($choices, $closure2), $list2);
     }
 
     public function testCreateFromChoicesSameFilterClosure()
@@ -150,9 +150,9 @@ class CachingFactoryDecoratorTest extends TestCase
             return $choices;
         }), $filter), null);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals($lazyChoiceList, $list1);
-        $this->assertEquals($lazyChoiceList, $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals($lazyChoiceList, $list1);
+        self::assertEquals($lazyChoiceList, $list2);
     }
 
     public function testCreateFromChoicesSameFilterClosureUseCache()
@@ -166,9 +166,9 @@ class CachingFactoryDecoratorTest extends TestCase
             return $choices;
         }), function () {}), null);
 
-        $this->assertSame($list1, $list2);
-        $this->assertEquals($lazyChoiceList, $list1);
-        $this->assertEquals($lazyChoiceList, $list2);
+        self::assertSame($list1, $list2);
+        self::assertEquals($lazyChoiceList, $list1);
+        self::assertEquals($lazyChoiceList, $list2);
     }
 
     public function testCreateFromChoicesDifferentFilterClosure()
@@ -182,9 +182,9 @@ class CachingFactoryDecoratorTest extends TestCase
             return $choices;
         }), function () {}), null);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals($lazyChoiceList, $list1);
-        $this->assertEquals($lazyChoiceList, $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals($lazyChoiceList, $list1);
+        self::assertEquals($lazyChoiceList, $list2);
     }
 
     public function testCreateFromLoaderSameLoader()
@@ -193,9 +193,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromLoader($loader);
         $list2 = $this->factory->createListFromLoader($loader);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals(new LazyChoiceList($loader), $list1);
-        $this->assertEquals(new LazyChoiceList($loader), $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals(new LazyChoiceList($loader), $list1);
+        self::assertEquals(new LazyChoiceList($loader), $list2);
     }
 
     public function testCreateFromLoaderSameLoaderUseCache()
@@ -204,14 +204,14 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromLoader(ChoiceList::loader($type, new ArrayChoiceLoader()));
         $list2 = $this->factory->createListFromLoader(ChoiceList::loader($type, new ArrayChoiceLoader()));
 
-        $this->assertSame($list1, $list2);
-        $this->assertEquals(new LazyChoiceList(new ArrayChoiceLoader(), null), $list1);
-        $this->assertEquals(new LazyChoiceList(new ArrayChoiceLoader(), null), $list2);
+        self::assertSame($list1, $list2);
+        self::assertEquals(new LazyChoiceList(new ArrayChoiceLoader(), null), $list1);
+        self::assertEquals(new LazyChoiceList(new ArrayChoiceLoader(), null), $list2);
     }
 
     public function testCreateFromLoaderDifferentLoader()
     {
-        $this->assertNotSame($this->factory->createListFromLoader(new ArrayChoiceLoader()), $this->factory->createListFromLoader(new ArrayChoiceLoader()));
+        self::assertNotSame($this->factory->createListFromLoader(new ArrayChoiceLoader()), $this->factory->createListFromLoader(new ArrayChoiceLoader()));
     }
 
     public function testCreateFromLoaderSameValueClosure()
@@ -221,9 +221,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromLoader($loader, $closure);
         $list2 = $this->factory->createListFromLoader($loader, $closure);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals(new LazyChoiceList($loader, $closure), $list1);
-        $this->assertEquals(new LazyChoiceList($loader, $closure), $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals(new LazyChoiceList($loader, $closure), $list1);
+        self::assertEquals(new LazyChoiceList($loader, $closure), $list2);
     }
 
     public function testCreateFromLoaderSameValueClosureUseCache()
@@ -234,9 +234,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromLoader(ChoiceList::loader($type, $loader), ChoiceList::value($type, $closure));
         $list2 = $this->factory->createListFromLoader(ChoiceList::loader($type, new ArrayChoiceLoader()), ChoiceList::value($type, function () {}));
 
-        $this->assertSame($list1, $list2);
-        $this->assertEquals(new LazyChoiceList($loader, $closure), $list1);
-        $this->assertEquals(new LazyChoiceList(new ArrayChoiceLoader(), function () {}), $list2);
+        self::assertSame($list1, $list2);
+        self::assertEquals(new LazyChoiceList($loader, $closure), $list1);
+        self::assertEquals(new LazyChoiceList(new ArrayChoiceLoader(), function () {}), $list2);
     }
 
     public function testCreateFromLoaderDifferentValueClosure()
@@ -245,7 +245,7 @@ class CachingFactoryDecoratorTest extends TestCase
         $closure1 = function () {};
         $closure2 = function () {};
 
-        $this->assertNotSame($this->factory->createListFromLoader($loader, $closure1), $this->factory->createListFromLoader($loader, $closure2));
+        self::assertNotSame($this->factory->createListFromLoader($loader, $closure1), $this->factory->createListFromLoader($loader, $closure2));
     }
 
     public function testCreateFromLoaderSameFilterClosure()
@@ -257,9 +257,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromLoader(ChoiceList::loader($type, $loader), null, $closure);
         $list2 = $this->factory->createListFromLoader(ChoiceList::loader($type, new ArrayChoiceLoader()), null, $closure);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator($loader, $closure)), $list1);
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $closure)), $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator($loader, $closure)), $list1);
+        self::assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $closure)), $list2);
     }
 
     public function testCreateFromLoaderSameFilterClosureUseCache()
@@ -269,9 +269,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromLoader(ChoiceList::loader($type, new ArrayChoiceLoader()), null, $choiceFilter);
         $list2 = $this->factory->createListFromLoader(ChoiceList::loader($type, new ArrayChoiceLoader()), null, $choiceFilter);
 
-        $this->assertSame($list1, $list2);
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), function () {})), $list1);
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), function () {})), $list2);
+        self::assertSame($list1, $list2);
+        self::assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), function () {})), $list1);
+        self::assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), function () {})), $list2);
     }
 
     public function testCreateFromLoaderDifferentFilterClosure()
@@ -282,9 +282,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $list1 = $this->factory->createListFromLoader(ChoiceList::loader($type, new ArrayChoiceLoader()), null, $closure1);
         $list2 = $this->factory->createListFromLoader(ChoiceList::loader($type, new ArrayChoiceLoader()), null, $closure2);
 
-        $this->assertNotSame($list1, $list2);
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $closure1), null), $list1);
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $closure2), null), $list2);
+        self::assertNotSame($list1, $list2);
+        self::assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $closure1), null), $list1);
+        self::assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $closure2), null), $list2);
     }
 
     public function testCreateViewSamePreferredChoices()
@@ -294,9 +294,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, $preferred);
         $view2 = $this->factory->createView($list, $preferred);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSamePreferredChoicesUseCache()
@@ -307,9 +307,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, ChoiceList::preferred($type, $preferred));
         $view2 = $this->factory->createView($list, ChoiceList::preferred($type, ['a']));
 
-        $this->assertSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewDifferentPreferredChoices()
@@ -320,9 +320,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, $preferred1);
         $view2 = $this->factory->createView($list, $preferred2);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSamePreferredChoicesClosure()
@@ -332,9 +332,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, $preferred);
         $view2 = $this->factory->createView($list, $preferred);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSamePreferredChoicesClosureUseCache()
@@ -345,9 +345,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, ChoiceList::preferred($type, $preferredCallback));
         $view2 = $this->factory->createView($list, ChoiceList::preferred($type, function () {}));
 
-        $this->assertSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewDifferentPreferredChoicesClosure()
@@ -358,9 +358,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, $preferred1);
         $view2 = $this->factory->createView($list, $preferred2);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameLabelClosure()
@@ -370,9 +370,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, $labels);
         $view2 = $this->factory->createView($list, null, $labels);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameLabelClosureUseCache()
@@ -383,9 +383,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, ChoiceList::label($type, $labelsCallback));
         $view2 = $this->factory->createView($list, null, ChoiceList::label($type, function () {}));
 
-        $this->assertSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewDifferentLabelClosure()
@@ -396,9 +396,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, $labels1);
         $view2 = $this->factory->createView($list, null, $labels2);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameIndexClosure()
@@ -408,9 +408,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, $index);
         $view2 = $this->factory->createView($list, null, null, $index);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameIndexClosureUseCache()
@@ -421,9 +421,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, ChoiceList::fieldName($type, $indexCallback));
         $view2 = $this->factory->createView($list, null, null, ChoiceList::fieldName($type, function () {}));
 
-        $this->assertSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewDifferentIndexClosure()
@@ -434,9 +434,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, $index1);
         $view2 = $this->factory->createView($list, null, null, $index2);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameGroupByClosure()
@@ -446,9 +446,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, $groupBy);
         $view2 = $this->factory->createView($list, null, null, null, $groupBy);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameGroupByClosureUseCache()
@@ -459,9 +459,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, ChoiceList::groupBy($type, $groupByCallback));
         $view2 = $this->factory->createView($list, null, null, null, ChoiceList::groupBy($type, function () {}));
 
-        $this->assertSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewDifferentGroupByClosure()
@@ -472,9 +472,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, $groupBy1);
         $view2 = $this->factory->createView($list, null, null, null, $groupBy2);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameAttributes()
@@ -484,9 +484,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, null, $attr);
         $view2 = $this->factory->createView($list, null, null, null, null, $attr);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameAttributesUseCache()
@@ -497,9 +497,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, null, ChoiceList::attr($type, $attr));
         $view2 = $this->factory->createView($list, null, null, null, null, ChoiceList::attr($type, ['class' => 'foobar']));
 
-        $this->assertSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewDifferentAttributes()
@@ -511,9 +511,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, null, $attr1);
         $view2 = $this->factory->createView($list, null, null, null, null, $attr2);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameAttributesClosure()
@@ -523,9 +523,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, null, $attr);
         $view2 = $this->factory->createView($list, null, null, null, null, $attr);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewSameAttributesClosureUseCache()
@@ -536,9 +536,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, null, ChoiceList::attr($type, $attrCallback));
         $view2 = $this->factory->createView($list, null, null, null, null, ChoiceList::attr($type, function () {}));
 
-        $this->assertSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function testCreateViewDifferentAttributesClosure()
@@ -550,9 +550,9 @@ class CachingFactoryDecoratorTest extends TestCase
         $view1 = $this->factory->createView($list, null, null, null, null, $attr1);
         $view2 = $this->factory->createView($list, null, null, null, null, $attr2);
 
-        $this->assertNotSame($view1, $view2);
-        $this->assertEquals(new ChoiceListView(), $view1);
-        $this->assertEquals(new ChoiceListView(), $view2);
+        self::assertNotSame($view1, $view2);
+        self::assertEquals(new ChoiceListView(), $view1);
+        self::assertEquals(new ChoiceListView(), $view2);
     }
 
     public function provideSameChoices()

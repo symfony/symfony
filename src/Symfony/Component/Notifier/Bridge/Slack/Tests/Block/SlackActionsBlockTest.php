@@ -23,7 +23,7 @@ final class SlackActionsBlockTest extends TestCase
             ->button('second button text', 'https://example.org/slack', 'danger')
         ;
 
-        $this->assertSame([
+        self::assertSame([
             'type' => 'actions',
             'elements' => [
                 [
@@ -54,8 +54,8 @@ final class SlackActionsBlockTest extends TestCase
             $section->button($i, $i);
         }
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Maximum number of buttons should not exceed 25.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Maximum number of buttons should not exceed 25.');
 
         $section->button('fail', 'fail');
     }

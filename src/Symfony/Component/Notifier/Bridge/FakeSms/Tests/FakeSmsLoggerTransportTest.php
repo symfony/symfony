@@ -24,7 +24,7 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
 {
     public function createTransport(HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
     {
-        $transport = (new FakeSmsLoggerTransport($logger ?? $this->createMock(LoggerInterface::class), $client ?? $this->createMock(HttpClientInterface::class)));
+        $transport = (new FakeSmsLoggerTransport($logger ?? self::createMock(LoggerInterface::class), $client ?? self::createMock(HttpClientInterface::class)));
 
         return $transport;
     }
@@ -43,7 +43,7 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSendWithDefaultTransport()
@@ -57,10 +57,10 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
         $transport->send($message);
 
         $logs = $logger->logs;
-        $this->assertNotEmpty($logs);
+        self::assertNotEmpty($logs);
 
         $log = $logs[0];
-        $this->assertSame(sprintf('New SMS on phone number: %s', $phone), $log['message']);
-        $this->assertSame('info', $log['level']);
+        self::assertSame(sprintf('New SMS on phone number: %s', $phone), $log['message']);
+        self::assertSame('info', $log['level']);
     }
 }

@@ -23,6 +23,6 @@ class AmpHttpClientTest extends HttpClientTestCase
 
     public function testProxy()
     {
-        $this->markTestSkipped('A real proxy server would be needed.');
+        self::markTestSkipped('A real proxy server would be needed.');
     }
 }

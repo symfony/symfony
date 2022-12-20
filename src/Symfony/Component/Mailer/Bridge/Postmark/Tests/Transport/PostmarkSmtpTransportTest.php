@@ -31,9 +31,9 @@ class PostmarkSmtpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(2, $email->getHeaders()->toArray());
-        $this->assertSame('X-PM-KeepID: true', $email->getHeaders()->get('X-PM-KeepID')->toString());
-        $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
+        self::assertCount(2, $email->getHeaders()->toArray());
+        self::assertSame('X-PM-KeepID: true', $email->getHeaders()->get('X-PM-KeepID')->toString());
+        self::assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
     }
 
     public function testTagAndMetadataAndMessageStreamHeaders()
@@ -50,13 +50,13 @@ class PostmarkSmtpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(6, $email->getHeaders()->toArray());
-        $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
-        $this->assertSame('X-PM-KeepID: true', $email->getHeaders()->get('X-PM-KeepID')->toString());
-        $this->assertSame('X-PM-Tag: password-reset', $email->getHeaders()->get('X-PM-Tag')->toString());
-        $this->assertSame('X-PM-Metadata-Color: blue', $email->getHeaders()->get('X-PM-Metadata-Color')->toString());
-        $this->assertSame('X-PM-Metadata-Client-ID: 12345', $email->getHeaders()->get('X-PM-Metadata-Client-ID')->toString());
-        $this->assertSame('X-PM-Message-Stream: broadcasts', $email->getHeaders()->get('X-PM-Message-Stream')->toString());
+        self::assertCount(6, $email->getHeaders()->toArray());
+        self::assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
+        self::assertSame('X-PM-KeepID: true', $email->getHeaders()->get('X-PM-KeepID')->toString());
+        self::assertSame('X-PM-Tag: password-reset', $email->getHeaders()->get('X-PM-Tag')->toString());
+        self::assertSame('X-PM-Metadata-Color: blue', $email->getHeaders()->get('X-PM-Metadata-Color')->toString());
+        self::assertSame('X-PM-Metadata-Client-ID: 12345', $email->getHeaders()->get('X-PM-Metadata-Client-ID')->toString());
+        self::assertSame('X-PM-Message-Stream: broadcasts', $email->getHeaders()->get('X-PM-Message-Stream')->toString());
     }
 
     public function testMultipleTagsAreNotAllowed()
@@ -69,7 +69,7 @@ class PostmarkSmtpTransportTest extends TestCase
         $method = new \ReflectionMethod(PostmarkSmtpTransport::class, 'addPostmarkHeaders');
         $method->setAccessible(true);
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
 
         $method->invoke($transport, $email);
     }

@@ -107,7 +107,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         $adapter->warmUp($expected);
 
         foreach ($expected as $key => $value) {
-            $this->assertSame(serialize($value), serialize($adapter->getItem($key)->get()), 'Warm up should create a PHP file that OPCache can load in memory');
+            self::assertSame(serialize($value), serialize($adapter->getItem($key)->get()), 'Warm up should create a PHP file that OPCache can load in memory');
         }
     }
 
@@ -142,7 +142,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
         $values = eval(substr(file_get_contents(self::$file), 6));
 
-        $this->assertSame($expected, $values, 'Warm up should create a PHP file that OPCache can load in memory');
+        self::assertSame($expected, $values, 'Warm up should create a PHP file that OPCache can load in memory');
     }
 }
 

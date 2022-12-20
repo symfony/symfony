@@ -31,12 +31,12 @@ class StateMachineTest extends TestCase
 
         // If you are in place "a" you should be able to apply "t1"
         $subject->setMarking('a');
-        $this->assertTrue($net->can($subject, 't1'));
+        self::assertTrue($net->can($subject, 't1'));
         $subject->setMarking('d');
-        $this->assertTrue($net->can($subject, 't1'));
+        self::assertTrue($net->can($subject, 't1'));
 
         $subject->setMarking('b');
-        $this->assertFalse($net->can($subject, 't1'));
+        self::assertFalse($net->can($subject, 't1'));
     }
 
     public function testCanWithMultipleTransition()
@@ -48,8 +48,8 @@ class StateMachineTest extends TestCase
 
         // If you are in place "b" you should be able to apply "t1" and "t2"
         $subject->setMarking('b');
-        $this->assertTrue($net->can($subject, 't2'));
-        $this->assertTrue($net->can($subject, 't3'));
+        self::assertTrue($net->can($subject, 't2'));
+        self::assertTrue($net->can($subject, 't3'));
     }
 
     public function testBuildTransitionBlockerList()
@@ -60,12 +60,12 @@ class StateMachineTest extends TestCase
         $subject = new Subject();
 
         $subject->setMarking('a');
-        $this->assertTrue($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        self::assertTrue($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
         $subject->setMarking('d');
-        $this->assertTrue($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        self::assertTrue($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
 
         $subject->setMarking('b');
-        $this->assertFalse($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        self::assertFalse($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
     }
 
     public function testBuildTransitionBlockerListWithMultipleTransitions()
@@ -76,8 +76,8 @@ class StateMachineTest extends TestCase
         $subject = new Subject();
 
         $subject->setMarking('b');
-        $this->assertTrue($net->buildTransitionBlockerList($subject, 't2')->isEmpty());
-        $this->assertTrue($net->buildTransitionBlockerList($subject, 't3')->isEmpty());
+        self::assertTrue($net->buildTransitionBlockerList($subject, 't2')->isEmpty());
+        self::assertTrue($net->buildTransitionBlockerList($subject, 't3')->isEmpty());
     }
 
     public function testBuildTransitionBlockerListReturnsExpectedReasonOnBranchMerge()
@@ -101,19 +101,19 @@ class StateMachineTest extends TestCase
         // blocker list contains guard blocker instead blockedByMarking
         $subject->setMarking('a');
         $transitionBlockerList = $net->buildTransitionBlockerList($subject, 't1');
-        $this->assertCount(1, $transitionBlockerList);
+        self::assertCount(1, $transitionBlockerList);
         $blockers = iterator_to_array($transitionBlockerList);
-        $this->assertSame('Transition blocker of place a', $blockers[0]->getMessage());
-        $this->assertSame('blocker', $blockers[0]->getCode());
+        self::assertSame('Transition blocker of place a', $blockers[0]->getMessage());
+        self::assertSame('blocker', $blockers[0]->getCode());
 
         // Test if when you are in place "d" and trying to apply  "t1" then
         // it returns blocker list contains guard blocker instead blockedByMarking
         $subject->setMarking('d');
         $transitionBlockerList = $net->buildTransitionBlockerList($subject, 't1');
-        $this->assertCount(1, $transitionBlockerList);
+        self::assertCount(1, $transitionBlockerList);
         $blockers = iterator_to_array($transitionBlockerList);
-        $this->assertSame('Transition blocker of place d', $blockers[0]->getMessage());
-        $this->assertSame('blocker', $blockers[0]->getCode());
+        self::assertSame('Transition blocker of place d', $blockers[0]->getMessage());
+        self::assertSame('blocker', $blockers[0]->getCode());
     }
 
     public function testApplyReturnsExpectedReasonOnBranchMerge()
@@ -135,11 +135,11 @@ class StateMachineTest extends TestCase
 
         try {
             $net->apply($subject, 't1');
-            $this->fail();
+            self::fail();
         } catch (NotEnabledTransitionException $e) {
             $blockers = iterator_to_array($e->getTransitionBlockerList());
-            $this->assertSame('Transition blocker of place a', $blockers[0]->getMessage());
-            $this->assertSame('blocker', $blockers[0]->getCode());
+            self::assertSame('Transition blocker of place a', $blockers[0]->getMessage());
+            self::assertSame('blocker', $blockers[0]->getCode());
         }
     }
 }

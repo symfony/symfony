@@ -60,7 +60,7 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->trans($id, $parameters));
+        self::assertEquals($expected, $translator->trans($id, $parameters));
     }
 
     /**
@@ -70,7 +70,7 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
+        self::assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
     }
 
     /**
@@ -82,7 +82,7 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
+        self::assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
     }
 
     /**
@@ -93,14 +93,14 @@ class TranslatorTest extends TestCase
         $translator = $this->getTranslator();
         $translator->setLocale('en_US_POSIX');
 
-        $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
+        self::assertEquals($expected, $translator->trans($id, ['%count%' => $number]));
     }
 
     public function testGetSetLocale()
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals('en', $translator->getLocale());
+        self::assertEquals('en', $translator->getLocale());
     }
 
     /**
@@ -111,10 +111,10 @@ class TranslatorTest extends TestCase
         $translator = $this->getTranslator();
 
         \Locale::setDefault('pt_BR');
-        $this->assertEquals('pt_BR', $translator->getLocale());
+        self::assertEquals('pt_BR', $translator->getLocale());
 
         \Locale::setDefault('en');
-        $this->assertEquals('en', $translator->getLocale());
+        self::assertEquals('en', $translator->getLocale());
     }
 
     public function getTransTests()
@@ -146,7 +146,7 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->trans($interval.' foo|[1,Inf[ bar', ['%count%' => $number]));
+        self::assertEquals($expected, $translator->trans($interval.' foo|[1,Inf[ bar', ['%count%' => $number]));
     }
 
     public function getInterval()
@@ -171,14 +171,14 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals($expected, $translator->trans($id, ['%count%' => $number], null, $locale));
+        self::assertEquals($expected, $translator->trans($id, ['%count%' => $number], null, $locale));
     }
 
     public function testReturnMessageIfExactlyOneStandardRuleIsGiven()
     {
         $translator = $this->getTranslator();
 
-        $this->assertEquals('There are two apples', $translator->trans('There are two apples', ['%count%' => 2]));
+        self::assertEquals('There are two apples', $translator->trans('There are two apples', ['%count%' => 2]));
     }
 
     /**
@@ -186,7 +186,7 @@ class TranslatorTest extends TestCase
      */
     public function testThrowExceptionIfMatchingMessageCannotBeFound($id, $number)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $translator = $this->getTranslator();
 
         $translator->trans($id, ['%count%' => $number]);
@@ -362,9 +362,9 @@ class TranslatorTest extends TestCase
         foreach ($matrix as $langCode => $data) {
             $indexes = array_flip($data);
             if ($expectSuccess) {
-                $this->assertCount($nplural, $indexes, "Langcode '$langCode' has '$nplural' plural forms.");
+                self::assertCount($nplural, $indexes, "Langcode '$langCode' has '$nplural' plural forms.");
             } else {
-                $this->assertNotEquals((int) $nplural, \count($indexes), "Langcode '$langCode' has '$nplural' plural forms.");
+                self::assertNotEquals((int) $nplural, \count($indexes), "Langcode '$langCode' has '$nplural' plural forms.");
             }
         }
     }

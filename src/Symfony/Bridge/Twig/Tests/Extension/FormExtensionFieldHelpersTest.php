@@ -102,62 +102,62 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
 
     public function testFieldName()
     {
-        $this->assertFalse($this->view->children['username']->isRendered());
-        $this->assertSame('register[username]', $this->rawExtension->getFieldName($this->view->children['username']));
-        $this->assertTrue($this->view->children['username']->isRendered());
+        self::assertFalse($this->view->children['username']->isRendered());
+        self::assertSame('register[username]', $this->rawExtension->getFieldName($this->view->children['username']));
+        self::assertTrue($this->view->children['username']->isRendered());
     }
 
     public function testFieldValue()
     {
-        $this->assertSame('tgalopin', $this->rawExtension->getFieldValue($this->view->children['username']));
-        $this->assertSame(['sugar', 'salt'], $this->rawExtension->getFieldValue($this->view->children['choice_multiple']));
+        self::assertSame('tgalopin', $this->rawExtension->getFieldValue($this->view->children['username']));
+        self::assertSame(['sugar', 'salt'], $this->rawExtension->getFieldValue($this->view->children['choice_multiple']));
     }
 
     public function testFieldLabel()
     {
-        $this->assertSame('base.username', $this->rawExtension->getFieldLabel($this->view->children['username']));
+        self::assertSame('base.username', $this->rawExtension->getFieldLabel($this->view->children['username']));
     }
 
     public function testFieldTranslatedLabel()
     {
-        $this->assertSame('[trans]base.username[/trans]', $this->translatorExtension->getFieldLabel($this->view->children['username']));
+        self::assertSame('[trans]base.username[/trans]', $this->translatorExtension->getFieldLabel($this->view->children['username']));
     }
 
     public function testFieldLabelFromFormat()
     {
-        $this->assertSame('label format for field "choice_grouped" with id "register_choice_grouped"', $this->rawExtension->getFieldLabel($this->view->children['choice_grouped']));
+        self::assertSame('label format for field "choice_grouped" with id "register_choice_grouped"', $this->rawExtension->getFieldLabel($this->view->children['choice_grouped']));
     }
 
     public function testFieldLabelFallsBackToName()
     {
-        $this->assertSame('Choice flat', $this->rawExtension->getFieldLabel($this->view->children['choice_flat']));
+        self::assertSame('Choice flat', $this->rawExtension->getFieldLabel($this->view->children['choice_flat']));
     }
 
     public function testFieldLabelReturnsNullWhenLabelIsDisabled()
     {
-        $this->assertNull($this->rawExtension->getFieldLabel($this->view->children['choice_multiple']));
+        self::assertNull($this->rawExtension->getFieldLabel($this->view->children['choice_multiple']));
     }
 
     public function testFieldHelp()
     {
-        $this->assertSame('base.username_help', $this->rawExtension->getFieldHelp($this->view->children['username']));
+        self::assertSame('base.username_help', $this->rawExtension->getFieldHelp($this->view->children['username']));
     }
 
     public function testFieldTranslatedHelp()
     {
-        $this->assertSame('[trans]base.username_help[/trans]', $this->translatorExtension->getFieldHelp($this->view->children['username']));
+        self::assertSame('[trans]base.username_help[/trans]', $this->translatorExtension->getFieldHelp($this->view->children['username']));
     }
 
     public function testFieldErrors()
     {
         $errors = $this->rawExtension->getFieldErrors($this->view->children['username']);
-        $this->assertSame(['username.max_length'], iterator_to_array($errors));
+        self::assertSame(['username.max_length'], iterator_to_array($errors));
     }
 
     public function testFieldTranslatedErrors()
     {
         $errors = $this->translatorExtension->getFieldErrors($this->view->children['username']);
-        $this->assertSame(['username.max_length'], iterator_to_array($errors));
+        self::assertSame(['username.max_length'], iterator_to_array($errors));
     }
 
     public function testFieldChoicesFlat()
@@ -169,13 +169,13 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
             $choicesArray[] = ['label' => $label, 'value' => $value];
         }
 
-        $this->assertCount(2, $choicesArray);
+        self::assertCount(2, $choicesArray);
 
-        $this->assertSame('yes', $choicesArray[0]['value']);
-        $this->assertSame('base.yes', $choicesArray[0]['label']);
+        self::assertSame('yes', $choicesArray[0]['value']);
+        self::assertSame('base.yes', $choicesArray[0]['label']);
 
-        $this->assertSame('no', $choicesArray[1]['value']);
-        $this->assertSame('base.no', $choicesArray[1]['label']);
+        self::assertSame('no', $choicesArray[1]['value']);
+        self::assertSame('base.no', $choicesArray[1]['label']);
     }
 
     public function testFieldTranslatedChoicesFlat()
@@ -187,13 +187,13 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
             $choicesArray[] = ['label' => $label, 'value' => $value];
         }
 
-        $this->assertCount(2, $choicesArray);
+        self::assertCount(2, $choicesArray);
 
-        $this->assertSame('yes', $choicesArray[0]['value']);
-        $this->assertSame('[trans]base.yes[/trans]', $choicesArray[0]['label']);
+        self::assertSame('yes', $choicesArray[0]['value']);
+        self::assertSame('[trans]base.yes[/trans]', $choicesArray[0]['label']);
 
-        $this->assertSame('no', $choicesArray[1]['value']);
-        $this->assertSame('[trans]base.no[/trans]', $choicesArray[1]['label']);
+        self::assertSame('no', $choicesArray[1]['value']);
+        self::assertSame('[trans]base.no[/trans]', $choicesArray[1]['label']);
     }
 
     public function testFieldChoicesGrouped()
@@ -210,25 +210,25 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
             $choicesArray[] = ['label' => $groupLabel, 'choices' => $groupChoicesArray];
         }
 
-        $this->assertCount(2, $choicesArray);
+        self::assertCount(2, $choicesArray);
 
-        $this->assertCount(2, $choicesArray[0]['choices']);
-        $this->assertSame('base.europe', $choicesArray[0]['label']);
+        self::assertCount(2, $choicesArray[0]['choices']);
+        self::assertSame('base.europe', $choicesArray[0]['label']);
 
-        $this->assertSame('fr', $choicesArray[0]['choices'][0]['value']);
-        $this->assertSame('base.fr', $choicesArray[0]['choices'][0]['label']);
+        self::assertSame('fr', $choicesArray[0]['choices'][0]['value']);
+        self::assertSame('base.fr', $choicesArray[0]['choices'][0]['label']);
 
-        $this->assertSame('de', $choicesArray[0]['choices'][1]['value']);
-        $this->assertSame('base.de', $choicesArray[0]['choices'][1]['label']);
+        self::assertSame('de', $choicesArray[0]['choices'][1]['value']);
+        self::assertSame('base.de', $choicesArray[0]['choices'][1]['label']);
 
-        $this->assertCount(2, $choicesArray[1]['choices']);
-        $this->assertSame('base.asia', $choicesArray[1]['label']);
+        self::assertCount(2, $choicesArray[1]['choices']);
+        self::assertSame('base.asia', $choicesArray[1]['label']);
 
-        $this->assertSame('cn', $choicesArray[1]['choices'][0]['value']);
-        $this->assertSame('base.cn', $choicesArray[1]['choices'][0]['label']);
+        self::assertSame('cn', $choicesArray[1]['choices'][0]['value']);
+        self::assertSame('base.cn', $choicesArray[1]['choices'][0]['label']);
 
-        $this->assertSame('jp', $choicesArray[1]['choices'][1]['value']);
-        $this->assertSame('base.jp', $choicesArray[1]['choices'][1]['label']);
+        self::assertSame('jp', $choicesArray[1]['choices'][1]['value']);
+        self::assertSame('base.jp', $choicesArray[1]['choices'][1]['label']);
     }
 
     public function testFieldTranslatedChoicesGrouped()
@@ -245,25 +245,25 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
             $choicesArray[] = ['label' => $groupLabel, 'choices' => $groupChoicesArray];
         }
 
-        $this->assertCount(2, $choicesArray);
+        self::assertCount(2, $choicesArray);
 
-        $this->assertCount(2, $choicesArray[0]['choices']);
-        $this->assertSame('[trans]base.europe[/trans]', $choicesArray[0]['label']);
+        self::assertCount(2, $choicesArray[0]['choices']);
+        self::assertSame('[trans]base.europe[/trans]', $choicesArray[0]['label']);
 
-        $this->assertSame('fr', $choicesArray[0]['choices'][0]['value']);
-        $this->assertSame('[trans]base.fr[/trans]', $choicesArray[0]['choices'][0]['label']);
+        self::assertSame('fr', $choicesArray[0]['choices'][0]['value']);
+        self::assertSame('[trans]base.fr[/trans]', $choicesArray[0]['choices'][0]['label']);
 
-        $this->assertSame('de', $choicesArray[0]['choices'][1]['value']);
-        $this->assertSame('[trans]base.de[/trans]', $choicesArray[0]['choices'][1]['label']);
+        self::assertSame('de', $choicesArray[0]['choices'][1]['value']);
+        self::assertSame('[trans]base.de[/trans]', $choicesArray[0]['choices'][1]['label']);
 
-        $this->assertCount(2, $choicesArray[1]['choices']);
-        $this->assertSame('[trans]base.asia[/trans]', $choicesArray[1]['label']);
+        self::assertCount(2, $choicesArray[1]['choices']);
+        self::assertSame('[trans]base.asia[/trans]', $choicesArray[1]['label']);
 
-        $this->assertSame('cn', $choicesArray[1]['choices'][0]['value']);
-        $this->assertSame('[trans]base.cn[/trans]', $choicesArray[1]['choices'][0]['label']);
+        self::assertSame('cn', $choicesArray[1]['choices'][0]['value']);
+        self::assertSame('[trans]base.cn[/trans]', $choicesArray[1]['choices'][0]['label']);
 
-        $this->assertSame('jp', $choicesArray[1]['choices'][1]['value']);
-        $this->assertSame('[trans]base.jp[/trans]', $choicesArray[1]['choices'][1]['label']);
+        self::assertSame('jp', $choicesArray[1]['choices'][1]['value']);
+        self::assertSame('[trans]base.jp[/trans]', $choicesArray[1]['choices'][1]['label']);
     }
 
     public function testFieldChoicesMultiple()
@@ -275,13 +275,13 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
             $choicesArray[] = ['label' => $label, 'value' => $value];
         }
 
-        $this->assertCount(2, $choicesArray);
+        self::assertCount(2, $choicesArray);
 
-        $this->assertSame('sugar', $choicesArray[0]['value']);
-        $this->assertSame('base.sugar', $choicesArray[0]['label']);
+        self::assertSame('sugar', $choicesArray[0]['value']);
+        self::assertSame('base.sugar', $choicesArray[0]['label']);
 
-        $this->assertSame('salt', $choicesArray[1]['value']);
-        $this->assertSame('base.salt', $choicesArray[1]['label']);
+        self::assertSame('salt', $choicesArray[1]['value']);
+        self::assertSame('base.salt', $choicesArray[1]['label']);
     }
 
     public function testFieldTranslatedChoicesMultiple()
@@ -293,12 +293,12 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
             $choicesArray[] = ['label' => $label, 'value' => $value];
         }
 
-        $this->assertCount(2, $choicesArray);
+        self::assertCount(2, $choicesArray);
 
-        $this->assertSame('sugar', $choicesArray[0]['value']);
-        $this->assertSame('[trans]base.sugar[/trans]', $choicesArray[0]['label']);
+        self::assertSame('sugar', $choicesArray[0]['value']);
+        self::assertSame('[trans]base.sugar[/trans]', $choicesArray[0]['label']);
 
-        $this->assertSame('salt', $choicesArray[1]['value']);
-        $this->assertSame('[trans]base.salt[/trans]', $choicesArray[1]['label']);
+        self::assertSame('salt', $choicesArray[1]['value']);
+        self::assertSame('[trans]base.salt[/trans]', $choicesArray[1]['label']);
     }
 }

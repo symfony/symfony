@@ -38,12 +38,12 @@ class HttplugClientTest extends TestCase
 
         $response = $client->sendRequest($client->createRequest('GET', 'http://localhost:8057'));
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $body = json_decode((string) $response->getBody(), true);
 
-        $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
+        self::assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }
 
     public function testSendAsyncRequest()
@@ -63,19 +63,19 @@ class HttplugClientTest extends TestCase
             throw $exception;
         });
 
-        $this->assertEquals(Promise::PENDING, $promise->getState());
+        self::assertEquals(Promise::PENDING, $promise->getState());
 
         $response = $promise->wait(true);
-        $this->assertTrue($successCallableCalled, '$promise->then() was never called.');
-        $this->assertFalse($failureCallableCalled, 'Failure callable should not be called when request is successful.');
-        $this->assertEquals(Promise::FULFILLED, $promise->getState());
+        self::assertTrue($successCallableCalled, '$promise->then() was never called.');
+        self::assertFalse($failureCallableCalled, 'Failure callable should not be called when request is successful.');
+        self::assertEquals(Promise::FULFILLED, $promise->getState());
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $body = json_decode((string) $response->getBody(), true);
 
-        $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
+        self::assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }
 
     public function testWait()
@@ -96,11 +96,11 @@ class HttplugClientTest extends TestCase
             });
 
         $client->wait(0);
-        $this->assertFalse($successCallableCalled, '$promise->then() should not be called yet.');
+        self::assertFalse($successCallableCalled, '$promise->then() should not be called yet.');
 
         $client->wait();
-        $this->assertTrue($successCallableCalled, '$promise->then() should have been called.');
-        $this->assertFalse($failureCallableCalled, 'Failure callable should not be called when request is successful.');
+        self::assertTrue($successCallableCalled, '$promise->then() should have been called.');
+        self::assertFalse($failureCallableCalled, 'Failure callable should not be called when request is successful.');
     }
 
     public function testPostRequest()
@@ -113,14 +113,14 @@ class HttplugClientTest extends TestCase
         $response = $client->sendRequest($request);
         $body = json_decode((string) $response->getBody(), true);
 
-        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
+        self::assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
     }
 
     public function testNetworkException()
     {
         $client = new HttplugClient(new NativeHttpClient());
 
-        $this->expectException(NetworkException::class);
+        self::expectException(NetworkException::class);
         $client->sendRequest($client->createRequest('GET', 'http://localhost:8058'));
     }
 
@@ -142,11 +142,11 @@ class HttplugClientTest extends TestCase
         });
 
         $promise->wait(false);
-        $this->assertFalse($successCallableCalled, 'Success callable should not be called when request fails.');
-        $this->assertTrue($failureCallableCalled, 'Failure callable was never called.');
-        $this->assertEquals(Promise::REJECTED, $promise->getState());
+        self::assertFalse($successCallableCalled, 'Success callable should not be called when request fails.');
+        self::assertTrue($failureCallableCalled, 'Failure callable was never called.');
+        self::assertEquals(Promise::REJECTED, $promise->getState());
 
-        $this->expectException(NetworkException::class);
+        self::expectException(NetworkException::class);
         $promise->wait(true);
     }
 
@@ -154,7 +154,7 @@ class HttplugClientTest extends TestCase
     {
         $client = new HttplugClient(new NativeHttpClient());
 
-        $this->expectException(RequestException::class);
+        self::expectException(RequestException::class);
         $client->sendRequest($client->createRequest('BAD.METHOD', 'http://localhost:8057'));
     }
 
@@ -169,7 +169,7 @@ class HttplugClientTest extends TestCase
             ->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057/404'))
             ->then(
                 function (ResponseInterface $response) use (&$successCallableCalled, $client) {
-                    $this->assertSame(404, $response->getStatusCode());
+                    self::assertSame(404, $response->getStatusCode());
                     $successCallableCalled = true;
 
                     return $client->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057'));
@@ -184,9 +184,9 @@ class HttplugClientTest extends TestCase
 
         $response = $promise->wait(true);
 
-        $this->assertTrue($successCallableCalled);
-        $this->assertFalse($failureCallableCalled);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertTrue($successCallableCalled);
+        self::assertFalse($failureCallableCalled);
+        self::assertSame(200, $response->getStatusCode());
     }
 
     public function testRetryNetworkError()
@@ -203,8 +203,8 @@ class HttplugClientTest extends TestCase
 
                 return $response;
             }, function (\Exception $exception) use (&$failureCallableCalled, $client) {
-                $this->assertSame(NetworkException::class, \get_class($exception));
-                $this->assertSame(TransportException::class, \get_class($exception->getPrevious()));
+                self::assertSame(NetworkException::class, \get_class($exception));
+                self::assertSame(TransportException::class, \get_class($exception->getPrevious()));
                 $failureCallableCalled = true;
 
                 return $client->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057'));
@@ -213,9 +213,9 @@ class HttplugClientTest extends TestCase
 
         $response = $promise->wait(true);
 
-        $this->assertFalse($successCallableCalled);
-        $this->assertTrue($failureCallableCalled);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertFalse($successCallableCalled);
+        self::assertTrue($failureCallableCalled);
+        self::assertSame(200, $response->getStatusCode());
     }
 
     public function testRetryEarlierError()
@@ -246,8 +246,8 @@ class HttplugClientTest extends TestCase
                     return $response;
                 },
                 function (\Exception $exception) use ($errorMessage, &$failureCallableCalled, $client, $request) {
-                    $this->assertSame(NetworkException::class, \get_class($exception));
-                    $this->assertSame($errorMessage, $exception->getMessage());
+                    self::assertSame(NetworkException::class, \get_class($exception));
+                    self::assertSame($errorMessage, $exception->getMessage());
                     $failureCallableCalled = true;
 
                     // Ensure arbitrary levels of promises work.
@@ -262,9 +262,9 @@ class HttplugClientTest extends TestCase
 
         $response = $promise->wait(true);
 
-        $this->assertFalse($successCallableCalled);
-        $this->assertTrue($failureCallableCalled);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('OK', (string) $response->getBody());
+        self::assertFalse($successCallableCalled);
+        self::assertTrue($failureCallableCalled);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', (string) $response->getBody());
     }
 }

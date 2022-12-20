@@ -24,33 +24,33 @@ class HelperSetTest extends TestCase
         $mock_helper = $this->getGenericMockHelper('fake_helper');
         $helperset = new HelperSet(['fake_helper_alias' => $mock_helper]);
 
-        $this->assertEquals($mock_helper, $helperset->get('fake_helper_alias'), '__construct sets given helper to helpers');
-        $this->assertTrue($helperset->has('fake_helper_alias'), '__construct sets helper alias for given helper');
+        self::assertEquals($mock_helper, $helperset->get('fake_helper_alias'), '__construct sets given helper to helpers');
+        self::assertTrue($helperset->has('fake_helper_alias'), '__construct sets helper alias for given helper');
     }
 
     public function testSet()
     {
         $helperset = new HelperSet();
         $helperset->set($this->getGenericMockHelper('fake_helper', $helperset));
-        $this->assertTrue($helperset->has('fake_helper'), '->set() adds helper to helpers');
+        self::assertTrue($helperset->has('fake_helper'), '->set() adds helper to helpers');
 
         $helperset = new HelperSet();
         $helperset->set($this->getGenericMockHelper('fake_helper_01', $helperset));
         $helperset->set($this->getGenericMockHelper('fake_helper_02', $helperset));
-        $this->assertTrue($helperset->has('fake_helper_01'), '->set() will set multiple helpers on consecutive calls');
-        $this->assertTrue($helperset->has('fake_helper_02'), '->set() will set multiple helpers on consecutive calls');
+        self::assertTrue($helperset->has('fake_helper_01'), '->set() will set multiple helpers on consecutive calls');
+        self::assertTrue($helperset->has('fake_helper_02'), '->set() will set multiple helpers on consecutive calls');
 
         $helperset = new HelperSet();
         $helperset->set($this->getGenericMockHelper('fake_helper', $helperset), 'fake_helper_alias');
-        $this->assertTrue($helperset->has('fake_helper'), '->set() adds helper alias when set');
-        $this->assertTrue($helperset->has('fake_helper_alias'), '->set() adds helper alias when set');
+        self::assertTrue($helperset->has('fake_helper'), '->set() adds helper alias when set');
+        self::assertTrue($helperset->has('fake_helper_alias'), '->set() adds helper alias when set');
     }
 
     public function testHas()
     {
         $helperset = new HelperSet(['fake_helper_alias' => $this->getGenericMockHelper('fake_helper')]);
-        $this->assertTrue($helperset->has('fake_helper'), '->has() finds set helper');
-        $this->assertTrue($helperset->has('fake_helper_alias'), '->has() finds set helper by alias');
+        self::assertTrue($helperset->has('fake_helper'), '->has() finds set helper');
+        self::assertTrue($helperset->has('fake_helper_alias'), '->has() finds set helper by alias');
     }
 
     public function testGet()
@@ -58,19 +58,19 @@ class HelperSetTest extends TestCase
         $helper_01 = $this->getGenericMockHelper('fake_helper_01');
         $helper_02 = $this->getGenericMockHelper('fake_helper_02');
         $helperset = new HelperSet(['fake_helper_01_alias' => $helper_01, 'fake_helper_02_alias' => $helper_02]);
-        $this->assertEquals($helper_01, $helperset->get('fake_helper_01'), '->get() returns correct helper by name');
-        $this->assertEquals($helper_01, $helperset->get('fake_helper_01_alias'), '->get() returns correct helper by alias');
-        $this->assertEquals($helper_02, $helperset->get('fake_helper_02'), '->get() returns correct helper by name');
-        $this->assertEquals($helper_02, $helperset->get('fake_helper_02_alias'), '->get() returns correct helper by alias');
+        self::assertEquals($helper_01, $helperset->get('fake_helper_01'), '->get() returns correct helper by name');
+        self::assertEquals($helper_01, $helperset->get('fake_helper_01_alias'), '->get() returns correct helper by alias');
+        self::assertEquals($helper_02, $helperset->get('fake_helper_02'), '->get() returns correct helper by name');
+        self::assertEquals($helper_02, $helperset->get('fake_helper_02_alias'), '->get() returns correct helper by alias');
 
         $helperset = new HelperSet();
         try {
             $helperset->get('foo');
-            $this->fail('->get() throws InvalidArgumentException when helper not found');
+            self::fail('->get() throws InvalidArgumentException when helper not found');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->get() throws InvalidArgumentException when helper not found');
-            $this->assertInstanceOf(ExceptionInterface::class, $e, '->get() throws domain specific exception when helper not found');
-            $this->assertStringContainsString('The helper "foo" is not defined.', $e->getMessage(), '->get() throws InvalidArgumentException when helper not found');
+            self::assertInstanceOf(\InvalidArgumentException::class, $e, '->get() throws InvalidArgumentException when helper not found');
+            self::assertInstanceOf(ExceptionInterface::class, $e, '->get() throws domain specific exception when helper not found');
+            self::assertStringContainsString('The helper "foo" is not defined.', $e->getMessage(), '->get() throws InvalidArgumentException when helper not found');
         }
     }
 
@@ -84,12 +84,12 @@ class HelperSetTest extends TestCase
 
         $helperset = new HelperSet();
         $helperset->setCommand($cmd_01);
-        $this->assertEquals($cmd_01, $helperset->getCommand(), '->setCommand() stores given command');
+        self::assertEquals($cmd_01, $helperset->getCommand(), '->setCommand() stores given command');
 
         $helperset = new HelperSet();
         $helperset->setCommand($cmd_01);
         $helperset->setCommand($cmd_02);
-        $this->assertEquals($cmd_02, $helperset->getCommand(), '->setCommand() overwrites stored command with consecutive calls');
+        self::assertEquals($cmd_02, $helperset->getCommand(), '->setCommand() overwrites stored command with consecutive calls');
     }
 
     /**
@@ -100,7 +100,7 @@ class HelperSetTest extends TestCase
         $cmd = new Command('foo');
         $helperset = new HelperSet();
         $helperset->setCommand($cmd);
-        $this->assertEquals($cmd, $helperset->getCommand(), '->getCommand() retrieves stored command');
+        self::assertEquals($cmd, $helperset->getCommand(), '->getCommand() retrieves stored command');
     }
 
     public function testIteration()
@@ -113,21 +113,21 @@ class HelperSetTest extends TestCase
         $i = 0;
 
         foreach ($helperset as $helper) {
-            $this->assertEquals($helpers[$i++], $helper->getName());
+            self::assertEquals($helpers[$i++], $helper->getName());
         }
     }
 
     private function getGenericMockHelper($name, HelperSet $helperset = null)
     {
-        $mock_helper = $this->createMock(HelperInterface::class);
-        $mock_helper->expects($this->any())
+        $mock_helper = self::createMock(HelperInterface::class);
+        $mock_helper->expects(self::any())
             ->method('getName')
             ->willReturn($name);
 
         if ($helperset) {
-            $mock_helper->expects($this->any())
+            $mock_helper->expects(self::any())
                 ->method('setHelperSet')
-                ->with($this->equalTo($helperset));
+                ->with(self::equalTo($helperset));
         }
 
         return $mock_helper;

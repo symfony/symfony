@@ -23,10 +23,10 @@ class SecretsRemoveCommandTest extends TestCase
      */
     public function testComplete(bool $withLocalVault, array $input, array $expectedSuggestions)
     {
-        $vault = $this->createMock(AbstractVault::class);
+        $vault = self::createMock(AbstractVault::class);
         $vault->method('list')->willReturn(['SECRET' => null, 'OTHER_SECRET' => null]);
         if ($withLocalVault) {
-            $localVault = $this->createMock(AbstractVault::class);
+            $localVault = self::createMock(AbstractVault::class);
             $localVault->method('list')->willReturn(['SECRET' => null]);
         } else {
             $localVault = null;
@@ -34,7 +34,7 @@ class SecretsRemoveCommandTest extends TestCase
         $command = new SecretsRemoveCommand($vault, $localVault);
         $tester = new CommandCompletionTester($command);
         $suggestions = $tester->complete($input);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()

@@ -22,24 +22,24 @@ class CrawlerSelectorTextContainsTest extends TestCase
     public function testConstraint()
     {
         $constraint = new CrawlerSelectorTextContains('title', 'Foo');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head></head><body>Bar'), '', true));
+        self::assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar'), '', true));
+        self::assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
+        self::assertFalse($constraint->evaluate(new Crawler('<html><head></head><body>Bar'), '', true));
 
         try {
             $constraint->evaluate(new Crawler('<html><head><title>Bar'));
 
-            $this->fail();
+            self::fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the text \"Bar\" of the node matching selector \"title\" contains \"Foo\".\n", TestFailure::exceptionToString($e));
+            self::assertEquals("Failed asserting that the text \"Bar\" of the node matching selector \"title\" contains \"Foo\".\n", TestFailure::exceptionToString($e));
         }
 
         try {
             $constraint->evaluate(new Crawler('<html><head></head><body>Bar'));
 
-            $this->fail();
+            self::fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler has a node matching selector \"title\".\n", TestFailure::exceptionToString($e));
+            self::assertEquals("Failed asserting that the Crawler has a node matching selector \"title\".\n", TestFailure::exceptionToString($e));
         }
     }
 }

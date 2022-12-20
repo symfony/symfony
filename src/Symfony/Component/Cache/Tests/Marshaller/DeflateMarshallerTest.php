@@ -33,7 +33,7 @@ class DeflateMarshallerTest extends TestCase
         $deflateResult = $deflateMarshaller->marshall($values, $failed);
         $deflateResult['abc'] = gzinflate($deflateResult['abc']);
 
-        $this->assertSame($defaultResult, $deflateResult);
+        self::assertSame($defaultResult, $deflateResult);
     }
 
     public function testUnmarshall()
@@ -46,7 +46,7 @@ class DeflateMarshallerTest extends TestCase
         $defaultResult = $defaultMarshaller->marshall($values, $failed);
         $deflateResult = $deflateMarshaller->marshall($values, $failed);
 
-        $this->assertSame($values['abc'], $deflateMarshaller->unmarshall($deflateResult['abc']));
-        $this->assertSame($values['abc'], $deflateMarshaller->unmarshall($defaultResult['abc']));
+        self::assertSame($values['abc'], $deflateMarshaller->unmarshall($deflateResult['abc']));
+        self::assertSame($values['abc'], $deflateMarshaller->unmarshall($defaultResult['abc']));
     }
 }

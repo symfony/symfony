@@ -116,10 +116,10 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
     protected function createContext()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())->method('trans')->willReturnArgument(0);
-        $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->any())
+        $translator = self::createMock(TranslatorInterface::class);
+        $translator->expects(self::any())->method('trans')->willReturnArgument(0);
+        $validator = self::createMock(ValidatorInterface::class);
+        $validator->expects(self::any())
             ->method('validate')
             ->willReturnCallback(function () {
                 return $this->expectedViolations[$this->call++] ?? new ConstraintViolationList();
@@ -130,7 +130,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
         $context->setConstraint($this->constraint);
 
-        $contextualValidator = $this->getMockBuilder(AssertingContextualValidator::class)
+        $contextualValidator = self::getMockBuilder(AssertingContextualValidator::class)
             ->setConstructorArgs([$context])
             ->setMethods([
                 'atPath',
@@ -140,32 +140,32 @@ abstract class ConstraintValidatorTestCase extends TestCase
                 'getViolations',
             ])
             ->getMock();
-        $contextualValidator->expects($this->any())
+        $contextualValidator->expects(self::any())
             ->method('atPath')
             ->willReturnCallback(function ($path) use ($contextualValidator) {
                 return $contextualValidator->doAtPath($path);
             });
-        $contextualValidator->expects($this->any())
+        $contextualValidator->expects(self::any())
             ->method('validate')
             ->willReturnCallback(function ($value, $constraints = null, $groups = null) use ($contextualValidator) {
                 return $contextualValidator->doValidate($value, $constraints, $groups);
             });
-        $contextualValidator->expects($this->any())
+        $contextualValidator->expects(self::any())
             ->method('validateProperty')
             ->willReturnCallback(function ($object, $propertyName, $groups = null) use ($contextualValidator) {
                 return $contextualValidator->validateProperty($object, $propertyName, $groups);
             });
-        $contextualValidator->expects($this->any())
+        $contextualValidator->expects(self::any())
             ->method('validatePropertyValue')
             ->willReturnCallback(function ($objectOrClass, $propertyName, $value, $groups = null) use ($contextualValidator) {
                 return $contextualValidator->doValidatePropertyValue($objectOrClass, $propertyName, $value, $groups);
             });
-        $contextualValidator->expects($this->any())
+        $contextualValidator->expects(self::any())
             ->method('getViolations')
             ->willReturnCallback(function () use ($contextualValidator) {
                 return $contextualValidator->doGetViolations();
             });
-        $validator->expects($this->any())
+        $validator->expects(self::any())
             ->method('inContext')
             ->with($context)
             ->willReturn($contextualValidator);
@@ -284,7 +284,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
     protected function assertNoViolation()
     {
-        $this->assertSame(0, $violationsCount = \count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));
+        self::assertSame(0, $violationsCount = \count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));
     }
 
     /**

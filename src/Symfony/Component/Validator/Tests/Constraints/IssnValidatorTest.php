@@ -109,7 +109,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $constraint = new Issn();
         $this->validator->validate(new \stdClass(), $constraint);
     }

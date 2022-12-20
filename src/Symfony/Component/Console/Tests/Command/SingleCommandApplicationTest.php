@@ -29,6 +29,6 @@ class SingleCommandApplicationTest extends TestCase
         };
 
         $command->setAutoExit(false);
-        $this->assertSame(0, (new CommandTester($command))->execute([]));
+        self::assertSame(0, (new CommandTester($command))->execute([]));
     }
 }

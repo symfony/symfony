@@ -39,10 +39,10 @@ class EncoderFactoryTest extends TestCase
             'arguments' => ['sha512', true, 5],
         ]]);
 
-        $encoder = $factory->getEncoder($this->createMock(UserInterface::class));
+        $encoder = $factory->getEncoder(self::createMock(UserInterface::class));
         $expectedEncoder = new MessageDigestPasswordEncoder('sha512', true, 5);
 
-        $this->assertEquals($expectedEncoder->encodePassword('foo', 'moo'), $encoder->encodePassword('foo', 'moo'));
+        self::assertEquals($expectedEncoder->encodePassword('foo', 'moo'), $encoder->encodePassword('foo', 'moo'));
     }
 
     public function testGetEncoderWithService()
@@ -51,13 +51,13 @@ class EncoderFactoryTest extends TestCase
             'Symfony\Component\Security\Core\User\UserInterface' => new MessageDigestPasswordEncoder('sha1'),
         ]);
 
-        $encoder = $factory->getEncoder($this->createMock(UserInterface::class));
+        $encoder = $factory->getEncoder(self::createMock(UserInterface::class));
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
+        self::assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
 
         $encoder = $factory->getEncoder(new User('user', 'pass'));
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
+        self::assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }
 
     public function testGetEncoderWithClassName()
@@ -68,7 +68,7 @@ class EncoderFactoryTest extends TestCase
 
         $encoder = $factory->getEncoder('Symfony\Component\Security\Core\Tests\Encoder\SomeChildUser');
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
+        self::assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }
 
     public function testGetEncoderConfiguredForConcreteClassWithService()
@@ -79,7 +79,7 @@ class EncoderFactoryTest extends TestCase
 
         $encoder = $factory->getEncoder(new User('user', 'pass'));
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
+        self::assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }
 
     public function testGetEncoderConfiguredForConcreteClassWithClassName()
@@ -90,7 +90,7 @@ class EncoderFactoryTest extends TestCase
 
         $encoder = $factory->getEncoder('Symfony\Component\Security\Core\Tests\Encoder\SomeChildUser');
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
+        self::assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }
 
     public function testGetNamedEncoderForEncoderAware()
@@ -102,7 +102,7 @@ class EncoderFactoryTest extends TestCase
 
         $encoder = $factory->getEncoder(new EncAwareUser('user', 'pass'));
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
+        self::assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }
 
     public function testGetNullNamedEncoderForEncoderAware()
@@ -116,12 +116,12 @@ class EncoderFactoryTest extends TestCase
         $user->encoderName = null;
         $encoder = $factory->getEncoder($user);
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
+        self::assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }
 
     public function testGetInvalidNamedEncoderForEncoderAware()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $factory = new EncoderFactory([
             'Symfony\Component\Security\Core\Tests\Encoder\EncAwareUser' => new MessageDigestPasswordEncoder('sha1'),
             'encoder_name' => new MessageDigestPasswordEncoder('sha256'),
@@ -141,13 +141,13 @@ class EncoderFactoryTest extends TestCase
 
         $encoder = $factory->getEncoder('Symfony\Component\Security\Core\Tests\Encoder\EncAwareUser');
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
-        $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
+        self::assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }
 
     public function testMigrateFrom()
     {
         if (!SodiumPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Sodium is not available');
+            self::markTestSkipped('Sodium is not available');
         }
 
         $factory = new EncoderFactory([
@@ -156,34 +156,25 @@ class EncoderFactoryTest extends TestCase
         ]);
 
         $encoder = $factory->getEncoder(SomeUser::class);
-        $this->assertInstanceOf(MigratingPasswordEncoder::class, $encoder);
+        self::assertInstanceOf(MigratingPasswordEncoder::class, $encoder);
 
-        $this->assertTrue($encoder->isPasswordValid((new SodiumPasswordEncoder())->encodePassword('foo', null), 'foo', null));
-        $this->assertTrue($encoder->isPasswordValid((new NativePasswordEncoder(null, null, null, \PASSWORD_BCRYPT))->encodePassword('foo', null), 'foo', null));
-        $this->assertTrue($encoder->isPasswordValid($digest->encodePassword('foo', null), 'foo', null));
-        $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $encoder->encodePassword('foo', null));
+        self::assertTrue($encoder->isPasswordValid((new SodiumPasswordEncoder())->encodePassword('foo', null), 'foo', null));
+        self::assertTrue($encoder->isPasswordValid((new NativePasswordEncoder(null, null, null, \PASSWORD_BCRYPT))->encodePassword('foo', null), 'foo', null));
+        self::assertTrue($encoder->isPasswordValid($digest->encodePassword('foo', null), 'foo', null));
+        self::assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $encoder->encodePassword('foo', null));
     }
 
     public function testDefaultMigratingEncoders()
     {
-        $this->assertInstanceOf(
-            MigratingPasswordEncoder::class,
-            (new EncoderFactory([SomeUser::class => ['class' => NativePasswordEncoder::class, 'arguments' => []]]))->getEncoder(SomeUser::class)
-        );
+        self::assertInstanceOf(MigratingPasswordEncoder::class, (new EncoderFactory([SomeUser::class => ['class' => NativePasswordEncoder::class, 'arguments' => []]]))->getEncoder(SomeUser::class));
 
-        $this->assertInstanceOf(
-            MigratingPasswordEncoder::class,
-            (new EncoderFactory([SomeUser::class => ['algorithm' => 'bcrypt', 'cost' => 11]]))->getEncoder(SomeUser::class)
-        );
+        self::assertInstanceOf(MigratingPasswordEncoder::class, (new EncoderFactory([SomeUser::class => ['algorithm' => 'bcrypt', 'cost' => 11]]))->getEncoder(SomeUser::class));
 
         if (!SodiumPasswordEncoder::isSupported()) {
             return;
         }
 
-        $this->assertInstanceOf(
-            MigratingPasswordEncoder::class,
-            (new EncoderFactory([SomeUser::class => ['class' => SodiumPasswordEncoder::class, 'arguments' => []]]))->getEncoder(SomeUser::class)
-        );
+        self::assertInstanceOf(MigratingPasswordEncoder::class, (new EncoderFactory([SomeUser::class => ['class' => SodiumPasswordEncoder::class, 'arguments' => []]]))->getEncoder(SomeUser::class));
     }
 
     public function testHasherAwareCompat()
@@ -194,7 +185,7 @@ class EncoderFactoryTest extends TestCase
 
         $encoder = $factory->getPasswordHasher(new HasherAwareUser('user', 'pass'));
         $expectedEncoder = new MessageDigestPasswordHasher('sha1');
-        $this->assertEquals($expectedEncoder->hash('foo', ''), $encoder->hash('foo', ''));
+        self::assertEquals($expectedEncoder->hash('foo', ''), $encoder->hash('foo', ''));
     }
 
     public function testLegacyPasswordHasher()

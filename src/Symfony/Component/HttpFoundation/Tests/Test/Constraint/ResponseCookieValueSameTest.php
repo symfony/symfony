@@ -25,21 +25,21 @@ class ResponseCookieValueSameTest extends TestCase
         $response = new Response();
         $response->headers->setCookie(Cookie::create('foo', 'bar', 0, '/path'));
         $constraint = new ResponseCookieValueSame('foo', 'bar', '/path');
-        $this->assertTrue($constraint->evaluate($response, '', true));
+        self::assertTrue($constraint->evaluate($response, '', true));
         $constraint = new ResponseCookieValueSame('foo', 'bar', '/path');
-        $this->assertTrue($constraint->evaluate($response, '', true));
+        self::assertTrue($constraint->evaluate($response, '', true));
         $constraint = new ResponseCookieValueSame('foo', 'babar', '/path');
-        $this->assertFalse($constraint->evaluate($response, '', true));
+        self::assertFalse($constraint->evaluate($response, '', true));
 
         try {
             $constraint->evaluate($response);
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Response has cookie \"foo\" with path \"/path\" with value \"babar\".\n", TestFailure::exceptionToString($e));
+            self::assertEquals("Failed asserting that the Response has cookie \"foo\" with path \"/path\" with value \"babar\".\n", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 
     public function testCookieWithNullValueIsComparedAsEmptyString()
@@ -47,6 +47,6 @@ class ResponseCookieValueSameTest extends TestCase
         $response = new Response();
         $response->headers->setCookie(Cookie::create('foo', null, 0, '/path'));
 
-        $this->assertTrue((new ResponseCookieValueSame('foo', '', '/path'))->evaluate($response, '', true));
+        self::assertTrue((new ResponseCookieValueSame('foo', '', '/path'))->evaluate($response, '', true));
     }
 }

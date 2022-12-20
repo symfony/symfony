@@ -22,11 +22,11 @@ class EntryManagerTest extends TestCase
 {
     public function testMove()
     {
-        $this->expectException(LdapException::class);
-        $this->expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
-        $connection = $this->createMock(Connection::class);
+        self::expectException(LdapException::class);
+        self::expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
+        $connection = self::createMock(Connection::class);
         $connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isBound')->willReturn(true);
 
         $entry = new Entry('$$$$$$');
@@ -36,11 +36,11 @@ class EntryManagerTest extends TestCase
 
     public function testGetResources()
     {
-        $this->expectException(NotBoundException::class);
-        $this->expectExceptionMessage('Query execution is not possible without binding the connection first.');
-        $connection = $this->createMock(Connection::class);
+        self::expectException(NotBoundException::class);
+        self::expectExceptionMessage('Query execution is not possible without binding the connection first.');
+        $connection = self::createMock(Connection::class);
         $connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isBound')->willReturn(false);
 
         $entry = new Entry('$$$$$$');
@@ -55,7 +55,7 @@ class EntryManagerTest extends TestCase
      */
     public function testMoveWithRFC4514DistinguishedName(string $dn, string $expectedRdn)
     {
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
 
         $entry = new Entry($dn);
         $entryManager = new EntryManager($connection);
@@ -65,7 +65,7 @@ class EntryManagerTest extends TestCase
 
         $cn = $method->invokeArgs($entryManager, [$entry, 'a']);
 
-        $this->assertSame($expectedRdn, $cn);
+        self::assertSame($expectedRdn, $cn);
     }
 
     public function moveWithRFC4514DistinguishedNameProvider(): array

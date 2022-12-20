@@ -35,14 +35,14 @@ class AccessListenerTest extends TestCase
 {
     public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
     {
-        $this->expectException(AccessDeniedException::class);
+        self::expectException(AccessDeniedException::class);
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([['foo' => 'bar'], null])
         ;
 
@@ -60,18 +60,18 @@ class AccessListenerTest extends TestCase
             }
         };
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn($token)
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = self::createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('decide')
-            ->with($this->equalTo($token), $this->equalTo(['foo' => 'bar']), $this->equalTo($request))
+            ->with(self::equalTo($token), self::equalTo(['foo' => 'bar']), self::equalTo($request))
             ->willReturn(false)
         ;
 
@@ -82,7 +82,7 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     /**
@@ -92,53 +92,53 @@ class AccessListenerTest extends TestCase
     {
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $notAuthenticatedToken = $this->createMock(TokenInterface::class);
+        $notAuthenticatedToken = self::createMock(TokenInterface::class);
         $notAuthenticatedToken
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isAuthenticated')
             ->willReturn(false)
         ;
 
-        $authenticatedToken = $this->createMock(TokenInterface::class);
+        $authenticatedToken = self::createMock(TokenInterface::class);
         $authenticatedToken
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isAuthenticated')
             ->willReturn(true)
         ;
 
-        $authManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authManager = self::createMock(AuthenticationManagerInterface::class);
         $authManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
-            ->with($this->equalTo($notAuthenticatedToken))
+            ->with(self::equalTo($notAuthenticatedToken))
             ->willReturn($authenticatedToken)
         ;
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn($notAuthenticatedToken)
         ;
         $tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setToken')
-            ->with($this->equalTo($authenticatedToken))
+            ->with(self::equalTo($authenticatedToken))
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = self::createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('decide')
-            ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar']), $this->equalTo($request))
+            ->with(self::equalTo($authenticatedToken), self::equalTo(['foo' => 'bar']), self::equalTo($request))
             ->willReturn(true)
         ;
 
@@ -150,72 +150,72 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest()
     {
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([null, null])
         ;
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         if (method_exists(TokenInterface::class, 'isAuthenticated')) {
             $token
-                ->expects($this->never())
+                ->expects(self::never())
                 ->method('isAuthenticated')
             ;
         }
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn($token)
         ;
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->createMock(AccessDecisionManagerInterface::class),
+            self::createMock(AccessDecisionManagerInterface::class),
             $accessMap,
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenAccessMapReturnsEmptyAttributes()
     {
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[], null])
         ;
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('getToken')
         ;
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->createMock(AccessDecisionManagerInterface::class),
+            self::createMock(AccessDecisionManagerInterface::class),
             $accessMap,
             false
         );
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener(new LazyResponseEvent($event));
     }
@@ -225,51 +225,51 @@ class AccessListenerTest extends TestCase
      */
     public function testLegacyHandleWhenTheSecurityTokenStorageHasNoToken()
     {
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        self::expectException(AuthenticationCredentialsNotFoundException::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([['foo' => 'bar'], null])
         ;
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->createMock(AccessDecisionManagerInterface::class),
+            self::createMock(AccessDecisionManagerInterface::class),
             $accessMap,
-            $this->createMock(AuthenticationManagerInterface::class)
+            self::createMock(AuthenticationManagerInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenTheSecurityTokenStorageHasNoToken()
     {
-        $this->expectException(AccessDeniedException::class);
+        self::expectException(AccessDeniedException::class);
         $tokenStorage = new TokenStorage();
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap->expects($this->any())
+        $accessMap = self::createMock(AccessMapInterface::class);
+        $accessMap->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
-        $accessDecisionManager->expects($this->once())
+        $accessDecisionManager = self::createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects(self::once())
             ->method('decide')
-            ->with($this->isInstanceOf(NullToken::class))
+            ->with(self::isInstanceOf(NullToken::class))
             ->willReturn(false);
 
         $listener = new AccessListener(
@@ -279,7 +279,7 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenPublicAccessIsAllowed()
@@ -287,17 +287,17 @@ class AccessListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap->expects($this->any())
+        $accessMap = self::createMock(AccessMapInterface::class);
+        $accessMap->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
-        $accessDecisionManager->expects($this->once())
+        $accessDecisionManager = self::createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects(self::once())
             ->method('decide')
-            ->with($this->isInstanceOf(NullToken::class), [AuthenticatedVoter::PUBLIC_ACCESS])
+            ->with(self::isInstanceOf(NullToken::class), [AuthenticatedVoter::PUBLIC_ACCESS])
             ->willReturn(true);
 
         $listener = new AccessListener(
@@ -307,7 +307,7 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenPublicAccessWhileAuthenticated()
@@ -317,17 +317,17 @@ class AccessListenerTest extends TestCase
         $tokenStorage->setToken($token);
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap->expects($this->any())
+        $accessMap = self::createMock(AccessMapInterface::class);
+        $accessMap->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
-        $accessDecisionManager->expects($this->once())
+        $accessDecisionManager = self::createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects(self::once())
             ->method('decide')
-            ->with($this->equalTo($token), [AuthenticatedVoter::PUBLIC_ACCESS])
+            ->with(self::equalTo($token), [AuthenticatedVoter::PUBLIC_ACCESS])
             ->willReturn(true);
 
         $listener = new AccessListener(
@@ -337,18 +337,18 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleMWithultipleAttributesShouldBeHandledAsAnd()
     {
         $request = new Request();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([['foo' => 'bar', 'bar' => 'baz'], null])
         ;
 
@@ -357,11 +357,11 @@ class AccessListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($authenticatedToken);
 
-        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = self::createMock(AccessDecisionManagerInterface::class);
         $accessDecisionManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('decide')
-            ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar', 'bar' => 'baz']), $this->equalTo($request), true)
+            ->with(self::equalTo($authenticatedToken), self::equalTo(['foo' => 'bar', 'bar' => 'baz']), self::equalTo($request), true)
             ->willReturn(true)
         ;
 
@@ -372,24 +372,24 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testLazyPublicPagesShouldNotAccessTokenStorage()
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage->expects($this->never())->method('getToken');
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
+        $tokenStorage->expects(self::never())->method('getToken');
 
         $request = new Request();
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap->expects($this->any())
+        $accessMap = self::createMock(AccessMapInterface::class);
+        $accessMap->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[AuthenticatedVoter::PUBLIC_ACCESS], null])
         ;
 
-        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, false);
-        $listener(new LazyResponseEvent(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
+        $listener = new AccessListener($tokenStorage, self::createMock(AccessDecisionManagerInterface::class), $accessMap, false);
+        $listener(new LazyResponseEvent(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
     }
 
     /**
@@ -397,18 +397,18 @@ class AccessListenerTest extends TestCase
      */
     public function testLegacyLazyPublicPagesShouldNotAccessTokenStorage()
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage->expects($this->never())->method('getToken');
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
+        $tokenStorage->expects(self::never())->method('getToken');
 
         $request = new Request();
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap->expects($this->any())
+        $accessMap = self::createMock(AccessMapInterface::class);
+        $accessMap->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY], null])
         ;
 
-        $listener = new AccessListener($tokenStorage, $this->createMock(AccessDecisionManagerInterface::class), $accessMap, false);
-        $listener(new LazyResponseEvent(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
+        $listener = new AccessListener($tokenStorage, self::createMock(AccessDecisionManagerInterface::class), $accessMap, false);
+        $listener(new LazyResponseEvent(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
     }
 }

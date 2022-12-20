@@ -27,7 +27,7 @@ class ButtonTest extends TestCase
 {
     public function testSetParentOnSubmittedButton()
     {
-        $this->expectException(AlreadySubmittedException::class);
+        self::expectException(AlreadySubmittedException::class);
         $button = $this->getButtonBuilder('button')
             ->getForm()
         ;
@@ -54,7 +54,7 @@ class ButtonTest extends TestCase
 
         $button->setParent($form);
 
-        $this->assertSame($result, $button->isDisabled());
+        self::assertSame($result, $button->isDisabled());
     }
 
     public function getDisabledStates()

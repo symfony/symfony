@@ -26,17 +26,17 @@ class EntryTest extends TestCase
             'givenName' => [$givenName],
         ]);
 
-        $this->assertFalse($entry->hasAttribute('givenname'));
-        $this->assertTrue($entry->hasAttribute('givenname', false));
+        self::assertFalse($entry->hasAttribute('givenname'));
+        self::assertTrue($entry->hasAttribute('givenname', false));
 
-        $this->assertNull($entry->getAttribute('givenname'));
-        $this->assertSame($givenName, $entry->getAttribute('givenname', false)[0]);
+        self::assertNull($entry->getAttribute('givenname'));
+        self::assertSame($givenName, $entry->getAttribute('givenname', false)[0]);
 
         $firstName = 'Fabien';
 
         $entry->setAttribute('firstName', [$firstName]);
-        $this->assertSame($firstName, $entry->getAttribute('firstname', false)[0]);
+        self::assertSame($firstName, $entry->getAttribute('firstname', false)[0]);
         $entry->removeAttribute('firstName');
-        $this->assertFalse($entry->hasAttribute('firstname', false));
+        self::assertFalse($entry->hasAttribute('firstname', false));
     }
 }

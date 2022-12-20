@@ -18,7 +18,7 @@ class RememberMeCookieTest extends AbstractWebTestCase
     /** @dataProvider getSessionRememberMeSecureCookieFlagAutoHttpsMap */
     public function testSessionRememberMeSecureCookieFlagAuto($https, $expectedSecureFlag)
     {
-        $client = $this->createClient(['test_case' => 'RememberMeCookie', 'root_config' => 'config.yml']);
+        $client = self::createClient(['test_case' => 'RememberMeCookie', 'root_config' => 'config.yml']);
 
         $client->request('POST', '/login', [
             '_username' => 'test',
@@ -28,7 +28,7 @@ class RememberMeCookieTest extends AbstractWebTestCase
         ]);
 
         $cookies = $client->getResponse()->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertSame($expectedSecureFlag, $cookies['']['/']['REMEMBERME']->isSecure());
+        self::assertSame($expectedSecureFlag, $cookies['']['/']['REMEMBERME']->isSecure());
     }
 
     /**
@@ -37,7 +37,7 @@ class RememberMeCookieTest extends AbstractWebTestCase
      */
     public function testLegacySessionRememberMeSecureCookieFlagAuto($https, $expectedSecureFlag)
     {
-        $client = $this->createClient(['test_case' => 'RememberMeCookie', 'root_config' => 'legacy_config.yml']);
+        $client = self::createClient(['test_case' => 'RememberMeCookie', 'root_config' => 'legacy_config.yml']);
 
         $client->request('POST', '/login', [
             '_username' => 'test',
@@ -47,7 +47,7 @@ class RememberMeCookieTest extends AbstractWebTestCase
         ]);
 
         $cookies = $client->getResponse()->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertSame($expectedSecureFlag, $cookies['']['/']['REMEMBERME']->isSecure());
+        self::assertSame($expectedSecureFlag, $cookies['']['/']['REMEMBERME']->isSecure());
     }
 
     public function getSessionRememberMeSecureCookieFlagAutoHttpsMap()

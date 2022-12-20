@@ -26,7 +26,7 @@ final class Sms77TransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null, string $from = null): TransportInterface
     {
-        return new Sms77Transport('apiKey', $from, $client ?? $this->createMock(HttpClientInterface::class));
+        return new Sms77Transport('apiKey', $from, $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -43,6 +43,6 @@ final class Sms77TransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

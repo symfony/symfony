@@ -27,7 +27,7 @@ final class DiscordOptionsTest extends TestCase
             ->avatarUrl('http://ava.tar/pic.png')
             ->tts(true);
 
-        $this->assertSame($discordOptions->toArray(), [
+        self::assertSame($discordOptions->toArray(), [
             'username' => 'name of the bot',
             'avatar_url' => 'http://ava.tar/pic.png',
             'tts' => true,
@@ -52,7 +52,7 @@ final class DiscordOptionsTest extends TestCase
                 ->title('New song added!')
             );
 
-        $this->assertSame($discordOptions->toArray(), [
+        self::assertSame($discordOptions->toArray(), [
             'embeds' => [
                 [
                     'description' => 'descript.io',
@@ -107,7 +107,7 @@ final class DiscordOptionsTest extends TestCase
                 )
             );
 
-        $this->assertSame($discordOptions->toArray(), [
+        self::assertSame($discordOptions->toArray(), [
             'embeds' => [
                 [
                     'description' => 'descript.io',
@@ -151,7 +151,7 @@ final class DiscordOptionsTest extends TestCase
             ->proxyIconUrl('proxy icon url')
         ;
 
-        $this->assertSame($footer->toArray(), [
+        self::assertSame($footer->toArray(), [
             'text' => 'text',
             'icon_url' => 'icon url',
             'proxy_icon_url' => 'proxy icon url',
@@ -167,7 +167,7 @@ final class DiscordOptionsTest extends TestCase
             ->width(600)
         ;
 
-        $this->assertSame($media->toArray(), [
+        self::assertSame($media->toArray(), [
             'url' => 'https://ur.l/',
             'proxy_url' => 'https://proxy.ur.l/',
             'height' => 900,
@@ -184,7 +184,7 @@ final class DiscordOptionsTest extends TestCase
             ->proxyIconUrl('https://proxy.ic.on/url')
         ;
 
-        $this->assertSame($author->toArray(), [
+        self::assertSame($author->toArray(), [
             'name' => 'name field',
             'url' => 'https://ur.l/',
             'icon_url' => 'https://icon.ur.l/',

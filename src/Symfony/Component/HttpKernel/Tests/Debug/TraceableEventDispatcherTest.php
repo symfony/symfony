@@ -34,7 +34,7 @@ class TraceableEventDispatcherTest extends TestCase
         $kernel->terminate($request, $response);
 
         $events = $stopwatch->getSectionEvents($request->attributes->get('_stopwatch_token'));
-        $this->assertEquals([
+        self::assertEquals([
             '__section__',
             'kernel.request',
             'kernel.controller',
@@ -47,10 +47,10 @@ class TraceableEventDispatcherTest extends TestCase
 
     public function testStopwatchCheckControllerOnRequestEvent()
     {
-        $stopwatch = $this->getMockBuilder(Stopwatch::class)
+        $stopwatch = self::getMockBuilder(Stopwatch::class)
             ->setMethods(['isStarted'])
             ->getMock();
-        $stopwatch->expects($this->once())
+        $stopwatch->expects(self::once())
             ->method('isStarted')
             ->willReturn(false);
 
@@ -63,13 +63,13 @@ class TraceableEventDispatcherTest extends TestCase
 
     public function testStopwatchStopControllerOnRequestEvent()
     {
-        $stopwatch = $this->getMockBuilder(Stopwatch::class)
+        $stopwatch = self::getMockBuilder(Stopwatch::class)
             ->setMethods(['isStarted', 'stop'])
             ->getMock();
-        $stopwatch->expects($this->once())
+        $stopwatch->expects(self::once())
             ->method('isStarted')
             ->willReturn(true);
-        $stopwatch->expects($this->exactly(3))
+        $stopwatch->expects(self::exactly(3))
             ->method('stop');
 
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch);
@@ -91,10 +91,10 @@ class TraceableEventDispatcherTest extends TestCase
             });
         });
         $dispatcher->dispatch(new Event(), 'my-event');
-        $this->assertTrue($called1);
-        $this->assertFalse($called2);
+        self::assertTrue($called1);
+        self::assertFalse($called2);
         $dispatcher->dispatch(new Event(), 'my-event');
-        $this->assertTrue($called2);
+        self::assertTrue($called2);
     }
 
     public function testListenerCanRemoveItselfWhenExecuted()
@@ -107,17 +107,17 @@ class TraceableEventDispatcherTest extends TestCase
         $eventDispatcher->addListener('foo', function () {});
         $eventDispatcher->dispatch(new Event(), 'foo');
 
-        $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
+        self::assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }
 
     protected function getHttpKernel($dispatcher)
     {
-        $controllerResolver = $this->createMock(ControllerResolverInterface::class);
-        $controllerResolver->expects($this->once())->method('getController')->willReturn(function () {
+        $controllerResolver = self::createMock(ControllerResolverInterface::class);
+        $controllerResolver->expects(self::once())->method('getController')->willReturn(function () {
             return new Response();
         });
-        $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
-        $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);
+        $argumentResolver = self::createMock(ArgumentResolverInterface::class);
+        $argumentResolver->expects(self::once())->method('getArguments')->willReturn([]);
 
         return new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);
     }

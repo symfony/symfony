@@ -35,8 +35,8 @@ class UserAuthenticatorTest extends TestCase
 
         $userAuthenticator = new UserAuthenticator($firewallMap, $container, $requestStack);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot determine the correct Symfony\Bundle\SecurityBundle\Security\UserAuthenticator to use: there is no active Request and so, the firewall cannot be determined. Try using a specific Symfony\Bundle\SecurityBundle\Security\UserAuthenticator service.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Cannot determine the correct Symfony\Bundle\SecurityBundle\Security\UserAuthenticator to use: there is no active Request and so, the firewall cannot be determined. Try using a specific Symfony\Bundle\SecurityBundle\Security\UserAuthenticator service.');
 
         $userAuthenticator->authenticateUser($user, $authenticator, $request);
     }

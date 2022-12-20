@@ -35,38 +35,38 @@ class JsonBundleReaderTest extends TestCase
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/json', 'en');
 
-        $this->assertIsArray($data);
-        $this->assertSame('Bar', $data['Foo']);
-        $this->assertArrayNotHasKey('ExistsNot', $data);
+        self::assertIsArray($data);
+        self::assertSame('Bar', $data['Foo']);
+        self::assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadFailsIfNonExistingLocale()
     {
-        $this->expectException(ResourceBundleNotFoundException::class);
+        self::expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', 'foo');
     }
 
     public function testReadFailsIfNonExistingDirectory()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/foo', 'en');
     }
 
     public function testReadFailsIfNotAFile()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }
 
     public function testReadFailsIfInvalidJson()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', 'en_Invalid');
     }
 
     public function testReaderDoesNotBreakOutOfGivenPath()
     {
-        $this->expectException(ResourceBundleNotFoundException::class);
+        self::expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', '../invalid_directory/en');
     }
 }

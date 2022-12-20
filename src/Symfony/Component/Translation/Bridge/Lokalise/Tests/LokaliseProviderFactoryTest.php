@@ -54,7 +54,7 @@ class LokaliseProviderFactoryTest extends ProviderFactoryTestCase
         // Make a real HTTP request.
         $provider->read(['messages'], ['en']);
 
-        $this->assertMatchesRegularExpression('/https:\/\/api.lokalise.com\/api2\/projects\/PROJECT_ID\/*/', $response->getRequestUrl());
+        self::assertMatchesRegularExpression('/https:\/\/api.lokalise.com\/api2\/projects\/PROJECT_ID\/*/', $response->getRequestUrl());
     }
 
     public function createFactory(): ProviderFactoryInterface

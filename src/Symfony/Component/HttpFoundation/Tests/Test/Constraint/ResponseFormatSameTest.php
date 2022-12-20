@@ -29,33 +29,33 @@ class ResponseFormatSameTest extends TestCase
         $request->setFormat('custom', ['application/vnd.myformat']);
 
         $constraint = new ResponseFormatSame($request, 'custom');
-        $this->assertTrue($constraint->evaluate(new Response('', 200, ['Content-Type' => 'application/vnd.myformat']), '', true));
-        $this->assertFalse($constraint->evaluate(new Response(), '', true));
+        self::assertTrue($constraint->evaluate(new Response('', 200, ['Content-Type' => 'application/vnd.myformat']), '', true));
+        self::assertFalse($constraint->evaluate(new Response(), '', true));
 
         try {
             $constraint->evaluate(new Response('', 200, ['Content-Type' => 'application/ld+json']));
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("Failed asserting that the Response format is custom.\nHTTP/1.0 200 OK", TestFailure::exceptionToString($e));
+            self::assertStringContainsString("Failed asserting that the Response format is custom.\nHTTP/1.0 200 OK", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 
     public function testNullFormat()
     {
         $constraint = new ResponseFormatSame(new Request(), null);
-        $this->assertTrue($constraint->evaluate(new Response(), '', true));
+        self::assertTrue($constraint->evaluate(new Response(), '', true));
 
         try {
             $constraint->evaluate(new Response('', 200, ['Content-Type' => 'application/ld+json']));
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("Failed asserting that the Response format is null.\nHTTP/1.0 200 OK", TestFailure::exceptionToString($e));
+            self::assertStringContainsString("Failed asserting that the Response format is null.\nHTTP/1.0 200 OK", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 }

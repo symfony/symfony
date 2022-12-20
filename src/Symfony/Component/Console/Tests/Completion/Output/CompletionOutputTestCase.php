@@ -36,7 +36,7 @@ abstract class CompletionOutputTestCase extends TestCase
         $stream = fopen('php://memory', 'rw+');
         $this->getCompletionOutput()->write($suggestions, new StreamOutput($stream));
         fseek($stream, 0);
-        $this->assertEquals($this->getExpectedOptionsOutput(), stream_get_contents($stream));
+        self::assertEquals($this->getExpectedOptionsOutput(), stream_get_contents($stream));
     }
 
     public function testValuesOutput()
@@ -46,6 +46,6 @@ abstract class CompletionOutputTestCase extends TestCase
         $stream = fopen('php://memory', 'rw+');
         $this->getCompletionOutput()->write($suggestions, new StreamOutput($stream));
         fseek($stream, 0);
-        $this->assertEquals($this->getExpectedValuesOutput(), stream_get_contents($stream));
+        self::assertEquals($this->getExpectedValuesOutput(), stream_get_contents($stream));
     }
 }

@@ -22,14 +22,14 @@ class SubmitTypeTest extends ButtonTypeTest
 
     public function testCreateSubmitButtonInstances()
     {
-        $this->assertInstanceOf(SubmitButton::class, $this->factory->create(static::TESTED_TYPE));
+        self::assertInstanceOf(SubmitButton::class, $this->factory->create(static::TESTED_TYPE));
     }
 
     public function testNotClickedByDefault()
     {
         $button = $this->factory->create(static::TESTED_TYPE);
 
-        $this->assertFalse($button->isClicked());
+        self::assertFalse($button->isClicked());
     }
 
     public function testNotClickedIfSubmittedWithNull()
@@ -37,7 +37,7 @@ class SubmitTypeTest extends ButtonTypeTest
         $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit(null);
 
-        $this->assertFalse($button->isClicked());
+        self::assertFalse($button->isClicked());
     }
 
     public function testClickedIfSubmittedWithEmptyString()
@@ -45,7 +45,7 @@ class SubmitTypeTest extends ButtonTypeTest
         $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit('');
 
-        $this->assertTrue($button->isClicked());
+        self::assertTrue($button->isClicked());
     }
 
     public function testClickedIfSubmittedWithUnemptyString()
@@ -53,7 +53,7 @@ class SubmitTypeTest extends ButtonTypeTest
         $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit('foo');
 
-        $this->assertTrue($button->isClicked());
+        self::assertTrue($button->isClicked());
     }
 
     public function testSubmitCanBeAddedToForm()
@@ -62,12 +62,12 @@ class SubmitTypeTest extends ButtonTypeTest
             ->createBuilder(FormTypeTest::TESTED_TYPE)
             ->getForm();
 
-        $this->assertSame($form, $form->add('send', static::TESTED_TYPE));
+        self::assertSame($form, $form->add('send', static::TESTED_TYPE));
     }
 
     public function testFormNoValidate()
     {
-        $this->assertTrue($this->factory->create(static::TESTED_TYPE, null, [
+        self::assertTrue($this->factory->create(static::TESTED_TYPE, null, [
             'validate' => false,
         ])->createView()->vars['attr']['formnovalidate']);
     }

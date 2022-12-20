@@ -27,7 +27,7 @@ abstract class AbstractInputTestCase extends TestCase
 
         $input->id($value = '1234');
 
-        $this->assertSame($value, $input->toArray()['id']);
+        self::assertSame($value, $input->toArray()['id']);
     }
 
     public function testIsRequiredWithFalse()
@@ -36,7 +36,7 @@ abstract class AbstractInputTestCase extends TestCase
 
         $input->isRequired(false);
 
-        $this->assertFalse($input->toArray()['isRequired']);
+        self::assertFalse($input->toArray()['isRequired']);
     }
 
     public function testIsRequiredWithTrue()
@@ -45,7 +45,7 @@ abstract class AbstractInputTestCase extends TestCase
 
         $input->isRequired(true);
 
-        $this->assertTrue($input->toArray()['isRequired']);
+        self::assertTrue($input->toArray()['isRequired']);
     }
 
     public function testTitle()
@@ -54,7 +54,7 @@ abstract class AbstractInputTestCase extends TestCase
 
         $input->title($value = 'Hey Symfony!');
 
-        $this->assertSame($value, $input->toArray()['title']);
+        self::assertSame($value, $input->toArray()['title']);
     }
 
     public function testValue()
@@ -63,6 +63,6 @@ abstract class AbstractInputTestCase extends TestCase
 
         $input->value($value = 'Community power!');
 
-        $this->assertSame($value, $input->toArray()['value']);
+        self::assertSame($value, $input->toArray()['value']);
     }
 }

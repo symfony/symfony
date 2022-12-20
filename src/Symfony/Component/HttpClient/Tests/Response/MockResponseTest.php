@@ -26,8 +26,8 @@ class MockResponseTest extends TestCase
         $response = new MockResponse('body');
         $response = MockResponse::fromRequest('GET', 'https://example.com/file.txt', [], $response);
 
-        $this->assertNotNull($response->getInfo('total_time'));
-        $this->assertGreaterThan(0.0, $response->getInfo('total_time'));
+        self::assertNotNull($response->getInfo('total_time'));
+        self::assertGreaterThan(0.0, $response->getInfo('total_time'));
     }
 
     public function testTotalTimeShouldNotBeSimulatedWhenProvided()
@@ -36,7 +36,7 @@ class MockResponseTest extends TestCase
         $response = new MockResponse('body', ['total_time' => $totalTime]);
         $response = MockResponse::fromRequest('GET', 'https://example.com/file.txt', [], $response);
 
-        $this->assertEquals($totalTime, $response->getInfo('total_time'));
+        self::assertEquals($totalTime, $response->getInfo('total_time'));
     }
 
     public function testToArray()
@@ -45,7 +45,7 @@ class MockResponseTest extends TestCase
         $response = new MockResponse(json_encode($data));
         $response = MockResponse::fromRequest('GET', 'https://example.com/file.json', [], $response);
 
-        $this->assertSame($data, $response->toArray());
+        self::assertSame($data, $response->toArray());
     }
 
     /**
@@ -53,8 +53,8 @@ class MockResponseTest extends TestCase
      */
     public function testToArrayError($content, $responseHeaders, $message)
     {
-        $this->expectException(JsonException::class);
-        $this->expectExceptionMessage($message);
+        self::expectException(JsonException::class);
+        self::expectExceptionMessage($message);
 
         $response = new MockResponse($content, ['response_headers' => $responseHeaders]);
         $response = MockResponse::fromRequest('GET', 'https://example.com/file.json', [], $response);
@@ -67,11 +67,11 @@ class MockResponseTest extends TestCase
         $url = 'https://example.com/some-endpoint';
         $response = MockResponse::fromRequest('GET', $url, [], $responseMock);
 
-        $this->assertSame('GET', $response->getInfo('http_method'));
-        $this->assertSame('GET', $responseMock->getRequestMethod());
+        self::assertSame('GET', $response->getInfo('http_method'));
+        self::assertSame('GET', $responseMock->getRequestMethod());
 
-        $this->assertSame($url, $response->getInfo('url'));
-        $this->assertSame($url, $responseMock->getRequestUrl());
+        self::assertSame($url, $response->getInfo('url'));
+        self::assertSame($url, $responseMock->getRequestUrl());
     }
 
     public function toArrayErrors()
@@ -109,8 +109,8 @@ class MockResponseTest extends TestCase
 
     public function testErrorIsTakenIntoAccountInInitialization()
     {
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('ccc error');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage('ccc error');
 
         MockResponse::fromRequest('GET', 'https://symfony.com', [], new MockResponse('', [
             'error' => 'ccc error',

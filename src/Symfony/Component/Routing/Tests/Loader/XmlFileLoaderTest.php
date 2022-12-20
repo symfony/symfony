@@ -23,13 +23,13 @@ class XmlFileLoaderTest extends TestCase
 {
     public function testSupports()
     {
-        $loader = new XmlFileLoader($this->createMock(FileLocator::class));
+        $loader = new XmlFileLoader(self::createMock(FileLocator::class));
 
-        $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        self::assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
+        self::assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
-        $this->assertTrue($loader->supports('foo.xml', 'xml'), '->supports() checks the resource type if specified');
-        $this->assertFalse($loader->supports('foo.xml', 'foo'), '->supports() checks the resource type if specified');
+        self::assertTrue($loader->supports('foo.xml', 'xml'), '->supports() checks the resource type if specified');
+        self::assertFalse($loader->supports('foo.xml', 'foo'), '->supports() checks the resource type if specified');
     }
 
     public function testLoadWithRoute()
@@ -38,16 +38,16 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('validpattern.xml');
         $route = $routeCollection->get('blog_show');
 
-        $this->assertInstanceOf(Route::class, $route);
-        $this->assertSame('/blog/{slug}', $route->getPath());
-        $this->assertSame('{locale}.example.com', $route->getHost());
-        $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertSame('\w+', $route->getRequirement('locale'));
-        $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
-        $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
-        $this->assertEquals(['https'], $route->getSchemes());
-        $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
-        $this->assertTrue($route->getDefault('_stateless'));
+        self::assertInstanceOf(Route::class, $route);
+        self::assertSame('/blog/{slug}', $route->getPath());
+        self::assertSame('{locale}.example.com', $route->getHost());
+        self::assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
+        self::assertSame('\w+', $route->getRequirement('locale'));
+        self::assertSame('RouteCompiler', $route->getOption('compiler_class'));
+        self::assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
+        self::assertEquals(['https'], $route->getSchemes());
+        self::assertEquals('context.getMethod() == "GET"', $route->getCondition());
+        self::assertTrue($route->getDefault('_stateless'));
     }
 
     public function testLoadWithNamespacePrefix()
@@ -55,17 +55,17 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('namespaceprefix.xml');
 
-        $this->assertCount(1, $routeCollection->all(), 'One route is loaded');
+        self::assertCount(1, $routeCollection->all(), 'One route is loaded');
 
         $route = $routeCollection->get('blog_show');
-        $this->assertSame('/blog/{slug}', $route->getPath());
-        $this->assertSame('{_locale}.example.com', $route->getHost());
-        $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertSame('\w+', $route->getRequirement('slug'));
-        $this->assertSame('en|fr|de', $route->getRequirement('_locale'));
-        $this->assertNull($route->getDefault('slug'));
-        $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
-        $this->assertSame(1, $route->getDefault('page'));
+        self::assertSame('/blog/{slug}', $route->getPath());
+        self::assertSame('{_locale}.example.com', $route->getHost());
+        self::assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
+        self::assertSame('\w+', $route->getRequirement('slug'));
+        self::assertSame('en|fr|de', $route->getRequirement('_locale'));
+        self::assertNull($route->getDefault('slug'));
+        self::assertSame('RouteCompiler', $route->getOption('compiler_class'));
+        self::assertSame(1, $route->getDefault('page'));
     }
 
     public function testLoadWithImport()
@@ -74,16 +74,16 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('validresource.xml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        self::assertCount(2, $routes, 'Two routes are loaded');
+        self::assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         foreach ($routes as $route) {
-            $this->assertSame('/{foo}/blog/{slug}', $route->getPath());
-            $this->assertSame('123', $route->getDefault('foo'));
-            $this->assertSame('\d+', $route->getRequirement('foo'));
-            $this->assertSame('bar', $route->getOption('foo'));
-            $this->assertSame('', $route->getHost());
-            $this->assertSame('context.getMethod() == "POST"', $route->getCondition());
+            self::assertSame('/{foo}/blog/{slug}', $route->getPath());
+            self::assertSame('123', $route->getDefault('foo'));
+            self::assertSame('\d+', $route->getRequirement('foo'));
+            self::assertSame('bar', $route->getOption('foo'));
+            self::assertSame('', $route->getHost());
+            self::assertSame('context.getMethod() == "POST"', $route->getCondition());
         }
     }
 
@@ -92,14 +92,14 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routes = $loader->load('defaults.xml');
 
-        $this->assertCount(1, $routes);
+        self::assertCount(1, $routes);
 
         $defaultsRoute = $routes->get('defaults');
 
-        $this->assertSame('/defaults', $defaultsRoute->getPath());
-        $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
-        $this->assertSame('html', $defaultsRoute->getDefault('_format'));
-        $this->assertTrue($defaultsRoute->getDefault('_stateless'));
+        self::assertSame('/defaults', $defaultsRoute->getPath());
+        self::assertSame('en', $defaultsRoute->getDefault('_locale'));
+        self::assertSame('html', $defaultsRoute->getDefault('_format'));
+        self::assertTrue($defaultsRoute->getDefault('_stateless'));
     }
 
     public function testLoadingImportedRoutesWithDefaults()
@@ -107,7 +107,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routes = $loader->load('importer-with-defaults.xml');
 
-        $this->assertCount(2, $routes);
+        self::assertCount(2, $routes);
 
         $expectedRoutes = new RouteCollection();
         $expectedRoutes->add('one', $localeRoute = new Route('/defaults/one'));
@@ -123,7 +123,7 @@ class XmlFileLoaderTest extends TestCase
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/imported-with-defaults.xml'));
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/importer-with-defaults.xml'));
 
-        $this->assertEquals($expectedRoutes, $routes);
+        self::assertEquals($expectedRoutes, $routes);
     }
 
     public function testLoadingUtf8Route()
@@ -131,7 +131,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('utf8.xml');
 
-        $this->assertCount(2, $routes);
+        self::assertCount(2, $routes);
 
         $expectedRoutes = new RouteCollection();
         $expectedRoutes->add('app_utf8', $route = new Route('/utf8'));
@@ -142,7 +142,7 @@ class XmlFileLoaderTest extends TestCase
 
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/utf8.xml'));
 
-        $this->assertEquals($expectedRoutes, $routes);
+        self::assertEquals($expectedRoutes, $routes);
     }
 
     public function testLoadingUtf8ImportedRoutes()
@@ -150,7 +150,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-utf8.xml');
 
-        $this->assertCount(2, $routes);
+        self::assertCount(2, $routes);
 
         $expectedRoutes = new RouteCollection();
         $expectedRoutes->add('utf8_one', $one = new Route('/one'));
@@ -162,7 +162,7 @@ class XmlFileLoaderTest extends TestCase
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/imported-with-utf8.xml'));
         $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/importer-with-utf8.xml'));
 
-        $this->assertEquals($expectedRoutes, $routes);
+        self::assertEquals($expectedRoutes, $routes);
     }
 
     public function testLoadLocalized()
@@ -171,11 +171,11 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('localized.xml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        self::assertCount(2, $routes, 'Two routes are loaded');
+        self::assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
-        $this->assertEquals('/route', $routeCollection->get('localized.fr')->getPath());
-        $this->assertEquals('/path', $routeCollection->get('localized.en')->getPath());
+        self::assertEquals('/route', $routeCollection->get('localized.fr')->getPath());
+        self::assertEquals('/path', $routeCollection->get('localized.en')->getPath());
     }
 
     public function testLocalizedImports()
@@ -184,14 +184,14 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('importer-with-locale.xml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        self::assertCount(2, $routes, 'Two routes are loaded');
+        self::assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
-        $this->assertEquals('/le-prefix/le-suffix', $routeCollection->get('imported.fr')->getPath());
-        $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+        self::assertEquals('/le-prefix/le-suffix', $routeCollection->get('imported.fr')->getPath());
+        self::assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
 
-        $this->assertEquals('fr', $routeCollection->get('imported.fr')->getRequirement('_locale'));
-        $this->assertEquals('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
+        self::assertEquals('fr', $routeCollection->get('imported.fr')->getRequirement('_locale'));
+        self::assertEquals('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
     }
 
     public function testLocalizedImportsOfNotLocalizedRoutes()
@@ -200,14 +200,14 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('importer-with-locale-imports-non-localized-route.xml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        self::assertCount(2, $routes, 'Two routes are loaded');
+        self::assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
-        $this->assertEquals('/le-prefix/suffix', $routeCollection->get('imported.fr')->getPath());
-        $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+        self::assertEquals('/le-prefix/suffix', $routeCollection->get('imported.fr')->getPath());
+        self::assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
 
-        $this->assertSame('fr', $routeCollection->get('imported.fr')->getRequirement('_locale'));
-        $this->assertSame('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
+        self::assertSame('fr', $routeCollection->get('imported.fr')->getRequirement('_locale'));
+        self::assertSame('en', $routeCollection->get('imported.en')->getRequirement('_locale'));
     }
 
     /**
@@ -215,7 +215,7 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
@@ -225,7 +225,7 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $loader = new CustomXmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
@@ -246,8 +246,8 @@ class XmlFileLoaderTest extends TestCase
 
     public function testDocTypeIsNotAllowed()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Document types are not allowed.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Document types are not allowed.');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load('withdoctype.xml');
     }
@@ -258,12 +258,12 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('null_values.xml');
         $route = $routeCollection->get('blog_show');
 
-        $this->assertTrue($route->hasDefault('foo'));
-        $this->assertNull($route->getDefault('foo'));
-        $this->assertTrue($route->hasDefault('bar'));
-        $this->assertNull($route->getDefault('bar'));
-        $this->assertEquals('foo', $route->getDefault('foobar'));
-        $this->assertEquals('bar', $route->getDefault('baz'));
+        self::assertTrue($route->hasDefault('foo'));
+        self::assertNull($route->getDefault('foo'));
+        self::assertTrue($route->hasDefault('bar'));
+        self::assertNull($route->getDefault('bar'));
+        self::assertEquals('foo', $route->getDefault('foobar'));
+        self::assertEquals('bar', $route->getDefault('baz'));
     }
 
     public function testScalarDataTypeDefaults()
@@ -272,21 +272,18 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('scalar_defaults.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(
-            [
-                '_controller' => 'AcmeBlogBundle:Blog:index',
-                'slug' => null,
-                'published' => true,
-                'page' => 1,
-                'price' => 3.5,
-                'archived' => false,
-                'free' => true,
-                'locked' => false,
-                'foo' => null,
-                'bar' => null,
-            ],
-            $route->getDefaults()
-        );
+        self::assertSame([
+            '_controller' => 'AcmeBlogBundle:Blog:index',
+            'slug' => null,
+            'published' => true,
+            'page' => 1,
+            'price' => 3.5,
+            'archived' => false,
+            'free' => true,
+            'locked' => false,
+            'foo' => null,
+            'bar' => null,
+        ], $route->getDefaults());
     }
 
     public function testListDefaults()
@@ -295,13 +292,10 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('list_defaults.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(
-            [
-                '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => [true, 1, 3.5, 'foo'],
-            ],
-            $route->getDefaults()
-        );
+        self::assertSame([
+            '_controller' => 'AcmeBlogBundle:Blog:index',
+            'values' => [true, 1, 3.5, 'foo'],
+        ], $route->getDefaults());
     }
 
     public function testListInListDefaults()
@@ -310,13 +304,10 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('list_in_list_defaults.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(
-            [
-                '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => [[true, 1, 3.5, 'foo']],
-            ],
-            $route->getDefaults()
-        );
+        self::assertSame([
+            '_controller' => 'AcmeBlogBundle:Blog:index',
+            'values' => [[true, 1, 3.5, 'foo']],
+        ], $route->getDefaults());
     }
 
     public function testListInMapDefaults()
@@ -325,13 +316,10 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('list_in_map_defaults.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(
-            [
-                '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => ['list' => [true, 1, 3.5, 'foo']],
-            ],
-            $route->getDefaults()
-        );
+        self::assertSame([
+            '_controller' => 'AcmeBlogBundle:Blog:index',
+            'values' => ['list' => [true, 1, 3.5, 'foo']],
+        ], $route->getDefaults());
     }
 
     public function testMapDefaults()
@@ -340,18 +328,15 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('map_defaults.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(
-            [
-                '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => [
-                    'public' => true,
-                    'page' => 1,
-                    'price' => 3.5,
-                    'title' => 'foo',
-                ],
+        self::assertSame([
+            '_controller' => 'AcmeBlogBundle:Blog:index',
+            'values' => [
+                'public' => true,
+                'page' => 1,
+                'price' => 3.5,
+                'title' => 'foo',
             ],
-            $route->getDefaults()
-        );
+        ], $route->getDefaults());
     }
 
     public function testMapInListDefaults()
@@ -360,18 +345,15 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('map_in_list_defaults.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(
-            [
-                '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => [[
-                    'public' => true,
-                    'page' => 1,
-                    'price' => 3.5,
-                    'title' => 'foo',
-                ]],
-            ],
-            $route->getDefaults()
-        );
+        self::assertSame([
+            '_controller' => 'AcmeBlogBundle:Blog:index',
+            'values' => [[
+                'public' => true,
+                'page' => 1,
+                'price' => 3.5,
+                'title' => 'foo',
+            ]],
+        ], $route->getDefaults());
     }
 
     public function testMapInMapDefaults()
@@ -380,18 +362,15 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('map_in_map_defaults.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(
-            [
-                '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => ['map' => [
-                    'public' => true,
-                    'page' => 1,
-                    'price' => 3.5,
-                    'title' => 'foo',
-                ]],
-            ],
-            $route->getDefaults()
-        );
+        self::assertSame([
+            '_controller' => 'AcmeBlogBundle:Blog:index',
+            'values' => ['map' => [
+                'public' => true,
+                'page' => 1,
+                'price' => 3.5,
+                'title' => 'foo',
+            ]],
+        ], $route->getDefaults());
     }
 
     public function testNullValuesInList()
@@ -400,7 +379,7 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('list_null_values.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame([null, null, null, null, null, null], $route->getDefault('list'));
+        self::assertSame([null, null, null, null, null, null], $route->getDefault('list'));
     }
 
     public function testNullValuesInMap()
@@ -409,17 +388,14 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('map_null_values.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(
-            [
-                'boolean' => null,
-                'integer' => null,
-                'float' => null,
-                'string' => null,
-                'list' => null,
-                'map' => null,
-            ],
-            $route->getDefault('map')
-        );
+        self::assertSame([
+            'boolean' => null,
+            'integer' => null,
+            'float' => null,
+            'string' => null,
+            'list' => null,
+            'map' => null,
+        ], $route->getDefault('map'));
     }
 
     public function testLoadRouteWithControllerAttribute()
@@ -429,7 +405,7 @@ class XmlFileLoaderTest extends TestCase
 
         $route = $routeCollection->get('app_homepage');
 
-        $this->assertSame('AppBundle:Homepage:show', $route->getDefault('_controller'));
+        self::assertSame('AppBundle:Homepage:show', $route->getDefault('_controller'));
     }
 
     public function testLoadRouteWithoutControllerAttribute()
@@ -439,7 +415,7 @@ class XmlFileLoaderTest extends TestCase
 
         $route = $routeCollection->get('app_logout');
 
-        $this->assertNull($route->getDefault('_controller'));
+        self::assertNull($route->getDefault('_controller'));
     }
 
     public function testLoadRouteWithControllerSetInDefaults()
@@ -449,13 +425,13 @@ class XmlFileLoaderTest extends TestCase
 
         $route = $routeCollection->get('app_blog');
 
-        $this->assertSame('AppBundle:Blog:list', $route->getDefault('_controller'));
+        self::assertSame('AppBundle:Blog:list', $route->getDefault('_controller'));
     }
 
     public function testOverrideControllerInDefaults()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('override_defaults.xml');
     }
@@ -469,13 +445,13 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load($file);
 
         $route = $routeCollection->get('app_homepage');
-        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+        self::assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
 
         $route = $routeCollection->get('app_blog');
-        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+        self::assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
 
         $route = $routeCollection->get('app_logout');
-        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+        self::assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
     }
 
     public function provideFilesImportingRoutesWithControllers()
@@ -486,8 +462,8 @@ class XmlFileLoaderTest extends TestCase
 
     public function testImportWithOverriddenController()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('import_override_defaults.xml');
     }
@@ -498,7 +474,7 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('import_single.xml');
 
         $route = $routeCollection->get('bar_route');
-        $this->assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
+        self::assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
     }
 
     public function testImportRouteWithGlobMatchingMultipleFiles()
@@ -507,10 +483,10 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('import_multiple.xml');
 
         $route = $routeCollection->get('bar_route');
-        $this->assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
+        self::assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
 
         $route = $routeCollection->get('baz_route');
-        $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
+        self::assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
     }
 
     public function testImportRouteWithNamePrefix()
@@ -518,10 +494,10 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_name_prefix']));
         $routeCollection = $loader->load('routing.xml');
 
-        $this->assertNotNull($routeCollection->get('app_blog'));
-        $this->assertEquals('/blog', $routeCollection->get('app_blog')->getPath());
-        $this->assertNotNull($routeCollection->get('api_app_blog'));
-        $this->assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
+        self::assertNotNull($routeCollection->get('app_blog'));
+        self::assertEquals('/blog', $routeCollection->get('app_blog')->getPath());
+        self::assertNotNull($routeCollection->get('api_app_blog'));
+        self::assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
     }
 
     public function testImportRouteWithNoTrailingSlash()
@@ -529,8 +505,8 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_no_trailing_slash']));
         $routeCollection = $loader->load('routing.xml');
 
-        $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());
-        $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
+        self::assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());
+        self::assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
     }
 
     public function testImportingRoutesWithHostsInImporter()
@@ -540,7 +516,7 @@ class XmlFileLoaderTest extends TestCase
 
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-host-expected-collection.php';
 
-        $this->assertEquals($expectedRoutes('xml'), $routes);
+        self::assertEquals($expectedRoutes('xml'), $routes);
     }
 
     public function testImportingRoutesWithLocalesAndHostInImporter()
@@ -550,7 +526,7 @@ class XmlFileLoaderTest extends TestCase
 
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-locale-and-host-expected-collection.php';
 
-        $this->assertEquals($expectedRoutes('xml'), $routes);
+        self::assertEquals($expectedRoutes('xml'), $routes);
     }
 
     public function testImportingRoutesWithoutHostsInImporter()
@@ -560,7 +536,7 @@ class XmlFileLoaderTest extends TestCase
 
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-without-host-expected-collection.php';
 
-        $this->assertEquals($expectedRoutes('xml'), $routes);
+        self::assertEquals($expectedRoutes('xml'), $routes);
     }
 
     public function testImportingRoutesWithSingleHostsInImporter()
@@ -570,7 +546,7 @@ class XmlFileLoaderTest extends TestCase
 
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
 
-        $this->assertEquals($expectedRoutes('xml'), $routes);
+        self::assertEquals($expectedRoutes('xml'), $routes);
     }
 
     public function testWhenEnv()
@@ -578,9 +554,9 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
         $routes = $loader->load('when-env.xml');
 
-        $this->assertSame(['b', 'a'], array_keys($routes->all()));
-        $this->assertSame('/b', $routes->get('b')->getPath());
-        $this->assertSame('/a1', $routes->get('a')->getPath());
+        self::assertSame(['b', 'a'], array_keys($routes->all()));
+        self::assertSame('/b', $routes->get('b')->getPath());
+        self::assertSame('/a1', $routes->get('a')->getPath());
     }
 
     public function testImportingAliases()
@@ -590,6 +566,6 @@ class XmlFileLoaderTest extends TestCase
 
         $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
 
-        $this->assertEquals($expectedRoutes('xml'), $routes);
+        self::assertEquals($expectedRoutes('xml'), $routes);
     }
 }

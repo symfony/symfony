@@ -24,7 +24,7 @@ class HtmlDumperTest extends TestCase
     public function testGet()
     {
         if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
-            $this->markTestSkipped('A custom file_link_format is defined.');
+            self::markTestSkipped('A custom file_link_format is defined.');
         }
 
         require __DIR__.'/../Fixtures/dumb-var.php';
@@ -52,8 +52,7 @@ class HtmlDumperTest extends TestCase
         $dumpId = $dumpId[0];
         $res = (int) $var['res'];
 
-        $this->assertStringMatchesFormat(
-            <<<EOTXT
+        self::assertStringMatchesFormat(<<<EOTXT
 <foo></foo><bar><span class=sf-dump-note>array:24</span> [<samp data-depth=1 class=sf-dump-expanded>
   "<span class=sf-dump-key>number</span>" => <span class=sf-dump-num>1</span>
   <span class=sf-dump-key>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
@@ -109,11 +108,7 @@ class HtmlDumperTest extends TestCase
 </samp>]
 </bar>
 
-EOTXT
-            ,
-
-            $out
-        );
+EOTXT, $out);
     }
 
     public function testCharset()
@@ -128,15 +123,11 @@ EOTXT
         $data = $cloner->cloneVar($var);
         $out = $dumper->dump($data, true);
 
-        $this->assertStringMatchesFormat(
-            <<<'EOTXT'
+        self::assertStringMatchesFormat(<<<'EOTXT'
 <foo></foo><bar>b"<span class=sf-dump-str title="7 binary or non-UTF-8 characters">&#1057;&#1083;&#1086;&#1074;&#1072;&#1088;&#1100;</span>"
 </bar>
 
-EOTXT
-            ,
-            $out
-        );
+EOTXT, $out);
     }
 
     public function testAppend()
@@ -153,16 +144,13 @@ EOTXT
 
         $out = stream_get_contents($out, -1, 0);
 
-        $this->assertSame(<<<'EOTXT'
+        self::assertSame(<<<'EOTXT'
 <foo></foo><bar><span class=sf-dump-num>123</span>
 </bar>
 <bar><span class=sf-dump-num>456</span>
 </bar>
 
-EOTXT
-            ,
-            $out
-        );
+EOTXT, $out);
     }
 
     /**
@@ -177,7 +165,7 @@ EOTXT
         $dumper->dump($cloner->cloneVar($var));
         $out = ob_get_clean();
 
-        $this->assertStringContainsString($needle, $out);
+        self::assertStringContainsString($needle, $out);
     }
 
     public function varToDumpProvider()

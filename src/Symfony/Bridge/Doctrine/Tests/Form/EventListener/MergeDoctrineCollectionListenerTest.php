@@ -33,7 +33,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
     {
         $this->collection = new ArrayCollection(['test']);
         $this->dispatcher = new EventDispatcher();
-        $this->factory = $this->createMock(FormFactoryInterface::class);
+        $this->factory = self::createMock(FormFactoryInterface::class);
         $this->form = $this->getBuilder()
             ->getForm();
     }
@@ -66,8 +66,8 @@ class MergeDoctrineCollectionListenerTest extends TestCase
 
         $this->dispatcher->dispatch($event, FormEvents::SUBMIT);
 
-        $this->assertTrue($this->collection->contains('test'));
-        $this->assertSame(1, $this->collection->count());
+        self::assertTrue($this->collection->contains('test'));
+        self::assertSame(1, $this->collection->count());
     }
 
     public function testOnSubmitNullClearCollection()
@@ -77,6 +77,6 @@ class MergeDoctrineCollectionListenerTest extends TestCase
 
         $this->dispatcher->dispatch($event, FormEvents::SUBMIT);
 
-        $this->assertTrue($this->collection->isEmpty());
+        self::assertTrue($this->collection->isEmpty());
     }
 }

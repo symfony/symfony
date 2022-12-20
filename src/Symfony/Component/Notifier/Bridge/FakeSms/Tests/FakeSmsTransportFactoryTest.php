@@ -24,7 +24,7 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
      */
     public function createFactory(): TransportFactoryInterface
     {
-        return new FakeSmsTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
+        return new FakeSmsTransportFactory(self::createMock(MailerInterface::class), self::createMock(LoggerInterface::class));
     }
 
     public function createProvider(): iterable

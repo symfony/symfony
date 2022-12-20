@@ -38,14 +38,14 @@ class UserProviderListenerTest extends TestCase
     {
         $passport = new SelfValidatingPassport(new UserBadge('wouter'));
 
-        $this->listener->checkPassport(new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport));
+        $this->listener->checkPassport(new CheckPassportEvent(self::createMock(AuthenticatorInterface::class), $passport));
 
         $badge = $passport->getBadge(UserBadge::class);
-        $this->assertEquals([$this->userProvider, 'loadUserByIdentifier'], $badge->getUserLoader());
+        self::assertEquals([$this->userProvider, 'loadUserByIdentifier'], $badge->getUserLoader());
 
         $user = new InMemoryUser('wouter', null);
         $this->userProvider->createUser($user);
-        $this->assertTrue($user->isEqualTo($passport->getUser()));
+        self::assertTrue($user->isEqualTo($passport->getUser()));
     }
 
     /**
@@ -54,9 +54,9 @@ class UserProviderListenerTest extends TestCase
     public function testNotOverrideUserLoader($passport)
     {
         $badgeBefore = $passport->hasBadge(UserBadge::class) ? $passport->getBadge(UserBadge::class) : null;
-        $this->listener->checkPassport(new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport));
+        $this->listener->checkPassport(new CheckPassportEvent(self::createMock(AuthenticatorInterface::class), $passport));
 
-        $this->assertEquals($passport->hasBadge(UserBadge::class) ? $passport->getBadge(UserBadge::class) : null, $badgeBefore);
+        self::assertEquals($passport->hasBadge(UserBadge::class) ? $passport->getBadge(UserBadge::class) : null, $badgeBefore);
     }
 
     public function provideCompletePassports()

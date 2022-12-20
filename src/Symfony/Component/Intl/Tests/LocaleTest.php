@@ -44,7 +44,7 @@ class LocaleTest extends TestCase
      */
     public function testGetFallback($expected, $locale)
     {
-        $this->assertSame($expected, Locale::getFallback($locale));
+        self::assertSame($expected, Locale::getFallback($locale));
     }
 
     public function testNoDefaultFallback()
@@ -52,9 +52,9 @@ class LocaleTest extends TestCase
         $prev = Locale::getDefaultFallback();
         Locale::setDefaultFallback(null);
 
-        $this->assertSame('nl', Locale::getFallback('nl_NL'));
-        $this->assertNull(Locale::getFallback('nl'));
-        $this->assertNull(Locale::getFallback('root'));
+        self::assertSame('nl', Locale::getFallback('nl_NL'));
+        self::assertNull(Locale::getFallback('nl'));
+        self::assertNull(Locale::getFallback('root'));
 
         Locale::setDefaultFallback($prev);
     }
@@ -64,9 +64,9 @@ class LocaleTest extends TestCase
         $prev = Locale::getDefaultFallback();
         Locale::setDefaultFallback('root');
 
-        $this->assertSame('nl', Locale::getFallback('nl_NL'));
-        $this->assertSame('root', Locale::getFallback('nl'));
-        $this->assertNull(Locale::getFallback('root'));
+        self::assertSame('nl', Locale::getFallback('nl_NL'));
+        self::assertSame('root', Locale::getFallback('nl'));
+        self::assertNull(Locale::getFallback('root'));
 
         Locale::setDefaultFallback($prev);
     }
@@ -80,6 +80,6 @@ class LocaleTest extends TestCase
             'LC_MONETARY=fr_FR.UTF-8;LC_MESSAGES=fr_FR.UTF-8;LC_PAPER=fr_FR.UTF-8;LC_NAME=fr_FR.UTF-8;'.
             'LC_ADDRESS=fr_FR.UTF-8;LC_TELEPHONE=fr_FR.UTF-8;LC_MEASUREMENT=fr_FR.UTF-8;LC_IDENTIFICATION=fr_FR.UTF-8';
 
-        $this->assertNull(Locale::getFallback($locale));
+        self::assertNull(Locale::getFallback($locale));
     }
 }

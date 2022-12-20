@@ -21,11 +21,11 @@ class SyncTransportTest extends TestCase
 {
     public function testSend()
     {
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())
+        $bus = self::createMock(MessageBusInterface::class);
+        $bus->expects(self::once())
             ->method('dispatch')
-            ->with($this->callback(function ($arg) {
-                $this->assertInstanceOf(Envelope::class, $arg);
+            ->with(self::callback(function ($arg) {
+                self::assertInstanceOf(Envelope::class, $arg);
 
                 return true;
             }))
@@ -35,7 +35,7 @@ class SyncTransportTest extends TestCase
         $transport = new SyncTransport($bus);
         $envelope = $transport->send($envelope);
 
-        $this->assertSame($message, $envelope->getMessage());
-        $this->assertNotNull($envelope->last(ReceivedStamp::class));
+        self::assertSame($message, $envelope->getMessage());
+        self::assertNotNull($envelope->last(ReceivedStamp::class));
     }
 }

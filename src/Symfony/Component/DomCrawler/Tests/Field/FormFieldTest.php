@@ -20,7 +20,7 @@ class FormFieldTest extends FormFieldTestCase
         $node = $this->createNode('input', '', ['type' => 'text', 'name' => 'name', 'value' => 'value']);
         $field = new InputFormField($node);
 
-        $this->assertEquals('name', $field->getName(), '->getName() returns the name of the field');
+        self::assertEquals('name', $field->getName(), '->getName() returns the name of the field');
     }
 
     public function testGetSetHasValue()
@@ -28,12 +28,12 @@ class FormFieldTest extends FormFieldTestCase
         $node = $this->createNode('input', '', ['type' => 'text', 'name' => 'name', 'value' => 'value']);
         $field = new InputFormField($node);
 
-        $this->assertEquals('value', $field->getValue(), '->getValue() returns the value of the field');
+        self::assertEquals('value', $field->getValue(), '->getValue() returns the value of the field');
 
         $field->setValue('foo');
-        $this->assertEquals('foo', $field->getValue(), '->setValue() sets the value of the field');
+        self::assertEquals('foo', $field->getValue(), '->setValue() sets the value of the field');
 
-        $this->assertTrue($field->hasValue(), '->hasValue() always returns true');
+        self::assertTrue($field->hasValue(), '->hasValue() always returns true');
     }
 
     public function testLabelReturnsNullIfNoneIsDefined()
@@ -42,7 +42,7 @@ class FormFieldTest extends FormFieldTestCase
         $dom->loadHTML('<html><form><input type="text" id="foo" name="foo" value="foo" /><input type="submit" /></form></html>');
 
         $field = new InputFormField($dom->getElementById('foo'));
-        $this->assertNull($field->getLabel(), '->getLabel() returns null if no label is defined');
+        self::assertNull($field->getLabel(), '->getLabel() returns null if no label is defined');
     }
 
     public function testLabelIsAssignedByForAttribute()
@@ -55,7 +55,7 @@ class FormFieldTest extends FormFieldTestCase
         </form></html>');
 
         $field = new InputFormField($dom->getElementById('foo'));
-        $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
+        self::assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
     }
 
     public function testLabelIsAssignedByParentingRelation()
@@ -67,6 +67,6 @@ class FormFieldTest extends FormFieldTestCase
         </form></html>');
 
         $field = new InputFormField($dom->getElementById('foo'));
-        $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the parent label');
+        self::assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the parent label');
     }
 }

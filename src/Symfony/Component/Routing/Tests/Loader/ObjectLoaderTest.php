@@ -35,9 +35,9 @@ class ObjectLoaderTest extends TestCase
             'service'
         );
 
-        $this->assertSame($collection, $actualRoutes);
+        self::assertSame($collection, $actualRoutes);
         // the service file should be listed as a resource
-        $this->assertNotEmpty($actualRoutes->getResources());
+        self::assertNotEmpty($actualRoutes->getResources());
     }
 
     /**
@@ -45,7 +45,7 @@ class ObjectLoaderTest extends TestCase
      */
     public function testExceptionWithoutSyntax(string $resourceString)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $loader = new TestObjectLoader();
         $loader->load($resourceString);
     }
@@ -64,7 +64,7 @@ class ObjectLoaderTest extends TestCase
 
     public function testExceptionOnNoObjectReturned()
     {
-        $this->expectException(\TypeError::class);
+        self::expectException(\TypeError::class);
         $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => 'NOT_AN_OBJECT'];
         $loader->load('my_service::method');
@@ -72,7 +72,7 @@ class ObjectLoaderTest extends TestCase
 
     public function testExceptionOnBadMethod()
     {
-        $this->expectException(\BadMethodCallException::class);
+        self::expectException(\BadMethodCallException::class);
         $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => new \stdClass()];
         $loader->load('my_service::method');
@@ -80,11 +80,11 @@ class ObjectLoaderTest extends TestCase
 
     public function testExceptionOnMethodNotReturningCollection()
     {
-        $this->expectException(\LogicException::class);
-        $service = $this->getMockBuilder(\stdClass::class)
+        self::expectException(\LogicException::class);
+        $service = self::getMockBuilder(\stdClass::class)
             ->setMethods(['loadRoutes'])
             ->getMock();
-        $service->expects($this->once())
+        $service->expects(self::once())
             ->method('loadRoutes')
             ->willReturn('NOT_A_COLLECTION');
 

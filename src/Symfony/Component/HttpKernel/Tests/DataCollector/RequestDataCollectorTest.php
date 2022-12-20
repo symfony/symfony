@@ -43,26 +43,26 @@ class RequestDataCollectorTest extends TestCase
 
         $attributes = $c->getRequestAttributes();
 
-        $this->assertSame('request', $c->getName());
-        $this->assertInstanceOf(ParameterBag::class, $c->getRequestHeaders());
-        $this->assertInstanceOf(ParameterBag::class, $c->getRequestServer());
-        $this->assertInstanceOf(ParameterBag::class, $c->getRequestCookies());
-        $this->assertInstanceOf(ParameterBag::class, $attributes);
-        $this->assertInstanceOf(ParameterBag::class, $c->getRequestRequest());
-        $this->assertInstanceOf(ParameterBag::class, $c->getRequestQuery());
-        $this->assertInstanceOf(ParameterBag::class, $c->getResponseCookies());
-        $this->assertSame('html', $c->getFormat());
-        $this->assertEquals('foobar', $c->getRoute());
-        $this->assertEquals(['name' => 'foo'], $c->getRouteParams());
-        $this->assertSame([], $c->getSessionAttributes());
-        $this->assertSame('en', $c->getLocale());
-        $this->assertContainsEquals(__FILE__, $attributes->get('resource'));
-        $this->assertSame('stdClass', $attributes->get('object')->getType());
+        self::assertSame('request', $c->getName());
+        self::assertInstanceOf(ParameterBag::class, $c->getRequestHeaders());
+        self::assertInstanceOf(ParameterBag::class, $c->getRequestServer());
+        self::assertInstanceOf(ParameterBag::class, $c->getRequestCookies());
+        self::assertInstanceOf(ParameterBag::class, $attributes);
+        self::assertInstanceOf(ParameterBag::class, $c->getRequestRequest());
+        self::assertInstanceOf(ParameterBag::class, $c->getRequestQuery());
+        self::assertInstanceOf(ParameterBag::class, $c->getResponseCookies());
+        self::assertSame('html', $c->getFormat());
+        self::assertEquals('foobar', $c->getRoute());
+        self::assertEquals(['name' => 'foo'], $c->getRouteParams());
+        self::assertSame([], $c->getSessionAttributes());
+        self::assertSame('en', $c->getLocale());
+        self::assertContainsEquals(__FILE__, $attributes->get('resource'));
+        self::assertSame('stdClass', $attributes->get('object')->getType());
 
-        $this->assertInstanceOf(ParameterBag::class, $c->getResponseHeaders());
-        $this->assertSame('OK', $c->getStatusText());
-        $this->assertSame(200, $c->getStatusCode());
-        $this->assertSame('application/json', $c->getContentType());
+        self::assertInstanceOf(ParameterBag::class, $c->getResponseHeaders());
+        self::assertSame('OK', $c->getStatusText());
+        self::assertSame(200, $c->getStatusCode());
+        self::assertSame('application/json', $c->getContentType());
     }
 
     public function testCollectWithoutRouteParams()
@@ -73,7 +73,7 @@ class RequestDataCollectorTest extends TestCase
         $c->collect($request, $this->createResponse());
         $c->lateCollect();
 
-        $this->assertEquals([], $c->getRouteParams());
+        self::assertEquals([], $c->getRouteParams());
     }
 
     /**
@@ -88,7 +88,7 @@ class RequestDataCollectorTest extends TestCase
         $c->collect($request, $response);
         $c->lateCollect();
 
-        $this->assertSame($expected, $c->getController()->getValue(true), sprintf('Testing: %s', $name));
+        self::assertSame($expected, $c->getController()->getValue(true), sprintf('Testing: %s', $name));
     }
 
     public function provideControllerCallables()
@@ -198,7 +198,7 @@ class RequestDataCollectorTest extends TestCase
         $c = new RequestDataCollector();
         $c->collect($request, $response);
 
-        $this->assertSame('n/a', $c->getController());
+        self::assertSame('n/a', $c->getController());
     }
 
     public function testItAddsRedirectedAttributesWhenRequestContainsSpecificCookie()
@@ -208,12 +208,12 @@ class RequestDataCollectorTest extends TestCase
             'sf_redirect' => '{}',
         ]);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $c = new RequestDataCollector();
         $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $this->createResponse()));
 
-        $this->assertTrue($request->attributes->get('_redirected'));
+        self::assertTrue($request->attributes->get('_redirected'));
     }
 
     public function testItSetsARedirectCookieIfTheResponseIsARedirection()
@@ -229,9 +229,9 @@ class RequestDataCollectorTest extends TestCase
 
         $cookie = $this->getCookieByName($response, 'sf_redirect');
 
-        $this->assertNotEmpty($cookie->getValue());
-        $this->assertSame('lax', $cookie->getSameSite());
-        $this->assertFalse($cookie->isSecure());
+        self::assertNotEmpty($cookie->getValue());
+        self::assertSame('lax', $cookie->getSameSite());
+        self::assertFalse($cookie->isSecure());
     }
 
     public function testItCollectsTheRedirectionAndClearTheCookie()
@@ -247,10 +247,10 @@ class RequestDataCollectorTest extends TestCase
         $c->collect($request, $response = $this->createResponse());
         $c->lateCollect();
 
-        $this->assertEquals('POST', $c->getRedirect()['method']);
+        self::assertEquals('POST', $c->getRedirect()['method']);
 
         $cookie = $this->getCookieByName($response, 'sf_redirect');
-        $this->assertNull($cookie->getValue());
+        self::assertNull($cookie->getValue());
     }
 
     public function testItCollectsTheSessionTraceProperly()
@@ -262,11 +262,11 @@ class RequestDataCollectorTest extends TestCase
         $collector->collectSessionUsage();
 
         $collector->collect($request, $this->createResponse());
-        $this->assertSame([], $collector->getSessionUsages());
+        self::assertSame([], $collector->getSessionUsages());
 
         $collector->reset();
 
-        $session = $this->createMock(SessionInterface::class);
+        $session = self::createMock(SessionInterface::class);
         $session->method('getMetadataBag')->willReturnCallback(static function () use ($collector) {
             $collector->collectSessionUsage();
 
@@ -279,15 +279,15 @@ class RequestDataCollectorTest extends TestCase
 
         $usages = $collector->getSessionUsages();
 
-        $this->assertCount(1, $usages);
-        $this->assertSame(__FILE__, $usages[0]['file']);
-        $this->assertSame(__LINE__ - 9, $line = $usages[0]['line']);
+        self::assertCount(1, $usages);
+        self::assertSame(__FILE__, $usages[0]['file']);
+        self::assertSame(__LINE__ - 9, $line = $usages[0]['line']);
 
         $trace = $usages[0]['trace'];
-        $this->assertSame('getMetadataBag', $trace[0]['function']);
-        $this->assertSame(self::class, $class = $trace[1]['class']);
+        self::assertSame('getMetadataBag', $trace[0]['function']);
+        self::assertSame(self::class, $class = $trace[1]['class']);
 
-        $this->assertSame(sprintf('%s:%s', $class, $line), $usages[0]['name']);
+        self::assertSame(sprintf('%s:%s', $class, $line), $usages[0]['name']);
     }
 
     public function testStatelessCheck()
@@ -300,7 +300,7 @@ class RequestDataCollectorTest extends TestCase
         $collector->collect($request, $response = $this->createResponse());
         $collector->lateCollect();
 
-        $this->assertFalse($collector->getStatelessCheck());
+        self::assertFalse($collector->getStatelessCheck());
 
         $requestStack = new RequestStack();
         $request = $this->createRequest();
@@ -311,7 +311,7 @@ class RequestDataCollectorTest extends TestCase
         $collector->collect($request, $response = $this->createResponse());
         $collector->lateCollect();
 
-        $this->assertTrue($collector->getStatelessCheck());
+        self::assertTrue($collector->getStatelessCheck());
 
         $requestStack = new RequestStack();
         $request = $this->createRequest();
@@ -320,7 +320,7 @@ class RequestDataCollectorTest extends TestCase
         $collector->collect($request, $response = $this->createResponse());
         $collector->lateCollect();
 
-        $this->assertFalse($collector->getStatelessCheck());
+        self::assertFalse($collector->getStatelessCheck());
     }
 
     public function testItHidesPassword()
@@ -340,8 +340,8 @@ class RequestDataCollectorTest extends TestCase
         $c->collect($request, $this->createResponse());
         $c->lateCollect();
 
-        $this->assertEquals('******', $c->getRequestRequest()->get('_password'));
-        $this->assertEquals('_password=******', $c->getContent());
+        self::assertEquals('******', $c->getRequestRequest()->get('_password'));
+        self::assertEquals('_password=******', $c->getContent());
     }
 
     protected function createRequest($routeParams = ['name' => 'foo'])
@@ -384,8 +384,8 @@ class RequestDataCollectorTest extends TestCase
      */
     protected function injectController($collector, $controller, $request)
     {
-        $resolver = $this->createMock(ControllerResolverInterface::class);
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class));
+        $resolver = self::createMock(ControllerResolverInterface::class);
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, self::createMock(ArgumentResolverInterface::class));
         $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MAIN_REQUEST);
         $collector->onKernelController($event);
     }
@@ -442,7 +442,7 @@ class RequestDataCollectorTest extends TestCase
         $c = new RequestDataCollector();
         $c->collect($request, $response);
 
-        $this->assertSame($expected, $c->isJsonRequest());
+        self::assertSame($expected, $c->isJsonRequest());
     }
 
     public function provideJsonContentTypes()
@@ -469,7 +469,7 @@ class RequestDataCollectorTest extends TestCase
         $c = new RequestDataCollector();
         $c->collect($request, $response);
 
-        $this->assertSame($expected, $c->getPrettyJson());
+        self::assertSame($expected, $c->getPrettyJson());
     }
 
     public function providePrettyJson()

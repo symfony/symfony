@@ -27,14 +27,14 @@ class PhpSerializerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Hello'));
 
         $encoded = $serializer->encode($envelope);
-        $this->assertStringNotContainsString("\0", $encoded['body'], 'Does not contain the binary characters');
-        $this->assertEquals($envelope, $serializer->decode($encoded));
+        self::assertStringNotContainsString("\0", $encoded['body'], 'Does not contain the binary characters');
+        self::assertEquals($envelope, $serializer->decode($encoded));
     }
 
     public function testDecodingFailsWithMissingBodyKey()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessage('Encoded envelope should have at least a "body", or maybe you should implement your own serializer');
+        self::expectException(MessageDecodingFailedException::class);
+        self::expectExceptionMessage('Encoded envelope should have at least a "body", or maybe you should implement your own serializer');
 
         $serializer = new PhpSerializer();
 
@@ -43,8 +43,8 @@ class PhpSerializerTest extends TestCase
 
     public function testDecodingFailsWithBadFormat()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageMatches('/Could not decode/');
+        self::expectException(MessageDecodingFailedException::class);
+        self::expectExceptionMessageMatches('/Could not decode/');
 
         $serializer = new PhpSerializer();
 
@@ -55,8 +55,8 @@ class PhpSerializerTest extends TestCase
 
     public function testDecodingFailsWithBadBase64Body()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageMatches('/Could not decode/');
+        self::expectException(MessageDecodingFailedException::class);
+        self::expectExceptionMessageMatches('/Could not decode/');
 
         $serializer = new PhpSerializer();
 
@@ -67,8 +67,8 @@ class PhpSerializerTest extends TestCase
 
     public function testDecodingFailsWithBadClass()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessageMatches('/class "ReceivedSt0mp" not found/');
+        self::expectException(MessageDecodingFailedException::class);
+        self::expectExceptionMessageMatches('/class "ReceivedSt0mp" not found/');
 
         $serializer = new PhpSerializer();
 
@@ -86,7 +86,7 @@ class PhpSerializerTest extends TestCase
         ]);
 
         $encoded = $serializer->encode($envelope);
-        $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
+        self::assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
     }
 
     public function testNonUtf8IsBase64Encoded()
@@ -96,8 +96,8 @@ class PhpSerializerTest extends TestCase
         $envelope = new Envelope(new DummyMessage("\xE9"));
 
         $encoded = $serializer->encode($envelope);
-        $this->assertTrue((bool) preg_match('//u', $encoded['body']), 'Encodes non-UTF8 payloads');
-        $this->assertEquals($envelope, $serializer->decode($encoded));
+        self::assertTrue((bool) preg_match('//u', $encoded['body']), 'Encodes non-UTF8 payloads');
+        self::assertEquals($envelope, $serializer->decode($encoded));
     }
 }
 

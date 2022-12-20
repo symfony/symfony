@@ -28,7 +28,7 @@ class LocaleAwareListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->localeAwareService = $this->createMock(LocaleAwareInterface::class);
+        $this->localeAwareService = self::createMock(LocaleAwareInterface::class);
         $this->requestStack = new RequestStack();
         $this->listener = new LocaleAwareListener(new \ArrayIterator([$this->localeAwareService]), $this->requestStack);
     }
@@ -36,75 +36,75 @@ class LocaleAwareListenerTest extends TestCase
     public function testLocaleIsSetInOnKernelRequest()
     {
         $this->localeAwareService
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setLocale')
-            ->with($this->equalTo('fr'));
+            ->with(self::equalTo('fr'));
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
     }
 
     public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest()
     {
         $this->localeAwareService
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('setLocale')
             ->withConsecutive(
-                [$this->anything()],
+                [self::anything()],
                 ['en']
             )
             ->willReturnOnConsecutiveCalls(
-                $this->throwException(new \InvalidArgumentException())
+                self::throwException(new \InvalidArgumentException())
             );
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
     }
 
     public function testLocaleIsSetInOnKernelFinishRequestWhenParentRequestExists()
     {
         $this->localeAwareService
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setLocale')
-            ->with($this->equalTo('fr'));
+            ->with(self::equalTo('fr'));
 
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent(self::createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }
 
     public function testLocaleIsSetToDefaultOnKernelFinishRequestWhenParentRequestDoesNotExist()
     {
         $this->localeAwareService
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setLocale')
-            ->with($this->equalTo('en'));
+            ->with(self::equalTo('en'));
 
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent(self::createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }
 
     public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest()
     {
         $this->localeAwareService
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('setLocale')
             ->withConsecutive(
-                [$this->anything()],
+                [self::anything()],
                 ['en']
             )
             ->willReturnOnConsecutiveCalls(
-                $this->throwException(new \InvalidArgumentException())
+                self::throwException(new \InvalidArgumentException())
             );
 
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent(self::createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }
 

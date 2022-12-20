@@ -26,22 +26,19 @@ final class EventAliasTest extends AbstractWebTestCase
 {
     public function testAliasedEvents()
     {
-        $client = $this->createClient(['test_case' => 'AliasedEvents', 'root_config' => 'config.yml']);
+        $client = self::createClient(['test_case' => 'AliasedEvents', 'root_config' => 'config.yml']);
         $container = $client->getContainer();
         $dispatcher = $container->get('event_dispatcher');
 
-        $dispatcher->dispatch(new AuthenticationSuccessEvent($this->createMock(TokenInterface::class)), AuthenticationEvents::AUTHENTICATION_SUCCESS);
-        $dispatcher->dispatch(new InteractiveLoginEvent($this->createMock(Request::class), $this->createMock(TokenInterface::class)), SecurityEvents::INTERACTIVE_LOGIN);
-        $dispatcher->dispatch(new SwitchUserEvent($this->createMock(Request::class), $this->createMock(UserInterface::class), $this->createMock(TokenInterface::class)), SecurityEvents::SWITCH_USER);
+        $dispatcher->dispatch(new AuthenticationSuccessEvent(self::createMock(TokenInterface::class)), AuthenticationEvents::AUTHENTICATION_SUCCESS);
+        $dispatcher->dispatch(new InteractiveLoginEvent(self::createMock(Request::class), self::createMock(TokenInterface::class)), SecurityEvents::INTERACTIVE_LOGIN);
+        $dispatcher->dispatch(new SwitchUserEvent(self::createMock(Request::class), self::createMock(UserInterface::class), self::createMock(TokenInterface::class)), SecurityEvents::SWITCH_USER);
 
-        $this->assertEquals(
-            [
-                'onAuthenticationSuccess' => 1,
-                'onInteractiveLogin' => 1,
-                'onSwitchUser' => 1,
-            ],
-            $container->get('test_subscriber')->calledMethods
-        );
+        self::assertEquals([
+            'onAuthenticationSuccess' => 1,
+            'onInteractiveLogin' => 1,
+            'onSwitchUser' => 1,
+        ], $container->get('test_subscriber')->calledMethods);
     }
 
     /**
@@ -49,15 +46,12 @@ final class EventAliasTest extends AbstractWebTestCase
      */
     public function testAliasedLegacyEvent()
     {
-        $client = $this->createClient(['test_case' => 'AliasedEvents', 'root_config' => 'config.yml']);
+        $client = self::createClient(['test_case' => 'AliasedEvents', 'root_config' => 'config.yml']);
         $container = $client->getContainer();
         $dispatcher = $container->get('event_dispatcher');
 
-        $dispatcher->dispatch(new AuthenticationFailureEvent($this->createMock(TokenInterface::class), new AuthenticationException()), AuthenticationEvents::AUTHENTICATION_FAILURE);
+        $dispatcher->dispatch(new AuthenticationFailureEvent(self::createMock(TokenInterface::class), new AuthenticationException()), AuthenticationEvents::AUTHENTICATION_FAILURE);
 
-        $this->assertEquals(
-            ['onAuthenticationFailure' => 1],
-            $container->get('test_subscriber')->calledMethods
-        );
+        self::assertEquals(['onAuthenticationFailure' => 1], $container->get('test_subscriber')->calledMethods);
     }
 }

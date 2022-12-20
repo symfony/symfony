@@ -43,9 +43,9 @@ class EsiFragmentRendererTest extends TestCase
         $request->setLocale('fr');
         $request->headers->set('Surrogate-Capability', 'ESI/1.0');
 
-        $this->assertEquals('<esi:include src="/" />', $strategy->render('/', $request)->getContent());
-        $this->assertEquals("<esi:comment text=\"This is a comment\" />\n<esi:include src=\"/\" />", $strategy->render('/', $request, ['comment' => 'This is a comment'])->getContent());
-        $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, ['alt' => 'foo'])->getContent());
+        self::assertEquals('<esi:include src="/" />', $strategy->render('/', $request)->getContent());
+        self::assertEquals("<esi:comment text=\"This is a comment\" />\n<esi:include src=\"/\" />", $strategy->render('/', $request, ['comment' => 'This is a comment'])->getContent());
+        self::assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, ['alt' => 'foo'])->getContent());
     }
 
     public function testRenderControllerReference()
@@ -60,15 +60,12 @@ class EsiFragmentRendererTest extends TestCase
         $reference = new ControllerReference('main_controller', [], []);
         $altReference = new ControllerReference('alt_controller', [], []);
 
-        $this->assertEquals(
-            '<esi:include src="/_fragment?_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" alt="/_fragment?_hash=iPJEdRoUpGrM1ztqByiorpfMPtiW%2FOWwdH1DBUXHhEc%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller" />',
-            $strategy->render($reference, $request, ['alt' => $altReference])->getContent()
-        );
+        self::assertEquals('<esi:include src="/_fragment?_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" alt="/_fragment?_hash=iPJEdRoUpGrM1ztqByiorpfMPtiW%2FOWwdH1DBUXHhEc%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller" />', $strategy->render($reference, $request, ['alt' => $altReference])->getContent());
     }
 
     public function testRenderControllerReferenceWithoutSignerThrowsException()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -80,7 +77,7 @@ class EsiFragmentRendererTest extends TestCase
 
     public function testRenderAltControllerReferenceWithoutSignerThrowsException()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -92,10 +89,10 @@ class EsiFragmentRendererTest extends TestCase
 
     private function getInlineStrategy($called = false)
     {
-        $inline = $this->createMock(InlineFragmentRenderer::class);
+        $inline = self::createMock(InlineFragmentRenderer::class);
 
         if ($called) {
-            $inline->expects($this->once())->method('render');
+            $inline->expects(self::once())->method('render');
         }
 
         return $inline;

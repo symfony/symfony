@@ -29,7 +29,7 @@ final class NoAssertionsTestRisky extends TestCase
      */
     public function testOne()
     {
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
         $this->expectDeprecation('foo');
         @trigger_error('foo', \E_USER_DEPRECATED);
     }
@@ -39,6 +39,6 @@ final class NoAssertionsTestRisky extends TestCase
      */
     public function testTwo()
     {
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
     }
 }

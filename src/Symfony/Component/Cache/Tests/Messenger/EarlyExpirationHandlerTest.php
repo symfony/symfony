@@ -62,9 +62,9 @@ class EarlyExpirationHandlerTest extends TestCase
 
         $handler($msg);
 
-        $this->assertSame(123, $pool->get('foo', [$this, 'fail'], 0.0, $metadata));
+        self::assertSame(123, $pool->get('foo', [$this, 'fail'], 0.0, $metadata));
 
-        $this->assertGreaterThan(25, $metadata['ctime']);
-        $this->assertGreaterThan(time(), $metadata['expiry']);
+        self::assertGreaterThan(25, $metadata['ctime']);
+        self::assertGreaterThan(time(), $metadata['expiry']);
     }
 }

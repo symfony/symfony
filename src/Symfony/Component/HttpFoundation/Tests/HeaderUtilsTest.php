@@ -21,7 +21,7 @@ class HeaderUtilsTest extends TestCase
      */
     public function testSplit(array $expected, string $header, string $separator)
     {
-        $this->assertSame($expected, HeaderUtils::split($header, $separator));
+        self::assertSame($expected, HeaderUtils::split($header, $separator));
     }
 
     public function provideHeaderToSplit(): array
@@ -61,45 +61,45 @@ class HeaderUtilsTest extends TestCase
 
     public function testCombine()
     {
-        $this->assertSame(['foo' => '123'], HeaderUtils::combine([['foo', '123']]));
-        $this->assertSame(['foo' => true], HeaderUtils::combine([['foo']]));
-        $this->assertSame(['foo' => true], HeaderUtils::combine([['Foo']]));
-        $this->assertSame(['foo' => '123', 'bar' => true], HeaderUtils::combine([['foo', '123'], ['bar']]));
+        self::assertSame(['foo' => '123'], HeaderUtils::combine([['foo', '123']]));
+        self::assertSame(['foo' => true], HeaderUtils::combine([['foo']]));
+        self::assertSame(['foo' => true], HeaderUtils::combine([['Foo']]));
+        self::assertSame(['foo' => '123', 'bar' => true], HeaderUtils::combine([['foo', '123'], ['bar']]));
     }
 
     public function testToString()
     {
-        $this->assertSame('foo', HeaderUtils::toString(['foo' => true], ','));
-        $this->assertSame('foo; bar', HeaderUtils::toString(['foo' => true, 'bar' => true], ';'));
-        $this->assertSame('foo=123', HeaderUtils::toString(['foo' => '123'], ','));
-        $this->assertSame('foo="1 2 3"', HeaderUtils::toString(['foo' => '1 2 3'], ','));
-        $this->assertSame('foo="1 2 3", bar', HeaderUtils::toString(['foo' => '1 2 3', 'bar' => true], ','));
+        self::assertSame('foo', HeaderUtils::toString(['foo' => true], ','));
+        self::assertSame('foo; bar', HeaderUtils::toString(['foo' => true, 'bar' => true], ';'));
+        self::assertSame('foo=123', HeaderUtils::toString(['foo' => '123'], ','));
+        self::assertSame('foo="1 2 3"', HeaderUtils::toString(['foo' => '1 2 3'], ','));
+        self::assertSame('foo="1 2 3", bar', HeaderUtils::toString(['foo' => '1 2 3', 'bar' => true], ','));
     }
 
     public function testQuote()
     {
-        $this->assertSame('foo', HeaderUtils::quote('foo'));
-        $this->assertSame('az09!#$%&\'*.^_`|~-', HeaderUtils::quote('az09!#$%&\'*.^_`|~-'));
-        $this->assertSame('"foo bar"', HeaderUtils::quote('foo bar'));
-        $this->assertSame('"foo [bar]"', HeaderUtils::quote('foo [bar]'));
-        $this->assertSame('"foo \"bar\""', HeaderUtils::quote('foo "bar"'));
-        $this->assertSame('"foo \\\\ bar"', HeaderUtils::quote('foo \\ bar'));
+        self::assertSame('foo', HeaderUtils::quote('foo'));
+        self::assertSame('az09!#$%&\'*.^_`|~-', HeaderUtils::quote('az09!#$%&\'*.^_`|~-'));
+        self::assertSame('"foo bar"', HeaderUtils::quote('foo bar'));
+        self::assertSame('"foo [bar]"', HeaderUtils::quote('foo [bar]'));
+        self::assertSame('"foo \"bar\""', HeaderUtils::quote('foo "bar"'));
+        self::assertSame('"foo \\\\ bar"', HeaderUtils::quote('foo \\ bar'));
     }
 
     public function testUnquote()
     {
-        $this->assertEquals('foo', HeaderUtils::unquote('foo'));
-        $this->assertEquals('az09!#$%&\'*.^_`|~-', HeaderUtils::unquote('az09!#$%&\'*.^_`|~-'));
-        $this->assertEquals('foo bar', HeaderUtils::unquote('"foo bar"'));
-        $this->assertEquals('foo [bar]', HeaderUtils::unquote('"foo [bar]"'));
-        $this->assertEquals('foo "bar"', HeaderUtils::unquote('"foo \"bar\""'));
-        $this->assertEquals('foo "bar"', HeaderUtils::unquote('"foo \"\b\a\r\""'));
-        $this->assertEquals('foo \\ bar', HeaderUtils::unquote('"foo \\\\ bar"'));
+        self::assertEquals('foo', HeaderUtils::unquote('foo'));
+        self::assertEquals('az09!#$%&\'*.^_`|~-', HeaderUtils::unquote('az09!#$%&\'*.^_`|~-'));
+        self::assertEquals('foo bar', HeaderUtils::unquote('"foo bar"'));
+        self::assertEquals('foo [bar]', HeaderUtils::unquote('"foo [bar]"'));
+        self::assertEquals('foo "bar"', HeaderUtils::unquote('"foo \"bar\""'));
+        self::assertEquals('foo "bar"', HeaderUtils::unquote('"foo \"\b\a\r\""'));
+        self::assertEquals('foo \\ bar', HeaderUtils::unquote('"foo \\\\ bar"'));
     }
 
     public function testMakeDispositionInvalidDisposition()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         HeaderUtils::makeDisposition('invalid', 'foo.html');
     }
 
@@ -108,7 +108,7 @@ class HeaderUtilsTest extends TestCase
      */
     public function testMakeDisposition($disposition, $filename, $filenameFallback, $expected)
     {
-        $this->assertEquals($expected, HeaderUtils::makeDisposition($disposition, $filename, $filenameFallback));
+        self::assertEquals($expected, HeaderUtils::makeDisposition($disposition, $filename, $filenameFallback));
     }
 
     public function provideMakeDisposition()
@@ -128,7 +128,7 @@ class HeaderUtilsTest extends TestCase
      */
     public function testMakeDispositionFail($disposition, $filename)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         HeaderUtils::makeDisposition($disposition, $filename);
     }
 
@@ -149,7 +149,7 @@ class HeaderUtilsTest extends TestCase
      */
     public function testParseQuery(string $query, string $expected = null)
     {
-        $this->assertSame($expected ?? $query, http_build_query(HeaderUtils::parseQuery($query), '', '&'));
+        self::assertSame($expected ?? $query, http_build_query(HeaderUtils::parseQuery($query), '', '&'));
     }
 
     public function provideParseQuery()
@@ -172,13 +172,13 @@ class HeaderUtilsTest extends TestCase
     public function testParseCookie()
     {
         $query = 'a.b=c; def%5Bg%5D=h';
-        $this->assertSame($query, http_build_query(HeaderUtils::parseQuery($query, false, ';'), '', '; '));
+        self::assertSame($query, http_build_query(HeaderUtils::parseQuery($query, false, ';'), '', '; '));
     }
 
     public function testParseQueryIgnoreBrackets()
     {
-        $this->assertSame(['a.b' => ['A', 'B']], HeaderUtils::parseQuery('a.b=A&a.b=B', true));
-        $this->assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b[]=A', true));
-        $this->assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b%5B%5D=A', true));
+        self::assertSame(['a.b' => ['A', 'B']], HeaderUtils::parseQuery('a.b=A&a.b=B', true));
+        self::assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b[]=A', true));
+        self::assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b%5B%5D=A', true));
     }
 }

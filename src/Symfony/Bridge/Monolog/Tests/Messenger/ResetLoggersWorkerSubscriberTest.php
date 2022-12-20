@@ -56,7 +56,7 @@ class ResetLoggersWorkerSubscriberTest extends TestCase
         $worker = new Worker([$this->createReceiver($message)], $bus, $eventDispatcher);
         $worker->run();
 
-        $this->assertCount(1, $loggerTestHandler->getRecords());
+        self::assertCount(1, $loggerTestHandler->getRecords());
     }
 
     private function createReceiver(object $message): ReceiverInterface

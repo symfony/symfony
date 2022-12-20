@@ -30,7 +30,7 @@ class ServiceSubscriberTraitTest extends TestCase
     {
         $expected = [LegacyTestService::class.'::aService' => '?'.Service2::class];
 
-        $this->assertEquals($expected, LegacyChildTestService::getSubscribedServices());
+        self::assertEquals($expected, LegacyChildTestService::getSubscribedServices());
     }
 
     /**
@@ -43,7 +43,7 @@ class ServiceSubscriberTraitTest extends TestCase
             TestService::class.'::nullableService' => '?'.Service2::class,
         ];
 
-        $this->assertEquals($expected, ChildTestService::getSubscribedServices());
+        self::assertEquals($expected, ChildTestService::getSubscribedServices());
     }
 
     public function testSetContainerIsCalledOnParent()
@@ -52,7 +52,7 @@ class ServiceSubscriberTraitTest extends TestCase
             use ServiceLocatorTrait;
         };
 
-        $this->assertSame($container, (new TestService())->setContainer($container));
+        self::assertSame($container, (new TestService())->setContainer($container));
     }
 
     public function testParentNotCalledIfHasMagicCall()
@@ -64,8 +64,8 @@ class ServiceSubscriberTraitTest extends TestCase
             use ServiceSubscriberTrait;
         };
 
-        $this->assertNull($service->setContainer($container));
-        $this->assertSame([], $service::getSubscribedServices());
+        self::assertNull($service->setContainer($container));
+        self::assertSame([], $service::getSubscribedServices());
     }
 
     public function testParentNotCalledIfNoParent()
@@ -77,8 +77,8 @@ class ServiceSubscriberTraitTest extends TestCase
             use ServiceSubscriberTrait;
         };
 
-        $this->assertNull($service->setContainer($container));
-        $this->assertSame([], $service::getSubscribedServices());
+        self::assertNull($service->setContainer($container));
+        self::assertSame([], $service::getSubscribedServices());
     }
 
     /**
@@ -89,7 +89,7 @@ class ServiceSubscriberTraitTest extends TestCase
     {
         $expected = [TestServiceSubscriberUnion::class.'::method1' => '?Symfony\Contracts\Tests\Fixtures\Service1'];
 
-        $this->assertEquals($expected, TestServiceSubscriberUnion::getSubscribedServices());
+        self::assertEquals($expected, TestServiceSubscriberUnion::getSubscribedServices());
     }
 }
 

@@ -23,9 +23,9 @@ class DefinitionTest extends TestCase
         $places = range('a', 'e');
         $definition = new Definition($places, []);
 
-        $this->assertCount(5, $definition->getPlaces());
+        self::assertCount(5, $definition->getPlaces());
 
-        $this->assertEquals(['a'], $definition->getInitialPlaces());
+        self::assertEquals(['a'], $definition->getInitialPlaces());
     }
 
     public function testSetInitialPlace()
@@ -33,7 +33,7 @@ class DefinitionTest extends TestCase
         $places = range('a', 'e');
         $definition = new Definition($places, [], $places[3]);
 
-        $this->assertEquals([$places[3]], $definition->getInitialPlaces());
+        self::assertEquals([$places[3]], $definition->getInitialPlaces());
     }
 
     public function testSetInitialPlaces()
@@ -41,13 +41,13 @@ class DefinitionTest extends TestCase
         $places = range('a', 'e');
         $definition = new Definition($places, [], ['a', 'e']);
 
-        $this->assertEquals(['a', 'e'], $definition->getInitialPlaces());
+        self::assertEquals(['a', 'e'], $definition->getInitialPlaces());
     }
 
     public function testSetInitialPlaceAndPlaceIsNotDefined()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Place "d" cannot be the initial place as it does not exist.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Place "d" cannot be the initial place as it does not exist.');
         new Definition([], [], 'd');
     }
 
@@ -58,14 +58,14 @@ class DefinitionTest extends TestCase
         $transition = new Transition('name', $places[0], $places[1]);
         $definition = new Definition($places, [$transition]);
 
-        $this->assertCount(1, $definition->getTransitions());
-        $this->assertSame($transition, $definition->getTransitions()[0]);
+        self::assertCount(1, $definition->getTransitions());
+        self::assertSame($transition, $definition->getTransitions()[0]);
     }
 
     public function testAddTransitionAndFromPlaceIsNotDefined()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
         $places = range('a', 'b');
 
         new Definition($places, [new Transition('name', 'c', $places[1])]);
@@ -73,8 +73,8 @@ class DefinitionTest extends TestCase
 
     public function testAddTransitionAndToPlaceIsNotDefined()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
         $places = range('a', 'b');
 
         new Definition($places, [new Transition('name', $places[0], 'c')]);

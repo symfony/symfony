@@ -50,7 +50,7 @@ class DataCollectorTranslatorPassTest extends TestCase
 
         $this->dataCollectorTranslatorPass->process($this->container);
 
-        $this->assertTrue($this->container->hasDefinition('translator.data_collector'));
+        self::assertTrue($this->container->hasDefinition('translator.data_collector'));
     }
 
     /**
@@ -62,7 +62,7 @@ class DataCollectorTranslatorPassTest extends TestCase
 
         $this->dataCollectorTranslatorPass->process($this->container);
 
-        $this->assertTrue($this->container->hasDefinition('data_collector.translation'));
+        self::assertTrue($this->container->hasDefinition('data_collector.translation'));
     }
 
     public function getImplementingTranslatorBagInterfaceTranslatorClassNames()
@@ -82,7 +82,7 @@ class DataCollectorTranslatorPassTest extends TestCase
 
         $this->dataCollectorTranslatorPass->process($this->container);
 
-        $this->assertFalse($this->container->hasDefinition('translator.data_collector'));
+        self::assertFalse($this->container->hasDefinition('translator.data_collector'));
     }
 
     /**
@@ -94,7 +94,7 @@ class DataCollectorTranslatorPassTest extends TestCase
 
         $this->dataCollectorTranslatorPass->process($this->container);
 
-        $this->assertFalse($this->container->hasDefinition('data_collector.translation'));
+        self::assertFalse($this->container->hasDefinition('data_collector.translation'));
     }
 
     public function getNotImplementingTranslatorBagInterfaceTranslatorClassNames()

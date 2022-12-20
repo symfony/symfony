@@ -30,7 +30,7 @@ class ChainEncoderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->encoder1 = $this->createMock(ContextAwareEncoderInterface::class);
+        $this->encoder1 = self::createMock(ContextAwareEncoderInterface::class);
         $this->encoder1
             ->method('supportsEncoding')
             ->willReturnMap([
@@ -41,7 +41,7 @@ class ChainEncoderTest extends TestCase
                 [self::FORMAT_3, ['foo' => 'bar2'], false],
             ]);
 
-        $this->encoder2 = $this->createMock(EncoderInterface::class);
+        $this->encoder2 = self::createMock(EncoderInterface::class);
         $this->encoder2
             ->method('supportsEncoding')
             ->willReturnMap([
@@ -64,39 +64,39 @@ class ChainEncoderTest extends TestCase
             ->method('encode')
             ->willReturn('result2');
 
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_1));
-        $this->assertEquals('result1', $this->chainEncoder->encode('', self::FORMAT_1, []));
+        self::assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_1));
+        self::assertEquals('result1', $this->chainEncoder->encode('', self::FORMAT_1, []));
 
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_2));
-        $this->assertEquals('result2', $this->chainEncoder->encode('', self::FORMAT_2, []));
+        self::assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_2));
+        self::assertEquals('result2', $this->chainEncoder->encode('', self::FORMAT_2, []));
 
-        $this->assertFalse($this->chainEncoder->supportsEncoding(self::FORMAT_3));
+        self::assertFalse($this->chainEncoder->supportsEncoding(self::FORMAT_3));
 
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar']));
-        $this->assertEquals('result1', $this->chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar']));
+        self::assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar']));
+        self::assertEquals('result1', $this->chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar']));
 
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar2']));
-        $this->assertEquals('result2', $this->chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar2']));
+        self::assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar2']));
+        self::assertEquals('result2', $this->chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar2']));
     }
 
     public function testEncode()
     {
-        $this->encoder1->expects($this->never())->method('encode');
-        $this->encoder2->expects($this->once())->method('encode')->willReturn('foo:123');
+        $this->encoder1->expects(self::never())->method('encode');
+        $this->encoder2->expects(self::once())->method('encode')->willReturn('foo:123');
 
-        $this->assertSame('foo:123', $this->chainEncoder->encode(['foo' => 123], self::FORMAT_2));
+        self::assertSame('foo:123', $this->chainEncoder->encode(['foo' => 123], self::FORMAT_2));
     }
 
     public function testEncodeUnsupportedFormat()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $this->chainEncoder->encode(['foo' => 123], self::FORMAT_3);
     }
 
     public function testNeedsNormalizationBasic()
     {
-        $this->assertTrue($this->chainEncoder->needsNormalization(self::FORMAT_1));
-        $this->assertTrue($this->chainEncoder->needsNormalization(self::FORMAT_2));
+        self::assertTrue($this->chainEncoder->needsNormalization(self::FORMAT_1));
+        self::assertTrue($this->chainEncoder->needsNormalization(self::FORMAT_2));
     }
 
     public function testNeedsNormalizationNormalizationAware()
@@ -104,7 +104,7 @@ class ChainEncoderTest extends TestCase
         $encoder = new NormalizationAwareEncoder();
         $sut = new ChainEncoder([$encoder]);
 
-        $this->assertFalse($sut->needsNormalization(self::FORMAT_1));
+        self::assertFalse($sut->needsNormalization(self::FORMAT_1));
     }
 }
 

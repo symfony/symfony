@@ -18,7 +18,7 @@ class LinkTest extends TestCase
 {
     public function testConstructorWithANonATag()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
@@ -31,12 +31,12 @@ class LinkTest extends TestCase
         $dom->loadHTML('<html><a href="https://example.com/foo">foo</a></html>');
 
         $link = new Link($dom->getElementsByTagName('a')->item(0));
-        $this->assertSame('https://example.com/foo', $link->getUri());
+        self::assertSame('https://example.com/foo', $link->getUri());
     }
 
     public function testAbsoluteBaseUriIsMandatoryWhenLinkUrlIsRelative()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
 
@@ -52,7 +52,7 @@ class LinkTest extends TestCase
         $node = $dom->getElementsByTagName('a')->item(0);
         $link = new Link($node, 'http://example.com/');
 
-        $this->assertEquals($node, $link->getNode(), '->getNode() returns the node associated with the link');
+        self::assertEquals($node, $link->getNode(), '->getNode() returns the node associated with the link');
     }
 
     public function testGetMethod()
@@ -63,10 +63,10 @@ class LinkTest extends TestCase
         $node = $dom->getElementsByTagName('a')->item(0);
         $link = new Link($node, 'http://example.com/');
 
-        $this->assertEquals('GET', $link->getMethod(), '->getMethod() returns the method of the link');
+        self::assertEquals('GET', $link->getMethod(), '->getMethod() returns the method of the link');
 
         $link = new Link($node, 'http://example.com/', 'post');
-        $this->assertEquals('POST', $link->getMethod(), '->getMethod() returns the method of the link');
+        self::assertEquals('POST', $link->getMethod(), '->getMethod() returns the method of the link');
     }
 
     /**
@@ -78,7 +78,7 @@ class LinkTest extends TestCase
         $dom->loadHTML(sprintf('<html><a href="%s">foo</a></html>', $url));
         $link = new Link($dom->getElementsByTagName('a')->item(0), $currentUri);
 
-        $this->assertEquals($expected, $link->getUri());
+        self::assertEquals($expected, $link->getUri());
     }
 
     /**
@@ -90,7 +90,7 @@ class LinkTest extends TestCase
         $dom->loadHTML(sprintf('<html><map><area href="%s" /></map></html>', $url));
         $link = new Link($dom->getElementsByTagName('area')->item(0), $currentUri);
 
-        $this->assertEquals($expected, $link->getUri());
+        self::assertEquals($expected, $link->getUri());
     }
 
     /**
@@ -102,7 +102,7 @@ class LinkTest extends TestCase
         $dom->loadHTML(sprintf('<html><head><link href="%s" /></head></html>', $url));
         $link = new Link($dom->getElementsByTagName('link')->item(0), $currentUri);
 
-        $this->assertEquals($expected, $link->getUri());
+        self::assertEquals($expected, $link->getUri());
     }
 
     public function getGetUriTests()

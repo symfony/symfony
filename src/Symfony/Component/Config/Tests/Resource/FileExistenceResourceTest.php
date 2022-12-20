@@ -36,12 +36,12 @@ class FileExistenceResourceTest extends TestCase
 
     public function testToString()
     {
-        $this->assertSame($this->file, (string) $this->resource);
+        self::assertSame($this->file, (string) $this->resource);
     }
 
     public function testGetResource()
     {
-        $this->assertSame($this->file, $this->resource->getResource(), '->getResource() returns the path to the resource');
+        self::assertSame($this->file, $this->resource->getResource(), '->getResource() returns the path to the resource');
     }
 
     public function testIsFreshWithExistingResource()
@@ -50,11 +50,11 @@ class FileExistenceResourceTest extends TestCase
         $serialized = serialize(new FileExistenceResource($this->file));
 
         $resource = unserialize($serialized);
-        $this->assertTrue($resource->isFresh($this->time), '->isFresh() returns true if the resource is still present');
+        self::assertTrue($resource->isFresh($this->time), '->isFresh() returns true if the resource is still present');
 
         unlink($this->file);
         $resource = unserialize($serialized);
-        $this->assertFalse($resource->isFresh($this->time), '->isFresh() returns false if the resource has been deleted');
+        self::assertFalse($resource->isFresh($this->time), '->isFresh() returns false if the resource has been deleted');
     }
 
     public function testIsFreshWithAbsentResource()
@@ -62,10 +62,10 @@ class FileExistenceResourceTest extends TestCase
         $serialized = serialize(new FileExistenceResource($this->file));
 
         $resource = unserialize($serialized);
-        $this->assertTrue($resource->isFresh($this->time), '->isFresh() returns true if the resource is still absent');
+        self::assertTrue($resource->isFresh($this->time), '->isFresh() returns true if the resource is still absent');
 
         touch($this->file, $this->time);
         $resource = unserialize($serialized);
-        $this->assertFalse($resource->isFresh($this->time), '->isFresh() returns false if the resource has been created');
+        self::assertFalse($resource->isFresh($this->time), '->isFresh() returns false if the resource has been created');
     }
 }

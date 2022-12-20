@@ -34,7 +34,7 @@ Root.property.path:
     Array
 EOF;
 
-        $this->assertSame($expected, (string) $violation);
+        self::assertSame($expected, (string) $violation);
     }
 
     public function testToStringHandlesArrayRoots()
@@ -53,7 +53,7 @@ Array.some_value:
     42 cannot be used here
 EOF;
 
-        $this->assertSame($expected, (string) $violation);
+        self::assertSame($expected, (string) $violation);
     }
 
     public function testToStringHandlesCodes()
@@ -74,7 +74,7 @@ Array.some_value:
     42 cannot be used here (code 0)
 EOF;
 
-        $this->assertSame($expected, (string) $violation);
+        self::assertSame($expected, (string) $violation);
     }
 
     public function testToStringOmitsEmptyCodes()
@@ -95,7 +95,7 @@ EOF;
             null
         );
 
-        $this->assertSame($expected, (string) $violation);
+        self::assertSame($expected, (string) $violation);
 
         $violation = new ConstraintViolation(
             '42 cannot be used here',
@@ -108,7 +108,7 @@ EOF;
             ''
         );
 
-        $this->assertSame($expected, (string) $violation);
+        self::assertSame($expected, (string) $violation);
     }
 
     public function testMessageCanBeStringableObject()
@@ -127,13 +127,13 @@ EOF;
 Root.property.path:
     toString
 EOF;
-        $this->assertSame($expected, (string) $violation);
-        $this->assertSame($message, $violation->getMessage());
+        self::assertSame($expected, (string) $violation);
+        self::assertSame($message, $violation->getMessage());
     }
 
     public function testMessageCannotBeArray()
     {
-        $this->expectException(\TypeError::class);
+        self::expectException(\TypeError::class);
         new ConstraintViolation(
             ['cannot be an array'],
             '',
@@ -146,7 +146,7 @@ EOF;
 
     public function testMessageObjectMustBeStringable()
     {
-        $this->expectException(\TypeError::class);
+        self::expectException(\TypeError::class);
         new ConstraintViolation(
             new CustomArrayObject(),
             '',

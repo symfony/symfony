@@ -41,7 +41,7 @@ class StoreFactoryTest extends TestCase
     {
         $store = StoreFactory::createStore($connection);
 
-        $this->assertInstanceOf($expectedStoreClass, $store);
+        self::assertInstanceOf($expectedStoreClass, $store);
     }
 
     public function validConnections()
@@ -50,18 +50,18 @@ class StoreFactoryTest extends TestCase
             yield [new \Redis(), RedisStore::class];
         }
         if (class_exists(RedisProxy::class)) {
-            yield [$this->createMock(RedisProxy::class), RedisStore::class];
+            yield [self::createMock(RedisProxy::class), RedisStore::class];
         }
         yield [new \Predis\Client(), RedisStore::class];
         if (class_exists(\Memcached::class)) {
             yield [new \Memcached(), MemcachedStore::class];
         }
         if (class_exists(\MongoDB\Collection::class)) {
-            yield [$this->createMock(\MongoDB\Collection::class), MongoDbStore::class];
+            yield [self::createMock(\MongoDB\Collection::class), MongoDbStore::class];
             yield ['mongodb://localhost/test?collection=lock', MongoDbStore::class];
         }
         if (class_exists(\Zookeeper::class)) {
-            yield [$this->createMock(\Zookeeper::class), ZookeeperStore::class];
+            yield [self::createMock(\Zookeeper::class), ZookeeperStore::class];
             yield ['zookeeper://localhost:2181', ZookeeperStore::class];
         }
         if (\extension_loaded('sysvsem')) {

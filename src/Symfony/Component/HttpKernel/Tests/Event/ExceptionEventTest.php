@@ -22,6 +22,6 @@ class ExceptionEventTest extends TestCase
     {
         $event = new ExceptionEvent(new TestHttpKernel(), new Request(), 1, new \Exception());
 
-        $this->assertFalse($event->isAllowingCustomResponseCode());
+        self::assertFalse($event->isAllowingCustomResponseCode());
     }
 }

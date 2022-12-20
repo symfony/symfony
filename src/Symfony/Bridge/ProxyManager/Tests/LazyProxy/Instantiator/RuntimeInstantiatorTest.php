@@ -41,7 +41,7 @@ class RuntimeInstantiatorTest extends TestCase
     public function testInstantiateProxy()
     {
         $instance = new \stdClass();
-        $container = $this->createMock(ContainerInterface::class);
+        $container = self::createMock(ContainerInterface::class);
         $definition = new Definition('stdClass');
         $instantiator = function () use ($instance) {
             return $instance;
@@ -50,12 +50,12 @@ class RuntimeInstantiatorTest extends TestCase
         /* @var $proxy LazyLoadingInterface|ValueHolderInterface */
         $proxy = $this->instantiator->instantiateProxy($container, $definition, 'foo', $instantiator);
 
-        $this->assertInstanceOf(LazyLoadingInterface::class, $proxy);
-        $this->assertInstanceOf(ValueHolderInterface::class, $proxy);
-        $this->assertFalse($proxy->isProxyInitialized());
+        self::assertInstanceOf(LazyLoadingInterface::class, $proxy);
+        self::assertInstanceOf(ValueHolderInterface::class, $proxy);
+        self::assertFalse($proxy->isProxyInitialized());
 
         $proxy->initializeProxy();
 
-        $this->assertSame($instance, $proxy->getWrappedValueHolderValue());
+        self::assertSame($instance, $proxy->getWrappedValueHolderValue());
     }
 }

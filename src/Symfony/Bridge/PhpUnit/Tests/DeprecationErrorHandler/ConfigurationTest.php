@@ -22,36 +22,36 @@ class ConfigurationTest extends TestCase
 
     public function testItThrowsOnStringishValue()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('hi');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('hi');
         Configuration::fromUrlEncodedString('hi');
     }
 
     public function testItThrowsOnUnknownConfigurationOption()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('min');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('min');
         Configuration::fromUrlEncodedString('min[total]=42');
     }
 
     public function testItThrowsOnUnknownThreshold()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('deep');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('deep');
         Configuration::fromUrlEncodedString('max[deep]=42');
     }
 
     public function testItThrowsOnStringishThreshold()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('forty-two');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('forty-two');
         Configuration::fromUrlEncodedString('max[total]=forty-two');
     }
 
     public function testItNoticesExceededTotalThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[total]=3');
-        $this->assertTrue($configuration->tolerates($this->buildGroups([
+        self::assertTrue($configuration->tolerates($this->buildGroups([
             'unsilenced' => 1,
             'self' => 0,
             'legacy' => 1,
@@ -59,7 +59,7 @@ class ConfigurationTest extends TestCase
             'direct' => 1,
             'indirect' => 1,
         ])));
-        $this->assertFalse($configuration->tolerates($this->buildGroups([
+        self::assertFalse($configuration->tolerates($this->buildGroups([
             'unsilenced' => 1,
             'self' => 1,
             'legacy' => 1,
@@ -72,7 +72,7 @@ class ConfigurationTest extends TestCase
     public function testItNoticesExceededSelfThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[self]=1');
-        $this->assertTrue($configuration->tolerates($this->buildGroups([
+        self::assertTrue($configuration->tolerates($this->buildGroups([
             'unsilenced' => 1234,
             'self' => 1,
             'legacy' => 23,
@@ -80,7 +80,7 @@ class ConfigurationTest extends TestCase
             'direct' => 124,
             'indirect' => 3244,
         ])));
-        $this->assertFalse($configuration->tolerates($this->buildGroups([
+        self::assertFalse($configuration->tolerates($this->buildGroups([
             'unsilenced' => 1234,
             'self' => 2,
             'legacy' => 23,
@@ -93,7 +93,7 @@ class ConfigurationTest extends TestCase
     public function testItNoticesExceededDirectThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[direct]=1&max[self]=999999');
-        $this->assertTrue($configuration->tolerates($this->buildGroups([
+        self::assertTrue($configuration->tolerates($this->buildGroups([
             'unsilenced' => 1234,
             'self' => 123,
             'legacy' => 23,
@@ -101,7 +101,7 @@ class ConfigurationTest extends TestCase
             'direct' => 1,
             'indirect' => 3244,
         ])));
-        $this->assertFalse($configuration->tolerates($this->buildGroups([
+        self::assertFalse($configuration->tolerates($this->buildGroups([
             'unsilenced' => 1234,
             'self' => 124,
             'legacy' => 23,
@@ -114,7 +114,7 @@ class ConfigurationTest extends TestCase
     public function testItNoticesExceededIndirectThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[indirect]=1&max[direct]=999999&max[self]=999999');
-        $this->assertTrue($configuration->tolerates($this->buildGroups([
+        self::assertTrue($configuration->tolerates($this->buildGroups([
             'unsilenced' => 1234,
             'self' => 123,
             'legacy' => 23,
@@ -122,7 +122,7 @@ class ConfigurationTest extends TestCase
             'direct' => 1234,
             'indirect' => 1,
         ])));
-        $this->assertFalse($configuration->tolerates($this->buildGroups([
+        self::assertFalse($configuration->tolerates($this->buildGroups([
             'unsilenced' => 1234,
             'self' => 124,
             'legacy' => 23,
@@ -135,7 +135,7 @@ class ConfigurationTest extends TestCase
     public function testIndirectThresholdIsUsedAsADefaultForDirectAndSelfThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[indirect]=1');
-        $this->assertTrue($configuration->tolerates($this->buildGroups([
+        self::assertTrue($configuration->tolerates($this->buildGroups([
             'unsilenced' => 0,
             'self' => 1,
             'legacy' => 0,
@@ -143,7 +143,7 @@ class ConfigurationTest extends TestCase
             'direct' => 0,
             'indirect' => 0,
         ])));
-        $this->assertFalse($configuration->tolerates($this->buildGroups([
+        self::assertFalse($configuration->tolerates($this->buildGroups([
             'unsilenced' => 0,
             'self' => 2,
             'legacy' => 0,
@@ -151,7 +151,7 @@ class ConfigurationTest extends TestCase
             'direct' => 0,
             'indirect' => 0,
         ])));
-        $this->assertTrue($configuration->tolerates($this->buildGroups([
+        self::assertTrue($configuration->tolerates($this->buildGroups([
             'unsilenced' => 0,
             'self' => 0,
             'legacy' => 0,
@@ -159,7 +159,7 @@ class ConfigurationTest extends TestCase
             'direct' => 1,
             'indirect' => 0,
         ])));
-        $this->assertFalse($configuration->tolerates($this->buildGroups([
+        self::assertFalse($configuration->tolerates($this->buildGroups([
             'unsilenced' => 0,
             'self' => 0,
             'legacy' => 0,
@@ -172,11 +172,11 @@ class ConfigurationTest extends TestCase
     public function testItCanTellWhetherToDisplayAStackTrace()
     {
         $configuration = Configuration::fromUrlEncodedString('');
-        $this->assertFalse($configuration->shouldDisplayStackTrace('interesting'));
+        self::assertFalse($configuration->shouldDisplayStackTrace('interesting'));
 
         $configuration = Configuration::fromRegex('/^interesting/');
-        $this->assertFalse($configuration->shouldDisplayStackTrace('uninteresting'));
-        $this->assertTrue($configuration->shouldDisplayStackTrace('interesting'));
+        self::assertFalse($configuration->shouldDisplayStackTrace('uninteresting'));
+        self::assertTrue($configuration->shouldDisplayStackTrace('interesting'));
     }
 
     public function provideItCanBeDisabled(): array
@@ -194,44 +194,44 @@ class ConfigurationTest extends TestCase
     public function testItCanBeDisabled(string $encodedString, bool $expectedEnabled)
     {
         $configuration = Configuration::fromUrlEncodedString($encodedString);
-        $this->assertSame($expectedEnabled, $configuration->isEnabled());
+        self::assertSame($expectedEnabled, $configuration->isEnabled());
     }
 
     public function testItCanBeShushed()
     {
         $configuration = Configuration::fromUrlEncodedString('verbose');
-        $this->assertFalse($configuration->verboseOutput('unsilenced'));
-        $this->assertFalse($configuration->verboseOutput('direct'));
-        $this->assertFalse($configuration->verboseOutput('indirect'));
-        $this->assertFalse($configuration->verboseOutput('self'));
-        $this->assertFalse($configuration->verboseOutput('other'));
+        self::assertFalse($configuration->verboseOutput('unsilenced'));
+        self::assertFalse($configuration->verboseOutput('direct'));
+        self::assertFalse($configuration->verboseOutput('indirect'));
+        self::assertFalse($configuration->verboseOutput('self'));
+        self::assertFalse($configuration->verboseOutput('other'));
     }
 
     public function testItCanBePartiallyShushed()
     {
         $configuration = Configuration::fromUrlEncodedString('quiet[]=unsilenced&quiet[]=indirect&quiet[]=other');
-        $this->assertFalse($configuration->verboseOutput('unsilenced'));
-        $this->assertTrue($configuration->verboseOutput('direct'));
-        $this->assertFalse($configuration->verboseOutput('indirect'));
-        $this->assertTrue($configuration->verboseOutput('self'));
-        $this->assertFalse($configuration->verboseOutput('other'));
+        self::assertFalse($configuration->verboseOutput('unsilenced'));
+        self::assertTrue($configuration->verboseOutput('direct'));
+        self::assertFalse($configuration->verboseOutput('indirect'));
+        self::assertTrue($configuration->verboseOutput('self'));
+        self::assertFalse($configuration->verboseOutput('other'));
     }
 
     public function testItThrowsOnUnknownVerbosityGroup()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('made-up');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('made-up');
         Configuration::fromUrlEncodedString('quiet[]=made-up');
     }
 
     public function testOutputIsNotVerboseInWeakMode()
     {
         $configuration = Configuration::inWeakMode();
-        $this->assertFalse($configuration->verboseOutput('unsilenced'));
-        $this->assertFalse($configuration->verboseOutput('direct'));
-        $this->assertFalse($configuration->verboseOutput('indirect'));
-        $this->assertFalse($configuration->verboseOutput('self'));
-        $this->assertFalse($configuration->verboseOutput('other'));
+        self::assertFalse($configuration->verboseOutput('unsilenced'));
+        self::assertFalse($configuration->verboseOutput('direct'));
+        self::assertFalse($configuration->verboseOutput('indirect'));
+        self::assertFalse($configuration->verboseOutput('self'));
+        self::assertFalse($configuration->verboseOutput('other'));
     }
 
     private function buildGroups($counts)
@@ -252,13 +252,13 @@ class ConfigurationTest extends TestCase
     {
         $filename = $this->createFile();
         $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
-        $this->assertTrue($configuration->isGeneratingBaseline());
+        self::assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
         $configuration->writeBaseline();
-        $this->assertEquals($filename, $configuration->getBaselineFile());
+        self::assertEquals($filename, $configuration->getBaselineFile());
         $expected_baseline = [
             [
                 'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
@@ -271,21 +271,21 @@ class ConfigurationTest extends TestCase
                 'count' => 1,
             ],
         ];
-        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+        self::assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
     }
 
     public function testBaselineGenerationNoFile()
     {
         $filename = $this->createFile();
         $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
-        $this->assertTrue($configuration->isGeneratingBaseline());
+        self::assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
         $configuration->writeBaseline();
-        $this->assertEquals($filename, $configuration->getBaselineFile());
+        self::assertEquals($filename, $configuration->getBaselineFile());
         $expected_baseline = [
             [
                 'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
@@ -298,7 +298,7 @@ class ConfigurationTest extends TestCase
                 'count' => 2,
             ],
         ];
-        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+        self::assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
     }
 
     public function testExistingBaseline()
@@ -319,12 +319,12 @@ class ConfigurationTest extends TestCase
         file_put_contents($filename, json_encode($baseline));
 
         $configuration = Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
-        $this->assertFalse($configuration->isGeneratingBaseline());
+        self::assertFalse($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
-        $this->assertFalse($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
-        $this->assertEquals($filename, $configuration->getBaselineFile());
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        self::assertFalse($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
+        self::assertEquals($filename, $configuration->getBaselineFile());
     }
 
     public function testExistingBaselineAndGeneration()
@@ -344,12 +344,12 @@ class ConfigurationTest extends TestCase
         ];
         file_put_contents($filename, json_encode($baseline));
         $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
-        $this->assertTrue($configuration->isGeneratingBaseline());
+        self::assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
-        $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
+        self::assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 3', $trace, '')));
         $configuration->writeBaseline();
-        $this->assertEquals($filename, $configuration->getBaselineFile());
+        self::assertEquals($filename, $configuration->getBaselineFile());
         $expected_baseline = [
             [
                 'location' => 'Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler\ConfigurationTest::runTest',
@@ -362,13 +362,13 @@ class ConfigurationTest extends TestCase
                 'count' => 1,
             ],
         ];
-        $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
+        self::assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
     }
 
     public function testBaselineArgumentException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('You cannot use the "generateBaseline" configuration option without providing a "baselineFile" configuration option.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('You cannot use the "generateBaseline" configuration option without providing a "baselineFile" configuration option.');
         Configuration::fromUrlEncodedString('generateBaseline=true');
     }
 
@@ -376,8 +376,8 @@ class ConfigurationTest extends TestCase
     {
         $filename = $this->createFile();
         unlink($filename);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The baselineFile "%s" does not exist.', $filename));
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('The baselineFile "%s" does not exist.', $filename));
         Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
     }
 
@@ -385,8 +385,8 @@ class ConfigurationTest extends TestCase
     {
         $filename = $this->createFile();
         chmod($filename, 0444);
-        $this->expectError();
-        $this->expectErrorMessageMatches('/[Ff]ailed to open stream: Permission denied/');
+        self::expectError();
+        self::expectErrorMessageMatches('/[Ff]ailed to open stream: Permission denied/');
         $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $configuration->writeBaseline();
     }

@@ -22,20 +22,20 @@ class ResponseStatusCodeSameTest extends TestCase
     public function testConstraint()
     {
         $constraint = new ResponseStatusCodeSame(200);
-        $this->assertTrue($constraint->evaluate(new Response(), '', true));
-        $this->assertFalse($constraint->evaluate(new Response('', 404), '', true));
+        self::assertTrue($constraint->evaluate(new Response(), '', true));
+        self::assertFalse($constraint->evaluate(new Response('', 404), '', true));
         $constraint = new ResponseStatusCodeSame(404);
-        $this->assertTrue($constraint->evaluate(new Response('', 404), '', true));
+        self::assertTrue($constraint->evaluate(new Response('', 404), '', true));
 
         $constraint = new ResponseStatusCodeSame(200);
         try {
             $constraint->evaluate(new Response('', 404));
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
+            self::assertStringContainsString("Failed asserting that the Response status code is 200.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 }

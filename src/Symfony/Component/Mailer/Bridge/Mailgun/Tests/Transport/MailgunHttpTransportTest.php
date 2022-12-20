@@ -29,7 +29,7 @@ class MailgunHttpTransportTest extends TestCase
      */
     public function testToString(MailgunHttpTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -57,19 +57,19 @@ class MailgunHttpTransportTest extends TestCase
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.us-east-1.mailgun.net:8984/v3/symfony/messages.mime', $url);
-            $this->assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.us-east-1.mailgun.net:8984/v3/symfony/messages.mime', $url);
+            self::assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
             $content = '';
             while ($chunk = $options['body']()) {
                 $content .= $chunk;
             }
 
-            $this->assertStringContainsString('Subject: Hello!', $content);
-            $this->assertStringContainsString('To: Saif Eddin <saif.gmati@symfony.com>', $content);
-            $this->assertStringContainsString('From: Fabien <fabpot@symfony.com>', $content);
-            $this->assertStringContainsString('Hello There!', $content);
+            self::assertStringContainsString('Subject: Hello!', $content);
+            self::assertStringContainsString('To: Saif Eddin <saif.gmati@symfony.com>', $content);
+            self::assertStringContainsString('From: Fabien <fabpot@symfony.com>', $content);
+            self::assertStringContainsString('Hello There!', $content);
 
             return new MockResponse(json_encode(['id' => 'foobar']), [
                 'http_code' => 200,
@@ -86,15 +86,15 @@ class MailgunHttpTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        self::assertSame('foobar', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.mailgun.net:8984/v3/symfony/messages.mime', $url);
-            $this->assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.mailgun.net:8984/v3/symfony/messages.mime', $url);
+            self::assertStringContainsString('Basic YXBpOkFDQ0VTU19LRVk=', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
                 'http_code' => 418,
@@ -112,8 +112,8 @@ class MailgunHttpTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
     }
 
@@ -130,9 +130,9 @@ class MailgunHttpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(3, $email->getHeaders()->toArray());
-        $this->assertSame('foo: bar', $email->getHeaders()->get('foo')->toString());
-        $this->assertSame('X-Mailgun-Tag: password-reset', $email->getHeaders()->get('X-Mailgun-Tag')->toString());
-        $this->assertSame('X-Mailgun-Variables: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-Mailgun-Variables')->toString());
+        self::assertCount(3, $email->getHeaders()->toArray());
+        self::assertSame('foo: bar', $email->getHeaders()->get('foo')->toString());
+        self::assertSame('X-Mailgun-Tag: password-reset', $email->getHeaders()->get('X-Mailgun-Tag')->toString());
+        self::assertSame('X-Mailgun-Variables: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-Mailgun-Variables')->toString());
     }
 }

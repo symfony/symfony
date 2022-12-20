@@ -32,7 +32,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
     protected function setUp(): void
     {
         if (!$host = getenv('POSTGRES_HOST')) {
-            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+            self::markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
         $this->driverConnection = DriverManager::getConnection(['url' => "pgsql://postgres:password@$host"]);
@@ -51,10 +51,10 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        self::assertEquals('{"message": "Hi"}', $encoded['body']);
+        self::assertEquals(['type' => DummyMessage::class], $encoded['headers']);
 
-        $this->assertNull($this->connection->get());
+        self::assertNull($this->connection->get());
     }
 
     private function createSchemaManager(): AbstractSchemaManager

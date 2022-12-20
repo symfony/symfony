@@ -45,12 +45,12 @@ class FormBuilderTest extends TestCase
      */
     public function testNoSetName()
     {
-        $this->assertFalse(method_exists($this->builder, 'setName'));
+        self::assertFalse(method_exists($this->builder, 'setName'));
     }
 
     public function testAddNameNoStringAndNoInteger()
     {
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $this->builder->add(true);
     }
 
@@ -58,40 +58,40 @@ class FormBuilderTest extends TestCase
     {
         $rootFormBuilder = new FormBuilder('name', 'stdClass', new EventDispatcher(), $this->factory);
         $childFormBuilder = $rootFormBuilder->add('foo');
-        $this->assertSame($childFormBuilder, $rootFormBuilder);
+        self::assertSame($childFormBuilder, $rootFormBuilder);
     }
 
     public function testAddIsFluent()
     {
         $builder = $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['bar' => 'baz']);
-        $this->assertSame($builder, $this->builder);
+        self::assertSame($builder, $this->builder);
     }
 
     public function testAdd()
     {
-        $this->assertFalse($this->builder->has('foo'));
+        self::assertFalse($this->builder->has('foo'));
         $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
-        $this->assertTrue($this->builder->has('foo'));
+        self::assertTrue($this->builder->has('foo'));
     }
 
     public function testAddIntegerName()
     {
-        $this->assertFalse($this->builder->has(0));
+        self::assertFalse($this->builder->has(0));
         $this->builder->add(0, 'Symfony\Component\Form\Extension\Core\Type\TextType');
-        $this->assertTrue($this->builder->has(0));
+        self::assertTrue($this->builder->has(0));
     }
 
     public function testAll()
     {
-        $this->assertCount(0, $this->builder->all());
-        $this->assertFalse($this->builder->has('foo'));
+        self::assertCount(0, $this->builder->all());
+        self::assertFalse($this->builder->has('foo'));
 
         $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $children = $this->builder->all();
 
-        $this->assertTrue($this->builder->has('foo'));
-        $this->assertCount(1, $children);
-        $this->assertArrayHasKey('foo', $children);
+        self::assertTrue($this->builder->has('foo'));
+        self::assertCount(1, $children);
+        self::assertArrayHasKey('foo', $children);
     }
 
     /*
@@ -105,20 +105,20 @@ class FormBuilderTest extends TestCase
 
         $children = $this->builder->all();
 
-        $this->assertSame(['foo', 'bar', 'baz'], array_keys($children));
+        self::assertSame(['foo', 'bar', 'baz'], array_keys($children));
     }
 
     public function testRemove()
     {
         $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->remove('foo');
-        $this->assertFalse($this->builder->has('foo'));
+        self::assertFalse($this->builder->has('foo'));
     }
 
     public function testRemoveUnknown()
     {
         $this->builder->remove('foo');
-        $this->assertFalse($this->builder->has('foo'));
+        self::assertFalse($this->builder->has('foo'));
     }
 
     // https://github.com/symfony/symfony/pull/4826
@@ -127,14 +127,14 @@ class FormBuilderTest extends TestCase
         $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->remove('foo');
         $form = $this->builder->getForm();
-        $this->assertInstanceOf(Form::class, $form);
+        self::assertInstanceOf(Form::class, $form);
     }
 
     public function testCreateNoTypeNo()
     {
         $builder = $this->builder->create('foo');
 
-        $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+        self::assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
     public function testAddButton()
@@ -142,13 +142,13 @@ class FormBuilderTest extends TestCase
         $this->builder->add(new ButtonBuilder('reset'));
         $this->builder->add(new SubmitButtonBuilder('submit'));
 
-        $this->assertCount(2, $this->builder->all());
+        self::assertCount(2, $this->builder->all());
     }
 
     public function testGetUnknown()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The child with the name "foo" does not exist.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The child with the name "foo" does not exist.');
 
         $this->builder->get('foo');
     }
@@ -158,7 +158,7 @@ class FormBuilderTest extends TestCase
         $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $builder = $this->builder->get('foo');
 
-        $this->assertNotSame($builder, $this->builder);
+        self::assertNotSame($builder, $this->builder);
     }
 
     public function testGetGuessedType()
@@ -167,7 +167,7 @@ class FormBuilderTest extends TestCase
         $rootFormBuilder->add('foo');
         $fooBuilder = $rootFormBuilder->get('foo');
 
-        $this->assertNotSame($fooBuilder, $rootFormBuilder);
+        self::assertNotSame($fooBuilder, $rootFormBuilder);
     }
 
     public function testGetFormConfigErasesReferences()
@@ -183,8 +183,8 @@ class FormBuilderTest extends TestCase
         $children->setAccessible(true);
         $unresolvedChildren->setAccessible(true);
 
-        $this->assertEmpty($children->getValue($config));
-        $this->assertEmpty($unresolvedChildren->getValue($config));
+        self::assertEmpty($children->getValue($config));
+        self::assertEmpty($unresolvedChildren->getValue($config));
     }
 
     public function testGetButtonBuilderBeforeExplicitlyResolvingAllChildren()
@@ -192,6 +192,6 @@ class FormBuilderTest extends TestCase
         $builder = new FormBuilder('name', null, new EventDispatcher(), (new FormFactoryBuilder())->getFormFactory());
         $builder->add('submit', SubmitType::class);
 
-        $this->assertInstanceOf(ButtonBuilder::class, $builder->get('submit'));
+        self::assertInstanceOf(ButtonBuilder::class, $builder->get('submit'));
     }
 }

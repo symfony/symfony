@@ -37,20 +37,20 @@ class IdentificationHeaderTest extends TestCase
         */
 
         $header = new IdentificationHeader('Message-ID', 'id-left@id-right');
-        $this->assertEquals('<id-left@id-right>', $header->getBodyAsString());
+        self::assertEquals('<id-left@id-right>', $header->getBodyAsString());
     }
 
     public function testIdCanBeRetrievedVerbatim()
     {
         $header = new IdentificationHeader('Message-ID', 'id-left@id-right');
-        $this->assertEquals('id-left@id-right', $header->getId());
+        self::assertEquals('id-left@id-right', $header->getId());
     }
 
     public function testMultipleIdsCanBeSet()
     {
         $header = new IdentificationHeader('References', 'c@d');
         $header->setIds(['a@b', 'x@y']);
-        $this->assertEquals(['a@b', 'x@y'], $header->getIds());
+        self::assertEquals(['a@b', 'x@y'], $header->getIds());
     }
 
     public function testSettingMultipleIdsProducesAListValue()
@@ -67,7 +67,7 @@ class IdentificationHeaderTest extends TestCase
          */
 
         $header = new IdentificationHeader('References', ['a@b', 'x@y']);
-        $this->assertEquals('<a@b> <x@y>', $header->getBodyAsString());
+        self::assertEquals('<a@b> <x@y>', $header->getBodyAsString());
     }
 
     public function testIdLeftCanBeQuoted()
@@ -77,8 +77,8 @@ class IdentificationHeaderTest extends TestCase
          */
 
         $header = new IdentificationHeader('References', '"ab"@c');
-        $this->assertEquals('"ab"@c', $header->getId());
-        $this->assertEquals('<"ab"@c>', $header->getBodyAsString());
+        self::assertEquals('"ab"@c', $header->getId());
+        self::assertEquals('<"ab"@c>', $header->getBodyAsString());
     }
 
     public function testIdLeftCanContainAnglesAsQuotedPairs()
@@ -88,21 +88,21 @@ class IdentificationHeaderTest extends TestCase
          */
 
         $header = new IdentificationHeader('References', '"a\\<\\>b"@c');
-        $this->assertEquals('"a\\<\\>b"@c', $header->getId());
-        $this->assertEquals('<"a\\<\\>b"@c>', $header->getBodyAsString());
+        self::assertEquals('"a\\<\\>b"@c', $header->getId());
+        self::assertEquals('<"a\\<\\>b"@c>', $header->getBodyAsString());
     }
 
     public function testIdLeftCanBeDotAtom()
     {
         $header = new IdentificationHeader('References', 'a.b+&%$.c@d');
-        $this->assertEquals('a.b+&%$.c@d', $header->getId());
-        $this->assertEquals('<a.b+&%$.c@d>', $header->getBodyAsString());
+        self::assertEquals('a.b+&%$.c@d', $header->getId());
+        self::assertEquals('<a.b+&%$.c@d>', $header->getBodyAsString());
     }
 
     public function testInvalidIdLeftThrowsException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Email "a b c@d" does not comply with addr-spec of RFC 2822.');
+        self::expectException(\Exception::class);
+        self::expectExceptionMessage('Email "a b c@d" does not comply with addr-spec of RFC 2822.');
         new IdentificationHeader('References', 'a b c@d');
     }
 
@@ -113,8 +113,8 @@ class IdentificationHeaderTest extends TestCase
          */
 
         $header = new IdentificationHeader('References', 'a@b.c+&%$.d');
-        $this->assertEquals('a@b.c+&%$.d', $header->getId());
-        $this->assertEquals('<a@b.c+&%$.d>', $header->getBodyAsString());
+        self::assertEquals('a@b.c+&%$.d', $header->getId());
+        self::assertEquals('<a@b.c+&%$.d>', $header->getBodyAsString());
     }
 
     public function testIdRightCanBeLiteral()
@@ -124,28 +124,28 @@ class IdentificationHeaderTest extends TestCase
         */
 
         $header = new IdentificationHeader('References', 'a@[1.2.3.4]');
-        $this->assertEquals('a@[1.2.3.4]', $header->getId());
-        $this->assertEquals('<a@[1.2.3.4]>', $header->getBodyAsString());
+        self::assertEquals('a@[1.2.3.4]', $header->getId());
+        self::assertEquals('<a@[1.2.3.4]>', $header->getBodyAsString());
     }
 
     public function testIdRigthIsIdnEncoded()
     {
         $header = new IdentificationHeader('References', 'a@ä');
-        $this->assertEquals('a@ä', $header->getId());
-        $this->assertEquals('<a@xn--4ca>', $header->getBodyAsString());
+        self::assertEquals('a@ä', $header->getId());
+        self::assertEquals('<a@xn--4ca>', $header->getBodyAsString());
     }
 
     public function testInvalidIdRightThrowsException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Email "a@b c d" does not comply with addr-spec of RFC 2822.');
+        self::expectException(\Exception::class);
+        self::expectExceptionMessage('Email "a@b c d" does not comply with addr-spec of RFC 2822.');
         new IdentificationHeader('References', 'a@b c d');
     }
 
     public function testMissingAtSignThrowsException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Email "abc" does not comply with addr-spec of RFC 2822.');
+        self::expectException(\Exception::class);
+        self::expectExceptionMessage('Email "abc" does not comply with addr-spec of RFC 2822.');
         /* -- RFC 2822, 3.6.4.
          msg-id          =       [CFWS] "<" id-left "@" id-right ">" [CFWS]
          */
@@ -156,18 +156,18 @@ class IdentificationHeaderTest extends TestCase
     {
         $header = new IdentificationHeader('Message-ID', 'c@d');
         $header->setBody('a@b');
-        $this->assertEquals(['a@b'], $header->getIds());
+        self::assertEquals(['a@b'], $header->getIds());
     }
 
     public function testGetBody()
     {
         $header = new IdentificationHeader('Message-ID', 'a@b');
-        $this->assertEquals(['a@b'], $header->getBody());
+        self::assertEquals(['a@b'], $header->getBody());
     }
 
     public function testStringValue()
     {
         $header = new IdentificationHeader('References', ['a@b', 'x@y']);
-        $this->assertEquals('References: <a@b> <x@y>', $header->toString());
+        self::assertEquals('References: <a@b> <x@y>', $header->toString());
     }
 }

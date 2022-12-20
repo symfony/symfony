@@ -21,8 +21,8 @@ class StateMachineValidatorTest extends TestCase
 {
     public function testWithMultipleTransitionWithSameNameShareInput()
     {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('A transition from a place/state must have an unique name.');
+        self::expectException(InvalidDefinitionException::class);
+        self::expectExceptionMessage('A transition from a place/state must have an unique name.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', 'b');
         $transitions[] = new Transition('t1', 'a', 'c');
@@ -45,8 +45,8 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithMultipleTos()
     {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('A transition in StateMachine can only have one output.');
+        self::expectException(InvalidDefinitionException::class);
+        self::expectExceptionMessage('A transition in StateMachine can only have one output.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', ['b', 'c']);
         $definition = new Definition($places, $transitions);
@@ -68,8 +68,8 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithMultipleFroms()
     {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('A transition in StateMachine can only have one input.');
+        self::expectException(InvalidDefinitionException::class);
+        self::expectExceptionMessage('A transition in StateMachine can only have one input.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', ['a', 'b'], 'c');
         $definition = new Definition($places, $transitions);
@@ -99,7 +99,7 @@ class StateMachineValidatorTest extends TestCase
         (new StateMachineValidator())->validate($definition, 'foo');
 
         // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
 
         // The graph looks like:
         //
@@ -116,8 +116,8 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithTooManyInitialPlaces()
     {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The state machine "foo" cannot store many places. But the definition has 2 initial places. Only one is supported.');
+        self::expectException(InvalidDefinitionException::class);
+        self::expectExceptionMessage('The state machine "foo" cannot store many places. But the definition has 2 initial places. Only one is supported.');
         $places = range('a', 'c');
         $transitions = [];
         $definition = new Definition($places, $transitions, ['a', 'b']);
@@ -125,7 +125,7 @@ class StateMachineValidatorTest extends TestCase
         (new StateMachineValidator())->validate($definition, 'foo');
 
         // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
 
         // The graph looks like:
         //

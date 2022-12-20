@@ -19,29 +19,23 @@ abstract class AbstractOperationTest extends TestCase
 {
     public function testGetEmptyDomains()
     {
-        $this->assertEquals(
-            [],
-            $this->createOperation(
-                new MessageCatalogue('en'),
-                new MessageCatalogue('en')
-            )->getDomains()
-        );
+        self::assertEquals([], $this->createOperation(
+            new MessageCatalogue('en'),
+            new MessageCatalogue('en')
+        )->getDomains());
     }
 
     public function testGetMergedDomains()
     {
-        $this->assertEquals(
-            ['a', 'b', 'c'],
-            $this->createOperation(
-                new MessageCatalogue('en', ['a' => [], 'b' => []]),
-                new MessageCatalogue('en', ['b' => [], 'c' => []])
-            )->getDomains()
-        );
+        self::assertEquals(['a', 'b', 'c'], $this->createOperation(
+            new MessageCatalogue('en', ['a' => [], 'b' => []]),
+            new MessageCatalogue('en', ['b' => [], 'c' => []])
+        )->getDomains());
     }
 
     public function testGetMessagesFromUnknownDomain()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $this->createOperation(
             new MessageCatalogue('en'),
             new MessageCatalogue('en')
@@ -50,24 +44,18 @@ abstract class AbstractOperationTest extends TestCase
 
     public function testGetEmptyMessages()
     {
-        $this->assertEquals(
-            [],
-            $this->createOperation(
-                new MessageCatalogue('en', ['a' => []]),
-                new MessageCatalogue('en')
-            )->getMessages('a')
-        );
+        self::assertEquals([], $this->createOperation(
+            new MessageCatalogue('en', ['a' => []]),
+            new MessageCatalogue('en')
+        )->getMessages('a'));
     }
 
     public function testGetEmptyResult()
     {
-        $this->assertEquals(
+        self::assertEquals(new MessageCatalogue('en'), $this->createOperation(
             new MessageCatalogue('en'),
-            $this->createOperation(
-                new MessageCatalogue('en'),
-                new MessageCatalogue('en')
-            )->getResult()
-        );
+            new MessageCatalogue('en')
+        )->getResult());
     }
 
     abstract protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target);

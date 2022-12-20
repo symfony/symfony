@@ -18,7 +18,7 @@ class ImageTest extends TestCase
 {
     public function testConstructorWithANonImgTag()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
@@ -31,12 +31,12 @@ class ImageTest extends TestCase
         $dom->loadHTML('<html><img alt="foo" src="https://example.com/foo" /></html>');
 
         $image = new Image($dom->getElementsByTagName('img')->item(0));
-        $this->assertSame('https://example.com/foo', $image->getUri());
+        self::assertSame('https://example.com/foo', $image->getUri());
     }
 
     public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelative()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><img alt="foo" src="/foo" /></html>');
 
@@ -53,7 +53,7 @@ class ImageTest extends TestCase
         $dom->loadHTML(sprintf('<html><img alt="foo" src="%s" /></html>', $url));
         $image = new Image($dom->getElementsByTagName('img')->item(0), $currentUri);
 
-        $this->assertEquals($expected, $image->getUri());
+        self::assertEquals($expected, $image->getUri());
     }
 
     public function getGetUriTests()

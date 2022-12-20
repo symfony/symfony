@@ -39,25 +39,25 @@ class BasicAuthenticationListenerTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
         $tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with(self::equalTo($token))
         ;
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
         $authenticationManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
-            ->with($this->isInstanceOf(UsernamePasswordToken::class))
+            ->with(self::isInstanceOf(UsernamePasswordToken::class))
             ->willReturn($token)
         ;
 
@@ -65,10 +65,10 @@ class BasicAuthenticationListenerTest extends TestCase
             $tokenStorage,
             $authenticationManager,
             'TheProviderKey',
-            $this->createMock(AuthenticationEntryPointInterface::class)
+            self::createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenAuthenticationFails()
@@ -78,59 +78,59 @@ class BasicAuthenticationListenerTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
         $tokenStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('setToken')
         ;
 
         $response = new Response();
 
-        $authenticationEntryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+        $authenticationEntryPoint = self::createMock(AuthenticationEntryPointInterface::class);
         $authenticationEntryPoint
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('start')
-            ->with($this->equalTo($request), $this->isInstanceOf(AuthenticationException::class))
+            ->with(self::equalTo($request), self::isInstanceOf(AuthenticationException::class))
             ->willReturn($response)
         ;
 
         $listener = new BasicAuthenticationListener(
             $tokenStorage,
-            new AuthenticationProviderManager([$this->createMock(AuthenticationProviderInterface::class)]),
+            new AuthenticationProviderManager([self::createMock(AuthenticationProviderInterface::class)]),
             'TheProviderKey',
             $authenticationEntryPoint
         );
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener($event);
 
-        $this->assertSame($response, $event->getResponse());
+        self::assertSame($response, $event->getResponse());
     }
 
     public function testHandleWithNoUsernameServerParameter()
     {
         $request = new Request();
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('getToken')
         ;
 
         $listener = new BasicAuthenticationListener(
             $tokenStorage,
-            $this->createMock(AuthenticationManagerInterface::class),
+            self::createMock(AuthenticationManagerInterface::class),
             'TheProviderKey',
-            $this->createMock(AuthenticationEntryPointInterface::class)
+            self::createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWithASimilarAuthenticatedToken()
@@ -139,16 +139,16 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $token = new UsernamePasswordToken('TheUsername', 'ThePassword', 'TheProviderKey', ['ROLE_FOO']);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn($token)
         ;
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
         $authenticationManager
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('authenticate')
         ;
 
@@ -156,21 +156,21 @@ class BasicAuthenticationListenerTest extends TestCase
             $tokenStorage,
             $authenticationManager,
             'TheProviderKey',
-            $this->createMock(AuthenticationEntryPointInterface::class)
+            self::createMock(AuthenticationEntryPointInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testItRequiresProviderKey()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('$providerKey must not be empty');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('$providerKey must not be empty');
         new BasicAuthenticationListener(
-            $this->createMock(TokenStorageInterface::class),
-            $this->createMock(AuthenticationManagerInterface::class),
+            self::createMock(TokenStorageInterface::class),
+            self::createMock(AuthenticationManagerInterface::class),
             '',
-            $this->createMock(AuthenticationEntryPointInterface::class)
+            self::createMock(AuthenticationEntryPointInterface::class)
         );
     }
 
@@ -183,38 +183,38 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $token = new PreAuthenticatedToken('TheUser', 'TheCredentials', 'TheProviderKey', ['ROLE_FOO']);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn($token)
         ;
         $tokenStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('setToken')
         ;
 
         $response = new Response();
 
-        $authenticationEntryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+        $authenticationEntryPoint = self::createMock(AuthenticationEntryPointInterface::class);
         $authenticationEntryPoint
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('start')
-            ->with($this->equalTo($request), $this->isInstanceOf(AuthenticationException::class))
+            ->with(self::equalTo($request), self::isInstanceOf(AuthenticationException::class))
             ->willReturn($response)
         ;
 
         $listener = new BasicAuthenticationListener(
             $tokenStorage,
-            new AuthenticationProviderManager([$this->createMock(AuthenticationProviderInterface::class)]),
+            new AuthenticationProviderManager([self::createMock(AuthenticationProviderInterface::class)]),
             'TheProviderKey',
             $authenticationEntryPoint
         );
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener($event);
 
-        $this->assertSame($response, $event->getResponse());
+        self::assertSame($response, $event->getResponse());
     }
 }

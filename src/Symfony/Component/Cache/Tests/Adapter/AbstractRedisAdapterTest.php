@@ -55,9 +55,9 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
         $cache = $this->createCachePool(0, __FUNCTION__);
 
         $cache->save($cache->getItem('foo')->set('bar'));
-        $this->assertTrue($cache->hasItem('foo'));
+        self::assertTrue($cache->hasItem('foo'));
 
         $cache->clear();
-        $this->assertFalse($cache->hasItem('foo'));
+        self::assertFalse($cache->hasItem('foo'));
     }
 }

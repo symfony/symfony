@@ -26,7 +26,7 @@ abstract class IteratorTestCase extends TestCase
         sort($values);
         sort($expected);
 
-        $this->assertEquals($expected, array_values($values));
+        self::assertEquals($expected, array_values($values));
     }
 
     protected function assertOrderedIterator($expected, \Traversable $iterator)
@@ -34,7 +34,7 @@ abstract class IteratorTestCase extends TestCase
         $values = array_map(function (\SplFileInfo $fileinfo) { return str_replace('/', \DIRECTORY_SEPARATOR, $fileinfo->getPathname()); }, iterator_to_array($iterator));
         $expected = array_map(function ($path) { return str_replace('/', \DIRECTORY_SEPARATOR, $path); }, $expected);
 
-        $this->assertEquals($expected, array_values($values));
+        self::assertEquals($expected, array_values($values));
     }
 
     /**
@@ -57,7 +57,7 @@ abstract class IteratorTestCase extends TestCase
             }
             sort($temp);
             sort($subarray);
-            $this->assertEquals($subarray, $temp);
+            self::assertEquals($subarray, $temp);
         }
     }
 
@@ -68,14 +68,14 @@ abstract class IteratorTestCase extends TestCase
     {
         $values = [];
         foreach ($iterator as $file) {
-            $this->assertInstanceOf(\Symfony\Component\Finder\SplFileInfo::class, $file);
+            self::assertInstanceOf(\Symfony\Component\Finder\SplFileInfo::class, $file);
             $values[] = $file->getPathname();
         }
 
         sort($values);
         sort($expected);
 
-        $this->assertEquals($expected, array_values($values));
+        self::assertEquals($expected, array_values($values));
     }
 
     /**
@@ -85,10 +85,10 @@ abstract class IteratorTestCase extends TestCase
     {
         $values = [];
         foreach ($iterator as $file) {
-            $this->assertInstanceOf(\Symfony\Component\Finder\SplFileInfo::class, $file);
+            self::assertInstanceOf(\Symfony\Component\Finder\SplFileInfo::class, $file);
             $values[] = $file->getPathname();
         }
 
-        $this->assertEquals($expected, array_values($values));
+        self::assertEquals($expected, array_values($values));
     }
 }

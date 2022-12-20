@@ -59,7 +59,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends BaseDateTimeTransforme
     {
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer($fromTz, $toTz);
 
-        $this->assertSame($to, $transformer->transform(null !== $from ? new \DateTime($from) : null));
+        self::assertSame($to, $transformer->transform(null !== $from ? new \DateTime($from) : null));
     }
 
     /**
@@ -69,12 +69,12 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends BaseDateTimeTransforme
     {
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer($fromTz, $toTz);
 
-        $this->assertSame($to, $transformer->transform(null !== $from ? new \DateTimeImmutable($from) : null));
+        self::assertSame($to, $transformer->transform(null !== $from ? new \DateTimeImmutable($from) : null));
     }
 
     public function testTransformRequiresValidDateTime()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer();
         $transformer->transform('2010-01-01');
     }
@@ -87,22 +87,22 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends BaseDateTimeTransforme
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer($toTz, $fromTz);
 
         if (null !== $to) {
-            $this->assertDateTimeEquals(new \DateTime($to), $transformer->reverseTransform($from));
+            self::assertDateTimeEquals(new \DateTime($to), $transformer->reverseTransform($from));
         } else {
-            $this->assertNull($transformer->reverseTransform($from));
+            self::assertNull($transformer->reverseTransform($from));
         }
     }
 
     public function testReverseTransformRequiresString()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer();
         $transformer->reverseTransform(12345);
     }
 
     public function testReverseTransformWithNonExistingDate()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC');
 
         $transformer->reverseTransform('2010-04-31T04:05');
@@ -110,7 +110,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends BaseDateTimeTransforme
 
     public function testReverseTransformExpectsValidDateString()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC');
 
         $transformer->reverseTransform('2010-2010-2010');

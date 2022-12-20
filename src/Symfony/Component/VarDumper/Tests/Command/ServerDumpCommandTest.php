@@ -24,12 +24,12 @@ class ServerDumpCommandTest extends TestCase
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $tester = new CommandCompletionTester($this->createCommand());
 
-        $this->assertSame($expectedSuggestions, $tester->complete($input));
+        self::assertSame($expectedSuggestions, $tester->complete($input));
     }
 
     public function provideCompletionSuggestions()
@@ -42,6 +42,6 @@ class ServerDumpCommandTest extends TestCase
 
     private function createCommand(): ServerDumpCommand
     {
-        return new ServerDumpCommand($this->createMock(DumpServer::class));
+        return new ServerDumpCommand(self::createMock(DumpServer::class));
     }
 }

@@ -25,19 +25,19 @@ class IntlFormatterTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormat($expected, $message, $arguments)
     {
-        $this->assertEquals($expected, trim((new IntlFormatter())->formatIntl($message, 'en', $arguments)));
+        self::assertEquals($expected, trim((new IntlFormatter())->formatIntl($message, 'en', $arguments)));
     }
 
     public function testInvalidFormat()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         (new IntlFormatter())->formatIntl('{foo', 'en', [2]);
     }
 
     public function testFormatWithNamedArguments()
     {
         if (version_compare(\INTL_ICU_VERSION, '4.8', '<')) {
-            $this->markTestSkipped('Format with named arguments can only be run with ICU 4.8 or higher and PHP >= 5.5');
+            self::markTestSkipped('Format with named arguments can only be run with ICU 4.8 or higher and PHP >= 5.5');
         }
 
         $chooseMessage = <<<'_MSG_'
@@ -66,7 +66,7 @@ _MSG_;
             'guest' => 'Guilherme',
         ]);
 
-        $this->assertEquals('Fabien invites Guilherme as one of the 9 people invited to his party.', $message);
+        self::assertEquals('Fabien invites Guilherme as one of the 9 people invited to his party.', $message);
     }
 
     public function provideDataForFormat()
@@ -93,9 +93,9 @@ _MSG_;
     public function testPercentsAndBracketsAreTrimmed()
     {
         $formatter = new IntlFormatter();
-        $this->assertInstanceof(IntlFormatterInterface::class, $formatter);
-        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['name' => 'Fab']));
-        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['%name%' => 'Fab']));
-        $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['{{ name }}' => 'Fab']));
+        self::assertInstanceof(IntlFormatterInterface::class, $formatter);
+        self::assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['name' => 'Fab']));
+        self::assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['%name%' => 'Fab']));
+        self::assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', ['{{ name }}' => 'Fab']));
     }
 }

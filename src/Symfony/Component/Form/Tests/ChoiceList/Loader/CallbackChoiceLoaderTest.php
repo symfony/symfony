@@ -64,7 +64,7 @@ class CallbackChoiceLoaderTest extends TestCase
 
     public function testLoadChoiceList()
     {
-        $this->assertInstanceOf(ChoiceListInterface::class, self::$loader->loadChoiceList(self::$value));
+        self::assertInstanceOf(ChoiceListInterface::class, self::$loader->loadChoiceList(self::$value));
     }
 
     public function testLoadChoicesOnlyOnce()
@@ -77,26 +77,18 @@ class CallbackChoiceLoaderTest extends TestCase
         });
         $loadedChoiceList = $loader->loadChoiceList();
 
-        $this->assertNotSame($loadedChoiceList, $loader->loadChoiceList());
-        $this->assertSame(1, $calls);
+        self::assertNotSame($loadedChoiceList, $loader->loadChoiceList());
+        self::assertSame(1, $calls);
     }
 
     public function testLoadChoicesForValuesLoadsChoiceListOnFirstCall()
     {
-        $this->assertSame(
-            self::$loader->loadChoicesForValues(self::$choiceValues, self::$value),
-            self::$lazyChoiceList->getChoicesForValues(self::$choiceValues),
-            'Choice list should not be reloaded.'
-        );
+        self::assertSame(self::$loader->loadChoicesForValues(self::$choiceValues, self::$value), self::$lazyChoiceList->getChoicesForValues(self::$choiceValues), 'Choice list should not be reloaded.');
     }
 
     public function testLoadValuesForChoicesLoadsChoiceListOnFirstCall()
     {
-        $this->assertSame(
-            self::$loader->loadValuesForChoices(self::$choices, self::$value),
-            self::$lazyChoiceList->getValuesForChoices(self::$choices),
-            'Choice list should not be reloaded.'
-        );
+        self::assertSame(self::$loader->loadValuesForChoices(self::$choices, self::$value), self::$lazyChoiceList->getValuesForChoices(self::$choices), 'Choice list should not be reloaded.');
     }
 
     public static function tearDownAfterClass(): void

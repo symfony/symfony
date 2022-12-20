@@ -31,7 +31,7 @@ class WorkflowExtensionTest extends TestCase
     protected function setUp(): void
     {
         if (!class_exists(Workflow::class)) {
-            $this->markTestSkipped('The Workflow component is needed to run tests for this extension.');
+            self::markTestSkipped('The Workflow component is needed to run tests for this extension.');
         }
 
         $places = ['ordered', 'waiting_for_payment', 'processed'];
@@ -66,8 +66,8 @@ class WorkflowExtensionTest extends TestCase
     {
         $subject = new Subject();
 
-        $this->assertTrue($this->extension->canTransition($subject, 't1'));
-        $this->assertFalse($this->extension->canTransition($subject, 't2'));
+        self::assertTrue($this->extension->canTransition($subject, 't1'));
+        self::assertFalse($this->extension->canTransition($subject, 't2'));
     }
 
     public function testGetEnabledTransitions()
@@ -76,9 +76,9 @@ class WorkflowExtensionTest extends TestCase
 
         $transitions = $this->extension->getEnabledTransitions($subject);
 
-        $this->assertCount(1, $transitions);
-        $this->assertInstanceOf(Transition::class, $transitions[0]);
-        $this->assertSame('t1', $transitions[0]->getName());
+        self::assertCount(1, $transitions);
+        self::assertInstanceOf(Transition::class, $transitions[0]);
+        self::assertSame('t1', $transitions[0]->getName());
     }
 
     public function testGetEnabledTransition()
@@ -87,51 +87,51 @@ class WorkflowExtensionTest extends TestCase
 
         $transition = $this->extension->getEnabledTransition($subject, 't1');
 
-        $this->assertInstanceOf(Transition::class, $transition);
-        $this->assertSame('t1', $transition->getName());
+        self::assertInstanceOf(Transition::class, $transition);
+        self::assertSame('t1', $transition->getName());
     }
 
     public function testHasMarkedPlace()
     {
         $subject = new Subject(['ordered' => 1, 'waiting_for_payment' => 1]);
 
-        $this->assertTrue($this->extension->hasMarkedPlace($subject, 'ordered'));
-        $this->assertTrue($this->extension->hasMarkedPlace($subject, 'waiting_for_payment'));
-        $this->assertFalse($this->extension->hasMarkedPlace($subject, 'processed'));
+        self::assertTrue($this->extension->hasMarkedPlace($subject, 'ordered'));
+        self::assertTrue($this->extension->hasMarkedPlace($subject, 'waiting_for_payment'));
+        self::assertFalse($this->extension->hasMarkedPlace($subject, 'processed'));
     }
 
     public function testGetMarkedPlaces()
     {
         $subject = new Subject(['ordered' => 1, 'waiting_for_payment' => 1]);
 
-        $this->assertSame(['ordered', 'waiting_for_payment'], $this->extension->getMarkedPlaces($subject));
-        $this->assertSame($subject->getMarking(), $this->extension->getMarkedPlaces($subject, false));
+        self::assertSame(['ordered', 'waiting_for_payment'], $this->extension->getMarkedPlaces($subject));
+        self::assertSame($subject->getMarking(), $this->extension->getMarkedPlaces($subject, false));
     }
 
     public function testGetMetadata()
     {
         if (!class_exists(InMemoryMetadataStore::class)) {
-            $this->markTestSkipped('This test requires symfony/workflow:4.1.');
+            self::markTestSkipped('This test requires symfony/workflow:4.1.');
         }
         $subject = new Subject();
 
-        $this->assertSame('workflow title', $this->extension->getMetadata($subject, 'title'));
-        $this->assertSame('ordered title', $this->extension->getMetadata($subject, 'title', 'orderer'));
-        $this->assertSame('t1 title', $this->extension->getMetadata($subject, 'title', $this->t1));
-        $this->assertNull($this->extension->getMetadata($subject, 'not found'));
-        $this->assertNull($this->extension->getMetadata($subject, 'not found', $this->t1));
+        self::assertSame('workflow title', $this->extension->getMetadata($subject, 'title'));
+        self::assertSame('ordered title', $this->extension->getMetadata($subject, 'title', 'orderer'));
+        self::assertSame('t1 title', $this->extension->getMetadata($subject, 'title', $this->t1));
+        self::assertNull($this->extension->getMetadata($subject, 'not found'));
+        self::assertNull($this->extension->getMetadata($subject, 'not found', $this->t1));
     }
 
     public function testbuildTransitionBlockerList()
     {
         if (!class_exists(TransitionBlockerList::class)) {
-            $this->markTestSkipped('This test requires symfony/workflow:4.1.');
+            self::markTestSkipped('This test requires symfony/workflow:4.1.');
         }
         $subject = new Subject();
 
         $list = $this->extension->buildTransitionBlockerList($subject, 't1');
-        $this->assertInstanceOf(TransitionBlockerList::class, $list);
-        $this->assertTrue($list->isEmpty());
+        self::assertInstanceOf(TransitionBlockerList::class, $list);
+        self::assertTrue($list->isEmpty());
     }
 }
 

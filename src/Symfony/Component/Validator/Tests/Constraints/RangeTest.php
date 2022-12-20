@@ -23,8 +23,8 @@ class RangeTest extends TestCase
 
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPath()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
         new Range([
             'min' => 'min',
             'minPropertyPath' => 'minPropertyPath',
@@ -36,15 +36,15 @@ class RangeTest extends TestCase
      */
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPathNamed()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
+        self::expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        self::expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
         eval('new \Symfony\Component\Validator\Constraints\Range(min: "min", minPropertyPath: "minPropertyPath");');
     }
 
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPath()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
         new Range([
             'max' => 'max',
             'maxPropertyPath' => 'maxPropertyPath',
@@ -56,21 +56,21 @@ class RangeTest extends TestCase
      */
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPathNamed()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
+        self::expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        self::expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
         eval('new \Symfony\Component\Validator\Constraints\Range(max: "max", maxPropertyPath: "maxPropertyPath");');
     }
 
     public function testThrowsConstraintExceptionIfNoLimitNorPropertyPath()
     {
-        $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given');
+        self::expectException(MissingOptionsException::class);
+        self::expectExceptionMessage('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given');
         new Range([]);
     }
 
     public function testThrowsNoDefaultOptionConfiguredException()
     {
-        $this->expectException(\TypeError::class);
+        self::expectException(\TypeError::class);
         new Range('value');
     }
 
@@ -92,8 +92,8 @@ class RangeTest extends TestCase
         $this->expectDeprecation('Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
 
         $sut = new Range($options);
-        $this->assertEquals($expectedDeprecatedMinMessageSet, $sut->deprecatedMinMessageSet);
-        $this->assertEquals($expectedDeprecatedMaxMessageSet, $sut->deprecatedMaxMessageSet);
+        self::assertEquals($expectedDeprecatedMinMessageSet, $sut->deprecatedMinMessageSet);
+        self::assertEquals($expectedDeprecatedMaxMessageSet, $sut->deprecatedMaxMessageSet);
     }
 
     public function provideDeprecationNotTriggeredIfNotMinMaxOrNotMinMessageNorMaxMessageSet(): array

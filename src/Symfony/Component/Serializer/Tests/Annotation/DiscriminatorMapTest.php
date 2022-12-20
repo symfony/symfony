@@ -33,8 +33,8 @@ class DiscriminatorMapTest extends TestCase
             'bar' => 'BarClass',
         ]]);
 
-        $this->assertEquals('type', $annotation->getTypeProperty());
-        $this->assertEquals([
+        self::assertEquals('type', $annotation->getTypeProperty());
+        self::assertEquals([
             'foo' => 'FooClass',
             'bar' => 'BarClass',
         ], $annotation->getMapping());
@@ -51,8 +51,8 @@ class DiscriminatorMapTest extends TestCase
             'bar' => 'BarClass',
         ]]);
 
-        $this->assertEquals('type', $annotation->getTypeProperty());
-        $this->assertEquals([
+        self::assertEquals('type', $annotation->getTypeProperty());
+        self::assertEquals([
             'foo' => 'FooClass',
             'bar' => 'BarClass',
         ], $annotation->getMapping());
@@ -63,7 +63,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWithoutTypeProperty()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new DiscriminatorMap(['mapping' => ['foo' => 'FooClass']]);
     }
 
@@ -72,7 +72,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWithEmptyTypeProperty()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new DiscriminatorMap(...['typeProperty' => '', 'mapping' => ['foo' => 'FooClass']]);
     }
 
@@ -81,7 +81,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWithEmptyTypePropertyLegacy()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new DiscriminatorMap(['typeProperty' => '', 'mapping' => ['foo' => 'FooClass']]);
     }
 
@@ -90,7 +90,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWithoutMappingProperty()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new DiscriminatorMap(...['typeProperty' => 'type']);
     }
 
@@ -99,7 +99,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWithoutMappingPropertyLegacy()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new DiscriminatorMap(['typeProperty' => 'type']);
     }
 
@@ -108,7 +108,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWitEmptyMappingProperty()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new DiscriminatorMap(...['typeProperty' => 'type', 'mapping' => []]);
     }
 
@@ -117,7 +117,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWitEmptyMappingPropertyLegacy()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new DiscriminatorMap(['typeProperty' => 'type', 'mapping' => []]);
     }
 }

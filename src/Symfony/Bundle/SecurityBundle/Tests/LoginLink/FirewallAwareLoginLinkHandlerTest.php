@@ -26,17 +26,17 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
 {
     public function testSuccessfulDecoration()
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = self::createMock(UserInterface::class);
         $linkDetails = new LoginLinkDetails('http://example.com', new \DateTimeImmutable());
         $request = Request::create('http://example.com/verify');
 
         $firewallMap = $this->createFirewallMap('main_firewall');
-        $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
-        $loginLinkHandler->expects($this->once())
+        $loginLinkHandler = self::createMock(LoginLinkHandlerInterface::class);
+        $loginLinkHandler->expects(self::once())
             ->method('createLoginLink')
             ->with($user, $request)
             ->willReturn($linkDetails);
-        $loginLinkHandler->expects($this->once())
+        $loginLinkHandler->expects(self::once())
             ->method('consumeLoginLink')
             ->with($request)
             ->willReturn($user);
@@ -48,16 +48,16 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
 
         $linker = new FirewallAwareLoginLinkHandler($firewallMap, $locator, $requestStack);
         $actualLinkDetails = $linker->createLoginLink($user, $request);
-        $this->assertSame($linkDetails, $actualLinkDetails);
+        self::assertSame($linkDetails, $actualLinkDetails);
 
         $actualUser = $linker->consumeLoginLink($request);
-        $this->assertSame($user, $actualUser);
+        self::assertSame($user, $actualUser);
     }
 
     private function createFirewallMap(string $firewallName)
     {
-        $map = $this->createMock(FirewallMap::class);
-        $map->expects($this->any())
+        $map = self::createMock(FirewallMap::class);
+        $map->expects(self::any())
             ->method('getFirewallConfig')
             ->willReturn($config = new FirewallConfig($firewallName, 'user_checker'));
 
@@ -66,13 +66,13 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
 
     private function createLocator(array $linkers)
     {
-        $locator = $this->createMock(ContainerInterface::class);
-        $locator->expects($this->any())
+        $locator = self::createMock(ContainerInterface::class);
+        $locator->expects(self::any())
             ->method('has')
             ->willReturnCallback(function ($firewallName) use ($linkers) {
                 return isset($linkers[$firewallName]);
             });
-        $locator->expects($this->any())
+        $locator->expects(self::any())
             ->method('get')
             ->willReturnCallback(function ($firewallName) use ($linkers) {
                 return $linkers[$firewallName];

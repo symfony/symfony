@@ -51,12 +51,12 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
      */
     public function testGetValue($collection, $path, $value)
     {
-        $this->assertSame($value, $this->propertyAccessor->getValue($collection, $path));
+        self::assertSame($value, $this->propertyAccessor->getValue($collection, $path));
     }
 
     public function testGetValueFailsIfNoSuchIndex()
     {
-        $this->expectException(NoSuchIndexException::class);
+        self::expectException(NoSuchIndexException::class);
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
@@ -73,7 +73,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     {
         $this->propertyAccessor->setValue($collection, $path, 'Updated');
 
-        $this->assertSame('Updated', $this->propertyAccessor->getValue($collection, $path));
+        self::assertSame('Updated', $this->propertyAccessor->getValue($collection, $path));
     }
 
     /**
@@ -81,7 +81,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
      */
     public function testIsReadable($collection, $path)
     {
-        $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
+        self::assertTrue($this->propertyAccessor->isReadable($collection, $path));
     }
 
     /**
@@ -89,7 +89,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
      */
     public function testIsWritable($collection, $path)
     {
-        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
+        self::assertTrue($this->propertyAccessor->isWritable($collection, $path));
     }
 
     /**
@@ -97,6 +97,6 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
      */
     public function testIsNotWritable($collection, $path)
     {
-        $this->assertFalse($this->propertyAccessor->isWritable($collection, $path));
+        self::assertFalse($this->propertyAccessor->isWritable($collection, $path));
     }
 }

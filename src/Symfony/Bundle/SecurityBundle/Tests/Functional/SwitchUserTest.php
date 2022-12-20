@@ -25,8 +25,8 @@ class SwitchUserTest extends AbstractWebTestCase
 
         $client->request('GET', '/profile?_switch_user='.$targetUser);
 
-        $this->assertEquals($expectedStatus, $client->getResponse()->getStatusCode());
-        $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
+        self::assertEquals($expectedStatus, $client->getResponse()->getStatusCode());
+        self::assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
     }
 
     /**
@@ -38,8 +38,8 @@ class SwitchUserTest extends AbstractWebTestCase
 
         $client->request('GET', '/profile?_switch_user='.$targetUser);
 
-        $this->assertEquals($expectedStatus, $client->getResponse()->getStatusCode());
-        $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
+        self::assertEquals($expectedStatus, $client->getResponse()->getStatusCode());
+        self::assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
     }
 
     /**
@@ -52,8 +52,8 @@ class SwitchUserTest extends AbstractWebTestCase
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_1');
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_2');
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertEquals('user_cannot_switch_2', $client->getProfile()->getCollector('security')->getUser());
+        self::assertEquals(200, $client->getResponse()->getStatusCode());
+        self::assertEquals('user_cannot_switch_2', $client->getProfile()->getCollector('security')->getUser());
     }
 
     /**
@@ -66,8 +66,8 @@ class SwitchUserTest extends AbstractWebTestCase
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_1');
         $client->request('GET', '/profile?_switch_user='.SwitchUserListener::EXIT_VALUE);
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
+        self::assertEquals(200, $client->getResponse()->getStatusCode());
+        self::assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
     }
 
     /**
@@ -75,14 +75,14 @@ class SwitchUserTest extends AbstractWebTestCase
      */
     public function testSwitchUserStateless(array $options)
     {
-        $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'switchuser_stateless.yml'] + $options);
+        $client = self::createClient(['test_case' => 'JsonLogin', 'root_config' => 'switchuser_stateless.yml'] + $options);
         $client->request('POST', '/chk', [], [], ['HTTP_X_SWITCH_USER' => 'dunglas', 'CONTENT_TYPE' => 'application/json'], '{"user": {"login": "user_can_switch", "password": "test"}}');
         $response = $client->getResponse();
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
-        $this->assertSame('dunglas', $client->getProfile()->getCollector('security')->getUser());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
+        self::assertSame('dunglas', $client->getProfile()->getCollector('security')->getUser());
     }
 
     public function getTestParameters()
@@ -107,7 +107,7 @@ class SwitchUserTest extends AbstractWebTestCase
 
     protected function createAuthenticatedClient($username, array $options = [])
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'switchuser.yml'] + $options);
+        $client = self::createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'switchuser.yml'] + $options);
         $client->followRedirects(true);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();

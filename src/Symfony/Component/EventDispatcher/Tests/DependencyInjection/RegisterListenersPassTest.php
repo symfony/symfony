@@ -35,7 +35,7 @@ class RegisterListenersPassTest extends TestCase
      */
     public function testEventSubscriberWithoutInterface()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $builder->register('event_dispatcher');
         $builder->register('my_event_subscriber', 'stdClass')
@@ -65,7 +65,7 @@ class RegisterListenersPassTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $eventDispatcherDefinition->getMethodCalls());
+        self::assertEquals($expectedCalls, $eventDispatcherDefinition->getMethodCalls());
     }
 
     public function testAliasedEventSubscriber()
@@ -100,13 +100,13 @@ class RegisterListenersPassTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $builder->getDefinition('event_dispatcher')->getMethodCalls());
+        self::assertEquals($expectedCalls, $builder->getDefinition('event_dispatcher')->getMethodCalls());
     }
 
     public function testAbstractEventListener()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "foo" tagged "kernel.event_listener" must not be abstract.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The service "foo" tagged "kernel.event_listener" must not be abstract.');
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_listener', []);
         $container->register('event_dispatcher', 'stdClass');
@@ -117,8 +117,8 @@ class RegisterListenersPassTest extends TestCase
 
     public function testAbstractEventSubscriber()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "foo" tagged "kernel.event_subscriber" must not be abstract.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The service "foo" tagged "kernel.event_subscriber" must not be abstract.');
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_subscriber', []);
         $container->register('event_dispatcher', 'stdClass');
@@ -149,7 +149,7 @@ class RegisterListenersPassTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+        self::assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
     public function testHotPathEvents()
@@ -161,7 +161,7 @@ class RegisterListenersPassTest extends TestCase
 
         (new RegisterListenersPass())->setHotPathEvents(['event'])->process($container);
 
-        $this->assertTrue($container->getDefinition('foo')->hasTag('container.hot_path'));
+        self::assertTrue($container->getDefinition('foo')->hasTag('container.hot_path'));
     }
 
     public function testNoPreloadEvents()
@@ -180,15 +180,15 @@ class RegisterListenersPassTest extends TestCase
             ->setNoPreloadEvents(['cold_event'])
             ->process($container);
 
-        $this->assertFalse($container->getDefinition('foo')->hasTag('container.no_preload'));
-        $this->assertTrue($container->getDefinition('bar')->hasTag('container.no_preload'));
-        $this->assertFalse($container->getDefinition('baz')->hasTag('container.no_preload'));
+        self::assertFalse($container->getDefinition('foo')->hasTag('container.no_preload'));
+        self::assertTrue($container->getDefinition('bar')->hasTag('container.no_preload'));
+        self::assertFalse($container->getDefinition('baz')->hasTag('container.no_preload'));
     }
 
     public function testEventSubscriberUnresolvableClassName()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('You have requested a non-existent parameter "subscriber.class"');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('You have requested a non-existent parameter "subscriber.class"');
         $container = new ContainerBuilder();
         $container->register('foo', '%subscriber.class%')->addTag('kernel.event_subscriber', []);
         $container->register('event_dispatcher', 'stdClass');
@@ -244,7 +244,7 @@ class RegisterListenersPassTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+        self::assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
     /**
@@ -278,7 +278,7 @@ class RegisterListenersPassTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+        self::assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
     /**
@@ -344,7 +344,7 @@ PHP
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+        self::assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
     public function testAliasedEventListener()
@@ -363,8 +363,8 @@ PHP
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
 
-        $this->assertTrue($container->hasParameter('event_dispatcher.event_aliases'));
-        $this->assertSame(array_merge($eventAliases, $customEventAlias), $container->getParameter('event_dispatcher.event_aliases'));
+        self::assertTrue($container->hasParameter('event_dispatcher.event_aliases'));
+        self::assertSame(array_merge($eventAliases, $customEventAlias), $container->getParameter('event_dispatcher.event_aliases'));
 
         $definition = $container->getDefinition('event_dispatcher');
         $expectedCalls = [
@@ -385,7 +385,7 @@ PHP
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+        self::assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
     public function testOmitEventNameOnTypedListener()
@@ -418,7 +418,7 @@ PHP
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+        self::assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
     public function testOmitEventNameOnUntypedListener()
@@ -427,8 +427,8 @@ PHP
         $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['method' => 'onEvent']);
         $container->register('event_dispatcher');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -440,8 +440,8 @@ PHP
         $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener');
         $container->register('event_dispatcher');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -453,8 +453,8 @@ PHP
         $container->register('foo', GenericListener::class)->addTag('kernel.event_listener');
         $container->register('event_dispatcher');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -492,7 +492,7 @@ PHP
                 ],
             ],
         ];
-        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+        self::assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 }
 

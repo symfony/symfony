@@ -21,13 +21,13 @@ class UnstructuredHeaderTest extends TestCase
     public function testGetNameReturnsNameVerbatim()
     {
         $header = new UnstructuredHeader('Subject', '');
-        $this->assertEquals('Subject', $header->getName());
+        self::assertEquals('Subject', $header->getName());
     }
 
     public function testGetValueReturnsValueVerbatim()
     {
         $header = new UnstructuredHeader('Subject', 'Test');
-        $this->assertEquals('Test', $header->getValue());
+        self::assertEquals('Test', $header->getValue());
     }
 
     public function testBasicStructureIsKeyValuePair()
@@ -37,7 +37,7 @@ class UnstructuredHeaderTest extends TestCase
         (":"), followed by a field body, and terminated by CRLF.
         */
         $header = new UnstructuredHeader('Subject', 'Test');
-        $this->assertEquals('Subject: Test', $header->toString());
+        self::assertEquals('Subject: Test', $header->toString());
     }
 
     public function testLongHeadersAreFoldedAtWordBoundary()
@@ -59,12 +59,9 @@ class UnstructuredHeaderTest extends TestCase
             X-Custom-Header: The quick brown fox jumped over the fence, he was a very very
             scary brown fox with a bushy tail
         */
-        $this->assertEquals(
-            'X-Custom-Header: The quick brown fox jumped over the fence, he was a'.
-            ' very'."\r\n".// Folding
-            ' very scary brown fox with a bushy tail',
-            $header->toString(), '%s: The header should have been folded at 76th char'
-        );
+        self::assertEquals('X-Custom-Header: The quick brown fox jumped over the fence, he was a'.
+        ' very'."\r\n".// Folding
+        ' very scary brown fox with a bushy tail', $header->toString(), '%s: The header should have been folded at 76th char');
     }
 
     public function testPrintableAsciiOnlyAppearsInHeaders()
@@ -78,7 +75,7 @@ class UnstructuredHeaderTest extends TestCase
 
         $nonAsciiChar = pack('C', 0x8F);
         $header = new UnstructuredHeader('X-Test', $nonAsciiChar);
-        $this->assertMatchesRegularExpression('~^[^:\x00-\x20\x80-\xFF]+: [^\x80-\xFF\r\n]+$~s', $header->toString());
+        self::assertMatchesRegularExpression('~^[^:\x00-\x20\x80-\xFF]+: [^\x80-\xFF\r\n]+$~s', $header->toString());
     }
 
     public function testEncodedWordsFollowGeneralStructure()
@@ -91,7 +88,7 @@ class UnstructuredHeaderTest extends TestCase
 
         $nonAsciiChar = pack('C', 0x8F);
         $header = new UnstructuredHeader('X-Test', $nonAsciiChar);
-        $this->assertMatchesRegularExpression('~^X-Test: \=?.*?\?.*?\?.*?\?=$~s', $header->toString());
+        self::assertMatchesRegularExpression('~^X-Test: \=?.*?\?.*?\?.*?\?=$~s', $header->toString());
     }
 
     public function testEncodedWordIncludesCharsetAndEncodingMethodAndText()
@@ -107,7 +104,7 @@ class UnstructuredHeaderTest extends TestCase
         $nonAsciiChar = pack('C', 0x8F);
         $header = new UnstructuredHeader('X-Test', $nonAsciiChar);
         $header->setCharset('iso-8859-1');
-        $this->assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8F?=', $header->toString());
+        self::assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8F?=', $header->toString());
     }
 
     public function testEncodedWordsAreUsedToEncodedNonPrintableAscii()
@@ -119,7 +116,7 @@ class UnstructuredHeaderTest extends TestCase
             $encodedChar = sprintf('=%02X', $byte);
             $header = new UnstructuredHeader('X-A', $char);
             $header->setCharset('iso-8859-1');
-            $this->assertEquals('X-A: =?'.$header->getCharset().'?Q?'.$encodedChar.'?=', $header->toString(), 'Non-printable ascii should be encoded');
+            self::assertEquals('X-A: =?'.$header->getCharset().'?Q?'.$encodedChar.'?=', $header->toString(), 'Non-printable ascii should be encoded');
         }
     }
 
@@ -130,7 +127,7 @@ class UnstructuredHeaderTest extends TestCase
             $encodedChar = sprintf('=%02X', $byte);
             $header = new UnstructuredHeader('X-A', $char);
             $header->setCharset('iso-8859-1');
-            $this->assertEquals('X-A: =?'.$header->getCharset().'?Q?'.$encodedChar.'?=', $header->toString(), '8-bit octets should be encoded');
+            self::assertEquals('X-A: =?'.$header->getCharset().'?Q?'.$encodedChar.'?=', $header->toString(), '8-bit octets should be encoded');
         }
     }
 
@@ -155,7 +152,7 @@ class UnstructuredHeaderTest extends TestCase
         // * X-Test: is 8 chars
         $header = new UnstructuredHeader('X-Test', $nonAsciiChar);
         $header->setCharset('iso-8859-1');
-        $this->assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8F?=', $header->toString());
+        self::assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8F?=', $header->toString());
     }
 
     public function testFWSPIsUsedWhenEncoderReturnsMultipleLines()
@@ -172,7 +169,7 @@ class UnstructuredHeaderTest extends TestCase
         // * X-Test: is 8 chars
         $header = new UnstructuredHeader('X-Test', pack('C', 0x8F).'line_one_here'."\r\n".'line_two_here');
         $header->setCharset('iso-8859-1');
-        $this->assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8Fline=5Fone=5Fhere?='."\r\n".' =?'.$header->getCharset().'?Q?line=5Ftwo=5Fhere?=', $header->toString());
+        self::assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8Fline=5Fone=5Fhere?='."\r\n".' =?'.$header->getCharset().'?Q?line=5Ftwo=5Fhere?=', $header->toString());
     }
 
     public function testAdjacentWordsAreEncodedTogether()
@@ -199,11 +196,9 @@ class UnstructuredHeaderTest extends TestCase
 
         $header = new UnstructuredHeader('X-Test', $text);
         $header->setCharset('iso-8859-1');
-        $this->assertEquals('X-Test: start =?'.$header->getCharset().'?Q?'.
+        self::assertEquals('X-Test: start =?'.$header->getCharset().'?Q?'.
             'w=8Frd_w=8Frd?= then =?'.$header->getCharset().'?Q?'.
-            'w=8Frd?=', $header->toString(),
-            'Adjacent encoded words should appear grouped with WSP encoded'
-        );
+            'w=8Frd?=', $header->toString(), 'Adjacent encoded words should appear grouped with WSP encoded');
     }
 
     public function testLanguageInformationAppearsInEncodedWords()
@@ -229,19 +224,19 @@ class UnstructuredHeaderTest extends TestCase
         $header = new UnstructuredHeader('Subject', $value);
         $header->setLanguage('en');
         $header->setCharset('iso-8859-1');
-        $this->assertEquals('Subject: =?iso-8859-1*en?Q?fo=8Fbar?=', $header->toString());
+        self::assertEquals('Subject: =?iso-8859-1*en?Q?fo=8Fbar?=', $header->toString());
     }
 
     public function testSetBody()
     {
         $header = new UnstructuredHeader('X-Test', '');
         $header->setBody('test');
-        $this->assertEquals('test', $header->getValue());
+        self::assertEquals('test', $header->getValue());
     }
 
     public function testGetBody()
     {
         $header = new UnstructuredHeader('Subject', 'test');
-        $this->assertEquals('test', $header->getBody());
+        self::assertEquals('test', $header->getBody());
     }
 }

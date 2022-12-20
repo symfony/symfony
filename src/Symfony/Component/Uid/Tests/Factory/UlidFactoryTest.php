@@ -23,21 +23,21 @@ final class UlidFactoryTest extends TestCase
         $ulidFactory->create();
 
         $ulid1 = $ulidFactory->create(new \DateTime('@999999.123000'));
-        $this->assertSame('999999.123000', $ulid1->getDateTime()->format('U.u'));
+        self::assertSame('999999.123000', $ulid1->getDateTime()->format('U.u'));
         $ulid2 = $ulidFactory->create(new \DateTime('@999999.123000'));
-        $this->assertSame('999999.123000', $ulid2->getDateTime()->format('U.u'));
+        self::assertSame('999999.123000', $ulid2->getDateTime()->format('U.u'));
 
-        $this->assertFalse($ulid1->equals($ulid2));
-        $this->assertSame(-1, $ulid1->compare($ulid2));
+        self::assertFalse($ulid1->equals($ulid2));
+        self::assertSame(-1, $ulid1->compare($ulid2));
 
         $ulid3 = $ulidFactory->create(new \DateTime('@1234.162524'));
-        $this->assertSame('1234.162000', $ulid3->getDateTime()->format('U.u'));
+        self::assertSame('1234.162000', $ulid3->getDateTime()->format('U.u'));
     }
 
     public function testCreateWithInvalidTimestamp()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The timestamp must be positive.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The timestamp must be positive.');
 
         (new UlidFactory())->create(new \DateTime('@-1000'));
     }

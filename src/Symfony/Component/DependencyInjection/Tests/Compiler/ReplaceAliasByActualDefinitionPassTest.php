@@ -38,25 +38,22 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertTrue($container->has('a'), '->process() does nothing to public definitions.');
-        $this->assertTrue($container->hasAlias('a_alias'));
-        $this->assertTrue($container->getAlias('a_alias')->isDeprecated());
-        $this->assertFalse($container->has('b'), '->process() removes non-public definitions.');
-        $this->assertTrue(
-            $container->has('b_alias') && !$container->hasAlias('b_alias'),
-            '->process() replaces alias to actual.'
-        );
-        $this->assertTrue($container->getDefinition('b_alias')->hasTag('container.private'));
+        self::assertTrue($container->has('a'), '->process() does nothing to public definitions.');
+        self::assertTrue($container->hasAlias('a_alias'));
+        self::assertTrue($container->getAlias('a_alias')->isDeprecated());
+        self::assertFalse($container->has('b'), '->process() removes non-public definitions.');
+        self::assertTrue($container->has('b_alias') && !$container->hasAlias('b_alias'), '->process() replaces alias to actual.');
+        self::assertTrue($container->getDefinition('b_alias')->hasTag('container.private'));
 
-        $this->assertTrue($container->has('container'));
+        self::assertTrue($container->has('container'));
 
         $resolvedFactory = $aDefinition->getFactory();
-        $this->assertSame('b_alias', (string) $resolvedFactory[0]);
+        self::assertSame('b_alias', (string) $resolvedFactory[0]);
     }
 
     public function testProcessWithInvalidAlias()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $container = new ContainerBuilder();
         $container->setAlias('a_alias', 'a');
         $this->process($container);

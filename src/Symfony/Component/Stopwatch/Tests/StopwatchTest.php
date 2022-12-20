@@ -32,17 +32,17 @@ class StopwatchTest extends TestCase
         $stopwatch = new Stopwatch();
         $event = $stopwatch->start('foo', 'cat');
 
-        $this->assertInstanceOf(StopwatchEvent::class, $event);
-        $this->assertEquals('cat', $event->getCategory());
-        $this->assertSame($event, $stopwatch->getEvent('foo'));
+        self::assertInstanceOf(StopwatchEvent::class, $event);
+        self::assertEquals('cat', $event->getCategory());
+        self::assertSame($event, $stopwatch->getEvent('foo'));
     }
 
     public function testStartWithoutCategory()
     {
         $stopwatch = new Stopwatch();
         $stopwatchEvent = $stopwatch->start('bar');
-        $this->assertSame('default', $stopwatchEvent->getCategory());
-        $this->assertSame($stopwatchEvent, $stopwatch->getEvent('bar'));
+        self::assertSame('default', $stopwatchEvent->getCategory());
+        self::assertSame($stopwatchEvent, $stopwatch->getEvent('bar'));
     }
 
     public function testIsStarted()
@@ -50,14 +50,14 @@ class StopwatchTest extends TestCase
         $stopwatch = new Stopwatch();
         $stopwatch->start('foo', 'cat');
 
-        $this->assertTrue($stopwatch->isStarted('foo'));
+        self::assertTrue($stopwatch->isStarted('foo'));
     }
 
     public function testIsNotStarted()
     {
         $stopwatch = new Stopwatch();
 
-        $this->assertFalse($stopwatch->isStarted('foo'));
+        self::assertFalse($stopwatch->isStarted('foo'));
     }
 
     public function testIsNotStartedEvent()
@@ -73,7 +73,7 @@ class StopwatchTest extends TestCase
 
         $events->setValue(end($section), ['foo' => new StopwatchEvent(microtime(true) * 1000)]);
 
-        $this->assertFalse($stopwatch->isStarted('foo'));
+        self::assertFalse($stopwatch->isStarted('foo'));
     }
 
     public function testStop()
@@ -83,20 +83,20 @@ class StopwatchTest extends TestCase
         usleep(200000);
         $event = $stopwatch->stop('foo');
 
-        $this->assertInstanceOf(StopwatchEvent::class, $event);
-        $this->assertEqualsWithDelta(200, $event->getDuration(), self::DELTA);
+        self::assertInstanceOf(StopwatchEvent::class, $event);
+        self::assertEqualsWithDelta(200, $event->getDuration(), self::DELTA);
     }
 
     public function testUnknownEvent()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->getEvent('foo');
     }
 
     public function testStopWithoutStart()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->stop('foo');
     }
@@ -108,9 +108,9 @@ class StopwatchTest extends TestCase
         $stopwatch->start('foo');
         $event = $stopwatch->stop('foo');
 
-        $this->assertIsFloat($event->getStartTime());
-        $this->assertIsFloat($event->getEndTime());
-        $this->assertIsFloat($event->getDuration());
+        self::assertIsFloat($event->getStartTime());
+        self::assertIsFloat($event->getEndTime());
+        self::assertIsFloat($event->getDuration());
     }
 
     public function testSection()
@@ -135,9 +135,9 @@ class StopwatchTest extends TestCase
         $stopwatch->stopSection('0');
 
         // the section is an event by itself
-        $this->assertCount(3, $stopwatch->getSectionEvents('1'));
-        $this->assertCount(2, $stopwatch->getSectionEvents('2'));
-        $this->assertCount(2, $stopwatch->getSectionEvents('0'));
+        self::assertCount(3, $stopwatch->getSectionEvents('1'));
+        self::assertCount(2, $stopwatch->getSectionEvents('2'));
+        self::assertCount(2, $stopwatch->getSectionEvents('0'));
     }
 
     public function testReopenASection()
@@ -154,13 +154,13 @@ class StopwatchTest extends TestCase
 
         $events = $stopwatch->getSectionEvents('section');
 
-        $this->assertCount(3, $events);
-        $this->assertCount(2, $events['__section__']->getPeriods());
+        self::assertCount(3, $events);
+        self::assertCount(2, $events['__section__']->getPeriods());
     }
 
     public function testReopenANewSectionShouldThrowAnException()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->openSection('section');
     }
@@ -174,6 +174,6 @@ class StopwatchTest extends TestCase
 
         $stopwatch->reset();
 
-        $this->assertEquals(new Stopwatch(), $stopwatch);
+        self::assertEquals(new Stopwatch(), $stopwatch);
     }
 }

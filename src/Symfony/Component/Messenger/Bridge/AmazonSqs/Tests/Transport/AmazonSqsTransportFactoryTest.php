@@ -20,9 +20,9 @@ class AmazonSqsTransportFactoryTest extends TestCase
     {
         $factory = new AmazonSqsTransportFactory();
 
-        $this->assertTrue($factory->supports('sqs://localhost', []));
-        $this->assertTrue($factory->supports('https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4', []));
-        $this->assertFalse($factory->supports('redis://localhost', []));
-        $this->assertFalse($factory->supports('invalid-dsn', []));
+        self::assertTrue($factory->supports('sqs://localhost', []));
+        self::assertTrue($factory->supports('https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4', []));
+        self::assertFalse($factory->supports('redis://localhost', []));
+        self::assertFalse($factory->supports('invalid-dsn', []));
     }
 }

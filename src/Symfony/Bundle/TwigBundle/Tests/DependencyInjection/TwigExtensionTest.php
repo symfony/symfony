@@ -34,15 +34,15 @@ class TwigExtensionTest extends TestCase
         $container->loadFromExtension('twig');
         $this->compileContainer($container);
 
-        $this->assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
+        self::assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
 
-        $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
+        self::assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
         // Twig options
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals('%kernel.cache_dir%/twig', $options['cache'], '->load() sets default value for cache option');
-        $this->assertEquals('%kernel.charset%', $options['charset'], '->load() sets default value for charset option');
-        $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
+        self::assertEquals('%kernel.cache_dir%/twig', $options['cache'], '->load() sets default value for cache option');
+        self::assertEquals('%kernel.charset%', $options['charset'], '->load() sets default value for charset option');
+        self::assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
     }
 
     /**
@@ -55,39 +55,39 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'full', $format);
         $this->compileContainer($container);
 
-        $this->assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
+        self::assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
 
         // Form resources
         $resources = $container->getParameter('twig.form.resources');
-        $this->assertContains('form_div_layout.html.twig', $resources, '->load() includes default template for form resources');
-        $this->assertContains('MyBundle::form.html.twig', $resources, '->load() merges new templates into form resources');
+        self::assertContains('form_div_layout.html.twig', $resources, '->load() includes default template for form resources');
+        self::assertContains('MyBundle::form.html.twig', $resources, '->load() merges new templates into form resources');
 
         // Globals
         $calls = $container->getDefinition('twig')->getMethodCalls();
-        $this->assertEquals('app', $calls[0][1][0], '->load() registers services as Twig globals');
-        $this->assertEquals(new Reference('twig.app_variable'), $calls[0][1][1]);
-        $this->assertEquals('foo', $calls[2][1][0], '->load() registers services as Twig globals');
-        $this->assertEquals(new Reference('bar'), $calls[2][1][1], '->load() registers services as Twig globals');
-        $this->assertEquals('baz', $calls[3][1][0], '->load() registers variables as Twig globals');
-        $this->assertEquals('@qux', $calls[3][1][1], '->load() allows escaping of service identifiers');
-        $this->assertEquals('pi', $calls[4][1][0], '->load() registers variables as Twig globals');
-        $this->assertEquals(3.14, $calls[4][1][1], '->load() registers variables as Twig globals');
+        self::assertEquals('app', $calls[0][1][0], '->load() registers services as Twig globals');
+        self::assertEquals(new Reference('twig.app_variable'), $calls[0][1][1]);
+        self::assertEquals('foo', $calls[2][1][0], '->load() registers services as Twig globals');
+        self::assertEquals(new Reference('bar'), $calls[2][1][1], '->load() registers services as Twig globals');
+        self::assertEquals('baz', $calls[3][1][0], '->load() registers variables as Twig globals');
+        self::assertEquals('@qux', $calls[3][1][1], '->load() allows escaping of service identifiers');
+        self::assertEquals('pi', $calls[4][1][0], '->load() registers variables as Twig globals');
+        self::assertEquals(3.14, $calls[4][1][1], '->load() registers variables as Twig globals');
 
         // Yaml and Php specific configs
         if (\in_array($format, ['yml', 'php'])) {
-            $this->assertEquals('bad', $calls[5][1][0], '->load() registers variables as Twig globals');
-            $this->assertEquals(['key' => 'foo'], $calls[5][1][1], '->load() registers variables as Twig globals');
+            self::assertEquals('bad', $calls[5][1][0], '->load() registers variables as Twig globals');
+            self::assertEquals(['key' => 'foo'], $calls[5][1][1], '->load() registers variables as Twig globals');
         }
 
         // Twig options
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
-        $this->assertTrue($options['autoescape'], '->load() sets the autoescape option');
-        $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
-        $this->assertEquals('/tmp', $options['cache'], '->load() sets the cache option');
-        $this->assertEquals('ISO-8859-1', $options['charset'], '->load() sets the charset option');
-        $this->assertTrue($options['debug'], '->load() sets the debug option');
-        $this->assertTrue($options['strict_variables'], '->load() sets the strict_variables option');
+        self::assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
+        self::assertTrue($options['autoescape'], '->load() sets the autoescape option');
+        self::assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
+        self::assertEquals('/tmp', $options['cache'], '->load() sets the cache option');
+        self::assertEquals('ISO-8859-1', $options['charset'], '->load() sets the charset option');
+        self::assertTrue($options['debug'], '->load() sets the debug option');
+        self::assertTrue($options['strict_variables'], '->load() sets the strict_variables option');
     }
 
     /**
@@ -101,7 +101,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals([new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'], $options['autoescape']);
+        self::assertEquals([new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'], $options['autoescape']);
     }
 
     /**
@@ -115,7 +115,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals('name', $options['autoescape']);
+        self::assertEquals('name', $options['autoescape']);
     }
 
     /**
@@ -130,12 +130,12 @@ class TwigExtensionTest extends TestCase
 
         $environmentConfigurator = $container->getDefinition('twig.configurator.environment');
 
-        $this->assertSame('Y-m-d', $environmentConfigurator->getArgument(0));
-        $this->assertSame('%d', $environmentConfigurator->getArgument(1));
-        $this->assertSame('Europe/Berlin', $environmentConfigurator->getArgument(2));
-        $this->assertSame(2, $environmentConfigurator->getArgument(3));
-        $this->assertSame(',', $environmentConfigurator->getArgument(4));
-        $this->assertSame('.', $environmentConfigurator->getArgument(5));
+        self::assertSame('Y-m-d', $environmentConfigurator->getArgument(0));
+        self::assertSame('%d', $environmentConfigurator->getArgument(1));
+        self::assertSame('Europe/Berlin', $environmentConfigurator->getArgument(2));
+        self::assertSame(2, $environmentConfigurator->getArgument(3));
+        self::assertSame(',', $environmentConfigurator->getArgument(4));
+        self::assertSame('.', $environmentConfigurator->getArgument(5));
     }
 
     public function testGlobalsWithDifferentTypesAndValues()
@@ -160,8 +160,8 @@ class TwigExtensionTest extends TestCase
 
         $calls = $container->getDefinition('twig')->getMethodCalls();
         foreach (\array_slice($calls, 2) as $call) {
-            $this->assertEquals(key($globals), $call[1][0]);
-            $this->assertSame(current($globals), $call[1][1]);
+            self::assertEquals(key($globals), $call[1][0]);
+            self::assertSame(current($globals), $call[1][1]);
 
             next($globals);
         }
@@ -186,7 +186,7 @@ class TwigExtensionTest extends TestCase
             }
         }
 
-        $this->assertEquals([
+        self::assertEquals([
             ['path1'],
             ['path2'],
             ['namespaced_path1', 'namespace1'],
@@ -227,7 +227,7 @@ class TwigExtensionTest extends TestCase
         $stopwatchIsAvailable = new \ReflectionProperty($tokenParsers[0], 'stopwatchIsAvailable');
         $stopwatchIsAvailable->setAccessible(true);
 
-        $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
+        self::assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
     }
 
     public function stopwatchExtensionAvailabilityProvider()
@@ -258,10 +258,10 @@ class TwigExtensionTest extends TestCase
 
         $loader = $container->getDefinition('twig.runtime_loader');
         $args = $container->getDefinition((string) $loader->getArgument(0))->getArgument(0);
-        $this->assertArrayHasKey('Symfony\Component\Form\FormRenderer', $args);
-        $this->assertArrayHasKey('FooClass', $args);
-        $this->assertEquals('twig.form.renderer', $args['Symfony\Component\Form\FormRenderer']->getValues()[0]);
-        $this->assertEquals('foo', $args['FooClass']->getValues()[0]);
+        self::assertArrayHasKey('Symfony\Component\Form\FormRenderer', $args);
+        self::assertArrayHasKey('FooClass', $args);
+        self::assertEquals('twig.form.renderer', $args['Symfony\Component\Form\FormRenderer']->getValues()[0]);
+        self::assertEquals('foo', $args['FooClass']->getValues()[0]);
     }
 
     private function createContainer()

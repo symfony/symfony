@@ -28,8 +28,8 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $configPass = new MergeExtensionConfigurationPass(['loaded', 'not_loaded']);
         $configPass->process($container);
 
-        $this->assertTrue($container->hasDefinition('loaded.foo'));
-        $this->assertTrue($container->hasDefinition('not_loaded.bar'));
+        self::assertTrue($container->hasDefinition('loaded.foo'));
+        self::assertTrue($container->hasDefinition('not_loaded.bar'));
     }
 }
 

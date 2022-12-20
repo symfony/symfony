@@ -33,9 +33,9 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
 
         $router = $container->getDefinition('router.default');
         $calls = $router->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
-        $this->assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
+        self::assertCount(1, $calls);
+        self::assertEquals('addExpressionLanguageProvider', $calls[0][0]);
+        self::assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
     }
 
     public function testProcessForRouterAlias()
@@ -53,8 +53,8 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
 
         $router = $container->getDefinition('my_router');
         $calls = $router->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertEquals('addExpressionLanguageProvider', $calls[0][0]);
-        $this->assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
+        self::assertCount(1, $calls);
+        self::assertEquals('addExpressionLanguageProvider', $calls[0][0]);
+        self::assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
     }
 }

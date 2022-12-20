@@ -28,32 +28,32 @@ class CookieClearingLogoutHandlerTest extends TestCase
     {
         $request = new Request();
         $response = new Response();
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
 
         $handler = new CookieClearingLogoutHandler(['foo' => ['path' => '/foo', 'domain' => 'foo.foo', 'secure' => true, 'samesite' => Cookie::SAMESITE_STRICT], 'foo2' => ['path' => null, 'domain' => null]]);
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(0, $cookies);
+        self::assertCount(0, $cookies);
 
         $handler->logout($request, $response, $token);
 
         $cookies = $response->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertCount(2, $cookies);
+        self::assertCount(2, $cookies);
 
         $cookie = $cookies['foo.foo']['/foo']['foo'];
-        $this->assertEquals('foo', $cookie->getName());
-        $this->assertEquals('/foo', $cookie->getPath());
-        $this->assertEquals('foo.foo', $cookie->getDomain());
-        $this->assertEquals(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
-        $this->assertTrue($cookie->isSecure());
-        $this->assertTrue($cookie->isCleared());
+        self::assertEquals('foo', $cookie->getName());
+        self::assertEquals('/foo', $cookie->getPath());
+        self::assertEquals('foo.foo', $cookie->getDomain());
+        self::assertEquals(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
+        self::assertTrue($cookie->isSecure());
+        self::assertTrue($cookie->isCleared());
 
         $cookie = $cookies['']['/']['foo2'];
-        $this->assertStringStartsWith('foo2', $cookie->getName());
-        $this->assertEquals('/', $cookie->getPath());
-        $this->assertNull($cookie->getDomain());
-        $this->assertNull($cookie->getSameSite());
-        $this->assertFalse($cookie->isSecure());
-        $this->assertTrue($cookie->isCleared());
+        self::assertStringStartsWith('foo2', $cookie->getName());
+        self::assertEquals('/', $cookie->getPath());
+        self::assertNull($cookie->getDomain());
+        self::assertNull($cookie->getSameSite());
+        self::assertFalse($cookie->isSecure());
+        self::assertTrue($cookie->isCleared());
     }
 }

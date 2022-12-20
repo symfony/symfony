@@ -23,7 +23,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
         // Ensure a bug specific to the DOM extension is fixed (see https://github.com/symfony/symfony/issues/28596)
         $crawler = $this->createCrawler();
         $crawler->add($this->getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>');
-        $this->assertEquals('Foo', $crawler->filterXPath('//h1')->text(), '->add() adds nodes from a string');
+        self::assertEquals('Foo', $crawler->filterXPath('//h1')->text(), '->add() adds nodes from a string');
     }
 
     /** @dataProvider validHtml5Provider */

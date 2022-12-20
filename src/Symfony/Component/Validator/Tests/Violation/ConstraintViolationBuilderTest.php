@@ -85,19 +85,19 @@ class ConstraintViolationBuilderTest extends TestCase
 
     private function assertViolationEquals(ConstraintViolation $expectedViolation)
     {
-        $this->assertCount(1, $this->violations);
+        self::assertCount(1, $this->violations);
 
         $violation = $this->violations->get(0);
 
-        $this->assertSame($expectedViolation->getMessage(), $violation->getMessage());
-        $this->assertSame($expectedViolation->getMessageTemplate(), $violation->getMessageTemplate());
-        $this->assertSame($expectedViolation->getParameters(), $violation->getParameters());
-        $this->assertSame($expectedViolation->getPlural(), $violation->getPlural());
-        $this->assertSame($expectedViolation->getRoot(), $violation->getRoot());
-        $this->assertSame($expectedViolation->getPropertyPath(), $violation->getPropertyPath());
-        $this->assertSame($expectedViolation->getInvalidValue(), $violation->getInvalidValue());
-        $this->assertSame($expectedViolation->getCode(), $violation->getCode());
-        $this->assertEquals($expectedViolation->getConstraint(), $violation->getConstraint());
-        $this->assertSame($expectedViolation->getCause(), $violation->getCause());
+        self::assertSame($expectedViolation->getMessage(), $violation->getMessage());
+        self::assertSame($expectedViolation->getMessageTemplate(), $violation->getMessageTemplate());
+        self::assertSame($expectedViolation->getParameters(), $violation->getParameters());
+        self::assertSame($expectedViolation->getPlural(), $violation->getPlural());
+        self::assertSame($expectedViolation->getRoot(), $violation->getRoot());
+        self::assertSame($expectedViolation->getPropertyPath(), $violation->getPropertyPath());
+        self::assertSame($expectedViolation->getInvalidValue(), $violation->getInvalidValue());
+        self::assertSame($expectedViolation->getCode(), $violation->getCode());
+        self::assertEquals($expectedViolation->getConstraint(), $violation->getConstraint());
+        self::assertSame($expectedViolation->getCause(), $violation->getCause());
     }
 }

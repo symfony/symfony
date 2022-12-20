@@ -37,53 +37,53 @@ class BooleanToStringTransformerTest extends TestCase
 
     public function testTransform()
     {
-        $this->assertEquals(self::TRUE_VALUE, $this->transformer->transform(true));
-        $this->assertNull($this->transformer->transform(false));
+        self::assertEquals(self::TRUE_VALUE, $this->transformer->transform(true));
+        self::assertNull($this->transformer->transform(false));
     }
 
     // https://github.com/symfony/symfony/issues/8989
     public function testTransformAcceptsNull()
     {
-        $this->assertNull($this->transformer->transform(null));
+        self::assertNull($this->transformer->transform(null));
     }
 
     public function testTransformFailsIfString()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $this->transformer->transform('1');
     }
 
     public function testReverseTransformFailsIfInteger()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform(1);
     }
 
     public function testReverseTransform()
     {
-        $this->assertTrue($this->transformer->reverseTransform(self::TRUE_VALUE));
-        $this->assertTrue($this->transformer->reverseTransform('foobar'));
-        $this->assertTrue($this->transformer->reverseTransform(''));
-        $this->assertFalse($this->transformer->reverseTransform(null));
+        self::assertTrue($this->transformer->reverseTransform(self::TRUE_VALUE));
+        self::assertTrue($this->transformer->reverseTransform('foobar'));
+        self::assertTrue($this->transformer->reverseTransform(''));
+        self::assertFalse($this->transformer->reverseTransform(null));
     }
 
     public function testCustomFalseValues()
     {
         $customFalseTransformer = new BooleanToStringTransformer(self::TRUE_VALUE, ['0', 'myFalse', true]);
-        $this->assertFalse($customFalseTransformer->reverseTransform('myFalse'));
-        $this->assertFalse($customFalseTransformer->reverseTransform('0'));
-        $this->assertFalse($customFalseTransformer->reverseTransform(true));
+        self::assertFalse($customFalseTransformer->reverseTransform('myFalse'));
+        self::assertFalse($customFalseTransformer->reverseTransform('0'));
+        self::assertFalse($customFalseTransformer->reverseTransform(true));
     }
 
     public function testTrueValueContainedInFalseValues()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new BooleanToStringTransformer('0', [null, '0']);
     }
 
     public function testBeStrictOnTrueInFalseValueCheck()
     {
         $transformer = new BooleanToStringTransformer('0', [null, false]);
-        $this->assertInstanceOf(BooleanToStringTransformer::class, $transformer);
+        self::assertInstanceOf(BooleanToStringTransformer::class, $transformer);
     }
 }

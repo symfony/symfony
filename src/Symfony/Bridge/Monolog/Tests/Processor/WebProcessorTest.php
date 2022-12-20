@@ -28,12 +28,12 @@ class WebProcessorTest extends TestCase
         $processor->onKernelRequest($event);
         $record = $processor($this->getRecord());
 
-        $this->assertCount(5, $record['extra']);
-        $this->assertEquals($server['REQUEST_URI'], $record['extra']['url']);
-        $this->assertEquals($server['REMOTE_ADDR'], $record['extra']['ip']);
-        $this->assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
-        $this->assertEquals($server['SERVER_NAME'], $record['extra']['server']);
-        $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
+        self::assertCount(5, $record['extra']);
+        self::assertEquals($server['REQUEST_URI'], $record['extra']['url']);
+        self::assertEquals($server['REMOTE_ADDR'], $record['extra']['ip']);
+        self::assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
+        self::assertEquals($server['SERVER_NAME'], $record['extra']['server']);
+        self::assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
     }
 
     public function testUseRequestClientIp()
@@ -45,12 +45,12 @@ class WebProcessorTest extends TestCase
         $processor->onKernelRequest($event);
         $record = $processor($this->getRecord());
 
-        $this->assertCount(5, $record['extra']);
-        $this->assertEquals($server['REQUEST_URI'], $record['extra']['url']);
-        $this->assertEquals($server['X_FORWARDED_FOR'], $record['extra']['ip']);
-        $this->assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
-        $this->assertEquals($server['SERVER_NAME'], $record['extra']['server']);
-        $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
+        self::assertCount(5, $record['extra']);
+        self::assertEquals($server['REQUEST_URI'], $record['extra']['url']);
+        self::assertEquals($server['X_FORWARDED_FOR'], $record['extra']['ip']);
+        self::assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
+        self::assertEquals($server['SERVER_NAME'], $record['extra']['server']);
+        self::assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
 
         Request::setTrustedProxies([], -1);
     }
@@ -58,7 +58,7 @@ class WebProcessorTest extends TestCase
     public function testCanBeConstructedWithExtraFields()
     {
         if (!$this->isExtraFieldsSupported()) {
-            $this->markTestSkipped('WebProcessor of the installed Monolog version does not support $extraFields parameter');
+            self::markTestSkipped('WebProcessor of the installed Monolog version does not support $extraFields parameter');
         }
 
         [$event, $server] = $this->createRequestEvent();
@@ -67,9 +67,9 @@ class WebProcessorTest extends TestCase
         $processor->onKernelRequest($event);
         $record = $processor($this->getRecord());
 
-        $this->assertCount(2, $record['extra']);
-        $this->assertEquals($server['REQUEST_URI'], $record['extra']['url']);
-        $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
+        self::assertCount(2, $record['extra']);
+        self::assertEquals($server['REQUEST_URI'], $record['extra']['url']);
+        self::assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
     }
 
     private function createRequestEvent(array $additionalServerParameters = []): array
@@ -89,7 +89,7 @@ class WebProcessorTest extends TestCase
         $request->server->replace($server);
         $request->headers->replace($server);
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         return [$event, $server];
     }

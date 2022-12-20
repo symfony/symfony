@@ -29,11 +29,11 @@ class TreeBuilderTest extends TestCase
 
         $nodeBuilder = $builder->getRootNode()->children();
 
-        $this->assertInstanceOf(CustomNodeBuilder::class, $nodeBuilder);
+        self::assertInstanceOf(CustomNodeBuilder::class, $nodeBuilder);
 
         $nodeBuilder = $nodeBuilder->arrayNode('deeper')->children();
 
-        $this->assertInstanceOf(CustomNodeBuilder::class, $nodeBuilder);
+        self::assertInstanceOf(CustomNodeBuilder::class, $nodeBuilder);
     }
 
     public function testOverrideABuiltInNodeType()
@@ -42,7 +42,7 @@ class TreeBuilderTest extends TestCase
 
         $definition = $builder->getRootNode()->children()->variableNode('variable');
 
-        $this->assertInstanceOf(VariableNodeDefinition::class, $definition);
+        self::assertInstanceOf(VariableNodeDefinition::class, $definition);
     }
 
     public function testAddANodeType()
@@ -51,7 +51,7 @@ class TreeBuilderTest extends TestCase
 
         $definition = $builder->getRootNode()->children()->barNode('variable');
 
-        $this->assertInstanceOf(BarNodeDefinition::class, $definition);
+        self::assertInstanceOf(BarNodeDefinition::class, $definition);
     }
 
     public function testCreateABuiltInNodeTypeWithACustomNodeBuilder()
@@ -60,7 +60,7 @@ class TreeBuilderTest extends TestCase
 
         $definition = $builder->getRootNode()->children()->booleanNode('boolean');
 
-        $this->assertInstanceOf(BooleanNodeDefinition::class, $definition);
+        self::assertInstanceOf(BooleanNodeDefinition::class, $definition);
     }
 
     public function testPrototypedArrayNodeUseTheCustomNodeBuilder()
@@ -70,7 +70,7 @@ class TreeBuilderTest extends TestCase
         $root = $builder->getRootNode();
         $root->prototype('bar')->end();
 
-        $this->assertInstanceOf(BarNode::class, $root->getNode(true)->getPrototype());
+        self::assertInstanceOf(BarNode::class, $root->getNode(true)->getPrototype());
     }
 
     public function testAnExtendedNodeBuilderGetsPropagatedToTheChildren()
@@ -92,11 +92,11 @@ class TreeBuilderTest extends TestCase
         $node = $builder->buildTree();
         $children = $node->getChildren();
 
-        $this->assertInstanceOf(BooleanNode::class, $children['foo']);
+        self::assertInstanceOf(BooleanNode::class, $children['foo']);
 
         $childChildren = $children['child']->getChildren();
 
-        $this->assertInstanceOf(BooleanNode::class, $childChildren['foo']);
+        self::assertInstanceOf(BooleanNode::class, $childChildren['foo']);
     }
 
     public function testDefinitionInfoGetsTransferredToNode()
@@ -112,8 +112,8 @@ class TreeBuilderTest extends TestCase
         $tree = $builder->buildTree();
         $children = $tree->getChildren();
 
-        $this->assertEquals('root info', $tree->getInfo());
-        $this->assertEquals('child info', $children['child']->getInfo());
+        self::assertEquals('root info', $tree->getInfo());
+        self::assertEquals('child info', $children['child']->getInfo());
     }
 
     public function testDefinitionExampleGetsTransferredToNode()
@@ -130,8 +130,8 @@ class TreeBuilderTest extends TestCase
         $tree = $builder->buildTree();
         $children = $tree->getChildren();
 
-        $this->assertIsArray($tree->getExample());
-        $this->assertEquals('example', $children['child']->getExample());
+        self::assertIsArray($tree->getExample());
+        self::assertEquals('example', $children['child']->getExample());
     }
 
     public function testDefaultPathSeparatorIsDot()
@@ -152,16 +152,16 @@ class TreeBuilderTest extends TestCase
         $node = $builder->buildTree();
         $children = $node->getChildren();
 
-        $this->assertArrayHasKey('foo', $children);
-        $this->assertInstanceOf(BaseNode::class, $children['foo']);
-        $this->assertSame('propagation.foo', $children['foo']->getPath());
+        self::assertArrayHasKey('foo', $children);
+        self::assertInstanceOf(BaseNode::class, $children['foo']);
+        self::assertSame('propagation.foo', $children['foo']->getPath());
 
-        $this->assertArrayHasKey('child', $children);
+        self::assertArrayHasKey('child', $children);
         $childChildren = $children['child']->getChildren();
 
-        $this->assertArrayHasKey('foo', $childChildren);
-        $this->assertInstanceOf(BaseNode::class, $childChildren['foo']);
-        $this->assertSame('propagation.child.foo', $childChildren['foo']->getPath());
+        self::assertArrayHasKey('foo', $childChildren);
+        self::assertInstanceOf(BaseNode::class, $childChildren['foo']);
+        self::assertSame('propagation.child.foo', $childChildren['foo']->getPath());
     }
 
     public function testPathSeparatorIsPropagatedToChildren()
@@ -183,15 +183,15 @@ class TreeBuilderTest extends TestCase
         $node = $builder->buildTree();
         $children = $node->getChildren();
 
-        $this->assertArrayHasKey('foo', $children);
-        $this->assertInstanceOf(BaseNode::class, $children['foo']);
-        $this->assertSame('propagation/foo', $children['foo']->getPath());
+        self::assertArrayHasKey('foo', $children);
+        self::assertInstanceOf(BaseNode::class, $children['foo']);
+        self::assertSame('propagation/foo', $children['foo']->getPath());
 
-        $this->assertArrayHasKey('child', $children);
+        self::assertArrayHasKey('child', $children);
         $childChildren = $children['child']->getChildren();
 
-        $this->assertArrayHasKey('foo', $childChildren);
-        $this->assertInstanceOf(BaseNode::class, $childChildren['foo']);
-        $this->assertSame('propagation/child/foo', $childChildren['foo']->getPath());
+        self::assertArrayHasKey('foo', $childChildren);
+        self::assertInstanceOf(BaseNode::class, $childChildren['foo']);
+        self::assertSame('propagation/child/foo', $childChildren['foo']->getPath());
     }
 }

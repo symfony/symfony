@@ -35,10 +35,10 @@ class FlockStoreTest extends AbstractStoreTest
 
     public function testConstructWhenRepositoryCannotBeCreated()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
-            $this->markTestSkipped('This test will fail if run under superuser');
+            self::markTestSkipped('This test will fail if run under superuser');
         }
 
         new FlockStore('/a/b/c/d/e');
@@ -46,10 +46,10 @@ class FlockStoreTest extends AbstractStoreTest
 
     public function testConstructWhenRepositoryIsNotWriteable()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The FlockStore directory "/" is not writable.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The FlockStore directory "/" is not writable.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
-            $this->markTestSkipped('This test will fail if run under superuser');
+            self::markTestSkipped('This test will fail if run under superuser');
         }
 
         new FlockStore('/');
@@ -58,7 +58,7 @@ class FlockStoreTest extends AbstractStoreTest
     public function testConstructWithSubdir()
     {
         new FlockStore($dir = (sys_get_temp_dir().'/sf-flock'));
-        $this->assertDirectoryExists($dir);
+        self::assertDirectoryExists($dir);
         // cleanup
         @rmdir($dir);
     }
@@ -79,7 +79,7 @@ class FlockStoreTest extends AbstractStoreTest
 
         $store->save($key);
 
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
 
         $store->delete($key);
     }
@@ -100,7 +100,7 @@ class FlockStoreTest extends AbstractStoreTest
 
         $store->save($key);
 
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
 
         $store->delete($key);
     }

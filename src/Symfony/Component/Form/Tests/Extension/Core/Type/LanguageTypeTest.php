@@ -31,9 +31,9 @@ class LanguageTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
 
-        $this->assertContainsEquals(new ChoiceView('en', 'en', 'English'), $choices);
-        $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'French'), $choices);
-        $this->assertContainsEquals(new ChoiceView('my', 'my', 'Burmese'), $choices);
+        self::assertContainsEquals(new ChoiceView('en', 'en', 'English'), $choices);
+        self::assertContainsEquals(new ChoiceView('fr', 'fr', 'French'), $choices);
+        self::assertContainsEquals(new ChoiceView('my', 'my', 'Burmese'), $choices);
     }
 
     /**
@@ -48,9 +48,9 @@ class LanguageTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('en', 'en', 'англійська'), $choices);
-        $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'французька'), $choices);
-        $this->assertContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
+        self::assertContainsEquals(new ChoiceView('en', 'en', 'англійська'), $choices);
+        self::assertContainsEquals(new ChoiceView('fr', 'fr', 'французька'), $choices);
+        self::assertContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
     }
 
     public function testAlpha3Option()
@@ -62,10 +62,10 @@ class LanguageTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('eng', 'eng', 'English'), $choices);
-        $this->assertContainsEquals(new ChoiceView('fra', 'fra', 'French'), $choices);
+        self::assertContainsEquals(new ChoiceView('eng', 'eng', 'English'), $choices);
+        self::assertContainsEquals(new ChoiceView('fra', 'fra', 'French'), $choices);
         // Burmese has no three letter language code
-        $this->assertNotContainsEquals(new ChoiceView('my', 'my', 'Burmese'), $choices);
+        self::assertNotContainsEquals(new ChoiceView('my', 'my', 'Burmese'), $choices);
     }
 
     /**
@@ -81,10 +81,10 @@ class LanguageTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('eng', 'eng', 'англійська'), $choices);
-        $this->assertContainsEquals(new ChoiceView('fra', 'fra', 'французька'), $choices);
+        self::assertContainsEquals(new ChoiceView('eng', 'eng', 'англійська'), $choices);
+        self::assertContainsEquals(new ChoiceView('fra', 'fra', 'французька'), $choices);
         // Burmese has no three letter language code
-        $this->assertNotContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
+        self::assertNotContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
     }
 
     /**
@@ -98,13 +98,13 @@ class LanguageTypeTest extends BaseTypeTest
             ])
             ->createView()->vars['choices'];
 
-        $this->assertContainsEquals(new ChoiceView('cs', 'cs', 'čeština'), $choices);
-        $this->assertContainsEquals(new ChoiceView('es', 'es', 'español'), $choices);
-        $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'français'), $choices);
-        $this->assertContainsEquals(new ChoiceView('ta', 'ta', 'தமிழ்'), $choices);
-        $this->assertContainsEquals(new ChoiceView('uk', 'uk', 'українська'), $choices);
-        $this->assertContainsEquals(new ChoiceView('yi', 'yi', 'ייִדיש'), $choices);
-        $this->assertContainsEquals(new ChoiceView('zh', 'zh', '中文'), $choices);
+        self::assertContainsEquals(new ChoiceView('cs', 'cs', 'čeština'), $choices);
+        self::assertContainsEquals(new ChoiceView('es', 'es', 'español'), $choices);
+        self::assertContainsEquals(new ChoiceView('fr', 'fr', 'français'), $choices);
+        self::assertContainsEquals(new ChoiceView('ta', 'ta', 'தமிழ்'), $choices);
+        self::assertContainsEquals(new ChoiceView('uk', 'uk', 'українська'), $choices);
+        self::assertContainsEquals(new ChoiceView('yi', 'yi', 'ייִדיש'), $choices);
+        self::assertContainsEquals(new ChoiceView('zh', 'zh', '中文'), $choices);
     }
 
     /**
@@ -119,13 +119,13 @@ class LanguageTypeTest extends BaseTypeTest
             ])
             ->createView()->vars['choices'];
 
-        $this->assertContainsEquals(new ChoiceView('spa', 'spa', 'español'), $choices, '', false, false);
-        $this->assertContainsEquals(new ChoiceView('yid', 'yid', 'ייִדיש'), $choices, '', false, false);
+        self::assertContainsEquals(new ChoiceView('spa', 'spa', 'español'), $choices, '', false, false);
+        self::assertContainsEquals(new ChoiceView('yid', 'yid', 'ייִדיש'), $choices, '', false, false);
     }
 
     public function testSelfTranslationNotAllowedWithChoiceTranslation()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
 
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_locale' => 'es',
@@ -138,7 +138,7 @@ class LanguageTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE, 'language')
             ->createView()->vars['choices'];
 
-        $this->assertNotContainsEquals(new ChoiceView('mul', 'mul', 'Mehrsprachig'), $choices);
+        self::assertNotContainsEquals(new ChoiceView('mul', 'mul', 'Mehrsprachig'), $choices);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

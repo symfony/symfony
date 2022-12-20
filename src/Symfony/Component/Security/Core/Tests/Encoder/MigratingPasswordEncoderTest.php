@@ -24,47 +24,47 @@ class MigratingPasswordEncoderTest extends TestCase
     {
         $bestEncoder = new NativePasswordEncoder(4, 12000, 4);
 
-        $extraEncoder = $this->createMock(TestPasswordEncoderInterface::class);
-        $extraEncoder->expects($this->never())->method('encodePassword');
-        $extraEncoder->expects($this->never())->method('isPasswordValid');
-        $extraEncoder->expects($this->never())->method('needsRehash');
+        $extraEncoder = self::createMock(TestPasswordEncoderInterface::class);
+        $extraEncoder->expects(self::never())->method('encodePassword');
+        $extraEncoder->expects(self::never())->method('isPasswordValid');
+        $extraEncoder->expects(self::never())->method('needsRehash');
 
         $encoder = new MigratingPasswordEncoder($bestEncoder, $extraEncoder);
 
-        $this->assertTrue($encoder->needsRehash('foo'));
+        self::assertTrue($encoder->needsRehash('foo'));
 
         $hash = $encoder->encodePassword('foo', 'salt');
-        $this->assertFalse($encoder->needsRehash($hash));
+        self::assertFalse($encoder->needsRehash($hash));
 
-        $this->assertTrue($encoder->isPasswordValid($hash, 'foo', 'salt'));
-        $this->assertFalse($encoder->isPasswordValid($hash, 'bar', 'salt'));
+        self::assertTrue($encoder->isPasswordValid($hash, 'foo', 'salt'));
+        self::assertFalse($encoder->isPasswordValid($hash, 'bar', 'salt'));
     }
 
     public function testFallback()
     {
         $bestEncoder = new NativePasswordEncoder(4, 12000, 4);
 
-        $extraEncoder1 = $this->createMock(TestPasswordEncoderInterface::class);
-        $extraEncoder1->expects($this->any())
+        $extraEncoder1 = self::createMock(TestPasswordEncoderInterface::class);
+        $extraEncoder1->expects(self::any())
             ->method('isPasswordValid')
             ->with('abc', 'foo', 'salt')
             ->willReturn(true);
 
         $encoder = new MigratingPasswordEncoder($bestEncoder, $extraEncoder1);
 
-        $this->assertTrue($encoder->isPasswordValid('abc', 'foo', 'salt'));
+        self::assertTrue($encoder->isPasswordValid('abc', 'foo', 'salt'));
 
-        $extraEncoder2 = $this->createMock(TestPasswordEncoderInterface::class);
-        $extraEncoder2->expects($this->any())
+        $extraEncoder2 = self::createMock(TestPasswordEncoderInterface::class);
+        $extraEncoder2->expects(self::any())
             ->method('isPasswordValid')
             ->willReturn(false);
 
         $encoder = new MigratingPasswordEncoder($bestEncoder, $extraEncoder2);
 
-        $this->assertFalse($encoder->isPasswordValid('abc', 'foo', 'salt'));
+        self::assertFalse($encoder->isPasswordValid('abc', 'foo', 'salt'));
 
         $encoder = new MigratingPasswordEncoder($bestEncoder, $extraEncoder2, $extraEncoder1);
 
-        $this->assertTrue($encoder->isPasswordValid('abc', 'foo', 'salt'));
+        self::assertTrue($encoder->isPasswordValid('abc', 'foo', 'salt'));
     }
 }

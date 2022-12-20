@@ -139,8 +139,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form->setData($object);
         $parent->submit([]);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
         $this->validator->validate($form, new Form());
@@ -202,8 +202,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form->setData($object);
         $form->submit([]);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
         $this->validator->validate($form, new Form());
@@ -226,8 +226,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         // Launch transformer
         $form->submit('foo');
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
         $this->validator->validate($form, new Form());
@@ -250,8 +250,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form->add($child);
         $form->submit([]);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
         $this->validator->validate($form, new Form());
@@ -280,8 +280,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         // Launch transformer
         $form->submit('foo');
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertFalse($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertFalse($form->isSynchronized());
         $this->expectNoValidate();
 
         $this->validator->validate($form, new Form());
@@ -317,8 +317,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         // Launch transformer
         $form->submit('foo');
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertFalse($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertFalse($form->isSynchronized());
         $this->expectNoValidate();
 
         $this->validator->validate($form, new Form());
@@ -605,8 +605,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->getForm();
         $form->submit('foo');
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
         $this->validator->validate($form, new Form());
@@ -624,8 +624,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $form->submit(['foo' => 'bar']);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSynchronized());
 
         $this->expectValidateValueAt(0, 'children[child]', $form->get('child'), new Form());
 
@@ -649,8 +649,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $form->submit(['foo' => 'bar', 'baz' => 'qux', 'quux' => 'quuz']);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSynchronized());
 
         $this->expectValidateValueAt(0, 'children[child]', $form->get('child'), new Form());
 
@@ -680,7 +680,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
 
-        $this->assertCount(0, $context->getViolations());
+        self::assertCount(0, $context->getViolations());
     }
 
     /**
@@ -710,8 +710,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->validator->initialize($context);
         $this->validator->validate($form, $constraint);
 
-        $this->assertCount(1, $context->getViolations());
-        $this->assertSame($constraint, $context->getViolations()->get(0)->getConstraint());
+        self::assertCount(1, $context->getViolations());
+        self::assertSame($constraint, $context->getViolations()->get(0)->getConstraint());
     }
 
     protected function createValidator()

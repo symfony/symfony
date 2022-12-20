@@ -19,6 +19,6 @@ class SentToFailureTransportStampTest extends TestCase
     public function testGetOriginalReceiverName()
     {
         $stamp = new SentToFailureTransportStamp('original_receiver');
-        $this->assertSame('original_receiver', $stamp->getOriginalReceiverName());
+        self::assertSame('original_receiver', $stamp->getOriginalReceiverName());
     }
 }

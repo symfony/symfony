@@ -22,47 +22,47 @@ class SessionAuthenticationStrategyTest extends TestCase
     public function testSessionIsNotChanged()
     {
         $request = $this->getRequest();
-        $request->expects($this->never())->method('getSession');
+        $request->expects(self::never())->method('getSession');
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::NONE);
-        $strategy->onAuthentication($request, $this->createMock(TokenInterface::class));
+        $strategy->onAuthentication($request, self::createMock(TokenInterface::class));
     }
 
     public function testUnsupportedStrategy()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Invalid session authentication strategy "foo"');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Invalid session authentication strategy "foo"');
         $request = $this->getRequest();
-        $request->expects($this->never())->method('getSession');
+        $request->expects(self::never())->method('getSession');
 
         $strategy = new SessionAuthenticationStrategy('foo');
-        $strategy->onAuthentication($request, $this->createMock(TokenInterface::class));
+        $strategy->onAuthentication($request, self::createMock(TokenInterface::class));
     }
 
     public function testSessionIsMigrated()
     {
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
+        $session = self::createMock(SessionInterface::class);
+        $session->expects(self::once())->method('migrate')->with(self::equalTo(true));
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
-        $strategy->onAuthentication($this->getRequest($session), $this->createMock(TokenInterface::class));
+        $strategy->onAuthentication($this->getRequest($session), self::createMock(TokenInterface::class));
     }
 
     public function testSessionIsInvalidated()
     {
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())->method('invalidate');
+        $session = self::createMock(SessionInterface::class);
+        $session->expects(self::once())->method('invalidate');
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::INVALIDATE);
-        $strategy->onAuthentication($this->getRequest($session), $this->createMock(TokenInterface::class));
+        $strategy->onAuthentication($this->getRequest($session), self::createMock(TokenInterface::class));
     }
 
     private function getRequest($session = null)
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
 
         if (null !== $session) {
-            $request->expects($this->any())->method('getSession')->willReturn($session);
+            $request->expects(self::any())->method('getSession')->willReturn($session);
         }
 
         return $request;

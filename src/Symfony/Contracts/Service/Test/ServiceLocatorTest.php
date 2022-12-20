@@ -35,9 +35,9 @@ abstract class ServiceLocatorTest extends TestCase
             function () { return 'dummy'; },
         ]);
 
-        $this->assertTrue($locator->has('foo'));
-        $this->assertTrue($locator->has('bar'));
-        $this->assertFalse($locator->has('dummy'));
+        self::assertTrue($locator->has('foo'));
+        self::assertTrue($locator->has('bar'));
+        self::assertFalse($locator->has('dummy'));
     }
 
     public function testGet()
@@ -47,8 +47,8 @@ abstract class ServiceLocatorTest extends TestCase
             'bar' => function () { return 'baz'; },
         ]);
 
-        $this->assertSame('bar', $locator->get('foo'));
-        $this->assertSame('baz', $locator->get('bar'));
+        self::assertSame('bar', $locator->get('foo'));
+        self::assertSame('baz', $locator->get('bar'));
     }
 
     public function testGetDoesNotMemoize()
@@ -62,16 +62,16 @@ abstract class ServiceLocatorTest extends TestCase
             },
         ]);
 
-        $this->assertSame('bar', $locator->get('foo'));
-        $this->assertSame('bar', $locator->get('foo'));
-        $this->assertSame(2, $i);
+        self::assertSame('bar', $locator->get('foo'));
+        self::assertSame('bar', $locator->get('foo'));
+        self::assertSame(2, $i);
     }
 
     public function testThrowsOnUndefinedInternalService()
     {
-        if (!$this->getExpectedException()) {
-            $this->expectException(\Psr\Container\NotFoundExceptionInterface::class);
-            $this->expectExceptionMessage('The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.');
+        if (!self::getExpectedException()) {
+            self::expectException(\Psr\Container\NotFoundExceptionInterface::class);
+            self::expectExceptionMessage('The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.');
         }
         $locator = $this->getServiceLocator([
             'foo' => function () use (&$locator) { return $locator->get('bar'); },
@@ -82,8 +82,8 @@ abstract class ServiceLocatorTest extends TestCase
 
     public function testThrowsOnCircularReference()
     {
-        $this->expectException(\Psr\Container\ContainerExceptionInterface::class);
-        $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
+        self::expectException(\Psr\Container\ContainerExceptionInterface::class);
+        self::expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
         $locator = $this->getServiceLocator([
             'foo' => function () use (&$locator) { return $locator->get('bar'); },
             'bar' => function () use (&$locator) { return $locator->get('baz'); },

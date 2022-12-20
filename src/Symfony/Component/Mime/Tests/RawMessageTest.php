@@ -22,11 +22,11 @@ class RawMessageTest extends TestCase
     public function testToString($messageParameter)
     {
         $message = new RawMessage($messageParameter);
-        $this->assertEquals('some string', $message->toString());
-        $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+        self::assertEquals('some string', $message->toString());
+        self::assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
         // calling methods more than once work
-        $this->assertEquals('some string', $message->toString());
-        $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
+        self::assertEquals('some string', $message->toString());
+        self::assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
     }
 
     public function provideMessages(): array
@@ -41,14 +41,14 @@ class RawMessageTest extends TestCase
     public function testSerialization()
     {
         $message = new RawMessage('string');
-        $this->assertEquals('string', unserialize(serialize($message))->toString());
+        self::assertEquals('string', unserialize(serialize($message))->toString());
         // calling methods more than once work
-        $this->assertEquals('string', unserialize(serialize($message))->toString());
+        self::assertEquals('string', unserialize(serialize($message))->toString());
 
         $message = new RawMessage(new \ArrayObject(['some', ' ', 'string']));
         $message = new RawMessage($message->toIterable());
-        $this->assertEquals('some string', unserialize(serialize($message))->toString());
+        self::assertEquals('some string', unserialize(serialize($message))->toString());
         // calling methods more than once work
-        $this->assertEquals('some string', unserialize(serialize($message))->toString());
+        self::assertEquals('some string', unserialize(serialize($message))->toString());
     }
 }

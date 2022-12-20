@@ -35,10 +35,10 @@ class MiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
         if (!interface_exists(MiddlewareInterface::class)) {
-            $this->markTestSkipped(sprintf('%s needed to run this test', MiddlewareInterface::class));
+            self::markTestSkipped(sprintf('%s needed to run this test', MiddlewareInterface::class));
         }
 
         ClockMock::withClockMock(false);
@@ -105,11 +105,11 @@ EOT
         $executeMethod($this->conn, 'INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)');
 
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
-        $this->assertCount(2, $debug);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)', $debug[1]['sql']);
-        $this->assertSame([], $debug[1]['params']);
-        $this->assertSame([], $debug[1]['types']);
-        $this->assertGreaterThan(0, $debug[1]['executionMS']);
+        self::assertCount(2, $debug);
+        self::assertSame('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)', $debug[1]['sql']);
+        self::assertSame([], $debug[1]['params']);
+        self::assertSame([], $debug[1]['types']);
+        self::assertGreaterThan(0, $debug[1]['executionMS']);
     }
 
     /**
@@ -135,11 +135,11 @@ EOT;
         $executeMethod($stmt);
 
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
-        $this->assertCount(2, $debug);
-        $this->assertSame($sql, $debug[1]['sql']);
-        $this->assertSame(['product1', 12.5, 5, $res, 'foo,bar', '2022-06-12 11:00:00'], $debug[1]['params']);
-        $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::BINARY, ParameterType::STRING, ParameterType::STRING], $debug[1]['types']);
-        $this->assertGreaterThan(0, $debug[1]['executionMS']);
+        self::assertCount(2, $debug);
+        self::assertSame($sql, $debug[1]['sql']);
+        self::assertSame(['product1', 12.5, 5, $res, 'foo,bar', '2022-06-12 11:00:00'], $debug[1]['params']);
+        self::assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER, ParameterType::BINARY, ParameterType::STRING, ParameterType::STRING], $debug[1]['types']);
+        self::assertGreaterThan(0, $debug[1]['executionMS']);
     }
 
     /**
@@ -166,11 +166,11 @@ EOT;
         $stock = 4;
 
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
-        $this->assertCount(2, $debug);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)', $debug[1]['sql']);
-        $this->assertSame(['product1', '12.5', 5], $debug[1]['params']);
-        $this->assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER], $debug[1]['types']);
-        $this->assertGreaterThan(0, $debug[1]['executionMS']);
+        self::assertCount(2, $debug);
+        self::assertSame('INSERT INTO products(name, price, stock) VALUES (?, ?, ?)', $debug[1]['sql']);
+        self::assertSame(['product1', '12.5', 5], $debug[1]['params']);
+        self::assertSame([ParameterType::STRING, ParameterType::STRING, ParameterType::INTEGER], $debug[1]['types']);
+        self::assertGreaterThan(0, $debug[1]['executionMS']);
     }
 
     public function provideEndTransactionMethod(): array
@@ -208,19 +208,19 @@ EOT;
         $endTransactionMethod($this->conn);
 
         $debug = $this->debugDataHolder->getData()['default'] ?? [];
-        $this->assertCount(7, $debug);
-        $this->assertSame('"START TRANSACTION"', $debug[1]['sql']);
-        $this->assertGreaterThan(0, $debug[1]['executionMS']);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)', $debug[2]['sql']);
-        $this->assertGreaterThan(0, $debug[2]['executionMS']);
-        $this->assertSame($expectedEndTransactionDebug, $debug[3]['sql']);
-        $this->assertGreaterThan(0, $debug[3]['executionMS']);
-        $this->assertSame('"START TRANSACTION"', $debug[4]['sql']);
-        $this->assertGreaterThan(0, $debug[4]['executionMS']);
-        $this->assertSame('INSERT INTO products(name, price, stock) VALUES ("product2", 15.5, 12)', $debug[5]['sql']);
-        $this->assertGreaterThan(0, $debug[5]['executionMS']);
-        $this->assertSame($expectedEndTransactionDebug, $debug[6]['sql']);
-        $this->assertGreaterThan(0, $debug[6]['executionMS']);
+        self::assertCount(7, $debug);
+        self::assertSame('"START TRANSACTION"', $debug[1]['sql']);
+        self::assertGreaterThan(0, $debug[1]['executionMS']);
+        self::assertSame('INSERT INTO products(name, price, stock) VALUES ("product1", 12.5, 5)', $debug[2]['sql']);
+        self::assertGreaterThan(0, $debug[2]['executionMS']);
+        self::assertSame($expectedEndTransactionDebug, $debug[3]['sql']);
+        self::assertGreaterThan(0, $debug[3]['executionMS']);
+        self::assertSame('"START TRANSACTION"', $debug[4]['sql']);
+        self::assertGreaterThan(0, $debug[4]['executionMS']);
+        self::assertSame('INSERT INTO products(name, price, stock) VALUES ("product2", 15.5, 12)', $debug[5]['sql']);
+        self::assertGreaterThan(0, $debug[5]['executionMS']);
+        self::assertSame($expectedEndTransactionDebug, $debug[6]['sql']);
+        self::assertGreaterThan(0, $debug[6]['executionMS']);
     }
 
     public function provideExecuteAndEndTransactionMethods(): array
@@ -253,22 +253,22 @@ EOT;
         $this->init();
 
         $periods = $this->stopwatch->getEvent('doctrine')->getPeriods();
-        $this->assertCount(1, $periods);
+        self::assertCount(1, $periods);
 
         $this->conn->beginTransaction();
 
-        $this->assertFalse($this->stopwatch->getEvent('doctrine')->isStarted());
-        $this->assertCount(2, $this->stopwatch->getEvent('doctrine')->getPeriods());
+        self::assertFalse($this->stopwatch->getEvent('doctrine')->isStarted());
+        self::assertCount(2, $this->stopwatch->getEvent('doctrine')->getPeriods());
 
         $sqlMethod($this->conn, 'SELECT * FROM products');
 
-        $this->assertFalse($this->stopwatch->getEvent('doctrine')->isStarted());
-        $this->assertCount(3, $this->stopwatch->getEvent('doctrine')->getPeriods());
+        self::assertFalse($this->stopwatch->getEvent('doctrine')->isStarted());
+        self::assertCount(3, $this->stopwatch->getEvent('doctrine')->getPeriods());
 
         $endTransactionMethod($this->conn);
 
-        $this->assertFalse($this->stopwatch->getEvent('doctrine')->isStarted());
-        $this->assertCount(4, $this->stopwatch->getEvent('doctrine')->getPeriods());
+        self::assertFalse($this->stopwatch->getEvent('doctrine')->isStarted());
+        self::assertCount(4, $this->stopwatch->getEvent('doctrine')->getPeriods());
     }
 
     /**

@@ -31,7 +31,7 @@ class FixUrlProtocolListenerTest extends TestCase
         $filter = new FixUrlProtocolListener('http');
         $filter->onSubmit($event);
 
-        $this->assertSame('http://'.$data, $event->getData());
+        self::assertSame('http://'.$data, $event->getData());
     }
 
     public function provideUrlToFix()
@@ -57,7 +57,7 @@ class FixUrlProtocolListenerTest extends TestCase
         $filter = new FixUrlProtocolListener('http');
         $filter->onSubmit($event);
 
-        $this->assertSame($url, $event->getData());
+        self::assertSame($url, $event->getData());
     }
 
     public function provideUrlToSkip()

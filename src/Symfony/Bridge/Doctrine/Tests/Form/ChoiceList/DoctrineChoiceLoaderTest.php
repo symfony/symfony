@@ -77,31 +77,31 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->factory = $this->createMock(ChoiceListFactoryInterface::class);
-        $this->om = $this->createMock(ObjectManager::class);
-        $this->repository = $this->createMock(ObjectRepository::class);
+        $this->factory = self::createMock(ChoiceListFactoryInterface::class);
+        $this->om = self::createMock(ObjectManager::class);
+        $this->repository = self::createMock(ObjectRepository::class);
         $this->class = 'stdClass';
-        $this->idReader = $this->createMock(IdReader::class);
-        $this->idReader->expects($this->any())
+        $this->idReader = self::createMock(IdReader::class);
+        $this->idReader->expects(self::any())
             ->method('isSingleId')
             ->willReturn(true)
         ;
 
-        $this->objectLoader = $this->createMock(EntityLoaderInterface::class);
+        $this->objectLoader = self::createMock(EntityLoaderInterface::class);
         $this->obj1 = (object) ['name' => 'A'];
         $this->obj2 = (object) ['name' => 'B'];
         $this->obj3 = (object) ['name' => 'C'];
 
-        $this->om->expects($this->any())
+        $this->om->expects(self::any())
             ->method('getRepository')
             ->with($this->class)
             ->willReturn($this->repository);
 
-        $this->om->expects($this->any())
+        $this->om->expects(self::any())
             ->method('getClassMetadata')
             ->with($this->class)
             ->willReturn(new ClassMetadata($this->class));
-        $this->repository->expects($this->any())
+        $this->repository->expects(self::any())
             ->method('findAll')
             ->willReturn([$this->obj1, $this->obj2, $this->obj3])
         ;
@@ -119,15 +119,15 @@ class DoctrineChoiceLoaderTest extends TestCase
         $value = function () {};
         $choiceList = new ArrayChoiceList($choices, $value);
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('findAll')
             ->willReturn($choices);
 
-        $this->assertEquals($choiceList, $loader->loadChoiceList($value));
+        self::assertEquals($choiceList, $loader->loadChoiceList($value));
 
         // no further loads on subsequent calls
 
-        $this->assertEquals($choiceList, $loader->loadChoiceList($value));
+        self::assertEquals($choiceList, $loader->loadChoiceList($value));
     }
 
     public function testLoadChoiceListUsesObjectLoaderIfAvailable()
@@ -142,17 +142,17 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $choiceList = new ArrayChoiceList($choices);
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll');
 
-        $this->objectLoader->expects($this->once())
+        $this->objectLoader->expects(self::once())
             ->method('getEntities')
             ->willReturn($choices);
 
-        $this->assertEquals($choiceList, $loaded = $loader->loadChoiceList());
+        self::assertEquals($choiceList, $loaded = $loader->loadChoiceList());
 
         // no further loads on subsequent calls
-        $this->assertEquals($loaded, $loader->loadChoiceList());
+        self::assertEquals($loaded, $loader->loadChoiceList());
     }
 
     public function testLoadValuesForChoices()
@@ -165,15 +165,15 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('findAll')
             ->willReturn($choices);
 
-        $this->assertSame(['1', '2'], $loader->loadValuesForChoices([$this->obj2, $this->obj3]));
+        self::assertSame(['1', '2'], $loader->loadValuesForChoices([$this->obj2, $this->obj3]));
 
         // no further loads on subsequent calls
 
-        $this->assertSame(['1', '2'], $loader->loadValuesForChoices([$this->obj2, $this->obj3]));
+        self::assertSame(['1', '2'], $loader->loadValuesForChoices([$this->obj2, $this->obj3]));
     }
 
     public function testLoadValuesForChoicesDoesNotLoadIfEmptyChoices()
@@ -184,10 +184,10 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->idReader
         );
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll');
 
-        $this->assertSame([], $loader->loadValuesForChoices([]));
+        self::assertSame([], $loader->loadValuesForChoices([]));
     }
 
     /**
@@ -202,15 +202,15 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->idReader
         );
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll');
 
-        $this->idReader->expects($this->any())
+        $this->idReader->expects(self::any())
             ->method('getIdValue')
             ->with($this->obj2)
             ->willReturn('2');
 
-        $this->assertSame(['2'], $loader->loadValuesForChoices([$this->obj2]));
+        self::assertSame(['2'], $loader->loadValuesForChoices([$this->obj2]));
     }
 
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntIdAndValueGiven()
@@ -224,11 +224,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll')
             ->willReturn($choices);
 
-        $this->assertSame(['B'], $loader->loadValuesForChoices(
+        self::assertSame(['B'], $loader->loadValuesForChoices(
             [$this->obj2],
             $value
         ));
@@ -244,15 +244,15 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $value = [$this->idReader, 'getIdValue'];
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll');
 
-        $this->idReader->expects($this->any())
+        $this->idReader->expects(self::any())
             ->method('getIdValue')
             ->with($this->obj2)
             ->willReturn('2');
 
-        $this->assertSame(['2'], $loader->loadValuesForChoices(
+        self::assertSame(['2'], $loader->loadValuesForChoices(
             [$this->obj2],
             $value
         ));
@@ -267,15 +267,15 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('findAll')
             ->willReturn($choices);
 
-        $this->assertSame([$this->obj2, $this->obj3], $loader->loadChoicesForValues(['1', '2']));
+        self::assertSame([$this->obj2, $this->obj3], $loader->loadChoicesForValues(['1', '2']));
 
         // no further loads on subsequent calls
 
-        $this->assertSame([$this->obj2, $this->obj3], $loader->loadChoicesForValues(['1', '2']));
+        self::assertSame([$this->obj2, $this->obj3], $loader->loadChoicesForValues(['1', '2']));
     }
 
     public function testLoadChoicesForValuesDoesNotLoadIfEmptyValues()
@@ -286,10 +286,10 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->idReader
         );
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll');
 
-        $this->assertSame([], $loader->loadChoicesForValues([]));
+        self::assertSame([], $loader->loadChoicesForValues([]));
     }
 
     /**
@@ -307,29 +307,26 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $choices = [$this->obj2, $this->obj3];
 
-        $this->idReader->expects($this->any())
+        $this->idReader->expects(self::any())
             ->method('getIdField')
             ->willReturn('idField');
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll');
 
-        $this->objectLoader->expects($this->once())
+        $this->objectLoader->expects(self::once())
             ->method('getEntitiesByIds')
             ->with('idField', [4 => '3', 7 => '2'])
             ->willReturn($choices);
 
-        $this->idReader->expects($this->any())
+        $this->idReader->expects(self::any())
             ->method('getIdValue')
             ->willReturnMap([
                 [$this->obj2, '2'],
                 [$this->obj3, '3'],
             ]);
 
-        $this->assertSame(
-            [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2'])
-        );
+        self::assertSame([4 => $this->obj3, 7 => $this->obj2], $loader->loadChoicesForValues([4 => '3', 7 => '2']));
     }
 
     public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
@@ -343,29 +340,26 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $choices = [$this->obj2, $this->obj3];
 
-        $this->idReader->expects($this->any())
+        $this->idReader->expects(self::any())
             ->method('getIdField')
             ->willReturn('idField');
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll');
 
-        $this->objectLoader->expects($this->once())
+        $this->objectLoader->expects(self::once())
             ->method('getEntitiesByIds')
             ->with('idField', [4 => '3', 7 => '2'])
             ->willReturn($choices);
 
-        $this->idReader->expects($this->any())
+        $this->idReader->expects(self::any())
             ->method('getIdValue')
             ->willReturnMap([
                 [$this->obj2, '2'],
                 [$this->obj3, '3'],
             ]);
 
-        $this->assertSame(
-            [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue'])
-        );
+        self::assertSame([4 => $this->obj3, 7 => $this->obj2], $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue']));
     }
 
     public function testLoadChoicesForValuesLoadsAllIfSingleIntIdAndValueGiven()
@@ -379,11 +373,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('findAll')
             ->willReturn($choices);
 
-        $this->assertSame([$this->obj2], $loader->loadChoicesForValues(
+        self::assertSame([$this->obj2], $loader->loadChoicesForValues(
             ['B'],
             $value
         ));
@@ -401,35 +395,35 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj2, $this->obj3];
         $value = [$this->idReader, 'getIdValue'];
 
-        $this->idReader->expects($this->any())
+        $this->idReader->expects(self::any())
             ->method('getIdField')
             ->willReturn('idField');
 
-        $this->repository->expects($this->never())
+        $this->repository->expects(self::never())
             ->method('findAll');
 
-        $this->objectLoader->expects($this->once())
+        $this->objectLoader->expects(self::once())
             ->method('getEntitiesByIds')
             ->with('idField', ['2'])
             ->willReturn($choices);
 
-        $this->idReader->expects($this->any())
+        $this->idReader->expects(self::any())
             ->method('getIdValue')
             ->willReturnMap([
                 [$this->obj2, '2'],
                 [$this->obj3, '3'],
             ]);
 
-        $this->assertSame([$this->obj2], $loader->loadChoicesForValues(['2'], $value));
+        self::assertSame([$this->obj2], $loader->loadChoicesForValues(['2'], $value));
     }
 
     public function testPassingIdReaderWithoutSingleIdEntity()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The second argument `$idReader` of "Symfony\\Bridge\\Doctrine\\Form\\ChoiceList\\DoctrineChoiceLoader::__construct" must be null when the query cannot be optimized because of composite id fields.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The second argument `$idReader` of "Symfony\\Bridge\\Doctrine\\Form\\ChoiceList\\DoctrineChoiceLoader::__construct" must be null when the query cannot be optimized because of composite id fields.');
 
-        $idReader = $this->createMock(IdReader::class);
-        $idReader->expects($this->once())
+        $idReader = self::createMock(IdReader::class);
+        $idReader->expects(self::once())
             ->method('isSingleId')
             ->willReturn(false)
         ;

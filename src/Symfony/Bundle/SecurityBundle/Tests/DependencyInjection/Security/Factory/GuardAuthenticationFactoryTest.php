@@ -35,7 +35,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         $normalizedConfig = $node->normalize($inputConfig);
         $finalizedConfig = $node->finalize($normalizedConfig);
 
-        $this->assertEquals($expectedConfig, $finalizedConfig);
+        self::assertEquals($expectedConfig, $finalizedConfig);
     }
 
     /**
@@ -43,7 +43,7 @@ class GuardAuthenticationFactoryTest extends TestCase
      */
     public function testAddInvalidConfiguration(array $inputConfig)
     {
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $factory = new GuardAuthenticationFactory();
         $nodeDefinition = new ArrayNodeDefinition('guard');
         $factory->addConfiguration($nodeDefinition);
@@ -106,10 +106,10 @@ class GuardAuthenticationFactoryTest extends TestCase
             'entry_point' => null,
         ];
         [$container, $entryPointId] = $this->executeCreate($config, null);
-        $this->assertEquals('authenticator123', $entryPointId);
+        self::assertEquals('authenticator123', $entryPointId);
 
         $providerDefinition = $container->getDefinition('security.authentication.provider.guard.my_firewall');
-        $this->assertEquals([
+        self::assertEquals([
             'index_0' => new IteratorArgument([new Reference('authenticator123')]),
             'index_1' => new Reference('my_user_provider'),
             'index_2' => 'my_firewall',
@@ -117,8 +117,8 @@ class GuardAuthenticationFactoryTest extends TestCase
         ], $providerDefinition->getArguments());
 
         $listenerDefinition = $container->getDefinition('security.authentication.listener.guard.my_firewall');
-        $this->assertEquals('my_firewall', $listenerDefinition->getArgument(2));
-        $this->assertEquals([new Reference('authenticator123')], $listenerDefinition->getArgument(3)->getValues());
+        self::assertEquals('my_firewall', $listenerDefinition->getArgument(2));
+        self::assertEquals([new Reference('authenticator123')], $listenerDefinition->getArgument(3)->getValues());
     }
 
     public function testExistingDefaultEntryPointUsed()
@@ -129,12 +129,12 @@ class GuardAuthenticationFactoryTest extends TestCase
             'entry_point' => null,
         ];
         [, $entryPointId] = $this->executeCreate($config, 'some_default_entry_point');
-        $this->assertEquals('some_default_entry_point', $entryPointId);
+        self::assertEquals('some_default_entry_point', $entryPointId);
     }
 
     public function testCannotOverrideDefaultEntryPoint()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         // any existing default entry point is used
         $config = [
             'authenticators' => ['authenticator123'],
@@ -145,7 +145,7 @@ class GuardAuthenticationFactoryTest extends TestCase
 
     public function testMultipleAuthenticatorsRequiresEntryPoint()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         // any existing default entry point is used
         $config = [
             'authenticators' => ['authenticator123', 'authenticatorABC'],
@@ -162,7 +162,7 @@ class GuardAuthenticationFactoryTest extends TestCase
             'entry_point' => 'authenticatorABC',
         ];
         [, $entryPointId] = $this->executeCreate($config, null);
-        $this->assertEquals('authenticatorABC', $entryPointId);
+        self::assertEquals('authenticatorABC', $entryPointId);
     }
 
     public function testAuthenticatorSystemCreate()
@@ -177,12 +177,12 @@ class GuardAuthenticationFactoryTest extends TestCase
         $factory = new GuardAuthenticationFactory();
 
         $authenticators = $factory->createAuthenticator($container, $firewallName, $config, $userProviderId);
-        $this->assertEquals('security.authenticator.guard.my_firewall.0', $authenticators[0]);
+        self::assertEquals('security.authenticator.guard.my_firewall.0', $authenticators[0]);
 
         $authenticatorDefinition = $container->getDefinition('security.authenticator.guard.my_firewall.0');
-        $this->assertEquals(GuardBridgeAuthenticator::class, $authenticatorDefinition->getClass());
-        $this->assertEquals('authenticator123', (string) $authenticatorDefinition->getArgument(0));
-        $this->assertEquals($userProviderId, (string) $authenticatorDefinition->getArgument(1));
+        self::assertEquals(GuardBridgeAuthenticator::class, $authenticatorDefinition->getClass());
+        self::assertEquals('authenticator123', (string) $authenticatorDefinition->getArgument(0));
+        self::assertEquals($userProviderId, (string) $authenticatorDefinition->getArgument(1));
     }
 
     private function executeCreate(array $config, $defaultEntryPointId)

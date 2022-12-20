@@ -29,7 +29,7 @@ class BirthdayTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please enter a valid birthdate.', $form->getConfig()->getOption('invalid_message'));
+        self::assertSame('Please enter a valid birthdate.', $form->getConfig()->getOption('invalid_message'));
     }
 
     /**
@@ -43,6 +43,6 @@ class BirthdayTypeValidatorExtensionTest extends BaseValidatorExtensionTest
             'legacy_error_messages' => true,
         ]);
 
-        $this->assertSame('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
+        self::assertSame('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 }

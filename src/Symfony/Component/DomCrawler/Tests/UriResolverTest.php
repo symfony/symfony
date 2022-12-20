@@ -21,7 +21,7 @@ class UriResolverTest extends TestCase
      */
     public function testResolver(string $uri, string $baseUri, string $expected)
     {
-        $this->assertEquals($expected, UriResolver::resolve($uri, $baseUri));
+        self::assertEquals($expected, UriResolver::resolve($uri, $baseUri));
     }
 
     public function provideResolverTests()

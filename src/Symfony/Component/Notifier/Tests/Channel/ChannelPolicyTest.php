@@ -22,7 +22,7 @@ class ChannelPolicyTest extends TestCase
 {
     public function testCannotRetrieveChannelsUsingUnavailableImportance()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
         $channelPolicy = new ChannelPolicy(['urgent' => ['chat']]);
         $channelPolicy->getChannels('low');
@@ -36,7 +36,7 @@ class ChannelPolicyTest extends TestCase
         $channelPolicy = new ChannelPolicy($policy);
         $channels = $channelPolicy->getChannels($importance);
 
-        $this->assertSame($expectedChannels, $channels);
+        self::assertSame($expectedChannels, $channels);
     }
 
     public function provideValidPolicies(): \Generator

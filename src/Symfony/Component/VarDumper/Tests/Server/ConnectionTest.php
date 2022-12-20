@@ -25,7 +25,7 @@ class ConnectionTest extends TestCase
     public function testDump()
     {
         if ('True' === getenv('APPVEYOR')) {
-            $this->markTestSkipped('Skip transient test on AppVeyor');
+            self::markTestSkipped('Skip transient test on AppVeyor');
         }
 
         $cloner = new VarCloner();
@@ -44,7 +44,7 @@ class ConnectionTest extends TestCase
         $process->start(function ($type, $buffer) use ($process, &$dumped, $connection, $data) {
             if (Process::ERR === $type) {
                 $process->stop();
-                $this->fail();
+                self::fail();
             } elseif ("READY\n" === $buffer) {
                 $connection->write($data);
             } else {
@@ -54,8 +54,8 @@ class ConnectionTest extends TestCase
 
         $process->wait();
 
-        $this->assertTrue($process->isSuccessful());
-        $this->assertStringMatchesFormat(<<<'DUMP'
+        self::assertTrue($process->isSuccessful());
+        self::assertStringMatchesFormat(<<<'DUMP'
 (3) "foo"
 [
   "timestamp" => %d.%d
@@ -65,8 +65,7 @@ class ConnectionTest extends TestCase
 ]
 %d
 
-DUMP
-            , $dumped);
+DUMP, $dumped);
     }
 
     public function testNoServer()
@@ -75,8 +74,8 @@ DUMP
         $data = $cloner->cloneVar('foo');
         $connection = new Connection(self::VAR_DUMPER_SERVER);
         $start = microtime(true);
-        $this->assertFalse($connection->write($data));
-        $this->assertLessThan(4, microtime(true) - $start);
+        self::assertFalse($connection->write($data));
+        self::assertLessThan(4, microtime(true) - $start);
     }
 
     private function getServerProcess(): Process

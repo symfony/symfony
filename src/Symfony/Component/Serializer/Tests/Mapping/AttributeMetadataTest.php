@@ -23,13 +23,13 @@ class AttributeMetadataTest extends TestCase
     public function testInterface()
     {
         $attributeMetadata = new AttributeMetadata('name');
-        $this->assertInstanceOf(AttributeMetadataInterface::class, $attributeMetadata);
+        self::assertInstanceOf(AttributeMetadataInterface::class, $attributeMetadata);
     }
 
     public function testGetName()
     {
         $attributeMetadata = new AttributeMetadata('name');
-        $this->assertEquals('name', $attributeMetadata->getName());
+        self::assertEquals('name', $attributeMetadata->getName());
     }
 
     public function testGroups()
@@ -39,7 +39,7 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('b');
 
-        $this->assertEquals(['a', 'b'], $attributeMetadata->getGroups());
+        self::assertEquals(['a', 'b'], $attributeMetadata->getGroups());
     }
 
     public function testMaxDepth()
@@ -47,7 +47,7 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata = new AttributeMetadata('name');
         $attributeMetadata->setMaxDepth(69);
 
-        $this->assertEquals(69, $attributeMetadata->getMaxDepth());
+        self::assertEquals(69, $attributeMetadata->getMaxDepth());
     }
 
     public function testSerializedName()
@@ -55,15 +55,15 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata = new AttributeMetadata('name');
         $attributeMetadata->setSerializedName('serialized_name');
 
-        $this->assertEquals('serialized_name', $attributeMetadata->getSerializedName());
+        self::assertEquals('serialized_name', $attributeMetadata->getSerializedName());
     }
 
     public function testIgnore()
     {
         $attributeMetadata = new AttributeMetadata('ignored');
-        $this->assertFalse($attributeMetadata->isIgnored());
+        self::assertFalse($attributeMetadata->isIgnored());
         $attributeMetadata->setIgnore(true);
-        $this->assertTrue($attributeMetadata->isIgnored());
+        self::assertTrue($attributeMetadata->isIgnored());
     }
 
     public function testSetContexts()
@@ -135,12 +135,12 @@ class AttributeMetadataTest extends TestCase
 
         $attributeMetadata1->merge($attributeMetadata2);
 
-        $this->assertEquals(['a', 'b', 'c'], $attributeMetadata1->getGroups());
-        $this->assertEquals(2, $attributeMetadata1->getMaxDepth());
-        $this->assertEquals('a3', $attributeMetadata1->getSerializedName());
-        $this->assertSame(['a' => ['foo' => 'bar']], $attributeMetadata1->getNormalizationContexts());
-        $this->assertSame(['c' => ['baz' => 'qux']], $attributeMetadata1->getDenormalizationContexts());
-        $this->assertTrue($attributeMetadata1->isIgnored());
+        self::assertEquals(['a', 'b', 'c'], $attributeMetadata1->getGroups());
+        self::assertEquals(2, $attributeMetadata1->getMaxDepth());
+        self::assertEquals('a3', $attributeMetadata1->getSerializedName());
+        self::assertSame(['a' => ['foo' => 'bar']], $attributeMetadata1->getNormalizationContexts());
+        self::assertSame(['c' => ['baz' => 'qux']], $attributeMetadata1->getDenormalizationContexts());
+        self::assertTrue($attributeMetadata1->isIgnored());
     }
 
     public function testContextsNotMergedIfAlreadyDefined()
@@ -168,6 +168,6 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata->setSerializedName('serialized_name');
 
         $serialized = serialize($attributeMetadata);
-        $this->assertEquals($attributeMetadata, unserialize($serialized));
+        self::assertEquals($attributeMetadata, unserialize($serialized));
     }
 }

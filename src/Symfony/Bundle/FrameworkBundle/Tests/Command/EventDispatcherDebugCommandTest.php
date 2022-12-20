@@ -28,7 +28,7 @@ class EventDispatcherDebugCommandTest extends TestCase
 
         $suggestions = $tester->complete($input);
 
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()

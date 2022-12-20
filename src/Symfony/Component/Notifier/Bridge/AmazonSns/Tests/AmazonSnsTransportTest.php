@@ -27,7 +27,7 @@ class AmazonSnsTransportTest extends TransportTestCase
 {
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new AmazonSnsTransport(new SnsClient(['region' => 'eu-west-3']), $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new AmazonSnsTransport(new SnsClient(['region' => 'eu-west-3']), $client ?? self::createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
@@ -43,26 +43,26 @@ class AmazonSnsTransportTest extends TransportTestCase
 
     public function unsupportedMessagesProvider(): iterable
     {
-        yield [$this->createMock(MessageInterface::class)];
-        yield [new ChatMessage('hello', $this->createMock(MessageOptionsInterface::class))];
+        yield [self::createMock(MessageInterface::class)];
+        yield [new ChatMessage('hello', self::createMock(MessageOptionsInterface::class))];
     }
 
     public function testSmsMessageOptions()
     {
-        $response = $this->createMock(PublishResponse::class);
+        $response = self::createMock(PublishResponse::class);
         $response
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMessageId')
             ->willReturn('messageId');
 
-        $snsMock = $this->getMockBuilder(SnsClient::class)
+        $snsMock = self::getMockBuilder(SnsClient::class)
             ->setConstructorArgs([[]])
             ->getMock();
 
         $snsMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('publish')
-            ->with($this->equalTo(['PhoneNumber' => '0600000000', 'Message' => 'test']))
+            ->with(self::equalTo(['PhoneNumber' => '0600000000', 'Message' => 'test']))
             ->willReturn($response);
 
         $transport = new AmazonSnsTransport($snsMock);
@@ -71,20 +71,20 @@ class AmazonSnsTransportTest extends TransportTestCase
 
     public function testChatMessageOptions()
     {
-        $response = $this->createMock(PublishResponse::class);
+        $response = self::createMock(PublishResponse::class);
         $response
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMessageId')
             ->willReturn('messageId');
 
-        $snsMock = $this->getMockBuilder(SnsClient::class)
+        $snsMock = self::getMockBuilder(SnsClient::class)
             ->setConstructorArgs([[]])
             ->getMock();
 
         $snsMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('publish')
-            ->with($this->equalTo(['TopicArn' => 'my-topic', 'Subject' => 'subject', 'Message' => 'Hello World !']))
+            ->with(self::equalTo(['TopicArn' => 'my-topic', 'Subject' => 'subject', 'Message' => 'Hello World !']))
             ->willReturn($response);
 
         $options = new AmazonSnsOptions('my-topic');

@@ -40,45 +40,45 @@ class AbstractPropertyInfoExtractorTest extends TestCase
 
     public function testInstanceOf()
     {
-        $this->assertInstanceOf(PropertyInfoExtractorInterface::class, $this->propertyInfo);
-        $this->assertInstanceOf(PropertyTypeExtractorInterface::class, $this->propertyInfo);
-        $this->assertInstanceOf(PropertyDescriptionExtractorInterface::class, $this->propertyInfo);
-        $this->assertInstanceOf(PropertyAccessExtractorInterface::class, $this->propertyInfo);
-        $this->assertInstanceOf(PropertyInitializableExtractorInterface::class, $this->propertyInfo);
+        self::assertInstanceOf(PropertyInfoExtractorInterface::class, $this->propertyInfo);
+        self::assertInstanceOf(PropertyTypeExtractorInterface::class, $this->propertyInfo);
+        self::assertInstanceOf(PropertyDescriptionExtractorInterface::class, $this->propertyInfo);
+        self::assertInstanceOf(PropertyAccessExtractorInterface::class, $this->propertyInfo);
+        self::assertInstanceOf(PropertyInitializableExtractorInterface::class, $this->propertyInfo);
     }
 
     public function testGetShortDescription()
     {
-        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', []));
+        self::assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', []));
     }
 
     public function testGetLongDescription()
     {
-        $this->assertSame('long', $this->propertyInfo->getLongDescription('Foo', 'bar', []));
+        self::assertSame('long', $this->propertyInfo->getLongDescription('Foo', 'bar', []));
     }
 
     public function testGetTypes()
     {
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_INT)], $this->propertyInfo->getTypes('Foo', 'bar', []));
+        self::assertEquals([new Type(Type::BUILTIN_TYPE_INT)], $this->propertyInfo->getTypes('Foo', 'bar', []));
     }
 
     public function testIsReadable()
     {
-        $this->assertTrue($this->propertyInfo->isReadable('Foo', 'bar', []));
+        self::assertTrue($this->propertyInfo->isReadable('Foo', 'bar', []));
     }
 
     public function testIsWritable()
     {
-        $this->assertTrue($this->propertyInfo->isWritable('Foo', 'bar', []));
+        self::assertTrue($this->propertyInfo->isWritable('Foo', 'bar', []));
     }
 
     public function testGetProperties()
     {
-        $this->assertEquals(['a', 'b'], $this->propertyInfo->getProperties('Foo'));
+        self::assertEquals(['a', 'b'], $this->propertyInfo->getProperties('Foo'));
     }
 
     public function testIsInitializable()
     {
-        $this->assertTrue($this->propertyInfo->isInitializable('Foo', 'bar', []));
+        self::assertTrue($this->propertyInfo->isInitializable('Foo', 'bar', []));
     }
 }

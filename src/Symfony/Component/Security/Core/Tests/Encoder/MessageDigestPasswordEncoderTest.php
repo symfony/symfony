@@ -25,31 +25,31 @@ class MessageDigestPasswordEncoderTest extends TestCase
     {
         $encoder = new MessageDigestPasswordEncoder('sha256', false, 1);
 
-        $this->assertTrue($encoder->isPasswordValid(hash('sha256', 'password'), 'password', ''));
+        self::assertTrue($encoder->isPasswordValid(hash('sha256', 'password'), 'password', ''));
     }
 
     public function testEncodePassword()
     {
         $encoder = new MessageDigestPasswordEncoder('sha256', false, 1);
-        $this->assertSame(hash('sha256', 'password'), $encoder->encodePassword('password', ''));
+        self::assertSame(hash('sha256', 'password'), $encoder->encodePassword('password', ''));
 
         $encoder = new MessageDigestPasswordEncoder('sha256', true, 1);
-        $this->assertSame(base64_encode(hash('sha256', 'password', true)), $encoder->encodePassword('password', ''));
+        self::assertSame(base64_encode(hash('sha256', 'password', true)), $encoder->encodePassword('password', ''));
 
         $encoder = new MessageDigestPasswordEncoder('sha256', false, 2);
-        $this->assertSame(hash('sha256', hash('sha256', 'password', true).'password'), $encoder->encodePassword('password', ''));
+        self::assertSame(hash('sha256', hash('sha256', 'password', true).'password'), $encoder->encodePassword('password', ''));
     }
 
     public function testEncodePasswordAlgorithmDoesNotExist()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $encoder = new MessageDigestPasswordEncoder('foobar');
         $encoder->encodePassword('password', '');
     }
 
     public function testEncodePasswordLength()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $encoder = new MessageDigestPasswordEncoder();
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');
@@ -59,7 +59,7 @@ class MessageDigestPasswordEncoderTest extends TestCase
     {
         $encoder = new MessageDigestPasswordEncoder();
 
-        $this->assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
+        self::assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
     }
 
     public function testCustomEncoder()
@@ -67,7 +67,7 @@ class MessageDigestPasswordEncoderTest extends TestCase
         $encoder = new MyMessageDigestPasswordEncoder();
         $encodedPassword = $encoder->encodePassword('p4ssw0rd', 's417');
 
-        $this->assertSame(base64_encode(hash('sha512', '{"password":"p4ssw0rd","salt":"s417"}', true)), $encodedPassword);
-        $this->assertTrue($encoder->isPasswordValid($encodedPassword, 'p4ssw0rd', 's417'));
+        self::assertSame(base64_encode(hash('sha512', '{"password":"p4ssw0rd","salt":"s417"}', true)), $encodedPassword);
+        self::assertTrue($encoder->isPasswordValid($encodedPassword, 'p4ssw0rd', 's417'));
     }
 }

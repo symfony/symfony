@@ -32,7 +32,7 @@ final class SlackOptionsTest extends TestCase
      */
     public function testToArray(array $options, array $expected = null)
     {
-        $this->assertSame($expected ?? $options, (new SlackOptions($options))->toArray());
+        self::assertSame($expected ?? $options, (new SlackOptions($options))->toArray());
     }
 
     public function toArrayProvider(): iterable
@@ -80,7 +80,7 @@ final class SlackOptionsTest extends TestCase
      */
     public function testGetRecipientId(?string $expected, SlackOptions $options)
     {
-        $this->assertSame($expected, $options->getRecipientId());
+        self::assertSame($expected, $options->getRecipientId());
     }
 
     public function getRecipientIdProvider(): iterable
@@ -100,7 +100,7 @@ final class SlackOptionsTest extends TestCase
     {
         $options = (new SlackOptions())->$method($value);
 
-        $this->assertSame($value, $options->toArray()[$optionsKey]);
+        self::assertSame($value, $options->toArray()[$optionsKey]);
     }
 
     public function setProvider(): iterable
@@ -121,7 +121,7 @@ final class SlackOptionsTest extends TestCase
     {
         $options = (new SlackOptions())->block(new SlackDividerBlock());
 
-        $this->assertSame([['type' => 'divider']], $options->toArray()['blocks']);
+        self::assertSame([['type' => 'divider']], $options->toArray()['blocks']);
     }
 
     /**
@@ -141,7 +141,7 @@ final class SlackOptionsTest extends TestCase
     {
         $options = SlackOptions::fromNotification($notification);
 
-        $this->assertSame($expected, $options->toArray());
+        self::assertSame($expected, $options->toArray());
     }
 
     public function fromNotificationProvider(): iterable
@@ -194,13 +194,13 @@ final class SlackOptionsTest extends TestCase
     {
         $options = new SlackOptions(['blocks' => array_map(static function () { return ['type' => 'divider']; }, range(0, 49))]);
 
-        $this->assertCount(50, $options->toArray()['blocks']);
+        self::assertCount(50, $options->toArray()['blocks']);
     }
 
     public function testConstructThrowsWithTooManyBlocks()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Maximum number of "blocks" has been reached (50).');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Maximum number of "blocks" has been reached (50).');
 
         new SlackOptions(['blocks' => array_map(static function () { return ['type' => 'divider']; }, range(0, 50))]);
     }
@@ -212,7 +212,7 @@ final class SlackOptionsTest extends TestCase
             $options->block(new SlackSectionBlock());
         }
 
-        $this->assertCount(50, $options->toArray()['blocks']);
+        self::assertCount(50, $options->toArray()['blocks']);
     }
 
     public function testThrowsWhenBlocksLimitReached()
@@ -222,8 +222,8 @@ final class SlackOptionsTest extends TestCase
             $options->block(new SlackSectionBlock());
         }
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Maximum number of "blocks" has been reached (50).');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Maximum number of "blocks" has been reached (50).');
 
         $options->block(new SlackSectionBlock());
     }

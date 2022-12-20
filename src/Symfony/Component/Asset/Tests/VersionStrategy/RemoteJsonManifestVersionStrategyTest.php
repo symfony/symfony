@@ -26,35 +26,35 @@ class RemoteJsonManifestVersionStrategyTest extends TestCase
     {
         $strategy = $this->createStrategy('https://cdn.example.com/manifest-valid.json');
 
-        $this->assertSame('main.123abc.js', $strategy->getVersion('main.js'));
+        self::assertSame('main.123abc.js', $strategy->getVersion('main.js'));
     }
 
     public function testApplyVersion()
     {
         $strategy = $this->createStrategy('https://cdn.example.com/manifest-valid.json');
 
-        $this->assertSame('css/styles.555def.css', $strategy->applyVersion('css/styles.css'));
+        self::assertSame('css/styles.555def.css', $strategy->applyVersion('css/styles.css'));
     }
 
     public function testApplyVersionWhenKeyDoesNotExistInManifest()
     {
         $strategy = $this->createStrategy('https://cdn.example.com/manifest-valid.json');
 
-        $this->assertSame('css/other.css', $strategy->applyVersion('css/other.css'));
+        self::assertSame('css/other.css', $strategy->applyVersion('css/other.css'));
     }
 
     public function testMissingManifestFileThrowsException()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('HTTP 404 returned for "https://cdn.example.com/non-existent-file.json"');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('HTTP 404 returned for "https://cdn.example.com/non-existent-file.json"');
         $strategy = $this->createStrategy('https://cdn.example.com/non-existent-file.json');
         $strategy->getVersion('main.js');
     }
 
     public function testManifestFileWithBadJSONThrowsException()
     {
-        $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Syntax error');
+        self::expectException(JsonException::class);
+        self::expectExceptionMessage('Syntax error');
         $strategy = $this->createStrategy('https://cdn.example.com/manifest-invalid.json');
         $strategy->getVersion('main.js');
     }

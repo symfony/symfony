@@ -42,7 +42,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
             new ConstraintA(['groups' => ['Default', 'EntityInterfaceA', 'EntityParent']]),
         ];
 
-        $this->assertEquals($constraints, $metadata->getConstraints());
+        self::assertEquals($constraints, $metadata->getConstraints());
     }
 
     public function testMergeParentConstraints()
@@ -78,7 +78,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
             ]]),
         ];
 
-        $this->assertEquals($constraints, $metadata->getConstraints());
+        self::assertEquals($constraints, $metadata->getConstraints());
     }
 
     public function testCachedMetadata()
@@ -93,29 +93,29 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
 
-        $this->assertEquals(self::PARENT_CLASS, $metadata->getClassName());
-        $this->assertEquals($expectedConstraints, $metadata->getConstraints());
+        self::assertEquals(self::PARENT_CLASS, $metadata->getClassName());
+        self::assertEquals($expectedConstraints, $metadata->getConstraints());
 
-        $loader = $this->createMock(LoaderInterface::class);
-        $loader->expects($this->never())->method('loadClassMetadata');
+        $loader = self::createMock(LoaderInterface::class);
+        $loader->expects(self::never())->method('loadClassMetadata');
 
         $factory = new LazyLoadingMetadataFactory($loader, $cache);
 
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
 
-        $this->assertEquals(self::PARENT_CLASS, $metadata->getClassName());
-        $this->assertEquals($expectedConstraints, $metadata->getConstraints());
+        self::assertEquals(self::PARENT_CLASS, $metadata->getClassName());
+        self::assertEquals($expectedConstraints, $metadata->getConstraints());
     }
 
     public function testNonClassNameStringValues()
     {
-        $this->expectException(NoSuchMetadataException::class);
+        self::expectException(NoSuchMetadataException::class);
         $testedValue = 'error@example.com';
-        $loader = $this->createMock(LoaderInterface::class);
-        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
+        $cache = self::createMock(CacheItemPoolInterface::class);
         $factory = new LazyLoadingMetadataFactory($loader, $cache);
         $cache
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('getItem');
         $factory->getMetadataFor($testedValue);
     }
@@ -128,11 +128,11 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
         $metadata->addConstraint(new Callback(function () {}));
 
-        $this->assertCount(3, $metadata->getConstraints());
+        self::assertCount(3, $metadata->getConstraints());
 
         $metadata = $factory->getMetadataFor(self::CLASS_NAME);
 
-        $this->assertCount(6, $metadata->getConstraints());
+        self::assertCount(6, $metadata->getConstraints());
     }
 
     public function testGroupsFromParent()
@@ -147,11 +147,11 @@ class LazyLoadingMetadataFactoryTest extends TestCase
             $groups = array_replace($groups, $constraints[0]->groups);
         }
 
-        $this->assertCount(4, $groups);
-        $this->assertContains('Default', $groups);
-        $this->assertContains('EntityStaticCarTurbo', $groups);
-        $this->assertContains('EntityStaticCar', $groups);
-        $this->assertContains('EntityStaticVehicle', $groups);
+        self::assertCount(4, $groups);
+        self::assertContains('Default', $groups);
+        self::assertContains('EntityStaticCarTurbo', $groups);
+        self::assertContains('EntityStaticCar', $groups);
+        self::assertContains('EntityStaticVehicle', $groups);
     }
 
     public function testMultipathInterfaceConstraint()
@@ -160,7 +160,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $metadata = $factory->getMetadataFor(PropertyGetter::class);
         $constraints = $metadata->getPropertyMetadata('property');
 
-        $this->assertCount(1, $constraints);
+        self::assertCount(1, $constraints);
     }
 }
 

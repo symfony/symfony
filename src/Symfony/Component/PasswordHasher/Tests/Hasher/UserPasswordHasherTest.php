@@ -33,41 +33,41 @@ class UserPasswordHasherTest extends TestCase
     {
         $this->expectDeprecation('Since symfony/password-hasher 5.3: Returning a string from "getSalt()" without implementing the "Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface" interface is deprecated, the "%s" class should implement it.');
 
-        $userMock = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
-        $userMock->expects($this->any())
+        $userMock = self::createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $userMock->expects(self::any())
             ->method('getSalt')
             ->willReturn('userSalt');
 
-        $mockHasher = $this->createMock(PasswordHasherInterface::class);
-        $mockHasher->expects($this->any())
+        $mockHasher = self::createMock(PasswordHasherInterface::class);
+        $mockHasher->expects(self::any())
             ->method('hash')
-            ->with($this->equalTo('plainPassword'), $this->equalTo('userSalt'))
+            ->with(self::equalTo('plainPassword'), self::equalTo('userSalt'))
             ->willReturn('hash');
 
-        $mockPasswordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $mockPasswordHasherFactory->expects($this->any())
+        $mockPasswordHasherFactory = self::createMock(PasswordHasherFactoryInterface::class);
+        $mockPasswordHasherFactory->expects(self::any())
             ->method('getPasswordHasher')
-            ->with($this->equalTo($userMock))
+            ->with(self::equalTo($userMock))
             ->willReturn($mockHasher);
 
         $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
 
         $encoded = $passwordHasher->hashPassword($userMock, 'plainPassword');
-        $this->assertEquals('hash', $encoded);
+        self::assertEquals('hash', $encoded);
     }
 
     public function testHashWithLegacyUser()
     {
         $user = new TestLegacyPasswordAuthenticatedUser('name', null, 'userSalt');
 
-        $mockHasher = $this->createMock(PasswordHasherInterface::class);
-        $mockHasher->expects($this->any())
+        $mockHasher = self::createMock(PasswordHasherInterface::class);
+        $mockHasher->expects(self::any())
             ->method('hash')
-            ->with($this->equalTo('plainPassword'), $this->equalTo('userSalt'))
+            ->with(self::equalTo('plainPassword'), self::equalTo('userSalt'))
             ->willReturn('hash');
 
-        $mockPasswordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $mockPasswordHasherFactory->expects($this->any())
+        $mockPasswordHasherFactory = self::createMock(PasswordHasherFactoryInterface::class);
+        $mockPasswordHasherFactory->expects(self::any())
             ->method('getPasswordHasher')
             ->with($user)
             ->willReturn($mockHasher);
@@ -75,21 +75,21 @@ class UserPasswordHasherTest extends TestCase
         $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
 
         $encoded = $passwordHasher->hashPassword($user, 'plainPassword');
-        $this->assertEquals('hash', $encoded);
+        self::assertEquals('hash', $encoded);
     }
 
     public function testHashWithPasswordAuthenticatedUser()
     {
         $user = new TestPasswordAuthenticatedUser();
 
-        $mockHasher = $this->createMock(PasswordHasherInterface::class);
-        $mockHasher->expects($this->any())
+        $mockHasher = self::createMock(PasswordHasherInterface::class);
+        $mockHasher->expects(self::any())
             ->method('hash')
-            ->with($this->equalTo('plainPassword'), $this->equalTo(null))
+            ->with(self::equalTo('plainPassword'), self::equalTo(null))
             ->willReturn('hash');
 
-        $mockPasswordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $mockPasswordHasherFactory->expects($this->any())
+        $mockPasswordHasherFactory = self::createMock(PasswordHasherFactoryInterface::class);
+        $mockPasswordHasherFactory->expects(self::any())
             ->method('getPasswordHasher')
             ->with($user)
             ->willReturn($mockHasher);
@@ -98,21 +98,21 @@ class UserPasswordHasherTest extends TestCase
 
         $hashedPassword = $passwordHasher->hashPassword($user, 'plainPassword');
 
-        $this->assertSame('hash', $hashedPassword);
+        self::assertSame('hash', $hashedPassword);
     }
 
     public function testVerifyWithLegacyUser()
     {
         $user = new TestLegacyPasswordAuthenticatedUser('user', 'hash', 'userSalt');
 
-        $mockHasher = $this->createMock(PasswordHasherInterface::class);
-        $mockHasher->expects($this->any())
+        $mockHasher = self::createMock(PasswordHasherInterface::class);
+        $mockHasher->expects(self::any())
             ->method('verify')
-            ->with($this->equalTo('hash'), $this->equalTo('plainPassword'), $this->equalTo('userSalt'))
+            ->with(self::equalTo('hash'), self::equalTo('plainPassword'), self::equalTo('userSalt'))
             ->willReturn(true);
 
-        $mockPasswordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $mockPasswordHasherFactory->expects($this->any())
+        $mockPasswordHasherFactory = self::createMock(PasswordHasherFactoryInterface::class);
+        $mockPasswordHasherFactory->expects(self::any())
             ->method('getPasswordHasher')
             ->with($user)
             ->willReturn($mockHasher);
@@ -120,21 +120,21 @@ class UserPasswordHasherTest extends TestCase
         $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
 
         $isValid = $passwordHasher->isPasswordValid($user, 'plainPassword');
-        $this->assertTrue($isValid);
+        self::assertTrue($isValid);
     }
 
     public function testVerify()
     {
         $user = new TestPasswordAuthenticatedUser('hash');
 
-        $mockHasher = $this->createMock(PasswordHasherInterface::class);
-        $mockHasher->expects($this->any())
+        $mockHasher = self::createMock(PasswordHasherInterface::class);
+        $mockHasher->expects(self::any())
             ->method('verify')
-            ->with($this->equalTo('hash'), $this->equalTo('plainPassword'), $this->equalTo(null))
+            ->with(self::equalTo('hash'), self::equalTo('plainPassword'), self::equalTo(null))
             ->willReturn(true);
 
-        $mockPasswordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $mockPasswordHasherFactory->expects($this->any())
+        $mockPasswordHasherFactory = self::createMock(PasswordHasherFactoryInterface::class);
+        $mockPasswordHasherFactory->expects(self::any())
             ->method('getPasswordHasher')
             ->with($user)
             ->willReturn($mockHasher);
@@ -142,7 +142,7 @@ class UserPasswordHasherTest extends TestCase
         $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
 
         $isValid = $passwordHasher->isPasswordValid($user, 'plainPassword');
-        $this->assertTrue($isValid);
+        self::assertTrue($isValid);
     }
 
     public function testNeedsRehash()
@@ -150,17 +150,17 @@ class UserPasswordHasherTest extends TestCase
         $user = new InMemoryUser('username', null);
         $hasher = new NativePasswordHasher(4, 20000, 4);
 
-        $mockPasswordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $mockPasswordHasherFactory->expects($this->any())
+        $mockPasswordHasherFactory = self::createMock(PasswordHasherFactoryInterface::class);
+        $mockPasswordHasherFactory->expects(self::any())
             ->method('getPasswordHasher')
             ->with($user)
-            ->will($this->onConsecutiveCalls($hasher, $hasher, new NativePasswordHasher(5, 20000, 5), $hasher));
+            ->will(self::onConsecutiveCalls($hasher, $hasher, new NativePasswordHasher(5, 20000, 5), $hasher));
 
         $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
 
         \Closure::bind(function () use ($passwordHasher) { $this->password = $passwordHasher->hashPassword($this, 'foo', 'salt'); }, $user, class_exists(User::class) ? User::class : InMemoryUser::class)();
-        $this->assertFalse($passwordHasher->needsRehash($user));
-        $this->assertTrue($passwordHasher->needsRehash($user));
-        $this->assertFalse($passwordHasher->needsRehash($user));
+        self::assertFalse($passwordHasher->needsRehash($user));
+        self::assertTrue($passwordHasher->needsRehash($user));
+        self::assertFalse($passwordHasher->needsRehash($user));
     }
 }

@@ -35,10 +35,10 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertNotInstanceOf(ChildDefinition::class, $def);
-        $this->assertEquals('bar', $def->getClass());
-        $this->assertEquals(['a', 'b'], $def->getArguments());
-        $this->assertEquals(['foo' => 'bar'], $def->getProperties());
+        self::assertNotInstanceOf(ChildDefinition::class, $def);
+        self::assertEquals('bar', $def->getClass());
+        self::assertEquals(['a', 'b'], $def->getArguments());
+        self::assertEquals(['foo' => 'bar'], $def->getProperties());
     }
 
     public function testProcessAppendsMethodCallsAlways()
@@ -58,7 +58,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertEquals([
+        self::assertEquals([
             ['foo', ['bar']],
             ['bar', ['foo']],
         ], $def->getMethodCalls());
@@ -80,7 +80,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertFalse($def->isAbstract());
+        self::assertFalse($def->isAbstract());
     }
 
     public function testProcessDoesNotCopyShared()
@@ -99,7 +99,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertTrue($def->isShared());
+        self::assertTrue($def->isShared());
     }
 
     public function testProcessDoesNotCopyTags()
@@ -118,7 +118,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertEquals([], $def->getTags());
+        self::assertEquals([], $def->getTags());
     }
 
     public function testProcessCopiesTagsProxy()
@@ -140,10 +140,10 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child1');
-        $this->assertSame(['proxy' => [['a' => 'b']]], $def->getTags());
+        self::assertSame(['proxy' => [['a' => 'b']]], $def->getTags());
 
         $def = $container->getDefinition('child2');
-        $this->assertSame(['proxy' => [['c' => 'd']]], $def->getTags());
+        self::assertSame(['proxy' => [['c' => 'd']]], $def->getTags());
     }
 
     public function testProcessDoesNotCopyDecoratedService()
@@ -162,7 +162,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertNull($def->getDecoratedService());
+        self::assertNull($def->getDecoratedService());
     }
 
     public function testProcessDoesNotDropShared()
@@ -181,7 +181,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertFalse($def->isShared());
+        self::assertFalse($def->isShared());
     }
 
     public function testProcessHandlesMultipleInheritance()
@@ -206,8 +206,8 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child2');
-        $this->assertEquals(['a', 'b', 'c'], $def->getArguments());
-        $this->assertEquals('foo', $def->getClass());
+        self::assertEquals(['a', 'b', 'c'], $def->getArguments());
+        self::assertEquals('foo', $def->getClass());
     }
 
     public function testSetLazyOnServiceHasParent()
@@ -222,7 +222,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertTrue($container->getDefinition('child1')->isLazy());
+        self::assertTrue($container->getDefinition('child1')->isLazy());
     }
 
     public function testSetLazyOnServiceIsParent()
@@ -237,7 +237,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertTrue($container->getDefinition('child1')->isLazy());
+        self::assertTrue($container->getDefinition('child1')->isLazy());
     }
 
     public function testSetAutowiredOnServiceHasParent()
@@ -254,7 +254,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertFalse($container->getDefinition('child1')->isAutowired());
+        self::assertFalse($container->getDefinition('child1')->isAutowired());
     }
 
     public function testSetAutowiredOnServiceIsParent()
@@ -269,7 +269,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertTrue($container->getDefinition('child1')->isAutowired());
+        self::assertTrue($container->getDefinition('child1')->isAutowired());
     }
 
     public function testDeepDefinitionsResolving()
@@ -288,24 +288,24 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $configurator = $container->getDefinition('sibling')->getConfigurator();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($configurator[0]));
-        $this->assertSame('parentClass', $configurator[0]->getClass());
+        self::assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($configurator[0]));
+        self::assertSame('parentClass', $configurator[0]->getClass());
 
         $factory = $container->getDefinition('sibling')->getFactory();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($factory[0]));
-        $this->assertSame('parentClass', $factory[0]->getClass());
+        self::assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($factory[0]));
+        self::assertSame('parentClass', $factory[0]->getClass());
 
         $argument = $container->getDefinition('sibling')->getArgument(0);
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($argument));
-        $this->assertSame('parentClass', $argument->getClass());
+        self::assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($argument));
+        self::assertSame('parentClass', $argument->getClass());
 
         $properties = $container->getDefinition('sibling')->getProperties();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($properties['prop']));
-        $this->assertSame('parentClass', $properties['prop']->getClass());
+        self::assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($properties['prop']));
+        self::assertSame('parentClass', $properties['prop']->getClass());
 
         $methodCalls = $container->getDefinition('sibling')->getMethodCalls();
-        $this->assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($methodCalls[0][1][0]));
-        $this->assertSame('parentClass', $methodCalls[0][1][0]->getClass());
+        self::assertSame('Symfony\Component\DependencyInjection\Definition', \get_class($methodCalls[0][1][0]));
+        self::assertSame('parentClass', $methodCalls[0][1][0]->getClass());
     }
 
     public function testSetDecoratedServiceOnServiceHasParent()
@@ -320,7 +320,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals(['foo', 'foo_inner', 5], $container->getDefinition('child1')->getDecoratedService());
+        self::assertEquals(['foo', 'foo_inner', 5], $container->getDefinition('child1')->getDecoratedService());
     }
 
     public function testDecoratedServiceCopiesDeprecatedStatusFromParent()
@@ -334,7 +334,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertTrue($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
+        self::assertTrue($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
     /**
@@ -356,7 +356,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
+        self::assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
     public function testProcessResolvesAliases()
@@ -370,7 +370,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertSame('ParentClass', $def->getClass());
+        self::assertSame('ParentClass', $def->getClass());
     }
 
     public function testProcessSetsArguments()
@@ -387,7 +387,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertSame([2, 1, 'foo' => 3], $def->getArguments());
+        self::assertSame([2, 1, 'foo' => 3], $def->getArguments());
     }
 
     public function testBindings()
@@ -408,7 +408,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         foreach ($container->getDefinition('child')->getBindings() as $k => $v) {
             $bindings[$k] = $v->getValues()[0];
         }
-        $this->assertEquals(['b' => 'B', 'c' => 'C', 'a' => '1'], $bindings);
+        self::assertEquals(['b' => 'B', 'c' => 'C', 'a' => '1'], $bindings);
     }
 
     public function testSetAutoconfiguredOnServiceIsParent()
@@ -423,7 +423,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertFalse($container->getDefinition('child1')->isAutoconfigured());
+        self::assertFalse($container->getDefinition('child1')->isAutoconfigured());
     }
 
     protected function process(ContainerBuilder $container)
@@ -434,8 +434,8 @@ class ResolveChildDefinitionsPassTest extends TestCase
 
     public function testProcessDetectsChildDefinitionIndirectCircularReference()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
-        $this->expectExceptionMessageMatches('/^Circular reference detected for service "c", path: "c -> b -> a -> c"./');
+        self::expectException(ServiceCircularReferenceException::class);
+        self::expectExceptionMessageMatches('/^Circular reference detected for service "c", path: "c -> b -> a -> c"./');
         $container = new ContainerBuilder();
 
         $container->register('a');
@@ -461,6 +461,6 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertTrue($def->isSynthetic());
+        self::assertTrue($def->isSynthetic());
     }
 }

@@ -31,7 +31,7 @@ class ConstraintViolationListTest extends TestCase
 
     public function testInit()
     {
-        $this->assertCount(0, $this->list);
+        self::assertCount(0, $this->list);
     }
 
     public function testInitWithViolations()
@@ -39,8 +39,8 @@ class ConstraintViolationListTest extends TestCase
         $violation = $this->getViolation('Error');
         $this->list = new ConstraintViolationList([$violation]);
 
-        $this->assertCount(1, $this->list);
-        $this->assertSame($violation, $this->list[0]);
+        self::assertCount(1, $this->list);
+        self::assertSame($violation, $this->list[0]);
     }
 
     public function testAdd()
@@ -48,8 +48,8 @@ class ConstraintViolationListTest extends TestCase
         $violation = $this->getViolation('Error');
         $this->list->add($violation);
 
-        $this->assertCount(1, $this->list);
-        $this->assertSame($violation, $this->list[0]);
+        self::assertCount(1, $this->list);
+        self::assertSame($violation, $this->list[0]);
     }
 
     public function testAddAll()
@@ -62,11 +62,11 @@ class ConstraintViolationListTest extends TestCase
         $otherList = new ConstraintViolationList($violations);
         $this->list->addAll($otherList);
 
-        $this->assertCount(3, $this->list);
+        self::assertCount(3, $this->list);
 
-        $this->assertSame($violations[10], $this->list[0]);
-        $this->assertSame($violations[20], $this->list[1]);
-        $this->assertSame($violations[30], $this->list[2]);
+        self::assertSame($violations[10], $this->list[0]);
+        self::assertSame($violations[20], $this->list[1]);
+        self::assertSame($violations[30], $this->list[2]);
     }
 
     public function testIterator()
@@ -80,7 +80,7 @@ class ConstraintViolationListTest extends TestCase
         $this->list = new ConstraintViolationList($violations);
 
         // indices are reset upon adding -> array_values()
-        $this->assertSame(array_values($violations), iterator_to_array($this->list));
+        self::assertSame(array_values($violations), iterator_to_array($this->list));
     }
 
     public function testArrayAccess()
@@ -88,17 +88,17 @@ class ConstraintViolationListTest extends TestCase
         $violation = $this->getViolation('Error');
         $this->list[] = $violation;
 
-        $this->assertSame($violation, $this->list[0]);
-        $this->assertArrayHasKey(0, $this->list);
+        self::assertSame($violation, $this->list[0]);
+        self::assertArrayHasKey(0, $this->list);
 
         unset($this->list[0]);
 
-        $this->assertArrayNotHasKey(0, $this->list);
+        self::assertArrayNotHasKey(0, $this->list);
 
         $this->list[10] = $violation;
 
-        $this->assertSame($violation, $this->list[10]);
-        $this->assertArrayHasKey(10, $this->list);
+        self::assertSame($violation, $this->list[10]);
+        self::assertArrayHasKey(10, $this->list);
     }
 
     public function testToString()
@@ -125,7 +125,7 @@ foo.bar:
 
 EOF;
 
-        $this->assertEquals($expected, (string) $this->list);
+        self::assertEquals($expected, (string) $this->list);
     }
 
     /**
@@ -142,8 +142,8 @@ EOF;
 
         $specificErrors = $list->findByCodes($code);
 
-        $this->assertInstanceOf(ConstraintViolationList::class, $specificErrors);
-        $this->assertCount($violationsCount, $specificErrors);
+        self::assertInstanceOf(ConstraintViolationList::class, $specificErrors);
+        self::assertCount($violationsCount, $specificErrors);
     }
 
     public function findByCodesProvider()
@@ -159,9 +159,9 @@ EOF;
     {
         $list = ConstraintViolationList::createFromMessage('my message');
 
-        $this->assertCount(1, $list);
-        $this->assertInstanceOf(ConstraintViolation::class, $list[0]);
-        $this->assertSame('my message', $list[0]->getMessage());
+        self::assertCount(1, $list);
+        self::assertInstanceOf(ConstraintViolation::class, $list[0]);
+        self::assertSame('my message', $list[0]->getMessage());
     }
 
     protected function getViolation($message, $root = null, $propertyPath = null, $code = null)

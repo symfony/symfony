@@ -23,15 +23,15 @@ class ValidationStampTest extends TestCase
     public function testStamp()
     {
         $stamp = new ValidationStamp($groups = ['Default', 'Extra']);
-        $this->assertSame($groups, $stamp->getGroups());
+        self::assertSame($groups, $stamp->getGroups());
 
         $stamp = new ValidationStamp($groups = new GroupSequence(['Default', 'Then']));
-        $this->assertSame($groups, $stamp->getGroups());
+        self::assertSame($groups, $stamp->getGroups());
     }
 
     public function testSerializable()
     {
-        $this->assertEquals($stamp = new ValidationStamp(['Default', 'Extra']), unserialize(serialize($stamp)));
-        $this->assertEquals($stamp = new ValidationStamp(new GroupSequence(['Default', 'Then'])), unserialize(serialize($stamp)));
+        self::assertEquals($stamp = new ValidationStamp(['Default', 'Extra']), unserialize(serialize($stamp)));
+        self::assertEquals($stamp = new ValidationStamp(new GroupSequence(['Default', 'Then'])), unserialize(serialize($stamp)));
     }
 }

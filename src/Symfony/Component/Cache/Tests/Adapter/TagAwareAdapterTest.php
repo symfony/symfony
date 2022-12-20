@@ -41,13 +41,13 @@ class TagAwareAdapterTest extends AdapterTestCase
     public function testPrune()
     {
         $cache = new TagAwareAdapter($this->getPruneableMock());
-        $this->assertTrue($cache->prune());
+        self::assertTrue($cache->prune());
 
         $cache = new TagAwareAdapter($this->getNonPruneableMock());
-        $this->assertFalse($cache->prune());
+        self::assertFalse($cache->prune());
 
         $cache = new TagAwareAdapter($this->getFailingPruneableMock());
-        $this->assertFalse($cache->prune());
+        self::assertFalse($cache->prune());
     }
 
     public function testKnownTagVersionsTtl()
@@ -65,16 +65,16 @@ class TagAwareAdapterTest extends AdapterTestCase
         $tagsPool->save($tag->set(10));
 
         $pool->save($item);
-        $this->assertTrue($pool->getItem('foo')->isHit());
-        $this->assertTrue($pool->getItem('foo')->isHit());
+        self::assertTrue($pool->getItem('foo')->isHit());
+        self::assertTrue($pool->getItem('foo')->isHit());
 
         sleep(20);
 
-        $this->assertTrue($pool->getItem('foo')->isHit());
+        self::assertTrue($pool->getItem('foo')->isHit());
 
         sleep(5);
 
-        $this->assertTrue($pool->getItem('foo')->isHit());
+        self::assertTrue($pool->getItem('foo')->isHit());
     }
 
     public function testTagEntryIsCreatedForItemWithoutTags()
@@ -86,7 +86,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pool->save($item);
 
         $adapter = new FilesystemAdapter();
-        $this->assertTrue($adapter->hasItem(TagAwareAdapter::TAGS_PREFIX.$itemKey));
+        self::assertTrue($adapter->hasItem(TagAwareAdapter::TAGS_PREFIX.$itemKey));
     }
 
     public function testHasItemReturnsFalseWhenPoolDoesNotHaveItemTags()
@@ -102,7 +102,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $adapter = new FilesystemAdapter();
         $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); // simulate item losing tags pair
 
-        $this->assertFalse($anotherPool->hasItem($itemKey));
+        self::assertFalse($anotherPool->hasItem($itemKey));
     }
 
     public function testGetItemReturnsCacheMissWhenPoolDoesNotHaveItemTags()
@@ -119,7 +119,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $adapter->deleteItem(TagAwareAdapter::TAGS_PREFIX.$itemKey); // simulate item losing tags pair
 
         $item = $anotherPool->getItem($itemKey);
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
     }
 
     public function testHasItemReturnsFalseWhenPoolDoesNotHaveItemAndOnlyHasTags()
@@ -135,7 +135,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $adapter = new FilesystemAdapter();
         $adapter->deleteItem($itemKey); // simulate losing item but keeping tags
 
-        $this->assertFalse($anotherPool->hasItem($itemKey));
+        self::assertFalse($anotherPool->hasItem($itemKey));
     }
 
     public function testInvalidateTagsWithArrayAdapter()
@@ -144,17 +144,17 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         $item = $adapter->getItem('foo');
 
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
 
         $item->tag('bar');
         $item->expiresAfter(100);
         $adapter->save($item);
 
-        $this->assertTrue($adapter->getItem('foo')->isHit());
+        self::assertTrue($adapter->getItem('foo')->isHit());
 
         $adapter->invalidateTags(['bar']);
 
-        $this->assertFalse($adapter->getItem('foo')->isHit());
+        self::assertFalse($adapter->getItem('foo')->isHit());
     }
 
     public function testGetItemReturnsCacheMissWhenPoolDoesNotHaveItemAndOnlyHasTags()
@@ -171,7 +171,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $adapter->deleteItem($itemKey); // simulate losing item but keeping tags
 
         $item = $anotherPool->getItem($itemKey);
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
     }
 
     /**
@@ -179,10 +179,10 @@ class TagAwareAdapterTest extends AdapterTestCase
      */
     private function getPruneableMock(): PruneableInterface
     {
-        $pruneable = $this->createMock(PrunableAdapter::class);
+        $pruneable = self::createMock(PrunableAdapter::class);
 
         $pruneable
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('prune')
             ->willReturn(true);
 
@@ -194,10 +194,10 @@ class TagAwareAdapterTest extends AdapterTestCase
      */
     private function getFailingPruneableMock(): PruneableInterface
     {
-        $pruneable = $this->createMock(PrunableAdapter::class);
+        $pruneable = self::createMock(PrunableAdapter::class);
 
         $pruneable
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('prune')
             ->willReturn(false);
 
@@ -209,7 +209,7 @@ class TagAwareAdapterTest extends AdapterTestCase
      */
     private function getNonPruneableMock(): AdapterInterface
     {
-        return $this->createMock(AdapterInterface::class);
+        return self::createMock(AdapterInterface::class);
     }
 
     /**

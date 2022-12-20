@@ -27,8 +27,8 @@ class NullDumperTest extends TestCase
         $dumper = new NullDumper();
         $definition = new Definition('stdClass');
 
-        $this->assertFalse($dumper->isProxyCandidate($definition));
-        $this->assertSame('', $dumper->getProxyFactoryCode($definition, 'foo', '(false)'));
-        $this->assertSame('', $dumper->getProxyCode($definition));
+        self::assertFalse($dumper->isProxyCandidate($definition));
+        self::assertSame('', $dumper->getProxyFactoryCode($definition, 'foo', '(false)'));
+        self::assertSame('', $dumper->getProxyCode($definition));
     }
 }

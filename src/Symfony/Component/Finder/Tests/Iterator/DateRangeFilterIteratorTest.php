@@ -84,9 +84,9 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [[new DateComparator('since 20 years ago')], $this->toAbsolute($since20YearsAgo)],
-            [[new DateComparator('since 2 months ago')], $this->toAbsolute($since2MonthsAgo)],
-            [[new DateComparator('until last month')], $this->toAbsolute($untilLastMonth)],
+            [[new DateComparator('since 20 years ago')], self::toAbsolute($since20YearsAgo)],
+            [[new DateComparator('since 2 months ago')], self::toAbsolute($since2MonthsAgo)],
+            [[new DateComparator('until last month')], self::toAbsolute($untilLastMonth)],
         ];
     }
 }

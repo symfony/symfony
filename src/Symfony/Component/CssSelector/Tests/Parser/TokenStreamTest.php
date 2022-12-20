@@ -25,9 +25,9 @@ class TokenStreamTest extends TestCase
         $stream->push($t2 = new Token(Token::TYPE_DELIMITER, '.', 2));
         $stream->push($t3 = new Token(Token::TYPE_IDENTIFIER, 'title', 3));
 
-        $this->assertSame($t1, $stream->getNext());
-        $this->assertSame($t2, $stream->getNext());
-        $this->assertSame($t3, $stream->getNext());
+        self::assertSame($t1, $stream->getNext());
+        self::assertSame($t2, $stream->getNext());
+        self::assertSame($t3, $stream->getNext());
     }
 
     public function testGetPeek()
@@ -37,11 +37,11 @@ class TokenStreamTest extends TestCase
         $stream->push($t2 = new Token(Token::TYPE_DELIMITER, '.', 2));
         $stream->push($t3 = new Token(Token::TYPE_IDENTIFIER, 'title', 3));
 
-        $this->assertSame($t1, $stream->getPeek());
-        $this->assertSame($t1, $stream->getNext());
-        $this->assertSame($t2, $stream->getPeek());
-        $this->assertSame($t2, $stream->getPeek());
-        $this->assertSame($t2, $stream->getNext());
+        self::assertSame($t1, $stream->getPeek());
+        self::assertSame($t1, $stream->getNext());
+        self::assertSame($t2, $stream->getPeek());
+        self::assertSame($t2, $stream->getPeek());
+        self::assertSame($t2, $stream->getNext());
     }
 
     public function testGetNextIdentifier()
@@ -49,12 +49,12 @@ class TokenStreamTest extends TestCase
         $stream = new TokenStream();
         $stream->push(new Token(Token::TYPE_IDENTIFIER, 'h1', 0));
 
-        $this->assertEquals('h1', $stream->getNextIdentifier());
+        self::assertEquals('h1', $stream->getNextIdentifier());
     }
 
     public function testFailToGetNextIdentifier()
     {
-        $this->expectException(SyntaxErrorException::class);
+        self::expectException(SyntaxErrorException::class);
 
         $stream = new TokenStream();
         $stream->push(new Token(Token::TYPE_DELIMITER, '.', 2));
@@ -66,15 +66,15 @@ class TokenStreamTest extends TestCase
         $stream = new TokenStream();
 
         $stream->push(new Token(Token::TYPE_IDENTIFIER, 'h1', 0));
-        $this->assertEquals('h1', $stream->getNextIdentifierOrStar());
+        self::assertEquals('h1', $stream->getNextIdentifierOrStar());
 
         $stream->push(new Token(Token::TYPE_DELIMITER, '*', 0));
-        $this->assertNull($stream->getNextIdentifierOrStar());
+        self::assertNull($stream->getNextIdentifierOrStar());
     }
 
     public function testFailToGetNextIdentifierOrStar()
     {
-        $this->expectException(SyntaxErrorException::class);
+        self::expectException(SyntaxErrorException::class);
 
         $stream = new TokenStream();
         $stream->push(new Token(Token::TYPE_DELIMITER, '.', 2));
@@ -89,9 +89,9 @@ class TokenStreamTest extends TestCase
         $stream->push($t3 = new Token(Token::TYPE_IDENTIFIER, 'h1', 3));
 
         $stream->skipWhitespace();
-        $this->assertSame($t1, $stream->getNext());
+        self::assertSame($t1, $stream->getNext());
 
         $stream->skipWhitespace();
-        $this->assertSame($t3, $stream->getNext());
+        self::assertSame($t3, $stream->getNext());
     }
 }

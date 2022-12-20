@@ -24,7 +24,7 @@ class MinifyTest extends TestCase
     {
         $dir = \dirname(__DIR__, 2).'/Resources/views/Profiler';
         $message = 'There cannot be any single line comment in this file. Consider using multiple line comment. ';
-        $this->assertTrue(2 === substr_count(file_get_contents($dir.'/base_js.html.twig'), '//'), $message);
-        $this->assertTrue(0 === substr_count(file_get_contents($dir.'/toolbar.css.twig'), '//'), $message);
+        self::assertTrue(2 === substr_count(file_get_contents($dir.'/base_js.html.twig'), '//'), $message);
+        self::assertTrue(0 === substr_count(file_get_contents($dir.'/toolbar.css.twig'), '//'), $message);
     }
 }

@@ -26,7 +26,7 @@ final class NativeTransportFactoryTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        parent::setUpBeforeClass();
+        self::setUpBeforeClass();
 
         $namespace = str_replace('\\Tests\\', '\\', __NAMESPACE__);
 
@@ -46,8 +46,8 @@ EOT;
 
     public function testCreateWithNotSupportedScheme()
     {
-        $this->expectException(UnsupportedSchemeException::class);
-        $this->expectErrorMessageMatches('#The ".*" scheme is not supported#');
+        self::expectException(UnsupportedSchemeException::class);
+        self::expectErrorMessageMatches('#The ".*" scheme is not supported#');
 
         $sut = new NativeTransportFactory();
         $sut->create(Dsn::fromString('sendmail://default'));
@@ -56,11 +56,11 @@ EOT;
     public function testCreateSendmailWithNoSendmailPath()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test cannot run on Windows.');
+            self::markTestSkipped('This test cannot run on Windows.');
         }
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('sendmail_path is not configured');
+        self::expectException(\Exception::class);
+        self::expectExceptionMessage('sendmail_path is not configured');
 
         $sut = new NativeTransportFactory();
         $sut->create(Dsn::fromString('native://default'));
@@ -79,11 +79,11 @@ EOT;
     public function testCreateSendmailWithNoHostOrNoPort(string $dsn, string $sendmaiPath, string $smtp, string $smtpPort)
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test only run on Windows.');
+            self::markTestSkipped('This test only run on Windows.');
         }
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('smtp or smtp_port is not configured');
+        self::expectException(\Exception::class);
+        self::expectExceptionMessage('smtp or smtp_port is not configured');
 
         self::$fakeConfiguration = [
             'sendmail_path' => $sendmaiPath,
@@ -127,6 +127,6 @@ EOT;
         $sut = new NativeTransportFactory();
         $transport = $sut->create(Dsn::fromString($dsn));
 
-        $this->assertEquals($expectedTransport, $transport);
+        self::assertEquals($expectedTransport, $transport);
     }
 }

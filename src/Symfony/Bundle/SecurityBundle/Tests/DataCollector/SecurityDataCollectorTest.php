@@ -41,18 +41,18 @@ class SecurityDataCollectorTest extends TestCase
         $collector = new SecurityDataCollector(null, null, null, null, null, null, true);
         $collector->collect(new Request(), new Response());
 
-        $this->assertSame('security', $collector->getName());
-        $this->assertFalse($collector->isEnabled());
-        $this->assertFalse($collector->isAuthenticated());
-        $this->assertFalse($collector->isImpersonated());
-        $this->assertNull($collector->getImpersonatorUser());
-        $this->assertNull($collector->getImpersonationExitPath());
-        $this->assertNull($collector->getTokenClass());
-        $this->assertFalse($collector->supportsRoleHierarchy());
-        $this->assertCount(0, $collector->getRoles());
-        $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
-        $this->assertNull($collector->getFirewall());
+        self::assertSame('security', $collector->getName());
+        self::assertFalse($collector->isEnabled());
+        self::assertFalse($collector->isAuthenticated());
+        self::assertFalse($collector->isImpersonated());
+        self::assertNull($collector->getImpersonatorUser());
+        self::assertNull($collector->getImpersonationExitPath());
+        self::assertNull($collector->getTokenClass());
+        self::assertFalse($collector->supportsRoleHierarchy());
+        self::assertCount(0, $collector->getRoles());
+        self::assertCount(0, $collector->getInheritedRoles());
+        self::assertEmpty($collector->getUser());
+        self::assertNull($collector->getFirewall());
     }
 
     public function testCollectWhenAuthenticationTokenIsNull()
@@ -61,18 +61,18 @@ class SecurityDataCollectorTest extends TestCase
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
         $collector->collect(new Request(), new Response());
 
-        $this->assertTrue($collector->isEnabled());
-        $this->assertFalse($collector->isAuthenticated());
-        $this->assertFalse($collector->isImpersonated());
-        $this->assertNull($collector->getImpersonatorUser());
-        $this->assertNull($collector->getImpersonationExitPath());
-        $this->assertNull($collector->getTokenClass());
-        $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertCount(0, $collector->getRoles());
-        $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
-        $this->assertNull($collector->getFirewall());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
+        self::assertTrue($collector->isEnabled());
+        self::assertFalse($collector->isAuthenticated());
+        self::assertFalse($collector->isImpersonated());
+        self::assertNull($collector->getImpersonatorUser());
+        self::assertNull($collector->getImpersonationExitPath());
+        self::assertNull($collector->getTokenClass());
+        self::assertTrue($collector->supportsRoleHierarchy());
+        self::assertCount(0, $collector->getRoles());
+        self::assertCount(0, $collector->getInheritedRoles());
+        self::assertEmpty($collector->getUser());
+        self::assertNull($collector->getFirewall());
+        self::assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     /** @dataProvider provideRoles */
@@ -85,17 +85,17 @@ class SecurityDataCollectorTest extends TestCase
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
-        $this->assertTrue($collector->isEnabled());
-        $this->assertTrue($collector->isAuthenticated());
-        $this->assertFalse($collector->isImpersonated());
-        $this->assertNull($collector->getImpersonatorUser());
-        $this->assertNull($collector->getImpersonationExitPath());
-        $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
-        $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame($normalizedRoles, $collector->getRoles()->getValue(true));
-        $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getValue(true));
-        $this->assertSame('hhamon', $collector->getUser());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
+        self::assertTrue($collector->isEnabled());
+        self::assertTrue($collector->isAuthenticated());
+        self::assertFalse($collector->isImpersonated());
+        self::assertNull($collector->getImpersonatorUser());
+        self::assertNull($collector->getImpersonationExitPath());
+        self::assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
+        self::assertTrue($collector->supportsRoleHierarchy());
+        self::assertSame($normalizedRoles, $collector->getRoles()->getValue(true));
+        self::assertSame($inheritedRoles, $collector->getInheritedRoles()->getValue(true));
+        self::assertSame('hhamon', $collector->getUser());
+        self::assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     public function testCollectSwitchUserToken()
@@ -109,15 +109,15 @@ class SecurityDataCollectorTest extends TestCase
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
-        $this->assertTrue($collector->isEnabled());
-        $this->assertTrue($collector->isAuthenticated());
-        $this->assertTrue($collector->isImpersonated());
-        $this->assertSame('yceruto', $collector->getImpersonatorUser());
-        $this->assertSame(SwitchUserToken::class, $collector->getTokenClass()->getValue());
-        $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $collector->getRoles()->getValue(true));
-        $this->assertSame([], $collector->getInheritedRoles()->getValue(true));
-        $this->assertSame('hhamon', $collector->getUser());
+        self::assertTrue($collector->isEnabled());
+        self::assertTrue($collector->isAuthenticated());
+        self::assertTrue($collector->isImpersonated());
+        self::assertSame('yceruto', $collector->getImpersonatorUser());
+        self::assertSame(SwitchUserToken::class, $collector->getTokenClass()->getValue());
+        self::assertTrue($collector->supportsRoleHierarchy());
+        self::assertSame(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $collector->getRoles()->getValue(true));
+        self::assertSame([], $collector->getInheritedRoles()->getValue(true));
+        self::assertSame('hhamon', $collector->getUser());
     }
 
     public function testGetFirewall()
@@ -125,12 +125,11 @@ class SecurityDataCollectorTest extends TestCase
         $firewallConfig = new FirewallConfig('dummy', 'security.request_matcher.dummy', 'security.user_checker.dummy');
         $request = new Request();
 
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMap::class)
+        $firewallMap = self::getMockBuilder(FirewallMap::class)
             ->disableOriginalConstructor()
             ->getMock();
         $firewallMap
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getFirewallConfig')
             ->with($request)
             ->willReturn($firewallConfig);
@@ -140,18 +139,18 @@ class SecurityDataCollectorTest extends TestCase
         $collector->lateCollect();
         $collected = $collector->getFirewall();
 
-        $this->assertSame($firewallConfig->getName(), $collected['name']);
-        $this->assertSame($firewallConfig->getRequestMatcher(), $collected['request_matcher']);
-        $this->assertSame($firewallConfig->isSecurityEnabled(), $collected['security_enabled']);
-        $this->assertSame($firewallConfig->isStateless(), $collected['stateless']);
-        $this->assertSame($firewallConfig->getProvider(), $collected['provider']);
-        $this->assertSame($firewallConfig->getContext(), $collected['context']);
-        $this->assertSame($firewallConfig->getEntryPoint(), $collected['entry_point']);
-        $this->assertSame($firewallConfig->getAccessDeniedHandler(), $collected['access_denied_handler']);
-        $this->assertSame($firewallConfig->getAccessDeniedUrl(), $collected['access_denied_url']);
-        $this->assertSame($firewallConfig->getUserChecker(), $collected['user_checker']);
-        $this->assertSame($firewallConfig->getAuthenticators(), $collected['authenticators']->getValue());
-        $this->assertTrue($collector->isAuthenticatorManagerEnabled());
+        self::assertSame($firewallConfig->getName(), $collected['name']);
+        self::assertSame($firewallConfig->getRequestMatcher(), $collected['request_matcher']);
+        self::assertSame($firewallConfig->isSecurityEnabled(), $collected['security_enabled']);
+        self::assertSame($firewallConfig->isStateless(), $collected['stateless']);
+        self::assertSame($firewallConfig->getProvider(), $collected['provider']);
+        self::assertSame($firewallConfig->getContext(), $collected['context']);
+        self::assertSame($firewallConfig->getEntryPoint(), $collected['entry_point']);
+        self::assertSame($firewallConfig->getAccessDeniedHandler(), $collected['access_denied_handler']);
+        self::assertSame($firewallConfig->getAccessDeniedUrl(), $collected['access_denied_url']);
+        self::assertSame($firewallConfig->getUserChecker(), $collected['user_checker']);
+        self::assertSame($firewallConfig->getAuthenticators(), $collected['authenticators']->getValue());
+        self::assertTrue($collector->isAuthenticatorManagerEnabled());
     }
 
     public function testGetFirewallReturnsNull()
@@ -162,27 +161,25 @@ class SecurityDataCollectorTest extends TestCase
         // Don't inject any firewall map
         $collector = new SecurityDataCollector(null, null, null, null, null, null, true);
         $collector->collect($request, $response);
-        $this->assertNull($collector->getFirewall());
+        self::assertNull($collector->getFirewall());
 
         // Inject an instance that is not context aware
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMapInterface::class)
+        $firewallMap = self::getMockBuilder(FirewallMapInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
         $collector->collect($request, $response);
-        $this->assertNull($collector->getFirewall());
+        self::assertNull($collector->getFirewall());
 
         // Null config
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMap::class)
+        $firewallMap = self::getMockBuilder(FirewallMap::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
         $collector->collect($request, $response);
-        $this->assertNull($collector->getFirewall());
+        self::assertNull($collector->getFirewall());
     }
 
     /**
@@ -191,22 +188,21 @@ class SecurityDataCollectorTest extends TestCase
     public function testGetListeners()
     {
         $request = new Request();
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $event->setResponse($response = new Response());
         $listener = function ($e) use ($event, &$listenerCalled) {
             $listenerCalled += $e === $event;
         };
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMap::class)
+        $firewallMap = self::getMockBuilder(FirewallMap::class)
             ->disableOriginalConstructor()
             ->getMock();
         $firewallMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getFirewallConfig')
             ->with($request)
             ->willReturn(null);
         $firewallMap
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getListeners')
             ->with($request)
             ->willReturn([[$listener], null, null]);
@@ -217,17 +213,17 @@ class SecurityDataCollectorTest extends TestCase
         $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall, true);
         $collector->collect($request, $response);
 
-        $this->assertNotEmpty($collected = $collector->getListeners()[0]);
+        self::assertNotEmpty($collected = $collector->getListeners()[0]);
         $collector->lateCollect();
-        $this->assertSame(1, $listenerCalled);
+        self::assertSame(1, $listenerCalled);
     }
 
     public function providerCollectDecisionLog(): \Generator
     {
-        $voter1 = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
-        $voter2 = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+        $voter1 = self::getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+        $voter2 = self::getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
 
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+        $eventDispatcher = self::getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
         $decoratedVoter1 = new TraceableVoter($voter1, $eventDispatcher);
 
         yield [
@@ -318,38 +314,33 @@ class SecurityDataCollectorTest extends TestCase
      */
     public function testCollectDecisionLog(string $strategy, array $decisionLog, array $voters, array $expectedVoterClasses, array $expectedDecisionLog)
     {
-        $accessDecisionManager = $this
-            ->getMockBuilder(TraceableAccessDecisionManager::class)
+        $accessDecisionManager = self::getMockBuilder(TraceableAccessDecisionManager::class)
             ->disableOriginalConstructor()
             ->setMethods(['getStrategy', 'getVoters', 'getDecisionLog'])
             ->getMock();
 
         $accessDecisionManager
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getStrategy')
             ->willReturn($strategy);
 
         $accessDecisionManager
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getVoters')
             ->willReturn($voters);
 
         $accessDecisionManager
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getDecisionLog')
             ->willReturn($decisionLog);
 
         $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
         $dataCollector->collect(new Request(), new Response());
 
-        $this->assertEquals($dataCollector->getAccessDecisionLog(), $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
+        self::assertEquals($dataCollector->getAccessDecisionLog(), $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
 
-        $this->assertSame(
-            array_map(function ($classStub) { return (string) $classStub; }, $dataCollector->getVoters()),
-            $expectedVoterClasses,
-            'Wrong value returned by getVoters'
-        );
-        $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
+        self::assertSame(array_map(function ($classStub) { return (string) $classStub; }, $dataCollector->getVoters()), $expectedVoterClasses, 'Wrong value returned by getVoters');
+        self::assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
     public function provideRoles()

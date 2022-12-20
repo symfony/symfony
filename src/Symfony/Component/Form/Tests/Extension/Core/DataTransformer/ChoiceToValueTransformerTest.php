@@ -52,8 +52,8 @@ class ChoiceToValueTransformerTest extends TestCase
      */
     public function testTransform($in, $out, $inWithNull, $outWithNull)
     {
-        $this->assertSame($out, $this->transformer->transform($in));
-        $this->assertSame($outWithNull, $this->transformerWithNull->transform($inWithNull));
+        self::assertSame($out, $this->transformer->transform($in));
+        self::assertSame($outWithNull, $this->transformerWithNull->transform($inWithNull));
     }
 
     public function reverseTransformProvider()
@@ -73,8 +73,8 @@ class ChoiceToValueTransformerTest extends TestCase
      */
     public function testReverseTransform($in, $out, $inWithNull, $outWithNull)
     {
-        $this->assertSame($out, $this->transformer->reverseTransform($in));
-        $this->assertSame($outWithNull, $this->transformerWithNull->reverseTransform($inWithNull));
+        self::assertSame($out, $this->transformer->reverseTransform($in));
+        self::assertSame($outWithNull, $this->transformerWithNull->reverseTransform($inWithNull));
     }
 
     public function reverseTransformExpectsStringOrNullProvider()
@@ -92,7 +92,7 @@ class ChoiceToValueTransformerTest extends TestCase
      */
     public function testReverseTransformExpectsStringOrNull($value)
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform($value);
     }
 }

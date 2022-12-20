@@ -33,16 +33,16 @@ class InlineFragmentRendererTest extends TestCase
 {
     public function testRender()
     {
-        $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
+        $strategy = new InlineFragmentRenderer($this->getKernel(self::returnValue(new Response('foo'))));
 
-        $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
+        self::assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     public function testRenderWithControllerReference()
     {
-        $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
+        $strategy = new InlineFragmentRenderer($this->getKernel(self::returnValue(new Response('foo'))));
 
-        $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
+        self::assertEquals('foo', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
     }
 
     public function testRenderWithObjectsAsAttributes()
@@ -58,7 +58,7 @@ class InlineFragmentRendererTest extends TestCase
 
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($subRequest));
 
-        $this->assertSame('foo', $strategy->render(new ControllerReference('main_controller', ['object' => $object], []), Request::create('/'))->getContent());
+        self::assertSame('foo', $strategy->render(new ControllerReference('main_controller', ['object' => $object], []), Request::create('/'))->getContent());
     }
 
     public function testRenderWithTrustedHeaderDisabled()
@@ -70,51 +70,48 @@ class InlineFragmentRendererTest extends TestCase
         $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
 
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
-        $this->assertSame('foo', $strategy->render('/', Request::create('/'))->getContent());
+        self::assertSame('foo', $strategy->render('/', Request::create('/'))->getContent());
 
         Request::setTrustedProxies([], -1);
     }
 
     public function testRenderExceptionNoIgnoreErrors()
     {
-        $this->expectException(\RuntimeException::class);
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects($this->never())->method('dispatch');
+        self::expectException(\RuntimeException::class);
+        $dispatcher = self::createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::never())->method('dispatch');
 
-        $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \RuntimeException('foo'))), $dispatcher);
+        $strategy = new InlineFragmentRenderer($this->getKernel(self::throwException(new \RuntimeException('foo'))), $dispatcher);
 
-        $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
+        self::assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     public function testRenderExceptionIgnoreErrors()
     {
         $exception = new \RuntimeException('foo');
-        $kernel = $this->getKernel($this->throwException($exception));
+        $kernel = $this->getKernel(self::throwException($exception));
         $request = Request::create('/');
         $expectedEvent = new ExceptionEvent($kernel, $request, $kernel::SUB_REQUEST, $exception);
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects($this->once())->method('dispatch')->with($expectedEvent, KernelEvents::EXCEPTION);
+        $dispatcher = self::createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::once())->method('dispatch')->with($expectedEvent, KernelEvents::EXCEPTION);
 
         $strategy = new InlineFragmentRenderer($kernel, $dispatcher);
 
-        $this->assertEmpty($strategy->render('/', $request, ['ignore_errors' => true])->getContent());
+        self::assertEmpty($strategy->render('/', $request, ['ignore_errors' => true])->getContent());
     }
 
     public function testRenderExceptionIgnoreErrorsWithAlt()
     {
-        $strategy = new InlineFragmentRenderer($this->getKernel($this->onConsecutiveCalls(
-            $this->throwException(new \RuntimeException('foo')),
-            $this->returnValue(new Response('bar'))
-        )));
+        $strategy = new InlineFragmentRenderer($this->getKernel(self::onConsecutiveCalls(self::throwException(new \RuntimeException('foo')), self::returnValue(new Response('bar')))));
 
-        $this->assertEquals('bar', $strategy->render('/', Request::create('/'), ['ignore_errors' => true, 'alt' => '/foo'])->getContent());
+        self::assertEquals('bar', $strategy->render('/', Request::create('/'), ['ignore_errors' => true, 'alt' => '/foo'])->getContent());
     }
 
     private function getKernel($returnValue)
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $kernel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('handle')
             ->will($returnValue)
         ;
@@ -124,9 +121,9 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
     {
-        $controllerResolver = $this->createMock(ControllerResolverInterface::class);
+        $controllerResolver = self::createMock(ControllerResolverInterface::class);
         $controllerResolver
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getController')
             ->willReturn(function () {
                 ob_start();
@@ -135,9 +132,9 @@ class InlineFragmentRendererTest extends TestCase
             })
         ;
 
-        $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
+        $argumentResolver = self::createMock(ArgumentResolverInterface::class);
         $argumentResolver
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getArguments')
             ->willReturn([])
         ;
@@ -152,7 +149,7 @@ class InlineFragmentRendererTest extends TestCase
         // simulate a sub-request with output buffering and an exception
         $renderer->render('/', Request::create('/'), ['ignore_errors' => true]);
 
-        $this->assertEquals('Foo', ob_get_clean());
+        self::assertEquals('Foo', ob_get_clean());
     }
 
     public function testLocaleAndFormatAreKeptInSubrequest()
@@ -263,11 +260,11 @@ class InlineFragmentRendererTest extends TestCase
      */
     private function getKernelExpectingRequest(Request $expectedRequest)
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $kernel
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handle')
-            ->with($this->callback(function (Request $request) use ($expectedRequest) {
+            ->with(self::callback(function (Request $request) use ($expectedRequest) {
                 $expectedRequest->server->remove('REQUEST_TIME_FLOAT');
                 $request->server->remove('REQUEST_TIME_FLOAT');
 

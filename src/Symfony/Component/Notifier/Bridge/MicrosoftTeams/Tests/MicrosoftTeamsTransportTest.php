@@ -32,7 +32,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new MicrosoftTeamsTransport('/testPath', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MicrosoftTeamsTransport('/testPath', $client ?: self::createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
@@ -48,7 +48,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSendWithErrorResponseThrows()
@@ -59,8 +59,8 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client);
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/testErrorMessage/');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessageMatches('/testErrorMessage/');
 
         $transport->send(new ChatMessage('testMessage'));
     }
@@ -71,8 +71,8 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client);
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/request-id not found/');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessageMatches('/request-id not found/');
 
         $transport->send(new ChatMessage('testMessage'));
     }
@@ -86,7 +86,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse('1', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 200]);
         });
@@ -108,7 +108,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse('1', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 200]);
         });
@@ -135,7 +135,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse('1', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 200]);
         });
@@ -155,7 +155,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse('1', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 200]);
         });

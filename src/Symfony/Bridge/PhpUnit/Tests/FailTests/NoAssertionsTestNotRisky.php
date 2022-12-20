@@ -27,6 +27,6 @@ final class NoAssertionsTestNotRisky extends TestCase
      */
     public function testOne()
     {
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
     }
 }

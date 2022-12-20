@@ -34,17 +34,17 @@ class DependencyInjectionExtensionTest extends TestCase
 
         $extension = new DependencyInjectionExtension(new ContainerBuilder(), $extensions, []);
 
-        $this->assertTrue($extension->hasTypeExtensions('test'));
-        $this->assertTrue($extension->hasTypeExtensions('other'));
-        $this->assertFalse($extension->hasTypeExtensions('unknown'));
-        $this->assertSame([$typeExtension1, $typeExtension2, $typeExtension4], $extension->getTypeExtensions('test'));
-        $this->assertSame([$typeExtension3, $typeExtension4], $extension->getTypeExtensions('other'));
+        self::assertTrue($extension->hasTypeExtensions('test'));
+        self::assertTrue($extension->hasTypeExtensions('other'));
+        self::assertFalse($extension->hasTypeExtensions('unknown'));
+        self::assertSame([$typeExtension1, $typeExtension2, $typeExtension4], $extension->getTypeExtensions('test'));
+        self::assertSame([$typeExtension3, $typeExtension4], $extension->getTypeExtensions('other'));
     }
 
     public function testThrowExceptionForInvalidExtendedType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The extended type "unmatched" specified for the type extension class "%s" does not match any of the actual extended types (["test"]).', TestTypeExtension::class));
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('The extended type "unmatched" specified for the type extension class "%s" does not match any of the actual extended types (["test"]).', TestTypeExtension::class));
 
         $extensions = [
             'unmatched' => new \ArrayIterator([new TestTypeExtension()]),
@@ -59,14 +59,14 @@ class DependencyInjectionExtensionTest extends TestCase
     {
         $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], [new FormTypeGuesserChain([])]);
 
-        $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
+        self::assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
     }
 
     public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured()
     {
         $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], []);
 
-        $this->assertNull($extension->getTypeGuesser());
+        self::assertNull($extension->getTypeGuesser());
     }
 }
 

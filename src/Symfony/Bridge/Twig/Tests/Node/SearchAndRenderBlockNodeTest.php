@@ -32,15 +32,12 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\')',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\')',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileWidgetWithVariables()
@@ -55,15 +52,12 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\', ["foo" => "bar"])',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\', ["foo" => "bar"])',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileLabelWithLabel()
@@ -75,15 +69,12 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["label" => "my label"])',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["label" => "my label"])',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileLabelWithNullLabel()
@@ -95,17 +86,14 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileLabelWithEmptyStringLabel()
@@ -117,17 +105,14 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileLabelWithDefaultLabel()
@@ -138,15 +123,12 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\')',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileLabelWithAttributes()
@@ -162,18 +144,15 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
         // https://github.com/symfony/symfony/issues/5029
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar"])',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar"])',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileLabelWithLabelAndAttributes()
@@ -191,15 +170,12 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in argument"])',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in argument"])',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileLabelWithLabelThatEvaluatesToNull()
@@ -219,18 +195,15 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
         // https://github.com/symfony/symfony/issues/5029
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes()
@@ -256,18 +229,15 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(self::createMock(LoaderInterface::class)));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
         // https://github.com/symfony/symfony/issues/5029
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in attributes"] + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in attributes"] + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     protected function getVariableGetter($name)

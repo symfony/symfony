@@ -91,7 +91,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoicesOptionExpectsArrayOrTraversable()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'choices' => new \stdClass(),
         ]);
@@ -99,7 +99,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceLoaderOptionExpectsChoiceLoaderInterface()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_loader' => new \stdClass(),
         ]);
@@ -107,7 +107,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceListAndChoicesCanBeEmpty()
     {
-        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, null, []));
+        self::assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, null, []));
     }
 
     public function testExpandedChoicesOptionsTurnIntoChildren()
@@ -117,7 +117,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => $this->choices,
         ]);
 
-        $this->assertCount(\count($this->choices), $form, 'Each choice should become a new field');
+        self::assertCount(\count($this->choices), $form, 'Each choice should become a new field');
     }
 
     public function testChoiceListWithScalarValues()
@@ -126,12 +126,12 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => $this->scalarChoices,
         ])->createView();
 
-        $this->assertSame('1', $view->vars['choices'][0]->value);
-        $this->assertSame('0', $view->vars['choices'][1]->value);
-        $this->assertSame('', $view->vars['choices'][2]->value);
-        $this->assertFalse($view->vars['is_selected']($view->vars['choices'][0], $view->vars['value']), 'True value should not be pre selected');
-        $this->assertFalse($view->vars['is_selected']($view->vars['choices'][1], $view->vars['value']), 'False value should not be pre selected');
-        $this->assertFalse($view->vars['is_selected']($view->vars['choices'][2], $view->vars['value']), 'Empty value should not be pre selected');
+        self::assertSame('1', $view->vars['choices'][0]->value);
+        self::assertSame('0', $view->vars['choices'][1]->value);
+        self::assertSame('', $view->vars['choices'][2]->value);
+        self::assertFalse($view->vars['is_selected']($view->vars['choices'][0], $view->vars['value']), 'True value should not be pre selected');
+        self::assertFalse($view->vars['is_selected']($view->vars['choices'][1], $view->vars['value']), 'False value should not be pre selected');
+        self::assertFalse($view->vars['is_selected']($view->vars['choices'][2], $view->vars['value']), 'Empty value should not be pre selected');
     }
 
     public function testChoiceListWithScalarValuesAndFalseAsPreSetData()
@@ -140,7 +140,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => $this->scalarChoices,
         ])->createView();
 
-        $this->assertTrue($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'False value should be pre selected');
+        self::assertTrue($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'False value should be pre selected');
     }
 
     public function testExpandedChoiceListWithScalarValues()
@@ -150,9 +150,9 @@ class ChoiceTypeTest extends BaseTypeTest
             'expanded' => true,
         ])->createView();
 
-        $this->assertFalse($view->children[0]->vars['checked'], 'True value should not be pre selected');
-        $this->assertFalse($view->children[1]->vars['checked'], 'False value should not be pre selected');
-        $this->assertTrue($view->children[2]->vars['checked'], 'Empty value should be pre selected');
+        self::assertFalse($view->children[0]->vars['checked'], 'True value should not be pre selected');
+        self::assertFalse($view->children[1]->vars['checked'], 'False value should not be pre selected');
+        self::assertTrue($view->children[2]->vars['checked'], 'Empty value should be pre selected');
     }
 
     public function testExpandedChoiceListWithBooleanAndNullValues()
@@ -162,9 +162,9 @@ class ChoiceTypeTest extends BaseTypeTest
             'expanded' => true,
         ])->createView();
 
-        $this->assertFalse($view->children[0]->vars['checked'], 'True value should not be pre selected');
-        $this->assertFalse($view->children[1]->vars['checked'], 'False value should not be pre selected');
-        $this->assertTrue($view->children[2]->vars['checked'], 'Empty value should be pre selected');
+        self::assertFalse($view->children[0]->vars['checked'], 'True value should not be pre selected');
+        self::assertFalse($view->children[1]->vars['checked'], 'False value should not be pre selected');
+        self::assertTrue($view->children[2]->vars['checked'], 'Empty value should be pre selected');
     }
 
     public function testExpandedChoiceListWithScalarValuesAndFalseAsPreSetData()
@@ -174,10 +174,10 @@ class ChoiceTypeTest extends BaseTypeTest
             'expanded' => true,
         ])->createView();
 
-        $this->assertSame('1', $view->vars['choices'][0]->value);
-        $this->assertSame('0', $view->vars['choices'][1]->value);
-        $this->assertTrue($view->children[1]->vars['checked'], 'False value should be pre selected');
-        $this->assertFalse($view->children[2]->vars['checked'], 'Empty value should not be pre selected');
+        self::assertSame('1', $view->vars['choices'][0]->value);
+        self::assertSame('0', $view->vars['choices'][1]->value);
+        self::assertTrue($view->children[1]->vars['checked'], 'False value should be pre selected');
+        self::assertFalse($view->children[2]->vars['checked'], 'Empty value should not be pre selected');
     }
 
     public function testExpandedChoiceListWithBooleanAndNullValuesAndFalseAsPreSetData()
@@ -187,9 +187,9 @@ class ChoiceTypeTest extends BaseTypeTest
             'expanded' => true,
         ])->createView();
 
-        $this->assertFalse($view->children[0]->vars['checked'], 'True value should not be pre selected');
-        $this->assertTrue($view->children[1]->vars['checked'], 'False value should be pre selected');
-        $this->assertFalse($view->children[2]->vars['checked'], 'Null value should not be pre selected');
+        self::assertFalse($view->children[0]->vars['checked'], 'True value should not be pre selected');
+        self::assertTrue($view->children[1]->vars['checked'], 'False value should be pre selected');
+        self::assertFalse($view->children[2]->vars['checked'], 'Null value should not be pre selected');
     }
 
     public function testPlaceholderPresentOnNonRequiredExpandedSingleChoice()
@@ -201,8 +201,8 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => $this->choices,
         ]);
 
-        $this->assertArrayHasKey('placeholder', $form);
-        $this->assertCount(\count($this->choices) + 1, $form, 'Each choice should become a new field');
+        self::assertArrayHasKey('placeholder', $form);
+        self::assertCount(\count($this->choices) + 1, $form, 'Each choice should become a new field');
     }
 
     public function testPlaceholderNotPresentIfRequired()
@@ -214,8 +214,8 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => $this->choices,
         ]);
 
-        $this->assertArrayNotHasKey('placeholder', $form);
-        $this->assertCount(\count($this->choices), $form, 'Each choice should become a new field');
+        self::assertArrayNotHasKey('placeholder', $form);
+        self::assertCount(\count($this->choices), $form, 'Each choice should become a new field');
     }
 
     public function testPlaceholderNotPresentIfMultiple()
@@ -227,8 +227,8 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => $this->choices,
         ]);
 
-        $this->assertArrayNotHasKey('placeholder', $form);
-        $this->assertCount(\count($this->choices), $form, 'Each choice should become a new field');
+        self::assertArrayNotHasKey('placeholder', $form);
+        self::assertCount(\count($this->choices), $form, 'Each choice should become a new field');
     }
 
     public function testPlaceholderNotPresentIfEmptyChoice()
@@ -243,8 +243,8 @@ class ChoiceTypeTest extends BaseTypeTest
             ],
         ]);
 
-        $this->assertArrayNotHasKey('placeholder', $form);
-        $this->assertCount(2, $form, 'Each choice should become a new field');
+        self::assertArrayNotHasKey('placeholder', $form);
+        self::assertCount(2, $form, 'Each choice should become a new field');
     }
 
     public function testPlaceholderWithBooleanChoices()
@@ -261,10 +261,10 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('', $view->vars['value'], 'Value should be empty');
-        $this->assertSame('1', $view->vars['choices'][0]->value);
-        $this->assertSame('0', $view->vars['choices'][1]->value, 'Choice "false" should have "0" as value');
-        $this->assertFalse($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'Choice "false" should not be selected');
+        self::assertSame('', $view->vars['value'], 'Value should be empty');
+        self::assertSame('1', $view->vars['choices'][0]->value);
+        self::assertSame('0', $view->vars['choices'][1]->value, 'Choice "false" should have "0" as value');
+        self::assertFalse($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'Choice "false" should not be selected');
     }
 
     public function testPlaceholderWithBooleanChoicesWithFalseAsPreSetData()
@@ -281,10 +281,10 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('0', $view->vars['value'], 'Value should be "0"');
-        $this->assertSame('1', $view->vars['choices'][0]->value);
-        $this->assertSame('0', $view->vars['choices'][1]->value, 'Choice "false" should have "0" as value');
-        $this->assertTrue($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'Choice "false" should be selected');
+        self::assertSame('0', $view->vars['value'], 'Value should be "0"');
+        self::assertSame('1', $view->vars['choices'][0]->value);
+        self::assertSame('0', $view->vars['choices'][1]->value, 'Choice "false" should have "0" as value');
+        self::assertTrue($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'Choice "false" should be selected');
     }
 
     public function testPlaceholderWithExpandedBooleanChoices()
@@ -300,15 +300,15 @@ class ChoiceTypeTest extends BaseTypeTest
             'placeholder' => 'Select an option',
         ]);
 
-        $this->assertArrayHasKey('placeholder', $form, 'Placeholder should be set');
-        $this->assertCount(3, $form, 'Each choice should become a new field, placeholder included');
+        self::assertArrayHasKey('placeholder', $form, 'Placeholder should be set');
+        self::assertCount(3, $form, 'Each choice should become a new field, placeholder included');
 
         $view = $form->createView();
 
-        $this->assertSame('', $view->vars['value'], 'Value should be an empty string');
-        $this->assertSame('1', $view->vars['choices'][0]->value);
-        $this->assertSame('0', $view->vars['choices'][1]->value, 'Choice "false" should have "0" as value');
-        $this->assertFalse($view->children[1]->vars['checked'], 'Choice "false" should not be selected');
+        self::assertSame('', $view->vars['value'], 'Value should be an empty string');
+        self::assertSame('1', $view->vars['choices'][0]->value);
+        self::assertSame('0', $view->vars['choices'][1]->value, 'Choice "false" should have "0" as value');
+        self::assertFalse($view->children[1]->vars['checked'], 'Choice "false" should not be selected');
     }
 
     public function testPlaceholderWithExpandedBooleanChoicesAndWithFalseAsPreSetData()
@@ -324,15 +324,15 @@ class ChoiceTypeTest extends BaseTypeTest
             'placeholder' => 'Select an option',
         ]);
 
-        $this->assertArrayHasKey('placeholder', $form, 'Placeholder should be set');
-        $this->assertCount(3, $form, 'Each choice should become a new field, placeholder included');
+        self::assertArrayHasKey('placeholder', $form, 'Placeholder should be set');
+        self::assertCount(3, $form, 'Each choice should become a new field, placeholder included');
 
         $view = $form->createView();
 
-        $this->assertSame('0', $view->vars['value'], 'Value should be "0"');
-        $this->assertSame('1', $view->vars['choices'][0]->value);
-        $this->assertSame('0', $view->vars['choices'][1]->value, 'Choice "false" should have "0" as value');
-        $this->assertTrue($view->children[1]->vars['checked'], 'Choice "false" should be selected');
+        self::assertSame('0', $view->vars['value'], 'Value should be "0"');
+        self::assertSame('1', $view->vars['choices'][0]->value);
+        self::assertSame('0', $view->vars['choices'][1]->value, 'Choice "false" should have "0" as value');
+        self::assertTrue($view->children[1]->vars['checked'], 'Choice "false" should be selected');
     }
 
     public function testExpandedChoicesOptionsAreFlattened()
@@ -347,10 +347,10 @@ class ChoiceTypeTest extends BaseTypeTest
             $flattened = array_merge($flattened, array_keys($choices));
         }
 
-        $this->assertCount($form->count(), $flattened, 'Each nested choice should become a new field, not the groups');
+        self::assertCount($form->count(), $flattened, 'Each nested choice should become a new field, not the groups');
 
         foreach ($flattened as $value => $choice) {
-            $this->assertTrue($form->has($value), 'Flattened choice is named after it\'s value');
+            self::assertTrue($form->has($value), 'Flattened choice is named after it\'s value');
         }
     }
 
@@ -371,12 +371,12 @@ class ChoiceTypeTest extends BaseTypeTest
             'choice_name' => 'id',
         ]);
 
-        $this->assertSame(5, $form->count(), 'Each nested choice should become a new field, not the groups');
-        $this->assertTrue($form->has(1));
-        $this->assertTrue($form->has(2));
-        $this->assertTrue($form->has(3));
-        $this->assertTrue($form->has(4));
-        $this->assertTrue($form->has(5));
+        self::assertSame(5, $form->count(), 'Each nested choice should become a new field, not the groups');
+        self::assertTrue($form->has(1));
+        self::assertTrue($form->has(2));
+        self::assertTrue($form->has(3));
+        self::assertTrue($form->has(4));
+        self::assertTrue($form->has(5));
     }
 
     public function testExpandedCheckboxesAreNeverRequired()
@@ -389,7 +389,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         foreach ($form as $child) {
-            $this->assertFalse($child->isRequired());
+            self::assertFalse($child->isRequired());
         }
     }
 
@@ -403,7 +403,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         foreach ($form as $child) {
-            $this->assertTrue($child->getConfig()->getOption('label_html'));
+            self::assertTrue($child->getConfig()->getOption('label_html'));
         }
     }
 
@@ -417,7 +417,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         foreach ($form as $child) {
-            $this->assertTrue($child->isRequired());
+            self::assertTrue($child->isRequired());
         }
     }
 
@@ -431,7 +431,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         foreach ($form as $child) {
-            $this->assertFalse($child->isRequired());
+            self::assertFalse($child->isRequired());
         }
     }
 
@@ -445,7 +445,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         foreach ($form as $child) {
-            $this->assertTrue($child->getConfig()->getOption('label_html'));
+            self::assertTrue($child->getConfig()->getOption('label_html'));
         }
     }
 
@@ -459,9 +459,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('b');
 
-        $this->assertEquals('b', $form->getData());
-        $this->assertEquals('b', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertEquals('b', $form->getData());
+        self::assertEquals('b', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleNonExpandedInvalidChoice()
@@ -474,9 +474,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('foobar');
 
-        $this->assertNull($form->getData());
-        $this->assertEquals('foobar', $form->getViewData());
-        $this->assertFalse($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertEquals('foobar', $form->getViewData());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testSubmitSingleNonExpandedNull()
@@ -489,9 +489,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -507,10 +507,10 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertSame('', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleNonExpandedEmpty()
@@ -523,9 +523,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleNonExpandedEmptyExplicitEmptyChoice()
@@ -543,9 +543,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('');
 
-        $this->assertSame('EMPTY_CHOICE', $form->getData());
-        $this->assertSame('', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame('EMPTY_CHOICE', $form->getData());
+        self::assertSame('', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -561,9 +561,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleNonExpandedFalse()
@@ -576,9 +576,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(false);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -594,9 +594,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(false);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleNonExpandedObjectChoices()
@@ -612,9 +612,9 @@ class ChoiceTypeTest extends BaseTypeTest
         // "id" value of the second entry
         $form->submit('2');
 
-        $this->assertEquals($this->objectChoices[1], $form->getData());
-        $this->assertEquals('2', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertEquals($this->objectChoices[1], $form->getData());
+        self::assertEquals('2', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
@@ -629,7 +629,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame($emptyData, $form->getData());
+        self::assertSame($emptyData, $form->getData());
     }
 
     public function testSubmitSingleChoiceWithEmptyDataAndInitialData()
@@ -643,7 +643,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame('test', $form->getData());
+        self::assertSame('test', $form->getData());
     }
 
     public function testSubmitMultipleChoiceWithEmptyData()
@@ -657,7 +657,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame(['test'], $form->getData());
+        self::assertSame(['test'], $form->getData());
     }
 
     public function testSubmitMultipleChoiceWithEmptyDataAndInitialEmptyArray()
@@ -671,7 +671,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame(['test'], $form->getData());
+        self::assertSame(['test'], $form->getData());
     }
 
     public function testSubmitMultipleChoiceWithEmptyDataAndInitialData()
@@ -685,7 +685,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame(['test'], $form->getData());
+        self::assertSame(['test'], $form->getData());
     }
 
     public function testSubmitSingleChoiceExpandedWithEmptyData()
@@ -699,7 +699,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame('test', $form->getData());
+        self::assertSame('test', $form->getData());
     }
 
     public function testSubmitSingleChoiceExpandedWithEmptyDataAndInitialData()
@@ -713,7 +713,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame('test', $form->getData());
+        self::assertSame('test', $form->getData());
     }
 
     public function testSubmitMultipleChoiceExpandedWithEmptyData()
@@ -727,7 +727,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame(['test'], $form->getData());
+        self::assertSame(['test'], $form->getData());
     }
 
     public function testSubmitMultipleChoiceExpandedWithEmptyDataAndInitialEmptyArray()
@@ -741,7 +741,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame(['test'], $form->getData());
+        self::assertSame(['test'], $form->getData());
     }
 
     public function testSubmitMultipleChoiceExpandedWithEmptyDataAndInitialData()
@@ -755,7 +755,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame(['test'], $form->getData());
+        self::assertSame(['test'], $form->getData());
     }
 
     public function testNullChoices()
@@ -765,9 +765,9 @@ class ChoiceTypeTest extends BaseTypeTest
             'expanded' => false,
             'choices' => null,
         ]);
-        $this->assertNull($form->getConfig()->getOption('choices'));
-        $this->assertFalse($form->getConfig()->getOption('multiple'));
-        $this->assertFalse($form->getConfig()->getOption('expanded'));
+        self::assertNull($form->getConfig()->getOption('choices'));
+        self::assertFalse($form->getConfig()->getOption('multiple'));
+        self::assertFalse($form->getConfig()->getOption('expanded'));
     }
 
     public function testSubmitMultipleNonExpanded()
@@ -780,9 +780,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'b']);
 
-        $this->assertEquals(['a', 'b'], $form->getData());
-        $this->assertEquals(['a', 'b'], $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertEquals(['a', 'b'], $form->getData());
+        self::assertEquals(['a', 'b'], $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitMultipleNonExpandedEmpty()
@@ -795,9 +795,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit([]);
 
-        $this->assertSame([], $form->getData());
-        $this->assertSame([], $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame([], $form->getData());
+        self::assertSame([], $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -813,9 +813,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit([]);
 
-        $this->assertSame([], $form->getData());
-        $this->assertSame([], $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame([], $form->getData());
+        self::assertSame([], $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitMultipleNonExpandedInvalidScalarChoice()
@@ -828,9 +828,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('foobar');
 
-        $this->assertNull($form->getData());
-        $this->assertEquals('foobar', $form->getViewData());
-        $this->assertFalse($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertEquals('foobar', $form->getViewData());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testSubmitMultipleNonExpandedInvalidArrayChoice()
@@ -843,9 +843,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'foobar']);
 
-        $this->assertEquals(['a'], $form->getData());
-        $this->assertEquals(['a'], $form->getViewData());
-        $this->assertFalse($form->isValid());
+        self::assertEquals(['a'], $form->getData());
+        self::assertEquals(['a'], $form->getViewData());
+        self::assertFalse($form->isValid());
     }
 
     public function testSubmitMultipleNonExpandedObjectChoices()
@@ -860,9 +860,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['2', '3']);
 
-        $this->assertEquals([$this->objectChoices[1], $this->objectChoices[2]], $form->getData());
-        $this->assertEquals(['2', '3'], $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertEquals([$this->objectChoices[1], $this->objectChoices[2]], $form->getData());
+        self::assertEquals(['2', '3'], $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleExpandedRequired()
@@ -876,21 +876,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('b');
 
-        $this->assertSame('b', $form->getData());
-        $this->assertSame('b', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame('b', $form->getData());
+        self::assertSame('b', $form->getViewData());
+        self::assertEmpty($form->getExtraData());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertTrue($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertSame('b', $form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertTrue($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertSame('b', $form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitSingleExpandedRequiredInvalidChoice()
@@ -904,21 +904,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('foobar');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('foobar', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
-        $this->assertFalse($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('foobar', $form->getViewData());
+        self::assertEmpty($form->getExtraData());
+        self::assertFalse($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitSingleExpandedNonRequired()
@@ -932,23 +932,23 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('b');
 
-        $this->assertSame('b', $form->getData());
-        $this->assertSame('b', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame('b', $form->getData());
+        self::assertSame('b', $form->getViewData());
+        self::assertEmpty($form->getExtraData());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertFalse($form['placeholder']->getData());
-        $this->assertFalse($form[0]->getData());
-        $this->assertTrue($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form['placeholder']->getViewData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertSame('b', $form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form['placeholder']->getData());
+        self::assertFalse($form[0]->getData());
+        self::assertTrue($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form['placeholder']->getViewData());
+        self::assertNull($form[0]->getViewData());
+        self::assertSame('b', $form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitSingleExpandedNonRequiredInvalidChoice()
@@ -962,21 +962,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('foobar');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('foobar', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
-        $this->assertFalse($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('foobar', $form->getViewData());
+        self::assertEmpty($form->getExtraData());
+        self::assertFalse($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitSingleExpandedRequiredNull()
@@ -990,21 +990,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -1021,10 +1021,10 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleExpandedRequiredEmpty()
@@ -1038,21 +1038,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -1069,10 +1069,10 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleExpandedRequiredFalse()
@@ -1086,21 +1086,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(false);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -1117,10 +1117,10 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(false);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleExpandedNonRequiredNull()
@@ -1134,23 +1134,23 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertTrue($form['placeholder']->getData());
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertSame('', $form['placeholder']->getViewData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertTrue($form['placeholder']->getData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertSame('', $form['placeholder']->getViewData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -1167,10 +1167,10 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleExpandedNonRequiredEmpty()
@@ -1184,23 +1184,23 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertTrue($form['placeholder']->getData());
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertSame('', $form['placeholder']->getViewData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertTrue($form['placeholder']->getData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertSame('', $form['placeholder']->getViewData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -1217,10 +1217,10 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleExpandedNonRequiredFalse()
@@ -1234,23 +1234,23 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(false);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertTrue($form['placeholder']->getData());
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertSame('', $form['placeholder']->getViewData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertTrue($form['placeholder']->getData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertSame('', $form['placeholder']->getViewData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -1267,10 +1267,10 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(false);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData(), 'View data should always be a string');
-        $this->assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData(), 'View data should always be a string');
+        self::assertSame([], $form->getExtraData(), 'ChoiceType is compound when expanded, extra data should always be an array');
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleExpandedWithEmptyChild()
@@ -1286,13 +1286,13 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('');
 
-        $this->assertSame('', $form->getData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame('', $form->getData());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertTrue($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertSame('', $form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
+        self::assertTrue($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertSame('', $form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
     }
 
     public function testSubmitSingleExpandedObjectChoices()
@@ -1307,19 +1307,19 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('2');
 
-        $this->assertSame($this->objectChoices[1], $form->getData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame($this->objectChoices[1], $form->getData());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertTrue($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertSame('2', $form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertTrue($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertSame('2', $form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitSingleExpandedClearMissingFalse()
@@ -1333,7 +1333,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
         $form->submit('bar', false);
 
-        $this->assertSame('bar', $form->getData());
+        self::assertSame('bar', $form->getData());
     }
 
     public function testSubmitMultipleExpanded()
@@ -1346,21 +1346,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'c']);
 
-        $this->assertSame(['a', 'c'], $form->getData());
-        $this->assertSame(['a', 'c'], $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame(['a', 'c'], $form->getData());
+        self::assertSame(['a', 'c'], $form->getViewData());
+        self::assertEmpty($form->getExtraData());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertTrue($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertTrue($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertSame('a', $form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertSame('c', $form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertTrue($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertTrue($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertSame('a', $form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertSame('c', $form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitMultipleExpandedInvalidScalarChoice()
@@ -1373,21 +1373,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('foobar');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('foobar', $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
-        $this->assertFalse($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertSame('foobar', $form->getViewData());
+        self::assertEmpty($form->getExtraData());
+        self::assertFalse($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitMultipleExpandedInvalidArrayChoice()
@@ -1400,21 +1400,21 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'foobar']);
 
-        $this->assertSame(['a'], $form->getData());
-        $this->assertSame(['a'], $form->getViewData());
-        $this->assertEmpty($form->getExtraData());
-        $this->assertFalse($form->isValid());
+        self::assertSame(['a'], $form->getData());
+        self::assertSame(['a'], $form->getViewData());
+        self::assertEmpty($form->getExtraData());
+        self::assertFalse($form->isValid());
 
-        $this->assertTrue($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertSame('a', $form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertTrue($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertSame('a', $form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitMultipleExpandedEmpty()
@@ -1427,19 +1427,19 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit([]);
 
-        $this->assertSame([], $form->getData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame([], $form->getData());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertFalse($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertFalse($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertNull($form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     // In edge cases (for example, when choices are loaded dynamically by a
@@ -1455,8 +1455,8 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit([]);
 
-        $this->assertSame([], $form->getData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame([], $form->getData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitMultipleExpandedWithEmptyChild()
@@ -1473,15 +1473,15 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['', '2']);
 
-        $this->assertSame(['', 2], $form->getData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame(['', 2], $form->getData());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertTrue($form[0]->getData());
-        $this->assertFalse($form[1]->getData());
-        $this->assertTrue($form[2]->getData());
-        $this->assertSame('', $form[0]->getViewData());
-        $this->assertNull($form[1]->getViewData());
-        $this->assertSame('2', $form[2]->getViewData());
+        self::assertTrue($form[0]->getData());
+        self::assertFalse($form[1]->getData());
+        self::assertTrue($form[2]->getData());
+        self::assertSame('', $form[0]->getViewData());
+        self::assertNull($form[1]->getViewData());
+        self::assertSame('2', $form[2]->getViewData());
     }
 
     public function testSubmitMultipleExpandedObjectChoices()
@@ -1496,19 +1496,19 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['1', '2']);
 
-        $this->assertSame([$this->objectChoices[0], $this->objectChoices[1]], $form->getData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame([$this->objectChoices[0], $this->objectChoices[1]], $form->getData());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertTrue($form[0]->getData());
-        $this->assertTrue($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertSame('1', $form[0]->getViewData());
-        $this->assertSame('2', $form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
+        self::assertTrue($form[0]->getData());
+        self::assertTrue($form[1]->getData());
+        self::assertFalse($form[2]->getData());
+        self::assertFalse($form[3]->getData());
+        self::assertFalse($form[4]->getData());
+        self::assertSame('1', $form[0]->getViewData());
+        self::assertSame('2', $form[1]->getViewData());
+        self::assertNull($form[2]->getViewData());
+        self::assertNull($form[3]->getViewData());
+        self::assertNull($form[4]->getViewData());
     }
 
     public function testSubmitMultipleChoicesInts()
@@ -1520,7 +1520,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit([1, 2]);
 
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSingleSelectedObjectChoices()
@@ -1537,8 +1537,8 @@ class ChoiceTypeTest extends BaseTypeTest
         /** @var callable $selectedChecker */
         $selectedChecker = $view->vars['is_selected'];
 
-        $this->assertTrue($selectedChecker($view->vars['choices'][3]->value, $view->vars['value']));
-        $this->assertFalse($selectedChecker($view->vars['choices'][1]->value, $view->vars['value']));
+        self::assertTrue($selectedChecker($view->vars['choices'][3]->value, $view->vars['value']));
+        self::assertFalse($selectedChecker($view->vars['choices'][1]->value, $view->vars['value']));
     }
 
     public function testMultipleSelectedObjectChoices()
@@ -1555,8 +1555,8 @@ class ChoiceTypeTest extends BaseTypeTest
         /** @var callable $selectedChecker */
         $selectedChecker = $view->vars['is_selected'];
 
-        $this->assertTrue($selectedChecker($view->vars['choices'][3]->value, $view->vars['value']));
-        $this->assertFalse($selectedChecker($view->vars['choices'][1]->value, $view->vars['value']));
+        self::assertTrue($selectedChecker($view->vars['choices'][3]->value, $view->vars['value']));
+        self::assertFalse($selectedChecker($view->vars['choices'][1]->value, $view->vars['value']));
     }
 
     public function testPassRequiredToView()
@@ -1566,7 +1566,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertTrue($view->vars['required']);
+        self::assertTrue($view->vars['required']);
     }
 
     public function testPassNonRequiredToView()
@@ -1577,7 +1577,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertFalse($view->vars['required']);
+        self::assertFalse($view->vars['required']);
     }
 
     public function testPassMultipleToView()
@@ -1588,7 +1588,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertTrue($view->vars['multiple']);
+        self::assertTrue($view->vars['multiple']);
     }
 
     public function testPassExpandedToView()
@@ -1599,7 +1599,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertTrue($view->vars['expanded']);
+        self::assertTrue($view->vars['expanded']);
     }
 
     public function testPassChoiceTranslationDomainToView()
@@ -1609,7 +1609,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertNull($view->vars['choice_translation_domain']);
+        self::assertNull($view->vars['choice_translation_domain']);
     }
 
     public function testChoiceTranslationDomainWithTrueValueToView()
@@ -1620,7 +1620,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertNull($view->vars['choice_translation_domain']);
+        self::assertNull($view->vars['choice_translation_domain']);
     }
 
     public function testDefaultChoiceTranslationDomainIsSameAsTranslationDomainToView()
@@ -1631,7 +1631,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals('foo', $view->vars['choice_translation_domain']);
+        self::assertEquals('foo', $view->vars['choice_translation_domain']);
     }
 
     public function testInheritChoiceTranslationDomainFromParent()
@@ -1644,7 +1644,7 @@ class ChoiceTypeTest extends BaseTypeTest
             ->getForm()
             ->createView();
 
-        $this->assertEquals('domain', $view['child']->vars['choice_translation_domain']);
+        self::assertEquals('domain', $view['child']->vars['choice_translation_domain']);
     }
 
     public function testPlaceholderIsNullByDefaultIfRequired()
@@ -1656,7 +1656,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertNull($view->vars['placeholder']);
+        self::assertNull($view->vars['placeholder']);
     }
 
     public function testPlaceholderIsEmptyStringByDefaultIfNotRequired()
@@ -1668,7 +1668,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('', $view->vars['placeholder']);
+        self::assertSame('', $view->vars['placeholder']);
     }
 
     /**
@@ -1685,8 +1685,8 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame($viewValue, $view->vars['placeholder']);
-        $this->assertFalse($view->vars['placeholder_in_choices']);
+        self::assertSame($viewValue, $view->vars['placeholder']);
+        self::assertFalse($view->vars['placeholder_in_choices']);
     }
 
     /**
@@ -1703,8 +1703,8 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertNull($view->vars['placeholder']);
-        $this->assertTrue($view->vars['placeholder_in_choices']);
+        self::assertNull($view->vars['placeholder']);
+        self::assertTrue($view->vars['placeholder_in_choices']);
     }
 
     public function getOptionsWithPlaceholder()
@@ -1759,7 +1759,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView('a', 'a', 'A'),
             new ChoiceView('b', 'b', 'B'),
             new ChoiceView('c', 'c', 'C'),
@@ -1776,13 +1776,13 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             0 => new ChoiceView('a', 'a', 'A'),
             1 => new ChoiceView('b', 'b', 'B'),
             2 => new ChoiceView('c', 'c', 'C'),
             3 => new ChoiceView('d', 'd', 'D'),
         ], $view->vars['choices']);
-        $this->assertEquals([
+        self::assertEquals([
             1 => new ChoiceView('b', 'b', 'B'),
             3 => new ChoiceView('d', 'd', 'D'),
         ], $view->vars['preferred_choices']);
@@ -1796,7 +1796,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             'Symfony' => new ChoiceGroupView('Symfony', [
                 0 => new ChoiceView('a', 'a', 'Bernhard'),
                 1 => new ChoiceView('b', 'b', 'Fabien'),
@@ -1807,7 +1807,7 @@ class ChoiceTypeTest extends BaseTypeTest
                 4 => new ChoiceView('e', 'e', 'Roman'),
             ]),
         ], $view->vars['choices']);
-        $this->assertEquals([
+        self::assertEquals([
             'Symfony' => new ChoiceGroupView('Symfony', [
                 1 => new ChoiceView('b', 'b', 'Fabien'),
             ]),
@@ -1842,7 +1842,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView($obj1, 'a', 'A', ['attr1' => 'value1'], ['%placeholder1%' => 'value1']),
             new ChoiceView($obj2, 'b', 'B', ['attr2' => 'value2'], ['%placeholder2%' => 'value2']),
             new ChoiceView($obj3, 'c', 'C', ['attr3' => 'value3'], ['%placeholder3%' => 'value3']),
@@ -1859,7 +1859,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('name[]', $view->vars['full_name']);
+        self::assertSame('name[]', $view->vars['full_name']);
     }
 
     public function testInvalidMessageAwarenessForMultiple()
@@ -1872,7 +1872,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         $form->submit(['My invalid choice']);
-        $this->assertEquals("ERROR: You are not able to use value \"My invalid choice\"\n", (string) $form->getErrors(true));
+        self::assertEquals("ERROR: You are not able to use value \"My invalid choice\"\n", (string) $form->getErrors(true));
     }
 
     public function testInvalidMessageAwarenessForMultipleWithoutScalarOrArrayViewData()
@@ -1885,16 +1885,15 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         $form->submit(new \stdClass());
-        $this->assertEquals("ERROR: You are not able to use value \"stdClass\"\n", (string) $form->getErrors(true));
+        self::assertEquals("ERROR: You are not able to use value \"stdClass\"\n", (string) $form->getErrors(true));
     }
 
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
-        $this->assertInstanceOf(
-            FormInterface::class, $this->factory->createNamed('name', static::TESTED_TYPE, null, [
-            'choices' => [],
-        ]));
+        self::assertInstanceOf(FormInterface::class, $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        'choices' => [],
+    ]));
     }
 
     public function testInitializeWithDefaultObjectChoice()
@@ -1914,7 +1913,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         // Trigger data initialization
-        $this->assertSame('c', $form->getViewData());
+        self::assertSame('c', $form->getViewData());
     }
 
     /**
@@ -1939,7 +1938,7 @@ class ChoiceTypeTest extends BaseTypeTest
         // The default 'choices' normalizer would fill the $choiceLabels, but it has been replaced
         // in the custom choice type, so $choiceLabels->labels remains empty array.
         // In this case the 'choice_label' closure returns null and not the closure from the first choice type.
-        $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
+        self::assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
     }
 
     /**
@@ -1954,12 +1953,12 @@ class ChoiceTypeTest extends BaseTypeTest
         ]);
 
         $form->submit($submissionData);
-        $this->assertFalse($form->isSynchronized());
-        $this->assertInstanceOf(TransformationFailedException::class, $form->getTransformationFailure());
+        self::assertFalse($form->isSynchronized());
+        self::assertInstanceOf(TransformationFailedException::class, $form->getTransformationFailure());
         if (!$multiple && !$expanded) {
-            $this->assertEquals('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+            self::assertEquals('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
         } else {
-            $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
+            self::assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
         }
     }
 
@@ -1983,7 +1982,7 @@ class ChoiceTypeTest extends BaseTypeTest
             ->getForm()
             ->createView();
 
-        $this->assertEquals('domain', $view['child']->vars['translation_domain']);
+        self::assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
     public function testPassTranslationDomainToView()
@@ -1993,7 +1992,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('domain', $view->vars['translation_domain']);
+        self::assertSame('domain', $view->vars['translation_domain']);
     }
 
     public function testPreferOwnTranslationDomain()
@@ -2008,7 +2007,7 @@ class ChoiceTypeTest extends BaseTypeTest
             ->getForm()
             ->createView();
 
-        $this->assertEquals('domain', $view['child']->vars['translation_domain']);
+        self::assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
     public function testDefaultTranslationDomain()
@@ -2018,7 +2017,7 @@ class ChoiceTypeTest extends BaseTypeTest
             ->getForm()
             ->createView();
 
-        $this->assertNull($view['child']->vars['translation_domain']);
+        self::assertNull($view['child']->vars['translation_domain']);
     }
 
     public function testPassMultipartFalseToView()
@@ -2026,7 +2025,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE, null)
             ->createView();
 
-        $this->assertFalse($view->vars['multipart']);
+        self::assertFalse($view->vars['multipart']);
     }
 
     public function testPassLabelToView()
@@ -2036,7 +2035,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('My label', $view->vars['label']);
+        self::assertSame('My label', $view->vars['label']);
     }
 
     public function testPassIdAndNameToViewWithGrandParent()
@@ -2046,9 +2045,9 @@ class ChoiceTypeTest extends BaseTypeTest
         $builder->get('child')->add('grand_child', static::TESTED_TYPE);
         $view = $builder->getForm()->createView();
 
-        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
-        $this->assertEquals('grand_child', $view['child']['grand_child']->vars['name']);
-        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
+        self::assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
+        self::assertEquals('grand_child', $view['child']['grand_child']->vars['name']);
+        self::assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
     }
 
     public function testPassIdAndNameToViewWithParent()
@@ -2058,9 +2057,9 @@ class ChoiceTypeTest extends BaseTypeTest
             ->getForm()
             ->createView();
 
-        $this->assertEquals('parent_child', $view['child']->vars['id']);
-        $this->assertEquals('child', $view['child']->vars['name']);
-        $this->assertEquals('parent[child]', $view['child']->vars['full_name']);
+        self::assertEquals('parent_child', $view['child']->vars['id']);
+        self::assertEquals('child', $view['child']->vars['name']);
+        self::assertEquals('parent[child]', $view['child']->vars['full_name']);
     }
 
     public function testPassDisabledAsOption()
@@ -2069,7 +2068,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'disabled' => true,
         ]);
 
-        $this->assertTrue($form->isDisabled());
+        self::assertTrue($form->isDisabled());
     }
 
     public function testPassIdAndNameToView()
@@ -2077,9 +2076,9 @@ class ChoiceTypeTest extends BaseTypeTest
         $view = $this->factory->createNamed('name', static::TESTED_TYPE, null)
             ->createView();
 
-        $this->assertEquals('name', $view->vars['id']);
-        $this->assertEquals('name', $view->vars['name']);
-        $this->assertEquals('name', $view->vars['full_name']);
+        self::assertEquals('name', $view->vars['id']);
+        self::assertEquals('name', $view->vars['name']);
+        self::assertEquals('name', $view->vars['full_name']);
     }
 
     public function testStripLeadingUnderscoresAndDigitsFromId()
@@ -2087,9 +2086,9 @@ class ChoiceTypeTest extends BaseTypeTest
         $view = $this->factory->createNamed('_09name', static::TESTED_TYPE, null)
             ->createView();
 
-        $this->assertEquals('name', $view->vars['id']);
-        $this->assertEquals('_09name', $view->vars['name']);
-        $this->assertEquals('_09name', $view->vars['full_name']);
+        self::assertEquals('name', $view->vars['id']);
+        self::assertEquals('_09name', $view->vars['name']);
+        self::assertEquals('_09name', $view->vars['full_name']);
     }
 
     public function testSubFormTranslationDomain()
@@ -2105,9 +2104,9 @@ class ChoiceTypeTest extends BaseTypeTest
             'expanded' => true,
         ])->createView();
 
-        $this->assertCount(2, $form->children);
-        $this->assertSame('choice_translation_domain', $form->children[0]->vars['translation_domain']);
-        $this->assertSame('choice_translation_domain', $form->children[1]->vars['translation_domain']);
+        self::assertCount(2, $form->children);
+        self::assertSame('choice_translation_domain', $form->children[0]->vars['translation_domain']);
+        self::assertSame('choice_translation_domain', $form->children[1]->vars['translation_domain']);
     }
 
     /**
@@ -2128,12 +2127,12 @@ class ChoiceTypeTest extends BaseTypeTest
         $form->submit($multiple ? (array) $submittedData : $submittedData);
 
         // When the choice does not exist the transformation fails
-        $this->assertFalse($form->isValid());
+        self::assertFalse($form->isValid());
 
         if ($multiple) {
-            $this->assertSame([], $form->getData());
+            self::assertSame([], $form->getData());
         } else {
-            $this->assertNull($form->getData());
+            self::assertNull($form->getData());
         }
     }
 
@@ -2154,8 +2153,8 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace);
 
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace, $form->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame($multiple ? (array) $valueWhitWhiteSpace : $valueWhitWhiteSpace, $form->getData());
     }
 
     public function provideTrimCases()
@@ -2190,7 +2189,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit($submittedData);
 
-        $this->assertSame($expected, $form->isEmpty());
+        self::assertSame($expected, $form->isEmpty());
     }
 
     public function expandedIsEmptyWhenNoRealChoiceIsSelectedProvider()
@@ -2218,7 +2217,7 @@ class ChoiceTypeTest extends BaseTypeTest
             },
         ]);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView('a', 'a', 'Bernhard'),
             new ChoiceView('b', 'b', 'Fabien'),
             new ChoiceView('c', 'c', 'Kris'),
@@ -2234,7 +2233,7 @@ class ChoiceTypeTest extends BaseTypeTest
             },
         ]);
 
-        $this->assertEquals(['Symfony' => new ChoiceGroupView('Symfony', [
+        self::assertEquals(['Symfony' => new ChoiceGroupView('Symfony', [
             new ChoiceView('a', 'a', 'Bernhard'),
             new ChoiceView('b', 'b', 'Fabien'),
             new ChoiceView('c', 'c', 'Kris'),
@@ -2252,7 +2251,7 @@ class ChoiceTypeTest extends BaseTypeTest
             },
         ]);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView('a', 'a', 'Bernhard'),
             new ChoiceView('b', 'b', 'Fabien'),
             new ChoiceView('c', 'c', 'Kris'),
@@ -2290,12 +2289,12 @@ class ChoiceTypeTest extends BaseTypeTest
             ->createView()
         ;
 
-        $this->assertSame('1', $view['choice_one']->vars['choices'][0]->value);
-        $this->assertSame('2', $view['choice_one']->vars['choices'][1]->value);
-        $this->assertSame('3', $view['choice_one']->vars['choices'][2]->value);
+        self::assertSame('1', $view['choice_one']->vars['choices'][0]->value);
+        self::assertSame('2', $view['choice_one']->vars['choices'][1]->value);
+        self::assertSame('3', $view['choice_one']->vars['choices'][2]->value);
 
-        $this->assertSame('10', $view['choice_two']->vars['choices'][0]->value);
-        $this->assertSame('20', $view['choice_two']->vars['choices'][1]->value);
-        $this->assertSame('30', $view['choice_two']->vars['choices'][2]->value);
+        self::assertSame('10', $view['choice_two']->vars['choices'][0]->value);
+        self::assertSame('20', $view['choice_two']->vars['choices'][1]->value);
+        self::assertSame('30', $view['choice_two']->vars['choices'][2]->value);
     }
 }

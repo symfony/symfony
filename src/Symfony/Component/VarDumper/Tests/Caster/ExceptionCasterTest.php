@@ -58,7 +58,7 @@ Exception {
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
-        $this->assertSame(['foo'], $ref);
+        self::assertSame(['foo'], $ref);
     }
 
     public function testSeek()
@@ -77,7 +77,7 @@ EODUMP;
 %A
 EODUMP;
 
-        $this->assertStringMatchesFormat($expectedDump, $this->getDump($e, 'trace'));
+        self::assertStringMatchesFormat($expectedDump, $this->getDump($e, 'trace'));
     }
 
     public function testNoArgs()
@@ -152,7 +152,7 @@ EODUMP;
     public function testHtmlDump()
     {
         if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
-            $this->markTestSkipped('A custom file_link_format is defined.');
+            self::markTestSkipped('A custom file_link_format is defined.');
         }
 
         $e = $this->getTestException(1);
@@ -181,7 +181,7 @@ Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDum
 </bar>
 EODUMP;
 
-        $this->assertStringMatchesFormat($expectedDump, $dump);
+        self::assertStringMatchesFormat($expectedDump, $dump);
     }
 
     /**

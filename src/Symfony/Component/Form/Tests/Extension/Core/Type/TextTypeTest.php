@@ -27,9 +27,9 @@ class TextTypeTest extends BaseTypeTest
         ]);
 
         $form->submit(null);
-        $this->assertSame('', $form->getData());
-        $this->assertSame('', $form->getNormData());
-        $this->assertSame('', $form->getViewData());
+        self::assertSame('', $form->getData());
+        self::assertSame('', $form->getNormData());
+        self::assertSame('', $form->getViewData());
     }
 
     public function provideZeros()
@@ -53,9 +53,9 @@ class TextTypeTest extends BaseTypeTest
         ]);
         $view = $form->createView();
 
-        $this->assertFalse($form->isEmpty());
+        self::assertFalse($form->isEmpty());
 
-        $this->assertSame($dataAsString, $view->vars['value']);
-        $this->assertSame($dataAsString, $form->getData());
+        self::assertSame($dataAsString, $view->vars['value']);
+        self::assertSame($dataAsString, $form->getData());
     }
 }

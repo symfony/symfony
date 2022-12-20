@@ -591,7 +591,7 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testGetCurrencyCodes()
     {
-        $this->assertSame(self::CURRENCIES, Currencies::getCurrencyCodes());
+        self::assertSame(self::CURRENCIES, Currencies::getCurrencyCodes());
     }
 
     /**
@@ -605,21 +605,21 @@ class CurrenciesTest extends ResourceBundleTestCase
 
         sort($keys);
 
-        $this->assertSame(self::CURRENCIES, $keys);
+        self::assertSame(self::CURRENCIES, $keys);
 
         // Names should be sorted
         $sortedNames = $names;
         $collator = new \Collator($displayLocale);
         $collator->asort($names);
 
-        $this->assertSame($sortedNames, $names);
+        self::assertSame($sortedNames, $names);
     }
 
     public function testGetNamesDefaultLocale()
     {
         \Locale::setDefault('de_AT');
 
-        $this->assertSame(Currencies::getNames('de_AT'), Currencies::getNames());
+        self::assertSame(Currencies::getNames('de_AT'), Currencies::getNames());
     }
 
     /**
@@ -630,7 +630,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(Currencies::getNames($ofLocale), Currencies::getNames($alias));
+        self::assertEquals(Currencies::getNames($ofLocale), Currencies::getNames($alias));
     }
 
     /**
@@ -645,7 +645,7 @@ class CurrenciesTest extends ResourceBundleTestCase
             $actual[$currency] = Currencies::getName($currency, $displayLocale);
         }
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function testGetNameDefaultLocale()
@@ -659,7 +659,7 @@ class CurrenciesTest extends ResourceBundleTestCase
             $actual[$currency] = Currencies::getName($currency);
         }
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -670,7 +670,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         $currencies = Currencies::getCurrencyCodes();
 
         foreach ($currencies as $currency) {
-            $this->assertGreaterThan(0, mb_strlen(Currencies::getSymbol($currency, $displayLocale)));
+            self::assertGreaterThan(0, mb_strlen(Currencies::getSymbol($currency, $displayLocale)));
         }
     }
 
@@ -690,7 +690,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         // ensure each currency code has a corresponding fraction digit
         Currencies::getFractionDigits($currency);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     /**
@@ -698,7 +698,7 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetRoundingIncrement($currency)
     {
-        $this->assertIsNumeric(Currencies::getRoundingIncrement($currency));
+        self::assertIsNumeric(Currencies::getRoundingIncrement($currency));
     }
 
     public function provideCurrenciesWithNumericEquivalent()
@@ -714,7 +714,7 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetNumericCode($currency)
     {
-        $this->assertSame(self::ALPHA3_TO_NUMERIC[$currency], Currencies::getNumericCode($currency));
+        self::assertSame(self::ALPHA3_TO_NUMERIC[$currency], Currencies::getNumericCode($currency));
     }
 
     public function provideCurrenciesWithoutNumericEquivalent()
@@ -730,7 +730,7 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Currencies::getNumericCode($currency);
     }
 
@@ -756,7 +756,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         sort($actual);
         sort($expected);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function provideInvalidNumericCodes()
@@ -775,20 +775,20 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testForNumericCodeFailsIfInvalidNumericCode($currency)
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Currencies::forNumericCode($currency);
     }
 
     public function testGetNameWithInvalidCurrencyCode()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Currencies::getName('foo');
     }
 
     public function testExists()
     {
-        $this->assertTrue(Currencies::exists('EUR'));
-        $this->assertFalse(Currencies::exists('XXX'));
+        self::assertTrue(Currencies::exists('EUR'));
+        self::assertFalse(Currencies::exists('XXX'));
     }
 
     private function getNumericToAlpha3Mapping()

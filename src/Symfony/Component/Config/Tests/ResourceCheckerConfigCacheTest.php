@@ -41,13 +41,13 @@ class ResourceCheckerConfigCacheTest extends TestCase
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
 
-        $this->assertSame($this->cacheFile, $cache->getPath());
+        self::assertSame($this->cacheFile, $cache->getPath());
     }
 
     public function testCacheIsNotFreshIfEmpty()
     {
-        $checker = $this->createMock(ResourceCheckerInterface::class)
-            ->expects($this->never())->method('supports');
+        $checker = self::createMock(ResourceCheckerInterface::class)
+            ->expects(self::never())->method('supports');
 
         /* If there is nothing in the cache, it needs to be filled (and thus it's not fresh).
             It does not matter if you provide checkers or not. */
@@ -55,7 +55,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         unlink($this->cacheFile); // remove tempnam() side effect
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
 
-        $this->assertFalse($cache->isFresh());
+        self::assertFalse($cache->isFresh());
     }
 
     public function testCacheIsFreshIfNoCheckerProvided()
@@ -63,13 +63,13 @@ class ResourceCheckerConfigCacheTest extends TestCase
         /* For example in prod mode, you may choose not to run any checkers
            at all. In that case, the cache should always be considered fresh. */
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
-        $this->assertTrue($cache->isFresh());
+        self::assertTrue($cache->isFresh());
     }
 
     public function testCacheIsFreshIfEmptyCheckerIteratorProvided()
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile, new \ArrayIterator([]));
-        $this->assertTrue($cache->isFresh());
+        self::assertTrue($cache->isFresh());
     }
 
     public function testResourcesWithoutcheckersAreIgnoredAndConsideredFresh()
@@ -78,55 +78,55 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
         $cache->write('', [new ResourceStub()]);
 
-        $this->assertTrue($cache->isFresh()); // no (matching) ResourceChecker passed
+        self::assertTrue($cache->isFresh()); // no (matching) ResourceChecker passed
     }
 
     public function testIsFreshWithchecker()
     {
-        $checker = $this->createMock(ResourceCheckerInterface::class);
+        $checker = self::createMock(ResourceCheckerInterface::class);
 
-        $checker->expects($this->once())
+        $checker->expects(self::once())
                   ->method('supports')
                   ->willReturn(true);
 
-        $checker->expects($this->once())
+        $checker->expects(self::once())
                   ->method('isFresh')
                   ->willReturn(true);
 
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('', [new ResourceStub()]);
 
-        $this->assertTrue($cache->isFresh());
+        self::assertTrue($cache->isFresh());
     }
 
     public function testIsNotFreshWithchecker()
     {
-        $checker = $this->createMock(ResourceCheckerInterface::class);
+        $checker = self::createMock(ResourceCheckerInterface::class);
 
-        $checker->expects($this->once())
+        $checker->expects(self::once())
                   ->method('supports')
                   ->willReturn(true);
 
-        $checker->expects($this->once())
+        $checker->expects(self::once())
                   ->method('isFresh')
                   ->willReturn(false);
 
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('', [new ResourceStub()]);
 
-        $this->assertFalse($cache->isFresh());
+        self::assertFalse($cache->isFresh());
     }
 
     public function testCacheIsNotFreshWhenUnserializeFails()
     {
-        $checker = $this->createMock(ResourceCheckerInterface::class);
+        $checker = self::createMock(ResourceCheckerInterface::class);
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('foo', [new FileResource(__FILE__)]);
 
         $metaFile = "{$this->cacheFile}.meta";
         file_put_contents($metaFile, str_replace('FileResource', 'ClassNotHere', file_get_contents($metaFile)));
 
-        $this->assertFalse($cache->isFresh());
+        self::assertFalse($cache->isFresh());
     }
 
     public function testCacheKeepsContent()
@@ -134,18 +134,18 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
         $cache->write('FOOBAR');
 
-        $this->assertSame('FOOBAR', file_get_contents($cache->getPath()));
+        self::assertSame('FOOBAR', file_get_contents($cache->getPath()));
     }
 
     public function testCacheIsNotFreshIfNotExistsMetaFile()
     {
-        $checker = $this->createMock(ResourceCheckerInterface::class);
+        $checker = self::createMock(ResourceCheckerInterface::class);
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('foo', [new FileResource(__FILE__)]);
 
         $metaFile = "{$this->cacheFile}.meta";
         unlink($metaFile);
 
-        $this->assertFalse($cache->isFresh());
+        self::assertFalse($cache->isFresh());
     }
 }

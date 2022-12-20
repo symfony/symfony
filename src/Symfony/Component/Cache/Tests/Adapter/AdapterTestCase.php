@@ -43,7 +43,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testGet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool();
@@ -51,27 +51,27 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $value = mt_rand();
 
-        $this->assertSame($value, $cache->get('foo', function (CacheItem $item) use ($value) {
-            $this->assertSame('foo', $item->getKey());
+        self::assertSame($value, $cache->get('foo', function (CacheItem $item) use ($value) {
+            self::assertSame('foo', $item->getKey());
 
             return $value;
         }));
 
         $item = $cache->getItem('foo');
-        $this->assertSame($value, $item->get());
+        self::assertSame($value, $item->get());
 
         $isHit = true;
-        $this->assertSame($value, $cache->get('foo', function (CacheItem $item) use (&$isHit) { $isHit = false; }, 0));
-        $this->assertTrue($isHit);
+        self::assertSame($value, $cache->get('foo', function (CacheItem $item) use (&$isHit) { $isHit = false; }, 0));
+        self::assertTrue($isHit);
 
-        $this->assertNull($cache->get('foo', function (CacheItem $item) use (&$isHit, $value) {
+        self::assertNull($cache->get('foo', function (CacheItem $item) use (&$isHit, $value) {
             $isHit = false;
-            $this->assertTrue($item->isHit());
-            $this->assertSame($value, $item->get());
+            self::assertTrue($item->isHit());
+            self::assertSame($value, $item->get());
         }, \INF));
-        $this->assertFalse($isHit);
+        self::assertFalse($isHit);
 
-        $this->assertSame($value, $cache->get('bar', new class($value) implements CallbackInterface {
+        self::assertSame($value, $cache->get('bar', new class($value) implements CallbackInterface {
             private $value;
 
             public function __construct(int $value)
@@ -91,7 +91,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testRecursiveGet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -103,15 +103,15 @@ abstract class AdapterTestCase extends CachePoolTest
             return $v;
         });
 
-        $this->assertSame(1, $counter);
-        $this->assertSame(1, $v);
-        $this->assertSame(1, $cache->get('k2', function () { return 2; }));
+        self::assertSame(1, $counter);
+        self::assertSame(1, $v);
+        self::assertSame(1, $cache->get('k2', function () { return 2; }));
     }
 
     public function testDontSaveWhenAskedNotTo()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -121,23 +121,23 @@ abstract class AdapterTestCase extends CachePoolTest
 
             return 1;
         });
-        $this->assertSame($v1, 1);
+        self::assertSame($v1, 1);
 
         $v2 = $cache->get('some-key', function () {
             return 2;
         });
-        $this->assertSame($v2, 2, 'First value was cached and should not have been');
+        self::assertSame($v2, 2, 'First value was cached and should not have been');
 
         $v3 = $cache->get('some-key', function () {
-            $this->fail('Value should have come from cache');
+            self::fail('Value should have come from cache');
         });
-        $this->assertSame($v3, 2);
+        self::assertSame($v3, 2);
     }
 
     public function testGetMetadata()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -153,16 +153,16 @@ abstract class AdapterTestCase extends CachePoolTest
         $item = $cache->getItem('foo');
 
         $metadata = $item->getMetadata();
-        $this->assertArrayHasKey(CacheItem::METADATA_CTIME, $metadata);
-        $this->assertEqualsWithDelta(999, $metadata[CacheItem::METADATA_CTIME], 150);
-        $this->assertArrayHasKey(CacheItem::METADATA_EXPIRY, $metadata);
-        $this->assertEqualsWithDelta(9 + time(), $metadata[CacheItem::METADATA_EXPIRY], 1);
+        self::assertArrayHasKey(CacheItem::METADATA_CTIME, $metadata);
+        self::assertEqualsWithDelta(999, $metadata[CacheItem::METADATA_CTIME], 150);
+        self::assertArrayHasKey(CacheItem::METADATA_EXPIRY, $metadata);
+        self::assertEqualsWithDelta(9 + time(), $metadata[CacheItem::METADATA_EXPIRY], 1);
     }
 
     public function testDefaultLifeTime()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(2);
@@ -173,17 +173,17 @@ abstract class AdapterTestCase extends CachePoolTest
         sleep(1);
 
         $item = $cache->getItem('key.dlt');
-        $this->assertTrue($item->isHit());
+        self::assertTrue($item->isHit());
 
         sleep(2);
         $item = $cache->getItem('key.dlt');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
     }
 
     public function testExpiration()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool();
@@ -192,18 +192,18 @@ abstract class AdapterTestCase extends CachePoolTest
 
         sleep(3);
         $item = $cache->getItem('k1');
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get(), "Item's value must be null when isHit() is false.");
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get(), "Item's value must be null when isHit() is false.");
 
         $item = $cache->getItem('k2');
-        $this->assertTrue($item->isHit());
-        $this->assertSame('v2', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertSame('v2', $item->get());
     }
 
     public function testNotUnserializable()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool();
@@ -212,7 +212,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->save($item->set(new NotUnserializable()));
 
         $item = $cache->getItem('foo');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
 
         foreach ($cache->getItems(['foo']) as $item) {
         }
@@ -220,17 +220,17 @@ abstract class AdapterTestCase extends CachePoolTest
 
         foreach ($cache->getItems(['foo']) as $item) {
         }
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
     }
 
     public function testPrune()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         if (!method_exists($this, 'isPruned')) {
-            $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
+            self::fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 
         /** @var PruneableInterface|CacheItemPoolInterface $cache */
@@ -253,46 +253,46 @@ abstract class AdapterTestCase extends CachePoolTest
         $doSet('qux', 'qux-val', new \DateInterval('PT20S'));
 
         sleep(30);
-        $this->assertTrue($cache->prune());
-        $this->assertTrue($this->isPruned($cache, 'foo'));
-        $this->assertTrue($this->isPruned($cache, 'bar'));
-        $this->assertTrue($this->isPruned($cache, 'baz'));
-        $this->assertTrue($this->isPruned($cache, 'qux'));
+        self::assertTrue($cache->prune());
+        self::assertTrue(self::isPruned($cache, 'foo'));
+        self::assertTrue(self::isPruned($cache, 'bar'));
+        self::assertTrue(self::isPruned($cache, 'baz'));
+        self::assertTrue(self::isPruned($cache, 'qux'));
 
         $doSet('foo', 'foo-val');
         $doSet('bar', 'bar-val', new \DateInterval('PT20S'));
         $doSet('baz', 'baz-val', new \DateInterval('PT40S'));
         $doSet('qux', 'qux-val', new \DateInterval('PT80S'));
 
-        $this->assertTrue($cache->prune());
-        $this->assertFalse($this->isPruned($cache, 'foo'));
-        $this->assertFalse($this->isPruned($cache, 'bar'));
-        $this->assertFalse($this->isPruned($cache, 'baz'));
-        $this->assertFalse($this->isPruned($cache, 'qux'));
+        self::assertTrue($cache->prune());
+        self::assertFalse(self::isPruned($cache, 'foo'));
+        self::assertFalse(self::isPruned($cache, 'bar'));
+        self::assertFalse(self::isPruned($cache, 'baz'));
+        self::assertFalse(self::isPruned($cache, 'qux'));
 
         sleep(30);
-        $this->assertTrue($cache->prune());
-        $this->assertFalse($this->isPruned($cache, 'foo'));
-        $this->assertTrue($this->isPruned($cache, 'bar'));
-        $this->assertFalse($this->isPruned($cache, 'baz'));
-        $this->assertFalse($this->isPruned($cache, 'qux'));
+        self::assertTrue($cache->prune());
+        self::assertFalse(self::isPruned($cache, 'foo'));
+        self::assertTrue(self::isPruned($cache, 'bar'));
+        self::assertFalse(self::isPruned($cache, 'baz'));
+        self::assertFalse(self::isPruned($cache, 'qux'));
 
         sleep(30);
-        $this->assertTrue($cache->prune());
-        $this->assertFalse($this->isPruned($cache, 'foo'));
-        $this->assertTrue($this->isPruned($cache, 'baz'));
-        $this->assertFalse($this->isPruned($cache, 'qux'));
+        self::assertTrue($cache->prune());
+        self::assertFalse(self::isPruned($cache, 'foo'));
+        self::assertTrue(self::isPruned($cache, 'baz'));
+        self::assertFalse(self::isPruned($cache, 'qux'));
 
         sleep(30);
-        $this->assertTrue($cache->prune());
-        $this->assertFalse($this->isPruned($cache, 'foo'));
-        $this->assertTrue($this->isPruned($cache, 'qux'));
+        self::assertTrue($cache->prune());
+        self::assertFalse(self::isPruned($cache, 'foo'));
+        self::assertTrue(self::isPruned($cache, 'qux'));
     }
 
     public function testClearPrefix()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -305,14 +305,14 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->save($item->set(2));
 
         $cache->clear('foo');
-        $this->assertFalse($cache->hasItem('foobar'));
-        $this->assertTrue($cache->hasItem('barfoo'));
+        self::assertFalse($cache->hasItem('foobar'));
+        self::assertTrue($cache->hasItem('barfoo'));
     }
 
     public function testWeirdDataMatchingMetadataWrappedValues()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -330,7 +330,7 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $cache->save($item->set($weirdDataMatchingMedatataWrappedValue));
 
-        $this->assertTrue($cache->hasItem('foobar'));
+        self::assertTrue($cache->hasItem('foobar'));
     }
 
     public function testNullByteInKey()
@@ -339,7 +339,7 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $cache->save($cache->getItem("a\0b")->set(123));
 
-        $this->assertSame(123, $cache->getItem("a\0b")->get());
+        self::assertSame(123, $cache->getItem("a\0b")->get());
     }
 
     public function testNumericKeysWorkAfterMemoryLeakPrevention()
@@ -352,7 +352,7 @@ abstract class AdapterTestCase extends CachePoolTest
             $cache->save($cacheItem);
         }
 
-        $this->assertEquals('value-50', $cache->getItem((string) 50)->get());
+        self::assertEquals('value-50', $cache->getItem((string) 50)->get());
     }
 }
 

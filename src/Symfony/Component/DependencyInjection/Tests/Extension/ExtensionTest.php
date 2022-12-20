@@ -29,7 +29,7 @@ class ExtensionTest extends TestCase
     public function testIsConfigEnabledReturnsTheResolvedValue($enabled)
     {
         $extension = new EnableableExtension();
-        $this->assertSame($enabled, $extension->isConfigEnabled(new ContainerBuilder(), ['enabled' => $enabled]));
+        self::assertSame($enabled, $extension->isConfigEnabled(new ContainerBuilder(), ['enabled' => $enabled]));
     }
 
     public function getResolvedEnabledFixtures()
@@ -42,8 +42,8 @@ class ExtensionTest extends TestCase
 
     public function testIsConfigEnabledOnNonEnableableConfig()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The config array has no \'enabled\' key.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The config array has no \'enabled\' key.');
         $extension = new EnableableExtension();
 
         $extension->isConfigEnabled(new ContainerBuilder(), []);
@@ -53,27 +53,27 @@ class ExtensionTest extends TestCase
     {
         $extension = new EnableableExtension();
 
-        $this->assertNull($extension->getConfiguration([], new ContainerBuilder()));
+        self::assertNull($extension->getConfiguration([], new ContainerBuilder()));
     }
 
     public function testValidConfiguration()
     {
         $extension = new ValidConfigExtension();
 
-        $this->assertInstanceOf(Configuration::class, $extension->getConfiguration([], new ContainerBuilder()));
+        self::assertInstanceOf(Configuration::class, $extension->getConfiguration([], new ContainerBuilder()));
     }
 
     public function testSemiValidConfiguration()
     {
         $extension = new SemiValidConfigExtension();
 
-        $this->assertNull($extension->getConfiguration([], new ContainerBuilder()));
+        self::assertNull($extension->getConfiguration([], new ContainerBuilder()));
     }
 
     public function testInvalidConfiguration()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The extension configuration class "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Extension\\InvalidConfig\\Configuration" must implement "Symfony\\Component\\Config\\Definition\\ConfigurationInterface".');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The extension configuration class "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Extension\\InvalidConfig\\Configuration" must implement "Symfony\\Component\\Config\\Definition\\ConfigurationInterface".');
 
         $extension = new InvalidConfigExtension();
 

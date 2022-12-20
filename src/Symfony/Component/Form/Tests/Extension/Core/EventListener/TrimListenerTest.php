@@ -29,7 +29,7 @@ class TrimListenerTest extends TestCase
         $filter = new TrimListener();
         $filter->preSubmit($event);
 
-        $this->assertEquals('Foo!', $event->getData());
+        self::assertEquals('Foo!', $event->getData());
     }
 
     public function testTrimSkipNonStrings()
@@ -41,6 +41,6 @@ class TrimListenerTest extends TestCase
         $filter = new TrimListener();
         $filter->preSubmit($event);
 
-        $this->assertSame(1234, $event->getData());
+        self::assertSame(1234, $event->getData());
     }
 }

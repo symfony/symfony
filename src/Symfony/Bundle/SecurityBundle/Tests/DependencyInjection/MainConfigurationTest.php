@@ -39,7 +39,7 @@ class MainConfigurationTest extends TestCase
 
     public function testNoConfigForProvider()
     {
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $config = [
             'providers' => [
                 'stub' => [],
@@ -53,7 +53,7 @@ class MainConfigurationTest extends TestCase
 
     public function testManyConfigForProvider()
     {
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $config = [
             'providers' => [
                 'stub' => [
@@ -85,10 +85,10 @@ class MainConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new MainConfiguration([], []);
         $processedConfig = $processor->processConfiguration($configuration, [$config]);
-        $this->assertArrayHasKey('csrf_token_generator', $processedConfig['firewalls']['stub']['logout']);
-        $this->assertEquals('a_token_generator', $processedConfig['firewalls']['stub']['logout']['csrf_token_generator']);
-        $this->assertArrayHasKey('csrf_token_id', $processedConfig['firewalls']['stub']['logout']);
-        $this->assertEquals('a_token_id', $processedConfig['firewalls']['stub']['logout']['csrf_token_id']);
+        self::assertArrayHasKey('csrf_token_generator', $processedConfig['firewalls']['stub']['logout']);
+        self::assertEquals('a_token_generator', $processedConfig['firewalls']['stub']['logout']['csrf_token_generator']);
+        self::assertArrayHasKey('csrf_token_id', $processedConfig['firewalls']['stub']['logout']);
+        self::assertEquals('a_token_id', $processedConfig['firewalls']['stub']['logout']['csrf_token_id']);
     }
 
     public function testDefaultUserCheckers()
@@ -97,7 +97,7 @@ class MainConfigurationTest extends TestCase
         $configuration = new MainConfiguration([], []);
         $processedConfig = $processor->processConfiguration($configuration, [static::$minimalConfig]);
 
-        $this->assertEquals('security.user_checker', $processedConfig['firewalls']['stub']['user_checker']);
+        self::assertEquals('security.user_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 
     public function testUserCheckers()
@@ -115,7 +115,7 @@ class MainConfigurationTest extends TestCase
         $configuration = new MainConfiguration([], []);
         $processedConfig = $processor->processConfiguration($configuration, [$config]);
 
-        $this->assertEquals('app.henk_checker', $processedConfig['firewalls']['stub']['user_checker']);
+        self::assertEquals('app.henk_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 
     public function testConfigMergeWithAccessDecisionManager()
@@ -133,13 +133,13 @@ class MainConfigurationTest extends TestCase
         $configuration = new MainConfiguration([], []);
         $processedConfig = $processor->processConfiguration($configuration, [$config, $config2]);
 
-        $this->assertSame(MainConfiguration::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
+        self::assertSame(MainConfiguration::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
     }
 
     public function testFirewalls()
     {
-        $factory = $this->createMock(AuthenticatorFactoryInterface::class);
-        $factory->expects($this->once())->method('addConfiguration');
+        $factory = self::createMock(AuthenticatorFactoryInterface::class);
+        $factory->expects(self::once())->method('addConfiguration');
         $factory->method('getKey')->willReturn('key');
 
         $configuration = new MainConfiguration(['stub' => $factory], []);
@@ -151,8 +151,8 @@ class MainConfigurationTest extends TestCase
      */
     public function testLegacyFirewalls()
     {
-        $factory = $this->createMock(AuthenticatorFactoryInterface::class);
-        $factory->expects($this->once())->method('addConfiguration');
+        $factory = self::createMock(AuthenticatorFactoryInterface::class);
+        $factory->expects(self::once())->method('addConfiguration');
 
         $this->expectDeprecation('Since symfony/security-bundle 5.4: Passing an array of arrays as 1st argument to "Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration::__construct" is deprecated, pass a sorted array of factories instead.');
 

@@ -39,10 +39,10 @@ class AmqpExtIntegrationTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
         if (!getenv('MESSENGER_AMQP_DSN')) {
-            $this->markTestSkipped('The "MESSENGER_AMQP_DSN" environment variable is required.');
+            self::markTestSkipped('The "MESSENGER_AMQP_DSN" environment variable is required.');
         }
     }
 
@@ -61,19 +61,19 @@ class AmqpExtIntegrationTest extends TestCase
         $sender->send($second = new Envelope(new DummyMessage('Second')));
 
         $envelopes = iterator_to_array($receiver->get());
-        $this->assertCount(1, $envelopes);
+        self::assertCount(1, $envelopes);
         /** @var Envelope $envelope */
         $envelope = $envelopes[0];
-        $this->assertEquals($first->getMessage(), $envelope->getMessage());
-        $this->assertInstanceOf(AmqpReceivedStamp::class, $envelope->last(AmqpReceivedStamp::class));
+        self::assertEquals($first->getMessage(), $envelope->getMessage());
+        self::assertInstanceOf(AmqpReceivedStamp::class, $envelope->last(AmqpReceivedStamp::class));
 
         $envelopes = iterator_to_array($receiver->get());
-        $this->assertCount(1, $envelopes);
+        self::assertCount(1, $envelopes);
         /** @var Envelope $envelope */
         $envelope = $envelopes[0];
-        $this->assertEquals($second->getMessage(), $envelope->getMessage());
+        self::assertEquals($second->getMessage(), $envelope->getMessage());
 
-        $this->assertEmpty(iterator_to_array($receiver->get()));
+        self::assertEmpty(iterator_to_array($receiver->get()));
     }
 
     public function testRetryAndDelay()
@@ -114,10 +114,10 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertApproximateDuration($startTime, 1);
 
         // this should be the custom routing key message first
-        $this->assertCount(1, $envelopes);
+        self::assertCount(1, $envelopes);
         /* @var Envelope $envelope */
         $receiver->ack($envelopes[0]);
-        $this->assertEquals($customRoutingKeyMessage, $envelopes[0]->getMessage());
+        self::assertEquals($customRoutingKeyMessage, $envelopes[0]->getMessage());
 
         // wait for final message (but max at 3 seconds)
         $envelopes = $this->receiveEnvelopes($receiver, 3);
@@ -126,10 +126,10 @@ class AmqpExtIntegrationTest extends TestCase
 
         /* @var RedeliveryStamp|null $retryStamp */
         // verify the stamp still exists from the last send
-        $this->assertCount(1, $envelopes);
+        self::assertCount(1, $envelopes);
         $retryStamp = $envelopes[0]->last(RedeliveryStamp::class);
-        $this->assertNotNull($retryStamp);
-        $this->assertSame(1, $retryStamp->getRetryCount());
+        self::assertNotNull($retryStamp);
+        self::assertSame(1, $retryStamp->getRetryCount());
 
         $receiver->ack($envelope);
     }
@@ -157,9 +157,9 @@ class AmqpExtIntegrationTest extends TestCase
         $sender->send(new Envelope(new DummyMessage('Payload')));
 
         $receivedEnvelopes = $this->receiveWithQueueName($receiver);
-        $this->assertCount(2, $receivedEnvelopes);
-        $this->assertArrayHasKey('A', $receivedEnvelopes);
-        $this->assertArrayHasKey('B', $receivedEnvelopes);
+        self::assertCount(2, $receivedEnvelopes);
+        self::assertArrayHasKey('A', $receivedEnvelopes);
+        self::assertArrayHasKey('B', $receivedEnvelopes);
 
         // retry: should receive in only "A" queue
         $retryEnvelope = $receivedEnvelopes['A']
@@ -168,8 +168,8 @@ class AmqpExtIntegrationTest extends TestCase
         $sender->send($retryEnvelope);
 
         $retriedEnvelopes = $this->receiveWithQueueName($receiver);
-        $this->assertCount(1, $retriedEnvelopes);
-        $this->assertArrayHasKey('A', $retriedEnvelopes);
+        self::assertCount(1, $retriedEnvelopes);
+        self::assertArrayHasKey('A', $retriedEnvelopes);
     }
 
     public function testItReceivesSignals()
@@ -208,9 +208,9 @@ class AmqpExtIntegrationTest extends TestCase
         }
 
         // make sure the process exited, after consuming only the 1 message
-        $this->assertFalse($process->isRunning());
-        $this->assertLessThan($amqpReadTimeout, microtime(true) - $signalTime);
-        $this->assertSame($expectedOutput.<<<'TXT'
+        self::assertFalse($process->isRunning());
+        self::assertLessThan($amqpReadTimeout, microtime(true) - $signalTime);
+        self::assertSame($expectedOutput.<<<'TXT'
 Get envelope with message: Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage
 with stamps: [
     "Symfony\\Component\\Messenger\\Bridge\\Amqp\\Transport\\AmqpReceivedStamp",
@@ -220,8 +220,7 @@ with stamps: [
 ]
 Done.
 
-TXT
-            , $process->getOutput());
+TXT, $process->getOutput());
     }
 
     public function testItCountsMessagesInQueue()
@@ -239,7 +238,7 @@ TXT
         $sender->send(new Envelope(new DummyMessage('Third')));
 
         sleep(1); // give amqp a moment to have the messages ready
-        $this->assertSame(3, $connection->countMessagesInQueues());
+        self::assertSame(3, $connection->countMessagesInQueues());
     }
 
     private function waitForOutput(Process $process, string $output, $timeoutInSeconds = 10)
@@ -271,7 +270,7 @@ TXT
         if (method_exists($this, 'assertEqualsWithDelta')) {
             $this->assertEqualsWithDelta($expectedDuration, $actualDuration, .5, 'Duration was not within expected range');
         } else {
-            $this->assertEquals($expectedDuration, $actualDuration, 'Duration was not within expected range', .5);
+            self::assertEquals($expectedDuration, $actualDuration, 'Duration was not within expected range', .5);
         }
     }
 

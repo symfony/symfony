@@ -22,7 +22,7 @@ class VoterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->token = $this->createMock(TokenInterface::class);
+        $this->token = self::createMock(TokenInterface::class);
     }
 
     public function getTests()
@@ -60,13 +60,13 @@ class VoterTest extends TestCase
      */
     public function testVote(VoterInterface $voter, array $attributes, $expectedVote, $object, $message)
     {
-        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
+        self::assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
 
     public function testVoteWithTypeError()
     {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Should error');
+        self::expectException(\TypeError::class);
+        self::expectExceptionMessage('Should error');
         $voter = new TypeErrorVoterTest_Voter();
         $voter->vote($this->token, new \stdClass(), ['EDIT']);
     }

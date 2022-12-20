@@ -22,7 +22,7 @@ class ContainerLoaderTest extends TestCase
      */
     public function testSupports(bool $expected, string $type = null)
     {
-        $this->assertSame($expected, (new ContainerLoader(new Container()))->supports('foo', $type));
+        self::assertSame($expected, (new ContainerLoader(new Container()))->supports('foo', $type));
     }
 
     public function supportsProvider()

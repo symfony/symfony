@@ -26,14 +26,14 @@ class AddAutoMappingConfigurationPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         (new AddAutoMappingConfigurationPass())->process($container);
-        $this->assertCount(1, $container->getDefinitions());
+        self::assertCount(1, $container->getDefinitions());
     }
 
     public function testNoValidatorBuilder()
     {
         $container = new ContainerBuilder();
         (new AddAutoMappingConfigurationPass())->process($container);
-        $this->assertCount(1, $container->getDefinitions());
+        self::assertCount(1, $container->getDefinitions());
     }
 
     /**
@@ -55,9 +55,9 @@ class AddAutoMappingConfigurationPassTest extends TestCase
         (new AddAutoMappingConfigurationPass())->process($container);
 
         foreach ($services as $service) {
-            $this->assertSame($expectedRegexp, $container->getDefinition($service)->getArgument('$classValidatorRegexp'));
+            self::assertSame($expectedRegexp, $container->getDefinition($service)->getArgument('$classValidatorRegexp'));
         }
-        $this->assertCount(\count($services), $container->getDefinition('validator.builder')->getMethodCalls());
+        self::assertCount(\count($services), $container->getDefinition('validator.builder')->getMethodCalls());
     }
 
     public function mappingProvider(): array
@@ -81,6 +81,6 @@ class AddAutoMappingConfigurationPassTest extends TestCase
 
         (new AddAutoMappingConfigurationPass())->process($container);
 
-        $this->assertNull($container->getDefinition('loader')->getArguments()['$classValidatorRegexp'] ?? null);
+        self::assertNull($container->getDefinition('loader')->getArguments()['$classValidatorRegexp'] ?? null);
     }
 }

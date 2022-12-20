@@ -20,38 +20,38 @@ class EnumNodeTest extends TestCase
     public function testFinalizeValue()
     {
         $node = new EnumNode('foo', null, ['foo', 'bar']);
-        $this->assertSame('foo', $node->finalize('foo'));
+        self::assertSame('foo', $node->finalize('foo'));
     }
 
     public function testConstructionWithNoValues()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('$values must contain at least one element.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('$values must contain at least one element.');
         new EnumNode('foo', null, []);
     }
 
     public function testConstructionWithOneValue()
     {
         $node = new EnumNode('foo', null, ['foo']);
-        $this->assertSame('foo', $node->finalize('foo'));
+        self::assertSame('foo', $node->finalize('foo'));
     }
 
     public function testConstructionWithOneDistinctValue()
     {
         $node = new EnumNode('foo', null, ['foo', 'foo']);
-        $this->assertSame('foo', $node->finalize('foo'));
+        self::assertSame('foo', $node->finalize('foo'));
     }
 
     public function testConstructionWithNullName()
     {
         $node = new EnumNode(null, null, ['foo']);
-        $this->assertSame('foo', $node->finalize('foo'));
+        self::assertSame('foo', $node->finalize('foo'));
     }
 
     public function testFinalizeWithInvalidValue()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The value "foobar" is not allowed for path "foo". Permissible values: "foo", "bar"');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('The value "foobar" is not allowed for path "foo". Permissible values: "foo", "bar"');
         $node = new EnumNode('foo', null, ['foo', 'bar']);
         $node->finalize('foobar');
     }

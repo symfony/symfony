@@ -30,7 +30,7 @@ class AuthorizationCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $this->accessDecisionManager = self::createMock(AccessDecisionManagerInterface::class);
         $this->tokenStorage = new TokenStorage();
 
         $this->authorizationChecker = new AuthorizationChecker(
@@ -51,12 +51,12 @@ class AuthorizationCheckerTest extends TestCase
 
         $newToken = new UsernamePasswordToken('username', 'password', 'provider');
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
         $this->authorizationChecker = new AuthorizationChecker($this->tokenStorage, $authenticationManager, $this->accessDecisionManager, false, false);
         $authenticationManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
-            ->with($this->equalTo($token))
+            ->with(self::equalTo($token))
             ->willReturn($newToken);
 
         // default with() isn't a strict check
@@ -66,15 +66,15 @@ class AuthorizationCheckerTest extends TestCase
         };
 
         $this->accessDecisionManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('decide')
-            ->with($this->callback($tokenComparison))
+            ->with(self::callback($tokenComparison))
             ->willReturn(true);
 
         // first run the token has not been re-authenticated yet, after isGranted is called, it should be equal
-        $this->assertNotSame($newToken, $this->tokenStorage->getToken());
-        $this->assertTrue($this->authorizationChecker->isGranted('foo'));
-        $this->assertSame($newToken, $this->tokenStorage->getToken());
+        self::assertNotSame($newToken, $this->tokenStorage->getToken());
+        self::assertTrue($this->authorizationChecker->isGranted('foo'));
+        self::assertSame($newToken, $this->tokenStorage->getToken());
     }
 
     /**
@@ -84,7 +84,7 @@ class AuthorizationCheckerTest extends TestCase
     {
         $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
 
-        $this->expectException(AuthenticationCredentialsNotFoundException::class);
+        self::expectException(AuthenticationCredentialsNotFoundException::class);
 
         $authorizationChecker->isGranted('ROLE_FOO');
     }
@@ -94,12 +94,12 @@ class AuthorizationCheckerTest extends TestCase
         $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager, false, false);
 
         $this->accessDecisionManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('decide')
-            ->with($this->isInstanceOf(NullToken::class))
+            ->with(self::isInstanceOf(NullToken::class))
             ->willReturn(true);
 
-        $this->assertTrue($authorizationChecker->isGranted('ANONYMOUS'));
+        self::assertTrue($authorizationChecker->isGranted('ANONYMOUS'));
     }
 
     /**
@@ -110,11 +110,11 @@ class AuthorizationCheckerTest extends TestCase
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
         $this->accessDecisionManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('decide')
             ->willReturn($decide);
         $this->tokenStorage->setToken($token);
-        $this->assertSame($decide, $this->authorizationChecker->isGranted('ROLE_FOO'));
+        self::assertSame($decide, $this->authorizationChecker->isGranted('ROLE_FOO'));
     }
 
     public function isGrantedProvider()
@@ -129,11 +129,11 @@ class AuthorizationCheckerTest extends TestCase
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
         $this->accessDecisionManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('decide')
-            ->with($this->identicalTo($token), $this->identicalTo([$attribute]))
+            ->with(self::identicalTo($token), self::identicalTo([$attribute]))
             ->willReturn(true);
         $this->tokenStorage->setToken($token);
-        $this->assertTrue($this->authorizationChecker->isGranted($attribute));
+        self::assertTrue($this->authorizationChecker->isGranted($attribute));
     }
 }

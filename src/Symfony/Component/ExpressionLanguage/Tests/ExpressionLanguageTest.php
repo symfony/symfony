@@ -24,20 +24,20 @@ class ExpressionLanguageTest extends TestCase
 {
     public function testCachedParse()
     {
-        $cacheMock = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItemMock = $this->createMock(CacheItemInterface::class);
+        $cacheMock = self::createMock(CacheItemPoolInterface::class);
+        $cacheItemMock = self::createMock(CacheItemInterface::class);
         $savedParsedExpression = null;
         $expressionLanguage = new ExpressionLanguage($cacheMock);
 
         $cacheMock
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('getItem')
             ->with('1%20%2B%201%2F%2F')
             ->willReturn($cacheItemMock)
         ;
 
         $cacheItemMock
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
@@ -45,9 +45,9 @@ class ExpressionLanguageTest extends TestCase
         ;
 
         $cacheItemMock
-            ->expects($this->exactly(1))
+            ->expects(self::exactly(1))
             ->method('set')
-            ->with($this->isInstanceOf(ParsedExpression::class))
+            ->with(self::isInstanceOf(ParsedExpression::class))
             ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
                 $savedParsedExpression = $parsedExpression;
 
@@ -56,39 +56,39 @@ class ExpressionLanguageTest extends TestCase
         ;
 
         $cacheMock
-            ->expects($this->exactly(1))
+            ->expects(self::exactly(1))
             ->method('save')
             ->with($cacheItemMock)
             ->willReturn(true)
         ;
 
         $parsedExpression = $expressionLanguage->parse('1 + 1', []);
-        $this->assertSame($savedParsedExpression, $parsedExpression);
+        self::assertSame($savedParsedExpression, $parsedExpression);
 
         $parsedExpression = $expressionLanguage->parse('1 + 1', []);
-        $this->assertSame($savedParsedExpression, $parsedExpression);
+        self::assertSame($savedParsedExpression, $parsedExpression);
     }
 
     public function testConstantFunction()
     {
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals(\PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
+        self::assertEquals(\PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
 
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+        self::assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
     }
 
     public function testProviders()
     {
         $expressionLanguage = new ExpressionLanguage(null, [new TestProvider()]);
-        $this->assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
-        $this->assertEquals('"foo"', $expressionLanguage->compile('identity("foo")'));
-        $this->assertEquals('FOO', $expressionLanguage->evaluate('strtoupper("foo")'));
-        $this->assertEquals('\strtoupper("foo")', $expressionLanguage->compile('strtoupper("foo")'));
-        $this->assertEquals('foo', $expressionLanguage->evaluate('strtolower("FOO")'));
-        $this->assertEquals('\strtolower("FOO")', $expressionLanguage->compile('strtolower("FOO")'));
-        $this->assertTrue($expressionLanguage->evaluate('fn_namespaced()'));
-        $this->assertEquals('\Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced()', $expressionLanguage->compile('fn_namespaced()'));
+        self::assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
+        self::assertEquals('"foo"', $expressionLanguage->compile('identity("foo")'));
+        self::assertEquals('FOO', $expressionLanguage->evaluate('strtoupper("foo")'));
+        self::assertEquals('\strtoupper("foo")', $expressionLanguage->compile('strtoupper("foo")'));
+        self::assertEquals('foo', $expressionLanguage->evaluate('strtolower("FOO")'));
+        self::assertEquals('\strtolower("FOO")', $expressionLanguage->compile('strtolower("FOO")'));
+        self::assertTrue($expressionLanguage->evaluate('fn_namespaced()'));
+        self::assertEquals('\Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced()', $expressionLanguage->compile('fn_namespaced()'));
     }
 
     /**
@@ -97,7 +97,7 @@ class ExpressionLanguageTest extends TestCase
     public function testShortCircuitOperatorsEvaluate($expression, array $values, $expected)
     {
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals($expected, $expressionLanguage->evaluate($expression, $values));
+        self::assertEquals($expected, $expressionLanguage->evaluate($expression, $values));
     }
 
     /**
@@ -108,21 +108,21 @@ class ExpressionLanguageTest extends TestCase
         $result = null;
         $expressionLanguage = new ExpressionLanguage();
         eval(sprintf('$result = %s;', $expressionLanguage->compile($expression, $names)));
-        $this->assertSame($expected, $result);
+        self::assertSame($expected, $result);
     }
 
     public function testParseThrowsInsteadOfNotice()
     {
-        $this->expectException(SyntaxError::class);
-        $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
+        self::expectException(SyntaxError::class);
+        self::expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->parse('node.', ['node']);
     }
 
     public function shortCircuitProviderEvaluate()
     {
-        $object = $this->getMockBuilder(\stdClass::class)->setMethods(['foo'])->getMock();
-        $object->expects($this->never())->method('foo');
+        $object = self::getMockBuilder(\stdClass::class)->setMethods(['foo'])->getMock();
+        $object->expects(self::never())->method('foo');
 
         return [
             ['false and object.foo()', ['object' => $object], false],
@@ -148,7 +148,7 @@ class ExpressionLanguageTest extends TestCase
         $expression = 'a + b';
         $expressionLanguage->evaluate($expression, ['a' => 1, 'b' => 1]);
         $result = $expressionLanguage->compile($expression, ['a', 'B' => 'b']);
-        $this->assertSame('($a + $B)', $result);
+        self::assertSame('($a + $B)', $result);
     }
 
     public function testStrictEquality()
@@ -156,25 +156,25 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage = new ExpressionLanguage();
         $expression = '123 === a';
         $result = $expressionLanguage->compile($expression, ['a']);
-        $this->assertSame('(123 === $a)', $result);
+        self::assertSame('(123 === $a)', $result);
     }
 
     public function testCachingWithDifferentNamesOrder()
     {
-        $cacheMock = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItemMock = $this->createMock(CacheItemInterface::class);
+        $cacheMock = self::createMock(CacheItemPoolInterface::class);
+        $cacheItemMock = self::createMock(CacheItemInterface::class);
         $expressionLanguage = new ExpressionLanguage($cacheMock);
         $savedParsedExpression = null;
 
         $cacheMock
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('getItem')
             ->with('a%20%2B%20b%2F%2Fa%7CB%3Ab')
             ->willReturn($cacheItemMock)
         ;
 
         $cacheItemMock
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
@@ -182,9 +182,9 @@ class ExpressionLanguageTest extends TestCase
         ;
 
         $cacheItemMock
-            ->expects($this->exactly(1))
+            ->expects(self::exactly(1))
             ->method('set')
-            ->with($this->isInstanceOf(ParsedExpression::class))
+            ->with(self::isInstanceOf(ParsedExpression::class))
             ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
                 $savedParsedExpression = $parsedExpression;
 
@@ -193,7 +193,7 @@ class ExpressionLanguageTest extends TestCase
         ;
 
         $cacheMock
-            ->expects($this->exactly(1))
+            ->expects(self::exactly(1))
             ->method('save')
             ->with($cacheItemMock)
             ->willReturn(true)
@@ -209,10 +209,10 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage = new ExpressionLanguage();
         $expression = 'foo.not in [bar]';
         $compiled = $expressionLanguage->compile($expression, ['foo', 'bar']);
-        $this->assertSame('in_array($foo->not, [0 => $bar])', $compiled);
+        self::assertSame('in_array($foo->not, [0 => $bar])', $compiled);
 
         $result = $expressionLanguage->evaluate($expression, ['foo' => (object) ['not' => 'test'], 'bar' => 'test']);
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
     /**
@@ -220,7 +220,7 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterParse($registerCallback)
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->parse('1 + 1', []);
         $registerCallback($el);
@@ -231,7 +231,7 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterEval($registerCallback)
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->evaluate('1 + 1');
         $registerCallback($el);
@@ -239,8 +239,8 @@ class ExpressionLanguageTest extends TestCase
 
     public function testCallBadCallable()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
         $el = new ExpressionLanguage();
         $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
     }
@@ -250,7 +250,7 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterCompile($registerCallback)
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
         $registerCallback($el);

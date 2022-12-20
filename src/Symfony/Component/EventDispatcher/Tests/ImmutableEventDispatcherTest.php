@@ -35,7 +35,7 @@ class ImmutableEventDispatcherTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->innerDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->innerDispatcher = self::createMock(EventDispatcherInterface::class);
         $this->dispatcher = new ImmutableEventDispatcher($this->innerDispatcher);
     }
 
@@ -44,58 +44,58 @@ class ImmutableEventDispatcherTest extends TestCase
         $event = new Event();
         $resultEvent = new Event();
 
-        $this->innerDispatcher->expects($this->once())
+        $this->innerDispatcher->expects(self::once())
             ->method('dispatch')
             ->with($event, 'event')
             ->willReturn($resultEvent);
 
-        $this->assertSame($resultEvent, $this->dispatcher->dispatch($event, 'event'));
+        self::assertSame($resultEvent, $this->dispatcher->dispatch($event, 'event'));
     }
 
     public function testGetListenersDelegates()
     {
-        $this->innerDispatcher->expects($this->once())
+        $this->innerDispatcher->expects(self::once())
             ->method('getListeners')
             ->with('event')
             ->willReturn(['result']);
 
-        $this->assertSame(['result'], $this->dispatcher->getListeners('event'));
+        self::assertSame(['result'], $this->dispatcher->getListeners('event'));
     }
 
     public function testHasListenersDelegates()
     {
-        $this->innerDispatcher->expects($this->once())
+        $this->innerDispatcher->expects(self::once())
             ->method('hasListeners')
             ->with('event')
             ->willReturn(true);
 
-        $this->assertTrue($this->dispatcher->hasListeners('event'));
+        self::assertTrue($this->dispatcher->hasListeners('event'));
     }
 
     public function testAddListenerDisallowed()
     {
-        $this->expectException(\BadMethodCallException::class);
+        self::expectException(\BadMethodCallException::class);
         $this->dispatcher->addListener('event', function () { return 'foo'; });
     }
 
     public function testAddSubscriberDisallowed()
     {
-        $this->expectException(\BadMethodCallException::class);
-        $subscriber = $this->createMock(EventSubscriberInterface::class);
+        self::expectException(\BadMethodCallException::class);
+        $subscriber = self::createMock(EventSubscriberInterface::class);
 
         $this->dispatcher->addSubscriber($subscriber);
     }
 
     public function testRemoveListenerDisallowed()
     {
-        $this->expectException(\BadMethodCallException::class);
+        self::expectException(\BadMethodCallException::class);
         $this->dispatcher->removeListener('event', function () { return 'foo'; });
     }
 
     public function testRemoveSubscriberDisallowed()
     {
-        $this->expectException(\BadMethodCallException::class);
-        $subscriber = $this->createMock(EventSubscriberInterface::class);
+        self::expectException(\BadMethodCallException::class);
+        $subscriber = self::createMock(EventSubscriberInterface::class);
 
         $this->dispatcher->removeSubscriber($subscriber);
     }

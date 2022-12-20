@@ -30,7 +30,7 @@ final class EsendexTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new EsendexTransport('email', 'password', 'testAccountReference', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new EsendexTransport('email', 'password', 'testAccountReference', 'testFrom', $client ?? self::createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
@@ -46,13 +46,13 @@ final class EsendexTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSendWithErrorResponseThrowsTransportException()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(500);
 
@@ -62,19 +62,19 @@ final class EsendexTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client);
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Unable to send the SMS: error 500.');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage('Unable to send the SMS: error 500.');
 
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
     public function testSendWithErrorResponseContainingDetailsThrowsTransportException()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(500);
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn(json_encode(['errors' => [['code' => 'accountreference_invalid', 'description' => 'Invalid Account Reference EX0000000']]]));
 
@@ -84,8 +84,8 @@ final class EsendexTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client);
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Unable to send the SMS: error 500. Details from Esendex: accountreference_invalid: "Invalid Account Reference EX0000000".');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage('Unable to send the SMS: error 500. Details from Esendex: accountreference_invalid: "Invalid Account Reference EX0000000".');
 
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
@@ -93,11 +93,11 @@ final class EsendexTransportTest extends TransportTestCase
     public function testSendWithSuccessfulResponseDispatchesMessageEvent()
     {
         $messageId = Uuid::v4()->toRfc4122();
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(200);
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
 
@@ -109,6 +109,6 @@ final class EsendexTransportTest extends TransportTestCase
 
         $sentMessage = $transport->send(new SmsMessage('phone', 'testMessage'));
 
-        $this->assertSame($messageId, $sentMessage->getMessageId());
+        self::assertSame($messageId, $sentMessage->getMessageId());
     }
 }

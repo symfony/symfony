@@ -25,14 +25,14 @@ class NullOutputFormatterTest extends TestCase
     {
         $formatter = new NullOutputFormatter();
 
-        $this->assertNull($formatter->format('this message will be destroyed'));
+        self::assertNull($formatter->format('this message will be destroyed'));
     }
 
     public function testGetStyle()
     {
         $formatter = new NullOutputFormatter();
-        $this->assertInstanceof(NullOutputFormatterStyle::class, $style = $formatter->getStyle('null'));
-        $this->assertSame($style, $formatter->getStyle('null'));
+        self::assertInstanceof(NullOutputFormatterStyle::class, $style = $formatter->getStyle('null'));
+        self::assertSame($style, $formatter->getStyle('null'));
     }
 
     public function testSetStyle()
@@ -40,25 +40,25 @@ class NullOutputFormatterTest extends TestCase
         $formatter = new NullOutputFormatter();
         $style = new OutputFormatterStyle();
         $formatter->setStyle('null', $style);
-        $this->assertNotSame($style, $formatter->getStyle('null'));
+        self::assertNotSame($style, $formatter->getStyle('null'));
     }
 
     public function testHasStyle()
     {
         $formatter = new NullOutputFormatter();
-        $this->assertFalse($formatter->hasStyle('null'));
+        self::assertFalse($formatter->hasStyle('null'));
     }
 
     public function testIsDecorated()
     {
         $formatter = new NullOutputFormatter();
-        $this->assertFalse($formatter->isDecorated());
+        self::assertFalse($formatter->isDecorated());
     }
 
     public function testSetDecorated()
     {
         $formatter = new NullOutputFormatter();
         $formatter->setDecorated(true);
-        $this->assertFalse($formatter->isDecorated());
+        self::assertFalse($formatter->isDecorated());
     }
 }

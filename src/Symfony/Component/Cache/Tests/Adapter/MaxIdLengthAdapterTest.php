@@ -19,16 +19,16 @@ class MaxIdLengthAdapterTest extends TestCase
 {
     public function testLongKey()
     {
-        $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
+        $cache = self::getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs([str_repeat('-', 10)])
             ->setMethods(['doHave', 'doFetch', 'doDelete', 'doSave', 'doClear'])
             ->getMock();
 
-        $cache->expects($this->exactly(2))
+        $cache->expects(self::exactly(2))
             ->method('doHave')
             ->withConsecutive(
-                [$this->equalTo('----------:nWfzGiCgLczv3SSUzXL3kg:')],
-                [$this->equalTo('----------:---------------------------------------')]
+                [self::equalTo('----------:nWfzGiCgLczv3SSUzXL3kg:')],
+                [self::equalTo('----------:---------------------------------------')]
             );
 
         $cache->hasItem(str_repeat('-', 40));
@@ -37,7 +37,7 @@ class MaxIdLengthAdapterTest extends TestCase
 
     public function testLongKeyVersioning()
     {
-        $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
+        $cache = self::getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs([str_repeat('-', 26)])
             ->getMock();
 
@@ -51,27 +51,27 @@ class MaxIdLengthAdapterTest extends TestCase
         $reflectionMethod->setAccessible(true);
 
         // No versioning enabled
-        $this->assertEquals('--------------------------:------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
-        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)])));
-        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 23)])));
-        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
+        self::assertEquals('--------------------------:------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
+        self::assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)])));
+        self::assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 23)])));
+        self::assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
 
         $reflectionProperty = $reflectionClass->getProperty('versioningIsEnabled');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($cache, true);
 
         // Versioning enabled
-        $this->assertEquals('--------------------------:2:------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
-        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)])));
-        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 23)])));
-        $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
+        self::assertEquals('--------------------------:2:------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
+        self::assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)])));
+        self::assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 23)])));
+        self::assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
     }
 
     public function testTooLongNamespace()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Namespace must be 26 chars max, 40 given ("----------------------------------------")');
-        $this->getMockBuilder(MaxIdLengthAdapter::class)
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Namespace must be 26 chars max, 40 given ("----------------------------------------")');
+        self::getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs([str_repeat('-', 40)])
             ->getMock();
     }

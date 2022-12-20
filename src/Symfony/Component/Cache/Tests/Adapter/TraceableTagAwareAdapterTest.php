@@ -25,13 +25,13 @@ class TraceableTagAwareAdapterTest extends TraceableAdapterTest
         $pool = new TraceableTagAwareAdapter(new TagAwareAdapter(new FilesystemAdapter()));
         $pool->invalidateTags(['foo']);
         $calls = $pool->getCalls();
-        $this->assertCount(1, $calls);
+        self::assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertSame('invalidateTags', $call->name);
-        $this->assertSame(0, $call->hits);
-        $this->assertSame(0, $call->misses);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('invalidateTags', $call->name);
+        self::assertSame(0, $call->hits);
+        self::assertSame(0, $call->misses);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 }

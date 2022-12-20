@@ -20,30 +20,30 @@ class InputFormFieldTest extends FormFieldTestCase
         $node = $this->createNode('input', '', ['type' => 'text', 'name' => 'name', 'value' => 'value']);
         $field = new InputFormField($node);
 
-        $this->assertEquals('value', $field->getValue(), '->initialize() sets the value of the field to the value attribute value');
+        self::assertEquals('value', $field->getValue(), '->initialize() sets the value of the field to the value attribute value');
 
         $node = $this->createNode('textarea', '');
         try {
             new InputFormField($node);
-            $this->fail('->initialize() throws a \LogicException if the node is not an input');
+            self::fail('->initialize() throws a \LogicException if the node is not an input');
         } catch (\LogicException $e) {
-            $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input');
+            self::assertTrue(true, '->initialize() throws a \LogicException if the node is not an input');
         }
 
         $node = $this->createNode('input', '', ['type' => 'checkbox']);
         try {
             new InputFormField($node);
-            $this->fail('->initialize() throws a \LogicException if the node is a checkbox');
+            self::fail('->initialize() throws a \LogicException if the node is a checkbox');
         } catch (\LogicException $e) {
-            $this->assertTrue(true, '->initialize() throws a \LogicException if the node is a checkbox');
+            self::assertTrue(true, '->initialize() throws a \LogicException if the node is a checkbox');
         }
 
         $node = $this->createNode('input', '', ['type' => 'file']);
         try {
             new InputFormField($node);
-            $this->fail('->initialize() throws a \LogicException if the node is a file');
+            self::fail('->initialize() throws a \LogicException if the node is a file');
         } catch (\LogicException $e) {
-            $this->assertTrue(true, '->initialize() throws a \LogicException if the node is a file');
+            self::assertTrue(true, '->initialize() throws a \LogicException if the node is a file');
         }
     }
 }

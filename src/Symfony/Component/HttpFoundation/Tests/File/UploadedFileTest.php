@@ -28,13 +28,13 @@ class UploadedFileTest extends TestCase
     protected function setUp(): void
     {
         if (!\ini_get('file_uploads')) {
-            $this->markTestSkipped('file_uploads is disabled in php.ini');
+            self::markTestSkipped('file_uploads is disabled in php.ini');
         }
     }
 
     public function testConstructWhenFileNotExists()
     {
-        $this->expectException(FileNotFoundException::class);
+        self::expectException(FileNotFoundException::class);
 
         new UploadedFile(
             __DIR__.'/Fixtures/not_here',
@@ -52,10 +52,10 @@ class UploadedFileTest extends TestCase
             \UPLOAD_ERR_OK
         );
 
-        $this->assertEquals('application/octet-stream', $file->getClientMimeType());
+        self::assertEquals('application/octet-stream', $file->getClientMimeType());
 
         if (\extension_loaded('fileinfo')) {
-            $this->assertEquals('image/gif', $file->getMimeType());
+            self::assertEquals('image/gif', $file->getMimeType());
         }
     }
 
@@ -68,7 +68,7 @@ class UploadedFileTest extends TestCase
             \UPLOAD_ERR_OK
         );
 
-        $this->assertEquals('application/octet-stream', $file->getClientMimeType());
+        self::assertEquals('application/octet-stream', $file->getClientMimeType());
     }
 
     public function testGuessClientExtension()
@@ -80,7 +80,7 @@ class UploadedFileTest extends TestCase
             null
         );
 
-        $this->assertEquals('gif', $file->guessClientExtension());
+        self::assertEquals('gif', $file->guessClientExtension());
     }
 
     public function testGuessClientExtensionWithIncorrectMimeType()
@@ -92,7 +92,7 @@ class UploadedFileTest extends TestCase
             null
         );
 
-        $this->assertEquals('png', $file->guessClientExtension());
+        self::assertEquals('png', $file->guessClientExtension());
     }
 
     public function testCaseSensitiveMimeType()
@@ -104,7 +104,7 @@ class UploadedFileTest extends TestCase
             null
         );
 
-        $this->assertEquals('xlsm', $file->guessClientExtension());
+        self::assertEquals('xlsm', $file->guessClientExtension());
     }
 
     public function testErrorIsOkByDefault()
@@ -116,7 +116,7 @@ class UploadedFileTest extends TestCase
             null
         );
 
-        $this->assertEquals(\UPLOAD_ERR_OK, $file->getError());
+        self::assertEquals(\UPLOAD_ERR_OK, $file->getError());
     }
 
     public function testGetClientOriginalName()
@@ -128,7 +128,7 @@ class UploadedFileTest extends TestCase
             null
         );
 
-        $this->assertEquals('original.gif', $file->getClientOriginalName());
+        self::assertEquals('original.gif', $file->getClientOriginalName());
     }
 
     public function testGetClientOriginalExtension()
@@ -140,12 +140,12 @@ class UploadedFileTest extends TestCase
             null
         );
 
-        $this->assertEquals('gif', $file->getClientOriginalExtension());
+        self::assertEquals('gif', $file->getClientOriginalExtension());
     }
 
     public function testMoveLocalFileIsNotAllowed()
     {
-        $this->expectException(FileException::class);
+        self::expectException(FileException::class);
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
@@ -199,7 +199,7 @@ class UploadedFileTest extends TestCase
                 $exceptionClass = FileException::class;
         }
 
-        $this->expectException($exceptionClass);
+        self::expectException($exceptionClass);
 
         $file->move(__DIR__.'/Fixtures/directory');
     }
@@ -223,9 +223,9 @@ class UploadedFileTest extends TestCase
 
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
 
-        $this->assertFileExists($targetPath);
-        $this->assertFileDoesNotExist($path);
-        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+        self::assertFileExists($targetPath);
+        self::assertFileDoesNotExist($path);
+        self::assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
     }
@@ -238,7 +238,7 @@ class UploadedFileTest extends TestCase
             'image/gif'
         );
 
-        $this->assertEquals('original.gif', $file->getClientOriginalName());
+        self::assertEquals('original.gif', $file->getClientOriginalName());
     }
 
     public function testGetSize()
@@ -249,7 +249,7 @@ class UploadedFileTest extends TestCase
             'image/gif'
         );
 
-        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
+        self::assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
 
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test',
@@ -257,7 +257,7 @@ class UploadedFileTest extends TestCase
             'image/gif'
         );
 
-        $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
+        self::assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
     }
 
     public function testGetExtension()
@@ -267,7 +267,7 @@ class UploadedFileTest extends TestCase
             'original.gif'
         );
 
-        $this->assertEquals('gif', $file->getExtension());
+        self::assertEquals('gif', $file->getExtension());
     }
 
     public function testIsValid()
@@ -280,7 +280,7 @@ class UploadedFileTest extends TestCase
             true
         );
 
-        $this->assertTrue($file->isValid());
+        self::assertTrue($file->isValid());
     }
 
     /**
@@ -295,7 +295,7 @@ class UploadedFileTest extends TestCase
             $error
         );
 
-        $this->assertFalse($file->isValid());
+        self::assertFalse($file->isValid());
     }
 
     public function uploadedFileErrorProvider()
@@ -318,7 +318,7 @@ class UploadedFileTest extends TestCase
             \UPLOAD_ERR_OK
         );
 
-        $this->assertFalse($file->isValid());
+        self::assertFalse($file->isValid());
     }
 
     public function testGetMaxFilesize()
@@ -326,15 +326,15 @@ class UploadedFileTest extends TestCase
         $size = UploadedFile::getMaxFilesize();
 
         if ($size > \PHP_INT_MAX) {
-            $this->assertIsFloat($size);
+            self::assertIsFloat($size);
         } else {
-            $this->assertIsInt($size);
+            self::assertIsInt($size);
         }
 
-        $this->assertGreaterThan(0, $size);
+        self::assertGreaterThan(0, $size);
 
         if (0 === (int) \ini_get('post_max_size') && 0 === (int) \ini_get('upload_max_filesize')) {
-            $this->assertSame(\PHP_INT_MAX, $size);
+            self::assertSame(\PHP_INT_MAX, $size);
         }
     }
 }

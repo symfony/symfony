@@ -43,6 +43,6 @@ class QtFileDumperTest extends TestCase
 
         $dumper = new QtFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/resources.ts', $dumper->formatCatalogue($catalogue, 'resources'));
+        self::assertStringEqualsFile(__DIR__.'/../fixtures/resources.ts', $dumper->formatCatalogue($catalogue, 'resources'));
     }
 }

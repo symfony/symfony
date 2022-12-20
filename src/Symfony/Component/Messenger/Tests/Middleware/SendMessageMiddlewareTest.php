@@ -31,33 +31,33 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = self::createMock(SenderInterface::class);
 
         $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['my_sender']], ['my_sender' => $sender]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'my_sender')))->willReturnArgument(0);
+        $sender->expects(self::once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'my_sender')))->willReturnArgument(0);
 
         $envelope = $middleware->handle($envelope, $this->getStackMock(false));
 
         /* @var SentStamp $stamp */
-        $this->assertInstanceOf(SentStamp::class, $stamp = $envelope->last(SentStamp::class), 'it adds a sent stamp');
-        $this->assertSame('my_sender', $stamp->getSenderAlias());
-        $this->assertStringMatchesFormat('Mock_SenderInterface_%s', $stamp->getSenderClass());
+        self::assertInstanceOf(SentStamp::class, $stamp = $envelope->last(SentStamp::class), 'it adds a sent stamp');
+        self::assertSame('my_sender', $stamp->getSenderAlias());
+        self::assertStringMatchesFormat('Mock_SenderInterface_%s', $stamp->getSenderClass());
     }
 
     public function testItSendsTheMessageToMultipleSenders()
     {
         $envelope = new Envelope(new DummyMessage('Hey'));
-        $sender = $this->createMock(SenderInterface::class);
-        $sender2 = $this->createMock(SenderInterface::class);
+        $sender = self::createMock(SenderInterface::class);
+        $sender2 = self::createMock(SenderInterface::class);
 
         $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['foo', 'bar']], ['foo' => $sender, 'bar' => $sender2]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $sender->expects($this->once())
+        $sender->expects(self::once())
             ->method('send')
-            ->with($this->callback(function (Envelope $envelope) {
+            ->with(self::callback(function (Envelope $envelope) {
                 /** @var SentStamp|null $lastSentStamp */
                 $lastSentStamp = $envelope->last(SentStamp::class);
 
@@ -65,9 +65,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
                 return null !== $lastSentStamp && 'foo' === $lastSentStamp->getSenderAlias();
             }))
             ->willReturnArgument(0);
-        $sender2->expects($this->once())
+        $sender2->expects(self::once())
             ->method('send')
-            ->with($this->callback(function (Envelope $envelope) {
+            ->with(self::callback(function (Envelope $envelope) {
                 /** @var SentStamp|null $lastSentStamp */
                 $lastSentStamp = $envelope->last(SentStamp::class);
 
@@ -80,18 +80,18 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         /** @var SentStamp[] $sentStamps */
         $sentStamps = $envelope->all(SentStamp::class);
-        $this->assertCount(2, $sentStamps);
+        self::assertCount(2, $sentStamps);
     }
 
     public function testItSendsTheMessageToAssignedSenderWithPreWrappedMessage()
     {
         $envelope = new Envelope(new ChildDummyMessage('Hey'));
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = self::createMock(SenderInterface::class);
 
         $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['foo_sender']], ['foo_sender' => $sender]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'foo_sender')))->willReturn($envelope);
+        $sender->expects(self::once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'foo_sender')))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock(false));
     }
@@ -100,12 +100,12 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     {
         $message = new ChildDummyMessage('Hey');
         $envelope = new Envelope($message);
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = self::createMock(SenderInterface::class);
 
         $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['foo_sender']], ['foo_sender' => $sender]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'foo_sender')))->willReturn($envelope);
+        $sender->expects(self::once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'foo_sender')))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock(false));
     }
@@ -114,12 +114,12 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = self::createMock(SenderInterface::class);
 
         $sendersLocator = $this->createSendersLocator([DummyMessageInterface::class => ['foo_sender']], ['foo_sender' => $sender]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'foo_sender')))->willReturn($envelope);
+        $sender->expects(self::once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'foo_sender')))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock(false));
     }
@@ -128,12 +128,12 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = self::createMock(SenderInterface::class);
 
         $sendersLocator = $this->createSendersLocator(['*' => ['foo_sender']], ['foo_sender' => $sender]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'foo_sender')))->willReturn($envelope);
+        $sender->expects(self::once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'foo_sender')))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock(false));
     }
@@ -152,35 +152,35 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     {
         $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('transport'));
 
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = self::createMock(SenderInterface::class);
 
         $sendersLocator = $this->createSendersLocator(['*' => ['foo']], ['foo' => $sender]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $sender->expects($this->never())->method('send');
+        $sender->expects(self::never())->method('send');
 
         $envelope = $middleware->handle($envelope, $this->getStackMock());
 
-        $this->assertNull($envelope->last(SentStamp::class), 'it does not add sent stamp for received messages');
+        self::assertNull($envelope->last(SentStamp::class), 'it does not add sent stamp for received messages');
     }
 
     public function testItDispatchesTheEventOneTime()
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects($this->once())
+        $dispatcher = self::createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(new SendMessageToTransportsEvent($envelope));
 
-        $sender1 = $this->createMock(SenderInterface::class);
-        $sender2 = $this->createMock(SenderInterface::class);
+        $sender1 = self::createMock(SenderInterface::class);
+        $sender2 = self::createMock(SenderInterface::class);
 
         $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['foo', 'bar']], ['foo' => $sender1, 'bar' => $sender2]);
         $middleware = new SendMessageMiddleware($sendersLocator, $dispatcher);
 
-        $sender1->expects($this->once())->method('send')->willReturn($envelope);
-        $sender2->expects($this->once())->method('send')->willReturn($envelope);
+        $sender1->expects(self::once())->method('send')->willReturn($envelope);
+        $sender2->expects(self::once())->method('send')->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock(false));
     }
@@ -189,8 +189,8 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects($this->never())->method('dispatch');
+        $dispatcher = self::createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::never())->method('dispatch');
 
         $middleware = new SendMessageMiddleware($this->createSendersLocator([], []), $dispatcher);
 
@@ -199,13 +199,13 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
     private function createSendersLocator(array $sendersMap, array $senders): SendersLocator
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())
+        $container = self::createMock(ContainerInterface::class);
+        $container->expects(self::any())
             ->method('has')
             ->willReturnCallback(function ($id) use ($senders) {
                 return isset($senders[$id]);
             });
-        $container->expects($this->any())
+        $container->expects(self::any())
             ->method('get')
             ->willReturnCallback(function ($id) use ($senders) {
                 return $senders[$id];

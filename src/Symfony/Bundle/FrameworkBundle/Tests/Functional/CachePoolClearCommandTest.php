@@ -25,7 +25,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
 {
     protected function setUp(): void
     {
-        static::bootKernel(['test_case' => 'CachePoolClear', 'root_config' => 'config.yml']);
+        self::bootKernel(['test_case' => 'CachePoolClear', 'root_config' => 'config.yml']);
     }
 
     public function testClearPrivatePool()
@@ -34,8 +34,8 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $tester->execute(['pools' => ['cache.private_pool']], ['decorated' => false]);
 
         $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
-        $this->assertStringContainsString('Clearing cache pool: cache.private_pool', $tester->getDisplay());
-        $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
+        self::assertStringContainsString('Clearing cache pool: cache.private_pool', $tester->getDisplay());
+        self::assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
     public function testClearPublicPool()
@@ -44,8 +44,8 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $tester->execute(['pools' => ['cache.public_pool']], ['decorated' => false]);
 
         $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
-        $this->assertStringContainsString('Clearing cache pool: cache.public_pool', $tester->getDisplay());
-        $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
+        self::assertStringContainsString('Clearing cache pool: cache.public_pool', $tester->getDisplay());
+        self::assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
     public function testClearPoolWithCustomClearer()
@@ -54,8 +54,8 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $tester->execute(['pools' => ['cache.pool_with_clearer']], ['decorated' => false]);
 
         $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
-        $this->assertStringContainsString('Clearing cache pool: cache.pool_with_clearer', $tester->getDisplay());
-        $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
+        self::assertStringContainsString('Clearing cache pool: cache.pool_with_clearer', $tester->getDisplay());
+        self::assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
     public function testCallClearer()
@@ -64,14 +64,14 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $tester->execute(['pools' => ['cache.app_clearer']], ['decorated' => false]);
 
         $tester->assertCommandIsSuccessful('cache:pool:clear exits with 0 in case of success');
-        $this->assertStringContainsString('Calling cache clearer: cache.app_clearer', $tester->getDisplay());
-        $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
+        self::assertStringContainsString('Calling cache clearer: cache.app_clearer', $tester->getDisplay());
+        self::assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
     public function testClearUnexistingPool()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('You have requested a non-existent service "unknown_pool"');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('You have requested a non-existent service "unknown_pool"');
         $this->createCommandTester()
             ->execute(['pools' => ['unknown_pool']], ['decorated' => false]);
     }
@@ -80,7 +80,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
     {
         $tester = $this->createCommandTester();
         /** @var FilesystemAdapter $pool */
-        $pool = static::getContainer()->get('cache.public_pool');
+        $pool = self::getContainer()->get('cache.public_pool');
         $item = $pool->getItem('foo');
         $item->set('baz');
         $pool->save($item);
@@ -100,15 +100,15 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
 
         $tester->execute(['pools' => ['cache.public_pool']]);
 
-        $this->assertSame(1, $tester->getStatusCode(), 'cache:pool:clear exits with 1 in case of error');
-        $this->assertStringNotContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
-        $this->assertStringContainsString('[WARNING] Cache pool "cache.public_pool" could not be cleared.', $tester->getDisplay());
+        self::assertSame(1, $tester->getStatusCode(), 'cache:pool:clear exits with 1 in case of error');
+        self::assertStringNotContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
+        self::assertStringContainsString('[WARNING] Cache pool "cache.public_pool" could not be cleared.', $tester->getDisplay());
     }
 
     private function createCommandTester()
     {
         $application = new Application(static::$kernel);
-        $application->add(new CachePoolClearCommand(static::getContainer()->get('cache.global_clearer')));
+        $application->add(new CachePoolClearCommand(self::getContainer()->get('cache.global_clearer')));
 
         return new CommandTester($application->find('cache:pool:clear'));
     }

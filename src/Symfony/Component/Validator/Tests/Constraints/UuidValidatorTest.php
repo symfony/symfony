@@ -44,15 +44,15 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsUuidConstraintCompatibleType()
     {
-        $this->expectException(UnexpectedTypeException::class);
-        $constraint = $this->getMockForAbstractClass(Constraint::class);
+        self::expectException(UnexpectedTypeException::class);
+        $constraint = self::getMockForAbstractClass(Constraint::class);
 
         $this->validator->validate('216fff40-98d9-11e3-a5e2-0800200c9a66', $constraint);
     }
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Uuid());
     }
 

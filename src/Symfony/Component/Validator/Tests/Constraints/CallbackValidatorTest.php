@@ -183,7 +183,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectValidMethods()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(['callback' => ['foobar']]));
@@ -191,7 +191,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectValidCallbacks()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(['callback' => ['foo', 'bar']]));
@@ -202,7 +202,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Callback([]);
         $targets = [Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT];
 
-        $this->assertEquals($targets, $constraint->getTargets());
+        self::assertEquals($targets, $constraint->getTargets());
     }
 
     // Should succeed. Needed when defining constraints as annotations.
@@ -210,21 +210,21 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Callback();
 
-        $this->assertSame([Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT], $constraint->getTargets());
+        self::assertSame([Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT], $constraint->getTargets());
     }
 
     public function testAnnotationInvocationSingleValued()
     {
         $constraint = new Callback(['value' => 'validateStatic']);
 
-        $this->assertEquals(new Callback('validateStatic'), $constraint);
+        self::assertEquals(new Callback('validateStatic'), $constraint);
     }
 
     public function testAnnotationInvocationMultiValued()
     {
         $constraint = new Callback(['value' => [__CLASS__.'_Class', 'validateCallback']]);
 
-        $this->assertEquals(new Callback([__CLASS__.'_Class', 'validateCallback']), $constraint);
+        self::assertEquals(new Callback([__CLASS__.'_Class', 'validateCallback']), $constraint);
     }
 
     public function testPayloadIsPassedToCallback()
@@ -240,13 +240,13 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
             'payload' => 'Hello world!',
         ]);
         $this->validator->validate($object, $constraint);
-        $this->assertEquals('Hello world!', $payloadCopy);
+        self::assertEquals('Hello world!', $payloadCopy);
 
         if (\PHP_VERSION_ID >= 80000) {
             $payloadCopy = 'Replace me!';
             $constraint = eval('return new \Symfony\Component\Validator\Constraints\Callback(callback: $callback, payload: "Hello world!");');
             $this->validator->validate($object, $constraint);
-            $this->assertEquals('Hello world!', $payloadCopy);
+            self::assertEquals('Hello world!', $payloadCopy);
             $payloadCopy = 'Replace me!';
         }
 
@@ -255,6 +255,6 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
             'callback' => $callback,
         ]);
         $this->validator->validate($object, $constraint);
-        $this->assertNull($payloadCopy);
+        self::assertNull($payloadCopy);
     }
 }

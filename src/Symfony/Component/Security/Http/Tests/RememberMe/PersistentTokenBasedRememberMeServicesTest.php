@@ -46,7 +46,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
     {
         $service = $this->getService(null, ['name' => 'foo']);
 
-        $this->assertNull($service->autoLogin(new Request()));
+        self::assertNull($service->autoLogin(new Request()));
     }
 
     public function testAutoLoginThrowsExceptionOnInvalidCookie()
@@ -56,8 +56,8 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request->request->set('foo', 'true');
         $request->cookies->set('foo', 'foo');
 
-        $this->assertNull($service->autoLogin($request));
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertNull($service->autoLogin($request));
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testAutoLoginThrowsExceptionOnNonExistentToken()
@@ -70,16 +70,16 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
             $tokenValue = 'foovalue',
         ]));
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $tokenProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loadTokenBySeries')
             ->willThrowException(new TokenNotFoundException('Token not found.'))
         ;
         $service->setTokenProvider($tokenProvider);
 
-        $this->assertNull($service->autoLogin($request));
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertNull($service->autoLogin($request));
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testAutoLoginReturnsNullOnNonExistentUser()
@@ -89,16 +89,16 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $tokenProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loadTokenBySeries')
             ->willReturn(new PersistentToken('fooclass', 'fooname', 'fooseries', $this->generateHash('foovalue'), new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 
-        $this->assertNull($service->autoLogin($request));
-        $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
+        self::assertNull($service->autoLogin($request));
+        self::assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
     public function testAutoLoginThrowsExceptionOnStolenCookieAndRemovesItFromThePersistentBackend()
@@ -108,29 +108,29 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $service->setTokenProvider($tokenProvider);
 
         $tokenProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loadTokenBySeries')
             ->willReturn(new PersistentToken('fooclass', 'foouser', 'fooseries', 'anotherFooValue', new \DateTime()))
         ;
 
         $tokenProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('deleteTokenBySeries')
-            ->with($this->equalTo('fooseries'))
+            ->with(self::equalTo('fooseries'))
             ->willReturn(null)
         ;
 
         try {
             $service->autoLogin($request);
-            $this->fail('Expected CookieTheftException was not thrown.');
+            self::fail('Expected CookieTheftException was not thrown.');
         } catch (CookieTheftException $e) {
         }
 
-        $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
+        self::assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
     public function testAutoLoginDoesNotAcceptAnExpiredCookie()
@@ -139,17 +139,17 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $tokenProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loadTokenBySeries')
-            ->with($this->equalTo('fooseries'))
+            ->with(self::equalTo('fooseries'))
             ->willReturn(new PersistentToken('fooclass', 'username', 'fooseries', $this->generateHash('foovalue'), new \DateTime('yesterday')))
         ;
         $service->setTokenProvider($tokenProvider);
 
-        $this->assertNull($service->autoLogin($request));
-        $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
+        self::assertNull($service->autoLogin($request));
+        self::assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
     /**
@@ -167,22 +167,22 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $tokenValue = $hashTokenValue ? $this->generateHash('foovalue') : 'foovalue';
         $tokenProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loadTokenBySeries')
-            ->with($this->equalTo('fooseries'))
+            ->with(self::equalTo('fooseries'))
             ->willReturn(new PersistentToken(InMemoryUser::class, 'foouser', 'fooseries', $tokenValue, new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 
         $returnedToken = $service->autoLogin($request);
 
-        $this->assertInstanceOf(RememberMeToken::class, $returnedToken);
-        $this->assertTrue($user->isEqualTo($returnedToken->getUser()));
-        $this->assertEquals('foosecret', $returnedToken->getSecret());
-        $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
+        self::assertInstanceOf(RememberMeToken::class, $returnedToken);
+        self::assertTrue($user->isEqualTo($returnedToken->getUser()));
+        self::assertEquals('foosecret', $returnedToken->getSecret());
+        self::assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
     public function testLogout()
@@ -191,13 +191,13 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
         $response = new Response();
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $tokenProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('deleteTokenBySeries')
-            ->with($this->equalTo('fooseries'))
+            ->with(self::equalTo('fooseries'))
             ->willReturn(null)
         ;
         $service->setTokenProvider($tokenProvider);
@@ -205,11 +205,11 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $service->logout($request, $response, $token);
 
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
-        $this->assertTrue($cookie->isCleared());
-        $this->assertEquals('/foo', $cookie->getPath());
-        $this->assertEquals('foodomain.foo', $cookie->getDomain());
-        $this->assertTrue($cookie->isSecure());
-        $this->assertFalse($cookie->isHttpOnly());
+        self::assertTrue($cookie->isCleared());
+        self::assertEquals('/foo', $cookie->getPath());
+        self::assertEquals('foodomain.foo', $cookie->getDomain());
+        self::assertTrue($cookie->isSecure());
+        self::assertFalse($cookie->isHttpOnly());
     }
 
     public function testLogoutSimplyIgnoresNonSetRequestCookie()
@@ -217,11 +217,11 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $tokenProvider
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('deleteTokenBySeries')
         ;
         $service->setTokenProvider($tokenProvider);
@@ -229,9 +229,9 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $service->logout($request, $response, $token);
 
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
-        $this->assertTrue($cookie->isCleared());
-        $this->assertEquals('/', $cookie->getPath());
-        $this->assertNull($cookie->getDomain());
+        self::assertTrue($cookie->isCleared());
+        self::assertEquals('/', $cookie->getPath());
+        self::assertNull($cookie->getDomain());
     }
 
     public function testLogoutSimplyIgnoresInvalidCookie()
@@ -240,18 +240,18 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', 'somefoovalue');
         $response = new Response();
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $tokenProvider
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('deleteTokenBySeries')
         ;
         $service->setTokenProvider($tokenProvider);
 
         $service->logout($request, $response, $token);
 
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testLoginFail()
@@ -259,9 +259,9 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
 
-        $this->assertFalse($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
+        self::assertFalse($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
         $service->loginFail($request);
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testLoginSuccessSetsCookieWhenLoggedInWithNonRememberMeTokenInterfaceImplementation()
@@ -271,34 +271,34 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $response = new Response();
 
         $account = new InMemoryUser('foo', null);
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $token
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getUser')
             ->willReturn($account)
         ;
 
-        $tokenProvider = $this->createMock(TokenProviderInterface::class);
+        $tokenProvider = self::createMock(TokenProviderInterface::class);
         $tokenProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('createNewToken')
         ;
         $service->setTokenProvider($tokenProvider);
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(0, $cookies);
+        self::assertCount(0, $cookies);
 
         $service->loginSuccess($request, $response, $token);
 
         $cookies = $response->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
         $cookie = $cookies['myfoodomain.foo']['/foo/path']['foo'];
-        $this->assertFalse($cookie->isCleared());
-        $this->assertTrue($cookie->isSecure());
-        $this->assertTrue($cookie->isHttpOnly());
-        $this->assertTrue($cookie->getExpiresTime() > time() + 3590 && $cookie->getExpiresTime() < time() + 3610);
-        $this->assertEquals('myfoodomain.foo', $cookie->getDomain());
-        $this->assertEquals('/foo/path', $cookie->getPath());
-        $this->assertSame(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
+        self::assertFalse($cookie->isCleared());
+        self::assertTrue($cookie->isSecure());
+        self::assertTrue($cookie->isHttpOnly());
+        self::assertTrue($cookie->getExpiresTime() > time() + 3590 && $cookie->getExpiresTime() < time() + 3610);
+        self::assertEquals('myfoodomain.foo', $cookie->getDomain());
+        self::assertEquals('/foo/path', $cookie->getPath());
+        self::assertSame(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
     }
 
     protected function encodeCookie(array $parts)

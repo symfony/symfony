@@ -41,7 +41,7 @@ ERROR;
      */
     public function testParseError(string $mimeType, string $json, string $expectedMessage)
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
         $response
             ->method('getInfo')
             ->willReturnMap([
@@ -55,8 +55,8 @@ ERROR;
         $response->method('getContent')->willReturn($json);
 
         $e = new TestException($response);
-        $this->assertSame(400, $e->getCode());
-        $this->assertSame($expectedMessage, $e->getMessage());
+        self::assertSame(400, $e->getCode());
+        self::assertSame($expectedMessage, $e->getMessage());
     }
 }
 

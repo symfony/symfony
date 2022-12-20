@@ -51,7 +51,7 @@ digraph workflow {
 
 EOGRAPH;
 
-        $this->assertEquals($expected, $dump);
+        self::assertEquals($expected, $dump);
     }
 
     public function testDumpWithMarking()
@@ -79,6 +79,6 @@ EOGRAPH;
 
         $dump = $this->dumper->dump($definition, $marking);
 
-        $this->assertEquals($expected, $dump);
+        self::assertEquals($expected, $dump);
     }
 }

@@ -42,13 +42,13 @@ class SendmailTransportTest extends TestCase
     public function testToString()
     {
         $t = new SendmailTransport();
-        $this->assertEquals('smtp://sendmail', (string) $t);
+        self::assertEquals('smtp://sendmail', (string) $t);
     }
 
     public function testToIsUsedWhenRecipientsAreNotSet()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
+            self::markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
         }
 
         $mail = new Email();
@@ -64,13 +64,13 @@ class SendmailTransportTest extends TestCase
         $sendmailTransport = new SendmailTransport(self::FAKE_SENDMAIL);
         $sendmailTransport->send($mail, $envelope);
 
-        $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com to@mail.com');
+        self::assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com to@mail.com');
     }
 
     public function testRecipientsAreUsedWhenSet()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
+            self::markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
         }
 
         $mail = new Email();
@@ -87,6 +87,6 @@ class SendmailTransportTest extends TestCase
         $sendmailTransport = new SendmailTransport(self::FAKE_SENDMAIL);
         $sendmailTransport->send($mail, $envelope);
 
-        $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com recipient@mail.com');
+        self::assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com recipient@mail.com');
     }
 }

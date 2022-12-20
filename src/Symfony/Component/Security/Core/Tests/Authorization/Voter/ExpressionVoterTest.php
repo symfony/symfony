@@ -29,7 +29,7 @@ class ExpressionVoterTest extends TestCase
     {
         $voter = new ExpressionVoter($this->createExpressionLanguage($expressionLanguageExpectsEvaluate), $this->createTrustResolver(), $this->createAuthorizationChecker());
 
-        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles, $tokenExpectsGetRoles), null, $attributes));
+        self::assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles, $tokenExpectsGetRoles), null, $attributes));
     }
 
     public function getVoteTests()
@@ -47,10 +47,10 @@ class ExpressionVoterTest extends TestCase
 
     protected function getTokenWithRoleNames(array $roles, $tokenExpectsGetRoles = true)
     {
-        $token = $this->createMock(AbstractToken::class);
+        $token = self::createMock(AbstractToken::class);
 
         if ($tokenExpectsGetRoles) {
-            $token->expects($this->once())
+            $token->expects(self::once())
                 ->method('getRoleNames')
                 ->willReturn($roles);
         }
@@ -60,10 +60,10 @@ class ExpressionVoterTest extends TestCase
 
     protected function createExpressionLanguage($expressionLanguageExpectsEvaluate = true)
     {
-        $mock = $this->createMock(ExpressionLanguage::class);
+        $mock = self::createMock(ExpressionLanguage::class);
 
         if ($expressionLanguageExpectsEvaluate) {
-            $mock->expects($this->once())
+            $mock->expects(self::once())
                 ->method('evaluate')
                 ->willReturn(true);
         }
@@ -73,16 +73,16 @@ class ExpressionVoterTest extends TestCase
 
     protected function createTrustResolver()
     {
-        return $this->createMock(AuthenticationTrustResolverInterface::class);
+        return self::createMock(AuthenticationTrustResolverInterface::class);
     }
 
     protected function createAuthorizationChecker()
     {
-        return $this->createMock(AuthorizationCheckerInterface::class);
+        return self::createMock(AuthorizationCheckerInterface::class);
     }
 
     protected function createExpression()
     {
-        return $this->createMock(Expression::class);
+        return self::createMock(Expression::class);
     }
 }

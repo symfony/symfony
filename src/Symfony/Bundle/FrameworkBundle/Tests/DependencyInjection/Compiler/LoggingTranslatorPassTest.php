@@ -36,13 +36,10 @@ class LoggingTranslatorPassTest extends TestCase
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
 
-        $this->assertEquals(
-            ['container.service_subscriber' => [
-                ['id' => 'foo'],
-                ['key' => 'translator', 'id' => 'translator.logging.inner'],
-            ]],
-            $translationWarmerDefinition->getTags()
-        );
+        self::assertEquals(['container.service_subscriber' => [
+            ['id' => 'foo'],
+            ['key' => 'translator', 'id' => 'translator.logging.inner'],
+        ]], $translationWarmerDefinition->getTags());
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNotLoggerDefinition()
@@ -58,8 +55,8 @@ class LoggingTranslatorPassTest extends TestCase
         $pass->process($container);
 
         // the container is untouched (i.e. no new definitions or aliases)
-        $this->assertCount($definitionsBefore, $container->getDefinitions());
-        $this->assertCount($aliasesBefore, $container->getAliases());
+        self::assertCount($definitionsBefore, $container->getDefinitions());
+        self::assertCount($aliasesBefore, $container->getAliases());
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNotTranslatorDefinition()
@@ -75,7 +72,7 @@ class LoggingTranslatorPassTest extends TestCase
         $pass->process($container);
 
         // the container is untouched (i.e. no new definitions or aliases)
-        $this->assertCount($definitionsBefore, $container->getDefinitions());
-        $this->assertCount($aliasesBefore, $container->getAliases());
+        self::assertCount($definitionsBefore, $container->getDefinitions());
+        self::assertCount($aliasesBefore, $container->getAliases());
     }
 }

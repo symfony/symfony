@@ -23,24 +23,24 @@ class CacheTraitTest extends TestCase
 {
     public function testSave()
     {
-        $item = $this->createMock(CacheItemInterface::class);
+        $item = self::createMock(CacheItemInterface::class);
         $item->method('set')
             ->willReturn($item);
         $item->method('isHit')
             ->willReturn(false);
 
-        $item->expects($this->once())
+        $item->expects(self::once())
             ->method('set')
             ->with('computed data');
 
-        $cache = $this->getMockBuilder(TestPool::class)
+        $cache = self::getMockBuilder(TestPool::class)
             ->setMethods(['getItem', 'save'])
             ->getMock();
-        $cache->expects($this->once())
+        $cache->expects(self::once())
             ->method('getItem')
             ->with('key')
             ->willReturn($item);
-        $cache->expects($this->once())
+        $cache->expects(self::once())
             ->method('save');
 
         $callback = function (CacheItemInterface $item) {
@@ -52,26 +52,26 @@ class CacheTraitTest extends TestCase
 
     public function testNoCallbackCallOnHit()
     {
-        $item = $this->createMock(CacheItemInterface::class);
+        $item = self::createMock(CacheItemInterface::class);
         $item->method('isHit')
             ->willReturn(true);
 
-        $item->expects($this->never())
+        $item->expects(self::never())
             ->method('set');
 
-        $cache = $this->getMockBuilder(TestPool::class)
+        $cache = self::getMockBuilder(TestPool::class)
             ->setMethods(['getItem', 'save'])
             ->getMock();
 
-        $cache->expects($this->once())
+        $cache->expects(self::once())
             ->method('getItem')
             ->with('key')
             ->willReturn($item);
-        $cache->expects($this->never())
+        $cache->expects(self::never())
             ->method('save');
 
         $callback = function (CacheItemInterface $item) {
-            $this->assertTrue(false, 'This code should never be reached');
+            self::assertTrue(false, 'This code should never be reached');
         };
 
         $cache->get('key', $callback);
@@ -79,26 +79,26 @@ class CacheTraitTest extends TestCase
 
     public function testRecomputeOnBetaInf()
     {
-        $item = $this->createMock(CacheItemInterface::class);
+        $item = self::createMock(CacheItemInterface::class);
         $item->method('set')
             ->willReturn($item);
         $item->method('isHit')
             // We want to recompute even if it is a hit
             ->willReturn(true);
 
-        $item->expects($this->once())
+        $item->expects(self::once())
             ->method('set')
             ->with('computed data');
 
-        $cache = $this->getMockBuilder(TestPool::class)
+        $cache = self::getMockBuilder(TestPool::class)
             ->setMethods(['getItem', 'save'])
             ->getMock();
 
-        $cache->expects($this->once())
+        $cache->expects(self::once())
             ->method('getItem')
             ->with('key')
             ->willReturn($item);
-        $cache->expects($this->once())
+        $cache->expects(self::once())
             ->method('save');
 
         $callback = function (CacheItemInterface $item) {
@@ -110,7 +110,7 @@ class CacheTraitTest extends TestCase
 
     public function testExceptionOnNegativeBeta()
     {
-        $cache = $this->getMockBuilder(TestPool::class)
+        $cache = self::getMockBuilder(TestPool::class)
             ->setMethods(['getItem', 'save'])
             ->getMock();
 
@@ -118,7 +118,7 @@ class CacheTraitTest extends TestCase
             return 'computed data';
         };
 
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $cache->get('key', $callback, -2);
     }
 }

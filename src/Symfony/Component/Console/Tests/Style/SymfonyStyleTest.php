@@ -55,7 +55,7 @@ class SymfonyStyleTest extends TestCase
         $code = require $inputCommandFilepath;
         $this->command->setCode($code);
         $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
-        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
+        self::assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
     /**
@@ -66,7 +66,7 @@ class SymfonyStyleTest extends TestCase
         $code = require $inputCommandFilepath;
         $this->command->setCode($code);
         $this->tester->execute([], ['interactive' => true, 'decorated' => false]);
-        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
+        self::assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
     public function inputInteractiveCommandToOutputFilesProvider()
@@ -95,27 +95,27 @@ class SymfonyStyleTest extends TestCase
 
         $this->command->setCode($code);
         $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
-        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
+        self::assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
     public function testGetErrorStyle()
     {
-        $input = $this->createMock(InputInterface::class);
+        $input = self::createMock(InputInterface::class);
 
-        $errorOutput = $this->createMock(OutputInterface::class);
+        $errorOutput = self::createMock(OutputInterface::class);
         $errorOutput
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
         $errorOutput
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('write');
 
-        $output = $this->createMock(ConsoleOutputInterface::class);
+        $output = self::createMock(ConsoleOutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
         $output
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getErrorOutput')
             ->willReturn($errorOutput);
 
@@ -125,15 +125,15 @@ class SymfonyStyleTest extends TestCase
 
     public function testCreateTableWithConsoleOutput()
     {
-        $input = $this->createMock(InputInterface::class);
-        $output = $this->createMock(ConsoleOutputInterface::class);
+        $input = self::createMock(InputInterface::class);
+        $output = self::createMock(ConsoleOutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
         $output
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('section')
-            ->willReturn($this->createMock(ConsoleSectionOutput::class));
+            ->willReturn(self::createMock(ConsoleSectionOutput::class));
 
         $style = new SymfonyStyle($input, $output);
 
@@ -142,30 +142,30 @@ class SymfonyStyleTest extends TestCase
 
     public function testCreateTableWithoutConsoleOutput()
     {
-        $input = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
+        $input = self::createMock(InputInterface::class);
+        $output = self::createMock(OutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
 
         $style = new SymfonyStyle($input, $output);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectDeprecationMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput"');
+        self::expectException(RuntimeException::class);
+        self::expectDeprecationMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput"');
 
         $style->createTable()->appendRow(['row']);
     }
 
     public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable()
     {
-        $output = $this->createMock(OutputInterface::class);
+        $output = self::createMock(OutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
 
-        $style = new SymfonyStyle($this->createMock(InputInterface::class), $output);
+        $style = new SymfonyStyle(self::createMock(InputInterface::class), $output);
 
-        $this->assertInstanceOf(SymfonyStyle::class, $style->getErrorStyle());
+        self::assertInstanceOf(SymfonyStyle::class, $style->getErrorStyle());
     }
 
     public function testMemoryConsumption()
@@ -179,6 +179,6 @@ class SymfonyStyleTest extends TestCase
             $io->writeln($str, SymfonyStyle::VERBOSITY_QUIET);
         }
 
-        $this->assertSame(0, memory_get_usage() - $start);
+        self::assertSame(0, memory_get_usage() - $start);
     }
 }

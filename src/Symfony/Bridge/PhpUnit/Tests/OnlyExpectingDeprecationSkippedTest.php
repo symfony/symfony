@@ -29,6 +29,6 @@ final class OnlyExpectingDeprecationSkippedTest extends TestCase
      */
     public function testExpectingOnlyDeprecations()
     {
-        $this->fail('should never be ran.');
+        self::fail('should never be ran.');
     }
 }

@@ -27,15 +27,15 @@ class ApcuAdapterTest extends AdapterTestCase
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         if (!\function_exists('apcu_fetch') || !filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN)) {
-            $this->markTestSkipped('APCu extension is required.');
+            self::markTestSkipped('APCu extension is required.');
         }
         if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
-            if ('testWithCliSapi' !== $this->getName()) {
-                $this->markTestSkipped('apc.enable_cli=1 is required.');
+            if ('testWithCliSapi' !== self::getName()) {
+                self::markTestSkipped('apc.enable_cli=1 is required.');
             }
         }
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Fails transiently on Windows.');
+            self::markTestSkipped('Fails transiently on Windows.');
         }
 
         return new ApcuAdapter(str_replace('\\', '.', __CLASS__), $defaultLifetime);
@@ -48,10 +48,10 @@ class ApcuAdapterTest extends AdapterTestCase
         $item = $pool->getItem('foo');
         $item->set(function () {});
 
-        $this->assertFalse($pool->save($item));
+        self::assertFalse($pool->save($item));
 
         $item = $pool->getItem('foo');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
     }
 
     public function testVersion()
@@ -61,22 +61,22 @@ class ApcuAdapterTest extends AdapterTestCase
         $pool1 = new ApcuAdapter($namespace, 0, 'p1');
 
         $item = $pool1->getItem('foo');
-        $this->assertFalse($item->isHit());
-        $this->assertTrue($pool1->save($item->set('bar')));
+        self::assertFalse($item->isHit());
+        self::assertTrue($pool1->save($item->set('bar')));
 
         $item = $pool1->getItem('foo');
-        $this->assertTrue($item->isHit());
-        $this->assertSame('bar', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertSame('bar', $item->get());
 
         $pool2 = new ApcuAdapter($namespace, 0, 'p2');
 
         $item = $pool2->getItem('foo');
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get());
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get());
 
         $item = $pool1->getItem('foo');
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get());
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get());
     }
 
     public function testNamespace()
@@ -86,22 +86,22 @@ class ApcuAdapterTest extends AdapterTestCase
         $pool1 = new ApcuAdapter($namespace.'_1', 0, 'p1');
 
         $item = $pool1->getItem('foo');
-        $this->assertFalse($item->isHit());
-        $this->assertTrue($pool1->save($item->set('bar')));
+        self::assertFalse($item->isHit());
+        self::assertTrue($pool1->save($item->set('bar')));
 
         $item = $pool1->getItem('foo');
-        $this->assertTrue($item->isHit());
-        $this->assertSame('bar', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertSame('bar', $item->get());
 
         $pool2 = new ApcuAdapter($namespace.'_2', 0, 'p1');
 
         $item = $pool2->getItem('foo');
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get());
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get());
 
         $item = $pool1->getItem('foo');
-        $this->assertTrue($item->isHit());
-        $this->assertSame('bar', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertSame('bar', $item->get());
     }
 
     public function testWithCliSapi()
@@ -118,7 +118,7 @@ class ApcuAdapterTest extends AdapterTestCase
             $item = $pool->getItem('foo');
             $item->isHit();
             $pool->save($item->set('bar'));
-            $this->assertFalse($isCalled);
+            self::assertFalse($isCalled);
         } finally {
             restore_error_handler();
         }
@@ -128,13 +128,13 @@ class ApcuAdapterTest extends AdapterTestCase
     {
         $namespace = str_replace('\\', '.', static::class);
 
-        $marshaller = $this->createMock(MarshallerInterface::class);
-        $marshaller->expects($this->once())
+        $marshaller = self::createMock(MarshallerInterface::class);
+        $marshaller->expects(self::once())
             ->method('marshall')
             ->with([$namespace.':foo' => 'bar'])
             ->willReturn([$namespace.':foo' => 'bar_serialized']);
 
-        $marshaller->expects($this->once())
+        $marshaller->expects(self::once())
             ->method('unmarshall')
             ->with('bar_serialized')
             ->willReturn('bar');
@@ -142,11 +142,11 @@ class ApcuAdapterTest extends AdapterTestCase
         $pool = new ApcuAdapter($namespace, 0, 'p1', $marshaller);
 
         $item = $pool->getItem('foo');
-        $this->assertFalse($item->isHit());
-        $this->assertTrue($pool->save($item->set('bar')));
+        self::assertFalse($item->isHit());
+        self::assertTrue($pool->save($item->set('bar')));
 
         $item = $pool->getItem('foo');
-        $this->assertTrue($item->isHit());
-        $this->assertSame('bar', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertSame('bar', $item->get());
     }
 }

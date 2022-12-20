@@ -41,7 +41,7 @@ class YamlLintCommandTest extends TestCase
         );
 
         $tester->assertCommandIsSuccessful('Returns 0 in case of success');
-        $this->assertStringContainsString('OK', trim($tester->getDisplay()));
+        self::assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
     public function testLintIncorrectFile()
@@ -54,13 +54,13 @@ bar';
 
         $tester->execute(['filename' => $filename], ['decorated' => false]);
 
-        $this->assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
-        $this->assertStringContainsString('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
+        self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+        self::assertStringContainsString('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
     }
 
     public function testLintFileNotReadable()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
         unlink($filename);
@@ -77,7 +77,7 @@ Or find all files in a bundle:
   <info>php %command.full_name% @AcmeDemoBundle</info>
 EOF;
 
-        $this->assertStringContainsString($expected, $command->getHelp());
+        self::assertStringContainsString($expected, $command->getHelp());
     }
 
     public function testLintFilesFromBundleDirectory()
@@ -89,7 +89,7 @@ EOF;
         );
 
         $tester->assertCommandIsSuccessful('Returns 0 in case of success');
-        $this->assertStringContainsString('[OK] All 0 YAML files contain valid syntax', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] All 0 YAML files contain valid syntax', trim($tester->getDisplay()));
     }
 
     private function createFile($content): string
@@ -120,31 +120,31 @@ EOF;
 
     private function getKernelAwareApplicationMock()
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = self::createMock(KernelInterface::class);
         $kernel
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('locateResource')
             ->with('@AppBundle/Resources')
             ->willReturn(sys_get_temp_dir().'/yml-lint-test');
 
-        $application = $this->createMock(Application::class);
+        $application = self::createMock(Application::class);
         $application
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getKernel')
             ->willReturn($kernel);
 
         $application
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getHelperSet')
             ->willReturn(new HelperSet());
 
         $application
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getDefinition')
             ->willReturn(new InputDefinition());
 
         $application
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with('lint:yaml')
             ->willReturn(new YamlLintCommand());

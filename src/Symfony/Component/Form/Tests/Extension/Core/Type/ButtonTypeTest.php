@@ -23,7 +23,7 @@ class ButtonTypeTest extends BaseTypeTest
 
     public function testCreateButtonInstances()
     {
-        $this->assertInstanceOf(Button::class, $this->factory->create(static::TESTED_TYPE));
+        self::assertInstanceOf(Button::class, $this->factory->create(static::TESTED_TYPE));
     }
 
     /**
@@ -32,8 +32,8 @@ class ButtonTypeTest extends BaseTypeTest
      */
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Buttons do not support empty data.');
+        self::expectException(BadMethodCallException::class);
+        self::expectExceptionMessage('Buttons do not support empty data.');
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }
 }

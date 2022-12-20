@@ -19,9 +19,9 @@ class CompiledRouteTest extends TestCase
     public function testAccessors()
     {
         $compiled = new CompiledRoute('prefix', 'regex', ['tokens'], [], null, [], [], ['variables']);
-        $this->assertEquals('prefix', $compiled->getStaticPrefix(), '__construct() takes a static prefix as its second argument');
-        $this->assertEquals('regex', $compiled->getRegex(), '__construct() takes a regexp as its third argument');
-        $this->assertEquals(['tokens'], $compiled->getTokens(), '__construct() takes an array of tokens as its fourth argument');
-        $this->assertEquals(['variables'], $compiled->getVariables(), '__construct() takes an array of variables as its ninth argument');
+        self::assertEquals('prefix', $compiled->getStaticPrefix(), '__construct() takes a static prefix as its second argument');
+        self::assertEquals('regex', $compiled->getRegex(), '__construct() takes a regexp as its third argument');
+        self::assertEquals(['tokens'], $compiled->getTokens(), '__construct() takes an array of tokens as its fourth argument');
+        self::assertEquals(['variables'], $compiled->getVariables(), '__construct() takes an array of variables as its ninth argument');
     }
 }

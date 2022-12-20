@@ -54,7 +54,7 @@ class RetryableHttpClientTest extends TestCase
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
 
-        $this->expectException(ServerException::class);
+        self::expectException(ServerException::class);
         $response->getHeaders();
     }
 
@@ -123,7 +123,7 @@ class RetryableHttpClientTest extends TestCase
 
         $response = $client->request('GET', 'http://example.com/foo-bar');
 
-        $this->expectExceptionMessageMatches('/must not return null when called with a body/');
+        self::expectExceptionMessageMatches('/must not return null when called with a body/');
         $response->getHeaders();
     }
 
@@ -165,10 +165,10 @@ class RetryableHttpClientTest extends TestCase
         try {
             $response->getHeaders();
         } catch (TransportExceptionInterface $e) {
-            $this->assertSame('Could not resolve host "does.not.exists".', $e->getMessage());
+            self::assertSame('Could not resolve host "does.not.exists".', $e->getMessage());
         }
-        $this->assertCount(2, $logger->logs);
-        $this->assertSame('Try #{count} after {delay}ms: Could not resolve host "does.not.exists".', $logger->logs[0]);
+        self::assertCount(2, $logger->logs);
+        self::assertSame('Try #{count} after {delay}ms: Could not resolve host "does.not.exists".', $logger->logs[0]);
     }
 
     public function testCancelOnTimeout()
@@ -176,7 +176,7 @@ class RetryableHttpClientTest extends TestCase
         $client = HttpClient::create();
 
         if ($client instanceof NativeHttpClient) {
-            $this->markTestSkipped('NativeHttpClient cannot timeout before receiving headers');
+            self::markTestSkipped('NativeHttpClient cannot timeout before receiving headers');
         }
 
         $client = new RetryableHttpClient($client);
@@ -184,7 +184,7 @@ class RetryableHttpClientTest extends TestCase
         $response = $client->request('GET', 'https://example.com/');
 
         foreach ($client->stream($response, 0) as $chunk) {
-            $this->assertTrue($chunk->isTimeout());
+            self::assertTrue($chunk->isTimeout());
             $response->cancel();
         }
     }
@@ -222,9 +222,9 @@ class RetryableHttpClientTest extends TestCase
 
         $delay = $logger->context['delay'] ?? null;
 
-        $this->assertArrayHasKey('delay', $logger->context);
-        $this->assertNotNull($delay);
-        $this->assertSame((int) ($retryAfter * 1000), $delay);
+        self::assertArrayHasKey('delay', $logger->context);
+        self::assertNotNull($delay);
+        self::assertSame((int) ($retryAfter * 1000), $delay);
     }
 
     public function testRetryOnErrorAssertContent()

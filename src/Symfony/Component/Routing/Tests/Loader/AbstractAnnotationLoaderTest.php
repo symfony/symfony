@@ -18,7 +18,7 @@ abstract class AbstractAnnotationLoaderTest extends TestCase
 {
     public function getReader()
     {
-        return $this->getMockBuilder(\Doctrine\Common\Annotations\Reader::class)
+        return self::getMockBuilder(\Doctrine\Common\Annotations\Reader::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -26,7 +26,7 @@ abstract class AbstractAnnotationLoaderTest extends TestCase
 
     public function getClassLoader($reader)
     {
-        return $this->getMockBuilder(AnnotationClassLoader::class)
+        return self::getMockBuilder(AnnotationClassLoader::class)
             ->setConstructorArgs([$reader])
             ->getMockForAbstractClass()
         ;

@@ -43,12 +43,12 @@ class X509AuthenticatorTest extends TestCase
         }
 
         $request = $this->createRequest($serverVars);
-        $this->assertTrue($this->authenticator->supports($request));
+        self::assertTrue($this->authenticator->supports($request));
 
         $this->userProvider->createUser(new InMemoryUser($username, null));
 
         $passport = $this->authenticator->authenticate($request);
-        $this->assertEquals($username, $passport->getUser()->getUserIdentifier());
+        self::assertEquals($username, $passport->getUser()->getUserIdentifier());
     }
 
     public static function provideServerVars()
@@ -64,12 +64,12 @@ class X509AuthenticatorTest extends TestCase
     {
         $request = $this->createRequest(['SSL_CLIENT_S_DN' => $credentials]);
 
-        $this->assertTrue($this->authenticator->supports($request));
+        self::assertTrue($this->authenticator->supports($request));
 
         $this->userProvider->createUser(new InMemoryUser($emailAddress, null));
 
         $passport = $this->authenticator->authenticate($request);
-        $this->assertEquals($emailAddress, $passport->getUser()->getUserIdentifier());
+        self::assertEquals($emailAddress, $passport->getUser()->getUserIdentifier());
     }
 
     public static function provideServerVarsNoUser()
@@ -87,7 +87,7 @@ class X509AuthenticatorTest extends TestCase
     {
         $request = $this->createRequest([]);
 
-        $this->assertFalse($this->authenticator->supports($request));
+        self::assertFalse($this->authenticator->supports($request));
     }
 
     public function testAuthenticationCustomUserKey()
@@ -97,12 +97,12 @@ class X509AuthenticatorTest extends TestCase
         $request = $this->createRequest([
             'TheUserKey' => 'TheUser',
         ]);
-        $this->assertTrue($authenticator->supports($request));
+        self::assertTrue($authenticator->supports($request));
 
         $this->userProvider->createUser(new InMemoryUser('TheUser', null));
 
         $passport = $this->authenticator->authenticate($request);
-        $this->assertEquals('TheUser', $passport->getUser()->getUserIdentifier());
+        self::assertEquals('TheUser', $passport->getUser()->getUserIdentifier());
     }
 
     public function testAuthenticationCustomCredentialsKey()
@@ -112,12 +112,12 @@ class X509AuthenticatorTest extends TestCase
         $request = $this->createRequest([
             'TheCertKey' => 'CN=Sample certificate DN/emailAddress=cert@example.com',
         ]);
-        $this->assertTrue($authenticator->supports($request));
+        self::assertTrue($authenticator->supports($request));
 
         $this->userProvider->createUser(new InMemoryUser('cert@example.com', null));
 
         $passport = $authenticator->authenticate($request);
-        $this->assertEquals('cert@example.com', $passport->getUser()->getUserIdentifier());
+        self::assertEquals('cert@example.com', $passport->getUser()->getUserIdentifier());
     }
 
     private function createRequest(array $server)

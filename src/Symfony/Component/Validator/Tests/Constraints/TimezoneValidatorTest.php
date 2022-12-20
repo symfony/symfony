@@ -43,7 +43,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Timezone());
     }
 
@@ -336,7 +336,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $tzDbVersion = isset($matches[1]) ? (int) trim($matches[1]) : 0;
 
         if (!$tzDbVersion || 2017 <= $tzDbVersion) {
-            $this->markTestSkipped('"Europe/Saratov" is expired until 2017, current version is '.$tzDbVersion);
+            self::markTestSkipped('"Europe/Saratov" is expired until 2017, current version is '.$tzDbVersion);
         }
 
         $constraint = new Timezone([

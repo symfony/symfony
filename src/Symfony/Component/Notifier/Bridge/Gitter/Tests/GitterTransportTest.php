@@ -26,7 +26,7 @@ final class GitterTransportTest extends TransportTestCase
 {
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new GitterTransport('token', '5539a3ee5etest0d3255bfef', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('api.gitter.im');
+        return (new GitterTransport('token', '5539a3ee5etest0d3255bfef', $client ?? self::createMock(HttpClientInterface::class)))->setHost('api.gitter.im');
     }
 
     public function toStringProvider(): iterable
@@ -42,6 +42,6 @@ final class GitterTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

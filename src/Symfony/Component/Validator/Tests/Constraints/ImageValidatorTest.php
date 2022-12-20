@@ -292,7 +292,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMinWidth()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'minWidth' => '1abc',
         ]);
@@ -302,7 +302,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxWidth()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'maxWidth' => '1abc',
         ]);
@@ -312,7 +312,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMinHeight()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'minHeight' => '1abc',
         ]);
@@ -322,7 +322,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxHeight()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'maxHeight' => '1abc',
         ]);
@@ -332,7 +332,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMinPixels()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'minPixels' => '1abc',
         ]);
@@ -342,7 +342,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxPixels()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'maxPixels' => '1abc',
         ]);
@@ -441,7 +441,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMinRatio()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'minRatio' => '1abc',
         ]);
@@ -451,7 +451,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxRatio()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'maxRatio' => '1abc',
         ]);
@@ -549,7 +549,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     public function testCorrupted(Image $constraint)
     {
         if (!\function_exists('imagecreatefromstring')) {
-            $this->markTestSkipped('This test require GD extension');
+            self::markTestSkipped('This test require GD extension');
         }
 
         $this->validator->validate($this->image, $constraint);
@@ -567,7 +567,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate($this->notAnImage, $constraint = new Image());
 
-        $this->assertSame('image/*', $constraint->mimeTypes);
+        self::assertSame('image/*', $constraint->mimeTypes);
 
         $this->buildViolation('This file is not a valid image.')
             ->setParameter('{{ file }}', sprintf('"%s"', $this->notAnImage))

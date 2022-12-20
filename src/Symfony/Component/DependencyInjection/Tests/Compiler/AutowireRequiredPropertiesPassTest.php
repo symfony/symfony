@@ -41,8 +41,8 @@ class AutowireRequiredPropertiesPassTest extends TestCase
 
         $properties = $container->getDefinition(PropertiesInjection::class)->getProperties();
 
-        $this->assertArrayHasKey('plop', $properties);
-        $this->assertEquals(Bar::class, (string) $properties['plop']);
+        self::assertArrayHasKey('plop', $properties);
+        self::assertEquals(Bar::class, (string) $properties['plop']);
     }
 
     /**
@@ -51,7 +51,7 @@ class AutowireRequiredPropertiesPassTest extends TestCase
     public function testAttribute()
     {
         if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+            self::markTestSkipped('symfony/service-contracts 2.2 required');
         }
 
         $container = new ContainerBuilder();
@@ -65,7 +65,7 @@ class AutowireRequiredPropertiesPassTest extends TestCase
 
         $properties = $container->getDefinition('property_injection')->getProperties();
 
-        $this->assertArrayHasKey('foo', $properties);
-        $this->assertEquals(Foo::class, (string) $properties['foo']);
+        self::assertArrayHasKey('foo', $properties);
+        self::assertEquals(Foo::class, (string) $properties['foo']);
     }
 }

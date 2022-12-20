@@ -27,7 +27,7 @@ PHP
         );
         $process->start();
         $process->wait();
-        $this->assertEquals($expected, $process->getOutput());
+        self::assertEquals($expected, $process->getOutput());
     }
 
     public function testCommandLine()
@@ -40,12 +40,12 @@ PHP
         $commandLine = $process->getCommandLine();
 
         $process->start();
-        $this->assertStringContainsString($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after start');
+        self::assertStringContainsString($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after start');
 
         $process->wait();
-        $this->assertStringContainsString($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after wait');
+        self::assertStringContainsString($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after wait');
 
-        $this->assertSame(\PHP_VERSION.\PHP_SAPI, $process->getOutput());
+        self::assertSame(\PHP_VERSION.\PHP_SAPI, $process->getOutput());
     }
 
     public function testPassingPhpExplicitly()
@@ -59,13 +59,13 @@ PHP
 PHP;
         $process = new PhpProcess($script, null, null, 60, $php);
         $process->run();
-        $this->assertEquals($expected, $process->getOutput());
+        self::assertEquals($expected, $process->getOutput());
     }
 
     public function testProcessCannotBeCreatedUsingFromShellCommandLine()
     {
-        static::expectException(LogicException::class);
-        static::expectExceptionMessage('The "Symfony\Component\Process\PhpProcess::fromShellCommandline()" method cannot be called when using "Symfony\Component\Process\PhpProcess".');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The "Symfony\Component\Process\PhpProcess::fromShellCommandline()" method cannot be called when using "Symfony\Component\Process\PhpProcess".');
         PhpProcess::fromShellCommandline(<<<PHP
 <?php echo 'Hello World!';
 PHP

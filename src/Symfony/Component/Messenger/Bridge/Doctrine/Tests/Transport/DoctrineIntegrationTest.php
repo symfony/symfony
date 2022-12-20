@@ -45,8 +45,8 @@ class DoctrineIntegrationTest extends TestCase
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        self::assertEquals('{"message": "Hi"}', $encoded['body']);
+        self::assertEquals(['type' => DummyMessage::class], $encoded['headers']);
     }
 
     public function testSendWithDelay()
@@ -64,7 +64,7 @@ class DoctrineIntegrationTest extends TestCase
 
         $now = new \DateTime();
         $now->modify('+60 seconds');
-        $this->assertGreaterThan($now, $available_at);
+        self::assertGreaterThan($now, $available_at);
     }
 
     public function testItRetrieveTheFirstAvailableMessage()
@@ -98,7 +98,7 @@ class DoctrineIntegrationTest extends TestCase
         ]);
 
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi available"}', $encoded['body']);
+        self::assertEquals('{"message": "Hi available"}', $encoded['body']);
     }
 
     public function testItCountMessages()
@@ -139,7 +139,7 @@ class DoctrineIntegrationTest extends TestCase
             'available_at' => $this->formatDateTime(new \DateTime('2019-03-15 12:30:00')),
         ]);
 
-        $this->assertSame(2, $this->connection->getMessageCount());
+        self::assertSame(2, $this->connection->getMessageCount());
     }
 
     public function testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout()
@@ -164,18 +164,18 @@ class DoctrineIntegrationTest extends TestCase
         ]);
 
         $next = $this->connection->get();
-        $this->assertEquals('{"message": "Hi requeued"}', $next['body']);
+        self::assertEquals('{"message": "Hi requeued"}', $next['body']);
         $this->connection->reject($next['id']);
     }
 
     public function testTheTransportIsSetupOnGet()
     {
-        $this->assertFalse($this->createSchemaManager()->tablesExist('messenger_messages'));
-        $this->assertNull($this->connection->get());
+        self::assertFalse($this->createSchemaManager()->tablesExist('messenger_messages'));
+        self::assertNull($this->connection->get());
 
         $this->connection->send('the body', ['my' => 'header']);
         $envelope = $this->connection->get();
-        $this->assertEquals('the body', $envelope['body']);
+        self::assertEquals('the body', $envelope['body']);
     }
 
     private function formatDateTime(\DateTime $dateTime)

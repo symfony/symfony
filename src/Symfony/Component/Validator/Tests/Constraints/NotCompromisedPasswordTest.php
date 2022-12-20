@@ -24,8 +24,8 @@ class NotCompromisedPasswordTest extends TestCase
     public function testDefaultValues()
     {
         $constraint = new NotCompromisedPassword();
-        $this->assertSame(1, $constraint->threshold);
-        $this->assertFalse($constraint->skipOnError);
+        self::assertSame(1, $constraint->threshold);
+        self::assertFalse($constraint->skipOnError);
     }
 
     /**

@@ -27,7 +27,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             parent::provideWrap(),
             [
                 [
-                    ['Käse' => static::createFromString('köstlich'), 'fromage' => static::createFromString('délicieux')],
+                    ['Käse' => self::createFromString('köstlich'), 'fromage' => self::createFromString('délicieux')],
                     ["Ka\u{0308}se" => "ko\u{0308}stlich", 'fromage' => 'délicieux'],
                 ],
                 [
@@ -58,11 +58,11 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                     'अ.नु.च्.छे.द',
                     '.',
                     [
-                        static::createFromString('अ'),
-                        static::createFromString('नु'),
-                        static::createFromString('च्'),
-                        static::createFromString('छे'),
-                        static::createFromString('द'),
+                        self::createFromString('अ'),
+                        self::createFromString('नु'),
+                        self::createFromString('च्'),
+                        self::createFromString('छे'),
+                        self::createFromString('द'),
                     ],
                     null,
                 ],
@@ -78,11 +78,11 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                 [
                     'अनुच्छेद',
                     [
-                        static::createFromString('अ'),
-                        static::createFromString('नु'),
-                        static::createFromString('च्'),
-                        static::createFromString('छे'),
-                        static::createFromString('द'),
+                        self::createFromString('अ'),
+                        self::createFromString('नु'),
+                        self::createFromString('च्'),
+                        self::createFromString('छे'),
+                        self::createFromString('द'),
                     ],
                     1,
                 ],

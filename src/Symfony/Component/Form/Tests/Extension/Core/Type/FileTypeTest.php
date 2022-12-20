@@ -37,7 +37,7 @@ class FileTypeTest extends BaseTypeTest
         $form->setData($data);
 
         // Ensures the data class is defined to accept File instance
-        $this->assertSame($data, $form->getData());
+        self::assertSame($data, $form->getData());
     }
 
     /**
@@ -50,7 +50,7 @@ class FileTypeTest extends BaseTypeTest
 
         $form->submit($data);
 
-        $this->assertSame($data, $form->getData());
+        self::assertSame($data, $form->getData());
     }
 
     /**
@@ -68,7 +68,7 @@ class FileTypeTest extends BaseTypeTest
         ];
 
         $form->setData($data);
-        $this->assertSame($data, $form->getData());
+        self::assertSame($data, $form->getData());
     }
 
     /**
@@ -86,11 +86,11 @@ class FileTypeTest extends BaseTypeTest
         ];
 
         $form->submit($data);
-        $this->assertSame($data, $form->getData());
+        self::assertSame($data, $form->getData());
 
         $view = $form->createView();
-        $this->assertSame('file[]', $view->vars['full_name']);
-        $this->assertArrayHasKey('multiple', $view->vars['attr']);
+        self::assertSame('file[]', $view->vars['full_name']);
+        self::assertArrayHasKey('multiple', $view->vars['attr']);
     }
 
     /**
@@ -103,7 +103,7 @@ class FileTypeTest extends BaseTypeTest
             'file' => $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
         ]);
 
-        $this->assertEquals('', $form->createView()->vars['value']);
+        self::assertEquals('', $form->createView()->vars['value']);
     }
 
     public function testPassMultipartFalseToView()
@@ -111,7 +111,7 @@ class FileTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE)
             ->createView();
 
-        $this->assertTrue($view->vars['multipart']);
+        self::assertTrue($view->vars['multipart']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -127,9 +127,9 @@ class FileTypeTest extends BaseTypeTest
         // submitted data when an input file is uploaded without choosing any file
         $form->submit([null]);
 
-        $this->assertSame([], $form->getData());
-        $this->assertSame([], $form->getNormData());
-        $this->assertSame([], $form->getViewData());
+        self::assertSame([], $form->getData());
+        self::assertSame([], $form->getNormData());
+        self::assertSame([], $form->getViewData());
     }
 
     /**
@@ -140,9 +140,9 @@ class FileTypeTest extends BaseTypeTest
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
         $form->submit('file:///etc/passwd');
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getViewData());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertSame('', $form->getViewData());
     }
 
     /**
@@ -162,7 +162,7 @@ class FileTypeTest extends BaseTypeTest
             $this->createUploadedFile(new NativeRequestHandler(), __DIR__.'/../../../Fixtures/foo2', 'foo2.jpg'),
         ]);
 
-        $this->assertCount(1, $form->getData());
+        self::assertCount(1, $form->getData());
     }
 
     /**
@@ -178,9 +178,9 @@ class FileTypeTest extends BaseTypeTest
             ->getForm();
         $form->submit(null);
 
-        $this->assertSame([], $form->getData());
-        $this->assertSame([], $form->getNormData());
-        $this->assertSame([], $form->getViewData());
+        self::assertSame([], $form->getData());
+        self::assertSame([], $form->getNormData());
+        self::assertSame([], $form->getViewData());
     }
 
     public function requestHandlerProvider()
@@ -204,10 +204,10 @@ class FileTypeTest extends BaseTypeTest
         $form->submit($this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo', $errorCode));
 
         if (\UPLOAD_ERR_OK === $errorCode) {
-            $this->assertTrue($form->isValid());
+            self::assertTrue($form->isValid());
         } else {
-            $this->assertFalse($form->isValid());
-            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            self::assertFalse($form->isValid());
+            self::assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
         }
     }
 
@@ -229,10 +229,10 @@ class FileTypeTest extends BaseTypeTest
         ]);
 
         if (\UPLOAD_ERR_OK === $errorCode) {
-            $this->assertTrue($form->isValid());
+            self::assertTrue($form->isValid());
         } else {
-            $this->assertFalse($form->isValid());
-            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            self::assertFalse($form->isValid());
+            self::assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
         }
     }
 
@@ -254,12 +254,12 @@ class FileTypeTest extends BaseTypeTest
         ]);
 
         if (\UPLOAD_ERR_OK === $errorCode) {
-            $this->assertTrue($form->isValid());
+            self::assertTrue($form->isValid());
         } else {
-            $this->assertFalse($form->isValid());
-            $this->assertCount(2, $form->getErrors());
-            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
-            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[1]->getMessage());
+            self::assertFalse($form->isValid());
+            self::assertCount(2, $form->getErrors());
+            self::assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            self::assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[1]->getMessage());
         }
     }
 
@@ -292,12 +292,12 @@ class FileTypeTest extends BaseTypeTest
         ]);
 
         if (\UPLOAD_ERR_OK === $errorCode) {
-            $this->assertTrue($form->isValid());
+            self::assertTrue($form->isValid());
         } else {
-            $this->assertFalse($form->isValid());
-            $this->assertCount(2, $form->getErrors());
-            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
-            $this->assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[1]->getMessage());
+            self::assertFalse($form->isValid());
+            self::assertCount(2, $form->getErrors());
+            self::assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            self::assertMatchesRegularExpression($expectedErrorMessage, $form->getErrors()[1]->getMessage());
         }
     }
 

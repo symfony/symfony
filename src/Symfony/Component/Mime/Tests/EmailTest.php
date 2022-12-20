@@ -35,31 +35,31 @@ class EmailTest extends TestCase
     {
         $e = new Email();
         $e->subject('Subject');
-        $this->assertEquals('Subject', $e->getSubject());
+        self::assertEquals('Subject', $e->getSubject());
     }
 
     public function testDate()
     {
         $e = new Email();
         $e->date($d = new \DateTimeImmutable());
-        $this->assertSame($d, $e->getDate());
+        self::assertSame($d, $e->getDate());
     }
 
     public function testReturnPath()
     {
         $e = new Email();
         $e->returnPath('fabien@symfony.com');
-        $this->assertEquals(new Address('fabien@symfony.com'), $e->getReturnPath());
+        self::assertEquals(new Address('fabien@symfony.com'), $e->getReturnPath());
     }
 
     public function testSender()
     {
         $e = new Email();
         $e->sender('fabien@symfony.com');
-        $this->assertEquals(new Address('fabien@symfony.com'), $e->getSender());
+        self::assertEquals(new Address('fabien@symfony.com'), $e->getSender());
 
         $e->sender($fabien = new Address('fabien@symfony.com'));
-        $this->assertSame($fabien, $e->getSender());
+        self::assertSame($fabien, $e->getSender());
     }
 
     public function testFrom()
@@ -69,30 +69,30 @@ class EmailTest extends TestCase
         $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
-        $this->assertSame($e, $e->from('fabien@symfony.com', $helene, $thomas));
+        self::assertSame($e, $e->from('fabien@symfony.com', $helene, $thomas));
         $v = $e->getFrom();
-        $this->assertCount(3, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
+        self::assertCount(3, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
 
-        $this->assertSame($e, $e->addFrom('lucas@symfony.com', $caramel));
+        self::assertSame($e, $e->addFrom('lucas@symfony.com', $caramel));
         $v = $e->getFrom();
-        $this->assertCount(5, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
-        $this->assertEquals(new Address('lucas@symfony.com'), $v[3]);
-        $this->assertSame($caramel, $v[4]);
+        self::assertCount(5, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
+        self::assertEquals(new Address('lucas@symfony.com'), $v[3]);
+        self::assertSame($caramel, $v[4]);
 
         $e = new Email();
         $e->addFrom('lucas@symfony.com', $caramel);
-        $this->assertCount(2, $e->getFrom());
+        self::assertCount(2, $e->getFrom());
 
         $e = new Email();
         $e->from('lucas@symfony.com');
         $e->from($caramel);
-        $this->assertSame([$caramel], $e->getFrom());
+        self::assertSame([$caramel], $e->getFrom());
     }
 
     public function testReplyTo()
@@ -102,30 +102,30 @@ class EmailTest extends TestCase
         $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
-        $this->assertSame($e, $e->replyTo('fabien@symfony.com', $helene, $thomas));
+        self::assertSame($e, $e->replyTo('fabien@symfony.com', $helene, $thomas));
         $v = $e->getReplyTo();
-        $this->assertCount(3, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
+        self::assertCount(3, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
 
-        $this->assertSame($e, $e->addReplyTo('lucas@symfony.com', $caramel));
+        self::assertSame($e, $e->addReplyTo('lucas@symfony.com', $caramel));
         $v = $e->getReplyTo();
-        $this->assertCount(5, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
-        $this->assertEquals(new Address('lucas@symfony.com'), $v[3]);
-        $this->assertSame($caramel, $v[4]);
+        self::assertCount(5, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
+        self::assertEquals(new Address('lucas@symfony.com'), $v[3]);
+        self::assertSame($caramel, $v[4]);
 
         $e = new Email();
         $e->addReplyTo('lucas@symfony.com', $caramel);
-        $this->assertCount(2, $e->getReplyTo());
+        self::assertCount(2, $e->getReplyTo());
 
         $e = new Email();
         $e->replyTo('lucas@symfony.com');
         $e->replyTo($caramel);
-        $this->assertSame([$caramel], $e->getReplyTo());
+        self::assertSame([$caramel], $e->getReplyTo());
     }
 
     public function testTo()
@@ -135,30 +135,30 @@ class EmailTest extends TestCase
         $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
-        $this->assertSame($e, $e->to('fabien@symfony.com', $helene, $thomas));
+        self::assertSame($e, $e->to('fabien@symfony.com', $helene, $thomas));
         $v = $e->getTo();
-        $this->assertCount(3, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
+        self::assertCount(3, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
 
-        $this->assertSame($e, $e->addTo('lucas@symfony.com', $caramel));
+        self::assertSame($e, $e->addTo('lucas@symfony.com', $caramel));
         $v = $e->getTo();
-        $this->assertCount(5, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
-        $this->assertEquals(new Address('lucas@symfony.com'), $v[3]);
-        $this->assertSame($caramel, $v[4]);
+        self::assertCount(5, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
+        self::assertEquals(new Address('lucas@symfony.com'), $v[3]);
+        self::assertSame($caramel, $v[4]);
 
         $e = new Email();
         $e->addTo('lucas@symfony.com', $caramel);
-        $this->assertCount(2, $e->getTo());
+        self::assertCount(2, $e->getTo());
 
         $e = new Email();
         $e->to('lucas@symfony.com');
         $e->to($caramel);
-        $this->assertSame([$caramel], $e->getTo());
+        self::assertSame([$caramel], $e->getTo());
     }
 
     public function testCc()
@@ -168,30 +168,30 @@ class EmailTest extends TestCase
         $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
-        $this->assertSame($e, $e->cc('fabien@symfony.com', $helene, $thomas));
+        self::assertSame($e, $e->cc('fabien@symfony.com', $helene, $thomas));
         $v = $e->getCc();
-        $this->assertCount(3, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
+        self::assertCount(3, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
 
-        $this->assertSame($e, $e->addCc('lucas@symfony.com', $caramel));
+        self::assertSame($e, $e->addCc('lucas@symfony.com', $caramel));
         $v = $e->getCc();
-        $this->assertCount(5, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
-        $this->assertEquals(new Address('lucas@symfony.com'), $v[3]);
-        $this->assertSame($caramel, $v[4]);
+        self::assertCount(5, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
+        self::assertEquals(new Address('lucas@symfony.com'), $v[3]);
+        self::assertSame($caramel, $v[4]);
 
         $e = new Email();
         $e->addCc('lucas@symfony.com', $caramel);
-        $this->assertCount(2, $e->getCc());
+        self::assertCount(2, $e->getCc());
 
         $e = new Email();
         $e->cc('lucas@symfony.com');
         $e->cc($caramel);
-        $this->assertSame([$caramel], $e->getCc());
+        self::assertSame([$caramel], $e->getCc());
     }
 
     public function testBcc()
@@ -201,48 +201,48 @@ class EmailTest extends TestCase
         $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
-        $this->assertSame($e, $e->bcc('fabien@symfony.com', $helene, $thomas));
+        self::assertSame($e, $e->bcc('fabien@symfony.com', $helene, $thomas));
         $v = $e->getBcc();
-        $this->assertCount(3, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
+        self::assertCount(3, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
 
-        $this->assertSame($e, $e->addBcc('lucas@symfony.com', $caramel));
+        self::assertSame($e, $e->addBcc('lucas@symfony.com', $caramel));
         $v = $e->getBcc();
-        $this->assertCount(5, $v);
-        $this->assertEquals(new Address('fabien@symfony.com'), $v[0]);
-        $this->assertSame($helene, $v[1]);
-        $this->assertSame($thomas, $v[2]);
-        $this->assertEquals(new Address('lucas@symfony.com'), $v[3]);
-        $this->assertSame($caramel, $v[4]);
+        self::assertCount(5, $v);
+        self::assertEquals(new Address('fabien@symfony.com'), $v[0]);
+        self::assertSame($helene, $v[1]);
+        self::assertSame($thomas, $v[2]);
+        self::assertEquals(new Address('lucas@symfony.com'), $v[3]);
+        self::assertSame($caramel, $v[4]);
 
         $e = new Email();
         $e->addBcc('lucas@symfony.com', $caramel);
-        $this->assertCount(2, $e->getBcc());
+        self::assertCount(2, $e->getBcc());
 
         $e = new Email();
         $e->bcc('lucas@symfony.com');
         $e->bcc($caramel);
-        $this->assertSame([$caramel], $e->getBcc());
+        self::assertSame([$caramel], $e->getBcc());
     }
 
     public function testPriority()
     {
         $e = new Email();
-        $this->assertEquals(3, $e->getPriority());
+        self::assertEquals(3, $e->getPriority());
 
         $e->priority(1);
-        $this->assertEquals(1, $e->getPriority());
+        self::assertEquals(1, $e->getPriority());
         $e->priority(10);
-        $this->assertEquals(5, $e->getPriority());
+        self::assertEquals(5, $e->getPriority());
         $e->priority(-10);
-        $this->assertEquals(1, $e->getPriority());
+        self::assertEquals(1, $e->getPriority());
     }
 
     public function testGenerateBodyThrowsWhenEmptyBody()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         (new Email())->getBody();
     }
 
@@ -250,7 +250,7 @@ class EmailTest extends TestCase
     {
         $e = new Email();
         $e->setBody($text = new TextPart('text content'));
-        $this->assertEquals($text, $e->getBody());
+        self::assertEquals($text, $e->getBody());
     }
 
     public function testGenerateBodyWithTextOnly()
@@ -258,8 +258,8 @@ class EmailTest extends TestCase
         $text = new TextPart('text content');
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->text('text content');
-        $this->assertEquals($text, $e->getBody());
-        $this->assertEquals('text content', $e->getTextBody());
+        self::assertEquals($text, $e->getBody());
+        self::assertEquals('text content', $e->getTextBody());
     }
 
     public function testGenerateBodyWithHtmlOnly()
@@ -267,8 +267,8 @@ class EmailTest extends TestCase
         $html = new TextPart('html content', 'utf-8', 'html');
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content');
-        $this->assertEquals($html, $e->getBody());
-        $this->assertEquals('html content', $e->getHtmlBody());
+        self::assertEquals($html, $e->getBody());
+        self::assertEquals('html content', $e->getHtmlBody());
     }
 
     public function testGenerateBodyWithTextAndHtml()
@@ -278,7 +278,7 @@ class EmailTest extends TestCase
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content');
         $e->text('text content');
-        $this->assertEquals(new AlternativePart($text, $html), $e->getBody());
+        self::assertEquals(new AlternativePart($text, $html), $e->getBody());
     }
 
     public function testGenerateBodyWithTextAndHtmlNotUtf8()
@@ -286,9 +286,9 @@ class EmailTest extends TestCase
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content', 'iso-8859-1');
         $e->text('text content', 'iso-8859-1');
-        $this->assertEquals('iso-8859-1', $e->getTextCharset());
-        $this->assertEquals('iso-8859-1', $e->getHtmlCharset());
-        $this->assertEquals(new AlternativePart(new TextPart('text content', 'iso-8859-1'), new TextPart('html content', 'iso-8859-1', 'html')), $e->getBody());
+        self::assertEquals('iso-8859-1', $e->getTextCharset());
+        self::assertEquals('iso-8859-1', $e->getHtmlCharset());
+        self::assertEquals(new AlternativePart(new TextPart('text content', 'iso-8859-1'), new TextPart('html content', 'iso-8859-1', 'html')), $e->getBody());
     }
 
     public function testGenerateBodyWithTextContentAndAttachedFile()
@@ -297,7 +297,7 @@ class EmailTest extends TestCase
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->attach($file);
         $e->text('text content');
-        $this->assertEquals(new MixedPart($text, $filePart), $e->getBody());
+        self::assertEquals(new MixedPart($text, $filePart), $e->getBody());
     }
 
     public function testGenerateBodyWithHtmlContentAndAttachedFile()
@@ -306,7 +306,7 @@ class EmailTest extends TestCase
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->attach($file);
         $e->html('html content');
-        $this->assertEquals(new MixedPart($html, $filePart), $e->getBody());
+        self::assertEquals(new MixedPart($html, $filePart), $e->getBody());
     }
 
     public function testGenerateBodyWithHtmlContentAndInlineImageNotreferenced()
@@ -317,7 +317,7 @@ class EmailTest extends TestCase
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->embed($image);
         $e->html('html content');
-        $this->assertEquals(new MixedPart($html, $imagePart), $e->getBody());
+        self::assertEquals(new MixedPart($html, $imagePart), $e->getBody());
     }
 
     public function testGenerateBodyWithAttachedFileOnly()
@@ -325,7 +325,7 @@ class EmailTest extends TestCase
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->attach($file);
-        $this->assertEquals(new MixedPart($filePart), $e->getBody());
+        self::assertEquals(new MixedPart($filePart), $e->getBody());
     }
 
     public function testGenerateBodyWithInlineImageOnly()
@@ -334,7 +334,7 @@ class EmailTest extends TestCase
         $imagePart->asInline();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->embed($image);
-        $this->assertEquals(new MixedPart($imagePart), $e->getBody());
+        self::assertEquals(new MixedPart($imagePart), $e->getBody());
     }
 
     public function testGenerateBodyWithEmbeddedImageOnly()
@@ -343,7 +343,7 @@ class EmailTest extends TestCase
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->embed($image);
         $imagePart->asInline();
-        $this->assertEquals(new MixedPart($imagePart), $e->getBody());
+        self::assertEquals(new MixedPart($imagePart), $e->getBody());
     }
 
     public function testGenerateBodyWithTextAndHtmlContentAndAttachedFile()
@@ -353,7 +353,7 @@ class EmailTest extends TestCase
         $e->html('html content');
         $e->text('text content');
         $e->attach($file);
-        $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $filePart), $e->getBody());
+        self::assertEquals(new MixedPart(new AlternativePart($text, $html), $filePart), $e->getBody());
     }
 
     public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageNotReferenced()
@@ -364,7 +364,7 @@ class EmailTest extends TestCase
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
-        $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $filePart, $imagePart), $e->getBody());
+        self::assertEquals(new MixedPart(new AlternativePart($text, $html), $filePart, $imagePart), $e->getBody());
     }
 
     public function testGenerateBodyWithTextAndAttachedFileAndAttachedImageNotReferenced()
@@ -374,7 +374,7 @@ class EmailTest extends TestCase
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
-        $this->assertEquals(new MixedPart($text, $filePart, $imagePart), $e->getBody());
+        self::assertEquals(new MixedPart($text, $filePart, $imagePart), $e->getBody());
     }
 
     public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageNotReferencedViaCid()
@@ -386,7 +386,7 @@ class EmailTest extends TestCase
         $e->attach($file);
         $e->attach($image, 'test.gif');
         $fullhtml = new TextPart($content, 'utf-8', 'html');
-        $this->assertEquals(new MixedPart(new AlternativePart($text, $fullhtml), $filePart, $imagePart), $e->getBody());
+        self::assertEquals(new MixedPart(new AlternativePart($text, $fullhtml), $filePart, $imagePart), $e->getBody());
     }
 
     public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageReferencedViaCid()
@@ -398,14 +398,14 @@ class EmailTest extends TestCase
         $e->attach($file);
         $e->attach($image, 'test.gif');
         $body = $e->getBody();
-        $this->assertInstanceOf(MixedPart::class, $body);
-        $this->assertCount(2, $related = $body->getParts());
-        $this->assertInstanceOf(RelatedPart::class, $related[0]);
-        $this->assertEquals($filePart, $related[1]);
-        $this->assertCount(2, $parts = $related[0]->getParts());
-        $this->assertInstanceOf(AlternativePart::class, $parts[0]);
+        self::assertInstanceOf(MixedPart::class, $body);
+        self::assertCount(2, $related = $body->getParts());
+        self::assertInstanceOf(RelatedPart::class, $related[0]);
+        self::assertEquals($filePart, $related[1]);
+        self::assertCount(2, $parts = $related[0]->getParts());
+        self::assertInstanceOf(AlternativePart::class, $parts[0]);
         $generatedHtml = $parts[0]->getParts()[1];
-        $this->assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
+        self::assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
     }
 
     public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImagePartAsInlineReferencedViaCid()
@@ -417,14 +417,14 @@ class EmailTest extends TestCase
         $e->attach($file);
         $e->attachPart((new DataPart($image, 'test.gif'))->asInline());
         $body = $e->getBody();
-        $this->assertInstanceOf(MixedPart::class, $body);
-        $this->assertCount(2, $related = $body->getParts());
-        $this->assertInstanceOf(RelatedPart::class, $related[0]);
-        $this->assertEquals($filePart, $related[1]);
-        $this->assertCount(2, $parts = $related[0]->getParts());
-        $this->assertInstanceOf(AlternativePart::class, $parts[0]);
+        self::assertInstanceOf(MixedPart::class, $body);
+        self::assertCount(2, $related = $body->getParts());
+        self::assertInstanceOf(RelatedPart::class, $related[0]);
+        self::assertEquals($filePart, $related[1]);
+        self::assertCount(2, $parts = $related[0]->getParts());
+        self::assertInstanceOf(AlternativePart::class, $parts[0]);
         $generatedHtml = $parts[0]->getParts()[1];
-        $this->assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
+        self::assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
     }
 
     public function testGenerateBodyWithHtmlAndInlinedImageTwiceReferencedViaCid()
@@ -442,10 +442,10 @@ class EmailTest extends TestCase
         $e->embed($image, 'test.gif');
         $e->embed($image, 'test.gif');
         $body = $e->getBody();
-        $this->assertInstanceOf(RelatedPart::class, $body);
+        self::assertInstanceOf(RelatedPart::class, $body);
         // 2 parts only, not 3 (text + embedded image once)
-        $this->assertCount(2, $parts = $body->getParts());
-        $this->assertStringMatchesFormat('html content <img src=3D"cid:%s@symfony">', $parts[0]->bodyToString());
+        self::assertCount(2, $parts = $body->getParts());
+        self::assertStringMatchesFormat('html content <img src=3D"cid:%s@symfony">', $parts[0]->bodyToString());
     }
 
     private function generateSomeParts(): array
@@ -467,7 +467,7 @@ class EmailTest extends TestCase
         $e = new Email();
         $e->attach($file, 'test');
         $e->embed($contents, 'test');
-        $this->assertEquals([$att, $inline], $e->getAttachments());
+        self::assertEquals([$att, $inline], $e->getAttachments());
 
         // inline part from path
         $att = DataPart::fromPath($name, 'test');
@@ -475,8 +475,8 @@ class EmailTest extends TestCase
         $e = new Email();
         $e->attachFromPath($name);
         $e->embedFromPath($name);
-        $this->assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(function (DataPart $a) { return $a->bodyToString(); }, $e->getAttachments()));
-        $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(function (DataPart $a) { return $a->getPreparedHeaders(); }, $e->getAttachments()));
+        self::assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(function (DataPart $a) { return $a->bodyToString(); }, $e->getAttachments()));
+        self::assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(function (DataPart $a) { return $a->getPreparedHeaders(); }, $e->getAttachments()));
     }
 
     public function testSerialize()
@@ -495,8 +495,8 @@ class EmailTest extends TestCase
         $e->attach($file, 'test');
         $expected = clone $e;
         $n = unserialize(serialize($e));
-        $this->assertEquals($expected->getHeaders(), $n->getHeaders());
-        $this->assertEquals($e->getBody(), $n->getBody());
+        self::assertEquals($expected->getHeaders(), $n->getHeaders());
+        self::assertEquals($e->getBody(), $n->getBody());
     }
 
     public function testSymfonySerialize()
@@ -554,22 +554,22 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        self::assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, Email::class, 'json');
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        self::assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n->from('fabien@symfony.com');
         $expected->from('fabien@symfony.com');
-        $this->assertEquals($expected->getHeaders(), $n->getHeaders());
-        $this->assertEquals($expected->getBody(), $n->getBody());
+        self::assertEquals($expected->getHeaders(), $n->getHeaders());
+        self::assertEquals($expected->getBody(), $n->getBody());
     }
 
     public function testMissingHeaderDoesNotThrowError()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed asserting that the Email has header "foo" with value "bar" (value is null).');
+        self::expectException(ExpectationFailedException::class);
+        self::expectExceptionMessage('Failed asserting that the Email has header "foo" with value "bar" (value is null).');
 
         $e = new Email();
         $emailHeaderSame = new EmailHeaderSame('foo', 'bar');
@@ -578,24 +578,24 @@ EOF;
 
     public function testAttachBodyExpectStringOrResource()
     {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('The body must be a string or a resource (got "bool").');
+        self::expectException(\TypeError::class);
+        self::expectExceptionMessage('The body must be a string or a resource (got "bool").');
 
         (new Email())->attach(false);
     }
 
     public function testEmbedBodyExpectStringOrResource()
     {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('The body must be a string or a resource (got "bool").');
+        self::expectException(\TypeError::class);
+        self::expectExceptionMessage('The body must be a string or a resource (got "bool").');
 
         (new Email())->embed(false);
     }
 
     public function testHtmlBodyExpectStringOrResourceOrNull()
     {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('The body must be a string, a resource or null (got "bool").');
+        self::expectException(\TypeError::class);
+        self::expectExceptionMessage('The body must be a string, a resource or null (got "bool").');
 
         (new Email())->html(false);
     }
@@ -605,20 +605,20 @@ EOF;
         $email = new Email();
 
         $email->html('foo');
-        $this->assertSame('foo', $email->getHtmlBody());
+        self::assertSame('foo', $email->getHtmlBody());
 
         $email->html(null);
-        $this->assertNull($email->getHtmlBody());
+        self::assertNull($email->getHtmlBody());
 
         $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', 'r');
         $email->html($contents);
-        $this->assertSame($contents, $email->getHtmlBody());
+        self::assertSame($contents, $email->getHtmlBody());
     }
 
     public function testTextBodyExpectStringOrResourceOrNull()
     {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('The body must be a string, a resource or null (got "bool").');
+        self::expectException(\TypeError::class);
+        self::expectExceptionMessage('The body must be a string, a resource or null (got "bool").');
 
         (new Email())->text(false);
     }
@@ -628,14 +628,14 @@ EOF;
         $email = new Email();
 
         $email->text('foo');
-        $this->assertSame('foo', $email->getTextBody());
+        self::assertSame('foo', $email->getTextBody());
 
         $email->text(null);
-        $this->assertNull($email->getTextBody());
+        self::assertNull($email->getTextBody());
 
         $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', 'r');
         $email->text($contents);
-        $this->assertSame($contents, $email->getTextBody());
+        self::assertSame($contents, $email->getTextBody());
     }
 
     public function testBodyCache()
@@ -646,7 +646,7 @@ EOF;
         $email->text('foo');
         $body1 = $email->getBody();
         $body2 = $email->getBody();
-        $this->assertSame($body1, $body2, 'The two bodies must reference the same object, so the body cache ensures that the hash for the DKIM signature is unique.');
+        self::assertSame($body1, $body2, 'The two bodies must reference the same object, so the body cache ensures that the hash for the DKIM signature is unique.');
 
         $email = new Email();
         $email->from('fabien@symfony.com');
@@ -655,6 +655,6 @@ EOF;
         $body1 = $email->getBody();
         $email->html('<b>bar</b>'); // We change a part to reset the body cache.
         $body2 = $email->getBody();
-        $this->assertNotSame($body1, $body2, 'The two bodies must not reference the same object, so the body cache does not ensure that the hash for the DKIM signature is unique.');
+        self::assertNotSame($body1, $body2, 'The two bodies must not reference the same object, so the body cache does not ensure that the hash for the DKIM signature is unique.');
     }
 }

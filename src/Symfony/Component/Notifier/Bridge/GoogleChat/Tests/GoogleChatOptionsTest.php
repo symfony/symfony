@@ -31,7 +31,7 @@ final class GoogleChatOptionsTest extends TestCase
             ],
         ];
 
-        $this->assertSame($expected, $options->toArray());
+        self::assertSame($expected, $options->toArray());
     }
 
     public function testOptionsWithThread()
@@ -39,8 +39,8 @@ final class GoogleChatOptionsTest extends TestCase
         $thread = 'fgh.ijk';
         $options = new GoogleChatOptions();
         $options->setThreadKey($thread);
-        $this->assertSame($thread, $options->getThreadKey());
+        self::assertSame($thread, $options->getThreadKey());
         $options->setThreadKey(null);
-        $this->assertNull($options->getThreadKey());
+        self::assertNull($options->getThreadKey());
     }
 }

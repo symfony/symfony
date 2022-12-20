@@ -22,7 +22,7 @@ class GetterMetadataTest extends TestCase
 
     public function testInvalidPropertyName()
     {
-        $this->expectException(ValidatorException::class);
+        self::expectException(ValidatorException::class);
 
         new GetterMetadata(self::CLASSNAME, 'foobar');
     }
@@ -35,7 +35,7 @@ class GetterMetadataTest extends TestCase
         $entity = new Entity('foobar');
         $metadata = new GetterMetadata(self::CLASSNAME, 'internal');
 
-        $this->assertEquals('foobar from getter', $metadata->getPropertyValue($entity));
+        self::assertEquals('foobar from getter', $metadata->getPropertyValue($entity));
     }
 
     public function testGetPropertyValueFromOverriddenPublicGetter()
@@ -43,7 +43,7 @@ class GetterMetadataTest extends TestCase
         $entity = new Entity();
         $metadata = new GetterMetadata(self::CLASSNAME, 'data');
 
-        $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
+        self::assertEquals('Overridden data', $metadata->getPropertyValue($entity));
     }
 
     public function testGetPropertyValueFromIsser()
@@ -51,7 +51,7 @@ class GetterMetadataTest extends TestCase
         $entity = new Entity();
         $metadata = new GetterMetadata(self::CLASSNAME, 'valid', 'isValid');
 
-        $this->assertEquals('valid', $metadata->getPropertyValue($entity));
+        self::assertEquals('valid', $metadata->getPropertyValue($entity));
     }
 
     public function testGetPropertyValueFromHasser()
@@ -59,13 +59,13 @@ class GetterMetadataTest extends TestCase
         $entity = new Entity();
         $metadata = new GetterMetadata(self::CLASSNAME, 'permissions');
 
-        $this->assertEquals('permissions', $metadata->getPropertyValue($entity));
+        self::assertEquals('permissions', $metadata->getPropertyValue($entity));
     }
 
     public function testUndefinedMethodNameThrowsException()
     {
-        $this->expectException(ValidatorException::class);
-        $this->expectExceptionMessage('The "hasLastName()" method does not exist in class "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity".');
+        self::expectException(ValidatorException::class);
+        self::expectExceptionMessage('The "hasLastName()" method does not exist in class "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity".');
         new GetterMetadata(self::CLASSNAME, 'lastName', 'hasLastName');
     }
 }

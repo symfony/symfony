@@ -35,8 +35,8 @@ class AddMimeTypeGuesserPassTest extends TestCase
 
         $router = $container->getDefinition('mime_types');
         $calls = $router->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertEquals('registerGuesser', $calls[0][0]);
-        $this->assertEquals(new Reference('some_mime_type_guesser'), $calls[0][1][0]);
+        self::assertCount(1, $calls);
+        self::assertEquals('registerGuesser', $calls[0][0]);
+        self::assertEquals(new Reference('some_mime_type_guesser'), $calls[0][1][0]);
     }
 }

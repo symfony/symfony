@@ -37,45 +37,45 @@ class FileResourceTest extends TestCase
 
     public function testGetResource()
     {
-        $this->assertSame(realpath($this->file), $this->resource->getResource(), '->getResource() returns the path to the resource');
+        self::assertSame(realpath($this->file), $this->resource->getResource(), '->getResource() returns the path to the resource');
     }
 
     public function testGetResourceWithScheme()
     {
         $resource = new FileResource('file://'.$this->file);
-        $this->assertSame('file://'.$this->file, $resource->getResource(), '->getResource() returns the path to the schemed resource');
+        self::assertSame('file://'.$this->file, $resource->getResource(), '->getResource() returns the path to the schemed resource');
     }
 
     public function testToString()
     {
-        $this->assertSame(realpath($this->file), (string) $this->resource);
+        self::assertSame(realpath($this->file), (string) $this->resource);
     }
 
     public function testResourceDoesNotExist()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/The file ".*" does not exist./');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/The file ".*" does not exist./');
         new FileResource('/____foo/foobar'.mt_rand(1, 999999));
     }
 
     public function testIsFresh()
     {
-        $this->assertTrue($this->resource->isFresh($this->time), '->isFresh() returns true if the resource has not changed in same second');
-        $this->assertTrue($this->resource->isFresh($this->time + 10), '->isFresh() returns true if the resource has not changed');
-        $this->assertFalse($this->resource->isFresh($this->time - 86400), '->isFresh() returns false if the resource has been updated');
+        self::assertTrue($this->resource->isFresh($this->time), '->isFresh() returns true if the resource has not changed in same second');
+        self::assertTrue($this->resource->isFresh($this->time + 10), '->isFresh() returns true if the resource has not changed');
+        self::assertFalse($this->resource->isFresh($this->time - 86400), '->isFresh() returns false if the resource has been updated');
     }
 
     public function testIsFreshForDeletedResources()
     {
         unlink($this->file);
 
-        $this->assertFalse($this->resource->isFresh($this->time), '->isFresh() returns false if the resource does not exist');
+        self::assertFalse($this->resource->isFresh($this->time), '->isFresh() returns false if the resource does not exist');
     }
 
     public function testSerializeUnserialize()
     {
         unserialize(serialize($this->resource));
 
-        $this->assertSame(realpath($this->file), $this->resource->getResource());
+        self::assertSame(realpath($this->file), $this->resource->getResource());
     }
 }

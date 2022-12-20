@@ -35,13 +35,13 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
 
-        $handler = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
+        $handler = self::createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
 
         $middleware = new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [$handler],
         ]));
 
-        $handler->expects($this->once())->method('__invoke')->with($message);
+        $handler->expects(self::once())->method('__invoke')->with($message);
 
         $middleware->handle($envelope, $this->getStackMock());
     }
@@ -64,21 +64,21 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
             $envelope = $e->getEnvelope();
         }
 
-        $this->assertEquals($expectedStamps, $envelope->all(HandledStamp::class));
+        self::assertEquals($expectedStamps, $envelope->all(HandledStamp::class));
     }
 
     public function itAddsHandledStampsProvider(): iterable
     {
-        $first = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
+        $first = self::createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
         $first->method('__invoke')->willReturn('first result');
         $firstClass = \get_class($first);
 
-        $second = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
+        $second = self::createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
         $second->method('__invoke')->willReturn(null);
         $secondClass = \get_class($second);
 
-        $failing = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
-        $failing->method('__invoke')->will($this->throwException(new \Exception('handler failed.')));
+        $failing = self::createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
+        $failing->method('__invoke')->will(self::throwException(new \Exception('handler failed.')));
 
         yield 'A stamp is added' => [
             [$first],
@@ -122,8 +122,8 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testThrowsNoHandlerException()
     {
-        $this->expectException(NoHandlerForMessageException::class);
-        $this->expectExceptionMessage('No handler for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"');
+        self::expectException(NoHandlerForMessageException::class);
+        self::expectExceptionMessage('No handler for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"');
         $middleware = new HandleMessageMiddleware(new HandlersLocator([]));
 
         $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware());
@@ -131,7 +131,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testMessageAlreadyHandled()
     {
-        $handler = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
+        $handler = self::createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
 
         $middleware = new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [$handler],
@@ -144,14 +144,14 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $envelope = $middleware->handle($envelope, $this->getStackMock());
 
-        $this->assertSame($envelope->all(HandledStamp::class), $handledStamp);
+        self::assertSame($envelope->all(HandledStamp::class), $handledStamp);
     }
 
     public function testAllowNoHandlers()
     {
         $middleware = new HandleMessageMiddleware(new HandlersLocator([]), true);
 
-        $this->assertInstanceOf(Envelope::class, $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware()));
+        self::assertInstanceOf(Envelope::class, $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware()));
     }
 
     public function testBatchHandler()
@@ -203,11 +203,11 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
             $envelopes[] = $middleware->handle(new Envelope($message, [new AckStamp($ack)]), new StackMiddleware());
         }
 
-        $this->assertSame($expectedMessages, $handler->processedMessages);
-        $this->assertSame($expectedMessages, $ackedMessages);
+        self::assertSame($expectedMessages, $handler->processedMessages);
+        self::assertSame($expectedMessages, $ackedMessages);
 
-        $this->assertNotNull($envelopes[0]->last(NoAutoAckStamp::class));
-        $this->assertNull($envelopes[1]->last(NoAutoAckStamp::class));
+        self::assertNotNull($envelopes[0]->last(NoAutoAckStamp::class));
+        self::assertNull($envelopes[1]->last(NoAutoAckStamp::class));
     }
 
     public function testBatchHandlerNoAck()
@@ -239,8 +239,8 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
             $error = $e;
         };
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The acknowledger was not called by the "Symfony\Component\Messenger\Handler\BatchHandlerInterface@anonymous" batch handler.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The acknowledger was not called by the "Symfony\Component\Messenger\Handler\BatchHandlerInterface@anonymous" batch handler.');
 
         $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp($ack)]), new StackMiddleware());
     }
@@ -277,7 +277,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hey');
         $middleware->handle(new Envelope($message), new StackMiddleware());
 
-        $this->assertSame([$message], $handler->processedMessages);
+        self::assertSame([$message], $handler->processedMessages);
     }
 }
 

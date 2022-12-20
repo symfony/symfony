@@ -32,21 +32,21 @@ class StreamOutputTest extends TestCase
     public function testConstructor()
     {
         $output = new StreamOutput($this->stream, Output::VERBOSITY_QUIET, true);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
-        $this->assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
+        self::assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        self::assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
     }
 
     public function testStreamIsRequired()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The StreamOutput class needs a stream as its first argument.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The StreamOutput class needs a stream as its first argument.');
         new StreamOutput('foo');
     }
 
     public function testGetStream()
     {
         $output = new StreamOutput($this->stream);
-        $this->assertEquals($this->stream, $output->getStream(), '->getStream() returns the current stream');
+        self::assertEquals($this->stream, $output->getStream(), '->getStream() returns the current stream');
     }
 
     public function testDoWrite()
@@ -54,7 +54,7 @@ class StreamOutputTest extends TestCase
         $output = new StreamOutput($this->stream);
         $output->writeln('foo');
         rewind($output->getStream());
-        $this->assertEquals('foo'.\PHP_EOL, stream_get_contents($output->getStream()), '->doWrite() writes to the stream');
+        self::assertEquals('foo'.\PHP_EOL, stream_get_contents($output->getStream()), '->doWrite() writes to the stream');
     }
 
     public function testDoWriteOnFailure()
@@ -62,6 +62,6 @@ class StreamOutputTest extends TestCase
         $resource = fopen(__DIR__.'/../Fixtures/stream_output_file.txt', 'r', false);
         $output = new StreamOutput($resource);
         rewind($output->getStream());
-        $this->assertEquals('', stream_get_contents($output->getStream()));
+        self::assertEquals('', stream_get_contents($output->getStream()));
     }
 }

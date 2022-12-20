@@ -27,7 +27,7 @@ class CachePoolClearCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $this->cachePool = self::createMock(CacheItemPoolInterface::class);
     }
 
     /**
@@ -41,7 +41,7 @@ class CachePoolClearCommandTest extends TestCase
 
         $suggestions = $tester->complete($input);
 
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()
@@ -57,16 +57,16 @@ class CachePoolClearCommandTest extends TestCase
      */
     private function getKernel(): KernelInterface
     {
-        $container = $this->createMock(ContainerInterface::class);
+        $container = self::createMock(ContainerInterface::class);
 
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = self::createMock(KernelInterface::class);
         $kernel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getContainer')
             ->willReturn($container);
 
         $kernel
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getBundles')
             ->willReturn([]);
 

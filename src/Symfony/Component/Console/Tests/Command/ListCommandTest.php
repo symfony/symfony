@@ -24,7 +24,7 @@ class ListCommandTest extends TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
 
-        $this->assertMatchesRegularExpression('/help\s{2,}Display help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
+        self::assertMatchesRegularExpression('/help\s{2,}Display help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
     }
 
     public function testExecuteListsCommandsWithXmlOption()
@@ -32,7 +32,7 @@ class ListCommandTest extends TestCase
         $application = new Application();
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--format' => 'xml']);
-        $this->assertMatchesRegularExpression('/<command id="list" name="list" hidden="0">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
+        self::assertMatchesRegularExpression('/<command id="list" name="list" hidden="0">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
     }
 
     public function testExecuteListsCommandsWithRawOption()
@@ -47,7 +47,7 @@ list         List commands
 
 EOF;
 
-        $this->assertEquals($output, $commandTester->getDisplay(true));
+        self::assertEquals($output, $commandTester->getDisplay(true));
     }
 
     public function testExecuteListsCommandsWithNamespaceArgument()
@@ -62,7 +62,7 @@ foo:bar   The foo:bar command
 
 EOF;
 
-        $this->assertEquals($output, $commandTester->getDisplay(true));
+        self::assertEquals($output, $commandTester->getDisplay(true));
     }
 
     public function testExecuteListsCommandsOrder()
@@ -94,7 +94,7 @@ Available commands:
   0foo:bar    0foo:bar command
 EOF;
 
-        $this->assertEquals($output, trim($commandTester->getDisplay(true)));
+        self::assertEquals($output, trim($commandTester->getDisplay(true)));
     }
 
     public function testExecuteListsCommandsOrderRaw()
@@ -111,7 +111,7 @@ list         List commands
 0foo:bar     0foo:bar command
 EOF;
 
-        $this->assertEquals($output, trim($commandTester->getDisplay(true)));
+        self::assertEquals($output, trim($commandTester->getDisplay(true)));
     }
 
     /**
@@ -124,7 +124,7 @@ EOF;
         $application->add(new \FooCommand());
         $tester = new CommandCompletionTester($application->get('list'));
         $suggestions = $tester->complete($input, 2);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()

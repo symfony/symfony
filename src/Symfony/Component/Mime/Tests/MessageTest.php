@@ -34,23 +34,23 @@ class MessageTest extends TestCase
     public function testConstruct()
     {
         $m = new Message();
-        $this->assertNull($m->getBody());
-        $this->assertEquals(new Headers(), $m->getHeaders());
+        self::assertNull($m->getBody());
+        self::assertEquals(new Headers(), $m->getHeaders());
 
         $m = new Message($h = (new Headers())->addDateHeader('Date', new \DateTime()), $b = new TextPart('content'));
-        $this->assertSame($b, $m->getBody());
-        $this->assertEquals($h, $m->getHeaders());
+        self::assertSame($b, $m->getBody());
+        self::assertEquals($h, $m->getHeaders());
 
         $m = new Message();
         $m->setBody($b);
         $m->setHeaders($h);
-        $this->assertSame($b, $m->getBody());
-        $this->assertSame($h, $m->getHeaders());
+        self::assertSame($b, $m->getBody());
+        self::assertSame($h, $m->getHeaders());
     }
 
     public function testGetPreparedHeadersThrowsWhenNoFrom()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         (new Message())->getPreparedHeaders();
     }
 
@@ -58,7 +58,7 @@ class MessageTest extends TestCase
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
-        $this->assertNotSame($message->getPreparedHeaders(), $message->getHeaders());
+        self::assertNotSame($message->getPreparedHeaders(), $message->getHeaders());
     }
 
     public function testGetPreparedHeadersSetRequiredHeaders()
@@ -66,10 +66,10 @@ class MessageTest extends TestCase
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $headers = $message->getPreparedHeaders();
-        $this->assertTrue($headers->has('MIME-Version'));
-        $this->assertTrue($headers->has('Message-ID'));
-        $this->assertTrue($headers->has('Date'));
-        $this->assertFalse($headers->has('Bcc'));
+        self::assertTrue($headers->has('MIME-Version'));
+        self::assertTrue($headers->has('Message-ID'));
+        self::assertTrue($headers->has('Date'));
+        self::assertFalse($headers->has('Bcc'));
     }
 
     public function testGetPreparedHeaders()
@@ -77,26 +77,26 @@ class MessageTest extends TestCase
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $h = $message->getPreparedHeaders();
-        $this->assertCount(4, iterator_to_array($h->all()));
-        $this->assertEquals(new MailboxListHeader('From', [new Address('fabien@symfony.com')]), $h->get('From'));
-        $this->assertEquals(new UnstructuredHeader('MIME-Version', '1.0'), $h->get('mime-version'));
-        $this->assertTrue($h->has('Message-Id'));
-        $this->assertTrue($h->has('Date'));
+        self::assertCount(4, iterator_to_array($h->all()));
+        self::assertEquals(new MailboxListHeader('From', [new Address('fabien@symfony.com')]), $h->get('From'));
+        self::assertEquals(new UnstructuredHeader('MIME-Version', '1.0'), $h->get('mime-version'));
+        self::assertTrue($h->has('Message-Id'));
+        self::assertTrue($h->has('Date'));
 
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $message->getHeaders()->addDateHeader('Date', $n = new \DateTimeImmutable());
-        $this->assertEquals($n, $message->getPreparedHeaders()->get('Date')->getDateTime());
+        self::assertEquals($n, $message->getPreparedHeaders()->get('Date')->getDateTime());
 
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $message->getHeaders()->addMailboxListHeader('Bcc', ['fabien@symfony.com']);
-        $this->assertNull($message->getPreparedHeaders()->get('Bcc'));
+        self::assertNull($message->getPreparedHeaders()->get('Bcc'));
     }
 
     public function testGetPreparedHeadersWithNoFrom()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         (new Message())->getPreparedHeaders();
     }
 
@@ -105,24 +105,24 @@ class MessageTest extends TestCase
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', [new Address('fabien@symfony.com', 'Fabien')]);
         $h = $message->getPreparedHeaders();
-        $this->assertEquals(new MailboxListHeader('From', [new Address('fabien@symfony.com', 'Fabien')]), $h->get('From'));
-        $this->assertTrue($h->has('Message-Id'));
+        self::assertEquals(new MailboxListHeader('From', [new Address('fabien@symfony.com', 'Fabien')]), $h->get('From'));
+        self::assertTrue($h->has('Message-Id'));
     }
 
     public function testGetPreparedHeadersHasSenderWhenNeeded()
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
-        $this->assertNull($message->getPreparedHeaders()->get('Sender'));
+        self::assertNull($message->getPreparedHeaders()->get('Sender'));
 
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com', 'lucas@symfony.com']);
-        $this->assertEquals('fabien@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
+        self::assertEquals('fabien@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
 
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com', 'lucas@symfony.com']);
         $message->getHeaders()->addMailboxHeader('Sender', 'thomas@symfony.com');
-        $this->assertEquals('thomas@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
+        self::assertEquals('thomas@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
     }
 
     public function testToString()
@@ -139,8 +139,8 @@ Content-Transfer-Encoding: quoted-printable
 
 
 EOF;
-        $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
-        $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
+        self::assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
+        self::assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
 
         $message = new Message(null, new TextPart('content'));
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
@@ -154,8 +154,8 @@ Content-Transfer-Encoding: quoted-printable
 
 content
 EOF;
-        $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
-        $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
+        self::assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
+        self::assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
     }
 
     public function testSymfonySerialize()
@@ -249,12 +249,12 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json');
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        self::assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, Message::class, 'json');
-        $this->assertEquals($expected->getHeaders(), $n->getHeaders());
+        self::assertEquals($expected->getHeaders(), $n->getHeaders());
 
         $serialized = $serializer->serialize($e, 'json');
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        self::assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
     }
 }

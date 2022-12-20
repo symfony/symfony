@@ -51,7 +51,7 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
             'bootstrap_3_horizontal_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, self::createMock(CsrfTokenManagerInterface::class));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 

@@ -35,7 +35,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
     public function testTimeoutOnDestruct()
     {
         if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {
-            $this->markTestSkipped('BaseHttpClientTestCase doesn\'t have testTimeoutOnDestruct().');
+            self::markTestSkipped('BaseHttpClientTestCase doesn\'t have testTimeoutOnDestruct().');
         }
 
         parent::testTimeoutOnDestruct();
@@ -48,7 +48,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057');
         $requestHeaders = $response->toArray();
 
-        $this->assertSame('*/*', $requestHeaders['HTTP_ACCEPT']);
+        self::assertSame('*/*', $requestHeaders['HTTP_ACCEPT']);
 
         $response = $client->request('GET', 'http://localhost:8057', [
             'headers' => [
@@ -57,7 +57,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
         $requestHeaders = $response->toArray();
 
-        $this->assertSame('foo/bar', $requestHeaders['HTTP_ACCEPT']);
+        self::assertSame('foo/bar', $requestHeaders['HTTP_ACCEPT']);
 
         $response = $client->request('GET', 'http://localhost:8057', [
             'headers' => [
@@ -66,7 +66,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
         $requestHeaders = $response->toArray();
 
-        $this->assertArrayNotHasKey('HTTP_ACCEPT', $requestHeaders);
+        self::assertArrayNotHasKey('HTTP_ACCEPT', $requestHeaders);
     }
 
     public function testToStream()
@@ -75,14 +75,14 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057');
         $stream = $response->toStream();
 
-        $this->assertSame("{\n    \"SER", fread($stream, 10));
-        $this->assertSame('VER_PROTOCOL', fread($stream, 12));
-        $this->assertFalse(feof($stream));
-        $this->assertTrue(rewind($stream));
+        self::assertSame("{\n    \"SER", fread($stream, 10));
+        self::assertSame('VER_PROTOCOL', fread($stream, 12));
+        self::assertFalse(feof($stream));
+        self::assertTrue(rewind($stream));
 
-        $this->assertIsArray(json_decode(fread($stream, 1024), true));
-        $this->assertSame('', fread($stream, 1));
-        $this->assertTrue(feof($stream));
+        self::assertIsArray(json_decode(fread($stream, 1024), true));
+        self::assertSame('', fread($stream, 1));
+        self::assertTrue(feof($stream));
     }
 
     public function testStreamCopyToStream()
@@ -92,10 +92,10 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $h = fopen('php://temp', 'w+');
         stream_copy_to_stream($response->toStream(), $h);
 
-        $this->assertTrue(rewind($h));
-        $this->assertSame("{\n    \"SER", fread($h, 10));
-        $this->assertSame('VER_PROTOCOL', fread($h, 12));
-        $this->assertFalse(feof($h));
+        self::assertTrue(rewind($h));
+        self::assertSame("{\n    \"SER", fread($h, 10));
+        self::assertSame('VER_PROTOCOL', fread($h, 12));
+        self::assertFalse(feof($h));
     }
 
     public function testToStream404()
@@ -104,13 +104,13 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057/404');
         $stream = $response->toStream(false);
 
-        $this->assertSame("{\n    \"SER", fread($stream, 10));
-        $this->assertSame('VER_PROTOCOL', fread($stream, 12));
-        $this->assertSame($response, stream_get_meta_data($stream)['wrapper_data']->getResponse());
-        $this->assertSame(404, $response->getStatusCode());
+        self::assertSame("{\n    \"SER", fread($stream, 10));
+        self::assertSame('VER_PROTOCOL', fread($stream, 12));
+        self::assertSame($response, stream_get_meta_data($stream)['wrapper_data']->getResponse());
+        self::assertSame(404, $response->getStatusCode());
 
         $response = $client->request('GET', 'http://localhost:8057/404');
-        $this->expectException(ClientException::class);
+        self::expectException(ClientException::class);
         $response->toStream();
     }
 
@@ -121,14 +121,14 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $stream = $response->toStream();
         usleep(10000);
 
-        $this->assertTrue(stream_set_blocking($stream, false));
-        $this->assertSame('<1>', fread($stream, 8192));
-        $this->assertFalse(feof($stream));
+        self::assertTrue(stream_set_blocking($stream, false));
+        self::assertSame('<1>', fread($stream, 8192));
+        self::assertFalse(feof($stream));
 
-        $this->assertTrue(stream_set_blocking($stream, true));
-        $this->assertSame('<2>', fread($stream, 8192));
-        $this->assertSame('', fread($stream, 8192));
-        $this->assertTrue(feof($stream));
+        self::assertTrue(stream_set_blocking($stream, true));
+        self::assertSame('<2>', fread($stream, 8192));
+        self::assertSame('', fread($stream, 8192));
+        self::assertTrue(feof($stream));
     }
 
     public function testSeekAsyncStream()
@@ -137,10 +137,10 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057/timeout-body');
         $stream = $response->toStream(false);
 
-        $this->assertSame(0, fseek($stream, 0, \SEEK_CUR));
-        $this->assertSame('<1>', fread($stream, 8192));
-        $this->assertFalse(feof($stream));
-        $this->assertSame('<2>', stream_get_contents($stream));
+        self::assertSame(0, fseek($stream, 0, \SEEK_CUR));
+        self::assertSame('<1>', fread($stream, 8192));
+        self::assertFalse(feof($stream));
+        self::assertSame('<2>', stream_get_contents($stream));
     }
 
     public function testResponseStreamRewind()
@@ -150,9 +150,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $stream = $response->toStream();
 
-        $this->assertSame('Here the body', stream_get_contents($stream));
+        self::assertSame('Here the body', stream_get_contents($stream));
         rewind($stream);
-        $this->assertSame('Here the body', stream_get_contents($stream));
+        self::assertSame('Here the body', stream_get_contents($stream));
     }
 
     public function testStreamWrapperStreamRewind()
@@ -162,9 +162,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $stream = StreamWrapper::createResource($response);
 
-        $this->assertSame('Here the body', stream_get_contents($stream));
+        self::assertSame('Here the body', stream_get_contents($stream));
         rewind($stream);
-        $this->assertSame('Here the body', stream_get_contents($stream));
+        self::assertSame('Here the body', stream_get_contents($stream));
     }
 
     public function testStreamWrapperWithClientStreamRewind()
@@ -174,9 +174,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $stream = StreamWrapper::createResource($response, $client);
 
-        $this->assertSame('Here the body', stream_get_contents($stream));
+        self::assertSame('Here the body', stream_get_contents($stream));
         rewind($stream);
-        $this->assertSame('Here the body', stream_get_contents($stream));
+        self::assertSame('Here the body', stream_get_contents($stream));
     }
 
     public function testHttp2PushVulcain()
@@ -211,7 +211,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'Accepting pushed response: "GET https://127.0.0.1:3000/json/3"',
             'Response: "200 https://127.0.0.1:3000/json/3"',
         ];
-        $this->assertSame($expected, $logger->logs);
+        self::assertSame($expected, $logger->logs);
     }
 
     public function testPause()
@@ -221,8 +221,8 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $time = microtime(true);
         $response->getInfo('pause_handler')(0.5);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertTrue(0.5 <= microtime(true) - $time);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertTrue(0.5 <= microtime(true) - $time);
 
         $response = $client->request('GET', 'http://localhost:8057/');
 
@@ -230,12 +230,12 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response->getInfo('pause_handler')(1);
 
         foreach ($client->stream($response, 0.5) as $chunk) {
-            $this->assertTrue($chunk->isTimeout());
+            self::assertTrue($chunk->isTimeout());
             $response->cancel();
         }
         $response = null;
-        $this->assertTrue(1.0 > microtime(true) - $time);
-        $this->assertTrue(0.5 <= microtime(true) - $time);
+        self::assertTrue(1.0 > microtime(true) - $time);
+        self::assertTrue(0.5 <= microtime(true) - $time);
     }
 
     public function testPauseReplace()
@@ -246,9 +246,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $time = microtime(true);
         $response->getInfo('pause_handler')(10);
         $response->getInfo('pause_handler')(0.5);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertGreaterThanOrEqual(0.5, microtime(true) - $time);
-        $this->assertLessThanOrEqual(5, microtime(true) - $time);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertGreaterThanOrEqual(0.5, microtime(true) - $time);
+        self::assertLessThanOrEqual(5, microtime(true) - $time);
     }
 
     public function testPauseDuringBody()
@@ -257,10 +257,10 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057/timeout-body');
 
         $time = microtime(true);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $response->getInfo('pause_handler')(1);
         $response->getContent();
-        $this->assertGreaterThanOrEqual(1, microtime(true) - $time);
+        self::assertGreaterThanOrEqual(1, microtime(true) - $time);
     }
 
     public function testHttp2PushVulcainWithUnusedResponse()
@@ -298,7 +298,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'Response: "200 https://127.0.0.1:3000/json/2"',
             'Unused pushed response: "https://127.0.0.1:3000/json/3"',
         ];
-        $this->assertSame($expected, $logger->logs);
+        self::assertSame($expected, $logger->logs);
     }
 
     public function testDnsFailure()
@@ -306,7 +306,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://bad.host.test/');
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
         $response->getStatusCode();
     }
 
@@ -357,11 +357,11 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         try {
             $client->request('GET', 'http://localhost:8057/304');
-            $this->fail(RedirectionExceptionInterface::class.' expected');
+            self::fail(RedirectionExceptionInterface::class.' expected');
         } catch (RedirectionExceptionInterface $e) {
             // The response content-type mustn't be json as that calls getContent
             // @see src/Symfony/Component/HttpClient/Exception/HttpExceptionTrait.php:58
-            $this->assertStringNotContainsString('json', $e->getResponse()->getHeaders(false)['content-type'][0] ?? '');
+            self::assertStringNotContainsString('json', $e->getResponse()->getHeaders(false)['content-type'][0] ?? '');
             unset($e);
 
             $r = new \ReflectionProperty($client, 'multi');
@@ -369,8 +369,8 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             /** @var ClientState $clientState */
             $clientState = $r->getValue($client);
 
-            $this->assertCount(0, $clientState->handlesActivity);
-            $this->assertCount(0, $clientState->openHandles);
+            self::assertCount(0, $clientState->handlesActivity);
+            self::assertCount(0, $clientState->openHandles);
         }
     }
 
@@ -383,7 +383,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             $traceInfo = $info;
         }]);
 
-        $this->assertNotEmpty($traceInfo['debug']);
+        self::assertNotEmpty($traceInfo['debug']);
     }
 
     public function testFixContentLength()
@@ -397,7 +397,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $body = $response->toArray();
 
-        $this->assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $body);
+        self::assertSame(['abc' => 'def', 'REQUEST_METHOD' => 'POST'], $body);
     }
 
     public function testDropContentRelatedHeadersWhenFollowingRequestIsUsingGet()
@@ -409,14 +409,14 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'headers' => ['Content-Length: 3'],
         ]);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
     }
 
     public function testNegativeTimeout()
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
-        $this->assertSame(200, $client->request('GET', 'http://localhost:8057', [
+        self::assertSame(200, $client->request('GET', 'http://localhost:8057', [
             'timeout' => -1,
         ])->getStatusCode());
     }
@@ -429,8 +429,8 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'body' => '',
         ]);
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsStringIgnoringCase("\r\nContent-Length: 0", $response->getInfo('debug'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsStringIgnoringCase("\r\nContent-Length: 0", $response->getInfo('debug'));
     }
 
     public function testEmptyPut()
@@ -441,8 +441,8 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'headers' => ['Content-Length' => '0'],
         ]);
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString("\r\nContent-Length: ", $response->getInfo('debug'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString("\r\nContent-Length: ", $response->getInfo('debug'));
     }
 
     public function testNullBody()
@@ -453,6 +453,6 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             'body' => null,
         ]);
 
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
     }
 }

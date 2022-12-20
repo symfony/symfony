@@ -20,9 +20,9 @@ class TranslationWriterTest extends TestCase
 {
     public function testWrite()
     {
-        $dumper = $this->createMock(DumperInterface::class);
+        $dumper = self::createMock(DumperInterface::class);
         $dumper
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('dump');
 
         $writer = new TranslationWriter();

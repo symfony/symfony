@@ -24,91 +24,64 @@ class TargetOperationTest extends AbstractOperationTest
             new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
         );
 
-        $this->assertEquals(
-            ['a' => 'old_a', 'c' => 'new_c'],
-            $operation->getMessages('messages')
-        );
+        self::assertEquals(['a' => 'old_a', 'c' => 'new_c'], $operation->getMessages('messages'));
 
-        $this->assertEquals(
-            ['c' => 'new_c'],
-            $operation->getNewMessages('messages')
-        );
+        self::assertEquals(['c' => 'new_c'], $operation->getNewMessages('messages'));
 
-        $this->assertEquals(
-            ['b' => 'old_b'],
-            $operation->getObsoleteMessages('messages')
-        );
+        self::assertEquals(['b' => 'old_b'], $operation->getObsoleteMessages('messages'));
     }
 
     public function testGetResultFromSingleDomain()
     {
-        $this->assertEquals(
-            new MessageCatalogue('en', [
-                'messages' => ['a' => 'old_a', 'c' => 'new_c'],
-            ]),
-            $this->createOperation(
-                new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]),
-                new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
-            )->getResult()
-        );
+        self::assertEquals(new MessageCatalogue('en', [
+            'messages' => ['a' => 'old_a', 'c' => 'new_c'],
+        ]), $this->createOperation(
+            new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]),
+            new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
+        )->getResult());
     }
 
     public function testGetResultFromIntlDomain()
     {
-        $this->assertEquals(
-            new MessageCatalogue('en', [
-                'messages' => ['a' => 'old_a'],
-                'messages+intl-icu' => ['c' => 'new_c'],
-            ]),
-            $this->createOperation(
-                new MessageCatalogue('en', ['messages' => ['a' => 'old_a'], 'messages+intl-icu' => ['b' => 'old_b']]),
-                new MessageCatalogue('en', ['messages' => ['a' => 'new_a'], 'messages+intl-icu' => ['c' => 'new_c']])
-            )->getResult()
-        );
+        self::assertEquals(new MessageCatalogue('en', [
+            'messages' => ['a' => 'old_a'],
+            'messages+intl-icu' => ['c' => 'new_c'],
+        ]), $this->createOperation(
+            new MessageCatalogue('en', ['messages' => ['a' => 'old_a'], 'messages+intl-icu' => ['b' => 'old_b']]),
+            new MessageCatalogue('en', ['messages' => ['a' => 'new_a'], 'messages+intl-icu' => ['c' => 'new_c']])
+        )->getResult());
     }
 
     public function testGetResultWithMixedDomains()
     {
-        $this->assertEquals(
-            new MessageCatalogue('en', [
-                'messages+intl-icu' => ['a' => 'new_a'],
-            ]),
-            $this->createOperation(
-                new MessageCatalogue('en', ['messages' => ['a' => 'old_a']]),
-                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a']])
-            )->getResult()
-        );
+        self::assertEquals(new MessageCatalogue('en', [
+            'messages+intl-icu' => ['a' => 'new_a'],
+        ]), $this->createOperation(
+            new MessageCatalogue('en', ['messages' => ['a' => 'old_a']]),
+            new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a']])
+        )->getResult());
 
-        $this->assertEquals(
-            new MessageCatalogue('en', [
-                'messages+intl-icu' => ['a' => 'old_a'],
-            ]),
-            $this->createOperation(
-                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a']]),
-                new MessageCatalogue('en', ['messages' => ['a' => 'new_a']])
-            )->getResult()
-        );
+        self::assertEquals(new MessageCatalogue('en', [
+            'messages+intl-icu' => ['a' => 'old_a'],
+        ]), $this->createOperation(
+            new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a']]),
+            new MessageCatalogue('en', ['messages' => ['a' => 'new_a']])
+        )->getResult());
 
-        $this->assertEquals(
-            new MessageCatalogue('en', [
-                'messages+intl-icu' => ['a' => 'old_a'],
-                'messages' => ['b' => 'new_b'],
-            ]),
-            $this->createOperation(
-                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a']]),
-                new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'b' => 'new_b']])
-            )->getResult()
-        );
+        self::assertEquals(new MessageCatalogue('en', [
+            'messages+intl-icu' => ['a' => 'old_a'],
+            'messages' => ['b' => 'new_b'],
+        ]), $this->createOperation(
+            new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a']]),
+            new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'b' => 'new_b']])
+        )->getResult());
 
-        $this->assertEquals(
-            new MessageCatalogue('en', [
-                'messages+intl-icu' => ['b' => 'new_b', 'a' => 'new_a'],
-            ]),
-            $this->createOperation(
-                new MessageCatalogue('en', ['messages' => ['a' => 'old_a']]),
-                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a', 'b' => 'new_b']])
-            )->getResult()
-        );
+        self::assertEquals(new MessageCatalogue('en', [
+            'messages+intl-icu' => ['b' => 'new_b', 'a' => 'new_a'],
+        ]), $this->createOperation(
+            new MessageCatalogue('en', ['messages' => ['a' => 'old_a']]),
+            new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a', 'b' => 'new_b']])
+        )->getResult());
     }
 
     public function testGetResultWithMetadata()
@@ -124,13 +97,10 @@ class TargetOperationTest extends AbstractOperationTest
         $diffCatalogue->setMetadata('b', 'bar', 'messages');
         $diffCatalogue->setMetadata('c', 'qux', 'messages');
 
-        $this->assertEquals(
-            $diffCatalogue,
-            $this->createOperation(
-                $leftCatalogue,
-                $rightCatalogue
-            )->getResult()
-        );
+        self::assertEquals($diffCatalogue, $this->createOperation(
+            $leftCatalogue,
+            $rightCatalogue
+        )->getResult());
     }
 
     public function testGetResultWithMetadataFromIntlDomain()
@@ -146,13 +116,10 @@ class TargetOperationTest extends AbstractOperationTest
         $diffCatalogue->setMetadata('b', 'bar', 'messages+intl-icu');
         $diffCatalogue->setMetadata('c', 'qux', 'messages+intl-icu');
 
-        $this->assertEquals(
-            $diffCatalogue,
-            $this->createOperation(
-                $leftCatalogue,
-                $rightCatalogue
-            )->getResult()
-        );
+        self::assertEquals($diffCatalogue, $this->createOperation(
+            $leftCatalogue,
+            $rightCatalogue
+        )->getResult());
     }
 
     protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target)

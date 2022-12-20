@@ -21,7 +21,7 @@ class HtmlErrorRendererTest extends TestCase
      */
     public function testRender(\Throwable $exception, HtmlErrorRenderer $errorRenderer, string $expected)
     {
-        $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception)->getAsString());
+        self::assertStringMatchesFormat($expected, $errorRenderer->render($exception)->getAsString());
     }
 
     public function getRenderData(): iterable

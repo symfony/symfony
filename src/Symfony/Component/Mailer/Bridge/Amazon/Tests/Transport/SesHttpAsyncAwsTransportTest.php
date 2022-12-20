@@ -30,7 +30,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
      */
     public function testToString(SesHttpAsyncAwsTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -74,18 +74,18 @@ class SesHttpAsyncAwsTransportTest extends TestCase
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://email.us-east-1.amazonaws.com/v2/email/outbound-emails', $url);
+            self::assertSame('POST', $method);
+            self::assertSame('https://email.us-east-1.amazonaws.com/v2/email/outbound-emails', $url);
 
             $body = json_decode($options['body'], true);
             $content = base64_decode($body['Content']['Raw']['Data']);
 
-            $this->assertStringContainsString('Hello!', $content);
-            $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
-            $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
-            $this->assertStringContainsString('Hello There!', $content);
-            $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
-            $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
+            self::assertStringContainsString('Hello!', $content);
+            self::assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
+            self::assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
+            self::assertStringContainsString('Hello There!', $content);
+            self::assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
+            self::assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -107,7 +107,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        self::assertSame('foobar', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()
@@ -134,8 +134,8 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
     }
 }

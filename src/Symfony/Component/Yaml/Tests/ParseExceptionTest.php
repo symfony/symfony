@@ -21,7 +21,7 @@ class ParseExceptionTest extends TestCase
         $exception = new ParseException('Error message', 42, 'foo: bar', '/var/www/app/config.yml');
         $message = 'Error message in "/var/www/app/config.yml" at line 42 (near "foo: bar")';
 
-        $this->assertEquals($message, $exception->getMessage());
+        self::assertEquals($message, $exception->getMessage());
     }
 
     public function testGetMessageWithUnicodeInFilename()
@@ -29,6 +29,6 @@ class ParseExceptionTest extends TestCase
         $exception = new ParseException('Error message', 42, 'foo: bar', 'äöü.yml');
         $message = 'Error message in "äöü.yml" at line 42 (near "foo: bar")';
 
-        $this->assertEquals($message, $exception->getMessage());
+        self::assertEquals($message, $exception->getMessage());
     }
 }

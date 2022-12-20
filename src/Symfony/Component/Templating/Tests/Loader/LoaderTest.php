@@ -21,9 +21,9 @@ class LoaderTest extends TestCase
     public function testGetSetLogger()
     {
         $loader = new ProjectTemplateLoader4();
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $loader->setLogger($logger);
-        $this->assertSame($logger, $loader->getLogger(), '->setLogger() sets the logger instance');
+        self::assertSame($logger, $loader->getLogger(), '->setLogger() sets the logger instance');
     }
 }
 

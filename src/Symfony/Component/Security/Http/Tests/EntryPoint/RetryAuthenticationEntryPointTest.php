@@ -29,8 +29,8 @@ class RetryAuthenticationEntryPointTest extends TestCase
         $entryPoint = new RetryAuthenticationEntryPoint($httpPort, $httpsPort);
         $response = $entryPoint->start($request);
 
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals($expectedUrl, $response->headers->get('Location'));
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertEquals($expectedUrl, $response->headers->get('Location'));
     }
 
     public function dataForStart()

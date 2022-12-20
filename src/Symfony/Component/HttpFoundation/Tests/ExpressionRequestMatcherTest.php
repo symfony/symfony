@@ -20,7 +20,7 @@ class ExpressionRequestMatcherTest extends TestCase
 {
     public function testWhenNoExpressionIsSet()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $expressionRequestMatcher = new ExpressionRequestMatcher();
         $expressionRequestMatcher->matches(new Request());
     }
@@ -34,7 +34,7 @@ class ExpressionRequestMatcherTest extends TestCase
         $expressionRequestMatcher = new ExpressionRequestMatcher();
 
         $expressionRequestMatcher->setExpression(new ExpressionLanguage(), $expression);
-        $this->assertSame($expected, $expressionRequestMatcher->matches($request));
+        self::assertSame($expected, $expressionRequestMatcher->matches($request));
     }
 
     /**
@@ -48,7 +48,7 @@ class ExpressionRequestMatcherTest extends TestCase
         $expressionRequestMatcher->matchAttribute('foo', 'bar');
 
         $expressionRequestMatcher->setExpression(new ExpressionLanguage(), $expression);
-        $this->assertFalse($expressionRequestMatcher->matches($request));
+        self::assertFalse($expressionRequestMatcher->matches($request));
     }
 
     public function provideExpressions()

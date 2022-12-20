@@ -59,24 +59,24 @@ class AttributeBagTest extends TestCase
     {
         $bag = new AttributeBag();
         $bag->initialize($this->array);
-        $this->assertEquals($this->array, $bag->all());
+        self::assertEquals($this->array, $bag->all());
         $array = ['should' => 'change'];
         $bag->initialize($array);
-        $this->assertEquals($array, $bag->all());
+        self::assertEquals($array, $bag->all());
     }
 
     public function testGetStorageKey()
     {
-        $this->assertEquals('_sf', $this->bag->getStorageKey());
+        self::assertEquals('_sf', $this->bag->getStorageKey());
         $attributeBag = new AttributeBag('test');
-        $this->assertEquals('test', $attributeBag->getStorageKey());
+        self::assertEquals('test', $attributeBag->getStorageKey());
     }
 
     public function testGetSetName()
     {
-        $this->assertEquals('attributes', $this->bag->getName());
+        self::assertEquals('attributes', $this->bag->getName());
         $this->bag->setName('foo');
-        $this->assertEquals('foo', $this->bag->getName());
+        self::assertEquals('foo', $this->bag->getName());
     }
 
     /**
@@ -84,7 +84,7 @@ class AttributeBagTest extends TestCase
      */
     public function testHas($key, $value, $exists)
     {
-        $this->assertEquals($exists, $this->bag->has($key));
+        self::assertEquals($exists, $this->bag->has($key));
     }
 
     /**
@@ -92,13 +92,13 @@ class AttributeBagTest extends TestCase
      */
     public function testGet($key, $value, $expected)
     {
-        $this->assertEquals($value, $this->bag->get($key));
+        self::assertEquals($value, $this->bag->get($key));
     }
 
     public function testGetDefaults()
     {
-        $this->assertNull($this->bag->get('user2.login'));
-        $this->assertEquals('default', $this->bag->get('user2.login', 'default'));
+        self::assertNull($this->bag->get('user2.login'));
+        self::assertEquals('default', $this->bag->get('user2.login', 'default'));
     }
 
     /**
@@ -107,17 +107,17 @@ class AttributeBagTest extends TestCase
     public function testSet($key, $value, $expected)
     {
         $this->bag->set($key, $value);
-        $this->assertEquals($value, $this->bag->get($key));
+        self::assertEquals($value, $this->bag->get($key));
     }
 
     public function testAll()
     {
-        $this->assertEquals($this->array, $this->bag->all());
+        self::assertEquals($this->array, $this->bag->all());
 
         $this->bag->set('hello', 'fabien');
         $array = $this->array;
         $array['hello'] = 'fabien';
-        $this->assertEquals($array, $this->bag->all());
+        self::assertEquals($array, $this->bag->all());
     }
 
     public function testReplace()
@@ -126,31 +126,31 @@ class AttributeBagTest extends TestCase
         $array['name'] = 'jack';
         $array['foo.bar'] = 'beep';
         $this->bag->replace($array);
-        $this->assertEquals($array, $this->bag->all());
-        $this->assertNull($this->bag->get('hello'));
-        $this->assertNull($this->bag->get('always'));
-        $this->assertNull($this->bag->get('user.login'));
+        self::assertEquals($array, $this->bag->all());
+        self::assertNull($this->bag->get('hello'));
+        self::assertNull($this->bag->get('always'));
+        self::assertNull($this->bag->get('user.login'));
     }
 
     public function testRemove()
     {
-        $this->assertEquals('world', $this->bag->get('hello'));
+        self::assertEquals('world', $this->bag->get('hello'));
         $this->bag->remove('hello');
-        $this->assertNull($this->bag->get('hello'));
+        self::assertNull($this->bag->get('hello'));
 
-        $this->assertEquals('be happy', $this->bag->get('always'));
+        self::assertEquals('be happy', $this->bag->get('always'));
         $this->bag->remove('always');
-        $this->assertNull($this->bag->get('always'));
+        self::assertNull($this->bag->get('always'));
 
-        $this->assertEquals('drak', $this->bag->get('user.login'));
+        self::assertEquals('drak', $this->bag->get('user.login'));
         $this->bag->remove('user.login');
-        $this->assertNull($this->bag->get('user.login'));
+        self::assertNull($this->bag->get('user.login'));
     }
 
     public function testClear()
     {
         $this->bag->clear();
-        $this->assertEquals([], $this->bag->all());
+        self::assertEquals([], $this->bag->all());
     }
 
     public function attributesProvider()
@@ -172,15 +172,15 @@ class AttributeBagTest extends TestCase
     {
         $i = 0;
         foreach ($this->bag as $key => $val) {
-            $this->assertEquals($this->array[$key], $val);
+            self::assertEquals($this->array[$key], $val);
             ++$i;
         }
 
-        $this->assertEquals(\count($this->array), $i);
+        self::assertEquals(\count($this->array), $i);
     }
 
     public function testCount()
     {
-        $this->assertCount(\count($this->array), $this->bag);
+        self::assertCount(\count($this->array), $this->bag);
     }
 }

@@ -25,7 +25,7 @@ class RateLimitTest extends TestCase
     {
         $rateLimit = new RateLimit(10, new \DateTimeImmutable(), true, 10);
 
-        $this->assertSame($rateLimit, $rateLimit->ensureAccepted());
+        self::assertSame($rateLimit, $rateLimit->ensureAccepted());
     }
 
     public function testEnsureAcceptedThrowsRateLimitExceptionIfNotAccepted()
@@ -35,14 +35,14 @@ class RateLimitTest extends TestCase
         try {
             $rateLimit->ensureAccepted();
         } catch (RateLimitExceededException $exception) {
-            $this->assertSame($rateLimit, $exception->getRateLimit());
-            $this->assertSame(10, $exception->getRemainingTokens());
-            $this->assertSame($retryAfter, $exception->getRetryAfter());
+            self::assertSame($rateLimit, $exception->getRateLimit());
+            self::assertSame(10, $exception->getRemainingTokens());
+            self::assertSame($retryAfter, $exception->getRetryAfter());
 
             return;
         }
 
-        $this->fail('RateLimitExceededException not thrown.');
+        self::fail('RateLimitExceededException not thrown.');
     }
 
     public function testWaitUsesMicrotime()
@@ -52,6 +52,6 @@ class RateLimitTest extends TestCase
         $rateLimit = new RateLimit(10, \DateTimeImmutable::createFromFormat('U.u', $retryAfter), true, 10);
 
         $rateLimit->wait(); // wait until $retryAfter (~2.5 seconds)
-        $this->assertEqualsWithDelta($retryAfter, microtime(true), 0.49);
+        self::assertEqualsWithDelta($retryAfter, microtime(true), 0.49);
     }
 }

@@ -19,7 +19,7 @@ class AlternativePartTest extends TestCase
     public function testConstructor()
     {
         $a = new AlternativePart();
-        $this->assertEquals('multipart', $a->getMediaType());
-        $this->assertEquals('alternative', $a->getMediaSubtype());
+        self::assertEquals('multipart', $a->getMediaType());
+        self::assertEquals('alternative', $a->getMediaSubtype());
     }
 }

@@ -27,12 +27,12 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection = self::createMock(Connection::class);
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = self::createMock(EntityManagerInterface::class);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = self::createMock(ManagerRegistry::class);
         $managerRegistry->method('getManager')->willReturn($this->entityManager);
 
         $this->middleware = new DoctrineTransactionMiddleware($managerRegistry);
@@ -40,13 +40,13 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewareWrapsInTransactionAndFlushes()
     {
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('beginTransaction')
         ;
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('commit')
         ;
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('flush')
         ;
 
@@ -55,12 +55,12 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 
     public function testTransactionIsRolledBackOnException()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Thrown from next middleware.');
-        $this->connection->expects($this->once())
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Thrown from next middleware.');
+        $this->connection->expects(self::once())
             ->method('beginTransaction')
         ;
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('rollBack')
         ;
 
@@ -69,15 +69,15 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 
     public function testInvalidEntityManagerThrowsException()
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = self::createMock(ManagerRegistry::class);
         $managerRegistry
             ->method('getManager')
             ->with('unknown_manager')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->will(self::throwException(new \InvalidArgumentException()));
 
         $middleware = new DoctrineTransactionMiddleware($managerRegistry, 'unknown_manager');
 
-        $this->expectException(UnrecoverableMessageHandlingException::class);
+        self::expectException(UnrecoverableMessageHandlingException::class);
 
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
     }

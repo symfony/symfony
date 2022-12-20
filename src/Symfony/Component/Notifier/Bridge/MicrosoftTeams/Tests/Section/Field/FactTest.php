@@ -21,7 +21,7 @@ final class FactTest extends TestCase
         $field = (new Fact())
             ->name($value = 'Current version');
 
-        $this->assertSame($value, $field->toArray()['name']);
+        self::assertSame($value, $field->toArray()['name']);
     }
 
     public function testTitle()
@@ -29,6 +29,6 @@ final class FactTest extends TestCase
         $field = (new Fact())
             ->value($value = '5.3');
 
-        $this->assertSame($value, $field->toArray()['value']);
+        self::assertSame($value, $field->toArray()['value']);
     }
 }

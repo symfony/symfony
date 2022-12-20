@@ -27,7 +27,7 @@ class ClassMetadataFactoryTest extends TestCase
     public function testInterface()
     {
         $classMetadata = new ClassMetadataFactory(new LoaderChain([]));
-        $this->assertInstanceOf(ClassMetadataFactoryInterface::class, $classMetadata);
+        self::assertInstanceOf(ClassMetadataFactoryInterface::class, $classMetadata);
     }
 
     public function testGetMetadataFor()
@@ -35,15 +35,15 @@ class ClassMetadataFactoryTest extends TestCase
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $classMetadata = $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy');
 
-        $this->assertEquals(TestClassMetadataFactory::createClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations', true, true), $classMetadata);
+        self::assertEquals(TestClassMetadataFactory::createClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Annotations', true, true), $classMetadata);
     }
 
     public function testHasMetadataFor()
     {
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy'));
-        $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummyParent'));
-        $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummyInterface'));
-        $this->assertFalse($factory->hasMetadataFor('Dunglas\Entity'));
+        self::assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy'));
+        self::assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummyParent'));
+        self::assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummyInterface'));
+        self::assertFalse($factory->hasMetadataFor('Dunglas\Entity'));
     }
 }

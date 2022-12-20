@@ -23,17 +23,17 @@ class MessagePartTest extends TestCase
     public function testConstructor()
     {
         $p = new MessagePart((new Email())->from('fabien@symfony.com')->to('you@example.com')->text('content'));
-        $this->assertStringContainsString('content', $p->getBody());
-        $this->assertStringContainsString('content', $p->bodyToString());
-        $this->assertStringContainsString('content', implode('', iterator_to_array($p->bodyToIterable())));
-        $this->assertEquals('message', $p->getMediaType());
-        $this->assertEquals('rfc822', $p->getMediaSubType());
+        self::assertStringContainsString('content', $p->getBody());
+        self::assertStringContainsString('content', $p->bodyToString());
+        self::assertStringContainsString('content', implode('', iterator_to_array($p->bodyToIterable())));
+        self::assertEquals('message', $p->getMediaType());
+        self::assertEquals('rfc822', $p->getMediaSubType());
     }
 
     public function testHeaders()
     {
         $p = new MessagePart((new Email())->from('fabien@symfony.com')->text('content')->subject('Subject'));
-        $this->assertEquals(new Headers(
+        self::assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'message/rfc822', ['name' => 'Subject.eml']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64'),
             new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'Subject.eml', 'filename' => 'Subject.eml'])
@@ -47,6 +47,6 @@ class MessagePartTest extends TestCase
 
         $p = new MessagePart($email);
         $expected = clone $p;
-        $this->assertEquals($expected->toString(), unserialize(serialize($p))->toString());
+        self::assertEquals($expected->toString(), unserialize(serialize($p))->toString());
     }
 }

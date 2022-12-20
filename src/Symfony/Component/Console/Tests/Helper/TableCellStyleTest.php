@@ -19,9 +19,9 @@ class TableCellStyleTest extends TestCase
     public function testCreateTableCellStyle()
     {
         $tableCellStyle = new TableCellStyle(['fg' => 'red']);
-        $this->assertEquals('red', $tableCellStyle->getOptions()['fg']);
+        self::assertEquals('red', $tableCellStyle->getOptions()['fg']);
 
-        $this->expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
+        self::expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
         new TableCellStyle(['wrong_key' => null]);
     }
 }

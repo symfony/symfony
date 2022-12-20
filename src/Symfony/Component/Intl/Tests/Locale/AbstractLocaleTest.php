@@ -24,7 +24,7 @@ abstract class AbstractLocaleTest extends TestCase
     {
         $this->call('setDefault', 'en_GB');
 
-        $this->assertSame('en_GB', $this->call('getDefault'));
+        self::assertSame('en_GB', $this->call('getDefault'));
     }
 
     /**

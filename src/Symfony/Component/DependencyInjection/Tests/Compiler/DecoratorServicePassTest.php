@@ -45,20 +45,20 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals('foo.extended', $container->getAlias('foo'));
-        $this->assertFalse($container->getAlias('foo')->isPublic());
+        self::assertEquals('foo.extended', $container->getAlias('foo'));
+        self::assertFalse($container->getAlias('foo')->isPublic());
 
-        $this->assertEquals('bar.extended', $container->getAlias('bar'));
-        $this->assertTrue($container->getAlias('bar')->isPublic());
+        self::assertEquals('bar.extended', $container->getAlias('bar'));
+        self::assertTrue($container->getAlias('bar')->isPublic());
 
-        $this->assertSame($fooDefinition, $container->getDefinition('foo.extended.inner'));
-        $this->assertFalse($container->getDefinition('foo.extended.inner')->isPublic());
+        self::assertSame($fooDefinition, $container->getDefinition('foo.extended.inner'));
+        self::assertFalse($container->getDefinition('foo.extended.inner')->isPublic());
 
-        $this->assertSame($barDefinition, $container->getDefinition('bar.yoo'));
-        $this->assertFalse($container->getDefinition('bar.yoo')->isPublic());
+        self::assertSame($barDefinition, $container->getDefinition('bar.yoo'));
+        self::assertFalse($container->getDefinition('bar.yoo')->isPublic());
 
-        $this->assertNull($fooExtendedDefinition->getDecoratedService());
-        $this->assertNull($barExtendedDefinition->getDecoratedService());
+        self::assertNull($fooExtendedDefinition->getDecoratedService());
+        self::assertNull($barExtendedDefinition->getDecoratedService());
     }
 
     public function testProcessWithAlias()
@@ -77,13 +77,13 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals('foo.extended', $container->getAlias('foo.alias'));
-        $this->assertFalse($container->getAlias('foo.alias')->isPublic());
+        self::assertEquals('foo.extended', $container->getAlias('foo.alias'));
+        self::assertFalse($container->getAlias('foo.alias')->isPublic());
 
-        $this->assertEquals('foo', $container->getAlias('foo.extended.inner'));
-        $this->assertFalse($container->getAlias('foo.extended.inner')->isPublic());
+        self::assertEquals('foo', $container->getAlias('foo.extended.inner'));
+        self::assertFalse($container->getAlias('foo.extended.inner')->isPublic());
 
-        $this->assertNull($fooExtendedDefinition->getDecoratedService());
+        self::assertNull($fooExtendedDefinition->getDecoratedService());
     }
 
     public function testProcessWithPriority()
@@ -110,21 +110,21 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals('bar', $container->getAlias('foo'));
-        $this->assertFalse($container->getAlias('foo')->isPublic());
+        self::assertEquals('bar', $container->getAlias('foo'));
+        self::assertFalse($container->getAlias('foo')->isPublic());
 
-        $this->assertSame($fooDefinition, $container->getDefinition('baz.inner'));
-        $this->assertFalse($container->getDefinition('baz.inner')->isPublic());
+        self::assertSame($fooDefinition, $container->getDefinition('baz.inner'));
+        self::assertFalse($container->getDefinition('baz.inner')->isPublic());
 
-        $this->assertEquals('qux', $container->getAlias('bar.inner'));
-        $this->assertFalse($container->getAlias('bar.inner')->isPublic());
+        self::assertEquals('qux', $container->getAlias('bar.inner'));
+        self::assertFalse($container->getAlias('bar.inner')->isPublic());
 
-        $this->assertEquals('baz', $container->getAlias('qux.inner'));
-        $this->assertFalse($container->getAlias('qux.inner')->isPublic());
+        self::assertEquals('baz', $container->getAlias('qux.inner'));
+        self::assertFalse($container->getAlias('qux.inner')->isPublic());
 
-        $this->assertNull($barDefinition->getDecoratedService());
-        $this->assertNull($bazDefinition->getDecoratedService());
-        $this->assertNull($quxDefinition->getDecoratedService());
+        self::assertNull($barDefinition->getDecoratedService());
+        self::assertNull($bazDefinition->getDecoratedService());
+        self::assertNull($quxDefinition->getDecoratedService());
     }
 
     public function testProcessWithInvalidDecorated()
@@ -136,7 +136,7 @@ class DecoratorServicePassTest extends TestCase
         ;
 
         $this->process($container);
-        $this->assertFalse($container->has('decorator'));
+        self::assertFalse($container->has('decorator'));
 
         $container = new ContainerBuilder();
         $decoratorDefinition = $container
@@ -145,8 +145,8 @@ class DecoratorServicePassTest extends TestCase
         ;
 
         $this->process($container);
-        $this->assertTrue($container->has('decorator'));
-        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $decoratorDefinition->decorationOnInvalid);
+        self::assertTrue($container->has('decorator'));
+        self::assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $decoratorDefinition->decorationOnInvalid);
 
         $container = new ContainerBuilder();
         $decoratorDefinition = $container
@@ -154,7 +154,7 @@ class DecoratorServicePassTest extends TestCase
             ->setDecoratedService('unknown_service')
         ;
 
-        $this->expectException(ServiceNotFoundException::class);
+        self::expectException(ServiceNotFoundException::class);
         $this->process($container);
     }
 
@@ -167,7 +167,7 @@ class DecoratorServicePassTest extends TestCase
         ;
 
         $this->process($container);
-        $this->assertFalse($container->hasAlias('decorator.inner'));
+        self::assertFalse($container->hasAlias('decorator.inner'));
     }
 
     public function testProcessWithInvalidDecoratedAndWrongBehavior()
@@ -178,7 +178,7 @@ class DecoratorServicePassTest extends TestCase
             ->setDecoratedService('unknown_decorated', null, 0, 12)
         ;
 
-        $this->expectException(ServiceNotFoundException::class);
+        self::expectException(ServiceNotFoundException::class);
         $this->process($container);
     }
 
@@ -197,8 +197,8 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEmpty($container->getDefinition('baz.inner')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
+        self::assertEmpty($container->getDefinition('baz.inner')->getTags());
+        self::assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
     }
 
     public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinitionMultipleTimes()
@@ -220,8 +220,8 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEmpty($container->getDefinition('deco1')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz']], $container->getDefinition('deco2')->getTags());
+        self::assertEmpty($container->getDefinition('deco1')->getTags());
+        self::assertEquals(['bar' => ['attr' => 'baz']], $container->getDefinition('deco2')->getTags());
     }
 
     public function testProcessLeavesServiceLocatorTagOnOriginalDefinition()
@@ -239,8 +239,8 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals(['container.service_locator' => [0 => []]], $container->getDefinition('baz.inner')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
+        self::assertEquals(['container.service_locator' => [0 => []]], $container->getDefinition('baz.inner')->getTags());
+        self::assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
     }
 
     public function testProcessLeavesServiceSubscriberTagOnOriginalDefinition()
@@ -258,8 +258,8 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals(['container.service_subscriber' => [], 'container.service_subscriber.locator' => []], $container->getDefinition('baz.inner')->getTags());
-        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
+        self::assertEquals(['container.service_subscriber' => [], 'container.service_subscriber.locator' => []], $container->getDefinition('baz.inner')->getTags());
+        self::assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
     }
 
     public function testCannotDecorateSyntheticService()
@@ -274,8 +274,8 @@ class DecoratorServicePassTest extends TestCase
             ->setDecoratedService('foo')
         ;
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A synthetic service cannot be decorated: service "baz" cannot decorate "foo".');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('A synthetic service cannot be decorated: service "baz" cannot decorate "foo".');
         $this->process($container);
     }
 
@@ -290,7 +290,7 @@ class DecoratorServicePassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals(['prop' => new Reference('bar.inner')], $container->getDefinition('bar')->getProperties());
+        self::assertEquals(['prop' => new Reference('bar.inner')], $container->getDefinition('bar')->getProperties());
     }
 
     protected function process(ContainerBuilder $container)

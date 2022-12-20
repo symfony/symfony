@@ -66,7 +66,7 @@ class TextBundleWriterTest extends TestCase
             'Entry2' => 'String',
         ]);
 
-        $this->assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
+        self::assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
     }
 
     public function testWriteTraversable()
@@ -87,7 +87,7 @@ class TextBundleWriterTest extends TestCase
             'Entry2' => 'String',
         ]));
 
-        $this->assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
+        self::assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
     }
 
     public function testWriteNoFallback()
@@ -98,7 +98,7 @@ class TextBundleWriterTest extends TestCase
 
         $this->writer->write($this->directory, 'en_nofallback', $data, $fallback = false);
 
-        $this->assertFileEquals(__DIR__.'/Fixtures/en_nofallback.txt', $this->directory.'/en_nofallback.txt');
+        self::assertFileEquals(__DIR__.'/Fixtures/en_nofallback.txt', $this->directory.'/en_nofallback.txt');
     }
 
     public function testEscapeKeysIfNecessary()
@@ -111,6 +111,6 @@ class TextBundleWriterTest extends TestCase
             'Entry With Spaces' => 'Value',
         ]);
 
-        $this->assertFileEquals(__DIR__.'/Fixtures/escaped.txt', $this->directory.'/escaped.txt');
+        self::assertFileEquals(__DIR__.'/Fixtures/escaped.txt', $this->directory.'/escaped.txt');
     }
 }

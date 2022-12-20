@@ -37,12 +37,12 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
             }
         };
 
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection = self::createMock(Connection::class);
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = self::createMock(EntityManagerInterface::class);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = self::createMock(ManagerRegistry::class);
         $managerRegistry->method('getManager')->willReturn($this->entityManager);
 
         $this->middleware = new DoctrineOpenTransactionLoggerMiddleware($managerRegistry, null, $this->logger);
@@ -50,13 +50,13 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewareWrapsInTransactionAndFlushes()
     {
-        $this->connection->expects($this->exactly(1))
+        $this->connection->expects(self::exactly(1))
             ->method('isTransactionActive')
-            ->will($this->onConsecutiveCalls(true, true, false))
+            ->will(self::onConsecutiveCalls(true, true, false))
         ;
 
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
 
-        $this->assertSame(['error' => ['A handler opened a transaction but did not close it.']], $this->logger->logs);
+        self::assertSame(['error' => ['A handler opened a transaction but did not close it.']], $this->logger->logs);
     }
 }

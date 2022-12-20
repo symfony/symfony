@@ -37,8 +37,8 @@ class FormLoginAuthenticatorTest extends TestCase
     protected function setUp(): void
     {
         $this->userProvider = new InMemoryUserProvider(['test' => ['password' => 's$cr$t']]);
-        $this->successHandler = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
+        $this->successHandler = self::createMock(AuthenticationSuccessHandlerInterface::class);
+        $this->failureHandler = self::createMock(AuthenticationFailureHandlerInterface::class);
     }
 
     /**
@@ -47,10 +47,10 @@ class FormLoginAuthenticatorTest extends TestCase
     public function testHandleWhenUsernameLength($username, $ok)
     {
         if ($ok) {
-            $this->expectNotToPerformAssertions();
+            self::expectNotToPerformAssertions();
         } else {
-            $this->expectException(BadCredentialsException::class);
-            $this->expectExceptionMessage('Invalid username.');
+            self::expectException(BadCredentialsException::class);
+            self::expectExceptionMessage('Invalid username.');
         }
 
         $request = Request::create('/login_check', 'POST', ['_username' => $username, '_password' => 's$cr$t']);
@@ -71,8 +71,8 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithArray($postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "array" given.');
+        self::expectException(BadRequestHttpException::class);
+        self::expectExceptionMessage('The key "_username" must be a string, "array" given.');
 
         $request = Request::create('/login_check', 'POST', ['_username' => []]);
         $request->setSession($this->createSession());
@@ -86,8 +86,8 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithInt($postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "integer" given.');
+        self::expectException(BadRequestHttpException::class);
+        self::expectExceptionMessage('The key "_username" must be a string, "integer" given.');
 
         $request = Request::create('/login_check', 'POST', ['_username' => 42]);
         $request->setSession($this->createSession());
@@ -101,8 +101,8 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithObject($postOnly)
     {
-        $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('The key "_username" must be a string, "object" given.');
+        self::expectException(BadRequestHttpException::class);
+        self::expectExceptionMessage('The key "_username" must be a string, "object" given.');
 
         $request = Request::create('/login_check', 'POST', ['_username' => new \stdClass()]);
         $request->setSession($this->createSession());
@@ -116,8 +116,8 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithToString($postOnly)
     {
-        $usernameObject = $this->createMock(DummyUserClass::class);
-        $usernameObject->expects($this->once())->method('__toString')->willReturn('someUsername');
+        $usernameObject = self::createMock(DummyUserClass::class);
+        $usernameObject->expects(self::once())->method('__toString')->willReturn('someUsername');
 
         $request = Request::create('/login_check', 'POST', ['_username' => $usernameObject, '_password' => 's$cr$t']);
         $request->setSession($this->createSession());
@@ -139,7 +139,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
         $this->setUpAuthenticator(['enable_csrf' => true]);
         $passport = $this->authenticator->authenticate($request);
-        $this->assertTrue($passport->hasBadge(CsrfTokenBadge::class));
+        self::assertTrue($passport->hasBadge(CsrfTokenBadge::class));
     }
 
     public function testUpgradePassword()
@@ -151,9 +151,9 @@ class FormLoginAuthenticatorTest extends TestCase
 
         $this->setUpAuthenticator();
         $passport = $this->authenticator->authenticate($request);
-        $this->assertTrue($passport->hasBadge(PasswordUpgradeBadge::class));
+        self::assertTrue($passport->hasBadge(PasswordUpgradeBadge::class));
         $badge = $passport->getBadge(PasswordUpgradeBadge::class);
-        $this->assertEquals('s$cr$t', $badge->getAndErasePlaintextPassword());
+        self::assertEquals('s$cr$t', $badge->getAndErasePlaintextPassword());
     }
 
     /**
@@ -168,7 +168,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
         $this->setUpAuthenticator(['form_only' => true]);
 
-        $this->assertSame($shouldSupport, $this->authenticator->supports($request));
+        self::assertSame($shouldSupport, $this->authenticator->supports($request));
     }
 
     public function provideContentTypes()
@@ -184,7 +184,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     private function createSession()
     {
-        return $this->createMock(SessionInterface::class);
+        return self::createMock(SessionInterface::class);
     }
 }
 

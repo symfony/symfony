@@ -24,7 +24,7 @@ final class SentMessageEventTest extends TestCase
      */
     public function testConstruct(SentMessage $message, SentMessageEvent $event)
     {
-        $this->assertEquals($event, new SentMessageEvent($message));
+        self::assertEquals($event, new SentMessageEvent($message));
     }
 
     /**
@@ -32,7 +32,7 @@ final class SentMessageEventTest extends TestCase
      */
     public function testGetMessage(SentMessage $message, SentMessageEvent $event)
     {
-        $this->assertSame($message, $event->getMessage());
+        self::assertSame($message, $event->getMessage());
     }
 
     public function messagesProvider(): iterable

@@ -24,8 +24,8 @@ class HandleTraitTest extends TestCase
 {
     public function testItThrowsOnNoMessageBusInstance()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, "null" given.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, "null" given.');
         $queryBus = new TestQueryBus(null);
         $query = new DummyMessage('Hello');
 
@@ -34,50 +34,50 @@ class HandleTraitTest extends TestCase
 
     public function testHandleReturnsHandledStampResult()
     {
-        $bus = $this->createMock(MessageBus::class);
+        $bus = self::createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
 
         $query = new DummyMessage('Hello');
-        $bus->expects($this->once())->method('dispatch')->willReturn(
+        $bus->expects(self::once())->method('dispatch')->willReturn(
             new Envelope($query, [new HandledStamp('result', 'DummyHandler::__invoke')])
         );
 
-        $this->assertSame('result', $queryBus->query($query));
+        self::assertSame('result', $queryBus->query($query));
     }
 
     public function testHandleAcceptsEnvelopes()
     {
-        $bus = $this->createMock(MessageBus::class);
+        $bus = self::createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
 
         $envelope = new Envelope(new DummyMessage('Hello'), [new HandledStamp('result', 'DummyHandler::__invoke')]);
-        $bus->expects($this->once())->method('dispatch')->willReturn($envelope);
+        $bus->expects(self::once())->method('dispatch')->willReturn($envelope);
 
-        $this->assertSame('result', $queryBus->query($envelope));
+        self::assertSame('result', $queryBus->query($envelope));
     }
 
     public function testHandleThrowsOnNoHandledStamp()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled zero times. Exactly one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()".');
-        $bus = $this->createMock(MessageBus::class);
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled zero times. Exactly one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()".');
+        $bus = self::createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
 
         $query = new DummyMessage('Hello');
-        $bus->expects($this->once())->method('dispatch')->willReturn(new Envelope($query));
+        $bus->expects(self::once())->method('dispatch')->willReturn(new Envelope($query));
 
         $queryBus->query($query);
     }
 
     public function testHandleThrowsOnMultipleHandledStamps()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "SecondDummyHandler::__invoke".');
-        $bus = $this->createMock(MessageBus::class);
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "SecondDummyHandler::__invoke".');
+        $bus = self::createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
 
         $query = new DummyMessage('Hello');
-        $bus->expects($this->once())->method('dispatch')->willReturn(
+        $bus->expects(self::once())->method('dispatch')->willReturn(
             new Envelope($query, [new HandledStamp('first_result', 'FirstDummyHandler::__invoke'), new HandledStamp('second_result', 'SecondDummyHandler::__invoke')])
         );
 

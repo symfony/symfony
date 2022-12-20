@@ -39,7 +39,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
 
         $suggestions = $tester->complete($input);
 
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()
@@ -69,15 +69,15 @@ class TranslationUpdateCommandCompletionTest extends TestCase
 
     private function createCommandCompletionTester($extractedMessages = [], $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = []): CommandCompletionTester
     {
-        $translator = $this->createMock(Translator::class);
+        $translator = self::createMock(Translator::class);
         $translator
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getFallbackLocales')
             ->willReturn(['en']);
 
-        $extractor = $this->createMock(ExtractorInterface::class);
+        $extractor = self::createMock(ExtractorInterface::class);
         $extractor
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('extract')
             ->willReturnCallback(
                 function ($path, $catalogue) use ($extractedMessages) {
@@ -87,9 +87,9 @@ class TranslationUpdateCommandCompletionTest extends TestCase
                 }
             );
 
-        $loader = $this->createMock(TranslationReader::class);
+        $loader = self::createMock(TranslationReader::class);
         $loader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('read')
             ->willReturnCallback(
                 function ($path, $catalogue) use ($loadedMessages) {
@@ -97,9 +97,9 @@ class TranslationUpdateCommandCompletionTest extends TestCase
                 }
             );
 
-        $writer = $this->createMock(TranslationWriter::class);
+        $writer = self::createMock(TranslationWriter::class);
         $writer
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getFormats')
             ->willReturn(
                 ['php', 'xlf', 'po', 'mo', 'yml', 'yaml', 'ts', 'csv', 'ini', 'json', 'res']
@@ -110,21 +110,21 @@ class TranslationUpdateCommandCompletionTest extends TestCase
                 ['foo', $this->getBundle($this->translationDir)],
                 ['test', $this->getBundle('test')],
             ];
-            $kernel = $this->createMock(KernelInterface::class);
+            $kernel = self::createMock(KernelInterface::class);
             $kernel
-                ->expects($this->any())
+                ->expects(self::any())
                 ->method('getBundle')
                 ->willReturnMap($returnValues);
         }
 
         $kernel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getBundles')
             ->willReturn([new ExtensionPresentBundle()]);
 
         $container = new Container();
         $kernel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getContainer')
             ->willReturn($container);
 
@@ -138,9 +138,9 @@ class TranslationUpdateCommandCompletionTest extends TestCase
 
     private function getBundle($path)
     {
-        $bundle = $this->createMock(BundleInterface::class);
+        $bundle = self::createMock(BundleInterface::class);
         $bundle
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPath')
             ->willReturn($path)
         ;

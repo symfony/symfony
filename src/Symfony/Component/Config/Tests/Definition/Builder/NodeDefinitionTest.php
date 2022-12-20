@@ -20,14 +20,14 @@ class NodeDefinitionTest extends TestCase
     public function testSetPathSeparatorChangesChildren()
     {
         $parentNode = new ArrayNodeDefinition('name');
-        $childNode = $this->createMock(NodeDefinition::class);
+        $childNode = self::createMock(NodeDefinition::class);
 
         $childNode
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setPathSeparator')
             ->with('/');
         $childNode
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setParent')
             ->with($parentNode)
             ->willReturn($childNode);

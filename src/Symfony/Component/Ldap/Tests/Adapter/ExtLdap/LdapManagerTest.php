@@ -63,7 +63,7 @@ class LdapManagerTest extends LdapTestCase
      */
     public function testLdapAddInvalidEntry()
     {
-        $this->expectException(LdapException::class);
+        self::expectException(LdapException::class);
         $this->executeSearchQuery(1);
 
         // The entry is missing a subject name
@@ -82,7 +82,7 @@ class LdapManagerTest extends LdapTestCase
      */
     public function testLdapAddDouble()
     {
-        $this->expectException(LdapException::class);
+        self::expectException(LdapException::class);
         $this->executeSearchQuery(1);
 
         $entry = new Entry('cn=Elsa Amrouche,dc=symfony,dc=com', [
@@ -109,7 +109,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
 
         $entry = $result[0];
-        $this->assertNull($entry->getAttribute('email'));
+        self::assertNull($entry->getAttribute('email'));
 
         $em = $this->adapter->getEntryManager();
         $em->update($entry);
@@ -117,14 +117,14 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
 
         $entry = $result[0];
-        $this->assertNull($entry->getAttribute('email'));
+        self::assertNull($entry->getAttribute('email'));
 
         $entry->removeAttribute('email');
         $em->update($entry);
 
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
-        $this->assertNull($entry->getAttribute('email'));
+        self::assertNull($entry->getAttribute('email'));
     }
 
     /**
@@ -133,7 +133,7 @@ class LdapManagerTest extends LdapTestCase
     public function testLdapUnboundAdd()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
-        $this->expectException(NotBoundException::class);
+        self::expectException(NotBoundException::class);
         $em = $this->adapter->getEntryManager();
         $em->add(new Entry(''));
     }
@@ -144,7 +144,7 @@ class LdapManagerTest extends LdapTestCase
     public function testLdapUnboundRemove()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
-        $this->expectException(NotBoundException::class);
+        self::expectException(NotBoundException::class);
         $em = $this->adapter->getEntryManager();
         $em->remove(new Entry(''));
     }
@@ -155,7 +155,7 @@ class LdapManagerTest extends LdapTestCase
     public function testLdapUnboundUpdate()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
-        $this->expectException(NotBoundException::class);
+        self::expectException(NotBoundException::class);
         $em = $this->adapter->getEntryManager();
         $em->update(new Entry(''));
     }
@@ -168,7 +168,7 @@ class LdapManagerTest extends LdapTestCase
             ->execute()
         ;
 
-        $this->assertCount($expectedResults, $results);
+        self::assertCount($expectedResults, $results);
 
         return $results;
     }
@@ -187,7 +187,7 @@ class LdapManagerTest extends LdapTestCase
 
         $result = $this->executeSearchQuery(1);
         $renamedEntry = $result[0];
-        $this->assertEquals('Kevin', $renamedEntry->getAttribute('cn')[0]);
+        self::assertEquals('Kevin', $renamedEntry->getAttribute('cn')[0]);
 
         $oldRdn = $entry->getAttribute('cn')[0];
         $entryManager->rename($renamedEntry, 'cn='.$oldRdn);
@@ -212,8 +212,8 @@ class LdapManagerTest extends LdapTestCase
         $originalCN = $entry->getAttribute('cn')[0];
 
         try {
-            $this->assertContains($originalCN, $newEntry->getAttribute('cn'));
-            $this->assertContains('Kevin', $newEntry->getAttribute('cn'));
+            self::assertContains($originalCN, $newEntry->getAttribute('cn'));
+            self::assertContains('Kevin', $newEntry->getAttribute('cn'));
         } finally {
             $entryManager->rename($newEntry, 'cn='.$originalCN);
         }
@@ -231,14 +231,14 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $newEntry = $result[0];
 
-        $this->assertCount(4, $newEntry->getAttribute('mail'));
+        self::assertCount(4, $newEntry->getAttribute('mail'));
 
         $entryManager->removeAttributeValues($newEntry, 'mail', ['fabpot@example.org', 'fabpot2@example.org']);
 
         $result = $this->executeSearchQuery(1);
         $newNewEntry = $result[0];
 
-        $this->assertCount(2, $newNewEntry->getAttribute('mail'));
+        self::assertCount(2, $newNewEntry->getAttribute('mail'));
     }
 
     public function testLdapRemoveAttributeValuesError()
@@ -248,7 +248,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->expectException(LdapException::class);
+        self::expectException(LdapException::class);
 
         $entryManager->removeAttributeValues($entry, 'mail', ['fabpot@example.org']);
     }
@@ -260,7 +260,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->expectException(LdapException::class);
+        self::expectException(LdapException::class);
 
         $entryManager->addAttributeValues($entry, 'mail', $entry->getAttribute('mail'));
     }
@@ -272,7 +272,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->expectException(UpdateOperationException::class);
+        self::expectException(UpdateOperationException::class);
 
         $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE_ALL, 'mail', [])]);
     }
@@ -284,7 +284,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->expectException(UpdateOperationException::class);
+        self::expectException(UpdateOperationException::class);
 
         $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(512, 'mail', [])]);
     }
@@ -304,7 +304,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $newEntry = $result[0];
 
-        $this->assertCount(6, $newEntry->getAttribute('mail'));
+        self::assertCount(6, $newEntry->getAttribute('mail'));
 
         $entryManager->applyOperations($entry->getDn(), [
             new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
@@ -314,7 +314,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $newNewEntry = $result[0];
 
-        $this->assertCount(2, $newNewEntry->getAttribute('mail'));
+        self::assertCount(2, $newNewEntry->getAttribute('mail'));
     }
 
     public function testUpdateOperationsWithIterator()
@@ -339,14 +339,14 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $newEntry = $result[0];
 
-        $this->assertCount(6, $newEntry->getAttribute('mail'));
+        self::assertCount(6, $newEntry->getAttribute('mail'));
 
         $entryManager->applyOperations($entry->getDn(), $iteratorRemove);
 
         $result = $this->executeSearchQuery(1);
         $newNewEntry = $result[0];
 
-        $this->assertCount(2, $newNewEntry->getAttribute('mail'));
+        self::assertCount(2, $newNewEntry->getAttribute('mail'));
     }
 
     public function testUpdateOperationsThrowsExceptionWhenAddedDuplicatedValue()
@@ -361,7 +361,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->expectException(UpdateOperationException::class);
+        self::expectException(UpdateOperationException::class);
 
         $entryManager->applyOperations($entry->getDn(), $duplicateIterator);
     }
@@ -374,14 +374,14 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
 
         $entry = $result[0];
-        $this->assertStringNotContainsString('ou=Ldap', $entry->getDn());
+        self::assertStringNotContainsString('ou=Ldap', $entry->getDn());
 
         $entryManager = $this->adapter->getEntryManager();
         $entryManager->move($entry, 'ou=Ldap,ou=Components,dc=symfony,dc=com');
 
         $result = $this->executeSearchQuery(1);
         $movedEntry = $result[0];
-        $this->assertStringContainsString('ou=Ldap', $movedEntry->getDn());
+        self::assertStringContainsString('ou=Ldap', $movedEntry->getDn());
 
         // Move back entry
         $entryManager->move($movedEntry, 'dc=symfony,dc=com');

@@ -23,14 +23,14 @@ class FormRendererTest extends TestCase
     {
         $renderer = new FormRenderer(new DummyFormRendererEngine());
 
-        $this->assertEquals('Is active', $renderer->humanize('is_active'));
-        $this->assertEquals('Is active', $renderer->humanize('isActive'));
+        self::assertEquals('Is active', $renderer->humanize('is_active'));
+        self::assertEquals('Is active', $renderer->humanize('isActive'));
     }
 
     public function testRenderARenderedField()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Field "foo" has already been rendered, save the result of previous render call to a variable and output that instead.');
+        self::expectException(BadMethodCallException::class);
+        self::expectExceptionMessage('Field "foo" has already been rendered, save the result of previous render call to a variable and output that instead.');
 
         $formView = new FormView();
         $formView->vars['name'] = 'foo';

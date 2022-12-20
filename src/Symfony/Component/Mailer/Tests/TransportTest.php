@@ -31,7 +31,7 @@ class TransportTest extends TestCase
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
 
-        $this->assertEquals($transport, $transportFactory->fromString($dsn));
+        self::assertEquals($transport, $transportFactory->fromString($dsn));
     }
 
     public function fromStringProvider(): iterable
@@ -65,7 +65,7 @@ class TransportTest extends TestCase
      */
     public function testFromDsn(string $dsn, TransportInterface $transport)
     {
-        $this->assertEquals($transport, Transport::fromDsn($dsn));
+        self::assertEquals($transport, Transport::fromDsn($dsn));
     }
 
     public function fromDsnProvider(): iterable
@@ -83,8 +83,8 @@ class TransportTest extends TestCase
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
 
-        $this->expectExceptionMessage($error);
-        $this->expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage($error);
+        self::expectException(InvalidArgumentException::class);
         $transportFactory->fromString($dsn);
     }
 

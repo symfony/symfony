@@ -52,7 +52,7 @@ class ConsoleEventsTest extends TestCase
         $tester = new ApplicationTester($container->get('application'));
         $tester->run(['fail']);
 
-        $this->assertSame([ConsoleCommandEvent::class, ConsoleErrorEvent::class, ConsoleTerminateEvent::class], $container->get('tracer')->observedEvents);
+        self::assertSame([ConsoleCommandEvent::class, ConsoleErrorEvent::class, ConsoleTerminateEvent::class], $container->get('tracer')->observedEvents);
     }
 }
 

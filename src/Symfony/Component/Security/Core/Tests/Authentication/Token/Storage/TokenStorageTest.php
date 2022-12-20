@@ -21,9 +21,9 @@ class TokenStorageTest extends TestCase
     public function testGetSetToken()
     {
         $tokenStorage = new TokenStorage();
-        $this->assertNull($tokenStorage->getToken());
+        self::assertNull($tokenStorage->getToken());
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password'), 'provider');
         $tokenStorage->setToken($token);
-        $this->assertSame($token, $tokenStorage->getToken());
+        self::assertSame($token, $tokenStorage->getToken());
     }
 }

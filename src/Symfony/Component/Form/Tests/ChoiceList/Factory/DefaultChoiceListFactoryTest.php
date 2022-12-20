@@ -115,8 +115,8 @@ class DefaultChoiceListFactoryTest extends TestCase
     {
         $list = $this->factory->createListFromChoices([]);
 
-        $this->assertSame([], $list->getChoices());
-        $this->assertSame([], $list->getValues());
+        self::assertSame([], $list->getChoices());
+        self::assertSame([], $list->getValues());
     }
 
     public function testCreateFromChoicesFlat()
@@ -258,7 +258,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
         $list = $this->factory->createListFromLoader($loader);
 
-        $this->assertEquals(new LazyChoiceList($loader), $list);
+        self::assertEquals(new LazyChoiceList($loader), $list);
     }
 
     public function testCreateFromLoaderWithValues()
@@ -268,7 +268,7 @@ class DefaultChoiceListFactoryTest extends TestCase
         $value = function () {};
         $list = $this->factory->createListFromLoader($loader, $value);
 
-        $this->assertEquals(new LazyChoiceList($loader, $value), $list);
+        self::assertEquals(new LazyChoiceList($loader, $value), $list);
     }
 
     public function testCreateFromLoaderWithFilter()
@@ -277,14 +277,14 @@ class DefaultChoiceListFactoryTest extends TestCase
 
         $list = $this->factory->createListFromLoader(new ArrayChoiceLoader(), null, $filter);
 
-        $this->assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $filter)), $list);
+        self::assertEquals(new LazyChoiceList(new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(), $filter)), $list);
     }
 
     public function testCreateViewFlat()
     {
         $view = $this->factory->createView($this->list);
 
-        $this->assertEquals(new ChoiceListView(
+        self::assertEquals(new ChoiceListView(
             [
                 0 => new ChoiceView($this->obj1, '0', 'A'),
                 1 => new ChoiceView($this->obj2, '1', 'B'),
@@ -315,15 +315,12 @@ class DefaultChoiceListFactoryTest extends TestCase
             return $view->label;
         }, $view->preferredChoices);
 
-        $this->assertSame(
-            [
-                1 => 'B',
-                0 => 'A',
-                3 => 'D',
-                2 => 'C',
-            ],
-            $preferredLabels
-        );
+        self::assertSame([
+            1 => 'B',
+            0 => 'A',
+            3 => 'D',
+            2 => 'C',
+        ], $preferredLabels);
     }
 
     public function testCreateViewFlatPreferredChoiceGroupsSameOrder()
@@ -342,19 +339,16 @@ class DefaultChoiceListFactoryTest extends TestCase
             }, $groupView->choices);
         }, $view->preferredChoices);
 
-        $this->assertEquals(
-            [
-                'Group 2' => [
-                    2 => 'C',
-                    3 => 'D',
-                ],
-                'Group 1' => [
-                    0 => 'A',
-                    1 => 'B',
-                ],
+        self::assertEquals([
+            'Group 2' => [
+                2 => 'C',
+                3 => 'D',
             ],
-            $preferredLabels
-        );
+            'Group 1' => [
+                0 => 'A',
+                1 => 'B',
+            ],
+        ], $preferredLabels);
     }
 
     public function testCreateViewFlatPreferredChoicesEmptyArray()
@@ -364,7 +358,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             []
         );
 
-        $this->assertEquals(new ChoiceListView(
+        self::assertEquals(new ChoiceListView(
             [
                 0 => new ChoiceView($this->obj1, '0', 'A'),
                 1 => new ChoiceView($this->obj2, '1', 'B'),
@@ -772,9 +766,9 @@ class DefaultChoiceListFactoryTest extends TestCase
             }
         );
 
-        $this->assertInstanceOf(TranslatableMessage::class, $view->choices[0]->label);
-        $this->assertEquals('my_message', $view->choices[0]->label->getMessage());
-        $this->assertArrayHasKey('param1', $view->choices[0]->label->getParameters());
+        self::assertInstanceOf(TranslatableMessage::class, $view->choices[0]->label);
+        self::assertEquals('my_message', $view->choices[0]->label->getMessage());
+        self::assertArrayHasKey('param1', $view->choices[0]->label->getParameters());
     }
 
     public function testCreateViewFlatLabelTranslationParametersAsArray()
@@ -883,16 +877,16 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertScalarListWithChoiceValues(ChoiceListInterface $list)
     {
-        $this->assertSame(['a', 'b', 'c', 'd'], $list->getValues());
+        self::assertSame(['a', 'b', 'c', 'd'], $list->getValues());
 
-        $this->assertSame([
+        self::assertSame([
             'a' => 'a',
             'b' => 'b',
             'c' => 'c',
             'd' => 'd',
         ], $list->getChoices());
 
-        $this->assertSame([
+        self::assertSame([
             'a' => 'A',
             'b' => 'B',
             'c' => 'C',
@@ -902,16 +896,16 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertObjectListWithGeneratedValues(ChoiceListInterface $list)
     {
-        $this->assertSame(['0', '1', '2', '3'], $list->getValues());
+        self::assertSame(['0', '1', '2', '3'], $list->getValues());
 
-        $this->assertSame([
+        self::assertSame([
             0 => $this->obj1,
             1 => $this->obj2,
             2 => $this->obj3,
             3 => $this->obj4,
         ], $list->getChoices());
 
-        $this->assertSame([
+        self::assertSame([
             0 => 'A',
             1 => 'B',
             2 => 'C',
@@ -921,16 +915,16 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertScalarListWithCustomValues(ChoiceListInterface $list)
     {
-        $this->assertSame(['a', 'b', '1', '2'], $list->getValues());
+        self::assertSame(['a', 'b', '1', '2'], $list->getValues());
 
-        $this->assertSame([
+        self::assertSame([
             'a' => 'a',
             'b' => 'b',
             1 => 'c',
             2 => 'd',
         ], $list->getChoices());
 
-        $this->assertSame([
+        self::assertSame([
             'a' => 'A',
             'b' => 'B',
             1 => 'C',
@@ -940,16 +934,16 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertObjectListWithCustomValues(ChoiceListInterface $list)
     {
-        $this->assertSame(['a', 'b', '1', '2'], $list->getValues());
+        self::assertSame(['a', 'b', '1', '2'], $list->getValues());
 
-        $this->assertSame([
+        self::assertSame([
             'a' => $this->obj1,
             'b' => $this->obj2,
             1 => $this->obj3,
             2 => $this->obj4,
         ], $list->getChoices());
 
-        $this->assertSame([
+        self::assertSame([
             'a' => 'A',
             'b' => 'B',
             1 => 'C',
@@ -959,7 +953,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertFlatView($view)
     {
-        $this->assertEquals(new ChoiceListView(
+        self::assertEquals(new ChoiceListView(
             [
                 0 => new ChoiceView($this->obj1, '0', 'A'),
                 1 => new ChoiceView($this->obj2, '1', 'B'),
@@ -974,7 +968,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertFlatViewWithCustomIndices($view)
     {
-        $this->assertEquals(new ChoiceListView(
+        self::assertEquals(new ChoiceListView(
             [
                 'w' => new ChoiceView($this->obj1, '0', 'A'),
                 'x' => new ChoiceView($this->obj2, '1', 'B'),
@@ -989,7 +983,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertFlatViewWithAttr($view)
     {
-        $this->assertEquals(new ChoiceListView(
+        self::assertEquals(new ChoiceListView(
             [
                 0 => new ChoiceView($this->obj1, '0', 'A'),
                 1 => new ChoiceView(
@@ -1024,7 +1018,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertFlatViewWithlabelTranslationParameters($view)
     {
-        $this->assertEquals(new ChoiceListView(
+        self::assertEquals(new ChoiceListView(
             [
                 0 => new ChoiceView($this->obj1, '0', 'A'),
                 1 => new ChoiceView($this->obj2, '1', 'B'),
@@ -1039,7 +1033,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertGroupedView($view)
     {
-        $this->assertEquals(new ChoiceListView(
+        self::assertEquals(new ChoiceListView(
             [
                 'Group 1' => new ChoiceGroupView(
                     'Group 1',
@@ -1070,7 +1064,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     private function assertGroupedViewWithChoiceDuplication($view)
     {
-        $this->assertEquals(new ChoiceListView(
+        self::assertEquals(new ChoiceListView(
             [
                 'Group 1' => new ChoiceGroupView(
                     'Group 1',

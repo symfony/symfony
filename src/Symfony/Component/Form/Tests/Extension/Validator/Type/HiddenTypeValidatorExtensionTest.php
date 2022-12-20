@@ -29,7 +29,7 @@ class HiddenTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     {
         $form = $this->createForm();
 
-        $this->assertSame('The hidden field is invalid.', $form->getConfig()->getOption('invalid_message'));
+        self::assertSame('The hidden field is invalid.', $form->getConfig()->getOption('invalid_message'));
     }
 
     /**
@@ -43,6 +43,6 @@ class HiddenTypeValidatorExtensionTest extends BaseValidatorExtensionTest
             'legacy_error_messages' => true,
         ]);
 
-        $this->assertSame('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
+        self::assertSame('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 }

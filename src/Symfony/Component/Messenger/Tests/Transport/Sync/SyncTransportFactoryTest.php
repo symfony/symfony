@@ -21,10 +21,10 @@ class SyncTransportFactoryTest extends TestCase
 {
     public function testCreateTransport()
     {
-        $serializer = $this->createMock(SerializerInterface::class);
-        $bus = $this->createMock(MessageBusInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
+        $bus = self::createMock(MessageBusInterface::class);
         $factory = new SyncTransportFactory($bus);
         $transport = $factory->createTransport('sync://', [], $serializer);
-        $this->assertInstanceOf(SyncTransport::class, $transport);
+        self::assertInstanceOf(SyncTransport::class, $transport);
     }
 }

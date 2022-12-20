@@ -29,8 +29,8 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
 
         $stack = $this->getStackMock(false);
 
-        $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())->method('handle')->with($envelope, $stack)->willReturn($envelope);
+        $middleware = self::createMock(MiddlewareInterface::class);
+        $middleware->expects(self::once())->method('handle')->with($envelope, $stack)->willReturn($envelope);
 
         $decorator = new ActivationMiddleware($middleware, true);
 
@@ -42,13 +42,13 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
 
-        $activated = $this->createPartialMock(ActivationMiddlewareTestCallable::class, ['__invoke']);
-        $activated->expects($this->once())->method('__invoke')->with($envelope)->willReturn(true);
+        $activated = self::createPartialMock(ActivationMiddlewareTestCallable::class, ['__invoke']);
+        $activated->expects(self::once())->method('__invoke')->with($envelope)->willReturn(true);
 
         $stack = $this->getStackMock(false);
 
-        $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())->method('handle')->with($envelope, $stack)->willReturn($envelope);
+        $middleware = self::createMock(MiddlewareInterface::class);
+        $middleware->expects(self::once())->method('handle')->with($envelope, $stack)->willReturn($envelope);
 
         $decorator = new ActivationMiddleware($middleware, $activated);
 
@@ -60,8 +60,8 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
 
-        $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->never())->method('handle');
+        $middleware = self::createMock(MiddlewareInterface::class);
+        $middleware->expects(self::never())->method('handle');
 
         $decorator = new ActivationMiddleware($middleware, false);
 

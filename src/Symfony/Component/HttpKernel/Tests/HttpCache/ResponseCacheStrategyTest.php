@@ -37,7 +37,7 @@ class ResponseCacheStrategyTest extends TestCase
         $response->setSharedMaxAge(86400);
         $cacheStrategy->update($response);
 
-        $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
+        self::assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
     }
 
     public function testSharedMaxAgeNotSetIfNotSetInAnyEmbeddedRequest()
@@ -55,7 +55,7 @@ class ResponseCacheStrategyTest extends TestCase
         $response->setSharedMaxAge(86400);
         $cacheStrategy->update($response);
 
-        $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
+        self::assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
     public function testSharedMaxAgeNotSetIfNotSetInMainRequest()
@@ -73,7 +73,7 @@ class ResponseCacheStrategyTest extends TestCase
         $response = new Response();
         $cacheStrategy->update($response);
 
-        $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
+        self::assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
     public function testMainResponseNotCacheableWhenEmbeddedResponseRequiresValidation()
@@ -88,9 +88,9 @@ class ResponseCacheStrategyTest extends TestCase
         $mainResponse->setSharedMaxAge(3600);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertFalse($mainResponse->isFresh());
+        self::assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        self::assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertFalse($mainResponse->isFresh());
     }
 
     public function testValidationOnMainResponseIsNotPossibleWhenItContainsEmbeddedResponses()
@@ -109,11 +109,11 @@ class ResponseCacheStrategyTest extends TestCase
 
         $cacheStrategy->update($mainResponse);
 
-        $this->assertFalse($mainResponse->isValidateable());
-        $this->assertFalse($mainResponse->headers->has('Last-Modified'));
-        $this->assertFalse($mainResponse->headers->has('ETag'));
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertFalse($mainResponse->isValidateable());
+        self::assertFalse($mainResponse->headers->has('Last-Modified'));
+        self::assertFalse($mainResponse->headers->has('ETag'));
+        self::assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        self::assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
     }
 
     public function testMainResponseWithValidationIsUnchangedWhenThereIsNoEmbeddedResponse()
@@ -124,7 +124,7 @@ class ResponseCacheStrategyTest extends TestCase
         $mainResponse->setLastModified(new \DateTime());
         $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($mainResponse->isValidateable());
+        self::assertTrue($mainResponse->isValidateable());
     }
 
     public function testMainResponseWithExpirationIsUnchangedWhenThereIsNoEmbeddedResponse()
@@ -135,7 +135,7 @@ class ResponseCacheStrategyTest extends TestCase
         $mainResponse->setSharedMaxAge(3600);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($mainResponse->isFresh());
+        self::assertTrue($mainResponse->isFresh());
     }
 
     public function testMainResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable()
@@ -149,14 +149,14 @@ class ResponseCacheStrategyTest extends TestCase
            That makes it uncacheable, it is always stale.
            (It does *not* make this private, though.) */
         $embeddedResponse = new Response();
-        $this->assertFalse($embeddedResponse->isFresh()); // not fresh, as no lifetime is provided
+        self::assertFalse($embeddedResponse->isFresh()); // not fresh, as no lifetime is provided
 
         $cacheStrategy->add($embeddedResponse);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertFalse($mainResponse->isFresh());
+        self::assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
+        self::assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertFalse($mainResponse->isFresh());
     }
 
     public function testEmbeddingPrivateResponseMakesMainResponsePrivate()
@@ -174,8 +174,8 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->add($embeddedResponse);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($mainResponse->headers->hasCacheControlDirective('public'));
+        self::assertTrue($mainResponse->headers->hasCacheControlDirective('private'));
+        self::assertFalse($mainResponse->headers->hasCacheControlDirective('public'));
     }
 
     public function testEmbeddingPublicResponseDoesNotMakeMainResponsePublic()
@@ -193,8 +193,8 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->add($embeddedResponse);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertTrue($mainResponse->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($mainResponse->headers->hasCacheControlDirective('public'));
+        self::assertTrue($mainResponse->headers->hasCacheControlDirective('private'));
+        self::assertFalse($mainResponse->headers->hasCacheControlDirective('public'));
     }
 
     public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation()
@@ -216,7 +216,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->add($embeddedResponse);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertEqualsWithDelta(60, (int) $mainResponse->headers->getCacheControlDirective('s-maxage'), 1);
+        self::assertEqualsWithDelta(60, (int) $mainResponse->headers->getCacheControlDirective('s-maxage'), 1);
     }
 
     public function testResponseIsExpirableButNotValidateableWhenMainResponseCombinesExpirationAndValidation()
@@ -234,8 +234,8 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->add($embeddedResponse);
         $cacheStrategy->update($mainResponse);
 
-        $this->assertSame('60', $mainResponse->headers->getCacheControlDirective('s-maxage'));
-        $this->assertFalse($mainResponse->isValidateable());
+        self::assertSame('60', $mainResponse->headers->getCacheControlDirective('s-maxage'));
+        self::assertFalse($mainResponse->isValidateable());
     }
 
     /**
@@ -293,18 +293,15 @@ class ResponseCacheStrategyTest extends TestCase
 
         foreach ($expects as $key => $value) {
             if ('expires' === $key) {
-                $this->assertSame($value, $response->getExpires()->format('U') - $response->getDate()->format('U'));
+                self::assertSame($value, $response->getExpires()->format('U') - $response->getDate()->format('U'));
             } elseif ('age' === $key) {
-                $this->assertSame($value, $response->getAge());
+                self::assertSame($value, $response->getAge());
             } elseif (true === $value) {
-                $this->assertTrue($response->headers->hasCacheControlDirective($key), sprintf('Cache-Control header must have "%s" flag', $key));
+                self::assertTrue($response->headers->hasCacheControlDirective($key), sprintf('Cache-Control header must have "%s" flag', $key));
             } elseif (false === $value) {
-                $this->assertFalse(
-                    $response->headers->hasCacheControlDirective($key),
-                    sprintf('Cache-Control header must NOT have "%s" flag', $key)
-                );
+                self::assertFalse($response->headers->hasCacheControlDirective($key), sprintf('Cache-Control header must NOT have "%s" flag', $key));
             } else {
-                $this->assertSame($value, $response->headers->getCacheControlDirective($key), sprintf('Cache-Control flag "%s" should be "%s"', $key, $value));
+                self::assertSame($value, $response->headers->getCacheControlDirective($key), sprintf('Cache-Control flag "%s" should be "%s"', $key, $value));
             }
         }
     }

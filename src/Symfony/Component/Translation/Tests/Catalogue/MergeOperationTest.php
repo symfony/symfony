@@ -24,47 +24,32 @@ class MergeOperationTest extends AbstractOperationTest
             new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
         );
 
-        $this->assertEquals(
-            ['a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c'],
-            $operation->getMessages('messages')
-        );
+        self::assertEquals(['a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c'], $operation->getMessages('messages'));
 
-        $this->assertEquals(
-            ['c' => 'new_c'],
-            $operation->getNewMessages('messages')
-        );
+        self::assertEquals(['c' => 'new_c'], $operation->getNewMessages('messages'));
 
-        $this->assertEquals(
-            [],
-            $operation->getObsoleteMessages('messages')
-        );
+        self::assertEquals([], $operation->getObsoleteMessages('messages'));
     }
 
     public function testGetResultFromSingleDomain()
     {
-        $this->assertEquals(
-            new MessageCatalogue('en', [
-                'messages' => ['a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c'],
-            ]),
-            $this->createOperation(
-                new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]),
-                new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
-            )->getResult()
-        );
+        self::assertEquals(new MessageCatalogue('en', [
+            'messages' => ['a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c'],
+        ]), $this->createOperation(
+            new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]),
+            new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
+        )->getResult());
     }
 
     public function testGetResultFromIntlDomain()
     {
-        $this->assertEquals(
-            new MessageCatalogue('en', [
-                'messages' => ['b' => 'old_b'],
-                'messages+intl-icu' => ['d' => 'old_d', 'c' => 'new_c', 'a' => 'new_a'],
-            ]),
-            $this->createOperation(
-                new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b'], 'messages+intl-icu' => ['d' => 'old_d']]),
-                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a', 'c' => 'new_c']])
-            )->getResult()
-        );
+        self::assertEquals(new MessageCatalogue('en', [
+            'messages' => ['b' => 'old_b'],
+            'messages+intl-icu' => ['d' => 'old_d', 'c' => 'new_c', 'a' => 'new_a'],
+        ]), $this->createOperation(
+            new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b'], 'messages+intl-icu' => ['d' => 'old_d']]),
+            new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a', 'c' => 'new_c']])
+        )->getResult());
     }
 
     public function testGetResultWithMetadata()
@@ -81,13 +66,10 @@ class MergeOperationTest extends AbstractOperationTest
         $mergedCatalogue->setMetadata('b', 'bar', 'messages');
         $mergedCatalogue->setMetadata('c', 'qux', 'messages');
 
-        $this->assertEquals(
-            $mergedCatalogue,
-            $this->createOperation(
-                $leftCatalogue,
-                $rightCatalogue
-            )->getResult()
-        );
+        self::assertEquals($mergedCatalogue, $this->createOperation(
+            $leftCatalogue,
+            $rightCatalogue
+        )->getResult());
     }
 
     public function testGetResultWithMetadataFromIntlDomain()
@@ -104,13 +86,10 @@ class MergeOperationTest extends AbstractOperationTest
         $mergedCatalogue->setMetadata('b', 'bar', 'messages+intl-icu');
         $mergedCatalogue->setMetadata('c', 'qux', 'messages+intl-icu');
 
-        $this->assertEquals(
-            $mergedCatalogue,
-            $this->createOperation(
-                $leftCatalogue,
-                $rightCatalogue
-            )->getResult()
-        );
+        self::assertEquals($mergedCatalogue, $this->createOperation(
+            $leftCatalogue,
+            $rightCatalogue
+        )->getResult());
     }
 
     protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target)

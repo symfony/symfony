@@ -36,12 +36,12 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
         $this->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testProcessThrowsExceptionOnInvalidReference()
     {
-        $this->expectException(ServiceNotFoundException::class);
+        self::expectException(ServiceNotFoundException::class);
         $container = new ContainerBuilder();
 
         $container
@@ -54,7 +54,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
     {
-        $this->expectException(ServiceNotFoundException::class);
+        self::expectException(ServiceNotFoundException::class);
         $container = new ContainerBuilder();
 
         $def = new Definition();
@@ -79,13 +79,13 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
         $this->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testWithErroredServiceLocator()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The service "foo" in the container provided to "bar" has a dependency on a non-existent service "baz".');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('The service "foo" in the container provided to "bar" has a dependency on a non-existent service "baz".');
         $container = new ContainerBuilder();
 
         ServiceLocatorTagPass::register($container, ['foo' => new Reference('baz')], 'bar');
@@ -97,8 +97,8 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testWithErroredHiddenService()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The service "bar" has a dependency on a non-existent service "foo".');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('The service "bar" has a dependency on a non-existent service "foo".');
         $container = new ContainerBuilder();
 
         ServiceLocatorTagPass::register($container, ['foo' => new Reference('foo')], 'bar');
@@ -110,8 +110,8 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testProcessThrowsExceptionOnInvalidReferenceWithAlternatives()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The service "a" has a dependency on a non-existent service "@ccc". Did you mean this: "ccc"?');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('The service "a" has a dependency on a non-existent service "@ccc". Did you mean this: "ccc"?');
         $container = new ContainerBuilder();
 
         $container

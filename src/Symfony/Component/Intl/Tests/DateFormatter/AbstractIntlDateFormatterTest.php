@@ -30,7 +30,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
@@ -38,7 +38,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
+        self::tearDown();
 
         \Locale::setDefault($this->defaultLocale);
     }
@@ -50,12 +50,9 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
 
-        $this->assertEquals(date_default_timezone_get(), $formatter->getTimeZoneId());
+        self::assertEquals(date_default_timezone_get(), $formatter->getTimeZoneId());
 
-        $this->assertEquals(
-            $this->getDateTime(0, $formatter->getTimeZoneId())->format('M j, Y, g:i A'),
-            $formatter->format(0)
-        );
+        self::assertEquals($this->getDateTime(0, $formatter->getTimeZoneId())->format('M j, Y, g:i A'), $formatter->format(0));
     }
 
     /**
@@ -65,7 +62,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         $formatter = $this->getDateFormatter('en', null, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN);
 
-        $this->assertSame('EEEE, MMMM d, y \'at\' h:mm a', $formatter->getPattern());
+        self::assertSame('EEEE, MMMM d, y \'at\' h:mm a', $formatter->getPattern());
     }
 
     /**
@@ -75,7 +72,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::SHORT, null, 'UTC', IntlDateFormatter::GREGORIAN);
 
-        $this->assertSame('M/d/yy, h:mm:ss a zzzz', $formatter->getPattern());
+        self::assertSame('M/d/yy, h:mm:ss a zzzz', $formatter->getPattern());
     }
 
     /**
@@ -87,7 +84,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $errorMessage = 'U_ZERO_ERROR';
 
         $formatter = $this->getDefaultDateFormatter($pattern);
-        $this->assertSame($expected, $formatter->format($timestamp));
+        self::assertSame($expected, $formatter->format($timestamp));
         $this->assertIsIntlSuccess($formatter, $errorMessage, $errorCode);
     }
 
@@ -292,10 +289,10 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $gmtFormatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'GMT', IntlDateFormatter::GREGORIAN, $pattern);
         $utcFormatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, $pattern);
 
-        $this->assertSame('1970.01.01 at 00:00:00 GMT', $gmtFormatter->format(new \DateTime('@0')));
-        $this->assertSame('1970.01.01 at 00:00:00 UTC', $utcFormatter->format(new \DateTime('@0')));
-        $this->assertSame('1970.01.01 at 00:00:00 GMT', $gmtFormatter->format(new \DateTimeImmutable('@0')));
-        $this->assertSame('1970.01.01 at 00:00:00 UTC', $utcFormatter->format(new \DateTimeImmutable('@0')));
+        self::assertSame('1970.01.01 at 00:00:00 GMT', $gmtFormatter->format(new \DateTime('@0')));
+        self::assertSame('1970.01.01 at 00:00:00 UTC', $utcFormatter->format(new \DateTime('@0')));
+        self::assertSame('1970.01.01 at 00:00:00 GMT', $gmtFormatter->format(new \DateTimeImmutable('@0')));
+        self::assertSame('1970.01.01 at 00:00:00 UTC', $utcFormatter->format(new \DateTimeImmutable('@0')));
     }
 
     /**
@@ -306,7 +303,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $errorCode = IntlGlobals::U_ILLEGAL_ARGUMENT_ERROR;
 
         $formatter = $this->getDefaultDateFormatter($pattern);
-        $this->assertFalse($formatter->format($timestamp));
+        self::assertFalse($formatter->format($timestamp));
         $this->assertIsIntlFailure($formatter, $errorMessage, $errorCode);
     }
 
@@ -324,7 +321,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         $pattern = 'yyyy-MM-dd HH:mm:ss';
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, $timezone, IntlDateFormatter::GREGORIAN, $pattern);
-        $this->assertSame($expected, $formatter->format($timestamp));
+        self::assertSame($expected, $formatter->format($timestamp));
     }
 
     public function formatWithTimezoneProvider()
@@ -366,7 +363,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $formatter = $this->getDefaultDateFormatter($pattern);
         $formatter->setTimeZone(new \DateTimeZone($timezone));
 
-        $this->assertEquals($expected, $formatter->format(0));
+        self::assertEquals($expected, $formatter->format(0));
     }
 
     public function formatTimezoneProvider()
@@ -425,7 +422,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
         $formatter->setTimeZone('GMT+03:00');
 
-        $this->assertEquals('GMT+03:00', $formatter->format(0));
+        self::assertEquals('GMT+03:00', $formatter->format(0));
     }
 
     public function testFormatWithGmtTimeZoneAndMinutesOffset()
@@ -434,7 +431,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
         $formatter->setTimeZone('GMT+00:30');
 
-        $this->assertEquals('GMT+00:30', $formatter->format(0));
+        self::assertEquals('GMT+00:30', $formatter->format(0));
     }
 
     public function testFormatWithNonStandardTimezone()
@@ -443,7 +440,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
         $formatter->setTimeZone('Pacific/Fiji');
 
-        $this->assertEquals('Fiji Standard Time', $formatter->format(0));
+        self::assertEquals('Fiji Standard Time', $formatter->format(0));
     }
 
     public function testFormatWithConstructorTimezone()
@@ -451,35 +448,32 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC');
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
-        $this->assertEquals(
-            $this->getDateTime(0, 'UTC')->format('Y-m-d H:i:s'),
-            $formatter->format(0)
-        );
+        self::assertEquals($this->getDateTime(0, 'UTC')->format('Y-m-d H:i:s'), $formatter->format(0));
     }
 
     public function testFormatWithDateTimeZoneGmt()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzz');
 
-        $this->assertEquals('GMT', $formatter->format(0));
+        self::assertEquals('GMT', $formatter->format(0));
     }
 
     public function testFormatWithDateTimeZoneGmtOffset()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
 
-        $this->assertEquals('GMT+03:00', $formatter->format(0));
+        self::assertEquals('GMT+03:00', $formatter->format(0));
     }
 
     public function testFormatWithIntlTimeZone()
     {
         if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('Extension intl is required.');
+            self::markTestSkipped('Extension intl is required.');
         }
 
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, \IntlTimeZone::createTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
 
-        $this->assertEquals('GMT+03:00', $formatter->format(0));
+        self::assertEquals('GMT+03:00', $formatter->format(0));
     }
 
     public function testFormatWithTimezoneFromPhp()
@@ -490,12 +484,9 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
-        $this->assertEquals(
-            $this->getDateTime(0, 'Europe/London')->format('Y-m-d H:i:s'),
-            $formatter->format(0)
-        );
+        self::assertEquals($this->getDateTime(0, 'Europe/London')->format('Y-m-d H:i:s'), $formatter->format(0));
 
-        $this->assertEquals('Europe/London', date_default_timezone_get());
+        self::assertEquals('Europe/London', date_default_timezone_get());
 
         // Restores TZ.
         date_default_timezone_set($tz);
@@ -507,7 +498,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     public function testDateAndTimeType($timestamp, $datetype, $timetype, $expected)
     {
         $formatter = $this->getDateFormatter('en', $datetype, $timetype, 'UTC');
-        $this->assertSame($expected, $formatter->format($timestamp));
+        self::assertSame($expected, $formatter->format($timestamp));
     }
 
     public function dateAndTimeTypeProvider()
@@ -527,31 +518,31 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     public function testGetCalendar()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $this->assertEquals(IntlDateFormatter::GREGORIAN, $formatter->getCalendar());
+        self::assertEquals(IntlDateFormatter::GREGORIAN, $formatter->getCalendar());
     }
 
     public function testGetDateType()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
-        $this->assertEquals(IntlDateFormatter::FULL, $formatter->getDateType());
+        self::assertEquals(IntlDateFormatter::FULL, $formatter->getDateType());
     }
 
     public function testGetLocale()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $this->assertEquals('en', $formatter->getLocale());
+        self::assertEquals('en', $formatter->getLocale());
     }
 
     public function testGetPattern()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
-        $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
+        self::assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
     public function testGetTimeType()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::NONE, IntlDateFormatter::FULL);
-        $this->assertEquals(IntlDateFormatter::FULL, $formatter->getTimeType());
+        self::assertEquals(IntlDateFormatter::FULL, $formatter->getTimeType());
     }
 
     /**
@@ -563,7 +554,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $errorMessage = 'U_ZERO_ERROR';
 
         $formatter = $this->getDefaultDateFormatter($pattern);
-        $this->assertSame($expected, $formatter->parse($value));
+        self::assertSame($expected, $formatter->parse($value));
         $this->assertIsIntlSuccess($formatter, $errorMessage, $errorCode);
     }
 
@@ -864,7 +855,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $errorMessage = 'Date parsing failed: U_PARSE_ERROR';
 
         $formatter = $this->getDefaultDateFormatter($pattern);
-        $this->assertFalse($formatter->parse($value));
+        self::assertFalse($formatter->parse($value));
         $this->assertIsIntlFailure($formatter, $errorMessage, $errorCode);
     }
 
@@ -894,7 +885,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         $position = null;
         $formatter = $this->getDefaultDateFormatter('y');
-        $this->assertSame(0, $formatter->parse('1970', $position));
+        self::assertSame(0, $formatter->parse('1970', $position));
         // Since $position is not supported by the Symfony implementation, the following won't work.
         // The intl implementation works this way since 60.2.
         // $this->assertSame(4, $position);
@@ -904,7 +895,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         $formatter = $this->getDefaultDateFormatter();
         $formatter->setPattern('yyyy-MM-dd');
-        $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
+        self::assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
     /**
@@ -916,7 +907,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
         $formatter->setTimeZone($timeZoneId);
 
-        $this->assertEquals($expectedTimeZoneId, $formatter->getTimeZoneId());
+        self::assertEquals($expectedTimeZoneId, $formatter->getTimeZoneId());
     }
 
     public function setTimeZoneIdProvider()
@@ -949,23 +940,23 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     protected function assertIsIntlFailure($formatter, $errorMessage, $errorCode)
     {
-        $this->assertSame($errorMessage, $this->getIntlErrorMessage());
-        $this->assertSame($errorCode, $this->getIntlErrorCode());
-        $this->assertTrue($this->isIntlFailure($this->getIntlErrorCode()));
-        $this->assertSame($errorMessage, $formatter->getErrorMessage());
-        $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertTrue($this->isIntlFailure($formatter->getErrorCode()));
+        self::assertSame($errorMessage, $this->getIntlErrorMessage());
+        self::assertSame($errorCode, $this->getIntlErrorCode());
+        self::assertTrue($this->isIntlFailure($this->getIntlErrorCode()));
+        self::assertSame($errorMessage, $formatter->getErrorMessage());
+        self::assertSame($errorCode, $formatter->getErrorCode());
+        self::assertTrue($this->isIntlFailure($formatter->getErrorCode()));
     }
 
     protected function assertIsIntlSuccess($formatter, $errorMessage, $errorCode)
     {
         /* @var IntlDateFormatter $formatter */
-        $this->assertSame($errorMessage, $this->getIntlErrorMessage());
-        $this->assertSame($errorCode, $this->getIntlErrorCode());
-        $this->assertFalse($this->isIntlFailure($this->getIntlErrorCode()));
-        $this->assertSame($errorMessage, $formatter->getErrorMessage());
-        $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertFalse($this->isIntlFailure($formatter->getErrorCode()));
+        self::assertSame($errorMessage, $this->getIntlErrorMessage());
+        self::assertSame($errorCode, $this->getIntlErrorCode());
+        self::assertFalse($this->isIntlFailure($this->getIntlErrorCode()));
+        self::assertSame($errorMessage, $formatter->getErrorMessage());
+        self::assertSame($errorCode, $formatter->getErrorCode());
+        self::assertFalse($this->isIntlFailure($formatter->getErrorCode()));
     }
 
     /**

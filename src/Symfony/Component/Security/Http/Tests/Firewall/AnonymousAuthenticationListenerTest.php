@@ -29,70 +29,70 @@ class AnonymousAuthenticationListenerTest extends TestCase
 {
     public function testHandleWithTokenStorageHavingAToken()
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
-            ->willReturn($this->createMock(TokenInterface::class))
+            ->willReturn(self::createMock(TokenInterface::class))
         ;
         $tokenStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('setToken')
         ;
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
         $authenticationManager
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('authenticate')
         ;
 
         $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheSecret', null, $authenticationManager);
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWithTokenStorageHavingNoToken()
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
         $anonymousToken = new AnonymousToken('TheSecret', 'anon.', []);
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
         $authenticationManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
-            ->with($this->callback(function ($token) {
+            ->with(self::callback(function ($token) {
                 return 'TheSecret' === $token->getSecret();
             }))
             ->willReturn($anonymousToken)
         ;
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setToken')
             ->with($anonymousToken)
         ;
 
         $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheSecret', null, $authenticationManager);
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandledEventIsLogged()
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
+        $logger->expects(self::once())
             ->method('info')
             ->with('Populated the TokenStorage with an anonymous Token.')
         ;
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
 
         $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheSecret', $logger, $authenticationManager);
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 }

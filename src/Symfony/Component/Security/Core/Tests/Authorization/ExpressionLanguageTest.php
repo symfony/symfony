@@ -42,7 +42,7 @@ class ExpressionLanguageTest extends TestCase
         $context['auth_checker'] = $authChecker;
         $context['token'] = $token;
 
-        $this->assertEquals($result, $expressionLanguage->evaluate($expression, $context));
+        self::assertEquals($result, $expressionLanguage->evaluate($expression, $context));
     }
 
     public function provider()

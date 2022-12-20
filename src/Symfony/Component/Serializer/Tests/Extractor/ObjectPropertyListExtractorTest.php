@@ -23,23 +23,20 @@ class ObjectPropertyListExtractorTest extends TestCase
         $context = ['bar' => true];
         $properties = ['prop1', 'prop2'];
 
-        $propertyListExtractor = $this->createMock(PropertyListExtractorInterface::class);
-        $propertyListExtractor->expects($this->once())
+        $propertyListExtractor = self::createMock(PropertyListExtractorInterface::class);
+        $propertyListExtractor->expects(self::once())
             ->method('getProperties')
             ->with(\get_class($object), $context)
             ->willReturn($properties);
 
-        $this->assertSame(
-            $properties,
-            (new ObjectPropertyListExtractor($propertyListExtractor))->getProperties($object, $context)
-        );
+        self::assertSame($properties, (new ObjectPropertyListExtractor($propertyListExtractor))->getProperties($object, $context));
     }
 
     public function testGetPropertiesWithObjectClassResolver()
     {
         $object = new \stdClass();
         $classResolver = function ($objectArg) use ($object): string {
-            $this->assertSame($object, $objectArg);
+            self::assertSame($object, $objectArg);
 
             return 'foo';
         };
@@ -47,15 +44,12 @@ class ObjectPropertyListExtractorTest extends TestCase
         $context = ['bar' => true];
         $properties = ['prop1', 'prop2'];
 
-        $propertyListExtractor = $this->createMock(PropertyListExtractorInterface::class);
-        $propertyListExtractor->expects($this->once())
+        $propertyListExtractor = self::createMock(PropertyListExtractorInterface::class);
+        $propertyListExtractor->expects(self::once())
             ->method('getProperties')
             ->with('foo', $context)
             ->willReturn($properties);
 
-        $this->assertSame(
-            $properties,
-            (new ObjectPropertyListExtractor($propertyListExtractor, $classResolver))->getProperties($object, $context)
-        );
+        self::assertSame($properties, (new ObjectPropertyListExtractor($propertyListExtractor, $classResolver))->getProperties($object, $context));
     }
 }

@@ -49,8 +49,7 @@ class CliDumperTest extends TestCase
         $intMax = \PHP_INT_MAX;
         $res = (int) $var['res'];
 
-        $this->assertStringMatchesFormat(
-            <<<EOTXT
+        self::assertStringMatchesFormat(<<<EOTXT
 array:24 [
   "number" => 1
   0 => &1 null
@@ -100,10 +99,7 @@ array:24 [
   b"bin-key-é" => ""
 ]
 
-EOTXT
-            ,
-            $out
-        );
+EOTXT, $out);
     }
 
     /**
@@ -123,7 +119,7 @@ EOTXT
 
         $dump = $dumper->dump($cloner->cloneVar($var), true);
 
-        $this->assertSame($expected, $dump);
+        self::assertSame($expected, $dump);
     }
 
     public function testDumpWithCommaFlagsAndExceptionCodeExcerpt()
@@ -136,7 +132,7 @@ EOTXT
 
         $dump = $dumper->dump($cloner->cloneVar($ex)->withRefHandles(false), true);
 
-        $this->assertStringMatchesFormat(<<<'EOTXT'
+        self::assertStringMatchesFormat(<<<'EOTXT'
 RuntimeException {
   #message: "foo"
   #code: 0
@@ -153,8 +149,7 @@ RuntimeException {
   }
 }
 
-EOTXT
-            , $dump);
+EOTXT, $dump);
     }
 
     public function provideDumpWithCommaFlagTests()
@@ -273,14 +268,10 @@ EOTXT
         $out = ob_get_clean();
         $res = (int) $var;
 
-        $this->assertStringMatchesFormat(
-            <<<EOTXT
+        self::assertStringMatchesFormat(<<<EOTXT
 Closed resource @{$res}
 
-EOTXT
-            ,
-            $out
-        );
+EOTXT, $out);
     }
 
     public function testFlags()
@@ -350,8 +341,7 @@ EOTXT
         $dumper->dump($data, $out);
         $out = stream_get_contents($out, -1, 0);
 
-        $this->assertStringMatchesFormat(
-            <<<EOTXT
+        self::assertStringMatchesFormat(<<<EOTXT
 stream resource {@{$ref}
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {#%d
     #message: "Unexpected Exception thrown from a caster: Foobar"
@@ -377,10 +367,7 @@ stream resource {@{$ref}
 %Aoptions: []
 }
 
-EOTXT
-            ,
-            $out
-        );
+EOTXT, $out);
     }
 
     public function testRefsInProperties()
@@ -395,17 +382,13 @@ EOTXT
         $data = $cloner->cloneVar($var);
         $out = $dumper->dump($data, true);
 
-        $this->assertStringMatchesFormat(
-            <<<EOTXT
+        self::assertStringMatchesFormat(<<<EOTXT
 {#%d
   +"foo": &1 "foo"
   +"bar": &1 "foo"
 }
 
-EOTXT
-            ,
-            $out
-        );
+EOTXT, $out);
     }
 
     /**
@@ -460,8 +443,7 @@ EOTXT
         $data = $cloner->cloneVar($var);
         $dumper->dump($data);
 
-        $this->assertSame(
-            <<<'EOTXT'
+        self::assertSame(<<<'EOTXT'
 array:2 [
   1 => array:1 [
     "GLOBALS" => & array:1 [ …1]
@@ -471,10 +453,7 @@ array:2 [
   ]
 ]
 
-EOTXT
-            ,
-            $out
-        );
+EOTXT, $out);
     }
 
     public function testIncompleteClass()
@@ -527,7 +506,7 @@ EOTXT
     public function testDumpArrayWithColor($value, $flags, $expectedOut)
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows console does not support coloration');
+            self::markTestSkipped('Windows console does not support coloration');
         }
 
         $out = '';
@@ -540,7 +519,7 @@ EOTXT
         $cloner = new VarCloner();
         $dumper->dump($cloner->cloneVar($value));
 
-        $this->assertSame($expectedOut, $out);
+        self::assertSame($expectedOut, $out);
     }
 
     private function getSpecialVars()

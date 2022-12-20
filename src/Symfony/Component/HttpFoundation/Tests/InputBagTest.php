@@ -23,19 +23,19 @@ class InputBagTest extends TestCase
     {
         $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false]);
 
-        $this->assertSame('bar', $bag->get('foo'), '->get() gets the value of a string parameter');
-        $this->assertSame('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
-        $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
-        $this->assertSame(1, $bag->get('int'), '->get() gets the value of an int parameter');
-        $this->assertSame(1.0, $bag->get('float'), '->get() gets the value of a float parameter');
-        $this->assertFalse($bag->get('bool'), '->get() gets the value of a bool parameter');
+        self::assertSame('bar', $bag->get('foo'), '->get() gets the value of a string parameter');
+        self::assertSame('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
+        self::assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
+        self::assertSame(1, $bag->get('int'), '->get() gets the value of an int parameter');
+        self::assertSame(1.0, $bag->get('float'), '->get() gets the value of a float parameter');
+        self::assertFalse($bag->get('bool'), '->get() gets the value of a bool parameter');
     }
 
     public function testGetDoesNotUseDeepByDefault()
     {
         $bag = new InputBag(['foo' => ['bar' => 'moo']]);
 
-        $this->assertNull($bag->get('foo[bar]'));
+        self::assertNull($bag->get('foo[bar]'));
     }
 
     public function testFilterArray()
@@ -45,7 +45,7 @@ class InputBagTest extends TestCase
         ]);
 
         $result = $bag->filter('foo', null, \FILTER_VALIDATE_INT, \FILTER_FORCE_ARRAY);
-        $this->assertSame([12, 8], $result);
+        self::assertSame([12, 8], $result);
     }
 
     /**
@@ -56,7 +56,7 @@ class InputBagTest extends TestCase
         $bag = new InputBag(['foo' => 'bar']);
 
         $this->expectDeprecation('Since symfony/http-foundation 5.2: Not passing a Closure together with FILTER_CALLBACK to "Symfony\Component\HttpFoundation\InputBag::filter()" is deprecated. Wrap your filter in a closure instead.');
-        $this->assertSame('BAR', $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']));
+        self::assertSame('BAR', $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']));
     }
 
     /**

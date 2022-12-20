@@ -39,6 +39,6 @@ class Psr16AdapterTest extends AdapterTestCase
         $item->set('someValue');
         $cache->save($item);
 
-        $this->assertTrue($cache->getItem('my_key')->isHit(), 'Stored item is successfully retrieved.');
+        self::assertTrue($cache->getItem('my_key')->isHit(), 'Stored item is successfully retrieved.');
     }
 }

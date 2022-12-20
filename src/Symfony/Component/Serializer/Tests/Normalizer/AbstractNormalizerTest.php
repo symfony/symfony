@@ -52,8 +52,8 @@ class AbstractNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $loader = $this->getMockBuilder(LoaderChain::class)->setConstructorArgs([[]])->getMock();
-        $this->classMetadata = $this->getMockBuilder(ClassMetadataFactory::class)->setConstructorArgs([$loader])->getMock();
+        $loader = self::getMockBuilder(LoaderChain::class)->setConstructorArgs([[]])->getMock();
+        $this->classMetadata = self::getMockBuilder(ClassMetadataFactory::class)->setConstructorArgs([$loader])->getMock();
         $this->normalizer = new AbstractNormalizerDummy($this->classMetadata);
     }
 
@@ -80,13 +80,13 @@ class AbstractNormalizerTest extends TestCase
         $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['test']], true);
-        $this->assertEquals(['a2', 'a4'], $result);
+        self::assertEquals(['a2', 'a4'], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['other']], true);
-        $this->assertEquals(['a3', 'a4'], $result);
+        self::assertEquals(['a3', 'a4'], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], true);
-        $this->assertEquals(['a1', 'a2', 'a3', 'a4'], $result);
+        self::assertEquals(['a1', 'a2', 'a3', 'a4'], $result);
     }
 
     public function testGetAllowedAttributesAsObjects()
@@ -112,16 +112,16 @@ class AbstractNormalizerTest extends TestCase
         $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['test']], false);
-        $this->assertEquals([$a2, $a4], $result);
+        self::assertEquals([$a2, $a4], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => 'test'], false);
-        $this->assertEquals([$a2, $a4], $result);
+        self::assertEquals([$a2, $a4], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['other']], false);
-        $this->assertEquals([$a3, $a4], $result);
+        self::assertEquals([$a3, $a4], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], false);
-        $this->assertEquals([$a1, $a2, $a3, $a4], $result);
+        self::assertEquals([$a1, $a2, $a3, $a4], $result);
     }
 
     public function testObjectWithStaticConstructor()
@@ -129,9 +129,9 @@ class AbstractNormalizerTest extends TestCase
         $normalizer = new StaticConstructorNormalizer();
         $dummy = $normalizer->denormalize(['foo' => 'baz'], StaticConstructorDummy::class);
 
-        $this->assertInstanceOf(StaticConstructorDummy::class, $dummy);
-        $this->assertEquals('baz', $dummy->quz);
-        $this->assertNull($dummy->foo);
+        self::assertInstanceOf(StaticConstructorDummy::class, $dummy);
+        self::assertEquals('baz', $dummy->quz);
+        self::assertNull($dummy->foo);
     }
 
     public function testObjectWithNullableConstructorArgument()
@@ -139,7 +139,7 @@ class AbstractNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize(['foo' => null], NullableOptionalConstructorArgumentDummy::class);
 
-        $this->assertNull($dummy->getFoo());
+        self::assertNull($dummy->getFoo());
     }
 
     public function testObjectWithNullableConstructorArgumentWithoutInput()
@@ -147,7 +147,7 @@ class AbstractNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize([], NullableOptionalConstructorArgumentDummy::class);
 
-        $this->assertNull($dummy->getFoo());
+        self::assertNull($dummy->getFoo());
     }
 
     public function testObjectWithNullableNonOptionalConstructorArgument()
@@ -155,7 +155,7 @@ class AbstractNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize(['foo' => null], NullableConstructorArgumentDummy::class);
 
-        $this->assertNull($dummy->getFoo());
+        self::assertNull($dummy->getFoo());
     }
 
     public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInput()
@@ -163,7 +163,7 @@ class AbstractNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize([], NullableConstructorArgumentDummy::class);
 
-        $this->assertNull($dummy->getFoo());
+        self::assertNull($dummy->getFoo());
     }
 
     /**
@@ -187,17 +187,17 @@ class AbstractNormalizerTest extends TestCase
         $normalizer->setSerializer($serializer);
         $data = $serializer->serialize($obj, 'json');
         $dummy = $normalizer->denormalize(json_decode($data, true), VariadicConstructorTypedArgsDummy::class);
-        $this->assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
-        $this->assertCount(2, $dummy->getFoo());
+        self::assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
+        self::assertCount(2, $dummy->getFoo());
         foreach ($dummy->getFoo() as $foo) {
-            $this->assertInstanceOf(Dummy::class, $foo);
+            self::assertInstanceOf(Dummy::class, $foo);
         }
 
         $dummy = $serializer->deserialize($data, VariadicConstructorTypedArgsDummy::class, 'json');
-        $this->assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
-        $this->assertCount(2, $dummy->getFoo());
+        self::assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
+        self::assertCount(2, $dummy->getFoo());
         foreach ($dummy->getFoo() as $foo) {
-            $this->assertInstanceOf(Dummy::class, $foo);
+            self::assertInstanceOf(Dummy::class, $foo);
         }
     }
 
@@ -224,6 +224,6 @@ class AbstractNormalizerTest extends TestCase
 
         $normalizer = new PropertyNormalizer($this->classMetadata);
 
-        $this->assertSame([], $normalizer->normalize($dummy));
+        self::assertSame([], $normalizer->normalize($dummy));
     }
 }

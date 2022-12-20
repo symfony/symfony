@@ -24,7 +24,7 @@ class CommentHandlerTest extends AbstractHandlerTest
         $reader = new Reader($value);
         $stream = new TokenStream();
 
-        $this->assertTrue($this->generateHandler()->handle($reader, $stream));
+        self::assertTrue($this->generateHandler()->handle($reader, $stream));
         // comments are ignored (not pushed as token in stream)
         $this->assertStreamEmpty($stream);
         $this->assertRemainingContent($reader, $remainingContent);

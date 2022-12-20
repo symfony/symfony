@@ -48,8 +48,8 @@ class StopWorkerOnCustomStopExceptionListenerTest extends TestCase
 
         $listener->onMessageFailed($failedEvent);
 
-        $worker = $this->createMock(Worker::class);
-        $worker->expects($shouldStop ? $this->once() : $this->never())->method('stop');
+        $worker = self::createMock(Worker::class);
+        $worker->expects($shouldStop ? self::once() : self::never())->method('stop');
         $runningEvent = new WorkerRunningEvent($worker, false);
 
         $listener->onWorkerRunning($runningEvent);

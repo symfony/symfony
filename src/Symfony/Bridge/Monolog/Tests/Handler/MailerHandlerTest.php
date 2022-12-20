@@ -27,7 +27,7 @@ class MailerHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mailer = $this->createMock(MailerInterface::class);
+        $this->mailer = self::createMock(MailerInterface::class);
     }
 
     public function testHandle()
@@ -35,9 +35,9 @@ class MailerHandlerTest extends TestCase
         $handler = new MailerHandler($this->mailer, (new Email())->subject('Alert: %level_name% %message%'));
         $handler->setFormatter(new LineFormatter());
         $this->mailer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
+            ->with(self::callback(function (Email $email) {
                 return 'Alert: WARNING message' === $email->getSubject() && null === $email->getHtmlBody();
             }))
         ;
@@ -49,9 +49,9 @@ class MailerHandlerTest extends TestCase
         $handler = new MailerHandler($this->mailer, (new Email())->subject('Alert: %level_name% %message%'));
         $handler->setFormatter(new LineFormatter());
         $this->mailer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
+            ->with(self::callback(function (Email $email) {
                 return 'Alert: ERROR error' === $email->getSubject() && null === $email->getHtmlBody();
             }))
         ;
@@ -61,7 +61,7 @@ class MailerHandlerTest extends TestCase
     public function testMessageCreationIsLazyWhenUsingCallback()
     {
         $this->mailer
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('send')
         ;
 
@@ -82,9 +82,9 @@ class MailerHandlerTest extends TestCase
         $handler = new MailerHandler($this->mailer, (new Email())->subject('Alert: %level_name% %message%'));
         $handler->setFormatter(new HtmlFormatter());
         $this->mailer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
+            ->with(self::callback(function (Email $email) {
                 return 'Alert: WARNING message' === $email->getSubject() && null === $email->getTextBody();
             }))
         ;

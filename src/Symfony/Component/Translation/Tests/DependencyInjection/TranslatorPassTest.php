@@ -42,17 +42,17 @@ class TranslatorPassTest extends TestCase
             ->addMethodCall('addLoader', ['xliff', new Reference('translation.xliff_loader')])
             ->addMethodCall('addLoader', ['xlf', new Reference('translation.xliff_loader')])
         ;
-        $this->assertEquals($expectedReader, $reader);
+        self::assertEquals($expectedReader, $reader);
 
         $expectedLoader = (new Definition())
             ->addTag('translation.loader', ['alias' => 'xliff', 'legacy-alias' => 'xlf'])
         ;
-        $this->assertEquals($expectedLoader, $loader);
+        self::assertEquals($expectedLoader, $loader);
 
-        $this->assertSame(['translation.xliff_loader' => ['xliff', 'xlf']], $translator->getArgument(3));
+        self::assertSame(['translation.xliff_loader' => ['xliff', 'xlf']], $translator->getArgument(3));
 
         $expected = ['translation.xliff_loader' => new ServiceClosureArgument(new Reference('translation.xliff_loader'))];
-        $this->assertEquals($expected, $container->getDefinition((string) $translator->getArgument(0))->getArgument(0));
+        self::assertEquals($expected, $container->getDefinition((string) $translator->getArgument(0))->getArgument(0));
     }
 
     public function testValidCommandsViewPathsArgument()
@@ -77,10 +77,10 @@ class TranslatorPassTest extends TestCase
 
         $expectedViewPaths = ['other/templates', 'tpl'];
 
-        $this->assertSame('templates', $debugCommand->getArgument(4));
-        $this->assertSame('templates', $updateCommand->getArgument(5));
-        $this->assertSame($expectedViewPaths, $debugCommand->getArgument(6));
-        $this->assertSame($expectedViewPaths, $updateCommand->getArgument(7));
+        self::assertSame('templates', $debugCommand->getArgument(4));
+        self::assertSame('templates', $updateCommand->getArgument(5));
+        self::assertSame($expectedViewPaths, $debugCommand->getArgument(6));
+        self::assertSame($expectedViewPaths, $updateCommand->getArgument(7));
     }
 
     public function testCommandsViewPathsArgumentsAreIgnoredWithOldServiceDefinitions()
@@ -116,7 +116,7 @@ class TranslatorPassTest extends TestCase
         $pass = new TranslatorPass();
         $pass->process($container);
 
-        $this->assertSame('templates', $debugCommand->getArgument(4));
-        $this->assertSame('templates', $updateCommand->getArgument(5));
+        self::assertSame('templates', $debugCommand->getArgument(4));
+        self::assertSame('templates', $updateCommand->getArgument(5));
     }
 }

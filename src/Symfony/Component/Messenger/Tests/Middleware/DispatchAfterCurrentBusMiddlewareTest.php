@@ -35,7 +35,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $thirdEvent = new DummyEvent('Third event');
 
         $middleware = new DispatchAfterCurrentBusMiddleware();
-        $handlingMiddleware = $this->createMock(MiddlewareInterface::class);
+        $handlingMiddleware = self::createMock(MiddlewareInterface::class);
 
         $eventBus = new MessageBus([
             $middleware,
@@ -52,7 +52,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $handlingMiddleware,
         ]);
 
-        $handlingMiddleware->expects($this->exactly(4))
+        $handlingMiddleware->expects(self::exactly(4))
             ->method('handle')
             ->withConsecutive(
                 // Third event is dispatch within main dispatch, but before its handling:
@@ -81,7 +81,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $secondEvent = new DummyEvent('Second event');
 
         $middleware = new DispatchAfterCurrentBusMiddleware();
-        $handlingMiddleware = $this->createMock(MiddlewareInterface::class);
+        $handlingMiddleware = self::createMock(MiddlewareInterface::class);
 
         $eventBus = new MessageBus([
             $middleware,
@@ -97,7 +97,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $handlingMiddleware,
         ]);
 
-        $handlingMiddleware->expects($this->exactly(3))
+        $handlingMiddleware->expects(self::exactly(3))
             ->method('handle')
             ->withConsecutive(
                 // Expect main dispatched message to be handled first:
@@ -109,12 +109,12 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(
                 $this->willHandleMessage(),
-                $this->throwException(new \RuntimeException('Some exception while handling first event')),
+                self::throwException(new \RuntimeException('Some exception while handling first event')),
                 $this->willHandleMessage()
             );
 
-        $this->expectException(DelayedMessageHandlingException::class);
-        $this->expectExceptionMessage('RuntimeException: Some exception while handling first event');
+        self::expectException(DelayedMessageHandlingException::class);
+        self::expectExceptionMessage('RuntimeException: Some exception while handling first event');
 
         $messageBus->dispatch($message);
     }
@@ -134,7 +134,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $eventL3b = new DummyEvent('Event level 3B');
 
         $middleware = new DispatchAfterCurrentBusMiddleware();
-        $handlingMiddleware = $this->createMock(MiddlewareInterface::class);
+        $handlingMiddleware = self::createMock(MiddlewareInterface::class);
 
         $eventBus = new MessageBus([
             $middleware,
@@ -153,7 +153,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         ]);
 
         // Handling $eventL1b will dispatch 2 more events
-        $handlingMiddleware->expects($this->exactly(7))
+        $handlingMiddleware->expects(self::exactly(7))
             ->method('handle')
             ->withConsecutive(
                 // Expect main dispatched message to be handled first:
@@ -172,7 +172,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 $this->willHandleMessage(),
                 $this->willHandleMessage(),
-                $this->returnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL2a, $eventL2b) {
+                self::returnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL2a, $eventL2b) {
                     $envelope1 = new Envelope($eventL2a, [new DispatchAfterCurrentBusStamp()]);
                     $eventBus->dispatch($envelope1);
                     $eventBus->dispatch(new Envelope($eventL2b, [new DispatchAfterCurrentBusStamp()]));
@@ -180,12 +180,12 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
                     return $stack->next()->handle($envelope, $stack);
                 }),
                 $this->willHandleMessage(),
-                $this->returnCallback(function () use ($eventBus, $eventL3a) {
+                self::returnCallback(function () use ($eventBus, $eventL3a) {
                     $eventBus->dispatch(new Envelope($eventL3a, [new DispatchAfterCurrentBusStamp()]));
 
                     throw new \RuntimeException('Some exception while handling Event level 2a');
                 }),
-                $this->returnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL3b) {
+                self::returnCallback(function ($envelope, StackInterface $stack) use ($eventBus, $eventL3b) {
                     $eventBus->dispatch(new Envelope($eventL3b, [new DispatchAfterCurrentBusStamp()]));
 
                     return $stack->next()->handle($envelope, $stack);
@@ -193,8 +193,8 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
                 $this->willHandleMessage()
             );
 
-        $this->expectException(DelayedMessageHandlingException::class);
-        $this->expectExceptionMessage('RuntimeException: Some exception while handling Event level 2a');
+        self::expectException(DelayedMessageHandlingException::class);
+        self::expectExceptionMessage('RuntimeException: Some exception while handling Event level 2a');
 
         $commandBus->dispatch($command);
     }
@@ -205,8 +205,8 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $event = new DummyEvent('Event on queue');
 
         $middleware = new DispatchAfterCurrentBusMiddleware();
-        $commandHandlingMiddleware = $this->createMock(MiddlewareInterface::class);
-        $eventHandlingMiddleware = $this->createMock(MiddlewareInterface::class);
+        $commandHandlingMiddleware = self::createMock(MiddlewareInterface::class);
+        $eventHandlingMiddleware = self::createMock(MiddlewareInterface::class);
 
         // This bus simulates the bus that are used when messages come back form the queue
         $messageBusAfterQueue = new MessageBus([
@@ -215,10 +215,10 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $eventHandlingMiddleware,
         ]);
 
-        $fakePutMessageOnQueue = $this->createMock(MiddlewareInterface::class);
-        $fakePutMessageOnQueue->expects($this->any())
+        $fakePutMessageOnQueue = self::createMock(MiddlewareInterface::class);
+        $fakePutMessageOnQueue->expects(self::any())
             ->method('handle')
-            ->with($this->callback(function ($envelope) use ($messageBusAfterQueue) {
+            ->with(self::callback(function ($envelope) use ($messageBusAfterQueue) {
                 // Fake putting the message on the queue
                 // Fake reading the queue
                 // Now, we add the message back to a new bus.
@@ -241,13 +241,13 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $commandHandlingMiddleware,
         ]);
 
-        $commandHandlingMiddleware->expects($this->once())
+        $commandHandlingMiddleware->expects(self::once())
             ->method('handle')
             ->with($this->expectHandledMessage($message))
             ->willReturnCallback(function ($envelope, StackInterface $stack) {
                 return $stack->next()->handle($envelope, $stack);
             });
-        $eventHandlingMiddleware->expects($this->once())
+        $eventHandlingMiddleware->expects(self::once())
             ->method('handle')
             ->with($this->expectHandledMessage($event))
             ->willReturnCallback(function ($envelope, StackInterface $stack) {
@@ -261,7 +261,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $event = new DummyEvent('First event');
 
         $middleware = new DispatchAfterCurrentBusMiddleware();
-        $handlingMiddleware = $this->createMock(MiddlewareInterface::class);
+        $handlingMiddleware = self::createMock(MiddlewareInterface::class);
 
         $handlingMiddleware
             ->method('handle')
@@ -280,14 +280,14 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
 
     private function expectHandledMessage($message): Callback
     {
-        return $this->callback(function (Envelope $envelope) use ($message) {
+        return self::callback(function (Envelope $envelope) use ($message) {
             return $envelope->getMessage() === $message;
         });
     }
 
     private function willHandleMessage(): ReturnCallback
     {
-        return $this->returnCallback(function ($envelope, StackInterface $stack) {
+        return self::returnCallback(function ($envelope, StackInterface $stack) {
             return $stack->next()->handle($envelope, $stack);
         });
     }

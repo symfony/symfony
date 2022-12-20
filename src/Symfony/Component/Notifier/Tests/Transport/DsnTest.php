@@ -24,15 +24,15 @@ final class DsnTest extends TestCase
     public function testConstruct(string $dsnString, string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [], string $path = null)
     {
         $dsn = new Dsn($dsnString);
-        $this->assertSame($dsnString, $dsn->getOriginalDsn());
+        self::assertSame($dsnString, $dsn->getOriginalDsn());
 
-        $this->assertSame($scheme, $dsn->getScheme());
-        $this->assertSame($host, $dsn->getHost());
-        $this->assertSame($user, $dsn->getUser());
-        $this->assertSame($password, $dsn->getPassword());
-        $this->assertSame($port, $dsn->getPort());
-        $this->assertSame($path, $dsn->getPath());
-        $this->assertSame($options, $dsn->getOptions());
+        self::assertSame($scheme, $dsn->getScheme());
+        self::assertSame($host, $dsn->getHost());
+        self::assertSame($user, $dsn->getUser());
+        self::assertSame($password, $dsn->getPassword());
+        self::assertSame($port, $dsn->getPort());
+        self::assertSame($path, $dsn->getPath());
+        self::assertSame($options, $dsn->getOptions());
     }
 
     public function constructProvider(): iterable
@@ -145,8 +145,8 @@ final class DsnTest extends TestCase
      */
     public function testInvalidDsn(string $dsnString, string $exceptionMessage)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($exceptionMessage);
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage($exceptionMessage);
 
         new Dsn($dsnString);
     }
@@ -176,7 +176,7 @@ final class DsnTest extends TestCase
     {
         $dsn = new Dsn($dsnString);
 
-        $this->assertSame($expected, $dsn->getOption($option, $default));
+        self::assertSame($expected, $dsn->getOption($option, $default));
     }
 
     public function getOptionProvider(): iterable
@@ -214,7 +214,7 @@ final class DsnTest extends TestCase
     {
         $dsn = new Dsn(sprintf('scheme://localhost?%s', $options));
 
-        $this->assertSame($expectedValue, $dsn->getRequiredOption($option));
+        self::assertSame($expectedValue, $dsn->getRequiredOption($option));
     }
 
     public function getRequiredOptionProvider(): iterable
@@ -239,8 +239,8 @@ final class DsnTest extends TestCase
     {
         $dsn = new Dsn(sprintf('scheme://localhost?%s', $options));
 
-        $this->expectException(MissingRequiredOptionException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        self::expectException(MissingRequiredOptionException::class);
+        self::expectExceptionMessage($expectedExceptionMessage);
 
         $dsn->getRequiredOption($option);
     }

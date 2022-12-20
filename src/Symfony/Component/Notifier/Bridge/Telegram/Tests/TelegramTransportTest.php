@@ -30,7 +30,7 @@ final class TelegramTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null, string $channel = null): TransportInterface
     {
-        return new TelegramTransport('token', $channel, $client ?? $this->createMock(HttpClientInterface::class));
+        return new TelegramTransport('token', $channel, $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -47,19 +47,19 @@ final class TelegramTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSendWithErrorResponseThrowsTransportException()
     {
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessageMatches('/testDescription.+testErrorCode/');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(400);
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn(json_encode(['description' => 'testDescription', 'error_code' => 'testErrorCode']));
 
@@ -74,8 +74,8 @@ final class TelegramTransportTest extends TransportTestCase
 
     public function testSendWithOptions()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(200);
 
@@ -102,7 +102,7 @@ final class TelegramTransportTest extends TransportTestCase
             }
 JSON;
 
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn($content)
         ;
@@ -114,7 +114,7 @@ JSON;
         ];
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
-            $this->assertSame($expectedBody, json_decode($options['body'], true));
+            self::assertSame($expectedBody, json_decode($options['body'], true));
 
             return $response;
         });
@@ -123,16 +123,16 @@ JSON;
 
         $sentMessage = $transport->send(new ChatMessage('testMessage'));
 
-        $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        self::assertEquals(1, $sentMessage->getMessageId());
+        self::assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
     public function testSendWithChannelOverride()
     {
         $channelOverride = 'channelOverride';
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(200);
         $content = <<<JSON
@@ -158,7 +158,7 @@ JSON;
             }
 JSON;
 
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn($content)
         ;
@@ -170,7 +170,7 @@ JSON;
         ];
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
-            $this->assertSame($expectedBody, json_decode($options['body'], true));
+            self::assertSame($expectedBody, json_decode($options['body'], true));
 
             return $response;
         });
@@ -182,14 +182,14 @@ JSON;
 
         $sentMessage = $transport->send(new ChatMessage('testMessage', $messageOptions));
 
-        $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
+        self::assertEquals(1, $sentMessage->getMessageId());
+        self::assertEquals('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
     }
 
     public function testSendWithMarkdownShouldEscapeSpecialCharacters()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(200);
 
@@ -216,7 +216,7 @@ JSON;
             }
 JSON;
 
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn($content)
         ;
@@ -228,7 +228,7 @@ JSON;
         ];
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
-            $this->assertSame($expectedBody, json_decode($options['body'], true));
+            self::assertSame($expectedBody, json_decode($options['body'], true));
 
             return $response;
         });

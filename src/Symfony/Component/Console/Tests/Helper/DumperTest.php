@@ -37,7 +37,7 @@ class DumperTest extends TestCase
      */
     public function testInvoke($variable)
     {
-        $output = $this->createMock(OutputInterface::class);
+        $output = self::createMock(OutputInterface::class);
         $output->method('isDecorated')->willReturn(false);
 
         $dumper = new Dumper($output);

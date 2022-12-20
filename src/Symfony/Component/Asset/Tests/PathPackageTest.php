@@ -25,7 +25,7 @@ class PathPackageTest extends TestCase
     public function testGetUrl($basePath, $format, $path, $expected)
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format));
-        $this->assertSame($expected, $package->getUrl($path));
+        self::assertSame($expected, $package->getUrl($path));
     }
 
     public function getConfigs()
@@ -57,7 +57,7 @@ class PathPackageTest extends TestCase
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format), $this->getContext($basePathRequest));
 
-        $this->assertSame($expected, $package->getUrl($path));
+        self::assertSame($expected, $package->getUrl($path));
     }
 
     public function getContextConfigs()
@@ -79,19 +79,19 @@ class PathPackageTest extends TestCase
 
     public function testVersionStrategyGivesAbsoluteURL()
     {
-        $versionStrategy = $this->createMock(VersionStrategyInterface::class);
-        $versionStrategy->expects($this->any())
+        $versionStrategy = self::createMock(VersionStrategyInterface::class);
+        $versionStrategy->expects(self::any())
             ->method('applyVersion')
             ->willReturn('https://cdn.com/bar/main.css');
         $package = new PathPackage('/subdirectory', $versionStrategy, $this->getContext('/bar'));
 
-        $this->assertSame('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
+        self::assertSame('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
     }
 
     private function getContext($basePath)
     {
-        $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->any())->method('getBasePath')->willReturn($basePath);
+        $context = self::createMock(ContextInterface::class);
+        $context->expects(self::any())->method('getBasePath')->willReturn($basePath);
 
         return $context;
     }

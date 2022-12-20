@@ -30,9 +30,9 @@ event: testEvent
 STR;
 
         $sse = new ServerSentEvent($rawData);
-        $this->assertSame("test\ntest", $sse->getData());
-        $this->assertSame('12', $sse->getId());
-        $this->assertSame('testEvent', $sse->getType());
+        self::assertSame("test\ntest", $sse->getData());
+        self::assertSame('12', $sse->getId());
+        self::assertSame('testEvent', $sse->getType());
     }
 
     public function testParseValid()
@@ -44,9 +44,9 @@ data
 STR;
 
         $sse = new ServerSentEvent($rawData);
-        $this->assertSame('', $sse->getData());
-        $this->assertSame('', $sse->getId());
-        $this->assertSame('testEvent', $sse->getType());
+        self::assertSame('', $sse->getData());
+        self::assertSame('', $sse->getId());
+        self::assertSame('testEvent', $sse->getType());
     }
 
     public function testParseRetry()
@@ -55,10 +55,10 @@ STR;
 retry: 12
 STR;
         $sse = new ServerSentEvent($rawData);
-        $this->assertSame('', $sse->getData());
-        $this->assertSame('', $sse->getId());
-        $this->assertSame('message', $sse->getType());
-        $this->assertSame(0.012, $sse->getRetry());
+        self::assertSame('', $sse->getData());
+        self::assertSame('', $sse->getId());
+        self::assertSame('message', $sse->getType());
+        self::assertSame(0.012, $sse->getRetry());
     }
 
     public function testParseNewLine()
@@ -74,6 +74,6 @@ data:
 data: </tag>
 STR;
         $sse = new ServerSentEvent($rawData);
-        $this->assertSame("<tag>\n\n  <foo />\n\n\n</tag>", $sse->getData());
+        self::assertSame("<tag>\n\n  <foo />\n\n\n</tag>", $sse->getData());
     }
 }

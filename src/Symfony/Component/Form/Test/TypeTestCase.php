@@ -31,7 +31,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->dispatcher = self::createMock(EventDispatcherInterface::class);
         $this->builder = new FormBuilder('', null, $this->dispatcher, $this->factory);
     }
 
@@ -47,7 +47,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         $extensions = [];
 
         if (\in_array(ValidatorExtensionTrait::class, class_uses($this))) {
-            $extensions[] = $this->getValidatorExtension();
+            $extensions[] = self::getValidatorExtension();
         }
 
         return $extensions;

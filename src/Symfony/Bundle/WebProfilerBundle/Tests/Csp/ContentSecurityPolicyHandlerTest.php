@@ -26,7 +26,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
 
-        $this->assertSame($expectedNonce, $cspHandler->getNonces($request, $response));
+        self::assertSame($expectedNonce, $cspHandler->getNonces($request, $response));
     }
 
     /**
@@ -36,13 +36,13 @@ class ContentSecurityPolicyHandlerTest extends TestCase
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
 
-        $this->assertSame($expectedNonce, $cspHandler->updateResponseHeaders($request, $response));
+        self::assertSame($expectedNonce, $cspHandler->updateResponseHeaders($request, $response));
 
-        $this->assertFalse($response->headers->has('X-SymfonyProfiler-Script-Nonce'));
-        $this->assertFalse($response->headers->has('X-SymfonyProfiler-Style-Nonce'));
+        self::assertFalse($response->headers->has('X-SymfonyProfiler-Script-Nonce'));
+        self::assertFalse($response->headers->has('X-SymfonyProfiler-Style-Nonce'));
 
         foreach ($expectedCsp as $header => $value) {
-            $this->assertSame($value, $response->headers->get($header), $header);
+            self::assertSame($value, $response->headers->get($header), $header);
         }
     }
 
@@ -211,9 +211,9 @@ class ContentSecurityPolicyHandlerTest extends TestCase
 
     private function mockNonceGenerator($value)
     {
-        $generator = $this->createMock(NonceGenerator::class);
+        $generator = self::createMock(NonceGenerator::class);
 
-        $generator->expects($this->any())
+        $generator->expects(self::any())
             ->method('generate')
             ->willReturn($value);
 

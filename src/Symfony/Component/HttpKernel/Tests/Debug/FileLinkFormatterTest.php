@@ -22,7 +22,7 @@ class FileLinkFormatterTest extends TestCase
     {
         $sut = new FileLinkFormatter([]);
 
-        $this->assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
+        self::assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
     }
 
     public function testWhenFileLinkFormatAndNoRequest()
@@ -31,7 +31,7 @@ class FileLinkFormatterTest extends TestCase
 
         $sut = new FileLinkFormatter('debug://open?url=file://%f&line=%l', new RequestStack());
 
-        $this->assertSame("debug://open?url=file://$file&line=3", $sut->format($file, 3));
+        self::assertSame("debug://open?url=file://$file&line=3", $sut->format($file, 3));
     }
 
     public function testWhenNoFileLinkFormatAndRequest()
@@ -49,7 +49,7 @@ class FileLinkFormatterTest extends TestCase
 
         $sut = new FileLinkFormatter([], $requestStack, __DIR__, '/_profiler/open?file=%f&line=%l#line%l');
 
-        $this->assertSame('http://www.example.org/_profiler/open?file=file.php&line=3#line3', $sut->format($file, 3));
+        self::assertSame('http://www.example.org/_profiler/open?file=file.php&line=3#line3', $sut->format($file, 3));
     }
 
     public function testIdeFileLinkFormat()
@@ -58,6 +58,6 @@ class FileLinkFormatterTest extends TestCase
 
         $sut = new FileLinkFormatter('atom');
 
-        $this->assertSame("atom://core/open/file?filename=$file&line=3", $sut->format($file, 3));
+        self::assertSame("atom://core/open/file?filename=$file&line=3", $sut->format($file, 3));
     }
 }

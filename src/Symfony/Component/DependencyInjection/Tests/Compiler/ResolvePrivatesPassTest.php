@@ -36,7 +36,7 @@ class ResolvePrivatesPassTest extends TestCase
 
         (new ResolvePrivatesPass())->process($container);
 
-        $this->assertFalse($container->getDefinition('foo')->isPublic());
-        $this->assertTrue($container->getAlias('bar')->isPublic());
+        self::assertFalse($container->getDefinition('foo')->isPublic());
+        self::assertTrue($container->getAlias('bar')->isPublic());
     }
 }

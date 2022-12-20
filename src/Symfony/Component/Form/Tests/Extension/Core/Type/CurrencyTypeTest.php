@@ -30,9 +30,9 @@ class CurrencyTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
 
-        $this->assertContainsEquals(new ChoiceView('EUR', 'EUR', 'Euro'), $choices);
-        $this->assertContainsEquals(new ChoiceView('USD', 'USD', 'US Dollar'), $choices);
-        $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices);
+        self::assertContainsEquals(new ChoiceView('EUR', 'EUR', 'Euro'), $choices);
+        self::assertContainsEquals(new ChoiceView('USD', 'USD', 'US Dollar'), $choices);
+        self::assertContainsEquals(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices);
     }
 
     /**
@@ -47,9 +47,9 @@ class CurrencyTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('EUR', 'EUR', 'євро'), $choices);
-        $this->assertContainsEquals(new ChoiceView('USD', 'USD', 'долар США'), $choices);
-        $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'словенський толар'), $choices);
+        self::assertContainsEquals(new ChoiceView('EUR', 'EUR', 'євро'), $choices);
+        self::assertContainsEquals(new ChoiceView('USD', 'USD', 'долар США'), $choices);
+        self::assertContainsEquals(new ChoiceView('SIT', 'SIT', 'словенський толар'), $choices);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

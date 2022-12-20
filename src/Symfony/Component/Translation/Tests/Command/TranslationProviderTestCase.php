@@ -29,7 +29,7 @@ abstract class TranslationProviderTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
         $this->fs = new Filesystem();
@@ -41,7 +41,7 @@ abstract class TranslationProviderTestCase extends TestCase
     {
         \Locale::setDefault($this->defaultLocale);
         $this->fs->remove($this->translationAppDir);
-        parent::tearDown();
+        self::tearDown();
     }
 
     protected function getProviderCollection(ProviderInterface $provider, array $providerNames = ['loco'], array $locales = ['en'], array $domains = ['messages']): TranslationProviderCollection

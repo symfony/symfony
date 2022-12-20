@@ -39,15 +39,15 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         $parent = '.instanceof.'.parent::class.'.0.foo';
         $def = $container->getDefinition('foo');
-        $this->assertEmpty($def->getInstanceofConditionals());
-        $this->assertInstanceOf(ChildDefinition::class, $def);
-        $this->assertTrue($def->isAutowired());
-        $this->assertSame($parent, $def->getParent());
-        $this->assertSame(['tag' => [[]], 'baz' => [['attr' => 123]]], $def->getTags());
+        self::assertEmpty($def->getInstanceofConditionals());
+        self::assertInstanceOf(ChildDefinition::class, $def);
+        self::assertTrue($def->isAutowired());
+        self::assertSame($parent, $def->getParent());
+        self::assertSame(['tag' => [[]], 'baz' => [['attr' => 123]]], $def->getTags());
 
         $parent = $container->getDefinition($parent);
-        $this->assertSame(['foo' => 'bar'], $parent->getProperties());
-        $this->assertSame([], $parent->getTags());
+        self::assertSame(['foo' => 'bar'], $parent->getProperties());
+        self::assertSame([], $parent->getTags());
     }
 
     public function testProcessInheritance()
@@ -72,8 +72,8 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
             ['foo', ['foo']],
         ];
 
-        $this->assertSame($expected, $container->getDefinition('parent')->getMethodCalls());
-        $this->assertSame($expected, $container->getDefinition('child')->getMethodCalls());
+        self::assertSame($expected, $container->getDefinition('parent')->getMethodCalls());
+        self::assertSame($expected, $container->getDefinition('child')->getMethodCalls());
     }
 
     public function testProcessDoesReplaceShared()
@@ -88,7 +88,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
 
         $def = $container->getDefinition('foo');
-        $this->assertFalse($def->isShared());
+        self::assertFalse($def->isShared());
     }
 
     public function testProcessHandlesMultipleInheritance()
@@ -106,9 +106,9 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveChildDefinitionsPass())->process($container);
 
         $def = $container->getDefinition('foo');
-        $this->assertTrue($def->isAutowired());
-        $this->assertTrue($def->isLazy());
-        $this->assertTrue($def->isShared());
+        self::assertTrue($def->isAutowired());
+        self::assertTrue($def->isLazy());
+        self::assertTrue($def->isShared());
     }
 
     public function testProcessUsesAutoconfiguredInstanceof()
@@ -131,11 +131,11 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         $def = $container->getDefinition('normal_service');
         // autowired thanks to the autoconfigured instanceof
-        $this->assertTrue($def->isAutowired());
+        self::assertTrue($def->isAutowired());
         // factory from the specific instanceof overrides global one
-        $this->assertEquals('locally_set_factory', $def->getFactory());
+        self::assertEquals('locally_set_factory', $def->getFactory());
         // tags are merged, the locally set one is first
-        $this->assertSame(['local_instanceof_tag' => [[]], 'autoconfigured_tag' => [[]]], $def->getTags());
+        self::assertSame(['local_instanceof_tag' => [[]], 'autoconfigured_tag' => [[]]], $def->getTags());
     }
 
     public function testAutoconfigureInstanceofDoesNotDuplicateTags()
@@ -158,7 +158,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveChildDefinitionsPass())->process($container);
 
         $def = $container->getDefinition('normal_service');
-        $this->assertSame(['duplicated_tag' => [[], ['and_attributes' => 1]]], $def->getTags());
+        self::assertSame(['duplicated_tag' => [[], ['and_attributes' => 1]]], $def->getTags());
     }
 
     public function testProcessDoesNotUseAutoconfiguredInstanceofIfNotEnabled()
@@ -176,13 +176,13 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveChildDefinitionsPass())->process($container);
 
         $def = $container->getDefinition('normal_service');
-        $this->assertFalse($def->isAutowired());
+        self::assertFalse($def->isAutowired());
     }
 
     public function testBadInterfaceThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"App\FakeInterface" is set as an "instanceof" conditional, but it does not exist.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('"App\FakeInterface" is set as an "instanceof" conditional, but it does not exist.');
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
         $def->setInstanceofConditionals([
@@ -202,7 +202,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
             ->setAutowired(true);
 
         (new ResolveInstanceofConditionalsPass())->process($container);
-        $this->assertTrue($container->hasDefinition('normal_service'));
+        self::assertTrue($container->hasDefinition('normal_service'));
     }
 
     /**
@@ -225,21 +225,17 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $container->registerForAutoconfiguration(self::class)->addMethodCall('callBar');
 
         $def = $container->register('foo', self::class)->setAutoconfigured(true)->addMethodCall('isBaz');
-        $this->assertEquals(
-            [['isBaz', []]],
-            $def->getMethodCalls(),
-            'Definition shouldn\'t have only one method call.'
-        );
+        self::assertEquals([['isBaz', []]], $def->getMethodCalls(), 'Definition shouldn\'t have only one method call.');
 
         (new ResolveInstanceofConditionalsPass())->process($container);
 
-        $this->assertEquals($expected, $container->findDefinition('foo')->getMethodCalls());
+        self::assertEquals($expected, $container->findDefinition('foo')->getMethodCalls());
     }
 
     public function testProcessThrowsExceptionForArguments()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Autoconfigured instanceof for type "PHPUnit[\\\\_]Framework[\\\\_]TestCase" defines arguments but these are not supported and should be removed\./');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/Autoconfigured instanceof for type "PHPUnit[\\\\_]Framework[\\\\_]TestCase" defines arguments but these are not supported and should be removed\./');
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(parent::class)
             ->addArgument('bar');
@@ -266,11 +262,11 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         $abstract = $container->getDefinition('.abstract.instanceof.bar');
 
-        $this->assertEmpty($abstract->getArguments());
-        $this->assertEmpty($abstract->getMethodCalls());
-        $this->assertNull($abstract->getDecoratedService());
-        $this->assertEmpty($abstract->getTags());
-        $this->assertTrue($abstract->isAbstract());
+        self::assertEmpty($abstract->getArguments());
+        self::assertEmpty($abstract->getMethodCalls());
+        self::assertNull($abstract->getDecoratedService());
+        self::assertEmpty($abstract->getTags());
+        self::assertTrue($abstract->isAbstract());
     }
 
     public function testProcessForAutoconfiguredBindings()
@@ -293,7 +289,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
             '$foo' => new BoundArgument(123, false),
             parent::class => new BoundArgument(new Reference('foo'), false),
         ];
-        $this->assertEquals($expected, $container->findDefinition('foo')->getBindings());
+        self::assertEquals($expected, $container->findDefinition('foo')->getBindings());
     }
 
     public function testBindingsOnInstanceofConditionals()
@@ -305,9 +301,9 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
 
         $bindings = $container->getDefinition('foo')->getBindings();
-        $this->assertSame(['$toto'], array_keys($bindings));
-        $this->assertInstanceOf(BoundArgument::class, $bindings['$toto']);
-        $this->assertSame(123, $bindings['$toto']->getValues()[0]);
+        self::assertSame(['$toto'], array_keys($bindings));
+        self::assertInstanceOf(BoundArgument::class, $bindings['$toto']);
+        self::assertSame(123, $bindings['$toto']->getValues()[0]);
     }
 
     public function testDecoratorsAreNotAutomaticallyTagged()
@@ -329,7 +325,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
         (new ResolveChildDefinitionsPass())->process($container);
 
-        $this->assertSame(['manual' => [[]]], $container->getDefinition('decorator')->getTags());
+        self::assertSame(['manual' => [[]]], $container->getDefinition('decorator')->getTags());
     }
 
     public function testDecoratorsKeepBehaviorDescribingTags()
@@ -358,7 +354,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         (new ResolveInstanceofConditionalsPass())->process($container);
 
-        $this->assertEquals([
+        self::assertEquals([
             'container.service_subscriber' => [0 => []],
             'kernel.reset' => [
                 [
@@ -366,7 +362,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
                 ],
             ],
         ], $container->getDefinition('decorator')->getTags());
-        $this->assertFalse($container->hasParameter('container.behavior_describing_tags'));
+        self::assertFalse($container->hasParameter('container.behavior_describing_tags'));
     }
 }
 

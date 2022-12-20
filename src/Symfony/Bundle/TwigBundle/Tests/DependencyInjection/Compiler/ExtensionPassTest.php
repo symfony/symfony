@@ -41,6 +41,6 @@ class ExtensionPassTest extends TestCase
         $extensionPass = new ExtensionPass();
         $extensionPass->process($container);
 
-        $this->assertCount(1, $nativeTwigLoader->getMethodCalls());
+        self::assertCount(1, $nativeTwigLoader->getMethodCalls());
     }
 }

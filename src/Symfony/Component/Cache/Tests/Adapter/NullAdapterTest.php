@@ -30,8 +30,8 @@ class NullAdapterTest extends TestCase
         $adapter = $this->createCachePool();
 
         $item = $adapter->getItem('key');
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get(), "Item's value must be null when isHit is false.");
     }
 
     public function testGet()
@@ -40,16 +40,16 @@ class NullAdapterTest extends TestCase
 
         $fetched = [];
         $adapter->get('myKey', function ($item) use (&$fetched) { $fetched[] = $item; });
-        $this->assertCount(1, $fetched);
+        self::assertCount(1, $fetched);
         $item = $fetched[0];
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
-        $this->assertSame('myKey', $item->getKey());
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get(), "Item's value must be null when isHit is false.");
+        self::assertSame('myKey', $item->getKey());
     }
 
     public function testHasItem()
     {
-        $this->assertFalse($this->createCachePool()->hasItem('key'));
+        self::assertFalse($this->createCachePool()->hasItem('key'));
     }
 
     public function testGetItems()
@@ -65,9 +65,9 @@ class NullAdapterTest extends TestCase
         foreach ($items as $key => $item) {
             $itemKey = $item->getKey();
 
-            $this->assertEquals($itemKey, $key, 'Keys must be preserved when fetching multiple items');
-            $this->assertContains($key, $keys, 'Cache key cannot change.');
-            $this->assertFalse($item->isHit());
+            self::assertEquals($itemKey, $key, 'Keys must be preserved when fetching multiple items');
+            self::assertContains($key, $keys, 'Cache key cannot change.');
+            self::assertFalse($item->isHit());
 
             // Remove $key for $keys
             foreach ($keys as $k => $v) {
@@ -79,7 +79,7 @@ class NullAdapterTest extends TestCase
             ++$count;
         }
 
-        $this->assertSame(4, $count);
+        self::assertSame(4, $count);
     }
 
     public function testIsHit()
@@ -87,22 +87,22 @@ class NullAdapterTest extends TestCase
         $adapter = $this->createCachePool();
 
         $item = $adapter->getItem('key');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
     }
 
     public function testClear()
     {
-        $this->assertTrue($this->createCachePool()->clear());
+        self::assertTrue($this->createCachePool()->clear());
     }
 
     public function testDeleteItem()
     {
-        $this->assertTrue($this->createCachePool()->deleteItem('key'));
+        self::assertTrue($this->createCachePool()->deleteItem('key'));
     }
 
     public function testDeleteItems()
     {
-        $this->assertTrue($this->createCachePool()->deleteItems(['key', 'foo', 'bar']));
+        self::assertTrue($this->createCachePool()->deleteItems(['key', 'foo', 'bar']));
     }
 
     public function testSave()
@@ -110,10 +110,10 @@ class NullAdapterTest extends TestCase
         $adapter = $this->createCachePool();
 
         $item = $adapter->getItem('key');
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get(), "Item's value must be null when isHit is false.");
 
-        $this->assertTrue($adapter->save($item));
+        self::assertTrue($adapter->save($item));
     }
 
     public function testDeferredSave()
@@ -121,10 +121,10 @@ class NullAdapterTest extends TestCase
         $adapter = $this->createCachePool();
 
         $item = $adapter->getItem('key');
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get(), "Item's value must be null when isHit is false.");
 
-        $this->assertTrue($adapter->saveDeferred($item));
+        self::assertTrue($adapter->saveDeferred($item));
     }
 
     public function testCommit()
@@ -132,10 +132,10 @@ class NullAdapterTest extends TestCase
         $adapter = $this->createCachePool();
 
         $item = $adapter->getItem('key');
-        $this->assertFalse($item->isHit());
-        $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
+        self::assertFalse($item->isHit());
+        self::assertNull($item->get(), "Item's value must be null when isHit is false.");
 
-        $this->assertTrue($adapter->saveDeferred($item));
-        $this->assertTrue($this->createCachePool()->commit());
+        self::assertTrue($adapter->saveDeferred($item));
+        self::assertTrue($this->createCachePool()->commit());
     }
 }

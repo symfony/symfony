@@ -35,17 +35,17 @@ class HtmlDescriptorTest extends TestCase
     public function testItOutputsStylesAndScriptsOnFirstDescribeCall()
     {
         $output = new BufferedOutput();
-        $dumper = $this->createMock(HtmlDumper::class);
+        $dumper = self::createMock(HtmlDumper::class);
         $dumper->method('dump')->willReturn('[DUMPED]');
         $descriptor = new HtmlDescriptor($dumper);
 
         $descriptor->describe($output, new Data([[123]]), ['timestamp' => 1544804268.3668], 1);
 
-        $this->assertStringMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output');
+        self::assertStringMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output');
 
         $descriptor->describe($output, new Data([[123]]), ['timestamp' => 1544804268.3668], 1);
 
-        $this->assertStringNotMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output only once');
+        self::assertStringNotMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output only once');
     }
 
     /**
@@ -54,13 +54,13 @@ class HtmlDescriptorTest extends TestCase
     public function testDescribe(array $context, string $expectedOutput)
     {
         $output = new BufferedOutput();
-        $dumper = $this->createMock(HtmlDumper::class);
+        $dumper = self::createMock(HtmlDumper::class);
         $dumper->method('dump')->willReturn('[DUMPED]');
         $descriptor = new HtmlDescriptor($dumper);
 
         $descriptor->describe($output, new Data([[123]]), $context + ['timestamp' => 1544804268.3668], 1);
 
-        $this->assertStringMatchesFormat(trim($expectedOutput), trim(preg_replace('@<style>.*</style><script>.*</script>@s', '', $output->fetch())));
+        self::assertStringMatchesFormat(trim($expectedOutput), trim(preg_replace('@<style>.*</style><script>.*</script>@s', '', $output->fetch())));
     }
 
     public function provideContext()

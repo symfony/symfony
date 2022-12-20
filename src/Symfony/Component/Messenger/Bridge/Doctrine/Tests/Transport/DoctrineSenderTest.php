@@ -27,10 +27,10 @@ class DoctrineSenderTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'])->willReturn('15');
+        $connection = self::createMock(Connection::class);
+        $connection->expects(self::once())->method('send')->with($encoded['body'], $encoded['headers'])->willReturn('15');
 
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new DoctrineSender($connection, $serializer);
@@ -38,8 +38,8 @@ class DoctrineSenderTest extends TestCase
 
         /** @var TransportMessageIdStamp $transportMessageIdStamp */
         $transportMessageIdStamp = $actualEnvelope->last(TransportMessageIdStamp::class);
-        $this->assertNotNull($transportMessageIdStamp);
-        $this->assertSame('15', $transportMessageIdStamp->getId());
+        self::assertNotNull($transportMessageIdStamp);
+        self::assertSame('15', $transportMessageIdStamp->getId());
     }
 
     public function testSendWithDelay()
@@ -47,10 +47,10 @@ class DoctrineSenderTest extends TestCase
         $envelope = (new Envelope(new DummyMessage('Oy')))->with(new DelayStamp(500));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 500);
+        $connection = self::createMock(Connection::class);
+        $connection->expects(self::once())->method('send')->with($encoded['body'], $encoded['headers'], 500);
 
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new DoctrineSender($connection, $serializer);

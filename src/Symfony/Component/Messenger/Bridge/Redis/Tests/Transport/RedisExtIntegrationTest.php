@@ -29,7 +29,7 @@ class RedisExtIntegrationTest extends TestCase
     protected function setUp(): void
     {
         if (!getenv('MESSENGER_REDIS_DSN')) {
-            $this->markTestSkipped('The "MESSENGER_REDIS_DSN" environment variable is required.');
+            self::markTestSkipped('The "MESSENGER_REDIS_DSN" environment variable is required.');
         }
 
         try {
@@ -46,7 +46,7 @@ class RedisExtIntegrationTest extends TestCase
     {
         $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $message = $this->connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => '{"message": "Hi"}',
                 'headers' => ['type' => DummyMessage::class],
@@ -59,14 +59,14 @@ class RedisExtIntegrationTest extends TestCase
         $this->connection->add('{"message": "Hi1"}', ['type' => DummyMessage::class]);
         $this->connection->add('{"message": "Hi2"}', ['type' => DummyMessage::class]);
         $message = $this->connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => '{"message": "Hi1"}',
                 'headers' => ['type' => DummyMessage::class],
             ]),
         ], $message['data']);
         $message = $this->connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => '{"message": "Hi2"}',
                 'headers' => ['type' => DummyMessage::class],
@@ -83,7 +83,7 @@ class RedisExtIntegrationTest extends TestCase
         $this->connection->add($body, $headers);
 
         $message = $this->connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => $body,
                 'headers' => $headers,
@@ -91,7 +91,7 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
 
         $message = $this->connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => $body,
                 'headers' => $headers,
@@ -103,10 +103,10 @@ class RedisExtIntegrationTest extends TestCase
     {
         $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class], 500);
         $message = $this->connection->get();
-        $this->assertNull($message);
+        self::assertNull($message);
         sleep(2);
         $message = $this->connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => '{"message": "Hi"}',
                 'headers' => ['type' => DummyMessage::class],
@@ -123,7 +123,7 @@ class RedisExtIntegrationTest extends TestCase
         $this->connection->add($body, $headers, 500);
         sleep(2);
         $message = $this->connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => $body,
                 'headers' => $headers,
@@ -131,7 +131,7 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
 
         $message = $this->connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => $body,
                 'headers' => $headers,
@@ -162,7 +162,7 @@ class RedisExtIntegrationTest extends TestCase
         );
 
         // Queue will not have any messages yet
-        $this->assertNull($connection->get());
+        self::assertNull($connection->get());
     }
 
     public function testConnectionClaimAndRedeliver()
@@ -195,7 +195,7 @@ class RedisExtIntegrationTest extends TestCase
 
         // Queue will return the pending message first because redeliver_timeout = 0
         $message = $connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => $body1,
                 'headers' => $headers,
@@ -205,7 +205,7 @@ class RedisExtIntegrationTest extends TestCase
 
         // Queue will return the second message
         $message = $connection->get();
-        $this->assertEquals([
+        self::assertEquals([
             'message' => json_encode([
                 'body' => $body2,
                 'headers' => $headers,
@@ -225,8 +225,8 @@ class RedisExtIntegrationTest extends TestCase
         );
 
         $connection->add('1', []);
-        $this->assertNotEmpty($message = $connection->get());
-        $this->assertSame([
+        self::assertNotEmpty($message = $connection->get());
+        self::assertSame([
             'message' => json_encode([
                 'body' => '1',
                 'headers' => [],
@@ -242,8 +242,8 @@ class RedisExtIntegrationTest extends TestCase
         $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', ['delete_after_ack' => true], $redis);
 
         $connection->add('1', []);
-        $this->assertNotEmpty($message = $connection->get());
-        $this->assertSame([
+        self::assertNotEmpty($message = $connection->get());
+        self::assertSame([
             'message' => json_encode([
                 'body' => '1',
                 'headers' => [],
@@ -259,7 +259,7 @@ class RedisExtIntegrationTest extends TestCase
 
         Connection::fromDsn('redis://localhost/queue?dbindex=2', ['delete_after_ack' => true], $redis);
 
-        $this->assertSame(2, $redis->getDbNum());
+        self::assertSame(2, $redis->getDbNum());
     }
 
     public function testFromDsnWithMultipleHosts()
@@ -273,7 +273,7 @@ class RedisExtIntegrationTest extends TestCase
         }, $hosts);
         $dsn = implode(',', $dsn);
 
-        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['delete_after_ack' => true]));
+        self::assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['delete_after_ack' => true]));
     }
 
     public function testJsonError()
@@ -285,7 +285,7 @@ class RedisExtIntegrationTest extends TestCase
         } catch (TransportException $e) {
         }
 
-        $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
+        self::assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
     }
 
     public function testGetNonBlocking()
@@ -294,9 +294,9 @@ class RedisExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn('redis://localhost/messenger-getnonblocking', ['delete_after_ack' => true], $redis);
 
-        $this->assertNull($connection->get()); // no message, should return null immediately
+        self::assertNull($connection->get()); // no message, should return null immediately
         $connection->add('1', []);
-        $this->assertNotEmpty($message = $connection->get());
+        self::assertNotEmpty($message = $connection->get());
         $connection->reject($message['id']);
         $redis->del('messenger-getnonblocking');
     }
@@ -313,7 +313,7 @@ class RedisExtIntegrationTest extends TestCase
         $connection->reject($failing['id']);
 
         $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['delete_after_ack' => true]);
-        $this->assertNotNull($connection->get());
+        self::assertNotNull($connection->get());
 
         $redis->del('messenger-rejectthenget');
     }

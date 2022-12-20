@@ -20,15 +20,15 @@ class DoctrineClearEntityManagerWorkerSubscriberTest extends MiddlewareTestCase
 {
     public function testMiddlewareClearEntityManager()
     {
-        $entityManager1 = $this->createMock(EntityManagerInterface::class);
-        $entityManager1->expects($this->once())
+        $entityManager1 = self::createMock(EntityManagerInterface::class);
+        $entityManager1->expects(self::once())
             ->method('clear');
 
-        $entityManager2 = $this->createMock(EntityManagerInterface::class);
-        $entityManager2->expects($this->once())
+        $entityManager2 = self::createMock(EntityManagerInterface::class);
+        $entityManager2->expects(self::once())
             ->method('clear');
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = self::createMock(ManagerRegistry::class);
         $managerRegistry
             ->method('getManagers')
             ->with()

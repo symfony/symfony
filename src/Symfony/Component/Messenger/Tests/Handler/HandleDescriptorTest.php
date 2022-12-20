@@ -24,7 +24,7 @@ class HandleDescriptorTest extends TestCase
     {
         $descriptor = new HandlerDescriptor($handler);
 
-        $this->assertStringMatchesFormat($expectedHandlerString, $descriptor->getName());
+        self::assertStringMatchesFormat($expectedHandlerString, $descriptor->getName());
     }
 
     public function provideHandlers(): iterable

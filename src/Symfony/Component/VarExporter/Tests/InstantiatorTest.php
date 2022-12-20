@@ -20,8 +20,8 @@ class InstantiatorTest extends TestCase
 {
     public function testNotFoundClass()
     {
-        $this->expectException(ClassNotFoundException::class);
-        $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
+        self::expectException(ClassNotFoundException::class);
+        self::expectExceptionMessage('Class "SomeNotExistingClass" not found.');
         Instantiator::instantiate('SomeNotExistingClass');
     }
 
@@ -30,8 +30,8 @@ class InstantiatorTest extends TestCase
      */
     public function testFailingInstantiation(string $class)
     {
-        $this->expectException(NotInstantiableTypeException::class);
-        $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
+        self::expectException(NotInstantiableTypeException::class);
+        self::expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         Instantiator::instantiate($class);
     }
 
@@ -46,9 +46,9 @@ class InstantiatorTest extends TestCase
 
     public function testInstantiate()
     {
-        $this->assertEquals((object) ['p' => 123], Instantiator::instantiate('stdClass', ['p' => 123]));
-        $this->assertEquals((object) ['p' => 123], Instantiator::instantiate('STDcLASS', ['p' => 123]));
-        $this->assertEquals(new \ArrayObject([123]), Instantiator::instantiate(\ArrayObject::class, ["\0" => [[123]]]));
+        self::assertEquals((object) ['p' => 123], Instantiator::instantiate('stdClass', ['p' => 123]));
+        self::assertEquals((object) ['p' => 123], Instantiator::instantiate('STDcLASS', ['p' => 123]));
+        self::assertEquals(new \ArrayObject([123]), Instantiator::instantiate(\ArrayObject::class, ["\0" => [[123]]]));
 
         $expected = [
             "\0".__NAMESPACE__."\Bar\0priv" => 123,
@@ -59,11 +59,11 @@ class InstantiatorTest extends TestCase
         $actual = (array) Instantiator::instantiate(Bar::class, ['dyn' => 345, 'priv' => 123], [Foo::class => ['priv' => 234]]);
         ksort($actual);
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
 
         $e = Instantiator::instantiate('Exception', ['trace' => [234]]);
 
-        $this->assertSame([234], $e->getTrace());
+        self::assertSame([234], $e->getTrace());
     }
 }
 

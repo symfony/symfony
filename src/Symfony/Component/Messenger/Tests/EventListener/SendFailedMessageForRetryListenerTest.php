@@ -27,11 +27,11 @@ class SendFailedMessageForRetryListenerTest extends TestCase
 {
     public function testNoRetryStrategyCausesNoRetry()
     {
-        $senderLocator = $this->createMock(ContainerInterface::class);
-        $senderLocator->expects($this->never())->method('has');
-        $senderLocator->expects($this->never())->method('get');
-        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
-        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(false);
+        $senderLocator = self::createMock(ContainerInterface::class);
+        $senderLocator->expects(self::never())->method('has');
+        $senderLocator->expects(self::never())->method('get');
+        $retryStrategyLocator = self::createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects(self::once())->method('has')->willReturn(false);
 
         $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
 
@@ -44,30 +44,30 @@ class SendFailedMessageForRetryListenerTest extends TestCase
 
     public function testRecoverableStrategyCausesRetry()
     {
-        $sender = $this->createMock(SenderInterface::class);
-        $sender->expects($this->once())->method('send')->willReturnCallback(function (Envelope $envelope) {
+        $sender = self::createMock(SenderInterface::class);
+        $sender->expects(self::once())->method('send')->willReturnCallback(function (Envelope $envelope) {
             /** @var DelayStamp $delayStamp */
             $delayStamp = $envelope->last(DelayStamp::class);
             /** @var RedeliveryStamp $redeliveryStamp */
             $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
 
-            $this->assertInstanceOf(DelayStamp::class, $delayStamp);
-            $this->assertSame(1000, $delayStamp->getDelay());
+            self::assertInstanceOf(DelayStamp::class, $delayStamp);
+            self::assertSame(1000, $delayStamp->getDelay());
 
-            $this->assertInstanceOf(RedeliveryStamp::class, $redeliveryStamp);
-            $this->assertSame(1, $redeliveryStamp->getRetryCount());
+            self::assertInstanceOf(RedeliveryStamp::class, $redeliveryStamp);
+            self::assertSame(1, $redeliveryStamp->getRetryCount());
 
             return $envelope;
         });
-        $senderLocator = $this->createMock(ContainerInterface::class);
-        $senderLocator->expects($this->once())->method('has')->willReturn(true);
-        $senderLocator->expects($this->once())->method('get')->willReturn($sender);
-        $retryStategy = $this->createMock(RetryStrategyInterface::class);
-        $retryStategy->expects($this->never())->method('isRetryable');
-        $retryStategy->expects($this->once())->method('getWaitingTime')->willReturn(1000);
-        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
-        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
-        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
+        $senderLocator = self::createMock(ContainerInterface::class);
+        $senderLocator->expects(self::once())->method('has')->willReturn(true);
+        $senderLocator->expects(self::once())->method('get')->willReturn($sender);
+        $retryStategy = self::createMock(RetryStrategyInterface::class);
+        $retryStategy->expects(self::never())->method('isRetryable');
+        $retryStategy->expects(self::once())->method('getWaitingTime')->willReturn(1000);
+        $retryStrategyLocator = self::createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects(self::once())->method('has')->willReturn(true);
+        $retryStrategyLocator->expects(self::once())->method('get')->willReturn($retryStategy);
 
         $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
 
@@ -83,33 +83,33 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $exception = new \Exception('no!');
         $envelope = new Envelope(new \stdClass());
 
-        $sender = $this->createMock(SenderInterface::class);
-        $sender->expects($this->once())->method('send')->willReturnCallback(function (Envelope $envelope) {
+        $sender = self::createMock(SenderInterface::class);
+        $sender->expects(self::once())->method('send')->willReturnCallback(function (Envelope $envelope) {
             /** @var DelayStamp $delayStamp */
             $delayStamp = $envelope->last(DelayStamp::class);
             /** @var RedeliveryStamp $redeliveryStamp */
             $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
 
-            $this->assertInstanceOf(DelayStamp::class, $delayStamp);
-            $this->assertSame(1000, $delayStamp->getDelay());
+            self::assertInstanceOf(DelayStamp::class, $delayStamp);
+            self::assertSame(1000, $delayStamp->getDelay());
 
-            $this->assertInstanceOf(RedeliveryStamp::class, $redeliveryStamp);
-            $this->assertSame(1, $redeliveryStamp->getRetryCount());
+            self::assertInstanceOf(RedeliveryStamp::class, $redeliveryStamp);
+            self::assertSame(1, $redeliveryStamp->getRetryCount());
 
             return $envelope;
         });
-        $senderLocator = $this->createMock(ContainerInterface::class);
-        $senderLocator->expects($this->once())->method('has')->willReturn(true);
-        $senderLocator->expects($this->once())->method('get')->willReturn($sender);
-        $retryStategy = $this->createMock(RetryStrategyInterface::class);
-        $retryStategy->expects($this->once())->method('isRetryable')->willReturn(true);
-        $retryStategy->expects($this->once())->method('getWaitingTime')->willReturn(1000);
-        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
-        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
-        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
+        $senderLocator = self::createMock(ContainerInterface::class);
+        $senderLocator->expects(self::once())->method('has')->willReturn(true);
+        $senderLocator->expects(self::once())->method('get')->willReturn($sender);
+        $retryStategy = self::createMock(RetryStrategyInterface::class);
+        $retryStategy->expects(self::once())->method('isRetryable')->willReturn(true);
+        $retryStategy->expects(self::once())->method('getWaitingTime')->willReturn(1000);
+        $retryStrategyLocator = self::createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects(self::once())->method('has')->willReturn(true);
+        $retryStrategyLocator->expects(self::once())->method('get')->willReturn($retryStategy);
 
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects($this->once())->method('dispatch');
+        $eventDispatcher = self::createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects(self::once())->method('dispatch');
 
         $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator, null, $eventDispatcher);
 
@@ -123,30 +123,30 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $exception = new \Exception('no!');
         $envelope = new Envelope(new \stdClass());
 
-        $sender = $this->createMock(SenderInterface::class);
-        $sender->expects($this->once())->method('send')->willReturnCallback(function (Envelope $envelope) {
+        $sender = self::createMock(SenderInterface::class);
+        $sender->expects(self::once())->method('send')->willReturnCallback(function (Envelope $envelope) {
             /** @var DelayStamp $delayStamp */
             $delayStamp = $envelope->last(DelayStamp::class);
             /** @var RedeliveryStamp $redeliveryStamp */
             $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
 
-            $this->assertInstanceOf(DelayStamp::class, $delayStamp);
-            $this->assertSame(1000, $delayStamp->getDelay());
+            self::assertInstanceOf(DelayStamp::class, $delayStamp);
+            self::assertSame(1000, $delayStamp->getDelay());
 
-            $this->assertInstanceOf(RedeliveryStamp::class, $redeliveryStamp);
-            $this->assertSame(1, $redeliveryStamp->getRetryCount());
+            self::assertInstanceOf(RedeliveryStamp::class, $redeliveryStamp);
+            self::assertSame(1, $redeliveryStamp->getRetryCount());
 
             return $envelope;
         });
-        $senderLocator = $this->createMock(ContainerInterface::class);
-        $senderLocator->expects($this->once())->method('has')->willReturn(true);
-        $senderLocator->expects($this->once())->method('get')->willReturn($sender);
-        $retryStategy = $this->createMock(RetryStrategyInterface::class);
-        $retryStategy->expects($this->once())->method('isRetryable')->with($envelope, $exception)->willReturn(true);
-        $retryStategy->expects($this->once())->method('getWaitingTime')->with($envelope, $exception)->willReturn(1000);
-        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
-        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
-        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStategy);
+        $senderLocator = self::createMock(ContainerInterface::class);
+        $senderLocator->expects(self::once())->method('has')->willReturn(true);
+        $senderLocator->expects(self::once())->method('get')->willReturn($sender);
+        $retryStategy = self::createMock(RetryStrategyInterface::class);
+        $retryStategy->expects(self::once())->method('isRetryable')->with($envelope, $exception)->willReturn(true);
+        $retryStategy->expects(self::once())->method('getWaitingTime')->with($envelope, $exception)->willReturn(1000);
+        $retryStrategyLocator = self::createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects(self::once())->method('has')->willReturn(true);
+        $retryStrategyLocator->expects(self::once())->method('get')->willReturn($retryStategy);
 
         $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
 
@@ -164,25 +164,25 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         );
         $envelope = new Envelope(new \stdClass(), $stamps);
 
-        $sender = $this->createMock(SenderInterface::class);
-        $sender->expects($this->once())->method('send')->willReturnCallback(function (Envelope $envelope) {
+        $sender = self::createMock(SenderInterface::class);
+        $sender->expects(self::once())->method('send')->willReturnCallback(function (Envelope $envelope) {
             $delayStamps = $envelope->all(DelayStamp::class);
             $redeliveryStamps = $envelope->all(RedeliveryStamp::class);
 
-            $this->assertCount(10, $delayStamps);
-            $this->assertCount(4, $redeliveryStamps);
+            self::assertCount(10, $delayStamps);
+            self::assertCount(4, $redeliveryStamps);
 
             return $envelope;
         });
-        $senderLocator = $this->createMock(ContainerInterface::class);
-        $senderLocator->expects($this->once())->method('has')->willReturn(true);
-        $senderLocator->expects($this->once())->method('get')->willReturn($sender);
-        $retryStrategy = $this->createMock(RetryStrategyInterface::class);
-        $retryStrategy->expects($this->once())->method('isRetryable')->willReturn(true);
-        $retryStrategy->expects($this->once())->method('getWaitingTime')->willReturn(1000);
-        $retryStrategyLocator = $this->createMock(ContainerInterface::class);
-        $retryStrategyLocator->expects($this->once())->method('has')->willReturn(true);
-        $retryStrategyLocator->expects($this->once())->method('get')->willReturn($retryStrategy);
+        $senderLocator = self::createMock(ContainerInterface::class);
+        $senderLocator->expects(self::once())->method('has')->willReturn(true);
+        $senderLocator->expects(self::once())->method('get')->willReturn($sender);
+        $retryStrategy = self::createMock(RetryStrategyInterface::class);
+        $retryStrategy->expects(self::once())->method('isRetryable')->willReturn(true);
+        $retryStrategy->expects(self::once())->method('getWaitingTime')->willReturn(1000);
+        $retryStrategyLocator = self::createMock(ContainerInterface::class);
+        $retryStrategyLocator->expects(self::once())->method('has')->willReturn(true);
+        $retryStrategyLocator->expects(self::once())->method('get')->willReturn($retryStrategy);
 
         $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
 

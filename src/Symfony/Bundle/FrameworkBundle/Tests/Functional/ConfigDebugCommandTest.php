@@ -27,7 +27,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     protected function setUp(): void
     {
-        $kernel = static::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
+        $kernel = self::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);
         $this->application->doRun(new ArrayInput([]), new NullOutput());
     }
@@ -37,8 +37,8 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'TestBundle']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('custom: foo', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('custom: foo', $tester->getDisplay());
     }
 
     public function testDumpBundleOption()
@@ -46,8 +46,8 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'TestBundle', 'path' => 'custom']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('foo', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('foo', $tester->getDisplay());
     }
 
     public function testParametersValuesAreResolved()
@@ -55,9 +55,9 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'framework']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString("locale: '%env(LOCALE)%'", $tester->getDisplay());
-        $this->assertStringContainsString('secret: test', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString("locale: '%env(LOCALE)%'", $tester->getDisplay());
+        self::assertStringContainsString('secret: test', $tester->getDisplay());
     }
 
     public function testDefaultParameterValueIsResolvedIfConfigIsExisting()
@@ -65,9 +65,9 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'framework']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
         $kernelCacheDir = $this->application->getKernel()->getContainer()->getParameter('kernel.cache_dir');
-        $this->assertStringContainsString(sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
+        self::assertStringContainsString(sprintf("dsn: 'file:%s/profiler'", $kernelCacheDir), $tester->getDisplay());
     }
 
     public function testDumpExtensionConfigWithoutBundle()
@@ -75,8 +75,8 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'test_dump']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('enabled: true', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('enabled: true', $tester->getDisplay());
     }
 
     public function testDumpUndefinedBundleOption()
@@ -84,7 +84,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $tester->execute(['name' => 'TestBundle', 'path' => 'foo']);
 
-        $this->assertStringContainsString('Unable to find configuration for "test.foo"', $tester->getDisplay());
+        self::assertStringContainsString('Unable to find configuration for "test.foo"', $tester->getDisplay());
     }
 
     public function testDumpWithPrefixedEnv()
@@ -92,7 +92,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $tester->execute(['name' => 'FrameworkBundle']);
 
-        $this->assertStringContainsString("cookie_httponly: '%env(bool:COOKIE_HTTPONLY)%'", $tester->getDisplay());
+        self::assertStringContainsString("cookie_httponly: '%env(bool:COOKIE_HTTPONLY)%'", $tester->getDisplay());
     }
 
     public function testDumpFallsBackToDefaultConfigAndResolvesParameterValue()
@@ -100,8 +100,8 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'DefaultConfigTestBundle']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('foo: bar', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('foo: bar', $tester->getDisplay());
     }
 
     public function testDumpFallsBackToDefaultConfigAndResolvesEnvPlaceholder()
@@ -109,14 +109,14 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'DefaultConfigTestBundle']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString("baz: '%env(BAZ)%'", $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString("baz: '%env(BAZ)%'", $tester->getDisplay());
     }
 
     public function testDumpThrowsExceptionWhenDefaultConfigFallbackIsImpossible()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The extension with alias "extension_without_config_test" does not have configuration.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('The extension with alias "extension_without_config_test" does not have configuration.');
 
         $tester = $this->createCommandTester();
         $tester->execute(['name' => 'ExtensionWithoutConfigTestBundle']);
@@ -134,7 +134,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $suggestions = $tester->complete($input);
 
         foreach ($expectedSuggestions as $expectedSuggestion) {
-            $this->assertContains($expectedSuggestion, $suggestions);
+            self::assertContains($expectedSuggestion, $suggestions);
         }
     }
 

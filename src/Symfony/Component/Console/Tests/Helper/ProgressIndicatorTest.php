@@ -45,23 +45,20 @@ class ProgressIndicatorTest extends TestCase
 
         rewind($output->getStream());
 
-        $this->assertEquals(
-            $this->generateOutput(' - Starting...').
-            $this->generateOutput(' \\ Starting...').
-            $this->generateOutput(' | Starting...').
-            $this->generateOutput(' / Starting...').
-            $this->generateOutput(' - Starting...').
-            $this->generateOutput(' \\ Starting...').
-            $this->generateOutput(' \\ Advancing...').
-            $this->generateOutput(' | Advancing...').
-            $this->generateOutput(' | Done...').
-            \PHP_EOL.
-            $this->generateOutput(' - Starting Again...').
-            $this->generateOutput(' \\ Starting Again...').
-            $this->generateOutput(' \\ Done Again...').
-            \PHP_EOL,
-            stream_get_contents($output->getStream())
-        );
+        self::assertEquals($this->generateOutput(' - Starting...').
+        $this->generateOutput(' \\ Starting...').
+        $this->generateOutput(' | Starting...').
+        $this->generateOutput(' / Starting...').
+        $this->generateOutput(' - Starting...').
+        $this->generateOutput(' \\ Starting...').
+        $this->generateOutput(' \\ Advancing...').
+        $this->generateOutput(' | Advancing...').
+        $this->generateOutput(' | Done...').
+        \PHP_EOL.
+        $this->generateOutput(' - Starting Again...').
+        $this->generateOutput(' \\ Starting Again...').
+        $this->generateOutput(' \\ Done Again...').
+        \PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testNonDecoratedOutput()
@@ -78,12 +75,9 @@ class ProgressIndicatorTest extends TestCase
 
         rewind($output->getStream());
 
-        $this->assertEquals(
-            ' Starting...'.\PHP_EOL.
-            ' Midway...'.\PHP_EOL.
-            ' Done...'.\PHP_EOL.\PHP_EOL,
-            stream_get_contents($output->getStream())
-        );
+        self::assertEquals(' Starting...'.\PHP_EOL.
+        ' Midway...'.\PHP_EOL.
+        ' Done...'.\PHP_EOL.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testCustomIndicatorValues()
@@ -100,26 +94,23 @@ class ProgressIndicatorTest extends TestCase
 
         rewind($output->getStream());
 
-        $this->assertEquals(
-            $this->generateOutput(' a Starting...').
-            $this->generateOutput(' b Starting...').
-            $this->generateOutput(' c Starting...').
-            $this->generateOutput(' a Starting...'),
-            stream_get_contents($output->getStream())
-        );
+        self::assertEquals($this->generateOutput(' a Starting...').
+        $this->generateOutput(' b Starting...').
+        $this->generateOutput(' c Starting...').
+        $this->generateOutput(' a Starting...'), stream_get_contents($output->getStream()));
     }
 
     public function testCannotSetInvalidIndicatorCharacters()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Must have at least 2 indicator value characters.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Must have at least 2 indicator value characters.');
         new ProgressIndicator($this->getOutputStream(), null, 100, ['1']);
     }
 
     public function testCannotStartAlreadyStartedIndicator()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Progress indicator already started.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Progress indicator already started.');
         $bar = new ProgressIndicator($this->getOutputStream());
         $bar->start('Starting...');
         $bar->start('Starting Again.');
@@ -127,16 +118,16 @@ class ProgressIndicatorTest extends TestCase
 
     public function testCannotAdvanceUnstartedIndicator()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Progress indicator has not yet been started.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Progress indicator has not yet been started.');
         $bar = new ProgressIndicator($this->getOutputStream());
         $bar->advance();
     }
 
     public function testCannotFinishUnstartedIndicator()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Progress indicator has not yet been started.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Progress indicator has not yet been started.');
         $bar = new ProgressIndicator($this->getOutputStream());
         $bar->finish('Finished');
     }
@@ -152,7 +143,7 @@ class ProgressIndicatorTest extends TestCase
 
         rewind($output->getStream());
 
-        $this->assertNotEmpty(stream_get_contents($output->getStream()));
+        self::assertNotEmpty(stream_get_contents($output->getStream()));
     }
 
     /**

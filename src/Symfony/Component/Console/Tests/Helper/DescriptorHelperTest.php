@@ -25,6 +25,6 @@ class DescriptorHelperTest extends TestCase
             'json',
             'md',
         ];
-        $this->assertSame($expectedFormats, $helper->getFormats());
+        self::assertSame($expectedFormats, $helper->getFormats());
     }
 }

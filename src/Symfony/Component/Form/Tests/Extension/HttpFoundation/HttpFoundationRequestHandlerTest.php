@@ -24,13 +24,13 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
 {
     public function testRequestShouldNotBeNull()
     {
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'));
     }
 
     public function testRequestShouldBeInstanceOfRequest()
     {
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'), new \stdClass());
     }
 

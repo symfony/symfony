@@ -31,23 +31,23 @@ class MergeExtensionConfigurationPassTest extends TestCase
     {
         $tmpProviders = [];
 
-        $extension = $this->createMock(ExtensionInterface::class);
-        $extension->expects($this->any())
+        $extension = self::createMock(ExtensionInterface::class);
+        $extension->expects(self::any())
             ->method('getXsdValidationBasePath')
             ->willReturn(false);
-        $extension->expects($this->any())
+        $extension->expects(self::any())
             ->method('getNamespace')
             ->willReturn('http://example.org/schema/dic/foo');
-        $extension->expects($this->any())
+        $extension->expects(self::any())
             ->method('getAlias')
             ->willReturn('foo');
-        $extension->expects($this->once())
+        $extension->expects(self::once())
             ->method('load')
             ->willReturnCallback(function (array $config, ContainerBuilder $container) use (&$tmpProviders) {
                 $tmpProviders = $container->getExpressionLanguageProviders();
             });
 
-        $provider = $this->createMock(ExpressionFunctionProviderInterface::class);
+        $provider = self::createMock(ExpressionFunctionProviderInterface::class);
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
         $container->prependExtensionConfig('foo', ['bar' => true]);
@@ -56,15 +56,15 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertEquals([$provider], $tmpProviders);
+        self::assertEquals([$provider], $tmpProviders);
     }
 
     public function testExtensionLoadGetAMergeExtensionConfigurationContainerBuilderInstance()
     {
-        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(['load'])->getMock();
-        $extension->expects($this->once())
+        $extension = self::getMockBuilder(FooExtension::class)->setMethods(['load'])->getMock();
+        $extension->expects(self::once())
             ->method('load')
-            ->with($this->isType('array'), $this->isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
+            ->with(self::isType('array'), self::isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
         ;
 
         $container = new ContainerBuilder(new ParameterBag());
@@ -77,8 +77,8 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
     public function testExtensionConfigurationIsTrackedByDefault()
     {
-        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(['getConfiguration'])->getMock();
-        $extension->expects($this->exactly(2))
+        $extension = self::getMockBuilder(FooExtension::class)->setMethods(['getConfiguration'])->getMock();
+        $extension->expects(self::exactly(2))
             ->method('getConfiguration')
             ->willReturn(new FooConfiguration());
 
@@ -89,7 +89,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertContainsEquals(new FileResource(__FILE__), $container->getResources());
+        self::assertContainsEquals(new FileResource(__FILE__), $container->getResources());
     }
 
     public function testOverriddenEnvsAreMerged()
@@ -102,14 +102,14 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertSame(['BAZ', 'FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
-        $this->assertSame(['BAZ' => 1, 'FOO' => 0], $container->getEnvCounters());
+        self::assertSame(['BAZ', 'FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        self::assertSame(['BAZ' => 1, 'FOO' => 0], $container->getEnvCounters());
     }
 
     public function testProcessedEnvsAreIncompatibleWithResolve()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Using a cast in "env(int:FOO)" is incompatible with resolution at compile time in "Symfony\Component\DependencyInjection\Tests\Compiler\BarExtension". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Using a cast in "env(int:FOO)" is incompatible with resolution at compile time in "Symfony\Component\DependencyInjection\Tests\Compiler\BarExtension". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.');
         $container = new ContainerBuilder();
         $container->registerExtension(new BarExtension());
         $container->prependExtensionConfig('bar', []);
@@ -126,17 +126,17 @@ class MergeExtensionConfigurationPassTest extends TestCase
         try {
             $pass = new MergeExtensionConfigurationPass();
             $pass->process($container);
-            $this->fail('An exception should have been thrown.');
+            self::fail('An exception should have been thrown.');
         } catch (\Exception $e) {
         }
 
-        $this->assertSame(['FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        self::assertSame(['FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
     }
 
     public function testReuseEnvPlaceholderGeneratedByPreviousExtension()
     {
         if (!property_exists(BaseNode::class, 'placeholderUniquePrefixes')) {
-            $this->markTestSkipped('This test requires symfony/config ^4.4.11|^5.0.11|^5.1.3');
+            self::markTestSkipped('This test requires symfony/config ^4.4.11|^5.0.11|^5.1.3');
         }
 
         $container = new ContainerBuilder();
@@ -147,7 +147,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
         (new MergeExtensionConfigurationPass())->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 }
 

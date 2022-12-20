@@ -36,9 +36,9 @@ class IntlBundleReaderTest extends TestCase
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro');
 
-        $this->assertInstanceOf(\ArrayAccess::class, $data);
-        $this->assertSame('Bar', $data['Foo']);
-        $this->assertArrayNotHasKey('ExistsNot', $data);
+        self::assertInstanceOf(\ArrayAccess::class, $data);
+        self::assertSame('Bar', $data['Foo']);
+        self::assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadFollowsAlias()
@@ -46,9 +46,9 @@ class IntlBundleReaderTest extends TestCase
         // "alias" = "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'alias');
 
-        $this->assertInstanceOf(\ArrayAccess::class, $data);
-        $this->assertSame('Bar', $data['Foo']);
-        $this->assertArrayNotHasKey('ExistsNot', $data);
+        self::assertInstanceOf(\ArrayAccess::class, $data);
+        self::assertSame('Bar', $data['Foo']);
+        self::assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadDoesNotFollowFallback()
@@ -56,11 +56,11 @@ class IntlBundleReaderTest extends TestCase
         // "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro_MD');
 
-        $this->assertInstanceOf(\ArrayAccess::class, $data);
-        $this->assertSame('Bam', $data['Baz']);
-        $this->assertArrayNotHasKey('Foo', $data);
-        $this->assertNull($data['Foo']);
-        $this->assertArrayNotHasKey('ExistsNot', $data);
+        self::assertInstanceOf(\ArrayAccess::class, $data);
+        self::assertSame('Bam', $data['Baz']);
+        self::assertArrayNotHasKey('Foo', $data);
+        self::assertNull($data['Foo']);
+        self::assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadDoesNotFollowFallbackAlias()
@@ -68,28 +68,28 @@ class IntlBundleReaderTest extends TestCase
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
 
-        $this->assertInstanceOf(\ArrayAccess::class, $data);
-        $this->assertSame('Bam', $data['Baz'], 'data from the aliased locale can be accessed');
-        $this->assertArrayNotHasKey('Foo', $data);
-        $this->assertNull($data['Foo']);
-        $this->assertArrayNotHasKey('ExistsNot', $data);
+        self::assertInstanceOf(\ArrayAccess::class, $data);
+        self::assertSame('Bam', $data['Baz'], 'data from the aliased locale can be accessed');
+        self::assertArrayNotHasKey('Foo', $data);
+        self::assertNull($data['Foo']);
+        self::assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadFailsIfNonExistingLocale()
     {
-        $this->expectException(ResourceBundleNotFoundException::class);
+        self::expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/res', 'foo');
     }
 
     public function testReadFailsIfNonExistingFallbackLocale()
     {
-        $this->expectException(ResourceBundleNotFoundException::class);
+        self::expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/res', 'ro_AT');
     }
 
     public function testReadFailsIfNonExistingDirectory()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/foo', 'ro');
     }
 }

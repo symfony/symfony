@@ -21,12 +21,12 @@ class NoLimiterTest extends TestCase
     public function testConsume()
     {
         $limiter = new NoLimiter();
-        $this->assertInstanceOf(RateLimit::class, $limiter->consume());
+        self::assertInstanceOf(RateLimit::class, $limiter->consume());
     }
 
     public function testReserve()
     {
         $limiter = new NoLimiter();
-        $this->assertInstanceOf(Reservation::class, $limiter->reserve());
+        self::assertInstanceOf(Reservation::class, $limiter->reserve());
     }
 }

@@ -29,8 +29,8 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
 
     public function testGetThrowsOnUndefinedService()
     {
-        $this->expectException(NotFoundExceptionInterface::class);
-        $this->expectExceptionMessage('Service "dummy" not found: the container inside "Symfony\Component\DependencyInjection\Tests\ServiceLocatorTest" is a smaller service locator that only knows about the "foo" and "bar" services.');
+        self::expectException(NotFoundExceptionInterface::class);
+        self::expectExceptionMessage('Service "dummy" not found: the container inside "Symfony\Component\DependencyInjection\Tests\ServiceLocatorTest" is a smaller service locator that only knows about the "foo" and "bar" services.');
         $locator = $this->getServiceLocator([
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
@@ -41,15 +41,15 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
 
     public function testThrowsOnCircularReference()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
+        self::expectException(ServiceCircularReferenceException::class);
+        self::expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
         parent::testThrowsOnCircularReference();
     }
 
     public function testThrowsInServiceSubscriber()
     {
-        $this->expectException(NotFoundExceptionInterface::class);
-        $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "caller" is a smaller service locator that only knows about the "bar" service. Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "SomeServiceSubscriber::getSubscribedServices()".');
+        self::expectException(NotFoundExceptionInterface::class);
+        self::expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "caller" is a smaller service locator that only knows about the "bar" service. Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "SomeServiceSubscriber::getSubscribedServices()".');
         $container = new Container();
         $container->set('foo', new \stdClass());
         $subscriber = new SomeServiceSubscriber();
@@ -61,8 +61,8 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
 
     public function testGetThrowsServiceNotFoundException()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.');
         $container = new Container();
         $container->set('foo', new \stdClass());
 
@@ -78,9 +78,9 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
             'bar' => function () { return 'baz'; },
         ]);
 
-        $this->assertSame('bar', $locator('foo'));
-        $this->assertSame('baz', $locator('bar'));
-        $this->assertNull($locator('dummy'), '->__invoke() should return null on invalid service');
+        self::assertSame('bar', $locator('foo'));
+        self::assertSame('baz', $locator('bar'));
+        self::assertNull($locator('dummy'), '->__invoke() should return null on invalid service');
     }
 
     public function testProvidesServicesInformation()
@@ -91,7 +91,7 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
             'baz' => function (): ?string { return 'zaz'; },
         ]);
 
-        $this->assertSame($locator->getProvidedServices(), [
+        self::assertSame($locator->getProvidedServices(), [
             'foo' => '?',
             'bar' => 'string',
             'baz' => '?string',

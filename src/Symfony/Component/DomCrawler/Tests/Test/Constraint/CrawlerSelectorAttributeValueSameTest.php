@@ -22,18 +22,18 @@ class CrawlerSelectorAttributeValueSameTest extends TestCase
     public function testConstraint()
     {
         $constraint = new CrawlerSelectorAttributeValueSame('input[name="username"]', 'value', 'Fabien');
-        $this->assertTrue($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username" value="Fabien">'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username">'), '', true));
-        $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
+        self::assertTrue($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username" value="Fabien">'), '', true));
+        self::assertFalse($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username">'), '', true));
+        self::assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
 
         try {
             $constraint->evaluate(new Crawler('<html><head><title>Bar'));
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Crawler has a node matching selector \"input[name=\"username\"]\" with attribute \"value\" of value \"Fabien\".\n", TestFailure::exceptionToString($e));
+            self::assertEquals("Failed asserting that the Crawler has a node matching selector \"input[name=\"username\"]\" with attribute \"value\" of value \"Fabien\".\n", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 }

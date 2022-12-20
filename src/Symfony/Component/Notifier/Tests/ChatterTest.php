@@ -30,8 +30,8 @@ class ChatterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->transport = $this->createMock(TransportInterface::class);
-        $this->bus = $this->createMock(MessageBusInterface::class);
+        $this->transport = self::createMock(TransportInterface::class);
+        $this->bus = self::createMock(MessageBusInterface::class);
     }
 
     public function testSendWithoutBus()
@@ -41,14 +41,14 @@ class ChatterTest extends TestCase
         $sentMessage = new SentMessage($message, 'any');
 
         $this->transport
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('send')
             ->with($message)
             ->willReturn($sentMessage);
 
         $chatter = new Chatter($this->transport);
-        $this->assertSame($sentMessage, $chatter->send($message));
-        $this->assertSame($message, $sentMessage->getOriginalMessage());
+        self::assertSame($sentMessage, $chatter->send($message));
+        self::assertSame($message, $sentMessage->getOriginalMessage());
     }
 
     public function testSendWithBus()
@@ -56,17 +56,17 @@ class ChatterTest extends TestCase
         $message = new DummyMessage();
 
         $this->transport
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('send')
             ->with($message);
 
         $this->bus
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('dispatch')
             ->with($message)
             ->willReturn(new Envelope(new \stdClass()));
 
         $chatter = new Chatter($this->transport, $this->bus);
-        $this->assertNull($chatter->send($message));
+        self::assertNull($chatter->send($message));
     }
 }

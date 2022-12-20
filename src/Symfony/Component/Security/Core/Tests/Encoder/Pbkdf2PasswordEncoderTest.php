@@ -24,31 +24,31 @@ class Pbkdf2PasswordEncoderTest extends TestCase
     {
         $encoder = new Pbkdf2PasswordEncoder('sha256', false, 1, 40);
 
-        $this->assertTrue($encoder->isPasswordValid('c1232f10f62715fda06ae7c0a2037ca19b33cf103b727ba56d870c11f290a2ab106974c75607c8a3', 'password', ''));
+        self::assertTrue($encoder->isPasswordValid('c1232f10f62715fda06ae7c0a2037ca19b33cf103b727ba56d870c11f290a2ab106974c75607c8a3', 'password', ''));
     }
 
     public function testEncodePassword()
     {
         $encoder = new Pbkdf2PasswordEncoder('sha256', false, 1, 40);
-        $this->assertSame('c1232f10f62715fda06ae7c0a2037ca19b33cf103b727ba56d870c11f290a2ab106974c75607c8a3', $encoder->encodePassword('password', ''));
+        self::assertSame('c1232f10f62715fda06ae7c0a2037ca19b33cf103b727ba56d870c11f290a2ab106974c75607c8a3', $encoder->encodePassword('password', ''));
 
         $encoder = new Pbkdf2PasswordEncoder('sha256', true, 1, 40);
-        $this->assertSame('wSMvEPYnFf2gaufAogN8oZszzxA7cnulbYcMEfKQoqsQaXTHVgfIow==', $encoder->encodePassword('password', ''));
+        self::assertSame('wSMvEPYnFf2gaufAogN8oZszzxA7cnulbYcMEfKQoqsQaXTHVgfIow==', $encoder->encodePassword('password', ''));
 
         $encoder = new Pbkdf2PasswordEncoder('sha256', false, 2, 40);
-        $this->assertSame('8bc2f9167a81cdcfad1235cd9047f1136271c1f978fcfcb35e22dbeafa4634f6fd2214218ed63ebb', $encoder->encodePassword('password', ''));
+        self::assertSame('8bc2f9167a81cdcfad1235cd9047f1136271c1f978fcfcb35e22dbeafa4634f6fd2214218ed63ebb', $encoder->encodePassword('password', ''));
     }
 
     public function testEncodePasswordAlgorithmDoesNotExist()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $encoder = new Pbkdf2PasswordEncoder('foobar');
         $encoder->encodePassword('password', '');
     }
 
     public function testEncodePasswordLength()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $encoder = new Pbkdf2PasswordEncoder('foobar');
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');
@@ -58,6 +58,6 @@ class Pbkdf2PasswordEncoderTest extends TestCase
     {
         $encoder = new Pbkdf2PasswordEncoder('foobar');
 
-        $this->assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
+        self::assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
     }
 }

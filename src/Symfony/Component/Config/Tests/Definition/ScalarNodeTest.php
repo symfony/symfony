@@ -25,7 +25,7 @@ class ScalarNodeTest extends TestCase
     public function testNormalize($value)
     {
         $node = new ScalarNode('test');
-        $this->assertSame($value, $node->normalize($value));
+        self::assertSame($value, $node->normalize($value));
     }
 
     public function getValidValues(): array
@@ -48,11 +48,11 @@ class ScalarNodeTest extends TestCase
         $childNode = new ScalarNode('foo');
         $childNode->setDeprecated('vendor/package', '1.1', '"%node%" is deprecated');
 
-        $this->assertTrue($childNode->isDeprecated());
+        self::assertTrue($childNode->isDeprecated());
         $deprecation = $childNode->getDeprecation($childNode->getName(), $childNode->getPath());
-        $this->assertSame('"foo" is deprecated', $deprecation['message']);
-        $this->assertSame('vendor/package', $deprecation['package']);
-        $this->assertSame('1.1', $deprecation['version']);
+        self::assertSame('"foo" is deprecated', $deprecation['message']);
+        self::assertSame('vendor/package', $deprecation['package']);
+        self::assertSame('1.1', $deprecation['version']);
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);
@@ -72,7 +72,7 @@ class ScalarNodeTest extends TestCase
         } finally {
             restore_error_handler();
         }
-        $this->assertSame(0, $deprecationTriggered, '->finalize() should not trigger if the deprecated node is not set');
+        self::assertSame(0, $deprecationTriggered, '->finalize() should not trigger if the deprecated node is not set');
 
         $prevErrorHandler = set_error_handler($deprecationHandler);
         try {
@@ -80,7 +80,7 @@ class ScalarNodeTest extends TestCase
         } finally {
             restore_error_handler();
         }
-        $this->assertSame(1, $deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
+        self::assertSame(1, $deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 
     /**
@@ -88,7 +88,7 @@ class ScalarNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException(InvalidTypeException::class);
+        self::expectException(InvalidTypeException::class);
         $node = new ScalarNode('test');
         $node->normalize($value);
     }
@@ -106,8 +106,8 @@ class ScalarNodeTest extends TestCase
     {
         $node = new ScalarNode('test');
 
-        $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessage('Invalid type for path "test". Expected "scalar", but got "array".');
+        self::expectException(InvalidTypeException::class);
+        self::expectExceptionMessage('Invalid type for path "test". Expected "scalar", but got "array".');
 
         $node->normalize([]);
     }
@@ -117,8 +117,8 @@ class ScalarNodeTest extends TestCase
         $node = new ScalarNode('test');
         $node->setInfo('"the test value"');
 
-        $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessage("Invalid type for path \"test\". Expected \"scalar\", but got \"array\".\nHint: \"the test value\"");
+        self::expectException(InvalidTypeException::class);
+        self::expectExceptionMessage("Invalid type for path \"test\". Expected \"scalar\", but got \"array\".\nHint: \"the test value\"");
 
         $node->normalize([]);
     }
@@ -133,7 +133,7 @@ class ScalarNodeTest extends TestCase
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);
 
-        $this->assertSame($value, $node->finalize($value));
+        self::assertSame($value, $node->finalize($value));
     }
 
     public function getValidNonEmptyValues(): array
@@ -156,7 +156,7 @@ class ScalarNodeTest extends TestCase
      */
     public function testNotAllowedEmptyValuesThrowException($value)
     {
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);
         $node->finalize($value);

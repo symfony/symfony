@@ -20,28 +20,28 @@ class AddressTest extends TestCase
     public function testConstructor()
     {
         $a = new Address('fabien@symfonï.com');
-        $this->assertEquals('fabien@symfonï.com', $a->getAddress());
-        $this->assertEquals('fabien@xn--symfon-nwa.com', $a->toString());
-        $this->assertEquals('fabien@xn--symfon-nwa.com', $a->getEncodedAddress());
+        self::assertEquals('fabien@symfonï.com', $a->getAddress());
+        self::assertEquals('fabien@xn--symfon-nwa.com', $a->toString());
+        self::assertEquals('fabien@xn--symfon-nwa.com', $a->getEncodedAddress());
 
         $a = new Address('fabien@symfonï.com', 'Fabien');
-        $this->assertEquals('Fabien', $a->getName());
-        $this->assertEquals('fabien@symfonï.com', $a->getAddress());
-        $this->assertEquals('"Fabien" <fabien@xn--symfon-nwa.com>', $a->toString());
-        $this->assertEquals('fabien@xn--symfon-nwa.com', $a->getEncodedAddress());
+        self::assertEquals('Fabien', $a->getName());
+        self::assertEquals('fabien@symfonï.com', $a->getAddress());
+        self::assertEquals('"Fabien" <fabien@xn--symfon-nwa.com>', $a->toString());
+        self::assertEquals('fabien@xn--symfon-nwa.com', $a->getEncodedAddress());
     }
 
     public function testConstructorWithInvalidAddress()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new Address('fab   pot@symfony.com');
     }
 
     public function testCreate()
     {
-        $this->assertSame($a = new Address('fabien@symfony.com'), Address::create($a));
-        $this->assertSame($b = new Address('helene@symfony.com', 'Helene'), Address::create($b));
-        $this->assertEquals($a, Address::create('fabien@symfony.com'));
+        self::assertSame($a = new Address('fabien@symfony.com'), Address::create($a));
+        self::assertSame($b = new Address('helene@symfony.com', 'Helene'), Address::create($b));
+        self::assertEquals($a, Address::create('fabien@symfony.com'));
     }
 
     /**
@@ -50,16 +50,16 @@ class AddressTest extends TestCase
     public function testCreateWithString($string, $displayName, $addrSpec)
     {
         $address = Address::create($string);
-        $this->assertEquals($displayName, $address->getName());
-        $this->assertEquals($addrSpec, $address->getAddress());
+        self::assertEquals($displayName, $address->getName());
+        self::assertEquals($addrSpec, $address->getAddress());
         $fromToStringAddress = Address::create($address->toString());
-        $this->assertEquals($displayName, $fromToStringAddress->getName());
-        $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
+        self::assertEquals($displayName, $fromToStringAddress->getName());
+        self::assertEquals($addrSpec, $fromToStringAddress->getAddress());
     }
 
     public function testCreateWrongArg()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         Address::create(new \stdClass());
     }
 
@@ -67,14 +67,14 @@ class AddressTest extends TestCase
     {
         $fabien = new Address('fabien@symfony.com');
         $helene = new Address('helene@symfony.com', 'Helene');
-        $this->assertSame([$fabien, $helene], Address::createArray([$fabien, $helene]));
+        self::assertSame([$fabien, $helene], Address::createArray([$fabien, $helene]));
 
-        $this->assertEquals([$fabien], Address::createArray(['fabien@symfony.com']));
+        self::assertEquals([$fabien], Address::createArray(['fabien@symfony.com']));
     }
 
     public function testCreateArrayWrongArg()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         Address::createArray([new \stdClass()]);
     }
 
@@ -84,7 +84,7 @@ class AddressTest extends TestCase
     public function testNameEmpty(string $name)
     {
         $mail = 'mail@example.org';
-        $this->assertSame($mail, (new Address($mail, $name))->toString());
+        self::assertSame($mail, (new Address($mail, $name))->toString());
     }
 
     public function nameEmptyDataProvider(): array
@@ -99,11 +99,11 @@ class AddressTest extends TestCase
     public function testFromString($string, $displayName, $addrSpec)
     {
         $address = Address::fromString($string);
-        $this->assertEquals($displayName, $address->getName());
-        $this->assertEquals($addrSpec, $address->getAddress());
+        self::assertEquals($displayName, $address->getName());
+        self::assertEquals($addrSpec, $address->getAddress());
         $fromToStringAddress = Address::fromString($address->toString());
-        $this->assertEquals($displayName, $fromToStringAddress->getName());
-        $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
+        self::assertEquals($displayName, $fromToStringAddress->getName());
+        self::assertEquals($addrSpec, $fromToStringAddress->getAddress());
     }
 
     /**
@@ -111,7 +111,7 @@ class AddressTest extends TestCase
      */
     public function testFromStringFailure()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         Address::fromString('Jane Doe <example@example.com');
     }
 
@@ -174,6 +174,6 @@ class AddressTest extends TestCase
     public function testEncodeNameIfNameContainsCommas()
     {
         $address = new Address('fabien@symfony.com', 'Fabien, "Potencier');
-        $this->assertSame('"Fabien, \"Potencier" <fabien@symfony.com>', $address->toString());
+        self::assertSame('"Fabien, \"Potencier" <fabien@symfony.com>', $address->toString());
     }
 }

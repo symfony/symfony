@@ -32,8 +32,8 @@ class UuidTest extends TestCase
      */
     public function testConstructorWithInvalidUuid(string $uuid)
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUID: "'.$uuid.'".');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid UUID: "'.$uuid.'".');
 
         Uuid::fromString($uuid);
     }
@@ -50,13 +50,13 @@ class UuidTest extends TestCase
     public function testInvalidVariant(string $uuid)
     {
         $uuid = new Uuid($uuid);
-        $this->assertFalse(Uuid::isValid($uuid));
+        self::assertFalse(Uuid::isValid($uuid));
 
         $uuid = (string) $uuid;
         $class = Uuid::class.'V'.$uuid[14];
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUIDv'.$uuid[14].': "'.$uuid.'".');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid UUIDv'.$uuid[14].': "'.$uuid.'".');
 
         new $class($uuid);
     }
@@ -74,55 +74,55 @@ class UuidTest extends TestCase
     {
         $uuid = new UuidV4(self::A_UUID_V4);
 
-        $this->assertSame(self::A_UUID_V4, (string) $uuid);
-        $this->assertSame('"'.self::A_UUID_V4.'"', json_encode($uuid));
+        self::assertSame(self::A_UUID_V4, (string) $uuid);
+        self::assertSame('"'.self::A_UUID_V4.'"', json_encode($uuid));
     }
 
     public function testV1()
     {
         $uuid = Uuid::v1();
 
-        $this->assertInstanceOf(UuidV1::class, $uuid);
+        self::assertInstanceOf(UuidV1::class, $uuid);
 
         $uuid = new UuidV1(self::A_UUID_V1);
 
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '1583245966.746458'), $uuid->getDateTime());
-        $this->assertSame('3499710062d0', $uuid->getNode());
+        self::assertEquals(\DateTimeImmutable::createFromFormat('U.u', '1583245966.746458'), $uuid->getDateTime());
+        self::assertSame('3499710062d0', $uuid->getNode());
     }
 
     public function testV3()
     {
         $uuid = Uuid::v3(new UuidV4(self::A_UUID_V4), 'the name');
 
-        $this->assertInstanceOf(UuidV3::class, $uuid);
-        $this->assertSame('8dac64d3-937a-3e7c-aa1d-d5d6c06a61f5', (string) $uuid);
+        self::assertInstanceOf(UuidV3::class, $uuid);
+        self::assertSame('8dac64d3-937a-3e7c-aa1d-d5d6c06a61f5', (string) $uuid);
     }
 
     public function testV4()
     {
         $uuid = Uuid::v4();
 
-        $this->assertInstanceOf(UuidV4::class, $uuid);
+        self::assertInstanceOf(UuidV4::class, $uuid);
     }
 
     public function testV5()
     {
         $uuid = Uuid::v5(new UuidV4('ec07aa88-f84e-47b9-a581-1c6b30a2f484'), 'the name');
 
-        $this->assertInstanceOf(UuidV5::class, $uuid);
-        $this->assertSame('851def0c-b9c7-55aa-a991-130e769ec0a9', (string) $uuid);
+        self::assertInstanceOf(UuidV5::class, $uuid);
+        self::assertSame('851def0c-b9c7-55aa-a991-130e769ec0a9', (string) $uuid);
     }
 
     public function testV6()
     {
         $uuid = Uuid::v6();
 
-        $this->assertInstanceOf(UuidV6::class, $uuid);
+        self::assertInstanceOf(UuidV6::class, $uuid);
 
         $uuid = new UuidV6(substr_replace(self::A_UUID_V1, '6', 14, 1));
 
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '85916308548.278321'), $uuid->getDateTime());
-        $this->assertSame('3499710062d0', $uuid->getNode());
+        self::assertEquals(\DateTimeImmutable::createFromFormat('U.u', '85916308548.278321'), $uuid->getDateTime());
+        self::assertSame('3499710062d0', $uuid->getNode());
     }
 
     public function testV6IsSeeded()
@@ -130,7 +130,7 @@ class UuidTest extends TestCase
         $uuidV1 = Uuid::v1();
         $uuidV6 = Uuid::v6();
 
-        $this->assertNotSame(substr($uuidV1, 24), substr($uuidV6, 24));
+        self::assertNotSame(substr($uuidV1, 24), substr($uuidV6, 24));
     }
 
     public function testBinary()
@@ -138,8 +138,8 @@ class UuidTest extends TestCase
         $uuid = new UuidV4(self::A_UUID_V4);
         $uuid = Uuid::fromString($uuid->toBinary());
 
-        $this->assertInstanceOf(UuidV4::class, $uuid);
-        $this->assertSame(self::A_UUID_V4, (string) $uuid);
+        self::assertInstanceOf(UuidV4::class, $uuid);
+        self::assertSame(self::A_UUID_V4, (string) $uuid);
     }
 
     public function testFromUlid()
@@ -147,27 +147,27 @@ class UuidTest extends TestCase
         $ulid = new Ulid();
         $uuid = Uuid::fromString($ulid);
 
-        $this->assertSame((string) $ulid, $uuid->toBase32());
-        $this->assertSame((string) $uuid, $uuid->toRfc4122());
-        $this->assertTrue($uuid->equals(Uuid::fromString($ulid)));
+        self::assertSame((string) $ulid, $uuid->toBase32());
+        self::assertSame((string) $uuid, $uuid->toRfc4122());
+        self::assertTrue($uuid->equals(Uuid::fromString($ulid)));
     }
 
     public function testBase58()
     {
         $uuid = new NilUuid();
-        $this->assertSame('1111111111111111111111', $uuid->toBase58());
+        self::assertSame('1111111111111111111111', $uuid->toBase58());
 
         $uuid = Uuid::fromString("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF");
-        $this->assertSame('YcVfxkQb6JRzqk5kF2tNLv', $uuid->toBase58());
-        $this->assertTrue($uuid->equals(Uuid::fromString('YcVfxkQb6JRzqk5kF2tNLv')));
+        self::assertSame('YcVfxkQb6JRzqk5kF2tNLv', $uuid->toBase58());
+        self::assertTrue($uuid->equals(Uuid::fromString('YcVfxkQb6JRzqk5kF2tNLv')));
     }
 
     public function testIsValid()
     {
-        $this->assertFalse(Uuid::isValid('not a uuid'));
-        $this->assertTrue(Uuid::isValid(self::A_UUID_V4));
-        $this->assertFalse(UuidV4::isValid(self::A_UUID_V1));
-        $this->assertTrue(UuidV4::isValid(self::A_UUID_V4));
+        self::assertFalse(Uuid::isValid('not a uuid'));
+        self::assertTrue(Uuid::isValid(self::A_UUID_V4));
+        self::assertFalse(UuidV4::isValid(self::A_UUID_V1));
+        self::assertTrue(UuidV4::isValid(self::A_UUID_V4));
     }
 
     public function testEquals()
@@ -175,8 +175,8 @@ class UuidTest extends TestCase
         $uuid1 = new UuidV1(self::A_UUID_V1);
         $uuid2 = new UuidV4(self::A_UUID_V4);
 
-        $this->assertTrue($uuid1->equals($uuid1));
-        $this->assertFalse($uuid1->equals($uuid2));
+        self::assertTrue($uuid1->equals($uuid1));
+        self::assertFalse($uuid1->equals($uuid2));
     }
 
     /**
@@ -184,7 +184,7 @@ class UuidTest extends TestCase
      */
     public function testEqualsAgainstOtherType($other)
     {
-        $this->assertFalse((new UuidV4(self::A_UUID_V4))->equals($other));
+        self::assertFalse((new UuidV4(self::A_UUID_V4))->equals($other));
     }
 
     public function provideInvalidEqualType()
@@ -204,13 +204,13 @@ class UuidTest extends TestCase
         $uuids[] = $d = new Uuid('00000000-0000-0000-0000-00000000000d');
         $uuids[] = $c = new Uuid('00000000-0000-0000-0000-00000000000c');
 
-        $this->assertNotSame([$a, $b, $c, $d], $uuids);
+        self::assertNotSame([$a, $b, $c, $d], $uuids);
 
         usort($uuids, static function (Uuid $a, Uuid $b): int {
             return $a->compare($b);
         });
 
-        $this->assertSame([$a, $b, $c, $d], $uuids);
+        self::assertSame([$a, $b, $c, $d], $uuids);
     }
 
     /**
@@ -222,21 +222,18 @@ class UuidTest extends TestCase
     {
         $uuid = Uuid::fromString($uuid);
 
-        $this->assertInstanceOf(NilUuid::class, $uuid);
-        $this->assertSame('00000000-0000-0000-0000-000000000000', (string) $uuid);
+        self::assertInstanceOf(NilUuid::class, $uuid);
+        self::assertSame('00000000-0000-0000-0000-000000000000', (string) $uuid);
     }
 
     public function testNewNilUuid()
     {
-        $this->assertSame('00000000-0000-0000-0000-000000000000', (string) new NilUuid());
+        self::assertSame('00000000-0000-0000-0000-000000000000', (string) new NilUuid());
     }
 
     public function testFromBinary()
     {
-        $this->assertEquals(
-            Uuid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
-            Uuid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08")
-        );
+        self::assertEquals(Uuid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"), Uuid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"));
     }
 
     /**
@@ -244,7 +241,7 @@ class UuidTest extends TestCase
      */
     public function testFromBinaryInvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
 
         Uuid::fromBinary($ulid);
     }
@@ -260,10 +257,7 @@ class UuidTest extends TestCase
 
     public function testFromBase58()
     {
-        $this->assertEquals(
-            UuidV1::fromString('94fSqj9oxGtsNbkfQNntwx'),
-            UuidV1::fromBase58('94fSqj9oxGtsNbkfQNntwx')
-        );
+        self::assertEquals(UuidV1::fromString('94fSqj9oxGtsNbkfQNntwx'), UuidV1::fromBase58('94fSqj9oxGtsNbkfQNntwx'));
     }
 
     /**
@@ -271,7 +265,7 @@ class UuidTest extends TestCase
      */
     public function testFromBase58InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
 
         Uuid::fromBase58($ulid);
     }
@@ -287,10 +281,7 @@ class UuidTest extends TestCase
 
     public function testFromBase32()
     {
-        $this->assertEquals(
-            UuidV5::fromString('2VN0S74HBDBB0AQRXAHFVG35KK'),
-            UuidV5::fromBase32('2VN0S74HBDBB0AQRXAHFVG35KK')
-        );
+        self::assertEquals(UuidV5::fromString('2VN0S74HBDBB0AQRXAHFVG35KK'), UuidV5::fromBase32('2VN0S74HBDBB0AQRXAHFVG35KK'));
     }
 
     /**
@@ -298,7 +289,7 @@ class UuidTest extends TestCase
      */
     public function testFromBase32InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
 
         Uuid::fromBase32($ulid);
     }
@@ -314,10 +305,7 @@ class UuidTest extends TestCase
 
     public function testFromRfc4122()
     {
-        $this->assertEquals(
-            UuidV6::fromString('1eb571b4-14c0-6893-bf70-2d4c83cf755a'),
-            UuidV6::fromRfc4122('1eb571b4-14c0-6893-bf70-2d4c83cf755a')
-        );
+        self::assertEquals(UuidV6::fromString('1eb571b4-14c0-6893-bf70-2d4c83cf755a'), UuidV6::fromRfc4122('1eb571b4-14c0-6893-bf70-2d4c83cf755a'));
     }
 
     /**
@@ -325,7 +313,7 @@ class UuidTest extends TestCase
      */
     public function testFromRfc4122InvalidFormat(string $ulid)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
 
         Uuid::fromRfc4122($ulid);
     }
@@ -341,22 +329,22 @@ class UuidTest extends TestCase
 
     public function testFromStringOnExtendedClassReturnsStatic()
     {
-        $this->assertInstanceOf(CustomUuid::class, CustomUuid::fromString(self::A_UUID_V4));
+        self::assertInstanceOf(CustomUuid::class, CustomUuid::fromString(self::A_UUID_V4));
     }
 
     public function testGetDateTime()
     {
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '103072857660.684697'), (new UuidV1('ffffffff-ffff-1fff-a456-426655440000'))->getDateTime());
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.000001'), (new UuidV1('1381400a-1dd2-11b2-a456-426655440000'))->getDateTime());
-        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814001-1dd2-11b2-a456-426655440000'))->getDateTime());
-        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814000-1dd2-11b2-a456-426655440000'))->getDateTime());
-        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13813fff-1dd2-11b2-a456-426655440000'))->getDateTime());
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), (new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime());
-        $this->assertEquals(new \DateTimeImmutable('@-12219292800'), (new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime());
+        self::assertEquals(\DateTimeImmutable::createFromFormat('U.u', '103072857660.684697'), (new UuidV1('ffffffff-ffff-1fff-a456-426655440000'))->getDateTime());
+        self::assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.000001'), (new UuidV1('1381400a-1dd2-11b2-a456-426655440000'))->getDateTime());
+        self::assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814001-1dd2-11b2-a456-426655440000'))->getDateTime());
+        self::assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814000-1dd2-11b2-a456-426655440000'))->getDateTime());
+        self::assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13813fff-1dd2-11b2-a456-426655440000'))->getDateTime());
+        self::assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), (new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime());
+        self::assertEquals(new \DateTimeImmutable('@-12219292800'), (new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime());
     }
 
     public function testFromStringBase58Padding()
     {
-        $this->assertInstanceOf(Uuid::class, Uuid::fromString('111111111u9QRyVM94rdmZ'));
+        self::assertInstanceOf(Uuid::class, Uuid::fromString('111111111u9QRyVM94rdmZ'));
     }
 }

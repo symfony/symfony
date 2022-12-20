@@ -41,18 +41,18 @@ class SlidingWindowLimiterTest extends TestCase
         sleep(15);
 
         $rateLimit = $limiter->consume();
-        $this->assertTrue($rateLimit->isAccepted());
-        $this->assertSame(10, $rateLimit->getLimit());
+        self::assertTrue($rateLimit->isAccepted());
+        self::assertSame(10, $rateLimit->getLimit());
 
         // We are 25% into the new window
         $rateLimit = $limiter->consume(5);
-        $this->assertFalse($rateLimit->isAccepted());
-        $this->assertEquals(3, $rateLimit->getRemainingTokens());
+        self::assertFalse($rateLimit->isAccepted());
+        self::assertEquals(3, $rateLimit->getRemainingTokens());
 
         sleep(13);
         $rateLimit = $limiter->consume(10);
-        $this->assertTrue($rateLimit->isAccepted());
-        $this->assertSame(10, $rateLimit->getLimit());
+        self::assertTrue($rateLimit->isAccepted());
+        self::assertSame(10, $rateLimit->getLimit());
     }
 
     public function testWaitIntervalOnConsumeOverLimit()
@@ -66,12 +66,12 @@ class SlidingWindowLimiterTest extends TestCase
 
         $start = microtime(true);
         $rateLimit->wait(); // wait 12 seconds
-        $this->assertEqualsWithDelta($start + 12, microtime(true), 1);
+        self::assertEqualsWithDelta($start + 12, microtime(true), 1);
     }
 
     public function testReserve()
     {
-        $this->expectException(ReserveNotSupportedException::class);
+        self::expectException(ReserveNotSupportedException::class);
 
         $this->createLimiter()->reserve();
     }

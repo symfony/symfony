@@ -23,7 +23,7 @@ class ReflectionClassResourceTest extends TestCase
     {
         $res = new ReflectionClassResource(new \ReflectionClass(\ErrorException::class));
 
-        $this->assertSame('reflection.ErrorException', (string) $res);
+        self::assertSame('reflection.ErrorException', (string) $res);
     }
 
     public function testSerializeUnserialize()
@@ -31,10 +31,10 @@ class ReflectionClassResourceTest extends TestCase
         $res = new ReflectionClassResource(new \ReflectionClass(DummyInterface::class));
         $ser = unserialize(serialize($res));
 
-        $this->assertTrue($res->isFresh(0));
-        $this->assertTrue($ser->isFresh(0));
+        self::assertTrue($res->isFresh(0));
+        self::assertTrue($ser->isFresh(0));
 
-        $this->assertSame((string) $res, (string) $ser);
+        self::assertSame((string) $res, (string) $ser);
     }
 
     public function testIsFresh()
@@ -42,9 +42,9 @@ class ReflectionClassResourceTest extends TestCase
         $res = new ReflectionClassResource(new \ReflectionClass(__CLASS__));
         $mtime = filemtime(__FILE__);
 
-        $this->assertTrue($res->isFresh($mtime), '->isFresh() returns true if the resource has not changed in same second');
-        $this->assertTrue($res->isFresh($mtime + 10), '->isFresh() returns true if the resource has not changed');
-        $this->assertTrue($res->isFresh($mtime - 86400), '->isFresh() returns true if the resource has not changed');
+        self::assertTrue($res->isFresh($mtime), '->isFresh() returns true if the resource has not changed in same second');
+        self::assertTrue($res->isFresh($mtime + 10), '->isFresh() returns true if the resource has not changed');
+        self::assertTrue($res->isFresh($mtime - 86400), '->isFresh() returns true if the resource has not changed');
     }
 
     public function testIsFreshForDeletedResources()
@@ -55,10 +55,10 @@ class ReflectionClassResourceTest extends TestCase
         require $tmp;
 
         $res = new ReflectionClassResource(new \ReflectionClass(\ReflectionClassResourceTestClass::class));
-        $this->assertTrue($res->isFresh($now));
+        self::assertTrue($res->isFresh($now));
 
         unlink($tmp);
-        $this->assertFalse($res->isFresh($now), '->isFresh() returns false if the resource does not exist');
+        self::assertFalse($res->isFresh($now), '->isFresh() returns false if the resource does not exist');
     }
 
     /**
@@ -111,9 +111,9 @@ EOPHP;
         $signature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
 
         if ($changeExpected) {
-            $this->assertNotSame($expectedSignature, $signature);
+            self::assertNotSame($expectedSignature, $signature);
         } else {
-            $this->assertSame($expectedSignature, $signature);
+            self::assertSame($expectedSignature, $signature);
         }
     }
 
@@ -191,52 +191,52 @@ EOPHP;
     public function testEventSubscriber()
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
 
         TestEventSubscriber::$subscribedEvents = [123];
-        $this->assertFalse($res->isFresh(0));
+        self::assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
     }
 
     public function testMessageSubscriber()
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
 
         TestMessageSubscriberConfigHolder::$handledMessages = ['SomeMessageClass' => []];
-        $this->assertFalse($res->isFresh(0));
+        self::assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
 
         TestMessageSubscriberConfigHolder::$handledMessages = ['OtherMessageClass' => []];
-        $this->assertFalse($res->isFresh(0));
+        self::assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestMessageSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
     }
 
     public function testServiceSubscriber()
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
 
         TestServiceSubscriber::$subscribedServices = [123];
-        $this->assertFalse($res->isFresh(0));
+        self::assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
     }
 
     public function testIgnoresObjectsInSignature()
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceWithStaticProperty::class));
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
 
         TestServiceWithStaticProperty::$initializedObject = new TestServiceWithStaticProperty();
-        $this->assertTrue($res->isFresh(0));
+        self::assertTrue($res->isFresh(0));
     }
 }
 

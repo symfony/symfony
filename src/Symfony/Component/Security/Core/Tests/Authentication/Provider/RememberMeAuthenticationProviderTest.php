@@ -32,24 +32,24 @@ class RememberMeAuthenticationProviderTest extends TestCase
     {
         $provider = $this->getProvider();
 
-        $this->assertTrue($provider->supports($this->getSupportedToken()));
-        $this->assertFalse($provider->supports($this->createMock(TokenInterface::class)));
-        $this->assertFalse($provider->supports($this->createMock(RememberMeToken::class)));
+        self::assertTrue($provider->supports($this->getSupportedToken()));
+        self::assertFalse($provider->supports(self::createMock(TokenInterface::class)));
+        self::assertFalse($provider->supports(self::createMock(RememberMeToken::class)));
     }
 
     public function testAuthenticateWhenTokenIsNotSupported()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('The token is not supported by this authentication provider.');
+        self::expectException(AuthenticationException::class);
+        self::expectExceptionMessage('The token is not supported by this authentication provider.');
         $provider = $this->getProvider();
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $provider->authenticate($token);
     }
 
     public function testAuthenticateWhenSecretsDoNotMatch()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $provider = $this->getProvider(null, 'secret1');
         $token = $this->getSupportedToken(null, 'secret2');
 
@@ -58,8 +58,8 @@ class RememberMeAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateThrowsOnNonUserInterfaceInstance()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Method "Symfony\Component\Security\Core\Authentication\Token\RememberMeToken::getUser()" must return a "Symfony\Component\Security\Core\User\UserInterface" instance, "string" returned.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Method "Symfony\Component\Security\Core\Authentication\Token\RememberMeToken::getUser()" must return a "Symfony\Component\Security\Core\User\UserInterface" instance, "string" returned.');
 
         $provider = $this->getProvider();
         $token = new RememberMeToken(new InMemoryUser('dummyuser', null), 'foo', 'test');
@@ -69,9 +69,9 @@ class RememberMeAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenPreChecksFails()
     {
-        $this->expectException(DisabledException::class);
-        $userChecker = $this->createMock(UserCheckerInterface::class);
-        $userChecker->expects($this->once())
+        self::expectException(DisabledException::class);
+        $userChecker = self::createMock(UserCheckerInterface::class);
+        $userChecker->expects(self::once())
             ->method('checkPreAuth')
             ->willThrowException(new DisabledException());
 
@@ -82,8 +82,8 @@ class RememberMeAuthenticationProviderTest extends TestCase
 
     public function testAuthenticate()
     {
-        $user = $this->createMock(UserInterface::class);
-        $user->expects($this->exactly(2))
+        $user = self::createMock(UserInterface::class);
+        $user->expects(self::exactly(2))
              ->method('getRoles')
              ->willReturn(['ROLE_FOO']);
 
@@ -92,25 +92,25 @@ class RememberMeAuthenticationProviderTest extends TestCase
         $token = $this->getSupportedToken($user);
         $authToken = $provider->authenticate($token);
 
-        $this->assertInstanceOf(RememberMeToken::class, $authToken);
-        $this->assertSame($user, $authToken->getUser());
-        $this->assertEquals(['ROLE_FOO'], $authToken->getRoleNames());
-        $this->assertEquals('', $authToken->getCredentials());
+        self::assertInstanceOf(RememberMeToken::class, $authToken);
+        self::assertSame($user, $authToken->getUser());
+        self::assertEquals(['ROLE_FOO'], $authToken->getRoleNames());
+        self::assertEquals('', $authToken->getCredentials());
     }
 
     protected function getSupportedToken($user = null, $secret = 'test')
     {
         if (null === $user) {
-            $user = $this->createMock(UserInterface::class);
+            $user = self::createMock(UserInterface::class);
             $user
-                ->expects($this->any())
+                ->expects(self::any())
                 ->method('getRoles')
                 ->willReturn([]);
         }
 
-        $token = $this->getMockBuilder(RememberMeToken::class)->setMethods(['getFirewallName'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
+        $token = self::getMockBuilder(RememberMeToken::class)->setMethods(['getFirewallName'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getFirewallName')
             ->willReturn('foo');
 
@@ -120,7 +120,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
     protected function getProvider($userChecker = null, $key = 'test')
     {
         if (null === $userChecker) {
-            $userChecker = $this->createMock(UserCheckerInterface::class);
+            $userChecker = self::createMock(UserCheckerInterface::class);
         }
 
         return new RememberMeAuthenticationProvider($userChecker, $key, 'foo');

@@ -27,7 +27,7 @@ class FileDumperTest extends TestCase
         $dumper = new ConcreteFileDumper();
         $dumper->dump($catalogue, ['path' => $tempDir]);
 
-        $this->assertFileExists($tempDir.'/messages.en.concrete');
+        self::assertFileExists($tempDir.'/messages.en.concrete');
 
         @unlink($tempDir.'/messages.en.concrete');
     }
@@ -45,14 +45,14 @@ class FileDumperTest extends TestCase
         @unlink($tempDir.'/d2.en.concrete');
         $dumper->dump($catalogue, ['path' => $tempDir]);
 
-        $this->assertStringEqualsFile($tempDir.'/d1.en.concrete', 'foo=bar');
+        self::assertStringEqualsFile($tempDir.'/d1.en.concrete', 'foo=bar');
         @unlink($tempDir.'/d1.en.concrete');
 
-        $this->assertStringEqualsFile($tempDir.'/d1+intl-icu.en.concrete', 'bar=foo');
+        self::assertStringEqualsFile($tempDir.'/d1+intl-icu.en.concrete', 'bar=foo');
         @unlink($tempDir.'/d1+intl-icu.en.concrete');
 
-        $this->assertFileDoesNotExist($tempDir.'/d2.en.concrete');
-        $this->assertStringEqualsFile($tempDir.'/d2+intl-icu.en.concrete', 'bar=foo');
+        self::assertFileDoesNotExist($tempDir.'/d2.en.concrete');
+        self::assertStringEqualsFile($tempDir.'/d2+intl-icu.en.concrete', 'bar=foo');
         @unlink($tempDir.'/d2+intl-icu.en.concrete');
     }
 
@@ -69,7 +69,7 @@ class FileDumperTest extends TestCase
         $dumper->setRelativePathTemplate('test/translations/%domain%.%locale%.%extension%');
         $dumper->dump($catalogue, ['path' => $tempDir]);
 
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
 
         @unlink($file);
         @rmdir($translationsDir);

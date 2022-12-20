@@ -72,7 +72,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     {
         $factory = $this->createFactory();
 
-        $this->assertSame($expected, $factory->supports(new Dsn($dsn)));
+        self::assertSame($expected, $factory->supports(new Dsn($dsn)));
     }
 
     /**
@@ -83,7 +83,7 @@ abstract class ProviderFactoryTestCase extends TestCase
         $factory = $this->createFactory();
         $provider = $factory->create(new Dsn($dsn));
 
-        $this->assertSame($expected, (string) $provider);
+        self::assertSame($expected, (string) $provider);
     }
 
     /**
@@ -95,9 +95,9 @@ abstract class ProviderFactoryTestCase extends TestCase
 
         $dsn = new Dsn($dsn);
 
-        $this->expectException(UnsupportedSchemeException::class);
+        self::expectException(UnsupportedSchemeException::class);
         if (null !== $message) {
-            $this->expectExceptionMessage($message);
+            self::expectExceptionMessage($message);
         }
 
         $factory->create($dsn);
@@ -112,9 +112,9 @@ abstract class ProviderFactoryTestCase extends TestCase
 
         $dsn = new Dsn($dsn);
 
-        $this->expectException(IncompleteDsnException::class);
+        self::expectException(IncompleteDsnException::class);
         if (null !== $message) {
-            $this->expectExceptionMessage($message);
+            self::expectExceptionMessage($message);
         }
 
         $factory->create($dsn);
@@ -127,7 +127,7 @@ abstract class ProviderFactoryTestCase extends TestCase
 
     protected function getLogger(): LoggerInterface
     {
-        return $this->logger ?? $this->logger = $this->createMock(LoggerInterface::class);
+        return $this->logger ?? $this->logger = self::createMock(LoggerInterface::class);
     }
 
     protected function getDefaultLocale(): string
@@ -137,11 +137,11 @@ abstract class ProviderFactoryTestCase extends TestCase
 
     protected function getLoader(): LoaderInterface
     {
-        return $this->loader ?? $this->loader = $this->createMock(LoaderInterface::class);
+        return $this->loader ?? $this->loader = self::createMock(LoaderInterface::class);
     }
 
     protected function getXliffFileDumper(): XliffFileDumper
     {
-        return $this->xliffFileDumper ?? $this->xliffFileDumper = $this->createMock(XliffFileDumper::class);
+        return $this->xliffFileDumper ?? $this->xliffFileDumper = self::createMock(XliffFileDumper::class);
     }
 }

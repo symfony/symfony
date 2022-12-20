@@ -33,11 +33,11 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(__DIR__.'/empty-mapping.yml');
         $metadata = new ClassMetadata(Entity::class);
 
-        $this->assertFalse($loader->loadClassMetadata($metadata));
+        self::assertFalse($loader->loadClassMetadata($metadata));
 
         $r = new \ReflectionProperty($loader, 'classes');
         $r->setAccessible(true);
-        $this->assertSame([], $r->getValue($loader));
+        self::assertSame([], $r->getValue($loader));
     }
 
     /**
@@ -45,7 +45,7 @@ class YamlFileLoaderTest extends TestCase
      */
     public function testInvalidYamlFiles($path)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $loader = new YamlFileLoader(__DIR__.'/'.$path);
         $metadata = new ClassMetadata(Entity::class);
 
@@ -71,7 +71,7 @@ class YamlFileLoaderTest extends TestCase
             $loader->loadClassMetadata($metadata);
         } catch (\InvalidArgumentException $e) {
             // Call again. Again an exception should be thrown
-            $this->expectException(\InvalidArgumentException::class);
+            self::expectException(\InvalidArgumentException::class);
             $loader->loadClassMetadata($metadata);
         }
     }
@@ -81,7 +81,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
         $metadata = new ClassMetadata(Entity::class);
 
-        $this->assertTrue($loader->loadClassMetadata($metadata));
+        self::assertTrue($loader->loadClassMetadata($metadata));
     }
 
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
@@ -89,7 +89,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
         $metadata = new ClassMetadata(\stdClass::class);
 
-        $this->assertFalse($loader->loadClassMetadata($metadata));
+        self::assertFalse($loader->loadClassMetadata($metadata));
     }
 
     public function testLoadClassMetadata()
@@ -123,7 +123,7 @@ class YamlFileLoaderTest extends TestCase
         $expected->addGetterConstraint('valid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
 
-        $this->assertEquals($expected, $metadata);
+        self::assertEquals($expected, $metadata);
     }
 
     public function testLoadClassMetadataWithConstants()
@@ -136,7 +136,7 @@ class YamlFileLoaderTest extends TestCase
         $expected = new ClassMetadata(Entity::class);
         $expected->addPropertyConstraint('firstName', new Range(['max' => \PHP_INT_MAX]));
 
-        $this->assertEquals($expected, $metadata);
+        self::assertEquals($expected, $metadata);
     }
 
     public function testLoadGroupSequenceProvider()
@@ -149,6 +149,6 @@ class YamlFileLoaderTest extends TestCase
         $expected = new ClassMetadata(GroupSequenceProviderEntity::class);
         $expected->setGroupSequenceProvider(true);
 
-        $this->assertEquals($expected, $metadata);
+        self::assertEquals($expected, $metadata);
     }
 }

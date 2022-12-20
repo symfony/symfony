@@ -18,9 +18,9 @@ class SerializerTest extends AbstractWebTestCase
 {
     public function testDeserializeArrayOfObject()
     {
-        static::bootKernel(['test_case' => 'Serializer']);
+        self::bootKernel(['test_case' => 'Serializer']);
 
-        $result = static::getContainer()->get('serializer.alias')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', Foo::class, 'json');
+        $result = self::getContainer()->get('serializer.alias')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', Foo::class, 'json');
 
         $bar1 = new Bar();
         $bar1->id = 1;
@@ -30,7 +30,7 @@ class SerializerTest extends AbstractWebTestCase
         $expected = new Foo();
         $expected->bars = [$bar1, $bar2];
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
@@ -38,9 +38,9 @@ class SerializerTest extends AbstractWebTestCase
      */
     public function testNormalizersAndEncodersUseDefaultContextConfigOption(string $normalizerId)
     {
-        static::bootKernel(['test_case' => 'Serializer']);
+        self::bootKernel(['test_case' => 'Serializer']);
 
-        $normalizer = static::getContainer()->get($normalizerId);
+        $normalizer = self::getContainer()->get($normalizerId);
 
         $reflectionObject = new \ReflectionObject($normalizer);
         $property = $reflectionObject->getProperty('defaultContext');

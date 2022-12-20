@@ -27,21 +27,21 @@ class SessionLogoutHandlerTest extends TestCase
     {
         $handler = new SessionLogoutHandler();
 
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $response = new Response();
-        $session = $this->createMock(Session::class);
+        $session = self::createMock(Session::class);
 
         $request
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getSession')
             ->willReturn($session)
         ;
 
         $session
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('invalidate')
         ;
 
-        $handler->logout($request, $response, $this->createMock(TokenInterface::class));
+        $handler->logout($request, $response, self::createMock(TokenInterface::class));
     }
 }

@@ -23,9 +23,9 @@ class AmqpTransportFactoryTest extends TestCase
     {
         $factory = new AmqpTransportFactory();
 
-        $this->assertTrue($factory->supports('amqp://localhost', []));
-        $this->assertFalse($factory->supports('sqs://localhost', []));
-        $this->assertFalse($factory->supports('invalid-dsn', []));
+        self::assertTrue($factory->supports('amqp://localhost', []));
+        self::assertFalse($factory->supports('sqs://localhost', []));
+        self::assertFalse($factory->supports('invalid-dsn', []));
     }
 
     /**
@@ -34,10 +34,10 @@ class AmqpTransportFactoryTest extends TestCase
     public function testItCreatesTheTransport()
     {
         $factory = new AmqpTransportFactory();
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
 
         $expectedTransport = new AmqpTransport(Connection::fromDsn('amqp://localhost', ['host' => 'localhost']), $serializer);
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('amqp://localhost', ['host' => 'localhost'], $serializer));
+        self::assertEquals($expectedTransport, $factory->createTransport('amqp://localhost', ['host' => 'localhost'], $serializer));
     }
 }

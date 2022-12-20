@@ -34,7 +34,7 @@ class PostgreSqlDbalStoreTest extends AbstractStoreTest
     public function getStore(): PersistingStoreInterface
     {
         if (!getenv('POSTGRES_HOST')) {
-            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+            self::markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
         $this->expectDeprecation('Since symfony/lock 5.4: Usage of a DBAL Connection with "Symfony\Component\Lock\Store\PostgreSqlStore" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore" instead.');

@@ -25,7 +25,7 @@ class TranslatorTest extends TestCase
     /** @dataProvider getXpathLiteralTestData */
     public function testXpathLiteral($value, $literal)
     {
-        $this->assertEquals($literal, Translator::getXpathLiteral($value));
+        self::assertEquals($literal, Translator::getXpathLiteral($value));
     }
 
     /** @dataProvider getCssToXPathTestData */
@@ -33,12 +33,12 @@ class TranslatorTest extends TestCase
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
-        $this->assertEquals($xpath, $translator->cssToXPath($css, ''));
+        self::assertEquals($xpath, $translator->cssToXPath($css, ''));
     }
 
     public function testCssToXPathPseudoElement()
     {
-        $this->expectException(ExpressionErrorException::class);
+        self::expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $translator->cssToXPath('e::first-line');
@@ -46,7 +46,7 @@ class TranslatorTest extends TestCase
 
     public function testGetExtensionNotExistsExtension()
     {
-        $this->expectException(ExpressionErrorException::class);
+        self::expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $translator->getExtension('fake');
@@ -54,7 +54,7 @@ class TranslatorTest extends TestCase
 
     public function testAddCombinationNotExistsExtension()
     {
-        $this->expectException(ExpressionErrorException::class);
+        self::expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $parser = new Parser();
@@ -65,7 +65,7 @@ class TranslatorTest extends TestCase
 
     public function testAddFunctionNotExistsFunction()
     {
-        $this->expectException(ExpressionErrorException::class);
+        self::expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
@@ -75,7 +75,7 @@ class TranslatorTest extends TestCase
 
     public function testAddPseudoClassNotExistsClass()
     {
-        $this->expectException(ExpressionErrorException::class);
+        self::expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
@@ -84,7 +84,7 @@ class TranslatorTest extends TestCase
 
     public function testAddAttributeMatchingClassNotExistsClass()
     {
-        $this->expectException(ExpressionErrorException::class);
+        self::expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
@@ -97,9 +97,9 @@ class TranslatorTest extends TestCase
         $translator = new Translator();
         $document = new \SimpleXMLElement(file_get_contents(__DIR__.'/Fixtures/lang.xml'));
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(\count($elementsId), $elements);
+        self::assertCount(\count($elementsId), $elements);
         foreach ($elements as $element) {
-            $this->assertContains((string) $element->attributes()->id, $elementsId);
+            self::assertContains((string) $element->attributes()->id, $elementsId);
         }
     }
 
@@ -114,10 +114,10 @@ class TranslatorTest extends TestCase
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(\count($elementsId), $elementsId);
+        self::assertCount(\count($elementsId), $elementsId);
         foreach ($elements as $element) {
             if (null !== $element->attributes()->id) {
-                $this->assertContains((string) $element->attributes()->id, $elementsId);
+                self::assertContains((string) $element->attributes()->id, $elementsId);
             }
         }
         libxml_clear_errors();
@@ -135,7 +135,7 @@ class TranslatorTest extends TestCase
         $document = simplexml_import_dom($document);
         $bodies = $document->xpath('//body');
         $elements = $bodies[0]->xpath($translator->cssToXPath($css));
-        $this->assertCount($count, $elements);
+        self::assertCount($count, $elements);
     }
 
     public function testOnlyOfTypeFindsSingleChildrenOfGivenType()
@@ -161,8 +161,8 @@ HTML
         $xpath = new \DOMXPath($document);
         $nodeList = $xpath->query($translator->cssToXPath('span:only-of-type'));
 
-        $this->assertSame(1, $nodeList->length);
-        $this->assertSame('A', $nodeList->item(0)->textContent);
+        self::assertSame(1, $nodeList->length);
+        self::assertSame('A', $nodeList->item(0)->textContent);
     }
 
     public function getXpathLiteralTestData()

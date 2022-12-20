@@ -26,7 +26,7 @@ final class OneSignalOptionsTest extends TestCase
             ->sendAfter(new \DateTimeImmutable('Thu Sep 24 2015 14:00:00 GMT-0700 (PDT)'))
             ->externalId('d637f30d-f709-4bed-9e2c-63637cb91894');
 
-        $this->assertSame([
+        self::assertSame([
             'headings' => ['en' => 'English Heading', 'fr' => 'French Heading'],
             'contents' => ['en' => 'English Content', 'fr' => 'French Content'],
             'url' => 'https://example.com',

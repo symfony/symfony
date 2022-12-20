@@ -30,7 +30,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
-        $this->assertEquals([
+        self::assertEquals([
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
                 'path' => '/foo/',
                 'permanent' => true,
@@ -38,9 +38,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
                 '_route' => 'foo',
-            ],
-            $matcher->match('/foo')
-        );
+            ], $matcher->match('/foo'));
     }
 
     public function testSchemeRedirect()
@@ -50,7 +48,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
-        $this->assertEquals([
+        self::assertEquals([
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
                 'path' => '/foo',
                 'permanent' => true,
@@ -58,9 +56,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
                 '_route' => 'foo',
-            ],
-            $matcher->match('/foo')
-        );
+            ], $matcher->match('/foo'));
     }
 
     private function getMatcher(RouteCollection $routes, RequestContext $context)

@@ -25,18 +25,18 @@ class QtFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/resources.ts';
         $catalogue = $loader->load($resource, 'en', 'resources');
 
-        $this->assertEquals([
+        self::assertEquals([
             'foo' => 'bar',
             'foo_bar' => 'foobar',
             'bar_foo' => 'barfoo',
         ], $catalogue->all('resources'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(NotFoundResourceException::class);
+        self::expectException(NotFoundResourceException::class);
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.ts';
         $loader->load($resource, 'en', 'domain1');
@@ -44,7 +44,7 @@ class QtFileLoaderTest extends TestCase
 
     public function testLoadNonLocalResource()
     {
-        $this->expectException(InvalidResourceException::class);
+        self::expectException(InvalidResourceException::class);
         $loader = new QtFileLoader();
         $resource = 'http://domain1.com/resources.ts';
         $loader->load($resource, 'en', 'domain1');
@@ -52,7 +52,7 @@ class QtFileLoaderTest extends TestCase
 
     public function testLoadInvalidResource()
     {
-        $this->expectException(InvalidResourceException::class);
+        self::expectException(InvalidResourceException::class);
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/invalid-xml-resources.xlf';
         $loader->load($resource, 'en', 'domain1');
@@ -63,8 +63,8 @@ class QtFileLoaderTest extends TestCase
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/empty.xlf';
 
-        $this->expectException(InvalidResourceException::class);
-        $this->expectExceptionMessage(sprintf('Unable to load "%s".', $resource));
+        self::expectException(InvalidResourceException::class);
+        self::expectExceptionMessage(sprintf('Unable to load "%s".', $resource));
 
         $loader->load($resource, 'en', 'domain1');
     }

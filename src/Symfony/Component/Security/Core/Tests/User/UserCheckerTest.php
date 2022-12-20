@@ -29,39 +29,39 @@ class UserCheckerTest extends TestCase
     {
         $checker = new UserChecker();
 
-        $this->assertNull($checker->checkPostAuth($this->createMock(UserInterface::class)));
+        self::assertNull($checker->checkPostAuth(self::createMock(UserInterface::class)));
     }
 
     public function testCheckPostAuthPass()
     {
         $checker = new UserChecker();
-        $this->assertNull($checker->checkPostAuth(new User('John', 'password')));
+        self::assertNull($checker->checkPostAuth(new User('John', 'password')));
     }
 
     public function testCheckPostAuthCredentialsExpired()
     {
-        $this->expectException(CredentialsExpiredException::class);
+        self::expectException(CredentialsExpiredException::class);
         $checker = new UserChecker();
         $checker->checkPostAuth(new User('John', 'password', [], true, true, false, true));
     }
 
     public function testCheckPreAuthAccountLocked()
     {
-        $this->expectException(LockedException::class);
+        self::expectException(LockedException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], true, true, false, false));
     }
 
     public function testCheckPreAuthDisabled()
     {
-        $this->expectException(DisabledException::class);
+        self::expectException(DisabledException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], false, true, false, true));
     }
 
     public function testCheckPreAuthAccountExpired()
     {
-        $this->expectException(AccountExpiredException::class);
+        self::expectException(AccountExpiredException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], true, false, true, true));
     }

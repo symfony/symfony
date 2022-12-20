@@ -27,7 +27,7 @@ final class FunctionsTest extends TestCase
      */
     public function testS(AbstractString $expected, ?string $input)
     {
-        $this->assertEquals($expected, s($input));
+        self::assertEquals($expected, s($input));
     }
 
     public function provideSStrings(): array
@@ -47,7 +47,7 @@ final class FunctionsTest extends TestCase
      */
     public function testU(UnicodeString $expected, ?string $input)
     {
-        $this->assertEquals($expected, u($input));
+        self::assertEquals($expected, u($input));
     }
 
     public function provideUStrings(): array
@@ -65,7 +65,7 @@ final class FunctionsTest extends TestCase
      */
     public function testB(ByteString $expected, ?string $input)
     {
-        $this->assertEquals($expected, b($input));
+        self::assertEquals($expected, b($input));
     }
 
     public function provideBStrings(): array

@@ -43,11 +43,11 @@ class ResolveNoPreloadPassTest extends TestCase
 
         (new ResolveNoPreloadPass())->process($container);
 
-        $this->assertFalse($container->getDefinition('entry_point')->hasTag('container.no_preload'));
-        $this->assertFalse($container->getDefinition('preloaded')->hasTag('container.no_preload'));
-        $this->assertFalse($container->getDefinition('preloaded_dep')->hasTag('container.no_preload'));
-        $this->assertFalse($container->getDefinition('common_dep')->hasTag('container.no_preload'));
-        $this->assertTrue($container->getDefinition('not_preloaded')->hasTag('container.no_preload'));
-        $this->assertTrue($container->getDefinition('not_preloaded_dep')->hasTag('container.no_preload'));
+        self::assertFalse($container->getDefinition('entry_point')->hasTag('container.no_preload'));
+        self::assertFalse($container->getDefinition('preloaded')->hasTag('container.no_preload'));
+        self::assertFalse($container->getDefinition('preloaded_dep')->hasTag('container.no_preload'));
+        self::assertFalse($container->getDefinition('common_dep')->hasTag('container.no_preload'));
+        self::assertTrue($container->getDefinition('not_preloaded')->hasTag('container.no_preload'));
+        self::assertTrue($container->getDefinition('not_preloaded_dep')->hasTag('container.no_preload'));
     }
 }

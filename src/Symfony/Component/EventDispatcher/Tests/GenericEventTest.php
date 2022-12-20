@@ -46,7 +46,7 @@ class GenericEventTest extends TestCase
 
     public function testConstruct()
     {
-        $this->assertEquals($this->event, new GenericEvent($this->subject, ['name' => 'Event']));
+        self::assertEquals($this->event, new GenericEvent($this->subject, ['name' => 'Event']));
     }
 
     /**
@@ -55,72 +55,72 @@ class GenericEventTest extends TestCase
     public function testGetArguments()
     {
         // test getting all
-        $this->assertSame(['name' => 'Event'], $this->event->getArguments());
+        self::assertSame(['name' => 'Event'], $this->event->getArguments());
     }
 
     public function testSetArguments()
     {
         $result = $this->event->setArguments(['foo' => 'bar']);
-        $this->assertSame(['foo' => 'bar'], $this->event->getArguments());
-        $this->assertSame($this->event, $result);
+        self::assertSame(['foo' => 'bar'], $this->event->getArguments());
+        self::assertSame($this->event, $result);
     }
 
     public function testSetArgument()
     {
         $result = $this->event->setArgument('foo2', 'bar2');
-        $this->assertSame(['name' => 'Event', 'foo2' => 'bar2'], $this->event->getArguments());
-        $this->assertEquals($this->event, $result);
+        self::assertSame(['name' => 'Event', 'foo2' => 'bar2'], $this->event->getArguments());
+        self::assertEquals($this->event, $result);
     }
 
     public function testGetArgument()
     {
         // test getting key
-        $this->assertEquals('Event', $this->event->getArgument('name'));
+        self::assertEquals('Event', $this->event->getArgument('name'));
     }
 
     public function testGetArgException()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $this->event->getArgument('nameNotExist');
     }
 
     public function testOffsetGet()
     {
         // test getting key
-        $this->assertEquals('Event', $this->event['name']);
+        self::assertEquals('Event', $this->event['name']);
 
         // test getting invalid arg
-        $this->expectException(\InvalidArgumentException::class);
-        $this->assertFalse($this->event['nameNotExist']);
+        self::expectException(\InvalidArgumentException::class);
+        self::assertFalse($this->event['nameNotExist']);
     }
 
     public function testOffsetSet()
     {
         $this->event['foo2'] = 'bar2';
-        $this->assertSame(['name' => 'Event', 'foo2' => 'bar2'], $this->event->getArguments());
+        self::assertSame(['name' => 'Event', 'foo2' => 'bar2'], $this->event->getArguments());
     }
 
     public function testOffsetUnset()
     {
         unset($this->event['name']);
-        $this->assertSame([], $this->event->getArguments());
+        self::assertSame([], $this->event->getArguments());
     }
 
     public function testOffsetIsset()
     {
-        $this->assertArrayHasKey('name', $this->event);
-        $this->assertArrayNotHasKey('nameNotExist', $this->event);
+        self::assertArrayHasKey('name', $this->event);
+        self::assertArrayNotHasKey('nameNotExist', $this->event);
     }
 
     public function testHasArgument()
     {
-        $this->assertTrue($this->event->hasArgument('name'));
-        $this->assertFalse($this->event->hasArgument('nameNotExist'));
+        self::assertTrue($this->event->hasArgument('name'));
+        self::assertFalse($this->event->hasArgument('nameNotExist'));
     }
 
     public function testGetSubject()
     {
-        $this->assertSame($this->subject, $this->event->getSubject());
+        self::assertSame($this->subject, $this->event->getSubject());
     }
 
     public function testHasIterator()
@@ -129,6 +129,6 @@ class GenericEventTest extends TestCase
         foreach ($this->event as $key => $value) {
             $data[$key] = $value;
         }
-        $this->assertEquals(['name' => 'Event'], $data);
+        self::assertEquals(['name' => 'Event'], $data);
     }
 }

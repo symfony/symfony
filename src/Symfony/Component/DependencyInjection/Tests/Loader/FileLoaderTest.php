@@ -83,7 +83,7 @@ class FileLoaderTest extends TestCase
             'foo_bar' => new Reference('foo_bar'),
         ];
 
-        $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
+        self::assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
     }
 
     public function testRegisterClasses()
@@ -97,18 +97,12 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*'); // loading twice should not be an issue
         $loader->registerAliasesForSinglyImplementedInterfaces();
 
-        $this->assertEquals(
-            ['service_container', Bar::class],
-            array_keys($container->getDefinitions())
-        );
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                BarInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        self::assertEquals(['service_container', Bar::class], array_keys($container->getDefinitions()));
+        self::assertEquals([
+            PsrContainerInterface::class,
+            ContainerInterface::class,
+            BarInterface::class,
+        ], array_keys($container->getAliases()));
     }
 
     public function testRegisterClassesWithExclude()
@@ -125,19 +119,16 @@ class FileLoaderTest extends TestCase
             'Prototype/{%other_dir%/AnotherSub,Foo.php}'
         );
 
-        $this->assertTrue($container->has(Bar::class));
-        $this->assertTrue($container->has(Baz::class));
-        $this->assertFalse($container->has(Foo::class));
-        $this->assertFalse($container->has(DeeperBaz::class));
+        self::assertTrue($container->has(Bar::class));
+        self::assertTrue($container->has(Baz::class));
+        self::assertFalse($container->has(Foo::class));
+        self::assertFalse($container->has(DeeperBaz::class));
 
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                BarInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        self::assertEquals([
+            PsrContainerInterface::class,
+            ContainerInterface::class,
+            BarInterface::class,
+        ], array_keys($container->getAliases()));
 
         $loader->registerClasses(
             new Definition(),
@@ -161,10 +152,10 @@ class FileLoaderTest extends TestCase
             ]
         );
 
-        $this->assertTrue($container->has(Foo::class));
-        $this->assertTrue($container->has(Baz::class));
-        $this->assertFalse($container->has(Bar::class));
-        $this->assertFalse($container->has(DeeperBaz::class));
+        self::assertTrue($container->has(Foo::class));
+        self::assertTrue($container->has(Baz::class));
+        self::assertFalse($container->has(Bar::class));
+        self::assertFalse($container->has(DeeperBaz::class));
     }
 
     public function testNestedRegisterClasses()
@@ -175,26 +166,23 @@ class FileLoaderTest extends TestCase
         $prototype = (new Definition())->setAutoconfigured(true);
         $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
 
-        $this->assertTrue($container->has(Bar::class));
-        $this->assertTrue($container->has(Baz::class));
-        $this->assertTrue($container->has(Foo::class));
+        self::assertTrue($container->has(Bar::class));
+        self::assertTrue($container->has(Baz::class));
+        self::assertTrue($container->has(Foo::class));
 
-        $this->assertEquals(
-            [
-                PsrContainerInterface::class,
-                ContainerInterface::class,
-                FooInterface::class,
-            ],
-            array_keys($container->getAliases())
-        );
+        self::assertEquals([
+            PsrContainerInterface::class,
+            ContainerInterface::class,
+            FooInterface::class,
+        ], array_keys($container->getAliases()));
 
         $alias = $container->getAlias(FooInterface::class);
-        $this->assertSame(Foo::class, (string) $alias);
-        $this->assertFalse($alias->isPublic());
-        $this->assertTrue($alias->isPrivate());
+        self::assertSame(Foo::class, (string) $alias);
+        self::assertFalse($alias->isPublic());
+        self::assertTrue($alias->isPrivate());
 
         if (\PHP_VERSION_ID >= 80000) {
-            $this->assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
+            self::assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
         }
     }
 
@@ -210,18 +198,15 @@ class FileLoaderTest extends TestCase
             'Prototype/%bad_classes_dir%/*'
         );
 
-        $this->assertTrue($container->has(MissingParent::class));
+        self::assertTrue($container->has(MissingParent::class));
 
-        $this->assertMatchesRegularExpression(
-            '{Class "?Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Fixtures\\\\Prototype\\\\BadClasses\\\\MissingClass"? not found}',
-            $container->getDefinition(MissingParent::class)->getErrors()[0]
-        );
+        self::assertMatchesRegularExpression('{Class "?Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Fixtures\\\\Prototype\\\\BadClasses\\\\MissingClass"? not found}', $container->getDefinition(MissingParent::class)->getErrors()[0]);
     }
 
     public function testRegisterClassesWithBadPrefix()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Expected to find class "Symfony\\\Component\\\DependencyInjection\\\Tests\\\Fixtures\\\Prototype\\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/Expected to find class "Symfony\\\Component\\\DependencyInjection\\\Tests\\\Fixtures\\\Prototype\\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/');
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
@@ -231,8 +216,8 @@ class FileLoaderTest extends TestCase
 
     public function testRegisterClassesWithIncompatibleExclude()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "exclude" pattern when importing classes for "Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\": make sure your "exclude" pattern (yaml/*) is a subset of the "resource" pattern (Prototype/*)');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid "exclude" pattern when importing classes for "Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\": make sure your "exclude" pattern (yaml/*) is a subset of the "resource" pattern (Prototype/*)');
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
@@ -258,8 +243,8 @@ class FileLoaderTest extends TestCase
             $exclude
         );
 
-        $this->assertTrue($container->has(Foo::class));
-        $this->assertFalse($container->has(DeeperBaz::class));
+        self::assertTrue($container->has(Foo::class));
+        self::assertFalse($container->has(DeeperBaz::class));
     }
 
     public function excludeTrailingSlashConsistencyProvider(): iterable
@@ -291,7 +276,7 @@ class FileLoaderTest extends TestCase
             'Prototype/{Foo.php}'
         );
 
-        $this->assertSame($expected, $container->has(Foo::class));
+        self::assertSame($expected, $container->has(Foo::class));
     }
 }
 

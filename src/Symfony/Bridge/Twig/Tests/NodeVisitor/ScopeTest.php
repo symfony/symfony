@@ -20,6 +20,6 @@ class ScopeTest extends TestCase
     {
         $scope = new Scope();
         $scope->enter();
-        $this->assertNull($scope->get('test'));
+        self::assertNull($scope->get('test'));
     }
 }

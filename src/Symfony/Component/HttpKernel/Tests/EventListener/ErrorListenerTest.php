@@ -45,8 +45,8 @@ class ErrorListenerTest extends TestCase
         $_controller = new \ReflectionProperty(\get_class($l), 'controller');
         $_controller->setAccessible(true);
 
-        $this->assertSame($logger, $_logger->getValue($l));
-        $this->assertSame('foo', $_controller->getValue($l));
+        self::assertSame($logger, $_logger->getValue($l));
+        self::assertSame('foo', $_controller->getValue($l));
     }
 
     /**
@@ -54,21 +54,21 @@ class ErrorListenerTest extends TestCase
      */
     public function testHandleWithoutLogger($event, $event2)
     {
-        $this->iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
+        self::iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
         $l = new ErrorListener('foo');
         $l->logKernelException($event);
         $l->onKernelException($event);
 
-        $this->assertEquals(new Response('foo'), $event->getResponse());
+        self::assertEquals(new Response('foo'), $event->getResponse());
 
         try {
             $l->logKernelException($event2);
             $l->onKernelException($event2);
-            $this->fail('RuntimeException expected');
+            self::fail('RuntimeException expected');
         } catch (\RuntimeException $e) {
-            $this->assertSame('bar', $e->getMessage());
-            $this->assertSame('foo', $e->getPrevious()->getMessage());
+            self::assertSame('bar', $e->getMessage());
+            self::assertSame('foo', $e->getPrevious()->getMessage());
         }
     }
 
@@ -83,19 +83,19 @@ class ErrorListenerTest extends TestCase
         $l->logKernelException($event);
         $l->onKernelException($event);
 
-        $this->assertEquals(new Response('foo'), $event->getResponse());
+        self::assertEquals(new Response('foo'), $event->getResponse());
 
         try {
             $l->logKernelException($event2);
             $l->onKernelException($event2);
-            $this->fail('RuntimeException expected');
+            self::fail('RuntimeException expected');
         } catch (\RuntimeException $e) {
-            $this->assertSame('bar', $e->getMessage());
-            $this->assertSame('foo', $e->getPrevious()->getMessage());
+            self::assertSame('bar', $e->getMessage());
+            self::assertSame('foo', $e->getPrevious()->getMessage());
         }
 
-        $this->assertEquals(3, $logger->countErrors());
-        $this->assertCount(3, $logger->getLogs('critical'));
+        self::assertEquals(3, $logger->countErrors());
+        self::assertCount(3, $logger->getLogs('critical'));
     }
 
     public function testHandleWithLoggerAndCustomConfiguration()
@@ -112,11 +112,11 @@ class ErrorListenerTest extends TestCase
         $l->logKernelException($event);
         $l->onKernelException($event);
 
-        $this->assertEquals(new Response('foo', 401), $event->getResponse());
+        self::assertEquals(new Response('foo', 401), $event->getResponse());
 
-        $this->assertEquals(0, $logger->countErrors());
-        $this->assertCount(0, $logger->getLogs('critical'));
-        $this->assertCount(1, $logger->getLogs('warning'));
+        self::assertEquals(0, $logger->countErrors());
+        self::assertCount(0, $logger->getLogs('critical'));
+        self::assertCount(1, $logger->getLogs('warning'));
     }
 
     public function provider()
@@ -137,10 +137,10 @@ class ErrorListenerTest extends TestCase
 
     public function testSubRequestFormat()
     {
-        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
+        $listener = new ErrorListener('foo', self::createMock(LoggerInterface::class));
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
+        $kernel = self::createMock(HttpKernelInterface::class);
+        $kernel->expects(self::once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
 
@@ -151,18 +151,18 @@ class ErrorListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $response = $event->getResponse();
-        $this->assertEquals('xml', $response->getContent());
+        self::assertEquals('xml', $response->getContent());
     }
 
     public function testCSPHeaderIsRemoved()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
+        $kernel = self::createMock(HttpKernelInterface::class);
+        $kernel->expects(self::once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
 
-        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class), true);
+        $listener = new ErrorListener('foo', self::createMock(LoggerInterface::class), true);
 
         $dispatcher->addSubscriber($listener);
 
@@ -171,12 +171,12 @@ class ErrorListenerTest extends TestCase
         $dispatcher->dispatch($event, KernelEvents::EXCEPTION);
 
         $response = new Response('', 200, ['content-security-policy' => "style-src 'self'"]);
-        $this->assertTrue($response->headers->has('content-security-policy'));
+        self::assertTrue($response->headers->has('content-security-policy'));
 
         $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
+        self::assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
     }
 
     /**
@@ -184,11 +184,11 @@ class ErrorListenerTest extends TestCase
      */
     public function testOnControllerArguments(callable $controller)
     {
-        $listener = new ErrorListener($controller, $this->createMock(LoggerInterface::class), true);
+        $listener = new ErrorListener($controller, self::createMock(LoggerInterface::class), true);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $kernel->method('handle')->willReturnCallback(function (Request $request) use ($listener, $controller, $kernel) {
-            $this->assertSame($controller, $request->attributes->get('_controller'));
+            self::assertSame($controller, $request->attributes->get('_controller'));
             $arguments = (new ArgumentResolver())->getArguments($request, $controller);
             $event = new ControllerArgumentsEvent($kernel, $controller, $arguments, $request, HttpKernelInterface::SUB_REQUEST);
             $listener->onControllerArguments($event);
@@ -199,7 +199,7 @@ class ErrorListenerTest extends TestCase
         $event = new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'));
         $listener->onKernelException($event);
 
-        $this->assertSame('OK: foo', $event->getResponse()->getContent());
+        self::assertSame('OK: foo', $event->getResponse()->getContent());
     }
 
     public function controllerProvider()
@@ -209,7 +209,7 @@ class ErrorListenerTest extends TestCase
         }];
 
         yield [function ($exception) {
-            $this->assertInstanceOf(FlattenException::class, $exception);
+            self::assertInstanceOf(FlattenException::class, $exception);
 
             return new Response('OK: '.$exception->getMessage());
         }];

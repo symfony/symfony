@@ -26,10 +26,10 @@ class ContainerTest extends TestCase
     public function testConstructor()
     {
         $sc = new Container();
-        $this->assertSame($sc, $sc->get('service_container'), '__construct() automatically registers itself as a service');
+        self::assertSame($sc, $sc->get('service_container'), '__construct() automatically registers itself as a service');
 
         $sc = new Container(new ParameterBag(['foo' => 'bar']));
-        $this->assertEquals(['foo' => 'bar'], $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
+        self::assertEquals(['foo' => 'bar'], $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
     }
 
     /**
@@ -37,7 +37,7 @@ class ContainerTest extends TestCase
      */
     public function testCamelize($id, $expected)
     {
-        $this->assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
+        self::assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
     }
 
     public function dataForTestCamelize()
@@ -61,7 +61,7 @@ class ContainerTest extends TestCase
      */
     public function testUnderscore($id, $expected)
     {
-        $this->assertEquals($expected, Container::underscore($id), sprintf('Container::underscore("%s")', $id));
+        self::assertEquals($expected, Container::underscore($id), sprintf('Container::underscore("%s")', $id));
     }
 
     public function dataForTestUnderscore()
@@ -79,48 +79,48 @@ class ContainerTest extends TestCase
     public function testCompile()
     {
         $sc = new Container(new ParameterBag(['foo' => 'bar']));
-        $this->assertFalse($sc->getParameterBag()->isResolved(), '->compile() resolves the parameter bag');
+        self::assertFalse($sc->getParameterBag()->isResolved(), '->compile() resolves the parameter bag');
         $sc->compile();
-        $this->assertTrue($sc->getParameterBag()->isResolved(), '->compile() resolves the parameter bag');
-        $this->assertInstanceOf(FrozenParameterBag::class, $sc->getParameterBag(), '->compile() changes the parameter bag to a FrozenParameterBag instance');
-        $this->assertEquals(['foo' => 'bar'], $sc->getParameterBag()->all(), '->compile() copies the current parameters to the new parameter bag');
+        self::assertTrue($sc->getParameterBag()->isResolved(), '->compile() resolves the parameter bag');
+        self::assertInstanceOf(FrozenParameterBag::class, $sc->getParameterBag(), '->compile() changes the parameter bag to a FrozenParameterBag instance');
+        self::assertEquals(['foo' => 'bar'], $sc->getParameterBag()->all(), '->compile() copies the current parameters to the new parameter bag');
     }
 
     public function testIsCompiled()
     {
         $sc = new Container(new ParameterBag(['foo' => 'bar']));
-        $this->assertFalse($sc->isCompiled(), '->isCompiled() returns false if the container is not compiled');
+        self::assertFalse($sc->isCompiled(), '->isCompiled() returns false if the container is not compiled');
         $sc->compile();
-        $this->assertTrue($sc->isCompiled(), '->isCompiled() returns true if the container is compiled');
+        self::assertTrue($sc->isCompiled(), '->isCompiled() returns true if the container is compiled');
     }
 
     public function testIsCompiledWithFrozenParameters()
     {
         $sc = new Container(new FrozenParameterBag(['foo' => 'bar']));
-        $this->assertFalse($sc->isCompiled(), '->isCompiled() returns false if the container is not compiled but the parameter bag is already frozen');
+        self::assertFalse($sc->isCompiled(), '->isCompiled() returns false if the container is not compiled but the parameter bag is already frozen');
     }
 
     public function testGetParameterBag()
     {
         $sc = new Container();
-        $this->assertEquals([], $sc->getParameterBag()->all(), '->getParameterBag() returns an empty array if no parameter has been defined');
+        self::assertEquals([], $sc->getParameterBag()->all(), '->getParameterBag() returns an empty array if no parameter has been defined');
     }
 
     public function testGetSetParameter()
     {
         $sc = new Container(new ParameterBag(['foo' => 'bar']));
         $sc->setParameter('bar', 'foo');
-        $this->assertEquals('foo', $sc->getParameter('bar'), '->setParameter() sets the value of a new parameter');
+        self::assertEquals('foo', $sc->getParameter('bar'), '->setParameter() sets the value of a new parameter');
 
         $sc->setParameter('foo', 'baz');
-        $this->assertEquals('baz', $sc->getParameter('foo'), '->setParameter() overrides previously set parameter');
+        self::assertEquals('baz', $sc->getParameter('foo'), '->setParameter() overrides previously set parameter');
 
         try {
             $sc->getParameter('baba');
-            $this->fail('->getParameter() thrown an \InvalidArgumentException if the key does not exist');
+            self::fail('->getParameter() thrown an \InvalidArgumentException if the key does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
+            self::assertInstanceOf(\InvalidArgumentException::class, $e, '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
+            self::assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
         }
     }
 
@@ -129,8 +129,8 @@ class ContainerTest extends TestCase
         $sc = new Container(new ParameterBag(['foo' => 'bar']));
 
         $sc->setParameter('Foo', 'baz1');
-        $this->assertEquals('bar', $sc->getParameter('foo'));
-        $this->assertEquals('baz1', $sc->getParameter('Foo'));
+        self::assertEquals('bar', $sc->getParameter('foo'));
+        self::assertEquals('baz1', $sc->getParameter('Foo'));
     }
 
     public function testGetServiceIds()
@@ -138,18 +138,18 @@ class ContainerTest extends TestCase
         $sc = new Container();
         $sc->set('foo', $obj = new \stdClass());
         $sc->set('bar', $obj = new \stdClass());
-        $this->assertEquals(['service_container', 'foo', 'bar'], $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
+        self::assertEquals(['service_container', 'foo', 'bar'], $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(['service_container', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'alias', 'foo'], $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
+        self::assertEquals(['service_container', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'alias', 'foo'], $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
     }
 
     public function testSet()
     {
         $sc = new Container();
         $sc->set('._. \\o/', $foo = new \stdClass());
-        $this->assertSame($foo, $sc->get('._. \\o/'), '->set() sets a service');
+        self::assertSame($foo, $sc->get('._. \\o/'), '->set() sets a service');
     }
 
     public function testSetWithNullResetTheService()
@@ -157,7 +157,7 @@ class ContainerTest extends TestCase
         $sc = new Container();
         $sc->set('foo', new \stdClass());
         $sc->set('foo', null);
-        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+        self::assertFalse($sc->has('foo'), '->set() with null service resets the service');
     }
 
     public function testSetReplacesAlias()
@@ -165,22 +165,22 @@ class ContainerTest extends TestCase
         $c = new ProjectServiceContainer();
 
         $c->set('alias', $foo = new \stdClass());
-        $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
+        self::assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
     }
 
     public function testSetWithNullOnInitializedPredefinedService()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "bar" service is already initialized, you cannot replace it.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "bar" service is already initialized, you cannot replace it.');
         $sc = new Container();
         $sc->set('foo', new \stdClass());
         $sc->set('foo', null);
-        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+        self::assertFalse($sc->has('foo'), '->set() with null service resets the service');
 
         $sc = new ProjectServiceContainer();
         $sc->get('bar');
         $sc->set('bar', null);
-        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
+        self::assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
     }
 
     public function testSetWithNullOnUninitializedPredefinedService()
@@ -189,29 +189,29 @@ class ContainerTest extends TestCase
         $sc->set('foo', new \stdClass());
         $sc->get('foo');
         $sc->set('foo', null);
-        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+        self::assertFalse($sc->has('foo'), '->set() with null service resets the service');
 
         $sc = new ProjectServiceContainer();
         $sc->set('bar', null);
-        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
+        self::assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
     }
 
     public function testGet()
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $foo = new \stdClass());
-        $this->assertSame($foo, $sc->get('foo'), '->get() returns the service for the given id');
-        $this->assertSame($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
-        $this->assertSame($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
-        $this->assertSame($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
+        self::assertSame($foo, $sc->get('foo'), '->get() returns the service for the given id');
+        self::assertSame($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
+        self::assertSame($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
+        self::assertSame($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
 
         try {
             $sc->get('');
-            $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
+            self::fail('->get() throws a \InvalidArgumentException exception if the service is empty');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(ServiceNotFoundException::class, $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
+            self::assertInstanceOf(ServiceNotFoundException::class, $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
         }
-        $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
+        self::assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
     }
 
     public function testCaseSensitivity()
@@ -220,9 +220,9 @@ class ContainerTest extends TestCase
         $sc->set('foo', $foo1 = new \stdClass());
         $sc->set('Foo', $foo2 = new \stdClass());
 
-        $this->assertSame(['service_container', 'foo', 'Foo'], $sc->getServiceIds());
-        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case sensitively');
-        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case sensitively');
+        self::assertSame(['service_container', 'foo', 'Foo'], $sc->getServiceIds());
+        self::assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case sensitively');
+        self::assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case sensitively');
     }
 
     public function testGetThrowServiceNotFoundException()
@@ -233,18 +233,18 @@ class ContainerTest extends TestCase
 
         try {
             $sc->get('foo1');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+            self::fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(ServiceNotFoundException::class, $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent service "foo1". Did you mean this: "foo"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
+            self::assertInstanceOf(ServiceNotFoundException::class, $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+            self::assertEquals('You have requested a non-existent service "foo1". Did you mean this: "foo"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
         }
 
         try {
             $sc->get('bag');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+            self::fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(ServiceNotFoundException::class, $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent service "bag". Did you mean one of these: "bar", "baz"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
+            self::assertInstanceOf(ServiceNotFoundException::class, $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+            self::assertEquals('You have requested a non-existent service "bag". Did you mean one of these: "bar", "baz"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
         }
     }
 
@@ -253,17 +253,17 @@ class ContainerTest extends TestCase
         $sc = new ProjectServiceContainer();
         try {
             $sc->get('circular');
-            $this->fail('->get() throws a ServiceCircularReferenceException if it contains circular reference');
+            self::fail('->get() throws a ServiceCircularReferenceException if it contains circular reference');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(ServiceCircularReferenceException::class, $e, '->get() throws a ServiceCircularReferenceException if it contains circular reference');
-            $this->assertStringStartsWith('Circular reference detected for service "circular"', $e->getMessage(), '->get() throws a \LogicException if it contains circular reference');
+            self::assertInstanceOf(ServiceCircularReferenceException::class, $e, '->get() throws a ServiceCircularReferenceException if it contains circular reference');
+            self::assertStringStartsWith('Circular reference detected for service "circular"', $e->getMessage(), '->get() throws a \LogicException if it contains circular reference');
         }
     }
 
     public function testGetSyntheticServiceThrows()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The "request" service is synthetic, it needs to be set at boot time before it can be used.');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('The "request" service is synthetic, it needs to be set at boot time before it can be used.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
@@ -272,8 +272,8 @@ class ContainerTest extends TestCase
 
     public function testGetRemovedServiceThrows()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
@@ -284,31 +284,31 @@ class ContainerTest extends TestCase
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', new \stdClass());
-        $this->assertFalse($sc->has('foo1'), '->has() returns false if the service does not exist');
-        $this->assertTrue($sc->has('foo'), '->has() returns true if the service exists');
-        $this->assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
-        $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
-        $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
+        self::assertFalse($sc->has('foo1'), '->has() returns false if the service does not exist');
+        self::assertTrue($sc->has('foo'), '->has() returns true if the service exists');
+        self::assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
+        self::assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
+        self::assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
     }
 
     public function testInitialized()
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', new \stdClass());
-        $this->assertTrue($sc->initialized('foo'), '->initialized() returns true if service is loaded');
-        $this->assertFalse($sc->initialized('foo1'), '->initialized() returns false if service is not loaded');
-        $this->assertFalse($sc->initialized('bar'), '->initialized() returns false if a service is defined, but not currently loaded');
-        $this->assertFalse($sc->initialized('alias'), '->initialized() returns false if an aliased service is not initialized');
+        self::assertTrue($sc->initialized('foo'), '->initialized() returns true if service is loaded');
+        self::assertFalse($sc->initialized('foo1'), '->initialized() returns false if service is not loaded');
+        self::assertFalse($sc->initialized('bar'), '->initialized() returns false if a service is defined, but not currently loaded');
+        self::assertFalse($sc->initialized('alias'), '->initialized() returns false if an aliased service is not initialized');
 
         $sc->get('bar');
-        $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
+        self::assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
     public function testInitializedWithPrivateService()
     {
         $sc = new ProjectServiceContainer();
         $sc->get('internal_dependency');
-        $this->assertFalse($sc->initialized('internal'));
+        self::assertFalse($sc->initialized('internal'));
     }
 
     public function testReset()
@@ -325,14 +325,14 @@ class ContainerTest extends TestCase
 
         $c->reset();
 
-        $this->assertNull($c->get('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        $this->assertSame(1, $bar->resetCounter);
+        self::assertNull($c->get('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        self::assertSame(1, $bar->resetCounter);
     }
 
     public function testGetThrowsException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Something went terribly wrong!');
+        self::expectException(\Exception::class);
+        self::expectExceptionMessage('Something went terribly wrong!');
         $c = new ProjectServiceContainer();
 
         try {
@@ -355,7 +355,7 @@ class ContainerTest extends TestCase
             // Do nothing.
         }
 
-        $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
+        self::assertFalse($c->initialized('throws_exception_on_service_configuration'));
 
         // Retry, to make sure that get*Service() will be called.
         try {
@@ -363,7 +363,7 @@ class ContainerTest extends TestCase
         } catch (\Exception $e) {
             // Do nothing.
         }
-        $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
+        self::assertFalse($c->initialized('throws_exception_on_service_configuration'));
     }
 
     protected function getField($obj, $field)
@@ -378,29 +378,29 @@ class ContainerTest extends TestCase
     {
         $c = new ProjectServiceContainer();
 
-        $this->assertTrue($c->has('alias'));
-        $this->assertSame($c->get('alias'), $c->get('bar'));
+        self::assertTrue($c->has('alias'));
+        self::assertSame($c->get('alias'), $c->get('bar'));
     }
 
     public function testThatCloningIsNotSupported()
     {
         $class = new \ReflectionClass(Container::class);
         $clone = $class->getMethod('__clone');
-        $this->assertFalse($class->isCloneable());
-        $this->assertTrue($clone->isPrivate());
+        self::assertFalse($class->isCloneable());
+        self::assertTrue($clone->isPrivate());
     }
 
     public function testCheckExistenceOfAnInternalPrivateService()
     {
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
-        $this->assertFalse($c->has('internal'));
+        self::assertFalse($c->has('internal'));
     }
 
     public function testRequestAnInternalSharedPrivateService()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('You have requested a non-existent service "internal".');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('You have requested a non-existent service "internal".');
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
         $c->get('internal');

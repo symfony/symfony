@@ -23,33 +23,33 @@ class FrozenParameterBagTest extends TestCase
             'bar' => 'bar',
         ];
         $bag = new FrozenParameterBag($parameters);
-        $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
+        self::assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
 
     public function testClear()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->clear();
     }
 
     public function testSet()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->set('foo', 'bar');
     }
 
     public function testAdd()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->add([]);
     }
 
     public function testRemove()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $bag = new FrozenParameterBag(['foo' => 'bar']);
         $bag->remove('foo');
     }

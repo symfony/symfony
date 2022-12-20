@@ -23,8 +23,8 @@ class UrlTypeTest extends TextTypeTest
 
         $form->submit('www.domain.com');
 
-        $this->assertSame('http://www.domain.com', $form->getData());
-        $this->assertSame('http://www.domain.com', $form->getViewData());
+        self::assertSame('http://www.domain.com', $form->getData());
+        self::assertSame('http://www.domain.com', $form->getViewData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
@@ -35,8 +35,8 @@ class UrlTypeTest extends TextTypeTest
 
         $form->submit('ftp://www.domain.com');
 
-        $this->assertSame('ftp://www.domain.com', $form->getData());
-        $this->assertSame('ftp://www.domain.com', $form->getViewData());
+        self::assertSame('ftp://www.domain.com', $form->getData());
+        self::assertSame('ftp://www.domain.com', $form->getViewData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
@@ -47,8 +47,8 @@ class UrlTypeTest extends TextTypeTest
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfNull()
@@ -59,8 +59,8 @@ class UrlTypeTest extends TextTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertSame('', $form->getViewData());
+        self::assertNull($form->getData());
+        self::assertSame('', $form->getViewData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
@@ -71,13 +71,13 @@ class UrlTypeTest extends TextTypeTest
 
         $form->submit('www.domain.com');
 
-        $this->assertSame('www.domain.com', $form->getData());
-        $this->assertSame('www.domain.com', $form->getViewData());
+        self::assertSame('www.domain.com', $form->getData());
+        self::assertSame('www.domain.com', $form->getViewData());
     }
 
     public function testThrowExceptionIfDefaultProtocolIsInvalid()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => [],
         ]);
@@ -91,8 +91,8 @@ class UrlTypeTest extends TextTypeTest
         $form->submit(null);
 
         // listener normalizes data on submit
-        $this->assertSame($expectedData, $form->getViewData());
-        $this->assertSame($expectedData, $form->getNormData());
-        $this->assertSame($expectedData, $form->getData());
+        self::assertSame($expectedData, $form->getViewData());
+        self::assertSame($expectedData, $form->getNormData());
+        self::assertSame($expectedData, $form->getData());
     }
 }

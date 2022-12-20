@@ -24,7 +24,7 @@ class AbstractChannelTest extends TestCase
 {
     public function testChannelCannotBeConstructedWithoutTransportAndBus()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
 
         new DummyChannel();
     }

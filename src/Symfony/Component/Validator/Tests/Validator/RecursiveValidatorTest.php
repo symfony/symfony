@@ -120,13 +120,13 @@ class RecursiveValidatorTest extends TestCase
     public function testValidate()
     {
         $callback = function ($value, ExecutionContextInterface $context) {
-            $this->assertNull($context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame('Bernhard', $context->getRoot());
-            $this->assertSame('Bernhard', $context->getValue());
-            $this->assertSame('Bernhard', $value);
+            self::assertNull($context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame('Bernhard', $context->getRoot());
+            self::assertSame('Bernhard', $context->getValue());
+            self::assertSame('Bernhard', $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -139,15 +139,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate('Bernhard', $constraint, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('', $violations[0]->getPropertyPath());
-        $this->assertSame('Bernhard', $violations[0]->getRoot());
-        $this->assertSame('Bernhard', $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('', $violations[0]->getPropertyPath());
+        self::assertSame('Bernhard', $violations[0]->getRoot());
+        self::assertSame('Bernhard', $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testClassConstraint()
@@ -155,14 +155,14 @@ class RecursiveValidatorTest extends TestCase
         $entity = new Entity();
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->metadata, $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame($entity, $context->getValue());
-            $this->assertSame($entity, $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->metadata, $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame($entity, $context->getValue());
+            self::assertSame($entity, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -175,15 +175,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame($entity, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testPropertyConstraint()
@@ -194,14 +194,14 @@ class RecursiveValidatorTest extends TestCase
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
 
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertSame('firstName', $context->getPropertyName());
-            $this->assertSame('firstName', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame('Bernhard', $context->getValue());
-            $this->assertSame('Bernhard', $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertSame('firstName', $context->getPropertyName());
+            self::assertSame('firstName', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($propertyMetadatas[0], $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame('Bernhard', $context->getValue());
+            self::assertSame('Bernhard', $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -214,15 +214,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('firstName', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame('Bernhard', $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('firstName', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame('Bernhard', $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testGetterConstraint()
@@ -233,14 +233,14 @@ class RecursiveValidatorTest extends TestCase
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('lastName');
 
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertSame('lastName', $context->getPropertyName());
-            $this->assertSame('lastName', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame('Schussek', $context->getValue());
-            $this->assertSame('Schussek', $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertSame('lastName', $context->getPropertyName());
+            self::assertSame('lastName', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($propertyMetadatas[0], $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame('Schussek', $context->getValue());
+            self::assertSame('Schussek', $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -253,15 +253,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('lastName', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame('Schussek', $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('lastName', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame('Schussek', $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testArray()
@@ -270,14 +270,14 @@ class RecursiveValidatorTest extends TestCase
         $array = ['key' => $entity];
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity, $array) {
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('[key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->metadata, $context->getMetadata());
-            $this->assertSame($array, $context->getRoot());
-            $this->assertSame($entity, $context->getValue());
-            $this->assertSame($entity, $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('[key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->metadata, $context->getMetadata());
+            self::assertSame($array, $context->getRoot());
+            self::assertSame($entity, $context->getValue());
+            self::assertSame($entity, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -290,15 +290,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($array, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('[key]', $violations[0]->getPropertyPath());
-        $this->assertSame($array, $violations[0]->getRoot());
-        $this->assertSame($entity, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('[key]', $violations[0]->getPropertyPath());
+        self::assertSame($array, $violations[0]->getRoot());
+        self::assertSame($entity, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testRecursiveArray()
@@ -307,14 +307,14 @@ class RecursiveValidatorTest extends TestCase
         $array = [2 => ['key' => $entity]];
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity, $array) {
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('[2][key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->metadata, $context->getMetadata());
-            $this->assertSame($array, $context->getRoot());
-            $this->assertSame($entity, $context->getValue());
-            $this->assertSame($entity, $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('[2][key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->metadata, $context->getMetadata());
+            self::assertSame($array, $context->getRoot());
+            self::assertSame($entity, $context->getValue());
+            self::assertSame($entity, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -327,15 +327,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($array, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('[2][key]', $violations[0]->getPropertyPath());
-        $this->assertSame($array, $violations[0]->getRoot());
-        $this->assertSame($entity, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('[2][key]', $violations[0]->getPropertyPath());
+        self::assertSame($array, $violations[0]->getRoot());
+        self::assertSame($entity, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testTraversable()
@@ -344,14 +344,14 @@ class RecursiveValidatorTest extends TestCase
         $traversable = new \ArrayIterator(['key' => $entity]);
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable) {
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('[key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->metadata, $context->getMetadata());
-            $this->assertSame($traversable, $context->getRoot());
-            $this->assertSame($entity, $context->getValue());
-            $this->assertSame($entity, $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('[key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->metadata, $context->getMetadata());
+            self::assertSame($traversable, $context->getRoot());
+            self::assertSame($entity, $context->getValue());
+            self::assertSame($entity, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -364,15 +364,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($traversable, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('[key]', $violations[0]->getPropertyPath());
-        $this->assertSame($traversable, $violations[0]->getRoot());
-        $this->assertSame($entity, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('[key]', $violations[0]->getPropertyPath());
+        self::assertSame($traversable, $violations[0]->getRoot());
+        self::assertSame($entity, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testRecursiveTraversable()
@@ -383,14 +383,14 @@ class RecursiveValidatorTest extends TestCase
         ]);
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable) {
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('[2][key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->metadata, $context->getMetadata());
-            $this->assertSame($traversable, $context->getRoot());
-            $this->assertSame($entity, $context->getValue());
-            $this->assertSame($entity, $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('[2][key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->metadata, $context->getMetadata());
+            self::assertSame($traversable, $context->getRoot());
+            self::assertSame($entity, $context->getValue());
+            self::assertSame($entity, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -403,15 +403,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($traversable, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('[2][key]', $violations[0]->getPropertyPath());
-        $this->assertSame($traversable, $violations[0]->getRoot());
-        $this->assertSame($entity, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('[2][key]', $violations[0]->getPropertyPath());
+        self::assertSame($traversable, $violations[0]->getRoot());
+        self::assertSame($entity, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testReferenceClassConstraint()
@@ -420,14 +420,14 @@ class RecursiveValidatorTest extends TestCase
         $entity->reference = new Reference();
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('reference', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->referenceMetadata, $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame($entity->reference, $context->getValue());
-            $this->assertSame($entity->reference, $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('reference', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->referenceMetadata, $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame($entity->reference, $context->getValue());
+            self::assertSame($entity->reference, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -441,15 +441,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('reference', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('reference', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame($entity->reference, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testReferencePropertyConstraint()
@@ -461,14 +461,14 @@ class RecursiveValidatorTest extends TestCase
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
             $propertyMetadatas = $this->referenceMetadata->getPropertyMetadata('value');
 
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertSame('value', $context->getPropertyName());
-            $this->assertSame('reference.value', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame('Foobar', $context->getValue());
-            $this->assertSame('Foobar', $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertSame('value', $context->getPropertyName());
+            self::assertSame('reference.value', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($propertyMetadatas[0], $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame('Foobar', $context->getValue());
+            self::assertSame('Foobar', $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -482,15 +482,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('reference.value', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame('Foobar', $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('reference.value', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame('Foobar', $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testReferenceGetterConstraint()
@@ -502,14 +502,14 @@ class RecursiveValidatorTest extends TestCase
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
             $propertyMetadatas = $this->referenceMetadata->getPropertyMetadata('privateValue');
 
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertSame('privateValue', $context->getPropertyName());
-            $this->assertSame('reference.privateValue', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame('Bamboo', $context->getValue());
-            $this->assertSame('Bamboo', $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertSame('privateValue', $context->getPropertyName());
+            self::assertSame('reference.privateValue', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($propertyMetadatas[0], $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame('Bamboo', $context->getValue());
+            self::assertSame('Bamboo', $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -523,15 +523,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('reference.privateValue', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame('Bamboo', $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('reference.privateValue', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame('Bamboo', $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testsIgnoreNullReference()
@@ -544,12 +544,12 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testFailOnScalarReferences()
     {
-        $this->expectException(NoSuchMetadataException::class);
+        self::expectException(NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = 'string';
 
@@ -567,14 +567,14 @@ class RecursiveValidatorTest extends TestCase
         $entity->reference = ['key' => new Reference()];
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('reference[key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->referenceMetadata, $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame($entity->reference['key'], $context->getValue());
-            $this->assertSame($entity->reference['key'], $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('reference[key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->referenceMetadata, $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame($entity->reference['key'], $context->getValue());
+            self::assertSame($entity->reference['key'], $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -588,15 +588,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('reference[key]', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity->reference['key'], $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('reference[key]', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame($entity->reference['key'], $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     /**
@@ -608,14 +608,14 @@ class RecursiveValidatorTest extends TestCase
         $entity->reference = [2 => ['key' => new Reference()]];
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('reference[2][key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->referenceMetadata, $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame($entity->reference[2]['key'], $context->getValue());
-            $this->assertSame($entity->reference[2]['key'], $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('reference[2][key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->referenceMetadata, $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame($entity->reference[2]['key'], $context->getValue());
+            self::assertSame($entity->reference[2]['key'], $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -629,15 +629,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('reference[2][key]', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity->reference[2]['key'], $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('reference[2][key]', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame($entity->reference[2]['key'], $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testOnlyCascadedArraysAreTraversed()
@@ -661,7 +661,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     /**
@@ -684,7 +684,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     /**
@@ -708,7 +708,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     /**
@@ -724,7 +724,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     /**
@@ -740,7 +740,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testTraversableReference()
@@ -749,14 +749,14 @@ class RecursiveValidatorTest extends TestCase
         $entity->reference = new \ArrayIterator(['key' => new Reference()]);
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('reference[key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->referenceMetadata, $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame($entity->reference['key'], $context->getValue());
-            $this->assertSame($entity->reference['key'], $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('reference[key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->referenceMetadata, $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame($entity->reference['key'], $context->getValue());
+            self::assertSame($entity->reference['key'], $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -770,15 +770,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('reference[key]', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity->reference['key'], $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('reference[key]', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame($entity->reference['key'], $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testDisableTraversableTraversal()
@@ -799,12 +799,12 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testMetadataMustExistIfTraversalIsDisabled()
     {
-        $this->expectException(NoSuchMetadataException::class);
+        self::expectException(NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = new \ArrayIterator();
 
@@ -823,14 +823,14 @@ class RecursiveValidatorTest extends TestCase
         ]);
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('reference[2][key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->referenceMetadata, $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame($entity->reference[2]['key'], $context->getValue());
-            $this->assertSame($entity->reference[2]['key'], $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('reference[2][key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->referenceMetadata, $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame($entity->reference[2]['key'], $context->getValue());
+            self::assertSame($entity->reference[2]['key'], $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -846,15 +846,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('reference[2][key]', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity->reference[2]['key'], $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('reference[2][key]', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame($entity->reference[2]['key'], $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testValidateProperty()
@@ -866,14 +866,14 @@ class RecursiveValidatorTest extends TestCase
         $callback1 = function ($value, ExecutionContextInterface $context) use ($entity) {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
 
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertSame('firstName', $context->getPropertyName());
-            $this->assertSame('firstName', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame('Bernhard', $context->getValue());
-            $this->assertSame('Bernhard', $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertSame('firstName', $context->getPropertyName());
+            self::assertSame('firstName', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($propertyMetadatas[0], $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame('Bernhard', $context->getValue());
+            self::assertSame('Bernhard', $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -894,15 +894,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validateProperty($entity, 'firstName', 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('firstName', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame('Bernhard', $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('firstName', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame('Bernhard', $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     /**
@@ -913,7 +913,7 @@ class RecursiveValidatorTest extends TestCase
         $entity = new Entity();
         $violations = $this->validateProperty($entity, 'lastName');
 
-        $this->assertCount(0, $violations, '->validateProperty() returns no violations if no constraints have been configured for the property being validated');
+        self::assertCount(0, $violations, '->validateProperty() returns no violations if no constraints have been configured for the property being validated');
     }
 
     public function testValidatePropertyValue()
@@ -924,14 +924,14 @@ class RecursiveValidatorTest extends TestCase
         $callback1 = function ($value, ExecutionContextInterface $context) use ($entity) {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
 
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertSame('firstName', $context->getPropertyName());
-            $this->assertSame('firstName', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame('Bernhard', $context->getValue());
-            $this->assertSame('Bernhard', $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertSame('firstName', $context->getPropertyName());
+            self::assertSame('firstName', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($propertyMetadatas[0], $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame('Bernhard', $context->getValue());
+            self::assertSame('Bernhard', $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -957,15 +957,15 @@ class RecursiveValidatorTest extends TestCase
         );
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('firstName', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame('Bernhard', $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('firstName', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame('Bernhard', $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testValidatePropertyValueWithClassName()
@@ -973,14 +973,14 @@ class RecursiveValidatorTest extends TestCase
         $callback1 = function ($value, ExecutionContextInterface $context) {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
 
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertSame('firstName', $context->getPropertyName());
-            $this->assertSame('', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
-            $this->assertSame('Bernhard', $context->getRoot());
-            $this->assertSame('Bernhard', $context->getValue());
-            $this->assertSame('Bernhard', $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertSame('firstName', $context->getPropertyName());
+            self::assertSame('', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($propertyMetadatas[0], $context->getMetadata());
+            self::assertSame('Bernhard', $context->getRoot());
+            self::assertSame('Bernhard', $context->getValue());
+            self::assertSame('Bernhard', $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -1006,15 +1006,15 @@ class RecursiveValidatorTest extends TestCase
         );
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('', $violations[0]->getPropertyPath());
-        $this->assertSame('Bernhard', $violations[0]->getRoot());
-        $this->assertSame('Bernhard', $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('', $violations[0]->getPropertyPath());
+        self::assertSame('Bernhard', $violations[0]->getRoot());
+        self::assertSame('Bernhard', $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     /**
@@ -1025,7 +1025,7 @@ class RecursiveValidatorTest extends TestCase
         $entity = new Entity();
         $violations = $this->validatePropertyValue($entity, 'lastName', 'foo');
 
-        $this->assertCount(0, $violations, '->validatePropertyValue() returns no violations if no constraints have been configured for the property being validated');
+        self::assertCount(0, $violations, '->validatePropertyValue() returns no violations if no constraints have been configured for the property being validated');
     }
 
     public function testValidateObjectOnlyOncePerGroup()
@@ -1045,7 +1045,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function testValidateDifferentObjectsSeparately()
@@ -1065,7 +1065,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(2, $violations);
+        self::assertCount(2, $violations);
     }
 
     public function testValidateSingleGroup()
@@ -1088,7 +1088,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Group 2');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function testValidateMultipleGroups()
@@ -1111,7 +1111,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, ['Group 1', 'Group 2']);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(2, $violations);
+        self::assertCount(2, $violations);
     }
 
     public function testReplaceDefaultGroupByGroupSequenceObject()
@@ -1144,8 +1144,8 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Default');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Violation in Group 2', $violations[0]->getMessage());
+        self::assertCount(1, $violations);
+        self::assertSame('Violation in Group 2', $violations[0]->getMessage());
     }
 
     public function testReplaceDefaultGroupByGroupSequenceArray()
@@ -1178,8 +1178,8 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Default');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Violation in Group 2', $violations[0]->getMessage());
+        self::assertCount(1, $violations);
+        self::assertSame('Violation in Group 2', $violations[0]->getMessage());
     }
 
     public function testPropagateDefaultGroupToReferenceWhenReplacingDefaultGroup()
@@ -1210,8 +1210,8 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Default');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Violation in Default group', $violations[0]->getMessage());
+        self::assertCount(1, $violations);
+        self::assertSame('Violation in Default group', $violations[0]->getMessage());
     }
 
     public function testValidateCustomGroupWhenDefaultGroupWasReplaced()
@@ -1240,8 +1240,8 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Other Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Violation in other group', $violations[0]->getMessage());
+        self::assertCount(1, $violations);
+        self::assertSame('Violation in other group', $violations[0]->getMessage());
     }
 
     /**
@@ -1278,9 +1278,9 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, 'Default');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(\count($assertViolations), $violations);
+        self::assertCount(\count($assertViolations), $violations);
         foreach ($assertViolations as $key => $message) {
-            $this->assertSame($message, $violations[$key]->getMessage());
+            self::assertSame($message, $violations[$key]->getMessage());
         }
     }
 
@@ -1328,13 +1328,13 @@ class RecursiveValidatorTest extends TestCase
     {
         $violations = $this->validator->validate(null, new NotNull());
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function testValidateWithEmptyArrayAsConstraint()
     {
         $violations = $this->validator->validate('value', []);
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testGroupSequenceAbortsAfterFailedGroup()
@@ -1365,8 +1365,8 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate($entity, new Valid(), $sequence);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message 1', $violations[0]->getMessage());
+        self::assertCount(1, $violations);
+        self::assertSame('Message 1', $violations[0]->getMessage());
     }
 
     public function testGroupSequenceIncludesReferences()
@@ -1395,8 +1395,8 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate($entity, new Valid(), $sequence);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Reference violation 1', $violations[0]->getMessage());
+        self::assertCount(1, $violations);
+        self::assertSame('Reference violation 1', $violations[0]->getMessage());
     }
 
     public function testValidateInSeparateContext()
@@ -1413,31 +1413,31 @@ class RecursiveValidatorTest extends TestCase
             ;
 
             /* @var ConstraintViolationInterface[] $violations */
-            $this->assertCount(1, $violations);
-            $this->assertSame('Message value', $violations[0]->getMessage());
-            $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-            $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-            $this->assertSame('', $violations[0]->getPropertyPath());
+            self::assertCount(1, $violations);
+            self::assertSame('Message value', $violations[0]->getMessage());
+            self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+            self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+            self::assertSame('', $violations[0]->getPropertyPath());
 
             // The root is different as we're in a new context
-            $this->assertSame($entity->reference, $violations[0]->getRoot());
-            $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
-            $this->assertNull($violations[0]->getPlural());
-            $this->assertNull($violations[0]->getCode());
+            self::assertSame($entity->reference, $violations[0]->getRoot());
+            self::assertSame($entity->reference, $violations[0]->getInvalidValue());
+            self::assertNull($violations[0]->getPlural());
+            self::assertNull($violations[0]->getCode());
 
             // Verify that this method is called
             $context->addViolation('Separate violation');
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->referenceMetadata, $context->getMetadata());
-            $this->assertSame($entity->reference, $context->getRoot());
-            $this->assertSame($entity->reference, $context->getValue());
-            $this->assertSame($entity->reference, $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->referenceMetadata, $context->getMetadata());
+            self::assertSame($entity->reference, $context->getRoot());
+            self::assertSame($entity->reference, $context->getValue());
+            self::assertSame($entity->reference, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -1454,8 +1454,8 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Separate violation', $violations[0]->getMessage());
+        self::assertCount(1, $violations);
+        self::assertSame('Separate violation', $violations[0]->getMessage());
     }
 
     public function testValidateInContext()
@@ -1478,22 +1478,22 @@ class RecursiveValidatorTest extends TestCase
             ;
 
             // context changes shouldn't leak out of the validate() call
-            $this->assertSame($previousValue, $context->getValue());
-            $this->assertSame($previousObject, $context->getObject());
-            $this->assertSame($previousMetadata, $context->getMetadata());
-            $this->assertSame($previousPath, $context->getPropertyPath());
-            $this->assertSame($previousGroup, $context->getGroup());
+            self::assertSame($previousValue, $context->getValue());
+            self::assertSame($previousObject, $context->getObject());
+            self::assertSame($previousMetadata, $context->getMetadata());
+            self::assertSame($previousPath, $context->getPropertyPath());
+            self::assertSame($previousGroup, $context->getGroup());
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('subpath', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->referenceMetadata, $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame($entity->reference, $context->getValue());
-            $this->assertSame($entity->reference, $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('subpath', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->referenceMetadata, $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame($entity->reference, $context->getValue());
+            self::assertSame($entity->reference, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -1510,15 +1510,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('subpath', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('subpath', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame($entity->reference, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testValidateArrayInContext()
@@ -1541,22 +1541,22 @@ class RecursiveValidatorTest extends TestCase
             ;
 
             // context changes shouldn't leak out of the validate() call
-            $this->assertSame($previousValue, $context->getValue());
-            $this->assertSame($previousObject, $context->getObject());
-            $this->assertSame($previousMetadata, $context->getMetadata());
-            $this->assertSame($previousPath, $context->getPropertyPath());
-            $this->assertSame($previousGroup, $context->getGroup());
+            self::assertSame($previousValue, $context->getValue());
+            self::assertSame($previousObject, $context->getObject());
+            self::assertSame($previousMetadata, $context->getMetadata());
+            self::assertSame($previousPath, $context->getPropertyPath());
+            self::assertSame($previousGroup, $context->getGroup());
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($entity) {
-            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('subpath[key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->referenceMetadata, $context->getMetadata());
-            $this->assertSame($entity, $context->getRoot());
-            $this->assertSame($entity->reference, $context->getValue());
-            $this->assertSame($entity->reference, $value);
+            self::assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('subpath[key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->referenceMetadata, $context->getMetadata());
+            self::assertSame($entity, $context->getRoot());
+            self::assertSame($entity->reference, $context->getValue());
+            self::assertSame($entity->reference, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -1573,15 +1573,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('subpath[key]', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('subpath[key]', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame($entity->reference, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testTraverseTraversableByDefault()
@@ -1590,14 +1590,14 @@ class RecursiveValidatorTest extends TestCase
         $traversable = new \ArrayIterator(['key' => $entity]);
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable) {
-            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
-            $this->assertNull($context->getPropertyName());
-            $this->assertSame('[key]', $context->getPropertyPath());
-            $this->assertSame('Group', $context->getGroup());
-            $this->assertSame($this->metadata, $context->getMetadata());
-            $this->assertSame($traversable, $context->getRoot());
-            $this->assertSame($entity, $context->getValue());
-            $this->assertSame($entity, $value);
+            self::assertSame($this::ENTITY_CLASS, $context->getClassName());
+            self::assertNull($context->getPropertyName());
+            self::assertSame('[key]', $context->getPropertyPath());
+            self::assertSame('Group', $context->getGroup());
+            self::assertSame($this->metadata, $context->getMetadata());
+            self::assertSame($traversable, $context->getRoot());
+            self::assertSame($entity, $context->getValue());
+            self::assertSame($entity, $value);
 
             $context->addViolation('Message %param%', ['%param%' => 'value']);
         };
@@ -1611,15 +1611,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($traversable, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('[key]', $violations[0]->getPropertyPath());
-        $this->assertSame($traversable, $violations[0]->getRoot());
-        $this->assertSame($entity, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getPlural());
-        $this->assertNull($violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('[key]', $violations[0]->getPropertyPath());
+        self::assertSame($traversable, $violations[0]->getRoot());
+        self::assertSame($entity, $violations[0]->getInvalidValue());
+        self::assertNull($violations[0]->getPlural());
+        self::assertNull($violations[0]->getCode());
     }
 
     public function testTraversalEnabledOnClass()
@@ -1643,7 +1643,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($traversable, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function testTraversalDisabledOnClass()
@@ -1652,7 +1652,7 @@ class RecursiveValidatorTest extends TestCase
         $traversable = new \ArrayIterator(['key' => $entity]);
 
         $callback = function ($value, ExecutionContextInterface $context) {
-            $this->fail('Should not be called');
+            self::fail('Should not be called');
         };
 
         $traversableMetadata = new ClassMetadata('ArrayIterator');
@@ -1667,12 +1667,12 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($traversable, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testExpectTraversableIfTraversalEnabledOnClass()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $entity = new Entity();
 
         $this->metadata->addConstraint(new Traverse(true));
@@ -1686,7 +1686,7 @@ class RecursiveValidatorTest extends TestCase
         $entity->reference = new \ArrayIterator(['key' => new Reference()]);
 
         $callback = function ($value, ExecutionContextInterface $context) {
-            $this->fail('Should not be called');
+            self::fail('Should not be called');
         };
 
         $traversableMetadata = new ClassMetadata('ArrayIterator');
@@ -1702,7 +1702,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testReferenceTraversalEnabledOnReferenceDisabledOnClass()
@@ -1711,7 +1711,7 @@ class RecursiveValidatorTest extends TestCase
         $entity->reference = new \ArrayIterator(['key' => new Reference()]);
 
         $callback = function ($value, ExecutionContextInterface $context) {
-            $this->fail('Should not be called');
+            self::fail('Should not be called');
         };
 
         $traversableMetadata = new ClassMetadata('ArrayIterator');
@@ -1729,7 +1729,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testReferenceTraversalDisabledOnReferenceEnabledOnClass()
@@ -1738,7 +1738,7 @@ class RecursiveValidatorTest extends TestCase
         $entity->reference = new \ArrayIterator(['key' => new Reference()]);
 
         $callback = function ($value, ExecutionContextInterface $context) {
-            $this->fail('Should not be called');
+            self::fail('Should not be called');
         };
 
         $traversableMetadata = new ClassMetadata('ArrayIterator');
@@ -1756,7 +1756,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testReferenceCascadeDisabledByDefault()
@@ -1765,7 +1765,7 @@ class RecursiveValidatorTest extends TestCase
         $entity->reference = new Reference();
 
         $callback = function ($value, ExecutionContextInterface $context) {
-            $this->fail('Should not be called');
+            self::fail('Should not be called');
         };
 
         $this->referenceMetadata->addConstraint(new Callback([
@@ -1776,7 +1776,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     /**
@@ -1790,7 +1790,7 @@ class RecursiveValidatorTest extends TestCase
         $this->metadata->addConstraint(new Cascade());
 
         $callback = function ($value, ExecutionContextInterface $context) {
-            $this->fail('Should not be called');
+            self::fail('Should not be called');
         };
 
         $this->referenceMetadata->addConstraint(new Callback([
@@ -1801,7 +1801,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     /**
@@ -1834,8 +1834,8 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, new Valid(), 'Group');
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertInstanceOf(Callback::class, $violations->get(0)->getConstraint());
+        self::assertCount(1, $violations);
+        self::assertInstanceOf(Callback::class, $violations->get(0)->getConstraint());
     }
 
     public function testAddCustomizedViolation()
@@ -1856,15 +1856,15 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate($entity);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(['%param%' => 'value'], $violations[0]->getParameters());
-        $this->assertSame('', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame('Invalid value', $violations[0]->getInvalidValue());
-        $this->assertSame(2, $violations[0]->getPlural());
-        $this->assertSame('42', $violations[0]->getCode());
+        self::assertCount(1, $violations);
+        self::assertSame('Message value', $violations[0]->getMessage());
+        self::assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        self::assertSame(['%param%' => 'value'], $violations[0]->getParameters());
+        self::assertSame('', $violations[0]->getPropertyPath());
+        self::assertSame($entity, $violations[0]->getRoot());
+        self::assertSame('Invalid value', $violations[0]->getInvalidValue());
+        self::assertSame(2, $violations[0]->getPlural());
+        self::assertSame('42', $violations[0]->getCode());
     }
 
     public function testNoDuplicateValidationIfClassConstraintInMultipleGroups()
@@ -1883,7 +1883,7 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate($entity, new Valid(), ['Group 1', 'Group 2']);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function testNoDuplicateValidationIfPropertyConstraintInMultipleGroups()
@@ -1902,12 +1902,12 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate($entity, new Valid(), ['Group 1', 'Group 2']);
 
         /* @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function testValidateFailsIfNoConstraintsAndNoObjectOrArray()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $this->validate('Foobar');
     }
 
@@ -1920,7 +1920,7 @@ class RecursiveValidatorTest extends TestCase
 
         $callback = function ($value, ExecutionContextInterface $context) use ($entity, &$called) {
             $called = true;
-            $this->assertSame($entity, $context->getObject());
+            self::assertSame($entity, $context->getObject());
         };
 
         $this->metadata->addConstraint(new Callback($callback));
@@ -1929,7 +1929,7 @@ class RecursiveValidatorTest extends TestCase
 
         $this->validator->validate($entity);
 
-        $this->assertTrue($called);
+        self::assertTrue($called);
     }
 
     public function testInitializeObjectsOnFirstValidation()
@@ -1938,17 +1938,17 @@ class RecursiveValidatorTest extends TestCase
         $entity->initialized = false;
 
         // prepare initializers that set "initialized" to true
-        $initializer1 = $this->createMock(ObjectInitializerInterface::class);
-        $initializer2 = $this->createMock(ObjectInitializerInterface::class);
+        $initializer1 = self::createMock(ObjectInitializerInterface::class);
+        $initializer2 = self::createMock(ObjectInitializerInterface::class);
 
-        $initializer1->expects($this->once())
+        $initializer1->expects(self::once())
             ->method('initialize')
             ->with($entity)
             ->willReturnCallback(function ($object) {
                 $object->initialized = true;
             });
 
-        $initializer2->expects($this->once())
+        $initializer2->expects(self::once())
             ->method('initialize')
             ->with($entity);
 
@@ -1961,7 +1961,7 @@ class RecursiveValidatorTest extends TestCase
         // * checks that "initialized" is set to true
         // * validates the object again
         $callback = function ($object, ExecutionContextInterface $context) {
-            $this->assertTrue($object->initialized);
+            self::assertTrue($object->initialized);
 
             // validate again in same group
             $validator = $context->getValidator()->inContext($context);
@@ -1976,7 +1976,7 @@ class RecursiveValidatorTest extends TestCase
 
         $this->validate($entity);
 
-        $this->assertTrue($entity->initialized);
+        self::assertTrue($entity->initialized);
     }
 
     public function testPassConstraintToViolation()
@@ -1984,8 +1984,8 @@ class RecursiveValidatorTest extends TestCase
         $constraint = new FailingConstraint();
         $violations = $this->validate('Foobar', $constraint);
 
-        $this->assertCount(1, $violations);
-        $this->assertSame($constraint, $violations[0]->getConstraint());
+        self::assertCount(1, $violations);
+        self::assertSame($constraint, $violations[0]->getConstraint());
     }
 
     public function testCollectionConstraintViolationHasCorrectContext()
@@ -2002,8 +2002,8 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validate($data, $constraint);
 
-        $this->assertCount(1, $violations);
-        $this->assertSame($constraint, $violations[0]->getConstraint());
+        self::assertCount(1, $violations);
+        self::assertSame($constraint, $violations[0]->getConstraint());
     }
 
     public function testNestedObjectIsNotValidatedIfGroupInValidConstraintIsNotValidated()
@@ -2020,7 +2020,7 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity, null, []);
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testNestedObjectIsValidatedIfGroupInValidConstraintIsValidated()
@@ -2037,7 +2037,7 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity, null, ['Default', 'group1']);
 
-        $this->assertCount(2, $violations);
+        self::assertCount(2, $violations);
     }
 
     public function testNestedObjectIsValidatedInMultipleGroupsIfGroupInValidConstraintIsValidated()
@@ -2058,7 +2058,7 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity, null, ['Default', 'group1', 'group2']);
 
-        $this->assertCount(3, $violations);
+        self::assertCount(3, $violations);
     }
 
     protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = []): ValidatorInterface
@@ -2081,20 +2081,19 @@ class RecursiveValidatorTest extends TestCase
         $childB->name = 'fake';
         $entity->childA = [$childA];
         $entity->childB = [$childB];
-        $validatorContext = $this->createMock(ContextualValidatorInterface::class);
+        $validatorContext = self::createMock(ContextualValidatorInterface::class);
         $validatorContext
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($entity, null, [])
             ->willReturnSelf();
 
-        $validator = $this
-            ->getMockBuilder(RecursiveValidator::class)
+        $validator = self::getMockBuilder(RecursiveValidator::class)
             ->disableOriginalConstructor()
             ->setMethods(['startContext'])
             ->getMock();
         $validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('startContext')
             ->willReturn($validatorContext);
 
@@ -2115,20 +2114,19 @@ class RecursiveValidatorTest extends TestCase
         $entity->childA = [$childA];
         $entity->childB = [$childB];
 
-        $validatorContext = $this->createMock(ContextualValidatorInterface::class);
+        $validatorContext = self::createMock(ContextualValidatorInterface::class);
         $validatorContext
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($entity, null, [])
             ->willReturnSelf();
 
-        $validator = $this
-            ->getMockBuilder(RecursiveValidator::class)
+        $validator = self::getMockBuilder(RecursiveValidator::class)
             ->disableOriginalConstructor()
             ->setMethods(['startContext'])
             ->getMock();
         $validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('startContext')
             ->willReturn($validatorContext);
 
@@ -2147,9 +2145,9 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity, null, ['one', 'two']);
 
-        $this->assertCount(2, $violations);
-        $this->assertInstanceOf(Length::class, $violations->get(0)->getConstraint());
-        $this->assertInstanceOf(NotBlank::class, $violations->get(1)->getConstraint());
+        self::assertCount(2, $violations);
+        self::assertInstanceOf(Length::class, $violations->get(0)->getConstraint());
+        self::assertInstanceOf(NotBlank::class, $violations->get(1)->getConstraint());
     }
 
     public function testGroupedMethodConstraintValidateInSequence()
@@ -2166,9 +2164,9 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity, null, $groups);
 
-        $this->assertCount(2, $violations);
-        $this->assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
-        $this->assertInstanceOf(IsTrue::class, $violations->get(1)->getConstraint());
+        self::assertCount(2, $violations);
+        self::assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
+        self::assertInstanceOf(IsTrue::class, $violations->get(1)->getConstraint());
     }
 
     public function testValidConstraintOnGetterReturningNull()
@@ -2180,7 +2178,7 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate(new EntityParent());
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testNotNullConstraintOnGetterReturningNull()
@@ -2192,8 +2190,8 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate(new EntityParent());
 
-        $this->assertCount(1, $violations);
-        $this->assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
+        self::assertCount(1, $violations);
+        self::assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
     }
 
     public function testAllConstraintValidateAllGroupsForNestedConstraints()
@@ -2208,24 +2206,24 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity, null, ['one', 'two']);
 
-        $this->assertCount(3, $violations);
-        $this->assertInstanceOf(NotBlank::class, $violations->get(0)->getConstraint());
-        $this->assertInstanceOf(Length::class, $violations->get(1)->getConstraint());
-        $this->assertInstanceOf(Length::class, $violations->get(2)->getConstraint());
+        self::assertCount(3, $violations);
+        self::assertInstanceOf(NotBlank::class, $violations->get(0)->getConstraint());
+        self::assertInstanceOf(Length::class, $violations->get(1)->getConstraint());
+        self::assertInstanceOf(Length::class, $violations->get(2)->getConstraint());
     }
 
     public function testRequiredConstraintIsIgnored()
     {
         $violations = $this->validator->validate([], new Required());
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testOptionalConstraintIsIgnored()
     {
         $violations = $this->validator->validate([], new Optional());
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     /**
@@ -2246,7 +2244,7 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity);
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
 
         CascadingEntity::$staticChild = null;
     }
@@ -2271,8 +2269,8 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity);
 
-        $this->assertCount(1, $violations);
-        $this->assertInstanceOf(Type::class, $violations->get(0)->getConstraint());
+        self::assertCount(1, $violations);
+        self::assertInstanceOf(Type::class, $violations->get(0)->getConstraint());
     }
 
     /**
@@ -2298,13 +2296,13 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity);
 
-        $this->assertCount(3, $violations);
-        $this->assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
-        $this->assertInstanceOf(NotNull::class, $violations->get(1)->getConstraint());
-        $this->assertInstanceOf(NotNull::class, $violations->get(2)->getConstraint());
-        $this->assertSame('requiredChild.name', $violations->get(0)->getPropertyPath());
-        $this->assertSame('staticChild.name', $violations->get(1)->getPropertyPath());
-        $this->assertSame('children[0].name', $violations->get(2)->getPropertyPath());
+        self::assertCount(3, $violations);
+        self::assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
+        self::assertInstanceOf(NotNull::class, $violations->get(1)->getConstraint());
+        self::assertInstanceOf(NotNull::class, $violations->get(2)->getConstraint());
+        self::assertSame('requiredChild.name', $violations->get(0)->getPropertyPath());
+        self::assertSame('staticChild.name', $violations->get(1)->getPropertyPath());
+        self::assertSame('children[0].name', $violations->get(2)->getPropertyPath());
 
         CascadingEntity::$staticChild = null;
     }
@@ -2329,13 +2327,13 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validator->validate($entity);
 
-        $this->assertCount(3, $violations);
-        $this->assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
-        $this->assertInstanceOf(NotNull::class, $violations->get(1)->getConstraint());
-        $this->assertInstanceOf(NotNull::class, $violations->get(2)->getConstraint());
-        $this->assertSame('requiredChild.name', $violations->get(0)->getPropertyPath());
-        $this->assertSame('staticChild.name', $violations->get(1)->getPropertyPath());
-        $this->assertSame('children[0].name', $violations->get(2)->getPropertyPath());
+        self::assertCount(3, $violations);
+        self::assertInstanceOf(NotNull::class, $violations->get(0)->getConstraint());
+        self::assertInstanceOf(NotNull::class, $violations->get(1)->getConstraint());
+        self::assertInstanceOf(NotNull::class, $violations->get(2)->getConstraint());
+        self::assertSame('requiredChild.name', $violations->get(0)->getPropertyPath());
+        self::assertSame('staticChild.name', $violations->get(1)->getPropertyPath());
+        self::assertSame('children[0].name', $violations->get(2)->getPropertyPath());
 
         CascadingEntity::$staticChild = null;
     }
@@ -2351,7 +2349,7 @@ class RecursiveValidatorTest extends TestCase
         $entity = new Entity();
         $entity->data = new \stdClass();
 
-        $this->assertCount(2, $this->validator->validate($entity, new TestConstraintHashesDoNotCollide()));
+        self::assertCount(2, $this->validator->validate($entity, new TestConstraintHashesDoNotCollide()));
     }
 
     public function testValidatedConstraintsHashesDoNotCollideWithSameConstraintValidatingDifferentProperties()
@@ -2370,7 +2368,7 @@ class RecursiveValidatorTest extends TestCase
         $validator->atPath('lastName')
             ->validate($entity->getLastName(), $constraint);
 
-        $this->assertCount(2, $validator->getViolations());
+        self::assertCount(2, $validator->getViolations());
     }
 }
 

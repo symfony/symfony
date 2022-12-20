@@ -43,7 +43,7 @@ class CasterTest extends TestCase
             $filteredArray = Caster::filter($this->referenceArray, $filter, $listedProperties);
         }
 
-        $this->assertSame($expectedDiff, array_diff_assoc($this->referenceArray, $filteredArray));
+        self::assertSame($expectedDiff, array_diff_assoc($this->referenceArray, $filteredArray));
     }
 
     public function provideFilter()

@@ -63,19 +63,19 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
     {
         $transformer = new DateIntervalToStringTransformer($format);
         $input = new \DateInterval($input);
-        $this->assertEquals($output, $transformer->transform($input));
+        self::assertEquals($output, $transformer->transform($input));
     }
 
     public function testTransformEmpty()
     {
         $transformer = new DateIntervalToStringTransformer();
-        $this->assertSame('', $transformer->transform(null));
+        self::assertSame('', $transformer->transform(null));
     }
 
     public function testTransformExpectsDateTime()
     {
         $transformer = new DateIntervalToStringTransformer();
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $transformer->transform('1234');
     }
 
@@ -86,7 +86,7 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
     {
         $reverseTransformer = new DateIntervalToStringTransformer($format, true);
         $interval = new \DateInterval($output);
-        $this->assertDateIntervalEquals($interval, $reverseTransformer->reverseTransform($input));
+        self::assertDateIntervalEquals($interval, $reverseTransformer->reverseTransform($input));
     }
 
     /**
@@ -96,27 +96,27 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
     {
         $reverseTransformer = new DateIntervalToStringTransformer($format, true);
         $interval = new \DateInterval($output);
-        $this->expectException(TransformationFailedException::class);
-        $this->assertDateIntervalEquals($interval, $reverseTransformer->reverseTransform($input));
+        self::expectException(TransformationFailedException::class);
+        self::assertDateIntervalEquals($interval, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformEmpty()
     {
         $reverseTransformer = new DateIntervalToStringTransformer();
-        $this->assertNull($reverseTransformer->reverseTransform(''));
+        self::assertNull($reverseTransformer->reverseTransform(''));
     }
 
     public function testReverseTransformExpectsString()
     {
         $reverseTransformer = new DateIntervalToStringTransformer();
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $reverseTransformer->reverseTransform(1234);
     }
 
     public function testReverseTransformExpectsValidIntervalString()
     {
         $reverseTransformer = new DateIntervalToStringTransformer();
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $reverseTransformer->reverseTransform('10Y');
     }
 }

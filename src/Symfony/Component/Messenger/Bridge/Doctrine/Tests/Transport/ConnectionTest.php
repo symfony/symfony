@@ -62,9 +62,9 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
-        $this->assertEquals(1, $doctrineEnvelope['id']);
-        $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
+        self::assertEquals(1, $doctrineEnvelope['id']);
+        self::assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
+        self::assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
     }
 
     public function testGetWithNoPendingMessageWillReturnNull()
@@ -79,10 +79,10 @@ class ConnectionTest extends TestCase
         $queryBuilder
             ->method('getParameterTypes')
             ->willReturn([]);
-        $driverConnection->expects($this->once())
+        $driverConnection->expects(self::once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
-        $driverConnection->expects($this->never())
+        $driverConnection->expects(self::never())
             ->method('update');
         $driverConnection
             ->method('executeQuery')
@@ -90,12 +90,12 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
-        $this->assertNull($doctrineEnvelope);
+        self::assertNull($doctrineEnvelope);
     }
 
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
         $driverConnection->method('delete')->willThrowException(new DBALException());
 
@@ -105,7 +105,7 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
         $driverConnection->method('delete')->willThrowException(new DBALException());
 
@@ -115,15 +115,15 @@ class ConnectionTest extends TestCase
 
     private function getDBALConnectionMock()
     {
-        $driverConnection = $this->createMock(DBALConnection::class);
-        $platform = $this->createMock(AbstractPlatform::class);
+        $driverConnection = self::createMock(DBALConnection::class);
+        $platform = self::createMock(AbstractPlatform::class);
         $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE');
-        $configuration = $this->createMock(\Doctrine\DBAL\Configuration::class);
+        $configuration = self::createMock(\Doctrine\DBAL\Configuration::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $driverConnection->method('getConfiguration')->willReturn($configuration);
 
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
-        $schemaConfig = $this->createMock(SchemaConfig::class);
+        $schemaManager = self::createMock(AbstractSchemaManager::class);
+        $schemaConfig = self::createMock(SchemaConfig::class);
         $schemaConfig->method('getMaxIdentifierLength')->willReturn(63);
         $schemaConfig->method('getDefaultTableOptions')->willReturn([]);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
@@ -138,7 +138,7 @@ class ConnectionTest extends TestCase
 
     private function getQueryBuilderMock()
     {
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder = self::createMock(QueryBuilder::class);
 
         $queryBuilder->method('select')->willReturn($queryBuilder);
         $queryBuilder->method('update')->willReturn($queryBuilder);
@@ -156,9 +156,9 @@ class ConnectionTest extends TestCase
 
     private function getResultMock($expectedResult)
     {
-        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
+        $stmt = self::createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
 
-        $stmt->expects($this->once())
+        $stmt->expects(self::once())
             ->method(interface_exists(AbstractionResult::class) || class_exists(Result::class) ? 'fetchAssociative' : 'fetch')
             ->willReturn($expectedResult);
 
@@ -171,11 +171,11 @@ class ConnectionTest extends TestCase
     public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup)
     {
         $config = Connection::buildConfiguration($dsn, $options);
-        $this->assertEquals($expectedConnection, $config['connection']);
-        $this->assertEquals($expectedTableName, $config['table_name']);
-        $this->assertEquals($expectedRedeliverTimeout, $config['redeliver_timeout']);
-        $this->assertEquals($expectedQueue, $config['queue_name']);
-        $this->assertEquals($expectedAutoSetup, $config['auto_setup']);
+        self::assertEquals($expectedConnection, $config['connection']);
+        self::assertEquals($expectedTableName, $config['table_name']);
+        self::assertEquals($expectedRedeliverTimeout, $config['redeliver_timeout']);
+        self::assertEquals($expectedQueue, $config['queue_name']);
+        self::assertEquals($expectedAutoSetup, $config['auto_setup']);
     }
 
     public function buildConfigurationProvider(): iterable
@@ -253,15 +253,15 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 
@@ -295,9 +295,9 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->find($id);
-        $this->assertEquals(1, $doctrineEnvelope['id']);
-        $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
+        self::assertEquals(1, $doctrineEnvelope['id']);
+        self::assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
+        self::assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
     }
 
     public function testFindAll()
@@ -315,8 +315,8 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
-        $stmt->expects($this->once())
+        $stmt = self::createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
+        $stmt->expects(self::once())
             ->method(interface_exists(AbstractionResult::class) || class_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
             ->willReturn([$message1, $message2]);
 
@@ -342,13 +342,13 @@ class ConnectionTest extends TestCase
         $connection = new Connection([], $driverConnection);
         $doctrineEnvelopes = $connection->findAll();
 
-        $this->assertEquals(1, $doctrineEnvelopes[0]['id']);
-        $this->assertEquals('{"message":"Hi"}', $doctrineEnvelopes[0]['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[0]['headers']);
+        self::assertEquals(1, $doctrineEnvelopes[0]['id']);
+        self::assertEquals('{"message":"Hi"}', $doctrineEnvelopes[0]['body']);
+        self::assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[0]['headers']);
 
-        $this->assertEquals(2, $doctrineEnvelopes[1]['id']);
-        $this->assertEquals('{"message":"Hi again"}', $doctrineEnvelopes[1]['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[1]['headers']);
+        self::assertEquals(2, $doctrineEnvelopes[1]['id']);
+        self::assertEquals('{"message":"Hi again"}', $doctrineEnvelopes[1]['body']);
+        self::assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[1]['headers']);
     }
 
     /**
@@ -356,32 +356,32 @@ class ConnectionTest extends TestCase
      */
     public function testGeneratedSql(AbstractPlatform $platform, string $expectedSql)
     {
-        $driverConnection = $this->createMock(DBALConnection::class);
+        $driverConnection = self::createMock(DBALConnection::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
         $driverConnection->method('createQueryBuilder')->willReturnCallback(function () use ($driverConnection) {
             return new QueryBuilder($driverConnection);
         });
 
         if (interface_exists(DriverResult::class)) {
-            $result = $this->createMock(DriverResult::class);
+            $result = self::createMock(DriverResult::class);
             $result->method('fetchAssociative')->willReturn(false);
 
             if (class_exists(Result::class)) {
                 $result = new Result($result, $driverConnection);
             }
         } else {
-            $result = $this->createMock(ResultStatement::class);
+            $result = self::createMock(ResultStatement::class);
             $result->method('fetch')->willReturn(false);
         }
 
-        $driverConnection->expects($this->once())->method('beginTransaction');
+        $driverConnection->expects(self::once())->method('beginTransaction');
         $driverConnection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeQuery')
             ->with($expectedSql)
             ->willReturn($result)
         ;
-        $driverConnection->expects($this->once())->method('commit');
+        $driverConnection->expects(self::once())->method('commit');
 
         $connection = new Connection([], $driverConnection);
         $connection->get();
@@ -412,7 +412,7 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection(['table_name' => 'queue_table'], $driverConnection);
         $connection->configureSchema($schema, $driverConnection);
-        $this->assertTrue($schema->hasTable('queue_table'));
+        self::assertTrue($schema->hasTable('queue_table'));
     }
 
     public function testConfigureSchemaDifferentDbalConnection()
@@ -423,7 +423,7 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection([], $driverConnection);
         $connection->configureSchema($schema, $driverConnection2);
-        $this->assertFalse($schema->hasTable('messenger_messages'));
+        self::assertFalse($schema->hasTable('messenger_messages'));
     }
 
     public function testConfigureSchemaTableExists()
@@ -435,6 +435,6 @@ class ConnectionTest extends TestCase
         $connection = new Connection([], $driverConnection);
         $connection->configureSchema($schema, $driverConnection);
         $table = $schema->getTable('messenger_messages');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        self::assertEmpty($table->getColumns(), 'The table was not overwritten');
     }
 }

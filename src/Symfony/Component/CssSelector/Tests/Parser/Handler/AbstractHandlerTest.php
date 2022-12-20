@@ -27,8 +27,8 @@ abstract class AbstractHandlerTest extends TestCase
         $reader = new Reader($value);
         $stream = new TokenStream();
 
-        $this->assertTrue($this->generateHandler()->handle($reader, $stream));
-        $this->assertEquals($expectedToken, $stream->getNext());
+        self::assertTrue($this->generateHandler()->handle($reader, $stream));
+        self::assertEquals($expectedToken, $stream->getNext());
         $this->assertRemainingContent($reader, $remainingContent);
     }
 
@@ -38,7 +38,7 @@ abstract class AbstractHandlerTest extends TestCase
         $reader = new Reader($value);
         $stream = new TokenStream();
 
-        $this->assertFalse($this->generateHandler()->handle($reader, $stream));
+        self::assertFalse($this->generateHandler()->handle($reader, $stream));
         $this->assertStreamEmpty($stream);
         $this->assertRemainingContent($reader, $value);
     }
@@ -54,17 +54,17 @@ abstract class AbstractHandlerTest extends TestCase
         $property = new \ReflectionProperty($stream, 'tokens');
         $property->setAccessible(true);
 
-        $this->assertEquals([], $property->getValue($stream));
+        self::assertEquals([], $property->getValue($stream));
     }
 
     protected function assertRemainingContent(Reader $reader, $remainingContent)
     {
         if ('' === $remainingContent) {
-            $this->assertEquals(0, $reader->getRemainingLength());
-            $this->assertTrue($reader->isEOF());
+            self::assertEquals(0, $reader->getRemainingLength());
+            self::assertTrue($reader->isEOF());
         } else {
-            $this->assertEquals(\strlen($remainingContent), $reader->getRemainingLength());
-            $this->assertEquals(0, $reader->getOffset($remainingContent));
+            self::assertEquals(\strlen($remainingContent), $reader->getRemainingLength());
+            self::assertEquals(0, $reader->getOffset($remainingContent));
         }
     }
 }

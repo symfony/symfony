@@ -37,7 +37,7 @@ class ContextualizedDumperTest extends TestCase
         $dumper->dump($data);
         $out = ob_get_clean();
 
-        $this->assertStringContainsString("\e]8;;{$href}\e\\\e[", $out);
-        $this->assertStringContainsString("m{$var}\e[", $out);
+        self::assertStringContainsString("\e]8;;{$href}\e\\\e[", $out);
+        self::assertStringContainsString("m{$var}\e[", $out);
     }
 }

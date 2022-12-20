@@ -37,17 +37,17 @@ class HttpHeaderSerializerTest extends TestCase
             (new Link('alternate', '/5'))->withRel('next')->withAttribute('hreflang', ['fr', 'de'])->withAttribute('title', 'Hello'),
         ];
 
-        $this->assertEquals('</1>; rel="prerender",</2>; rel="dns-prefetch"; pr="0.7",</3>; rel="preload"; as="script",</4>; rel="preload"; as="image"; nopush,</5>; rel="alternate next"; hreflang="fr"; hreflang="de"; title="Hello"', $this->serializer->serialize($links));
+        self::assertEquals('</1>; rel="prerender",</2>; rel="dns-prefetch"; pr="0.7",</3>; rel="preload"; as="script",</4>; rel="preload"; as="image"; nopush,</5>; rel="alternate next"; hreflang="fr"; hreflang="de"; title="Hello"', $this->serializer->serialize($links));
     }
 
     public function testSerializeEmpty()
     {
-        $this->assertNull($this->serializer->serialize([]));
+        self::assertNull($this->serializer->serialize([]));
     }
 
     public function testSerializeDoubleQuotesInAttributeValue()
     {
-        $this->assertSame('</foo>; rel="alternate"; title="\"escape me\" \"already escaped\" \"\"\""', $this->serializer->serialize([
+        self::assertSame('</foo>; rel="alternate"; title="\"escape me\" \"already escaped\" \"\"\""', $this->serializer->serialize([
             (new Link('alternate', '/foo'))
                 ->withAttribute('title', '"escape me" \"already escaped\" ""\"'),
         ]));

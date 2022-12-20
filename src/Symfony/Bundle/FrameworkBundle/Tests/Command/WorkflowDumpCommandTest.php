@@ -28,7 +28,7 @@ class WorkflowDumpCommandTest extends TestCase
 
         $tester = new CommandCompletionTester($application->find('workflow:dump'));
         $suggestions = $tester->complete($input, 2);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions(): iterable

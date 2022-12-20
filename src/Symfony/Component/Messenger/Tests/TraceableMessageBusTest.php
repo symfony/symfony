@@ -28,16 +28,16 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
 
         $stamp = new DelayStamp(5);
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())->method('dispatch')->with($message, [$stamp])->willReturn(new Envelope($message, [$stamp]));
+        $bus = self::createMock(MessageBusInterface::class);
+        $bus->expects(self::once())->method('dispatch')->with($message, [$stamp])->willReturn(new Envelope($message, [$stamp]));
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
         $traceableBus->dispatch($message, [$stamp]);
-        $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
+        self::assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $actualTracedMessage = $tracedMessages[0];
         unset($actualTracedMessage['callTime']); // don't check, too variable
-        $this->assertEquals([
+        self::assertEquals([
             'message' => $message,
             'stamps' => [$stamp],
             'stamps_after_dispatch' => [$stamp],
@@ -53,15 +53,15 @@ class TraceableMessageBusTest extends TestCase
     {
         $message = new DummyMessage('Hello');
 
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn((new Envelope($message))->with($stamp = new HandledStamp('result', 'handlerName')));
+        $bus = self::createMock(MessageBusInterface::class);
+        $bus->expects(self::once())->method('dispatch')->with($message)->willReturn((new Envelope($message))->with($stamp = new HandledStamp('result', 'handlerName')));
 
         $traceableBus = new TraceableMessageBus($bus);
         (new TestTracesWithHandleTraitAction($traceableBus))($message);
-        $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
+        self::assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $actualTracedMessage = $tracedMessages[0];
         unset($actualTracedMessage['callTime']); // don't check, too variable
-        $this->assertEquals([
+        self::assertEquals([
             'message' => $message,
             'stamps' => [],
             'stamps_after_dispatch' => [$stamp],
@@ -78,16 +78,16 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
         $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
 
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($envelope);
+        $bus = self::createMock(MessageBusInterface::class);
+        $bus->expects(self::once())->method('dispatch')->with($envelope)->willReturn($envelope);
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
         $traceableBus->dispatch($envelope);
-        $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
+        self::assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $actualTracedMessage = $tracedMessages[0];
         unset($actualTracedMessage['callTime']); // don't check, too variable
-        $this->assertEquals([
+        self::assertEquals([
             'message' => $message,
             'stamps' => [$stamp],
             'stamps_after_dispatch' => [$stamp],
@@ -104,16 +104,16 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
         $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
 
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($envelope->with($anotherStamp = new AnEnvelopeStamp()));
+        $bus = self::createMock(MessageBusInterface::class);
+        $bus->expects(self::once())->method('dispatch')->with($envelope)->willReturn($envelope->with($anotherStamp = new AnEnvelopeStamp()));
 
         $traceableBus = new TraceableMessageBus($bus);
         $line = __LINE__ + 1;
         $traceableBus->dispatch($envelope);
-        $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
+        self::assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $actualTracedMessage = $tracedMessages[0];
         unset($actualTracedMessage['callTime']); // don't check, too variable
-        $this->assertEquals([
+        self::assertEquals([
             'message' => $message,
             'stamps' => [$stamp],
             'stamps_after_dispatch' => [$stamp, $anotherStamp],
@@ -129,8 +129,8 @@ class TraceableMessageBusTest extends TestCase
     {
         $message = new DummyMessage('Hello');
 
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())->method('dispatch')->with($message)->willThrowException($exception = new \RuntimeException('Meh.'));
+        $bus = self::createMock(MessageBusInterface::class);
+        $bus->expects(self::once())->method('dispatch')->with($message)->willThrowException($exception = new \RuntimeException('Meh.'));
 
         $traceableBus = new TraceableMessageBus($bus);
 
@@ -138,13 +138,13 @@ class TraceableMessageBusTest extends TestCase
             $line = __LINE__ + 1;
             $traceableBus->dispatch($message);
         } catch (\RuntimeException $e) {
-            $this->assertSame($exception, $e);
+            self::assertSame($exception, $e);
         }
 
-        $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
+        self::assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
         $actualTracedMessage = $tracedMessages[0];
         unset($actualTracedMessage['callTime']); // don't check, too variable
-        $this->assertEquals([
+        self::assertEquals([
             'message' => $message,
             'exception' => $exception,
             'stamps' => [],
@@ -162,15 +162,15 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
         $exception = new \RuntimeException();
 
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())
+        $bus = self::createMock(MessageBusInterface::class);
+        $bus->expects(self::once())
             ->method('dispatch')
             ->with($message)
             ->willThrowException($exception);
 
         $traceableBus = new TraceableMessageBus($bus);
 
-        $this->expectExceptionObject($exception);
+        self::expectExceptionObject($exception);
 
         array_map([$traceableBus, 'dispatch'], [$message]);
     }

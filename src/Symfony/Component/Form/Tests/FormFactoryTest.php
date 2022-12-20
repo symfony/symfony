@@ -67,44 +67,44 @@ class FormFactoryTest extends TestCase
     {
         $builder = $this->factory->createNamedBuilder('name', ConfigurableFormType::class, null, ['a' => '1', 'b' => '2']);
 
-        $this->assertSame('1', $builder->getOption('a'));
-        $this->assertSame('2', $builder->getOption('b'));
+        self::assertSame('1', $builder->getOption('a'));
+        self::assertSame('2', $builder->getOption('b'));
     }
 
     public function testCreateNamedBuilderFillsDataOption()
     {
         $builder = $this->factory->createNamedBuilder('name', ConfigurableFormType::class, 'DATA', ['a' => '1', 'b' => '2']);
 
-        $this->assertSame('DATA', $builder->getOption('data'));
+        self::assertSame('DATA', $builder->getOption('data'));
     }
 
     public function testCreateNamedBuilderDoesNotOverrideExistingDataOption()
     {
         $builder = $this->factory->createNamedBuilder('name', ConfigurableFormType::class, 'DATA', ['a' => '1', 'b' => '2', 'data' => 'CUSTOM']);
 
-        $this->assertSame('CUSTOM', $builder->getOption('data'));
+        self::assertSame('CUSTOM', $builder->getOption('data'));
     }
 
     public function testCreateUsesBlockPrefixIfTypeGivenAsString()
     {
         $form = $this->factory->create(ConfigurableFormType::class);
 
-        $this->assertSame('configurable_form_prefix', $form->getName());
+        self::assertSame('configurable_form_prefix', $form->getName());
     }
 
     public function testCreateNamed()
     {
         $form = $this->factory->createNamed('name', ConfigurableFormType::class, null, ['a' => '1', 'b' => '2']);
 
-        $this->assertSame('1', $form->getConfig()->getOption('a'));
-        $this->assertSame('2', $form->getConfig()->getOption('b'));
+        self::assertSame('1', $form->getConfig()->getOption('a'));
+        self::assertSame('2', $form->getConfig()->getOption('b'));
     }
 
     public function testCreateBuilderForPropertyWithoutTypeGuesser()
     {
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertSame('firstName', $builder->getName());
+        self::assertSame('firstName', $builder->getName());
     }
 
     public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
@@ -114,17 +114,17 @@ class FormFactoryTest extends TestCase
 
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertSame('firstName', $builder->getName());
-        $this->assertSame(['maxlength' => 7], $builder->getOption('attr'));
-        $this->assertInstanceOf(PasswordType::class, $builder->getType()->getInnerType());
+        self::assertSame('firstName', $builder->getName());
+        self::assertSame(['maxlength' => 7], $builder->getOption('attr'));
+        self::assertInstanceOf(PasswordType::class, $builder->getType()->getInnerType());
     }
 
     public function testCreateBuilderCreatesTextFormIfNoGuess()
     {
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertSame('firstName', $builder->getName());
-        $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+        self::assertSame('firstName', $builder->getName());
+        self::assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
     public function testOptionsCanBeOverridden()
@@ -133,9 +133,9 @@ class FormFactoryTest extends TestCase
 
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, ['attr' => ['maxlength' => 11]]);
 
-        $this->assertSame('firstName', $builder->getName());
-        $this->assertSame(['class' => 'foo', 'maxlength' => 11], $builder->getOption('attr'));
-        $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+        self::assertSame('firstName', $builder->getName());
+        self::assertSame(['class' => 'foo', 'maxlength' => 11], $builder->getOption('attr'));
+        self::assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
     public function testCreateBuilderUsesMaxLengthIfFound()
@@ -145,9 +145,9 @@ class FormFactoryTest extends TestCase
 
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertSame('firstName', $builder->getName());
-        $this->assertSame(['maxlength' => 20], $builder->getOption('attr'));
-        $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+        self::assertSame('firstName', $builder->getName());
+        self::assertSame(['maxlength' => 20], $builder->getOption('attr'));
+        self::assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
     public function testCreateBuilderUsesMaxLengthAndPattern()
@@ -157,9 +157,9 @@ class FormFactoryTest extends TestCase
 
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, ['attr' => ['class' => 'tinymce']]);
 
-        $this->assertSame('firstName', $builder->getName());
-        $this->assertSame(['maxlength' => 20, 'pattern' => '.{5,}', 'class' => 'tinymce'], $builder->getOption('attr'));
-        $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+        self::assertSame('firstName', $builder->getName());
+        self::assertSame(['maxlength' => 20, 'pattern' => '.{5,}', 'class' => 'tinymce'], $builder->getOption('attr'));
+        self::assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
@@ -169,9 +169,9 @@ class FormFactoryTest extends TestCase
 
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertSame('firstName', $builder->getName());
-        $this->assertFalse($builder->getOption('required'));
-        $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+        self::assertSame('firstName', $builder->getName());
+        self::assertFalse($builder->getOption('required'));
+        self::assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
     public function testCreateBuilderUsesPatternIfFound()
@@ -181,9 +181,9 @@ class FormFactoryTest extends TestCase
 
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertSame('firstName', $builder->getName());
-        $this->assertSame(['pattern' => '[a-zA-Z]'], $builder->getOption('attr'));
-        $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+        self::assertSame('firstName', $builder->getName());
+        self::assertSame(['pattern' => '[a-zA-Z]'], $builder->getOption('attr'));
+        self::assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 }
 

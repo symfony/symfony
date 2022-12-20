@@ -34,7 +34,7 @@ final class FirebaseTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new FirebaseTransport('username:password', $client ?? $this->createMock(HttpClientInterface::class));
+        return new FirebaseTransport('username:password', $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -50,7 +50,7 @@ final class FirebaseTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     /**
@@ -58,7 +58,7 @@ final class FirebaseTransportTest extends TransportTestCase
      */
     public function testSendWithErrorThrowsTransportException(ResponseInterface $response)
     {
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
 
         $client = new MockHttpClient(static function () use ($response): ResponseInterface {
             return $response;

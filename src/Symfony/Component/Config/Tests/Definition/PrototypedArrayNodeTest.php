@@ -24,7 +24,7 @@ class PrototypedArrayNodeTest extends TestCase
         $node = new PrototypedArrayNode('root');
         $prototype = new ArrayNode(null, $node);
         $node->setPrototype($prototype);
-        $this->assertEmpty($node->getDefaultValue());
+        self::assertEmpty($node->getDefaultValue());
     }
 
     public function testGetDefaultValueReturnsDefaultValueForPrototypes()
@@ -33,7 +33,7 @@ class PrototypedArrayNodeTest extends TestCase
         $prototype = new ArrayNode(null, $node);
         $node->setPrototype($prototype);
         $node->setDefaultValue(['test']);
-        $this->assertEquals(['test'], $node->getDefaultValue());
+        self::assertEquals(['test'], $node->getDefaultValue());
     }
 
     // a remapped key (e.g. "mapping" -> "mappings") should be unset after being used
@@ -52,7 +52,7 @@ class PrototypedArrayNodeTest extends TestCase
         $node->setXmlRemappings($remappings);
 
         $normalized = $node->normalize(['mapping' => ['foo', 'bar']]);
-        $this->assertEquals(['mappings' => ['foo', 'bar']], $normalized);
+        self::assertEquals(['mappings' => ['foo', 'bar']], $normalized);
     }
 
     /**
@@ -89,7 +89,7 @@ class PrototypedArrayNodeTest extends TestCase
 
         $expected = [];
         $expected['item_name'] = ['foo' => 'bar'];
-        $this->assertEquals($expected, $normalized);
+        self::assertEquals($expected, $normalized);
     }
 
     /**
@@ -113,49 +113,49 @@ class PrototypedArrayNodeTest extends TestCase
 
         $expected = [];
         $expected['item_name'] = ['id' => 'item_name', 'foo' => 'bar'];
-        $this->assertEquals($expected, $normalized);
+        self::assertEquals($expected, $normalized);
     }
 
     public function testAddDefaultChildren()
     {
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setAddChildrenIfNoneSet();
-        $this->assertTrue($node->hasDefaultValue());
-        $this->assertEquals([['foo' => 'bar']], $node->getDefaultValue());
+        self::assertTrue($node->hasDefaultValue());
+        self::assertEquals([['foo' => 'bar']], $node->getDefaultValue());
 
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setKeyAttribute('foobar');
         $node->setAddChildrenIfNoneSet();
-        $this->assertTrue($node->hasDefaultValue());
-        $this->assertEquals(['defaults' => ['foo' => 'bar']], $node->getDefaultValue());
+        self::assertTrue($node->hasDefaultValue());
+        self::assertEquals(['defaults' => ['foo' => 'bar']], $node->getDefaultValue());
 
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setKeyAttribute('foobar');
         $node->setAddChildrenIfNoneSet('defaultkey');
-        $this->assertTrue($node->hasDefaultValue());
-        $this->assertEquals(['defaultkey' => ['foo' => 'bar']], $node->getDefaultValue());
+        self::assertTrue($node->hasDefaultValue());
+        self::assertEquals(['defaultkey' => ['foo' => 'bar']], $node->getDefaultValue());
 
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setKeyAttribute('foobar');
         $node->setAddChildrenIfNoneSet(['defaultkey']);
-        $this->assertTrue($node->hasDefaultValue());
-        $this->assertEquals(['defaultkey' => ['foo' => 'bar']], $node->getDefaultValue());
+        self::assertTrue($node->hasDefaultValue());
+        self::assertEquals(['defaultkey' => ['foo' => 'bar']], $node->getDefaultValue());
 
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setKeyAttribute('foobar');
         $node->setAddChildrenIfNoneSet(['dk1', 'dk2']);
-        $this->assertTrue($node->hasDefaultValue());
-        $this->assertEquals(['dk1' => ['foo' => 'bar'], 'dk2' => ['foo' => 'bar']], $node->getDefaultValue());
+        self::assertTrue($node->hasDefaultValue());
+        self::assertEquals(['dk1' => ['foo' => 'bar'], 'dk2' => ['foo' => 'bar']], $node->getDefaultValue());
 
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setAddChildrenIfNoneSet([5, 6]);
-        $this->assertTrue($node->hasDefaultValue());
-        $this->assertEquals([0 => ['foo' => 'bar'], 1 => ['foo' => 'bar']], $node->getDefaultValue());
+        self::assertTrue($node->hasDefaultValue());
+        self::assertEquals([0 => ['foo' => 'bar'], 1 => ['foo' => 'bar']], $node->getDefaultValue());
 
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setAddChildrenIfNoneSet(2);
-        $this->assertTrue($node->hasDefaultValue());
-        $this->assertEquals([['foo' => 'bar'], ['foo' => 'bar']], $node->getDefaultValue());
+        self::assertTrue($node->hasDefaultValue());
+        self::assertEquals([['foo' => 'bar'], ['foo' => 'bar']], $node->getDefaultValue());
     }
 
     public function testDefaultChildrenWinsOverDefaultValue()
@@ -163,8 +163,8 @@ class PrototypedArrayNodeTest extends TestCase
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setAddChildrenIfNoneSet();
         $node->setDefaultValue(['bar' => 'foo']);
-        $this->assertTrue($node->hasDefaultValue());
-        $this->assertEquals([['foo' => 'bar']], $node->getDefaultValue());
+        self::assertTrue($node->hasDefaultValue());
+        self::assertEquals([['foo' => 'bar']], $node->getDefaultValue());
     }
 
     protected function getPrototypeNodeWithDefaultChildren()
@@ -277,7 +277,7 @@ class PrototypedArrayNodeTest extends TestCase
         $node->setPrototype($prototype);
 
         $normalized = $node->normalize($children);
-        $this->assertEquals($expected, $normalized);
+        self::assertEquals($expected, $normalized);
     }
 
     public function getDataForKeyRemovedLeftValueOnly(): array

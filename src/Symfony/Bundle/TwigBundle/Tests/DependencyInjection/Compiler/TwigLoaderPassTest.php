@@ -47,7 +47,7 @@ class TwigLoaderPassTest extends TestCase
 
         $this->pass->process($this->builder);
 
-        $this->assertSame('test_loader_1', (string) $this->builder->getAlias('twig.loader'));
+        self::assertSame('test_loader_1', (string) $this->builder->getAlias('twig.loader'));
     }
 
     public function testMapperPassWithTwoTaggedLoaders()
@@ -60,13 +60,13 @@ class TwigLoaderPassTest extends TestCase
 
         $this->pass->process($this->builder);
 
-        $this->assertSame('twig.loader.chain', (string) $this->builder->getAlias('twig.loader'));
+        self::assertSame('twig.loader.chain', (string) $this->builder->getAlias('twig.loader'));
         $calls = $this->chainLoader->getMethodCalls();
-        $this->assertCount(2, $calls);
-        $this->assertEquals('addLoader', $calls[0][0]);
-        $this->assertEquals('addLoader', $calls[1][0]);
-        $this->assertEquals('test_loader_1', (string) $calls[0][1][0]);
-        $this->assertEquals('test_loader_2', (string) $calls[1][1][0]);
+        self::assertCount(2, $calls);
+        self::assertEquals('addLoader', $calls[0][0]);
+        self::assertEquals('addLoader', $calls[1][0]);
+        self::assertEquals('test_loader_1', (string) $calls[0][1][0]);
+        self::assertEquals('test_loader_2', (string) $calls[1][1][0]);
     }
 
     public function testMapperPassWithTwoTaggedLoadersWithPriority()
@@ -79,18 +79,18 @@ class TwigLoaderPassTest extends TestCase
 
         $this->pass->process($this->builder);
 
-        $this->assertSame('twig.loader.chain', (string) $this->builder->getAlias('twig.loader'));
+        self::assertSame('twig.loader.chain', (string) $this->builder->getAlias('twig.loader'));
         $calls = $this->chainLoader->getMethodCalls();
-        $this->assertCount(2, $calls);
-        $this->assertEquals('addLoader', $calls[0][0]);
-        $this->assertEquals('addLoader', $calls[1][0]);
-        $this->assertEquals('test_loader_2', (string) $calls[0][1][0]);
-        $this->assertEquals('test_loader_1', (string) $calls[1][1][0]);
+        self::assertCount(2, $calls);
+        self::assertEquals('addLoader', $calls[0][0]);
+        self::assertEquals('addLoader', $calls[1][0]);
+        self::assertEquals('test_loader_2', (string) $calls[0][1][0]);
+        self::assertEquals('test_loader_1', (string) $calls[1][1][0]);
     }
 
     public function testMapperPassWithZeroTaggedLoaders()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
         $this->pass->process($this->builder);
     }
 }

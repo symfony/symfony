@@ -21,9 +21,9 @@ class SessionLogoutListenerTest extends TestCase
 {
     public function testOnLogoutIfHasNoSession()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request->method('hasSession')->willReturn(false);
-        $request->expects($this->never())->method('getSession');
+        $request->expects(self::never())->method('getSession');
 
         $sessionLogoutListener = new SessionLogoutListener();
         $sessionLogoutListener->onLogout(new LogoutEvent($request, null));
@@ -31,10 +31,10 @@ class SessionLogoutListenerTest extends TestCase
 
     public function testOnLogoutIfHasSession()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->once())->method('invalidate');
+        $session = self::createMock(Session::class);
+        $session->expects(self::once())->method('invalidate');
 
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request->method('getSession')->willReturn($session);
         $request->method('hasSession')->willReturn(true);
 

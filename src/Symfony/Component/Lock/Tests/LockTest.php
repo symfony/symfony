@@ -31,59 +31,59 @@ class LockTest extends TestCase
     public function testAcquireNoBlocking()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save');
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquire(false));
+        self::assertTrue($lock->acquire(false));
     }
 
     public function testAcquireNoBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save');
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquire(false));
+        self::assertTrue($lock->acquire(false));
     }
 
     public function testAcquireBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save');
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquire(true));
+        self::assertTrue($lock->acquire(true));
     }
 
     public function testAcquireBlockingRetryWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('save')
             ->willReturnCallback(static function () {
                 if (1 === random_int(0, 1)) {
@@ -95,73 +95,73 @@ class LockTest extends TestCase
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquire(true));
+        self::assertTrue($lock->acquire(true));
     }
 
     public function testAcquireReturnsFalse()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->willThrowException(new LockConflictedException());
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertFalse($lock->acquire(false));
+        self::assertFalse($lock->acquire(false));
     }
 
     public function testAcquireReturnsFalseStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->willThrowException(new LockConflictedException());
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertFalse($lock->acquire(false));
+        self::assertFalse($lock->acquire(false));
     }
 
     public function testAcquireBlockingWithBlockingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(BlockingStoreInterface::class);
+        $store = self::createMock(BlockingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('save');
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('waitAndSave');
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquire(true));
+        self::assertTrue($lock->acquire(true));
     }
 
     public function testAcquireSetsTtl()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save');
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
             ->with($key, 10);
         $store
@@ -174,11 +174,11 @@ class LockTest extends TestCase
     public function testRefresh()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
             ->with($key, 10);
         $store
@@ -191,11 +191,11 @@ class LockTest extends TestCase
     public function testRefreshCustom()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
             ->with($key, 20);
         $store
@@ -208,7 +208,7 @@ class LockTest extends TestCase
     public function testIsAquired()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -216,22 +216,22 @@ class LockTest extends TestCase
             ->with($key)
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->isAcquired());
+        self::assertTrue($lock->isAcquired());
     }
 
     public function testRelease()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
@@ -242,16 +242,16 @@ class LockTest extends TestCase
     public function testReleaseStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
@@ -262,7 +262,7 @@ class LockTest extends TestCase
     public function testReleaseOnDestruction()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(BlockingStoreInterface::class);
+        $store = self::createMock(BlockingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -270,7 +270,7 @@ class LockTest extends TestCase
             ->willReturnOnConsecutiveCalls(true, false)
         ;
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
         ;
 
@@ -281,7 +281,7 @@ class LockTest extends TestCase
     public function testNoAutoReleaseWhenNotConfigured()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(BlockingStoreInterface::class);
+        $store = self::createMock(BlockingStoreInterface::class);
         $lock = new Lock($key, $store, 10, false);
 
         $store
@@ -289,7 +289,7 @@ class LockTest extends TestCase
             ->willReturnOnConsecutiveCalls(true, false)
         ;
         $store
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('delete')
         ;
 
@@ -299,19 +299,19 @@ class LockTest extends TestCase
 
     public function testReleaseThrowsExceptionWhenDeletionFail()
     {
-        $this->expectException(LockReleasingException::class);
+        self::expectException(LockReleasingException::class);
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key)
             ->willThrowException(new \RuntimeException('Boom'));
 
         $store
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('exists')
             ->with($key);
 
@@ -320,18 +320,18 @@ class LockTest extends TestCase
 
     public function testReleaseThrowsExceptionIfNotWellDeleted()
     {
-        $this->expectException(LockReleasingException::class);
+        self::expectException(LockReleasingException::class);
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('exists')
             ->with($key)
             ->willReturn(true);
@@ -341,24 +341,24 @@ class LockTest extends TestCase
 
     public function testReleaseThrowsAndLog()
     {
-        $this->expectException(LockReleasingException::class);
+        self::expectException(LockReleasingException::class);
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $lock = new Lock($key, $store, 10, true);
         $lock->setLogger($logger);
 
-        $logger->expects($this->atLeastOnce())
+        $logger->expects(self::atLeastOnce())
             ->method('notice')
             ->with('Failed to release the "{resource}" lock.', ['resource' => $key]);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('exists')
             ->with($key)
             ->willReturn(true);
@@ -372,7 +372,7 @@ class LockTest extends TestCase
     public function testExpiration($ttls, $expected)
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         foreach ($ttls as $ttl) {
@@ -382,7 +382,7 @@ class LockTest extends TestCase
                 $key->reduceLifetime($ttl);
             }
         }
-        $this->assertSame($expected, $lock->isExpired());
+        self::assertSame($expected, $lock->isExpired());
     }
 
     /**
@@ -391,7 +391,7 @@ class LockTest extends TestCase
     public function testExpirationStoreInterface($ttls, $expected)
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         foreach ($ttls as $ttl) {
@@ -401,7 +401,7 @@ class LockTest extends TestCase
                 $key->reduceLifetime($ttl);
             }
         }
-        $this->assertSame($expected, $lock->isExpired());
+        self::assertSame($expected, $lock->isExpired());
     }
 
     public function provideExpiredDates()
@@ -418,17 +418,17 @@ class LockTest extends TestCase
     public function testAcquireReadNoBlockingWithSharedLockStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(SharedLockStoreInterface::class);
+        $store = self::createMock(SharedLockStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('saveRead');
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquireRead(false));
+        self::assertTrue($lock->acquireRead(false));
     }
 
     /**
@@ -470,10 +470,10 @@ class LockTest extends TestCase
         $ttl = 1;
         $lock = new Lock($key, $store, $ttl);
 
-        $this->assertTrue($lock->acquireRead());
+        self::assertTrue($lock->acquireRead());
         $lock->release();
         sleep($ttl + 1);
-        $this->assertTrue($lock->acquireRead());
+        self::assertTrue($lock->acquireRead());
         $lock->release();
     }
 
@@ -516,37 +516,37 @@ class LockTest extends TestCase
         $ttl = 1;
         $lock = new Lock($key, $store, $ttl);
 
-        $this->assertTrue($lock->acquire());
+        self::assertTrue($lock->acquire());
         $lock->release();
         sleep($ttl + 1);
-        $this->assertTrue($lock->acquire());
+        self::assertTrue($lock->acquire());
         $lock->release();
     }
 
     public function testAcquireReadBlockingWithBlockingSharedLockStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(BlockingSharedLockStoreInterface::class);
+        $store = self::createMock(BlockingSharedLockStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('waitAndSaveRead');
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquireRead(true));
+        self::assertTrue($lock->acquireRead(true));
     }
 
     public function testAcquireReadBlockingWithSharedLockStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(SharedLockStoreInterface::class);
+        $store = self::createMock(SharedLockStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('saveRead')
             ->willReturnCallback(static function () {
                 if (1 === random_int(0, 1)) {
@@ -558,33 +558,33 @@ class LockTest extends TestCase
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquireRead(true));
+        self::assertTrue($lock->acquireRead(true));
     }
 
     public function testAcquireReadBlockingWithBlockingLockStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(BlockingStoreInterface::class);
+        $store = self::createMock(BlockingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('waitAndSave');
         $store
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquireRead(true));
+        self::assertTrue($lock->acquireRead(true));
     }
 
     public function testAcquireReadBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('save')
             ->willReturnCallback(static function () {
                 if (1 === random_int(0, 1)) {
@@ -596,6 +596,6 @@ class LockTest extends TestCase
             ->method('exists')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->assertTrue($lock->acquireRead(true));
+        self::assertTrue($lock->acquireRead(true));
     }
 }

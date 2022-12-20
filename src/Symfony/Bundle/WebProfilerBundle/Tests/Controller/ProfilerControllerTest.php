@@ -34,11 +34,11 @@ class ProfilerControllerTest extends WebTestCase
 {
     public function testHomeActionWithProfilerDisabled()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('The profiler must be enabled.');
+        self::expectException(NotFoundHttpException::class);
+        self::expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $twig = $this->createMock(Environment::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $twig = self::createMock(Environment::class);
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->homeAction();
@@ -51,8 +51,8 @@ class ProfilerControllerTest extends WebTestCase
 
         $client->request('GET', '/_profiler/');
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $this->assertSame('/_profiler/empty/search/results?limit=10', $client->getResponse()->getTargetUrl());
+        self::assertSame(302, $client->getResponse()->getStatusCode());
+        self::assertSame('/_profiler/empty/search/results?limit=10', $client->getResponse()->getTargetUrl());
     }
 
     public function testPanelActionWithLatestTokenWhenNoTokensExist()
@@ -62,7 +62,7 @@ class ProfilerControllerTest extends WebTestCase
 
         $client->request('GET', '/_profiler/latest');
 
-        $this->assertStringContainsString('No profiles found.', $client->getResponse()->getContent());
+        self::assertStringContainsString('No profiles found.', $client->getResponse()->getContent());
     }
 
     public function testPanelActionWithLatestToken()
@@ -73,7 +73,7 @@ class ProfilerControllerTest extends WebTestCase
         $client->request('GET', '/');
         $client->request('GET', '/_profiler/latest');
 
-        $this->assertStringContainsString('kernel::homepageController', $client->getResponse()->getContent());
+        self::assertStringContainsString('kernel::homepageController', $client->getResponse()->getContent());
     }
 
     public function testPanelActionWithoutValidToken()
@@ -83,7 +83,7 @@ class ProfilerControllerTest extends WebTestCase
 
         $client->request('GET', '/_profiler/this-token-does-not-exist');
 
-        $this->assertStringContainsString('Token &quot;this-token-does-not-exist&quot; not found.', $client->getResponse()->getContent());
+        self::assertStringContainsString('Token &quot;this-token-does-not-exist&quot; not found.', $client->getResponse()->getContent());
     }
 
     public function testPanelActionWithWrongPanel()
@@ -94,7 +94,7 @@ class ProfilerControllerTest extends WebTestCase
         $client->request('GET', '/');
         $client->request('GET', '/_profiler/latest?panel=this-panel-does-not-exist');
 
-        $this->assertSame(404, $client->getResponse()->getStatusCode());
+        self::assertSame(404, $client->getResponse()->getStatusCode());
     }
 
     public function testPanelActionWithValidPanelAndToken()
@@ -105,16 +105,16 @@ class ProfilerControllerTest extends WebTestCase
         $client->request('GET', '/');
         $crawler = $client->request('GET', '/_profiler/latest?panel=router');
 
-        $this->assertSame('_', $crawler->filter('.metrics .metric .value')->eq(0)->text());
+        self::assertSame('_', $crawler->filter('.metrics .metric .value')->eq(0)->text());
     }
 
     public function testToolbarActionWithProfilerDisabled()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('The profiler must be enabled.');
+        self::expectException(NotFoundHttpException::class);
+        self::expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $twig = $this->createMock(Environment::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $twig = self::createMock(Environment::class);
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->toolbarAction(Request::create('/_wdt/foo-token'), null);
@@ -125,14 +125,14 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testToolbarActionWithEmptyToken($token)
     {
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $twig = $this->createMock(Environment::class);
-        $profiler = $this->createMock(Profiler::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $twig = self::createMock(Environment::class);
+        $profiler = self::createMock(Profiler::class);
 
         $controller = new ProfilerController($urlGenerator, $profiler, $twig, []);
 
         $response = $controller->toolbarAction(Request::create('/_wdt/empty'), $token);
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertEquals(200, $response->getStatusCode());
     }
 
     public function getEmptyTokenCases()
@@ -149,18 +149,18 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testOpeningDisallowedPaths($path, $isAllowed)
     {
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $twig = $this->createMock(Environment::class);
-        $profiler = $this->createMock(Profiler::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $twig = self::createMock(Environment::class);
+        $profiler = self::createMock(Profiler::class);
 
         $controller = new ProfilerController($urlGenerator, $profiler, $twig, [], null, __DIR__.'/../..');
 
         try {
             $response = $controller->openAction(Request::create('/_wdt/open', Request::METHOD_GET, ['file' => $path]));
-            $this->assertEquals(200, $response->getStatusCode());
-            $this->assertTrue($isAllowed);
+            self::assertEquals(200, $response->getStatusCode());
+            self::assertTrue($isAllowed);
         } catch (NotFoundHttpException $e) {
-            $this->assertFalse($isAllowed);
+            self::assertFalse($isAllowed);
         }
     }
 
@@ -182,11 +182,11 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testReturns404onTokenNotFound($withCsp)
     {
-        $twig = $this->createMock(Environment::class);
-        $profiler = $this->createMock(Profiler::class);
+        $twig = self::createMock(Environment::class);
+        $profiler = self::createMock(Profiler::class);
 
         $profiler
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('loadProfile')
             ->willReturnCallback(function ($token) {
                 return 'found' == $token ? new Profile($token) : null;
@@ -196,19 +196,19 @@ class ProfilerControllerTest extends WebTestCase
         $controller = $this->createController($profiler, $twig, $withCsp);
 
         $response = $controller->toolbarAction(Request::create('/_wdt/found'), 'found');
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertEquals(200, $response->getStatusCode());
 
         $response = $controller->toolbarAction(Request::create('/_wdt/notFound'), 'notFound');
-        $this->assertEquals(404, $response->getStatusCode());
+        self::assertEquals(404, $response->getStatusCode());
     }
 
     public function testSearchBarActionWithProfilerDisabled()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('The profiler must be enabled.');
+        self::expectException(NotFoundHttpException::class);
+        self::expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $twig = $this->createMock(Environment::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $twig = self::createMock(Environment::class);
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->searchBarAction(Request::create('/_profiler/search_bar'));
@@ -221,10 +221,10 @@ class ProfilerControllerTest extends WebTestCase
 
         $crawler = $client->request('GET', '/_profiler/search_bar');
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
 
         foreach (['ip', 'status_code', 'url', 'token', 'start', 'end'] as $searchCriteria) {
-            $this->assertSame('', $crawler->filter(sprintf('form input[name="%s"]', $searchCriteria))->text());
+            self::assertSame('', $crawler->filter(sprintf('form input[name="%s"]', $searchCriteria))->text());
         }
     }
 
@@ -233,8 +233,8 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testSearchResultsAction($withCsp)
     {
-        $twig = $this->createMock(Environment::class);
-        $profiler = $this->createMock(Profiler::class);
+        $twig = self::createMock(Environment::class);
+        $profiler = self::createMock(Profiler::class);
 
         $controller = $this->createController($profiler, $twig, $withCsp);
 
@@ -259,7 +259,7 @@ class ProfilerControllerTest extends WebTestCase
             ],
         ];
         $profiler
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->willReturn($tokens);
 
@@ -270,9 +270,9 @@ class ProfilerControllerTest extends WebTestCase
             'url' => 'http://example.com/',
         ]);
 
-        $twig->expects($this->once())
+        $twig->expects(self::once())
             ->method('render')
-            ->with($this->stringEndsWith('results.html.twig'), $this->equalTo([
+            ->with(self::stringEndsWith('results.html.twig'), self::equalTo([
                 'token' => 'empty',
                 'profile' => null,
                 'tokens' => $tokens,
@@ -290,16 +290,16 @@ class ProfilerControllerTest extends WebTestCase
             ]));
 
         $response = $controller->searchResultsAction($request, 'empty');
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertEquals(200, $response->getStatusCode());
     }
 
     public function testSearchActionWithProfilerDisabled()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('The profiler must be enabled.');
+        self::expectException(NotFoundHttpException::class);
+        self::expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $twig = $this->createMock(Environment::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $twig = self::createMock(Environment::class);
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->searchBarAction(Request::create('/_profiler/search'));
@@ -314,8 +314,8 @@ class ProfilerControllerTest extends WebTestCase
         $token = $client->getResponse()->headers->get('x-debug-token');
         $client->request('GET', '/_profiler/search?token='.$token);
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $this->assertSame('/_profiler/'.$token, $client->getResponse()->getTargetUrl());
+        self::assertSame(302, $client->getResponse()->getStatusCode());
+        self::assertSame('/_profiler/'.$token, $client->getResponse()->getTargetUrl());
     }
 
     public function testSearchActionWithoutToken()
@@ -328,17 +328,17 @@ class ProfilerControllerTest extends WebTestCase
         $token = $client->getResponse()->headers->get('x-debug-token');
         $client->request('GET', '/_profiler/search?ip=&method=GET&status_code=&url=&token=&start=&end=&limit=10');
 
-        $this->assertStringContainsString('results found', $client->getResponse()->getContent());
-        $this->assertStringContainsString(sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
+        self::assertStringContainsString('results found', $client->getResponse()->getContent());
+        self::assertStringContainsString(sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
     }
 
     public function testPhpinfoActionWithProfilerDisabled()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('The profiler must be enabled.');
+        self::expectException(NotFoundHttpException::class);
+        self::expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $twig = $this->createMock(Environment::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $twig = self::createMock(Environment::class);
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->phpinfoAction(Request::create('/_profiler/phpinfo'));
@@ -351,7 +351,7 @@ class ProfilerControllerTest extends WebTestCase
 
         $client->request('GET', '/_profiler/phpinfo');
 
-        $this->assertStringContainsString('PHP License', $client->getResponse()->getContent());
+        self::assertStringContainsString('PHP License', $client->getResponse()->getContent());
     }
 
     public function provideCspVariants()
@@ -367,9 +367,9 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testDefaultPanel(string $expectedPanel, Profile $profile)
     {
-        $profiler = $this->createMock(Profiler::class);
+        $profiler = self::createMock(Profiler::class);
         $profiler
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('loadProfile')
             ->with($profile->getToken())
             ->willReturn($profile);
@@ -377,31 +377,31 @@ class ProfilerControllerTest extends WebTestCase
         $collectorsNames = array_keys($profile->getCollectors());
 
         $profiler
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('has')
-            ->with($this->logicalXor(...$collectorsNames))
+            ->with(self::logicalXor(...$collectorsNames))
             ->willReturn(true);
 
         $expectedTemplate = 'expected_template.html.twig';
 
         if (Environment::MAJOR_VERSION > 1) {
-            $loader = $this->createMock(LoaderInterface::class);
+            $loader = self::createMock(LoaderInterface::class);
             $loader
-                ->expects($this->atLeastOnce())
+                ->expects(self::atLeastOnce())
                 ->method('exists')
-                ->with($this->logicalXor($expectedTemplate, 'other_template.html.twig'))
+                ->with(self::logicalXor($expectedTemplate, 'other_template.html.twig'))
                 ->willReturn(true);
         } else {
-            $loader = $this->createMock(SourceContextLoaderInterface::class);
+            $loader = self::createMock(SourceContextLoaderInterface::class);
         }
 
-        $twig = $this->createMock(Environment::class);
+        $twig = self::createMock(Environment::class);
         $twig
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getLoader')
             ->willReturn($loader);
         $twig
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('render')
             ->with($expectedTemplate);
 
@@ -430,13 +430,13 @@ class ProfilerControllerTest extends WebTestCase
         yield [$exceptionDataCollector->getName(), $profile];
 
         // Test exception priority
-        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector = self::createMock(DumpDataCollector::class);
         $dumpDataCollector
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getName')
             ->willReturn('dump');
         $dumpDataCollector
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getDumpsCount')
             ->willReturn(1);
         $profile = new Profile('xxxxxx');
@@ -456,10 +456,10 @@ class ProfilerControllerTest extends WebTestCase
 
     private function createController($profiler, $twig, $withCSP, array $templates = []): ProfilerController
     {
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
 
         if ($withCSP) {
-            $nonceGenerator = $this->createMock(NonceGenerator::class);
+            $nonceGenerator = self::createMock(NonceGenerator::class);
             $nonceGenerator->method('generate')->willReturn('dummy_nonce');
 
             return new ProfilerController($urlGenerator, $profiler, $twig, $templates, new ContentSecurityPolicyHandler($nonceGenerator));

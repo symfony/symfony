@@ -19,15 +19,15 @@ class AutowiringTypesTest extends AbstractWebTestCase
 {
     public function testAccessDecisionManagerAutowiring()
     {
-        static::bootKernel(['debug' => false]);
+        self::bootKernel(['debug' => false]);
 
-        $autowiredServices = static::getContainer()->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(AccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The security.access.decision_manager service should be injected in debug mode');
+        $autowiredServices = self::getContainer()->get('test.autowiring_types.autowired_services');
+        self::assertInstanceOf(AccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The security.access.decision_manager service should be injected in debug mode');
 
-        static::bootKernel(['debug' => true]);
+        self::bootKernel(['debug' => true]);
 
-        $autowiredServices = static::getContainer()->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(TraceableAccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The debug.security.access.decision_manager service should be injected in non-debug mode');
+        $autowiredServices = self::getContainer()->get('test.autowiring_types.autowired_services');
+        self::assertInstanceOf(TraceableAccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The debug.security.access.decision_manager service should be injected in non-debug mode');
     }
 
     /**
@@ -35,15 +35,15 @@ class AutowiringTypesTest extends AbstractWebTestCase
      */
     public function testLegacyAccessDecisionManagerAutowiring()
     {
-        static::bootKernel(['debug' => false, 'root_config' => 'legacy_config.yml']);
+        self::bootKernel(['debug' => false, 'root_config' => 'legacy_config.yml']);
 
-        $autowiredServices = static::getContainer()->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(AccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The security.access.decision_manager service should be injected in debug mode');
+        $autowiredServices = self::getContainer()->get('test.autowiring_types.autowired_services');
+        self::assertInstanceOf(AccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The security.access.decision_manager service should be injected in debug mode');
 
-        static::bootKernel(['debug' => true, 'root_config' => 'legacy_config.yml']);
+        self::bootKernel(['debug' => true, 'root_config' => 'legacy_config.yml']);
 
-        $autowiredServices = static::getContainer()->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(TraceableAccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The debug.security.access.decision_manager service should be injected in non-debug mode');
+        $autowiredServices = self::getContainer()->get('test.autowiring_types.autowired_services');
+        self::assertInstanceOf(TraceableAccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The debug.security.access.decision_manager service should be injected in non-debug mode');
     }
 
     protected static function createKernel(array $options = []): KernelInterface

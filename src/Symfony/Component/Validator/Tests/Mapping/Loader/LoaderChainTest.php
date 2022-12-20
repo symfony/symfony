@@ -22,15 +22,15 @@ class LoaderChainTest extends TestCase
     {
         $metadata = new ClassMetadata('\stdClass');
 
-        $loader1 = $this->createMock(LoaderInterface::class);
-        $loader1->expects($this->once())
+        $loader1 = self::createMock(LoaderInterface::class);
+        $loader1->expects(self::once())
             ->method('loadClassMetadata')
-            ->with($this->equalTo($metadata));
+            ->with(self::equalTo($metadata));
 
-        $loader2 = $this->createMock(LoaderInterface::class);
-        $loader2->expects($this->once())
+        $loader2 = self::createMock(LoaderInterface::class);
+        $loader2->expects(self::once())
             ->method('loadClassMetadata')
-            ->with($this->equalTo($metadata));
+            ->with(self::equalTo($metadata));
 
         $chain = new LoaderChain([
             $loader1,
@@ -44,13 +44,13 @@ class LoaderChainTest extends TestCase
     {
         $metadata = new ClassMetadata('\stdClass');
 
-        $loader1 = $this->createMock(LoaderInterface::class);
-        $loader1->expects($this->any())
+        $loader1 = self::createMock(LoaderInterface::class);
+        $loader1->expects(self::any())
             ->method('loadClassMetadata')
             ->willReturn(true);
 
-        $loader2 = $this->createMock(LoaderInterface::class);
-        $loader2->expects($this->any())
+        $loader2 = self::createMock(LoaderInterface::class);
+        $loader2->expects(self::any())
             ->method('loadClassMetadata')
             ->willReturn(false);
 
@@ -59,20 +59,20 @@ class LoaderChainTest extends TestCase
             $loader2,
         ]);
 
-        $this->assertTrue($chain->loadClassMetadata($metadata));
+        self::assertTrue($chain->loadClassMetadata($metadata));
     }
 
     public function testReturnsFalseIfNoLoaderReturnedTrue()
     {
         $metadata = new ClassMetadata('\stdClass');
 
-        $loader1 = $this->createMock(LoaderInterface::class);
-        $loader1->expects($this->any())
+        $loader1 = self::createMock(LoaderInterface::class);
+        $loader1->expects(self::any())
             ->method('loadClassMetadata')
             ->willReturn(false);
 
-        $loader2 = $this->createMock(LoaderInterface::class);
-        $loader2->expects($this->any())
+        $loader2 = self::createMock(LoaderInterface::class);
+        $loader2->expects(self::any())
             ->method('loadClassMetadata')
             ->willReturn(false);
 
@@ -81,6 +81,6 @@ class LoaderChainTest extends TestCase
             $loader2,
         ]);
 
-        $this->assertFalse($chain->loadClassMetadata($metadata));
+        self::assertFalse($chain->loadClassMetadata($metadata));
     }
 }

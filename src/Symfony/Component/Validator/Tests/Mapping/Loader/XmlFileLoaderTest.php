@@ -36,7 +36,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
         $metadata = new ClassMetadata(Entity::class);
 
-        $this->assertTrue($loader->loadClassMetadata($metadata));
+        self::assertTrue($loader->loadClassMetadata($metadata));
     }
 
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
@@ -44,7 +44,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
         $metadata = new ClassMetadata('\stdClass');
 
-        $this->assertFalse($loader->loadClassMetadata($metadata));
+        self::assertFalse($loader->loadClassMetadata($metadata));
     }
 
     public function testLoadClassMetadata()
@@ -79,7 +79,7 @@ class XmlFileLoaderTest extends TestCase
         $expected->addGetterConstraint('valid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
 
-        $this->assertEquals($expected, $metadata);
+        self::assertEquals($expected, $metadata);
     }
 
     public function testLoadClassMetadataWithNonStrings()
@@ -95,7 +95,7 @@ class XmlFileLoaderTest extends TestCase
         $properties = $metadata->getPropertyMetadata('firstName');
         $constraints = $properties[0]->getConstraints();
 
-        $this->assertFalse($constraints[0]->match);
+        self::assertFalse($constraints[0]->match);
     }
 
     public function testLoadGroupSequenceProvider()
@@ -108,7 +108,7 @@ class XmlFileLoaderTest extends TestCase
         $expected = new ClassMetadata(GroupSequenceProviderEntity::class);
         $expected->setGroupSequenceProvider(true);
 
-        $this->assertEquals($expected, $metadata);
+        self::assertEquals($expected, $metadata);
     }
 
     public function testThrowExceptionIfDocTypeIsSet()
@@ -116,7 +116,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(__DIR__.'/withdoctype.xml');
         $metadata = new ClassMetadata(Entity::class);
 
-        $this->expectException(MappingException::class);
+        self::expectException(MappingException::class);
         $loader->loadClassMetadata($metadata);
     }
 
@@ -131,7 +131,7 @@ class XmlFileLoaderTest extends TestCase
         try {
             $loader->loadClassMetadata($metadata);
         } catch (MappingException $e) {
-            $this->expectException(MappingException::class);
+            self::expectException(MappingException::class);
             $loader->loadClassMetadata($metadata);
         }
     }

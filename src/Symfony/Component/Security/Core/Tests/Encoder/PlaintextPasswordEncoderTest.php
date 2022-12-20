@@ -24,27 +24,27 @@ class PlaintextPasswordEncoderTest extends TestCase
     {
         $encoder = new PlaintextPasswordEncoder();
 
-        $this->assertTrue($encoder->isPasswordValid('foo', 'foo', ''));
-        $this->assertFalse($encoder->isPasswordValid('bar', 'foo', ''));
-        $this->assertFalse($encoder->isPasswordValid('FOO', 'foo', ''));
+        self::assertTrue($encoder->isPasswordValid('foo', 'foo', ''));
+        self::assertFalse($encoder->isPasswordValid('bar', 'foo', ''));
+        self::assertFalse($encoder->isPasswordValid('FOO', 'foo', ''));
 
         $encoder = new PlaintextPasswordEncoder(true);
 
-        $this->assertTrue($encoder->isPasswordValid('foo', 'foo', ''));
-        $this->assertFalse($encoder->isPasswordValid('bar', 'foo', ''));
-        $this->assertTrue($encoder->isPasswordValid('FOO', 'foo', ''));
+        self::assertTrue($encoder->isPasswordValid('foo', 'foo', ''));
+        self::assertFalse($encoder->isPasswordValid('bar', 'foo', ''));
+        self::assertTrue($encoder->isPasswordValid('FOO', 'foo', ''));
     }
 
     public function testEncodePassword()
     {
         $encoder = new PlaintextPasswordEncoder();
 
-        $this->assertSame('foo', $encoder->encodePassword('foo', ''));
+        self::assertSame('foo', $encoder->encodePassword('foo', ''));
     }
 
     public function testEncodePasswordLength()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $encoder = new PlaintextPasswordEncoder();
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');
@@ -54,6 +54,6 @@ class PlaintextPasswordEncoderTest extends TestCase
     {
         $encoder = new PlaintextPasswordEncoder();
 
-        $this->assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
+        self::assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
     }
 }

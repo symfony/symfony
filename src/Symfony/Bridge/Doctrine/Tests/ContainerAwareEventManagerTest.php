@@ -35,7 +35,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->container->set('sub1', $subscriber1 = new MySubscriber(['foo']));
         $this->container->set('sub2', $subscriber2 = new MySubscriber(['foo']));
 
-        $this->assertSame([$subscriber1, $listener1, $subscriber2], array_values($this->evm->getListeners('foo')));
+        self::assertSame([$subscriber1, $listener1, $subscriber2], array_values($this->evm->getListeners('foo')));
     }
 
     public function testDispatchEvent()
@@ -43,7 +43,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm = new ContainerAwareEventManager($this->container, ['lazy4']);
 
         $this->container->set('lazy4', $subscriber1 = new MySubscriber(['foo']));
-        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
+        self::assertSame(0, $subscriber1->calledSubscribedEventsCount);
 
         $this->container->set('lazy1', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy1');
@@ -56,28 +56,28 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('bar', $listener5);
         $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
 
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->evm->dispatchEvent('foo');
         $this->evm->dispatchEvent('bar');
 
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber1->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
-        $this->assertSame(0, $listener1->calledByInvokeCount);
-        $this->assertSame(1, $listener1->calledByEventNameCount);
-        $this->assertSame(0, $listener2->calledByInvokeCount);
-        $this->assertSame(1, $listener2->calledByEventNameCount);
-        $this->assertSame(1, $listener3->calledByInvokeCount);
-        $this->assertSame(0, $listener3->calledByEventNameCount);
-        $this->assertSame(1, $listener4->calledByInvokeCount);
-        $this->assertSame(0, $listener4->calledByEventNameCount);
-        $this->assertSame(1, $listener5->calledByInvokeCount);
-        $this->assertSame(1, $listener5->calledByEventNameCount);
-        $this->assertSame(0, $subscriber1->calledByInvokeCount);
-        $this->assertSame(1, $subscriber1->calledByEventNameCount);
-        $this->assertSame(1, $subscriber2->calledByInvokeCount);
-        $this->assertSame(0, $subscriber2->calledByEventNameCount);
+        self::assertSame(0, $listener1->calledByInvokeCount);
+        self::assertSame(1, $listener1->calledByEventNameCount);
+        self::assertSame(0, $listener2->calledByInvokeCount);
+        self::assertSame(1, $listener2->calledByEventNameCount);
+        self::assertSame(1, $listener3->calledByInvokeCount);
+        self::assertSame(0, $listener3->calledByEventNameCount);
+        self::assertSame(1, $listener4->calledByInvokeCount);
+        self::assertSame(0, $listener4->calledByEventNameCount);
+        self::assertSame(1, $listener5->calledByInvokeCount);
+        self::assertSame(1, $listener5->calledByEventNameCount);
+        self::assertSame(0, $subscriber1->calledByInvokeCount);
+        self::assertSame(1, $subscriber1->calledByEventNameCount);
+        self::assertSame(1, $subscriber2->calledByInvokeCount);
+        self::assertSame(0, $subscriber2->calledByEventNameCount);
     }
 
     public function testAddEventListenerAndSubscriberAfterDispatchEvent()
@@ -85,11 +85,11 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm = new ContainerAwareEventManager($this->container, ['lazy7']);
 
         $this->container->set('lazy7', $subscriber1 = new MySubscriber(['foo']));
-        $this->assertSame(0, $subscriber1->calledSubscribedEventsCount);
+        self::assertSame(0, $subscriber1->calledSubscribedEventsCount);
 
         $this->container->set('lazy1', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy1');
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber1->calledSubscribedEventsCount);
 
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
         $this->container->set('lazy2', $listener3 = new MyListener());
@@ -100,13 +100,13 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('bar', $listener5);
         $this->evm->addEventSubscriber($subscriber2 = new MySubscriber(['bar']));
 
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->evm->dispatchEvent('foo');
         $this->evm->dispatchEvent('bar');
 
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber1->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber2->calledSubscribedEventsCount);
 
         $this->container->set('lazy4', $listener6 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy4');
@@ -119,44 +119,44 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('bar', $listener10);
         $this->evm->addEventSubscriber($subscriber3 = new MySubscriber(['bar']));
 
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber3->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber1->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber2->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber3->calledSubscribedEventsCount);
 
         $this->evm->dispatchEvent('foo');
         $this->evm->dispatchEvent('bar');
 
-        $this->assertSame(1, $subscriber1->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber2->calledSubscribedEventsCount);
-        $this->assertSame(1, $subscriber3->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber1->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber2->calledSubscribedEventsCount);
+        self::assertSame(1, $subscriber3->calledSubscribedEventsCount);
 
-        $this->assertSame(0, $listener1->calledByInvokeCount);
-        $this->assertSame(2, $listener1->calledByEventNameCount);
-        $this->assertSame(0, $listener2->calledByInvokeCount);
-        $this->assertSame(2, $listener2->calledByEventNameCount);
-        $this->assertSame(2, $listener3->calledByInvokeCount);
-        $this->assertSame(0, $listener3->calledByEventNameCount);
-        $this->assertSame(2, $listener4->calledByInvokeCount);
-        $this->assertSame(0, $listener4->calledByEventNameCount);
-        $this->assertSame(2, $listener5->calledByInvokeCount);
-        $this->assertSame(2, $listener5->calledByEventNameCount);
-        $this->assertSame(0, $subscriber1->calledByInvokeCount);
-        $this->assertSame(2, $subscriber1->calledByEventNameCount);
-        $this->assertSame(2, $subscriber2->calledByInvokeCount);
-        $this->assertSame(0, $subscriber2->calledByEventNameCount);
+        self::assertSame(0, $listener1->calledByInvokeCount);
+        self::assertSame(2, $listener1->calledByEventNameCount);
+        self::assertSame(0, $listener2->calledByInvokeCount);
+        self::assertSame(2, $listener2->calledByEventNameCount);
+        self::assertSame(2, $listener3->calledByInvokeCount);
+        self::assertSame(0, $listener3->calledByEventNameCount);
+        self::assertSame(2, $listener4->calledByInvokeCount);
+        self::assertSame(0, $listener4->calledByEventNameCount);
+        self::assertSame(2, $listener5->calledByInvokeCount);
+        self::assertSame(2, $listener5->calledByEventNameCount);
+        self::assertSame(0, $subscriber1->calledByInvokeCount);
+        self::assertSame(2, $subscriber1->calledByEventNameCount);
+        self::assertSame(2, $subscriber2->calledByInvokeCount);
+        self::assertSame(0, $subscriber2->calledByEventNameCount);
 
-        $this->assertSame(0, $listener6->calledByInvokeCount);
-        $this->assertSame(1, $listener6->calledByEventNameCount);
-        $this->assertSame(0, $listener7->calledByInvokeCount);
-        $this->assertSame(1, $listener7->calledByEventNameCount);
-        $this->assertSame(1, $listener8->calledByInvokeCount);
-        $this->assertSame(0, $listener8->calledByEventNameCount);
-        $this->assertSame(1, $listener9->calledByInvokeCount);
-        $this->assertSame(0, $listener9->calledByEventNameCount);
-        $this->assertSame(1, $listener10->calledByInvokeCount);
-        $this->assertSame(1, $listener10->calledByEventNameCount);
-        $this->assertSame(1, $subscriber3->calledByInvokeCount);
-        $this->assertSame(0, $subscriber3->calledByEventNameCount);
+        self::assertSame(0, $listener6->calledByInvokeCount);
+        self::assertSame(1, $listener6->calledByEventNameCount);
+        self::assertSame(0, $listener7->calledByInvokeCount);
+        self::assertSame(1, $listener7->calledByEventNameCount);
+        self::assertSame(1, $listener8->calledByInvokeCount);
+        self::assertSame(0, $listener8->calledByEventNameCount);
+        self::assertSame(1, $listener9->calledByInvokeCount);
+        self::assertSame(0, $listener9->calledByEventNameCount);
+        self::assertSame(1, $listener10->calledByInvokeCount);
+        self::assertSame(1, $listener10->calledByEventNameCount);
+        self::assertSame(1, $subscriber3->calledByInvokeCount);
+        self::assertSame(0, $subscriber3->calledByEventNameCount);
     }
 
     public function testGetListenersForEvent()
@@ -168,7 +168,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
-        $this->assertSame([$subscriber1, $listener1, $listener2], array_values($this->evm->getListeners('foo')));
+        self::assertSame([$subscriber1, $listener1, $listener2], array_values($this->evm->getListeners('foo')));
     }
 
     public function testGetListeners()
@@ -177,7 +177,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
-        $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners()['foo']));
+        self::assertSame([$listener1, $listener2], array_values($this->evm->getListeners()['foo']));
     }
 
     public function testGetAllListeners()
@@ -186,7 +186,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
-        $this->assertSame([$listener1, $listener2], array_values($this->evm->getAllListeners()['foo']));
+        self::assertSame([$listener1, $listener2], array_values($this->evm->getAllListeners()['foo']));
     }
 
     public function testRemoveEventListener()
@@ -196,10 +196,10 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
         $this->evm->removeEventListener('foo', $listener2);
-        $this->assertSame([$listener1], array_values($this->evm->getListeners('foo')));
+        self::assertSame([$listener1], array_values($this->evm->getListeners('foo')));
 
         $this->evm->removeEventListener('foo', 'lazy');
-        $this->assertSame([], $this->evm->getListeners('foo'));
+        self::assertSame([], $this->evm->getListeners('foo'));
     }
 
     public function testRemoveEventListenerAfterDispatchEvent()
@@ -211,10 +211,10 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->dispatchEvent('foo');
 
         $this->evm->removeEventListener('foo', $listener2);
-        $this->assertSame([$listener1], array_values($this->evm->getListeners('foo')));
+        self::assertSame([$listener1], array_values($this->evm->getListeners('foo')));
 
         $this->evm->removeEventListener('foo', 'lazy');
-        $this->assertSame([], $this->evm->getListeners('foo'));
+        self::assertSame([], $this->evm->getListeners('foo'));
     }
 }
 

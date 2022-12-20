@@ -23,23 +23,23 @@ class RequestStackTest extends TestCase
     public function testGetCurrentRequest()
     {
         $requestStack = new RequestStack();
-        $this->assertNull($requestStack->getCurrentRequest());
+        self::assertNull($requestStack->getCurrentRequest());
 
         $request = Request::create('/foo');
 
         $requestStack->push($request);
-        $this->assertSame($request, $requestStack->getCurrentRequest());
+        self::assertSame($request, $requestStack->getCurrentRequest());
 
-        $this->assertSame($request, $requestStack->pop());
-        $this->assertNull($requestStack->getCurrentRequest());
+        self::assertSame($request, $requestStack->pop());
+        self::assertNull($requestStack->getCurrentRequest());
 
-        $this->assertNull($requestStack->pop());
+        self::assertNull($requestStack->pop());
     }
 
     public function testGetMainRequest()
     {
         $requestStack = new RequestStack();
-        $this->assertNull($requestStack->getMainRequest());
+        self::assertNull($requestStack->getMainRequest());
 
         $mainRequest = Request::create('/foo');
         $subRequest = Request::create('/bar');
@@ -47,7 +47,7 @@ class RequestStackTest extends TestCase
         $requestStack->push($mainRequest);
         $requestStack->push($subRequest);
 
-        $this->assertSame($mainRequest, $requestStack->getMainRequest());
+        self::assertSame($mainRequest, $requestStack->getMainRequest());
     }
 
     /**
@@ -56,7 +56,7 @@ class RequestStackTest extends TestCase
     public function testGetMasterRequest()
     {
         $requestStack = new RequestStack();
-        $this->assertNull($requestStack->getMasterRequest());
+        self::assertNull($requestStack->getMasterRequest());
 
         $masterRequest = Request::create('/foo');
         $subRequest = Request::create('/bar');
@@ -65,27 +65,27 @@ class RequestStackTest extends TestCase
         $requestStack->push($subRequest);
 
         $this->expectDeprecation('Since symfony/http-foundation 5.3: "Symfony\Component\HttpFoundation\RequestStack::getMasterRequest()" is deprecated, use "getMainRequest()" instead.');
-        $this->assertSame($masterRequest, $requestStack->getMasterRequest());
+        self::assertSame($masterRequest, $requestStack->getMasterRequest());
     }
 
     public function testGetParentRequest()
     {
         $requestStack = new RequestStack();
-        $this->assertNull($requestStack->getParentRequest());
+        self::assertNull($requestStack->getParentRequest());
 
         $mainRequest = Request::create('/foo');
 
         $requestStack->push($mainRequest);
-        $this->assertNull($requestStack->getParentRequest());
+        self::assertNull($requestStack->getParentRequest());
 
         $firstSubRequest = Request::create('/bar');
 
         $requestStack->push($firstSubRequest);
-        $this->assertSame($mainRequest, $requestStack->getParentRequest());
+        self::assertSame($mainRequest, $requestStack->getParentRequest());
 
         $secondSubRequest = Request::create('/baz');
 
         $requestStack->push($secondSubRequest);
-        $this->assertSame($firstSubRequest, $requestStack->getParentRequest());
+        self::assertSame($firstSubRequest, $requestStack->getParentRequest());
     }
 }

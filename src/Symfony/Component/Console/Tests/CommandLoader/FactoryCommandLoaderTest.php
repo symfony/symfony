@@ -25,9 +25,9 @@ class FactoryCommandLoaderTest extends TestCase
             'bar' => function () { return new Command('bar'); },
         ]);
 
-        $this->assertTrue($loader->has('foo'));
-        $this->assertTrue($loader->has('bar'));
-        $this->assertFalse($loader->has('baz'));
+        self::assertTrue($loader->has('foo'));
+        self::assertTrue($loader->has('bar'));
+        self::assertFalse($loader->has('baz'));
     }
 
     public function testGet()
@@ -37,13 +37,13 @@ class FactoryCommandLoaderTest extends TestCase
             'bar' => function () { return new Command('bar'); },
         ]);
 
-        $this->assertInstanceOf(Command::class, $loader->get('foo'));
-        $this->assertInstanceOf(Command::class, $loader->get('bar'));
+        self::assertInstanceOf(Command::class, $loader->get('foo'));
+        self::assertInstanceOf(Command::class, $loader->get('bar'));
     }
 
     public function testGetUnknownCommandThrows()
     {
-        $this->expectException(CommandNotFoundException::class);
+        self::expectException(CommandNotFoundException::class);
         (new FactoryCommandLoader([]))->get('unknown');
     }
 
@@ -54,6 +54,6 @@ class FactoryCommandLoaderTest extends TestCase
             'bar' => function () { return new Command('bar'); },
         ]);
 
-        $this->assertSame(['foo', 'bar'], $loader->getNames());
+        self::assertSame(['foo', 'bar'], $loader->getNames());
     }
 }

@@ -31,7 +31,7 @@ class PostgreSqlStoreTest extends AbstractStoreTest
     public function getPostgresHost(): string
     {
         if (!$host = getenv('POSTGRES_HOST')) {
-            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+            self::markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
         return $host;
@@ -54,8 +54,8 @@ class PostgreSqlStoreTest extends AbstractStoreTest
     {
         $store = new PostgreSqlStore('sqlite:/tmp/foo.db');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The adapter "Symfony\Component\Lock\Store\PostgreSqlStore" does not support');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The adapter "Symfony\Component\Lock\Store\PostgreSqlStore" does not support');
         $store->exists(new Key('foo'));
     }
 
@@ -67,7 +67,7 @@ class PostgreSqlStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $store1->save($key);
-        $this->assertTrue($store1->exists($key));
+        self::assertTrue($store1->exists($key));
 
         $lockConflicted = false;
 
@@ -77,13 +77,13 @@ class PostgreSqlStoreTest extends AbstractStoreTest
             $lockConflicted = true;
         }
 
-        $this->assertTrue($lockConflicted);
-        $this->assertFalse($store2->exists($key));
+        self::assertTrue($lockConflicted);
+        self::assertFalse($store2->exists($key));
 
         $store1->delete($key);
 
         $store2->save($key);
-        $this->assertTrue($store2->exists($key));
+        self::assertTrue($store2->exists($key));
     }
 
     public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore()
@@ -107,11 +107,11 @@ class PostgreSqlStoreTest extends AbstractStoreTest
             $store2->waitAndSave(new Key($keyId));
         } catch (\PDOException $waitSaveError) {
         }
-        $this->assertInstanceOf(\PDOException::class, $waitSaveError, 'waitAndSave should have thrown');
+        self::assertInstanceOf(\PDOException::class, $waitSaveError, 'waitAndSave should have thrown');
         $pdo->exec('SET statement_timeout = 0');
 
         $store1->delete($store1Key);
-        $this->assertFalse($store1->exists($store1Key));
+        self::assertFalse($store1->exists($store1Key));
 
         $store2Key = new Key($keyId);
         $lockConflicted = false;
@@ -121,8 +121,8 @@ class PostgreSqlStoreTest extends AbstractStoreTest
             $lockConflicted = true;
         }
 
-        $this->assertFalse($lockConflicted, 'lock should be available now that its been remove from $store1');
-        $this->assertTrue($store2->exists($store2Key));
+        self::assertFalse($lockConflicted, 'lock should be available now that its been remove from $store1');
+        self::assertTrue($store2->exists($store2Key));
     }
 
     public function testWaitAndSaveReadAfterConflictReleasesLockFromInternalStore()
@@ -146,10 +146,10 @@ class PostgreSqlStoreTest extends AbstractStoreTest
             $store2->waitAndSaveRead(new Key($keyId));
         } catch (\PDOException $waitSaveError) {
         }
-        $this->assertInstanceOf(\PDOException::class, $waitSaveError, 'waitAndSave should have thrown');
+        self::assertInstanceOf(\PDOException::class, $waitSaveError, 'waitAndSave should have thrown');
 
         $store1->delete($store1Key);
-        $this->assertFalse($store1->exists($store1Key));
+        self::assertFalse($store1->exists($store1Key));
 
         $store2Key = new Key($keyId);
         // since the lock is going to be acquired in read mode and is not exclusive
@@ -159,6 +159,6 @@ class PostgreSqlStoreTest extends AbstractStoreTest
         $pdo->exec('SET statement_timeout = 20000');
         $store2->waitAndSaveRead($store2Key);
 
-        $this->assertTrue($store2->exists($store2Key));
+        self::assertTrue($store2->exists($store2Key));
     }
 }

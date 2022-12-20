@@ -32,7 +32,7 @@ class ResponseListenerTest extends TestCase
         $listener = new ResponseListener('UTF-8');
         $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
 
-        $this->kernel = $this->createMock(HttpKernelInterface::class);
+        $this->kernel = self::createMock(HttpKernelInterface::class);
     }
 
     protected function tearDown(): void
@@ -48,7 +48,7 @@ class ResponseListenerTest extends TestCase
         $event = new ResponseEvent($this->kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('', $event->getResponse()->headers->get('content-type'));
+        self::assertEquals('', $event->getResponse()->headers->get('content-type'));
     }
 
     public function testFilterSetsNonDefaultCharsetIfNotOverridden()
@@ -61,7 +61,7 @@ class ResponseListenerTest extends TestCase
         $event = new ResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('ISO-8859-15', $response->getCharset());
+        self::assertEquals('ISO-8859-15', $response->getCharset());
     }
 
     public function testFilterDoesNothingIfCharsetIsOverridden()
@@ -75,7 +75,7 @@ class ResponseListenerTest extends TestCase
         $event = new ResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('ISO-8859-1', $response->getCharset());
+        self::assertEquals('ISO-8859-1', $response->getCharset());
     }
 
     public function testFiltersSetsNonDefaultCharsetIfNotOverriddenOnNonTextContentType()
@@ -90,7 +90,7 @@ class ResponseListenerTest extends TestCase
         $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('ISO-8859-15', $response->getCharset());
+        self::assertEquals('ISO-8859-15', $response->getCharset());
     }
 
     public function testSetContentLanguageHeaderWhenEmptyAndAtLeast2EnabledLocalesAreConfigured()
@@ -105,7 +105,7 @@ class ResponseListenerTest extends TestCase
         $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('fr', $response->headers->get('Content-Language'));
+        self::assertEquals('fr', $response->headers->get('Content-Language'));
     }
 
     public function testNotOverrideContentLanguageHeaderWhenNotEmpty()
@@ -121,7 +121,7 @@ class ResponseListenerTest extends TestCase
         $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('mi, en', $response->headers->get('Content-Language'));
+        self::assertEquals('mi, en', $response->headers->get('Content-Language'));
     }
 
     public function testNotSetContentLanguageHeaderWhenDisabled()
@@ -136,6 +136,6 @@ class ResponseListenerTest extends TestCase
         $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertNull($response->headers->get('Content-Language'));
+        self::assertNull($response->headers->get('Content-Language'));
     }
 }

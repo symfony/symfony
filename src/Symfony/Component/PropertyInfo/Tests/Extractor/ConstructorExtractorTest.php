@@ -33,17 +33,17 @@ class ConstructorExtractorTest extends TestCase
 
     public function testInstanceOf()
     {
-        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface::class, $this->extractor);
+        self::assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface::class, $this->extractor);
     }
 
     public function testGetTypes()
     {
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_STRING)], $this->extractor->getTypes('Foo', 'bar', []));
+        self::assertEquals([new Type(Type::BUILTIN_TYPE_STRING)], $this->extractor->getTypes('Foo', 'bar', []));
     }
 
     public function testGetTypesIfNoExtractors()
     {
         $extractor = new ConstructorExtractor([]);
-        $this->assertNull($extractor->getTypes('Foo', 'bar', []));
+        self::assertNull($extractor->getTypes('Foo', 'bar', []));
     }
 }

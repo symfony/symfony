@@ -34,18 +34,18 @@ class WorkflowTest extends TestCase
 
     public function testGetMarkingWithInvalidStoreReturn()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
         $subject = new Subject();
-        $workflow = new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class));
+        $workflow = new Workflow(new Definition([], []), self::createMock(MarkingStoreInterface::class));
 
         $workflow->getMarking($subject);
     }
 
     public function testGetMarkingWithEmptyDefinition()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The Marking is empty and there is no initial place for workflow "unnamed".');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The Marking is empty and there is no initial place for workflow "unnamed".');
         $subject = new Subject();
         $workflow = new Workflow(new Definition([], []), new MethodMarkingStore());
 
@@ -54,8 +54,8 @@ class WorkflowTest extends TestCase
 
     public function testGetMarkingWithImpossiblePlace()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Place "nope" is not valid for workflow "unnamed".');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Place "nope" is not valid for workflow "unnamed".');
         $subject = new Subject();
         $subject->setMarking(['nope' => 1]);
         $workflow = new Workflow(new Definition([], []), new MethodMarkingStore());
@@ -71,9 +71,9 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertTrue($marking->has('a'));
-        $this->assertSame(['a' => 1], $subject->getMarking());
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertTrue($marking->has('a'));
+        self::assertSame(['a' => 1], $subject->getMarking());
     }
 
     public function testGetMarkingWithExistingMarking()
@@ -85,9 +85,9 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertTrue($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertTrue($marking->has('b'));
+        self::assertTrue($marking->has('c'));
     }
 
     public function testCanWithUnexistingTransition()
@@ -96,7 +96,7 @@ class WorkflowTest extends TestCase
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
-        $this->assertFalse($workflow->can($subject, 'foobar'));
+        self::assertFalse($workflow->can($subject, 'foobar'));
     }
 
     public function testCan()
@@ -105,25 +105,25 @@ class WorkflowTest extends TestCase
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
-        $this->assertTrue($workflow->can($subject, 't1'));
-        $this->assertFalse($workflow->can($subject, 't2'));
+        self::assertTrue($workflow->can($subject, 't1'));
+        self::assertFalse($workflow->can($subject, 't2'));
 
         $subject->setMarking(['b' => 1]);
 
-        $this->assertFalse($workflow->can($subject, 't1'));
+        self::assertFalse($workflow->can($subject, 't1'));
         // In a workflow net, all "from" places should contain a token to enable
         // the transition.
-        $this->assertFalse($workflow->can($subject, 't2'));
+        self::assertFalse($workflow->can($subject, 't2'));
 
         $subject->setMarking(['b' => 1, 'c' => 1]);
 
-        $this->assertFalse($workflow->can($subject, 't1'));
-        $this->assertTrue($workflow->can($subject, 't2'));
+        self::assertFalse($workflow->can($subject, 't1'));
+        self::assertTrue($workflow->can($subject, 't2'));
 
         $subject->setMarking(['f' => 1]);
 
-        $this->assertFalse($workflow->can($subject, 't5'));
-        $this->assertTrue($workflow->can($subject, 't6'));
+        self::assertFalse($workflow->can($subject, 't5'));
+        self::assertTrue($workflow->can($subject, 't6'));
     }
 
     public function testCanWithGuard()
@@ -136,7 +136,7 @@ class WorkflowTest extends TestCase
         });
         $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
 
-        $this->assertFalse($workflow->can($subject, 't1'));
+        self::assertFalse($workflow->can($subject, 't1'));
     }
 
     public function testCanDoesNotTriggerGuardEventsForNotEnabledTransitions()
@@ -160,7 +160,7 @@ class WorkflowTest extends TestCase
 
         $workflow->can($subject, 't3');
 
-        $this->assertSame(['workflow_name.guard.t3'], $dispatchedEvents);
+        self::assertSame(['workflow_name.guard.t3'], $dispatchedEvents);
     }
 
     public function testCanWithSameNameTransition()
@@ -169,20 +169,20 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $subject = new Subject();
-        $this->assertTrue($workflow->can($subject, 'a_to_bc'));
-        $this->assertFalse($workflow->can($subject, 'b_to_c'));
-        $this->assertFalse($workflow->can($subject, 'to_a'));
+        self::assertTrue($workflow->can($subject, 'a_to_bc'));
+        self::assertFalse($workflow->can($subject, 'b_to_c'));
+        self::assertFalse($workflow->can($subject, 'to_a'));
 
         $subject->setMarking(['b' => 1]);
-        $this->assertFalse($workflow->can($subject, 'a_to_bc'));
-        $this->assertTrue($workflow->can($subject, 'b_to_c'));
-        $this->assertTrue($workflow->can($subject, 'to_a'));
+        self::assertFalse($workflow->can($subject, 'a_to_bc'));
+        self::assertTrue($workflow->can($subject, 'b_to_c'));
+        self::assertTrue($workflow->can($subject, 'to_a'));
     }
 
     public function testBuildTransitionBlockerListReturnsUndefinedTransition()
     {
-        $this->expectException(UndefinedTransitionException::class);
-        $this->expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
+        self::expectException(UndefinedTransitionException::class);
+        self::expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
         $definition = $this->createSimpleWorkflowDefinition();
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
@@ -196,23 +196,23 @@ class WorkflowTest extends TestCase
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
-        $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
-        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
+        self::assertTrue($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        self::assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
 
         $subject->setMarking(['b' => 1]);
 
-        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
-        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
+        self::assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        self::assertFalse($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
 
         $subject->setMarking(['b' => 1, 'c' => 1]);
 
-        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
-        $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
+        self::assertFalse($workflow->buildTransitionBlockerList($subject, 't1')->isEmpty());
+        self::assertTrue($workflow->buildTransitionBlockerList($subject, 't2')->isEmpty());
 
         $subject->setMarking(['f' => 1]);
 
-        $this->assertFalse($workflow->buildTransitionBlockerList($subject, 't5')->isEmpty());
-        $this->assertTrue($workflow->buildTransitionBlockerList($subject, 't6')->isEmpty());
+        self::assertFalse($workflow->buildTransitionBlockerList($subject, 't5')->isEmpty());
+        self::assertTrue($workflow->buildTransitionBlockerList($subject, 't6')->isEmpty());
     }
 
     public function testBuildTransitionBlockerListReturnsReasonsProvidedByMarking()
@@ -222,10 +222,10 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't2');
-        $this->assertCount(1, $transitionBlockerList);
+        self::assertCount(1, $transitionBlockerList);
         $blockers = iterator_to_array($transitionBlockerList);
-        $this->assertSame('The marking does not enable the transition.', $blockers[0]->getMessage());
-        $this->assertSame('19beefc8-6b1e-4716-9d07-a39bd6d16e34', $blockers[0]->getCode());
+        self::assertSame('The marking does not enable the transition.', $blockers[0]->getMessage());
+        self::assertSame('19beefc8-6b1e-4716-9d07-a39bd6d16e34', $blockers[0]->getCode());
     }
 
     public function testBuildTransitionBlockerListReturnsReasonsProvidedInGuards()
@@ -250,18 +250,18 @@ class WorkflowTest extends TestCase
         });
 
         $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't1');
-        $this->assertCount(5, $transitionBlockerList);
+        self::assertCount(5, $transitionBlockerList);
         $blockers = iterator_to_array($transitionBlockerList);
-        $this->assertSame('Transition blocker 1', $blockers[0]->getMessage());
-        $this->assertSame('blocker_1', $blockers[0]->getCode());
-        $this->assertSame('Transition blocker 2', $blockers[1]->getMessage());
-        $this->assertSame('blocker_2', $blockers[1]->getCode());
-        $this->assertSame('Transition blocker 3', $blockers[2]->getMessage());
-        $this->assertSame('blocker_3', $blockers[2]->getCode());
-        $this->assertSame('The transition has been blocked by a guard (Symfony\Component\Workflow\Tests\WorkflowTest).', $blockers[3]->getMessage());
-        $this->assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[3]->getCode());
-        $this->assertSame('You should not pass !!', $blockers[4]->getMessage());
-        $this->assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[4]->getCode());
+        self::assertSame('Transition blocker 1', $blockers[0]->getMessage());
+        self::assertSame('blocker_1', $blockers[0]->getCode());
+        self::assertSame('Transition blocker 2', $blockers[1]->getMessage());
+        self::assertSame('blocker_2', $blockers[1]->getCode());
+        self::assertSame('Transition blocker 3', $blockers[2]->getMessage());
+        self::assertSame('blocker_3', $blockers[2]->getCode());
+        self::assertSame('The transition has been blocked by a guard (Symfony\Component\Workflow\Tests\WorkflowTest).', $blockers[3]->getMessage());
+        self::assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[3]->getCode());
+        self::assertSame('You should not pass !!', $blockers[4]->getMessage());
+        self::assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[4]->getCode());
     }
 
     public function testApplyWithNotExisingTransition()
@@ -276,10 +276,10 @@ class WorkflowTest extends TestCase
         try {
             $workflow->apply($subject, '404 Not Found', $context);
 
-            $this->fail('Should throw an exception');
+            self::fail('Should throw an exception');
         } catch (UndefinedTransitionException $e) {
-            $this->assertSame('Transition "404 Not Found" is not defined for workflow "unnamed".', $e->getMessage());
-            $this->assertSame($e->getContext(), $context);
+            self::assertSame('Transition "404 Not Found" is not defined for workflow "unnamed".', $e->getMessage());
+            self::assertSame($e->getContext(), $context);
         }
     }
 
@@ -295,16 +295,16 @@ class WorkflowTest extends TestCase
         try {
             $workflow->apply($subject, 't2', $context);
 
-            $this->fail('Should throw an exception');
+            self::fail('Should throw an exception');
         } catch (NotEnabledTransitionException $e) {
-            $this->assertSame('Transition "t2" is not enabled for workflow "unnamed".', $e->getMessage());
-            $this->assertCount(1, $e->getTransitionBlockerList());
+            self::assertSame('Transition "t2" is not enabled for workflow "unnamed".', $e->getMessage());
+            self::assertCount(1, $e->getTransitionBlockerList());
             $list = iterator_to_array($e->getTransitionBlockerList());
-            $this->assertSame('The marking does not enable the transition.', $list[0]->getMessage());
-            $this->assertSame($e->getWorkflow(), $workflow);
-            $this->assertSame($e->getSubject(), $subject);
-            $this->assertSame($e->getTransitionName(), 't2');
-            $this->assertSame($e->getContext(), $context);
+            self::assertSame('The marking does not enable the transition.', $list[0]->getMessage());
+            self::assertSame($e->getWorkflow(), $workflow);
+            self::assertSame($e->getSubject(), $subject);
+            self::assertSame($e->getTransitionName(), 't2');
+            self::assertSame($e->getContext(), $context);
         }
     }
 
@@ -316,10 +316,10 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->apply($subject, 't1');
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertFalse($marking->has('a'));
-        $this->assertTrue($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertFalse($marking->has('a'));
+        self::assertTrue($marking->has('b'));
+        self::assertTrue($marking->has('c'));
     }
 
     public function testApplyWithSameNameTransition()
@@ -330,28 +330,28 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->apply($subject, 'a_to_bc');
 
-        $this->assertFalse($marking->has('a'));
-        $this->assertTrue($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        self::assertFalse($marking->has('a'));
+        self::assertTrue($marking->has('b'));
+        self::assertTrue($marking->has('c'));
 
         $marking = $workflow->apply($subject, 'to_a');
 
-        $this->assertTrue($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertFalse($marking->has('c'));
+        self::assertTrue($marking->has('a'));
+        self::assertFalse($marking->has('b'));
+        self::assertFalse($marking->has('c'));
 
         $workflow->apply($subject, 'a_to_bc');
         $marking = $workflow->apply($subject, 'b_to_c');
 
-        $this->assertFalse($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
+        self::assertFalse($marking->has('a'));
+        self::assertFalse($marking->has('b'));
+        self::assertTrue($marking->has('c'));
 
         $marking = $workflow->apply($subject, 'to_a');
 
-        $this->assertTrue($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertFalse($marking->has('c'));
+        self::assertTrue($marking->has('a'));
+        self::assertFalse($marking->has('b'));
+        self::assertFalse($marking->has('c'));
     }
 
     public function testApplyWithSameNameTransition2()
@@ -368,10 +368,10 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->apply($subject, 't');
 
-        $this->assertFalse($marking->has('a'));
-        $this->assertFalse($marking->has('b'));
-        $this->assertTrue($marking->has('c'));
-        $this->assertTrue($marking->has('d'));
+        self::assertFalse($marking->has('a'));
+        self::assertFalse($marking->has('b'));
+        self::assertTrue($marking->has('c'));
+        self::assertTrue($marking->has('d'));
     }
 
     public function testApplyWithSameNameTransition3()
@@ -389,8 +389,8 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->apply($subject, 't');
         // We want to make sure we do not end up in "d"
-        $this->assertTrue($marking->has('b'));
-        $this->assertFalse($marking->has('d'));
+        self::assertTrue($marking->has('b'));
+        self::assertFalse($marking->has('d'));
     }
 
     public function testApplyWithEventDispatcher()
@@ -435,7 +435,7 @@ class WorkflowTest extends TestCase
 
         $workflow->apply($subject, 't1');
 
-        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+        self::assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
     public function provideApplyWithEventDispatcherForAnnounceTests()
@@ -456,9 +456,9 @@ class WorkflowTest extends TestCase
         $workflow->apply($subject, 't1', $context);
 
         if ($fired) {
-            $this->assertContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
+            self::assertContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
         } else {
-            $this->assertNotContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
+            self::assertNotContains('workflow.workflow_name.announce', $eventDispatcher->dispatchedEvents);
         }
     }
 
@@ -489,7 +489,7 @@ class WorkflowTest extends TestCase
             Workflow::DISABLE_ANNOUNCE_EVENT => true,
         ]);
 
-        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+        self::assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
     public function testApplyDispatchesNoEventsWhenSpecifiedByDefinition()
@@ -510,7 +510,7 @@ class WorkflowTest extends TestCase
 
         $workflow->apply($subject, 'a-b');
 
-        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+        self::assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
     public function testApplyOnlyDispatchesEventsThatHaveBeenSpecifiedByDefinition()
@@ -534,7 +534,7 @@ class WorkflowTest extends TestCase
 
         $workflow->apply($subject, 'a-b');
 
-        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+        self::assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
     public function testApplyDoesNotTriggerExtraGuardWithEventDispatcher()
@@ -575,7 +575,7 @@ class WorkflowTest extends TestCase
 
         $workflow->apply($subject, 'a-b');
 
-        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+        self::assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
     public function testApplyWithContext()
@@ -590,7 +590,7 @@ class WorkflowTest extends TestCase
 
         $workflow->apply($subject, 't1', ['foo' => 'bar']);
 
-        $this->assertSame(['foo' => 'bar', 'user' => 'admin'], $subject->getContext());
+        self::assertSame(['foo' => 'bar', 'user' => 'admin'], $subject->getContext());
     }
 
     public function testEventName()
@@ -602,7 +602,7 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
 
         $assertWorkflowName = function (Event $event) use ($name) {
-            $this->assertEquals($name, $event->getWorkflowName());
+            self::assertEquals($name, $event->getWorkflowName());
         };
 
         $eventNames = [
@@ -631,7 +631,7 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
 
         $assertWorkflowContext = function (Event $event) use ($context) {
-            $this->assertEquals($context, $event->getContext());
+            self::assertEquals($context, $event->getContext());
         };
 
         $eventNames = [
@@ -648,8 +648,8 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->apply($subject, 't1', $context);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertSame($context, $marking->getContext());
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertSame($context, $marking->getContext());
     }
 
     public function testEventContextUpdated()
@@ -666,8 +666,8 @@ class WorkflowTest extends TestCase
 
         $marking = $workflow->apply($subject, 't1', ['initial']);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertSame(['foo' => 'bar'], $marking->getContext());
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertSame(['foo' => 'bar'], $marking->getContext());
     }
 
     public function testEventDefaultInitialContext()
@@ -680,7 +680,7 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
 
         $assertWorkflowContext = function (Event $event) use ($context) {
-            $this->assertEquals($context, $event->getContext());
+            self::assertEquals($context, $event->getContext());
         };
 
         $eventNames = [
@@ -706,10 +706,10 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, 'test');
 
         $assertInitialState = function (Event $event) {
-            $this->assertEquals(new Marking(['a' => 1, 'b' => 1, 'c' => 1]), $event->getMarking());
+            self::assertEquals(new Marking(['a' => 1, 'b' => 1, 'c' => 1]), $event->getMarking());
         };
         $assertTransitionState = function (Event $event) {
-            $this->assertEquals(new Marking([]), $event->getMarking());
+            self::assertEquals(new Marking([]), $event->getMarking());
         };
 
         $dispatcher->addListener('workflow.leave', $assertInitialState);
@@ -739,18 +739,18 @@ class WorkflowTest extends TestCase
         });
         $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
 
-        $this->assertEmpty($workflow->getEnabledTransitions($subject));
+        self::assertEmpty($workflow->getEnabledTransitions($subject));
 
         $subject->setMarking(['d' => 1]);
         $transitions = $workflow->getEnabledTransitions($subject);
-        $this->assertCount(2, $transitions);
-        $this->assertSame('t3', $transitions[0]->getName());
-        $this->assertSame('t4', $transitions[1]->getName());
+        self::assertCount(2, $transitions);
+        self::assertSame('t3', $transitions[0]->getName());
+        self::assertSame('t4', $transitions[1]->getName());
 
         $subject->setMarking(['c' => 1, 'e' => 1]);
         $transitions = $workflow->getEnabledTransitions($subject);
-        $this->assertCount(1, $transitions);
-        $this->assertSame('t5', $transitions[0]->getName());
+        self::assertCount(1, $transitions);
+        self::assertSame('t5', $transitions[0]->getName());
     }
 
     public function testGetEnabledTransition()
@@ -761,11 +761,11 @@ class WorkflowTest extends TestCase
 
         $subject->setMarking(['d' => 1]);
         $transition = $workflow->getEnabledTransition($subject, 't3');
-        $this->assertInstanceOf(Transition::class, $transition);
-        $this->assertSame('t3', $transition->getName());
+        self::assertInstanceOf(Transition::class, $transition);
+        self::assertSame('t3', $transition->getName());
 
         $transition = $workflow->getEnabledTransition($subject, 'does_not_exist');
-        $this->assertNull($transition);
+        self::assertNull($transition);
     }
 
     public function testGetEnabledTransitionsWithSameNameTransition()
@@ -775,15 +775,15 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MethodMarkingStore());
 
         $transitions = $workflow->getEnabledTransitions($subject);
-        $this->assertCount(1, $transitions);
-        $this->assertSame('a_to_bc', $transitions[0]->getName());
+        self::assertCount(1, $transitions);
+        self::assertSame('a_to_bc', $transitions[0]->getName());
 
         $subject->setMarking(['b' => 1, 'c' => 1]);
         $transitions = $workflow->getEnabledTransitions($subject);
-        $this->assertCount(3, $transitions);
-        $this->assertSame('b_to_c', $transitions[0]->getName());
-        $this->assertSame('to_a', $transitions[1]->getName());
-        $this->assertSame('to_a', $transitions[2]->getName());
+        self::assertCount(3, $transitions);
+        self::assertSame('b_to_c', $transitions[0]->getName());
+        self::assertSame('to_a', $transitions[1]->getName());
+        self::assertSame('to_a', $transitions[2]->getName());
     }
 }
 

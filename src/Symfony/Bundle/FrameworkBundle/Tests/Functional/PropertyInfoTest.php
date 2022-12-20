@@ -17,9 +17,9 @@ class PropertyInfoTest extends AbstractWebTestCase
 {
     public function testPhpDocPriority()
     {
-        static::bootKernel(['test_case' => 'Serializer']);
+        self::bootKernel(['test_case' => 'Serializer']);
 
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_INT))], static::getContainer()->get('property_info')->getTypes('Symfony\Bundle\FrameworkBundle\Tests\Functional\Dummy', 'codes'));
+        self::assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_INT))], self::getContainer()->get('property_info')->getTypes('Symfony\Bundle\FrameworkBundle\Tests\Functional\Dummy', 'codes'));
     }
 }
 

@@ -18,10 +18,10 @@ class AnonymousTest extends AbstractWebTestCase
 {
     public function testAnonymous()
     {
-        $client = $this->createClient(['test_case' => 'Anonymous', 'root_config' => 'config.yml']);
+        $client = self::createClient(['test_case' => 'Anonymous', 'root_config' => 'config.yml']);
 
         $client->request('GET', '/');
 
-        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        self::assertSame(401, $client->getResponse()->getStatusCode());
     }
 }

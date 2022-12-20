@@ -35,7 +35,7 @@ class SwitchUserTokenProcessorTest extends TestCase
             $originalToken = new UsernamePasswordToken(new User('original_user', 'password', ['ROLE_SUPER_ADMIN']), null, 'provider', ['ROLE_SUPER_ADMIN']);
             $switchUserToken = new SwitchUserToken(new User('user', 'passsword', ['ROLE_USER']), null, 'provider', ['ROLE_USER'], $originalToken);
         }
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage->method('getToken')->willReturn($switchUserToken);
 
         $processor = new SwitchUserTokenProcessor($tokenStorage);
@@ -53,6 +53,6 @@ class SwitchUserTokenProcessorTest extends TestCase
             $expected['impersonator_token']['user_identifier'] = 'original_user';
         }
 
-        $this->assertEquals($expected, $record['extra']);
+        self::assertEquals($expected, $record['extra']);
     }
 }

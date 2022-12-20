@@ -25,8 +25,8 @@ final class NotifierTest extends TestCase
 {
     public function testItThrowAnExplicitErrorIfAnSmsChannelDoesNotHaveRecipient()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "sms" channel needs a Recipient.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The "sms" channel needs a Recipient.');
 
         $notifier = new Notifier(['sms' => new SmsChannel(new NullTransport())]);
         $notifier->send(new Notification('Hello World!', ['sms/twilio']));

@@ -19,13 +19,13 @@ class SpecificityTest extends TestCase
     /** @dataProvider getValueTestData */
     public function testValue(Specificity $specificity, $value)
     {
-        $this->assertEquals($value, $specificity->getValue());
+        self::assertEquals($value, $specificity->getValue());
     }
 
     /** @dataProvider getValueTestData */
     public function testPlusValue(Specificity $specificity, $value)
     {
-        $this->assertEquals($value + 123, $specificity->plus(new Specificity(1, 2, 3))->getValue());
+        self::assertEquals($value + 123, $specificity->plus(new Specificity(1, 2, 3))->getValue());
     }
 
     public function getValueTestData()
@@ -42,7 +42,7 @@ class SpecificityTest extends TestCase
     /** @dataProvider getCompareTestData */
     public function testCompareTo(Specificity $a, Specificity $b, $result)
     {
-        $this->assertEquals($result, $a->compareTo($b));
+        self::assertEquals($result, $a->compareTo($b));
     }
 
     public function getCompareTestData()

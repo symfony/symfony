@@ -20,7 +20,7 @@ class AccessMapTest extends TestCase
 {
     public function testReturnsFirstMatchedPattern()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $requestMatcher1 = $this->getRequestMatcher($request, false);
         $requestMatcher2 = $this->getRequestMatcher($request, true);
 
@@ -28,24 +28,24 @@ class AccessMapTest extends TestCase
         $map->add($requestMatcher1, ['ROLE_ADMIN'], 'http');
         $map->add($requestMatcher2, ['ROLE_USER'], 'https');
 
-        $this->assertSame([['ROLE_USER'], 'https'], $map->getPatterns($request));
+        self::assertSame([['ROLE_USER'], 'https'], $map->getPatterns($request));
     }
 
     public function testReturnsEmptyPatternIfNoneMatched()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $requestMatcher = $this->getRequestMatcher($request, false);
 
         $map = new AccessMap();
         $map->add($requestMatcher, ['ROLE_USER'], 'https');
 
-        $this->assertSame([null, null], $map->getPatterns($request));
+        self::assertSame([null, null], $map->getPatterns($request));
     }
 
     private function getRequestMatcher($request, $matches)
     {
-        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
-        $requestMatcher->expects($this->once())
+        $requestMatcher = self::createMock(RequestMatcherInterface::class);
+        $requestMatcher->expects(self::once())
             ->method('matches')->with($request)
             ->willReturn($matches);
 

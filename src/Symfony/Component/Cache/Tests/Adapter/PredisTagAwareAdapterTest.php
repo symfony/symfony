@@ -29,7 +29,7 @@ class PredisTagAwareAdapterTest extends PredisAdapterTest
 
     public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
     {
-        $this->assertInstanceOf(\Predis\Client::class, self::$redis);
+        self::assertInstanceOf(\Predis\Client::class, self::$redis);
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 
         return $adapter;

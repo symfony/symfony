@@ -64,7 +64,7 @@ class LoggerTest extends TestCase
 
     public function testImplements()
     {
-        $this->assertInstanceOf(LoggerInterface::class, $this->logger);
+        self::assertInstanceOf(LoggerInterface::class, $this->logger);
     }
 
     /**
@@ -79,7 +79,7 @@ class LoggerTest extends TestCase
             "[$level] message of level $level with context: Bob",
             "[$level] message of level $level with context: Bob",
         ];
-        $this->assertLogsMatch($expected, $this->getLogs());
+        self::assertLogsMatch($expected, $this->getLogs());
     }
 
     public function provideLevelsAndMessages()
@@ -104,24 +104,24 @@ class LoggerTest extends TestCase
         $this->logger->log(LogLevel::DEBUG, 'test', ['user' => 'Bob']);
 
         // Will always be true, but asserts than an exception isn't thrown
-        $this->assertSame([], $this->getLogs());
+        self::assertSame([], $this->getLogs());
     }
 
     public function testThrowsOnInvalidLevel()
     {
-        $this->expectException(\Psr\Log\InvalidArgumentException::class);
+        self::expectException(\Psr\Log\InvalidArgumentException::class);
         $this->logger->log('invalid level', 'Foo');
     }
 
     public function testThrowsOnInvalidMinLevel()
     {
-        $this->expectException(\Psr\Log\InvalidArgumentException::class);
+        self::expectException(\Psr\Log\InvalidArgumentException::class);
         new Logger('invalid');
     }
 
     public function testInvalidOutput()
     {
-        $this->expectException(\Psr\Log\InvalidArgumentException::class);
+        self::expectException(\Psr\Log\InvalidArgumentException::class);
         new Logger(LogLevel::DEBUG, '/');
     }
 
@@ -131,7 +131,7 @@ class LoggerTest extends TestCase
         $logger->info('{Message {nothing} {user} {foo.bar} a}', ['user' => 'Bob', 'foo.bar' => 'Bar']);
 
         $expected = ['[info] {Message {nothing} Bob Bar a}'];
-        $this->assertLogsMatch($expected, $this->getLogs());
+        self::assertLogsMatch($expected, $this->getLogs());
     }
 
     public function testObjectCastToString()
@@ -139,16 +139,16 @@ class LoggerTest extends TestCase
         if (method_exists($this, 'createPartialMock')) {
             $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         } else {
-            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
+            $dummy = self::createPartialMock(DummyTest::class, ['__toString']);
         }
-        $dummy->expects($this->atLeastOnce())
+        $dummy->expects(self::atLeastOnce())
             ->method('__toString')
             ->willReturn('DUMMY');
 
         $this->logger->warning($dummy);
 
         $expected = ['[warning] DUMMY'];
-        $this->assertLogsMatch($expected, $this->getLogs());
+        self::assertLogsMatch($expected, $this->getLogs());
     }
 
     public function testContextCanContainAnything()
@@ -167,7 +167,7 @@ class LoggerTest extends TestCase
         $this->logger->warning('Crazy context data', $context);
 
         $expected = ['[warning] Crazy context data'];
-        $this->assertLogsMatch($expected, $this->getLogs());
+        self::assertLogsMatch($expected, $this->getLogs());
     }
 
     public function testContextExceptionKeyCanBeExceptionOrOtherValues()
@@ -180,7 +180,7 @@ class LoggerTest extends TestCase
             '[warning] Random message',
             '[critical] Uncaught Exception!',
         ];
-        $this->assertLogsMatch($expected, $this->getLogs());
+        self::assertLogsMatch($expected, $this->getLogs());
     }
 
     public function testFormatter()
@@ -191,7 +191,7 @@ class LoggerTest extends TestCase
 
         $this->logger->error('An error', ['foo' => 'bar']);
         $this->logger->warning('A warning', ['baz' => 'bar']);
-        $this->assertSame([
+        self::assertSame([
             '{"level":"error","message":"An error","context":{"foo":"bar"}}',
             '{"level":"warning","message":"A warning","context":{"baz":"bar"}}',
         ], $this->getLogs());
@@ -211,7 +211,7 @@ class LoggerTest extends TestCase
         ];
 
         foreach ($this->getLogs() as $k => $line) {
-            $this->assertSame(1, preg_match('/\[[\w\/\-: ]+\] '.preg_quote($expected[$k]).'/', $line), "\"$line\" do not match expected pattern \"$expected[$k]\"");
+            self::assertSame(1, preg_match('/\[[\w\/\-: ]+\] '.preg_quote($expected[$k]).'/', $line), "\"$line\" do not match expected pattern \"$expected[$k]\"");
         }
 
         ini_set('error_log', $oldErrorLog);

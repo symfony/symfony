@@ -26,20 +26,20 @@ class IpTest extends TestCase
     {
         $ip = new Ip(['normalizer' => 'trim']);
 
-        $this->assertEquals('trim', $ip->normalizer);
+        self::assertEquals('trim', $ip->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Ip(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Ip(['normalizer' => new \stdClass()]);
     }
 

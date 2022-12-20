@@ -32,23 +32,20 @@ class NullTransportFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->nullTransportFactory = new NullTransportFactory(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(HttpClientInterface::class)
+            self::createMock(EventDispatcherInterface::class),
+            self::createMock(HttpClientInterface::class)
         );
     }
 
     public function testCreateThrowsUnsupportedSchemeException()
     {
-        $this->expectException(UnsupportedSchemeException::class);
+        self::expectException(UnsupportedSchemeException::class);
 
         $this->nullTransportFactory->create(new Dsn('foo://localhost'));
     }
 
     public function testCreate()
     {
-        $this->assertInstanceOf(
-            NullTransport::class,
-            $this->nullTransportFactory->create(new Dsn('null://null'))
-        );
+        self::assertInstanceOf(NullTransport::class, $this->nullTransportFactory->create(new Dsn('null://null')));
     }
 }

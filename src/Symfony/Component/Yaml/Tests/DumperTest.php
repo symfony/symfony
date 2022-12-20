@@ -79,7 +79,7 @@ foobar:
                      - foo
 
 EOF;
-        $this->assertSame($expected, $dumper->dump($this->array, 4, 0));
+        self::assertSame($expected, $dumper->dump($this->array, 4, 0));
         $this->assertSameData($this->array, $this->parser->parse($expected));
     }
 
@@ -106,7 +106,7 @@ EOF;
                 }
 
                 $expected = eval('return '.trim($test['php']).';');
-                $this->assertSame($expected, $this->parser->parse($this->dumper->dump($expected, 10)), $test['test']);
+                self::assertSame($expected, $this->parser->parse($this->dumper->dump($expected, 10)), $test['test']);
             }
         }
     }
@@ -116,8 +116,8 @@ EOF;
         $expected = <<<'EOF'
 { '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo, { a: A }], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
 EOF;
-        $this->assertSame($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
-        $this->assertSame($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
+        self::assertSame($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
+        self::assertSame($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
         $this->assertSameData($this->array, $this->parser->parse($expected));
 
         $expected = <<<'EOF'
@@ -128,7 +128,7 @@ bar: [1, foo, { a: A }]
 foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
 
 EOF;
-        $this->assertSame($expected, $this->dumper->dump($this->array, 1), '->dump() takes an inline level argument');
+        self::assertSame($expected, $this->dumper->dump($this->array, 1), '->dump() takes an inline level argument');
         $this->assertSameData($this->array, $this->parser->parse($expected));
 
         $expected = <<<'EOF'
@@ -145,7 +145,7 @@ foobar:
     foobar: { foo: bar, bar: [1, foo] }
 
 EOF;
-        $this->assertSame($expected, $this->dumper->dump($this->array, 2), '->dump() takes an inline level argument');
+        self::assertSame($expected, $this->dumper->dump($this->array, 2), '->dump() takes an inline level argument');
         $this->assertSameData($this->array, $this->parser->parse($expected));
 
         $expected = <<<'EOF'
@@ -167,7 +167,7 @@ foobar:
         bar: [1, foo]
 
 EOF;
-        $this->assertSame($expected, $this->dumper->dump($this->array, 3), '->dump() takes an inline level argument');
+        self::assertSame($expected, $this->dumper->dump($this->array, 3), '->dump() takes an inline level argument');
         $this->assertSameData($this->array, $this->parser->parse($expected));
 
         $expected = <<<'EOF'
@@ -191,8 +191,8 @@ foobar:
             - foo
 
 EOF;
-        $this->assertSame($expected, $this->dumper->dump($this->array, 4), '->dump() takes an inline level argument');
-        $this->assertSame($expected, $this->dumper->dump($this->array, 10), '->dump() takes an inline level argument');
+        self::assertSame($expected, $this->dumper->dump($this->array, 4), '->dump() takes an inline level argument');
+        self::assertSame($expected, $this->dumper->dump($this->array, 10), '->dump() takes an inline level argument');
         $this->assertSameData($this->array, $this->parser->parse($expected));
     }
 
@@ -200,19 +200,19 @@ EOF;
     {
         $dump = $this->dumper->dump(['foo' => new A(), 'bar' => 1], 0, 0, Yaml::DUMP_OBJECT);
 
-        $this->assertSame('{ foo: !php/object \'O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}\', bar: 1 }', $dump, '->dump() is able to dump objects');
+        self::assertSame('{ foo: !php/object \'O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}\', bar: 1 }', $dump, '->dump() is able to dump objects');
     }
 
     public function testObjectSupportDisabledButNoExceptions()
     {
         $dump = $this->dumper->dump(['foo' => new A(), 'bar' => 1]);
 
-        $this->assertSame('{ foo: null, bar: 1 }', $dump, '->dump() does not dump objects when disabled');
+        self::assertSame('{ foo: null, bar: 1 }', $dump, '->dump() does not dump objects when disabled');
     }
 
     public function testObjectSupportDisabledWithExceptions()
     {
-        $this->expectException(DumpException::class);
+        self::expectException(DumpException::class);
         $this->dumper->dump(['foo' => new A(), 'bar' => 1], 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
     }
 
@@ -221,7 +221,7 @@ EOF;
      */
     public function testEscapedEscapeSequencesInQuotedScalar($input, $expected)
     {
-        $this->assertSame($expected, $this->dumper->dump($input));
+        self::assertSame($expected, $this->dumper->dump($input));
         $this->assertSameData($input, $this->parser->parse($expected));
     }
 
@@ -256,13 +256,13 @@ EOF;
         $binaryData = file_get_contents(__DIR__.'/Fixtures/arrow.gif');
         $expected = '{ data: !!binary '.base64_encode($binaryData).' }';
 
-        $this->assertSame($expected, $this->dumper->dump(['data' => $binaryData]));
+        self::assertSame($expected, $this->dumper->dump(['data' => $binaryData]));
     }
 
     public function testNonUtf8DataIsDumpedBase64Encoded()
     {
         // "für" (ISO-8859-1 encoded)
-        $this->assertSame('!!binary ZsM/cg==', $this->dumper->dump("f\xc3\x3fr"));
+        self::assertSame('!!binary ZsM/cg==', $this->dumper->dump("f\xc3\x3fr"));
     }
 
     /**
@@ -320,7 +320,7 @@ outer2:
     inner3: { deep1: d, deep2: e }
 
 YAML;
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
     }
 
     public function testDumpingArrayObjectInstancesWithNumericKeysInlined()
@@ -333,7 +333,7 @@ YAML;
         $expected = <<<YAML
 { 0: a, 1: { 0: b, 1: c, 2: { 0: d, 1: e } } }
 YAML;
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
     }
 
     public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel()
@@ -350,17 +350,17 @@ YAML;
     2: { 0: d, 1: e }
 
 YAML;
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
     }
 
     public function testDumpEmptyArrayObjectInstanceAsMap()
     {
-        $this->assertSame('{  }', $this->dumper->dump(new \ArrayObject(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
+        self::assertSame('{  }', $this->dumper->dump(new \ArrayObject(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
     }
 
     public function testDumpEmptyStdClassInstanceAsMap()
     {
-        $this->assertSame('{  }', $this->dumper->dump(new \stdClass(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
+        self::assertSame('{  }', $this->dumper->dump(new \stdClass(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
     }
 
     public function testDumpingStdClassInstancesRespectsInlineLevel()
@@ -388,7 +388,7 @@ outer2:
     inner3: { deep1: d, deep2: e }
 
 YAML;
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
         $this->assertSameData($outer, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
@@ -414,7 +414,7 @@ YAML;
   - claire
 
 YAML;
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -425,7 +425,7 @@ YAML;
         $yaml = $this->dumper->dump($data);
 
         $expected = '!user jane';
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
         $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -436,7 +436,7 @@ YAML;
         $yaml = $this->dumper->dump($data);
 
         $expected = '!user { name: jane }';
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
         $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -450,14 +450,14 @@ name: jane
 
 YAML;
         $yaml = $this->dumper->dump($data, 2);
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
     }
 
     public function testDumpingTaggedValueTopLevelMultiLine()
     {
         $data = new TaggedValue('text', "a\nb\n");
 
-        $this->assertSame("!text |\n    a\n    b\n    ", $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        self::assertSame("!text |\n    a\n    b\n    ", $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     public function testDumpingTaggedValueSpecialCharsInTag()
@@ -465,7 +465,7 @@ YAML;
         // @todo Validate the tag name in the TaggedValue constructor.
         $data = new TaggedValue('a b @ c', 5);
         $expected = '!a b @ c 5';
-        $this->assertSame($expected, $this->dumper->dump($data));
+        self::assertSame($expected, $this->dumper->dump($data));
         // The data changes after a round trip, due to the illegal tag name.
         $data = new TaggedValue('a', 'b @ c 5');
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
@@ -492,7 +492,7 @@ YAML;
 - !number 5
 
 YAML;
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -520,7 +520,7 @@ names1: !names
 count: !number 5
 
 YAML;
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -543,7 +543,7 @@ user1: !user { username: jane }
 names1: !names [john, claire]
 
 YAML;
-        $this->assertSame($expected, $yaml);
+        self::assertSame($expected, $yaml);
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -559,7 +559,7 @@ user2: !user john
 
 YAML;
 
-        $this->assertSame($expected, $this->dumper->dump($data, 2));
+        self::assertSame($expected, $this->dumper->dump($data, 2));
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -573,7 +573,7 @@ foo: !bar null
 
 YAML;
 
-        $this->assertSame($expected, $this->dumper->dump($data, 2));
+        self::assertSame($expected, $this->dumper->dump($data, 2));
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT));
     }
 
@@ -593,7 +593,7 @@ YAML;
             "    \n".
             '    baz';
 
-        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        self::assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -603,11 +603,11 @@ YAML;
             new TaggedValue('bar', "a\nb"),
         ];
         $expected = "- !bar |\n    a\n    b";
-        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        self::assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
         // @todo Fix the parser, eliminate these exceptions.
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 3 (near "!bar |").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Unable to parse at line 3 (near "!bar |").');
 
         $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS);
     }
@@ -618,7 +618,7 @@ YAML;
             'foo' => new TaggedValue('bar', "a\nb\n\n\n"),
         ];
         $expected = "foo: !bar |\n    a\n    b\n    \n    \n    ";
-        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        self::assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
         // @todo Fix the parser, the result should be identical to $data.
         $this->assertSameData(
@@ -634,11 +634,11 @@ YAML;
             new TaggedValue('bar', "a\nb\n\n\n"),
         ];
         $expected = "- !bar |\n    a\n    b\n    \n    \n    ";
-        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        self::assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
         // @todo Fix the parser, eliminate these exceptions.
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 6 (near "!bar |").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Unable to parse at line 6 (near "!bar |").');
 
         $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS);
     }
@@ -656,7 +656,7 @@ data:
 
 YAML;
         $yml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-        $this->assertSame($expected, $yml);
+        self::assertSame($expected, $yml);
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
@@ -691,8 +691,8 @@ data:
 
 YAML
         );
-        $this->assertSame($expected, $yml);
-        $this->assertSame($data, $this->parser->parse($yml));
+        self::assertSame($expected, $yml);
+        self::assertSame($data, $this->parser->parse($yml));
     }
 
     public function testDumpMultiLineStringAsScalarBlockWhenFirstLineHasLeadingSpace()
@@ -706,16 +706,16 @@ YAML
         $expected = "data:\n    multi_line: |4-\n            the first line has leading spaces\n        The second line does not.";
 
         $yml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-        $this->assertSame($expected, $yml);
-        $this->assertSame($data, $this->parser->parse($yml));
+        self::assertSame($expected, $yml);
+        self::assertSame($data, $this->parser->parse($yml));
     }
 
     public function testCarriageReturnFollowedByNewlineIsMaintainedWhenDumpingAsMultiLineLiteralBlock()
     {
         $data = ["a\r\nb\nc"];
         $expected = "- \"a\\r\\nb\\nc\"\n";
-        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
-        $this->assertSame($data, $this->parser->parse($expected));
+        self::assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        self::assertSame($data, $this->parser->parse($expected));
     }
 
     public function testCarriageReturnNotFollowedByNewlineIsPreservedWhenDumpingAsMultiLineLiteralBlock()
@@ -730,8 +730,8 @@ parent:
     foo: "bar\n\rbaz: qux"
 
 YAML;
-        $this->assertSame($expected, $this->dumper->dump($data, 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
-        $this->assertSame($data, $this->parser->parse($expected));
+        self::assertSame($expected, $this->dumper->dump($data, 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        self::assertSame($data, $this->parser->parse($expected));
     }
 
     public function testNoExtraTrailingNewlineWhenDumpingAsMultiLineLiteralBlock()
@@ -742,16 +742,16 @@ YAML;
         ];
         $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
-        $this->assertSame("- |-\n    a\n    b\n- |-\n    c\n    d", $yaml);
-        $this->assertSame($data, $this->parser->parse($yaml));
+        self::assertSame("- |-\n    a\n    b\n- |-\n    c\n    d", $yaml);
+        self::assertSame($data, $this->parser->parse($yaml));
     }
 
     public function testTopLevelMultiLineStringLiteral()
     {
         $data = "a\nb\n";
         $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-        $this->assertSame('"a\nb\n"', $yaml);
-        $this->assertSame($data, $this->parser->parse($yaml));
+        self::assertSame('"a\nb\n"', $yaml);
+        self::assertSame($data, $this->parser->parse($yaml));
     }
 
     public function testDumpTrailingNewlineInMultiLineLiteralBlocks()
@@ -794,27 +794,27 @@ YAML;
     two
 YAML;
 
-        $this->assertSame($expected, $yaml);
-        $this->assertSame($data, $this->parser->parse($yaml));
+        self::assertSame($expected, $yaml);
+        self::assertSame($data, $this->parser->parse($yaml));
     }
 
     public function testZeroIndentationThrowsException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The indentation must be greater than zero');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The indentation must be greater than zero');
         new Dumper(0);
     }
 
     public function testNegativeIndentationThrowsException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The indentation must be greater than zero');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The indentation must be greater than zero');
         new Dumper(-4);
     }
 
     public function testDumpNullAsTilde()
     {
-        $this->assertSame('{ foo: ~ }', $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_TILDE));
+        self::assertSame('{ foo: ~ }', $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_TILDE));
     }
 
     public function testDumpIdeographicSpaces()
@@ -825,7 +825,7 @@ within_string: 'a　b'
 regular_space: 'a b'
 
 YAML;
-        $this->assertSame($expected, $this->dumper->dump([
+        self::assertSame($expected, $this->dumper->dump([
             'alone' => '　',
             'within_string' => 'a　b',
             'regular_space' => 'a b',
@@ -834,11 +834,8 @@ YAML;
 
     private function assertSameData($expected, $actual)
     {
-        $this->assertEquals($expected, $actual);
-        $this->assertSame(
-            var_export($expected, true),
-            var_export($actual, true)
-        );
+        self::assertEquals($expected, $actual);
+        self::assertSame(var_export($expected, true), var_export($actual, true));
     }
 }
 

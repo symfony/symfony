@@ -33,7 +33,7 @@ class AttributeAutoconfigurationPassTest extends TestCase
 
         (new AttributeAutoconfigurationPass())->process($container);
 
-        $this->assertSame([], $container->getDefinition('foo')->getInstanceofConditionals());
+        self::assertSame([], $container->getDefinition('foo')->getInstanceofConditionals());
     }
 
     public function testAttributeConfiguratorCallableMissingType()
@@ -44,8 +44,8 @@ class AttributeAutoconfigurationPassTest extends TestCase
             ->setAutoconfigured(true)
         ;
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Argument "$reflector" of attribute autoconfigurator should have a type, use one or more of "\ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\Reflector" in ');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Argument "$reflector" of attribute autoconfigurator should have a type, use one or more of "\ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\Reflector" in ');
         (new AttributeAutoconfigurationPass())->process($container);
     }
 }

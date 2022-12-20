@@ -22,7 +22,7 @@ class XmlReferenceDumperTest extends TestCase
         $configuration = new ExampleConfiguration();
 
         $dumper = new XmlReferenceDumper();
-        $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
+        self::assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 
     public function testNamespaceDumper()
@@ -30,7 +30,7 @@ class XmlReferenceDumperTest extends TestCase
         $configuration = new ExampleConfiguration();
 
         $dumper = new XmlReferenceDumper();
-        $this->assertEquals(str_replace('http://example.org/schema/dic/acme_root', 'http://symfony.com/schema/dic/symfony', $this->getConfigurationAsString()), $dumper->dump($configuration, 'http://symfony.com/schema/dic/symfony'));
+        self::assertEquals(str_replace('http://example.org/schema/dic/acme_root', 'http://symfony.com/schema/dic/symfony', $this->getConfigurationAsString()), $dumper->dump($configuration, 'http://symfony.com/schema/dic/symfony'));
     }
 
     private function getConfigurationAsString()

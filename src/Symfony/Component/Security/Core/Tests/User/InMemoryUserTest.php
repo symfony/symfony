@@ -23,23 +23,23 @@ class InMemoryUserTest extends TestCase
 
     public function testConstructorException()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new InMemoryUser('', 'superpass');
     }
 
     public function testGetRoles()
     {
         $user = new InMemoryUser('fabien', 'superpass');
-        $this->assertEquals([], $user->getRoles());
+        self::assertEquals([], $user->getRoles());
 
         $user = new InMemoryUser('fabien', 'superpass', ['ROLE_ADMIN']);
-        $this->assertEquals(['ROLE_ADMIN'], $user->getRoles());
+        self::assertEquals(['ROLE_ADMIN'], $user->getRoles());
     }
 
     public function testGetPassword()
     {
         $user = new InMemoryUser('fabien', 'superpass');
-        $this->assertEquals('superpass', $user->getPassword());
+        self::assertEquals('superpass', $user->getPassword());
     }
 
     /**
@@ -50,41 +50,41 @@ class InMemoryUserTest extends TestCase
         $user = new InMemoryUser('fabien', 'superpass');
 
         $this->expectDeprecation('Since symfony/security-core 5.3: Method "Symfony\Component\Security\Core\User\User::getUsername()" is deprecated, use getUserIdentifier() instead.');
-        $this->assertEquals('fabien', $user->getUsername());
+        self::assertEquals('fabien', $user->getUsername());
     }
 
     public function testGetUserIdentifier()
     {
         $user = new InMemoryUser('fabien', 'superpass');
-        $this->assertEquals('fabien', $user->getUserIdentifier());
+        self::assertEquals('fabien', $user->getUserIdentifier());
     }
 
     public function testGetSalt()
     {
         $user = new InMemoryUser('fabien', 'superpass');
-        $this->assertNull($user->getSalt());
+        self::assertNull($user->getSalt());
     }
 
     public function testIsEnabled()
     {
         $user = new InMemoryUser('mathilde', 'k');
-        $this->assertTrue($user->isEnabled());
+        self::assertTrue($user->isEnabled());
 
         $user = new InMemoryUser('robin', 'superpass', [], false);
-        $this->assertFalse($user->isEnabled());
+        self::assertFalse($user->isEnabled());
     }
 
     public function testEraseCredentials()
     {
         $user = new InMemoryUser('fabien', 'superpass');
         $user->eraseCredentials();
-        $this->assertEquals('superpass', $user->getPassword());
+        self::assertEquals('superpass', $user->getPassword());
     }
 
     public function testToString()
     {
         $user = new InMemoryUser('fabien', 'superpass');
-        $this->assertEquals('fabien', (string) $user);
+        self::assertEquals('fabien', (string) $user);
     }
 
     /**
@@ -96,8 +96,8 @@ class InMemoryUserTest extends TestCase
      */
     public function testIsEqualTo($expectation, $a, $b)
     {
-        $this->assertSame($expectation, $a->isEqualTo($b));
-        $this->assertSame($expectation, $b->isEqualTo($a));
+        self::assertSame($expectation, $a->isEqualTo($b));
+        self::assertSame($expectation, $b->isEqualTo($a));
     }
 
     public static function isEqualToData()
@@ -114,6 +114,6 @@ class InMemoryUserTest extends TestCase
     public function testIsEqualToWithDifferentUser()
     {
         $user = new InMemoryUser('username', 'password');
-        $this->assertFalse($user->isEqualTo($this->createMock(UserInterface::class)));
+        self::assertFalse($user->isEqualTo(self::createMock(UserInterface::class)));
     }
 }

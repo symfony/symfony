@@ -23,9 +23,9 @@ final class CommandIsSuccessfulTest extends TestCase
     {
         $constraint = new CommandIsSuccessful();
 
-        $this->assertTrue($constraint->evaluate(Command::SUCCESS, '', true));
-        $this->assertFalse($constraint->evaluate(Command::FAILURE, '', true));
-        $this->assertFalse($constraint->evaluate(Command::INVALID, '', true));
+        self::assertTrue($constraint->evaluate(Command::SUCCESS, '', true));
+        self::assertFalse($constraint->evaluate(Command::FAILURE, '', true));
+        self::assertFalse($constraint->evaluate(Command::INVALID, '', true));
     }
 
     /**
@@ -38,13 +38,13 @@ final class CommandIsSuccessfulTest extends TestCase
         try {
             $constraint->evaluate($exitCode);
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('Failed asserting that the command is successful.', TestFailure::exceptionToString($e));
-            $this->assertStringContainsString($expectedException, TestFailure::exceptionToString($e));
+            self::assertStringContainsString('Failed asserting that the command is successful.', TestFailure::exceptionToString($e));
+            self::assertStringContainsString($expectedException, TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 
     public function providesUnsuccessful(): iterable

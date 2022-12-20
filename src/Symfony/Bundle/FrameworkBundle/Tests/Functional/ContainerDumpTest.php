@@ -18,15 +18,15 @@ class ContainerDumpTest extends AbstractWebTestCase
 {
     public function testContainerCompilationInDebug()
     {
-        $this->createClient(['test_case' => 'ContainerDump', 'root_config' => 'config.yml']);
+        self::createClient(['test_case' => 'ContainerDump', 'root_config' => 'config.yml']);
 
-        $this->assertTrue(static::getContainer()->has('serializer'));
+        self::assertTrue(self::getContainer()->has('serializer'));
     }
 
     public function testContainerCompilation()
     {
-        $this->createClient(['test_case' => 'ContainerDump', 'root_config' => 'config.yml', 'debug' => false]);
+        self::createClient(['test_case' => 'ContainerDump', 'root_config' => 'config.yml', 'debug' => false]);
 
-        $this->assertTrue(static::getContainer()->has('serializer'));
+        self::assertTrue(self::getContainer()->has('serializer'));
     }
 }

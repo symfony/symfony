@@ -29,30 +29,30 @@ class DebugCommandTest extends TestCase
 {
     public function testOutputWithClassArgument()
     {
-        $validator = $this->createMock(MetadataFactoryInterface::class);
-        $classMetadata = $this->createMock(ClassMetadataInterface::class);
-        $propertyMetadata = $this->createMock(PropertyMetadataInterface::class);
+        $validator = self::createMock(MetadataFactoryInterface::class);
+        $classMetadata = self::createMock(ClassMetadataInterface::class);
+        $propertyMetadata = self::createMock(PropertyMetadataInterface::class);
 
         $validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMetadataFor')
             ->with(DummyClassOne::class)
             ->willReturn($classMetadata);
 
         $classMetadata
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getConstraints')
             ->willReturn([new Expression('1 + 1 = 2')]);
 
         $classMetadata
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getConstrainedProperties')
             ->willReturn([
                 'firstArgument',
             ]);
 
         $classMetadata
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPropertyMetadata')
             ->with('firstArgument')
             ->willReturn([
@@ -60,7 +60,7 @@ class DebugCommandTest extends TestCase
             ]);
 
         $propertyMetadata
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getConstraints')
             ->willReturn([new NotBlank(), new Email()]);
 
@@ -69,7 +69,7 @@ class DebugCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['class' => DummyClassOne::class], ['decorated' => false]);
 
-        $this->assertSame(<<<TXT
+        self::assertSame(<<<TXT
 
 Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 -----------------------------------------------------
@@ -97,19 +97,17 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 |               |                                                    |         | ]                                                          |
 +---------------+----------------------------------------------------+---------+------------------------------------------------------------+
 
-TXT
-            , $tester->getDisplay(true)
-        );
+TXT, $tester->getDisplay(true));
     }
 
     public function testOutputWithPathArgument()
     {
-        $validator = $this->createMock(MetadataFactoryInterface::class);
-        $classMetadata = $this->createMock(ClassMetadataInterface::class);
-        $propertyMetadata = $this->createMock(PropertyMetadataInterface::class);
+        $validator = self::createMock(MetadataFactoryInterface::class);
+        $classMetadata = self::createMock(ClassMetadataInterface::class);
+        $propertyMetadata = self::createMock(PropertyMetadataInterface::class);
 
         $validator
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('getMetadataFor')
             ->withAnyParameters()
             ->willReturn($classMetadata);
@@ -121,7 +119,7 @@ TXT
             ]);
 
         $classMetadata
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('getConstraints')
             ->willReturn([new Expression('1 + 1 = 2')]);
 
@@ -141,7 +139,7 @@ TXT
         $tester = new CommandTester($command);
         $tester->execute(['class' => __DIR__.'/../Dummy'], ['decorated' => false]);
 
-        $this->assertSame(<<<TXT
+        self::assertSame(<<<TXT
 
 Symfony\Component\Validator\Tests\Dummy\DummyClassOne
 -----------------------------------------------------
@@ -195,24 +193,20 @@ Symfony\Component\Validator\Tests\Dummy\DummyClassTwo
 |               |                                                    |         | ]                                                          |
 +---------------+----------------------------------------------------+---------+------------------------------------------------------------+
 
-TXT
-            , $tester->getDisplay(true)
-        );
+TXT, $tester->getDisplay(true));
     }
 
     public function testOutputWithInvalidClassArgument()
     {
-        $validator = $this->createMock(MetadataFactoryInterface::class);
+        $validator = self::createMock(MetadataFactoryInterface::class);
 
         $command = new DebugCommand($validator);
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => 'App\\NotFoundResource'], ['decorated' => false]);
 
-        $this->assertStringContainsString(<<<TXT
+        self::assertStringContainsString(<<<TXT
 Neither class nor path were found with "App\NotFoundResource" argument.
-TXT
-            , $tester->getDisplay(true)
-        );
+TXT, $tester->getDisplay(true));
     }
 }

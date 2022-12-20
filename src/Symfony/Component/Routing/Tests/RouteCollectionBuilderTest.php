@@ -28,9 +28,9 @@ class RouteCollectionBuilderTest extends TestCase
 {
     public function testImport()
     {
-        $resolvedLoader = $this->createMock(LoaderInterface::class);
-        $resolver = $this->createMock(LoaderResolverInterface::class);
-        $resolver->expects($this->once())
+        $resolvedLoader = self::createMock(LoaderInterface::class);
+        $resolver = self::createMock(LoaderResolverInterface::class);
+        $resolver->expects(self::once())
             ->method('resolve')
             ->with('admin_routing.yml', 'yaml')
             ->willReturn($resolvedLoader);
@@ -41,13 +41,13 @@ class RouteCollectionBuilderTest extends TestCase
         $expectedCollection->addResource(new FileResource(__DIR__.'/Fixtures/file_resource.yml'));
 
         $resolvedLoader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('load')
             ->with('admin_routing.yml', 'yaml')
             ->willReturn($expectedCollection);
 
-        $loader = $this->createMock(LoaderInterface::class);
-        $loader->expects($this->any())
+        $loader = self::createMock(LoaderInterface::class);
+        $loader->expects(self::any())
             ->method('getResolver')
             ->willReturn($resolver);
 
@@ -56,19 +56,19 @@ class RouteCollectionBuilderTest extends TestCase
         $importedRoutes = $routes->import('admin_routing.yml', '/', 'yaml');
 
         // we should get back a RouteCollectionBuilder
-        $this->assertInstanceOf(RouteCollectionBuilder::class, $importedRoutes);
+        self::assertInstanceOf(RouteCollectionBuilder::class, $importedRoutes);
 
         // get the collection back so we can look at it
         $addedCollection = $importedRoutes->build();
         $route = $addedCollection->get('one_test_route');
-        $this->assertSame($originalRoute, $route);
+        self::assertSame($originalRoute, $route);
         // should return file_resource.yml, which is in the original collection
-        $this->assertCount(1, $addedCollection->getResources());
+        self::assertCount(1, $addedCollection->getResources());
 
         // make sure the routes were imported into the top-level builder
         $routeCollection = $routes->build();
-        $this->assertCount(1, $routes->build());
-        $this->assertCount(1, $routeCollection->getResources());
+        self::assertCount(1, $routes->build());
+        self::assertCount(1, $routeCollection->getResources());
     }
 
     public function testImportAddResources()
@@ -77,12 +77,12 @@ class RouteCollectionBuilderTest extends TestCase
         $routeCollectionBuilder->import('file_resource.yml');
         $routeCollection = $routeCollectionBuilder->build();
 
-        $this->assertCount(1, $routeCollection->getResources());
+        self::assertCount(1, $routeCollection->getResources());
     }
 
     public function testImportWithoutLoaderThrowsException()
     {
-        $this->expectException(\BadMethodCallException::class);
+        self::expectException(\BadMethodCallException::class);
         $collectionBuilder = new RouteCollectionBuilder();
         $collectionBuilder->import('routing.yml');
     }
@@ -93,11 +93,11 @@ class RouteCollectionBuilderTest extends TestCase
 
         $addedRoute = $collectionBuilder->add('/checkout', 'AppBundle:Order:checkout');
         $addedRoute2 = $collectionBuilder->add('/blogs', 'AppBundle:Blog:list', 'blog_list');
-        $this->assertInstanceOf(Route::class, $addedRoute);
-        $this->assertEquals('AppBundle:Order:checkout', $addedRoute->getDefault('_controller'));
+        self::assertInstanceOf(Route::class, $addedRoute);
+        self::assertEquals('AppBundle:Order:checkout', $addedRoute->getDefault('_controller'));
 
         $finalCollection = $collectionBuilder->build();
-        $this->assertSame($addedRoute2, $finalCollection->get('blog_list'));
+        self::assertSame($addedRoute2, $finalCollection->get('blog_list'));
     }
 
     public function testFlushOrdering()
@@ -106,13 +106,13 @@ class RouteCollectionBuilderTest extends TestCase
         $importedCollection->add('imported_route1', new Route('/imported/foo1'));
         $importedCollection->add('imported_route2', new Route('/imported/foo2'));
 
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
         // make this loader able to do the import - keeps mocking simple
-        $loader->expects($this->any())
+        $loader->expects(self::any())
             ->method('supports')
             ->willReturn(true);
         $loader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('load')
             ->willReturn($importedCollection);
 
@@ -132,9 +132,9 @@ class RouteCollectionBuilderTest extends TestCase
 
         $actualCollection = $routes->build();
 
-        $this->assertCount(5, $actualCollection);
+        self::assertCount(5, $actualCollection);
         $actualRouteNames = array_keys($actualCollection->all());
-        $this->assertEquals([
+        self::assertEquals([
             'checkout_route',
             'imported_route1',
             'imported_route2',
@@ -145,8 +145,8 @@ class RouteCollectionBuilderTest extends TestCase
         // make sure the defaults were set
         $checkoutRoute = $actualCollection->get('checkout_route');
         $defaults = $checkoutRoute->getDefaults();
-        $this->assertArrayHasKey('_locale', $defaults);
-        $this->assertEquals('fr', $defaults['_locale']);
+        self::assertArrayHasKey('_locale', $defaults);
+        self::assertEquals('fr', $defaults['_locale']);
     }
 
     public function testFlushSetsRouteNames()
@@ -164,7 +164,7 @@ class RouteCollectionBuilderTest extends TestCase
 
         $actualCollection = $collectionBuilder->build();
         $actualRouteNames = array_keys($actualCollection->all());
-        $this->assertEquals([
+        self::assertEquals([
             'admin_dashboard',
             'GET_blogs',
             '100',
@@ -210,28 +210,28 @@ class RouteCollectionBuilderTest extends TestCase
         $collection = $routes->build();
         $actualListRoute = $collection->get('blog_list');
 
-        $this->assertEquals(1, $actualListRoute->getDefault('page'));
-        $this->assertEquals('\d+', $actualListRoute->getRequirement('id'));
-        $this->assertTrue($actualListRoute->getOption('expose'));
+        self::assertEquals(1, $actualListRoute->getDefault('page'));
+        self::assertEquals('\d+', $actualListRoute->getRequirement('id'));
+        self::assertTrue($actualListRoute->getOption('expose'));
         // none of these should be overridden
-        $this->assertEquals('html', $actualListRoute->getDefault('_format'));
-        $this->assertEquals('json|xml', $actualListRoute->getRequirement('_format'));
-        $this->assertTrue($actualListRoute->getOption('fooBar'));
-        $this->assertEquals('example.com', $actualListRoute->getHost());
-        $this->assertEquals('request.isSecure()', $actualListRoute->getCondition());
-        $this->assertEquals(['https'], $actualListRoute->getSchemes());
-        $this->assertEquals(['POST'], $actualListRoute->getMethods());
+        self::assertEquals('html', $actualListRoute->getDefault('_format'));
+        self::assertEquals('json|xml', $actualListRoute->getRequirement('_format'));
+        self::assertTrue($actualListRoute->getOption('fooBar'));
+        self::assertEquals('example.com', $actualListRoute->getHost());
+        self::assertEquals('request.isSecure()', $actualListRoute->getCondition());
+        self::assertEquals(['https'], $actualListRoute->getSchemes());
+        self::assertEquals(['POST'], $actualListRoute->getMethods());
         // inherited from the main collection
-        $this->assertEquals('fr', $actualListRoute->getDefault('_locale'));
-        $this->assertEquals('fr|en', $actualListRoute->getRequirement('_locale'));
-        $this->assertTrue($actualListRoute->getOption('niceRoute'));
+        self::assertEquals('fr', $actualListRoute->getDefault('_locale'));
+        self::assertEquals('fr|en', $actualListRoute->getRequirement('_locale'));
+        self::assertTrue($actualListRoute->getOption('niceRoute'));
 
         $actualEditRoute = $collection->get('blog_edit');
         // inherited from the collection
-        $this->assertEquals('symfony.com', $actualEditRoute->getHost());
-        $this->assertEquals('request.query.get("page")==1', $actualEditRoute->getCondition());
-        $this->assertEquals(['http'], $actualEditRoute->getSchemes());
-        $this->assertEquals(['GET', 'POST'], $actualEditRoute->getMethods());
+        self::assertEquals('symfony.com', $actualEditRoute->getHost());
+        self::assertEquals('request.query.get("page")==1', $actualEditRoute->getCondition());
+        self::assertEquals(['http'], $actualEditRoute->getSchemes());
+        self::assertEquals(['GET', 'POST'], $actualEditRoute->getMethods());
     }
 
     /**
@@ -248,7 +248,7 @@ class RouteCollectionBuilderTest extends TestCase
 
         $collection = $outerRoutes->build();
 
-        $this->assertEquals($expectedPath, $collection->get('test_route')->getPath());
+        self::assertEquals($expectedPath, $collection->get('test_route')->getPath());
     }
 
     public function providePrefixTests()
@@ -269,7 +269,7 @@ class RouteCollectionBuilderTest extends TestCase
 
     public function testFlushSetsPrefixedWithMultipleLevels()
     {
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
         $routes = new RouteCollectionBuilder($loader);
 
         $routes->add('homepage', 'MainController::homepageAction', 'homepage');
@@ -297,22 +297,22 @@ class RouteCollectionBuilderTest extends TestCase
         $importedCollection = new RouteCollection();
         $importedCollection->add('imported_route', new Route('/foo'));
         // make this loader able to do the import - keeps mocking simple
-        $loader->expects($this->any())
+        $loader->expects(self::any())
             ->method('supports')
             ->willReturn(true);
         $loader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('load')
             ->willReturn($importedCollection);
         // import this from the /admin route builder
         $adminRoutes->import('admin.yml', '/imported');
 
         $collection = $routes->build();
-        $this->assertEquals('/admin/dashboard', $collection->get('admin_dashboard')->getPath(), 'Routes before mounting have the prefix');
-        $this->assertEquals('/admin/users', $collection->get('admin_users')->getPath(), 'Routes after mounting have the prefix');
-        $this->assertEquals('/admin/blog/new', $collection->get('admin_blog_new')->getPath(), 'Sub-collections receive prefix even if mounted before parent prefix');
-        $this->assertEquals('/admin/stats/sales', $collection->get('admin_stats_sales')->getPath(), 'Sub-collections receive prefix if mounted after parent prefix');
-        $this->assertEquals('/admin/imported/foo', $collection->get('imported_route')->getPath(), 'Normal RouteCollections are also prefixed properly');
+        self::assertEquals('/admin/dashboard', $collection->get('admin_dashboard')->getPath(), 'Routes before mounting have the prefix');
+        self::assertEquals('/admin/users', $collection->get('admin_users')->getPath(), 'Routes after mounting have the prefix');
+        self::assertEquals('/admin/blog/new', $collection->get('admin_blog_new')->getPath(), 'Sub-collections receive prefix even if mounted before parent prefix');
+        self::assertEquals('/admin/stats/sales', $collection->get('admin_stats_sales')->getPath(), 'Sub-collections receive prefix if mounted after parent prefix');
+        self::assertEquals('/admin/imported/foo', $collection->get('imported_route')->getPath(), 'Normal RouteCollections are also prefixed properly');
     }
 
     public function testAutomaticRouteNamesDoNotConflict()
@@ -336,7 +336,7 @@ class RouteCollectionBuilderTest extends TestCase
 
         $collection = $routes->build();
         // there are 2 routes (i.e. with non-conflicting names)
-        $this->assertCount(3, $collection->all());
+        self::assertCount(3, $collection->all());
     }
 
     public function testAddsThePrefixOnlyOnceWhenLoadingMultipleCollections()
@@ -347,12 +347,12 @@ class RouteCollectionBuilderTest extends TestCase
         $secondCollection = new RouteCollection();
         $secondCollection->add('b', new Route('/b'));
 
-        $loader = $this->createMock(LoaderInterface::class);
-        $loader->expects($this->any())
+        $loader = self::createMock(LoaderInterface::class);
+        $loader->expects(self::any())
             ->method('supports')
             ->willReturn(true);
         $loader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('load')
             ->willReturn([$firstCollection, $secondCollection]);
 
@@ -360,8 +360,8 @@ class RouteCollectionBuilderTest extends TestCase
         $routeCollectionBuilder->import('/directory/recurse/*', '/other/', 'glob');
         $routes = $routeCollectionBuilder->build()->all();
 
-        $this->assertCount(2, $routes);
-        $this->assertEquals('/other/a', $routes['a']->getPath());
-        $this->assertEquals('/other/b', $routes['b']->getPath());
+        self::assertCount(2, $routes);
+        self::assertEquals('/other/a', $routes['a']->getPath());
+        self::assertEquals('/other/b', $routes['b']->getPath());
     }
 }

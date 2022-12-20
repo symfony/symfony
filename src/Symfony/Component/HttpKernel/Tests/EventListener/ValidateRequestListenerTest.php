@@ -29,9 +29,9 @@ class ValidateRequestListenerTest extends TestCase
 
     public function testListenerThrowsWhenMainRequestHasInconsistentClientIps()
     {
-        $this->expectException(ConflictingHeadersException::class);
+        self::expectException(ConflictingHeadersException::class);
         $dispatcher = new EventDispatcher();
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_FORWARDED);

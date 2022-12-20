@@ -32,31 +32,31 @@ class SessionStrategyListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->sessionAuthenticationStrategy = $this->createMock(SessionAuthenticationStrategyInterface::class);
+        $this->sessionAuthenticationStrategy = self::createMock(SessionAuthenticationStrategyInterface::class);
         $this->listener = new SessionStrategyListener($this->sessionAuthenticationStrategy);
         $this->request = new Request();
-        $this->token = $this->createMock(TokenInterface::class);
+        $this->token = self::createMock(TokenInterface::class);
     }
 
     public function testRequestWithSession()
     {
         $this->configurePreviousSession();
 
-        $this->sessionAuthenticationStrategy->expects($this->once())->method('onAuthentication')->with($this->request, $this->token);
+        $this->sessionAuthenticationStrategy->expects(self::once())->method('onAuthentication')->with($this->request, $this->token);
 
         $this->listener->onSuccessfulLogin($this->createEvent('main_firewall'));
     }
 
     public function testRequestWithoutPreviousSession()
     {
-        $this->sessionAuthenticationStrategy->expects($this->never())->method('onAuthentication')->with($this->request, $this->token);
+        $this->sessionAuthenticationStrategy->expects(self::never())->method('onAuthentication')->with($this->request, $this->token);
 
         $this->listener->onSuccessfulLogin($this->createEvent('main_firewall'));
     }
 
     public function testStatelessFirewalls()
     {
-        $this->sessionAuthenticationStrategy->expects($this->never())->method('onAuthentication');
+        $this->sessionAuthenticationStrategy->expects(self::never())->method('onAuthentication');
 
         $listener = new SessionStrategyListener($this->sessionAuthenticationStrategy, ['api_firewall']);
         $listener->onSuccessfulLogin($this->createEvent('api_firewall'));
@@ -64,13 +64,13 @@ class SessionStrategyListenerTest extends TestCase
 
     private function createEvent($firewallName)
     {
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', function ($username) { return new InMemoryUser($username, null); })), $this->token, $this->request, null, $firewallName);
+        return new LoginSuccessEvent(self::createMock(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('test', function ($username) { return new InMemoryUser($username, null); })), $this->token, $this->request, null, $firewallName);
     }
 
     private function configurePreviousSession()
     {
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->any())
+        $session = self::createMock(SessionInterface::class);
+        $session->expects(self::any())
             ->method('getName')
             ->willReturn('test_session_name');
         $this->request->setSession($session);

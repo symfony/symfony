@@ -29,7 +29,7 @@ class AbstractProxyTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->proxy = $this->getMockForAbstractClass(AbstractProxy::class);
+        $this->proxy = self::getMockForAbstractClass(AbstractProxy::class);
     }
 
     protected function tearDown(): void
@@ -39,19 +39,19 @@ class AbstractProxyTest extends TestCase
 
     public function testGetSaveHandlerName()
     {
-        $this->assertNull($this->proxy->getSaveHandlerName());
+        self::assertNull($this->proxy->getSaveHandlerName());
     }
 
     public function testIsSessionHandlerInterface()
     {
-        $this->assertFalse($this->proxy->isSessionHandlerInterface());
+        self::assertFalse($this->proxy->isSessionHandlerInterface());
         $sh = new SessionHandlerProxy(new \SessionHandler());
-        $this->assertTrue($sh->isSessionHandlerInterface());
+        self::assertTrue($sh->isSessionHandlerInterface());
     }
 
     public function testIsWrapper()
     {
-        $this->assertFalse($this->proxy->isWrapper());
+        self::assertFalse($this->proxy->isWrapper());
     }
 
     /**
@@ -60,9 +60,9 @@ class AbstractProxyTest extends TestCase
      */
     public function testIsActive()
     {
-        $this->assertFalse($this->proxy->isActive());
+        self::assertFalse($this->proxy->isActive());
         session_start();
-        $this->assertTrue($this->proxy->isActive());
+        self::assertTrue($this->proxy->isActive());
     }
 
     /**
@@ -71,10 +71,10 @@ class AbstractProxyTest extends TestCase
      */
     public function testName()
     {
-        $this->assertEquals(session_name(), $this->proxy->getName());
+        self::assertEquals(session_name(), $this->proxy->getName());
         $this->proxy->setName('foo');
-        $this->assertEquals('foo', $this->proxy->getName());
-        $this->assertEquals(session_name(), $this->proxy->getName());
+        self::assertEquals('foo', $this->proxy->getName());
+        self::assertEquals(session_name(), $this->proxy->getName());
     }
 
     /**
@@ -83,7 +83,7 @@ class AbstractProxyTest extends TestCase
      */
     public function testNameException()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         session_start();
         $this->proxy->setName('foo');
     }
@@ -94,10 +94,10 @@ class AbstractProxyTest extends TestCase
      */
     public function testId()
     {
-        $this->assertEquals(session_id(), $this->proxy->getId());
+        self::assertEquals(session_id(), $this->proxy->getId());
         $this->proxy->setId('foo');
-        $this->assertEquals('foo', $this->proxy->getId());
-        $this->assertEquals(session_id(), $this->proxy->getId());
+        self::assertEquals('foo', $this->proxy->getId());
+        self::assertEquals(session_id(), $this->proxy->getId());
     }
 
     /**
@@ -106,7 +106,7 @@ class AbstractProxyTest extends TestCase
      */
     public function testIdException()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         session_start();
         $this->proxy->setId('foo');
     }

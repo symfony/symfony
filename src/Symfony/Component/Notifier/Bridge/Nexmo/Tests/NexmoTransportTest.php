@@ -29,7 +29,7 @@ final class NexmoTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new NexmoTransport('apiKey', 'apiSecret', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
+        return new NexmoTransport('apiKey', 'apiSecret', 'sender', $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -45,6 +45,6 @@ final class NexmoTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

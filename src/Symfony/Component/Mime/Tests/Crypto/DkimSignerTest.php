@@ -63,9 +63,9 @@ EOF;
             'headers_to_ignore' => ['Message-ID'],
         ]);
 
-        $this->assertSame($message->getBody()->toString(), $signedMessage->getBody()->toString());
-        $this->assertTrue($signedMessage->getHeaders()->has('DKIM-Signature'));
-        $this->assertEquals($header, $signedMessage->getHeaders()->get('DKIM-Signature')->getBody());
+        self::assertSame($message->getBody()->toString(), $signedMessage->getBody()->toString());
+        self::assertTrue($signedMessage->getHeaders()->has('DKIM-Signature'));
+        self::assertEquals($header, $signedMessage->getHeaders()->get('DKIM-Signature')->getBody());
     }
 
     public function getSignData()
@@ -93,15 +93,13 @@ EOF;
 
     public function testSignWithUnsupportedAlgorithm()
     {
-        $message = $this->createMock(Message::class);
+        $message = self::createMock(Message::class);
 
         $signer = new DkimSigner(self::$pk, 'testdkim.symfony.net', 'sf', [
             'algorithm' => 'unsupported-value',
         ]);
 
-        $this->expectExceptionObject(
-            new \LogicException('Invalid DKIM signing algorithm "unsupported-value".')
-        );
+        self::expectExceptionObject(new \LogicException('Invalid DKIM signing algorithm "unsupported-value".'));
 
         $signer->sign($message, []);
     }
@@ -128,8 +126,8 @@ EOF;
         preg_match('{bh=([^;]+).+l=([^;]+)}', $signedMessage->getHeaders()->get('DKIM-Signature')->getBody(), $matches);
         $bh = $matches[1];
         $l = $matches[2];
-        $this->assertEquals(base64_encode(hash('sha256', $canonBody, true)), $bh);
-        $this->assertEquals(\strlen($canonBody), $l);
+        self::assertEquals(base64_encode(hash('sha256', $canonBody, true)), $bh);
+        self::assertEquals(\strlen($canonBody), $l);
     }
 
     public function getCanonicalizeHeaderData()

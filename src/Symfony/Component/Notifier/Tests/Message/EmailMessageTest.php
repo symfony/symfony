@@ -23,8 +23,8 @@ class EmailMessageTest extends TestCase
 {
     public function testEnsureNonEmptyEmailOnCreationFromNotification()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('"Symfony\Component\Notifier\Message\EmailMessage" needs an email, it cannot be empty.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('"Symfony\Component\Notifier\Message\EmailMessage" needs an email, it cannot be empty.');
 
         EmailMessage::fromNotification(new Notification(), new Recipient('', '+3312345678'));
     }

@@ -28,14 +28,14 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
 
         (new AliasDeprecatedPublicServicesPass())->process($container);
 
-        $this->assertTrue($container->hasAlias('foo'));
+        self::assertTrue($container->hasAlias('foo'));
 
         $alias = $container->getAlias('foo');
 
-        $this->assertSame('.container.private.foo', (string) $alias);
-        $this->assertTrue($alias->isPublic());
-        $this->assertFalse($alias->isPrivate());
-        $this->assertSame([
+        self::assertSame('.container.private.foo', (string) $alias);
+        self::assertTrue($alias->isPublic());
+        self::assertFalse($alias->isPrivate());
+        self::assertSame([
             'package' => 'foo/bar',
             'version' => '1.2',
             'message' => 'Accessing the "foo" service directly from the container is deprecated, use dependency injection instead.',
@@ -47,8 +47,8 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
      */
     public function testProcessWithMissingAttribute(string $attribute, array $attributes)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "%s" attribute is mandatory for the "container.private" tag on the "foo" service.', $attribute));
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('The "%s" attribute is mandatory for the "container.private" tag on the "foo" service.', $attribute));
 
         $container = new ContainerBuilder();
         $container
@@ -75,6 +75,6 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
 
         (new AliasDeprecatedPublicServicesPass())->process($container);
 
-        $this->assertTrue($container->hasDefinition('foo'));
+        self::assertTrue($container->hasDefinition('foo'));
     }
 }

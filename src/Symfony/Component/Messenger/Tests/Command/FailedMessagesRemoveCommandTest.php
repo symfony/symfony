@@ -28,8 +28,8 @@ class FailedMessagesRemoveCommandTest extends TestCase
      */
     public function testRemoveSingleMessage()
     {
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
 
         $command = new FailedMessagesRemoveCommand(
             'failure_receiver',
@@ -39,18 +39,18 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => 20, '--force' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
     public function testRemoveSingleMessageWithServiceLocator()
     {
         $globalFailureReceiverName = 'failure_receiver';
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects(self::any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
@@ -60,8 +60,8 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => 20, '--force' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
     /**
@@ -69,8 +69,8 @@ class FailedMessagesRemoveCommandTest extends TestCase
      */
     public function testRemoveUniqueMessage()
     {
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
 
         $command = new FailedMessagesRemoveCommand(
             'failure_receiver',
@@ -80,18 +80,18 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20], '--force' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
     public function testRemoveUniqueMessageWithServiceLocator()
     {
         $globalFailureReceiverName = 'failure_receiver';
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects(self::any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
@@ -101,18 +101,18 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20], '--force' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
     public function testRemoveUniqueMessageWithServiceLocatorFromSpecificFailureTransport()
     {
         $failureReveiverName = 'specific_failure_receiver';
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($failureReveiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($failureReveiverName)->willReturn($receiver);
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('has')->with($failureReveiverName)->willReturn(true);
+        $serviceLocator->expects(self::any())->method('get')->with($failureReveiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
             $failureReveiverName,
@@ -122,8 +122,8 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20], '--transport' => $failureReveiverName, '--force' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
     /**
@@ -132,9 +132,9 @@ class FailedMessagesRemoveCommandTest extends TestCase
     public function testThrowExceptionIfFailureTransportNotDefined()
     {
         $failureReceiverName = 'failure_receiver';
-        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver = self::createMock(ListableReceiverInterface::class);
 
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $command = new FailedMessagesRemoveCommand(
             null,
             $receiver
@@ -143,18 +143,18 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20], '--transport' => $failureReceiverName, '--force' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
     public function testThrowExceptionIfFailureTransportNotDefinedWithServiceLocator()
     {
         $failureReceiverName = 'failure_receiver';
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($failureReceiverName)->willReturn(false);
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('has')->with($failureReceiverName)->willReturn(false);
 
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $command = new FailedMessagesRemoveCommand(
             $failureReceiverName,
             $serviceLocator
@@ -163,8 +163,8 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20], '--transport' => $failureReceiverName, '--force' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
     /**
@@ -172,8 +172,8 @@ class FailedMessagesRemoveCommandTest extends TestCase
      */
     public function testRemoveMultipleMessages()
     {
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(3))->method('find')->withConsecutive([20], [30], [40])->willReturnOnConsecutiveCalls(
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::exactly(3))->method('find')->withConsecutive([20], [30], [40])->willReturnOnConsecutiveCalls(
             new Envelope(new \stdClass()),
             null,
             new Envelope(new \stdClass())
@@ -187,25 +187,25 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20, 30, 40], '--force' => true]);
 
-        $this->assertStringNotContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
-        $this->assertStringContainsString('The message with id "30" was not found.', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 40 removed.', $tester->getDisplay());
+        self::assertStringNotContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('The message with id "30" was not found.', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 40 removed.', $tester->getDisplay());
     }
 
     public function testRemoveMultipleMessagesWithServiceLocator()
     {
         $globalFailureReceiverName = 'failure_receiver';
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(3))->method('find')->withConsecutive([20], [30], [40])->willReturnOnConsecutiveCalls(
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::exactly(3))->method('find')->withConsecutive([20], [30], [40])->willReturnOnConsecutiveCalls(
             new Envelope(new \stdClass()),
             null,
             new Envelope(new \stdClass())
         );
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects(self::any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
@@ -215,10 +215,10 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20, 30, 40], '--force' => true]);
 
-        $this->assertStringNotContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
-        $this->assertStringContainsString('The message with id "30" was not found.', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 40 removed.', $tester->getDisplay());
+        self::assertStringNotContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('The message with id "30" was not found.', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 40 removed.', $tester->getDisplay());
     }
 
     /**
@@ -226,8 +226,8 @@ class FailedMessagesRemoveCommandTest extends TestCase
      */
     public function testRemoveMultipleMessagesAndDisplayMessages()
     {
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(2))->method('find')->withConsecutive([20], [30])->willReturnOnConsecutiveCalls(
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::exactly(2))->method('find')->withConsecutive([20], [30])->willReturnOnConsecutiveCalls(
             new Envelope(new \stdClass()),
             new Envelope(new \stdClass())
         );
@@ -240,23 +240,23 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20, 30], '--force' => true, '--show-messages' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
     }
 
     public function testRemoveMultipleMessagesAndDisplayMessagesWithServiceLocator()
     {
         $globalFailureReceiverName = 'failure_receiver';
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->exactly(2))->method('find')->withConsecutive([20], [30])->willReturnOnConsecutiveCalls(
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::exactly(2))->method('find')->withConsecutive([20], [30])->willReturnOnConsecutiveCalls(
             new Envelope(new \stdClass()),
             new Envelope(new \stdClass())
         );
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects(self::any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
@@ -266,19 +266,19 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [20, 30], '--force' => true, '--show-messages' => true]);
 
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Failed Message Details', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        self::assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
     }
 
     public function testCompletingTransport()
     {
         $globalFailureReceiverName = 'failure_receiver';
 
-        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver = self::createMock(ListableReceiverInterface::class);
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('getProvidedServices')->willReturn([
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('getProvidedServices')->willReturn([
             'global_receiver' => $receiver,
             $globalFailureReceiverName => $receiver,
         ]);
@@ -290,22 +290,22 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandCompletionTester($command);
 
         $suggestions = $tester->complete(['--transport']);
-        $this->assertSame(['global_receiver', 'failure_receiver'], $suggestions);
+        self::assertSame(['global_receiver', 'failure_receiver'], $suggestions);
     }
 
     public function testCompleteId()
     {
         $globalFailureReceiverName = 'failure_receiver';
 
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('all')->with(50)->willReturn([
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::once())->method('all')->with(50)->willReturn([
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('2ab50dfa1fbf')]),
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
         ]);
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects(self::any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
@@ -315,7 +315,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $suggestions = $tester->complete(['']);
 
-        $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
+        self::assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 
     public function testCompleteIdWithSpecifiedTransport()
@@ -323,15 +323,15 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $globalFailureReceiverName = 'failure_receiver';
         $anotherFailureReceiverName = 'another_receiver';
 
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('all')->with(50)->willReturn([
+        $receiver = self::createMock(ListableReceiverInterface::class);
+        $receiver->expects(self::once())->method('all')->with(50)->willReturn([
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('2ab50dfa1fbf')]),
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
         ]);
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($anotherFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($anotherFailureReceiverName)->willReturn($receiver);
+        $serviceLocator = self::createMock(ServiceLocator::class);
+        $serviceLocator->expects(self::once())->method('has')->with($anotherFailureReceiverName)->willReturn(true);
+        $serviceLocator->expects(self::any())->method('get')->with($anotherFailureReceiverName)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
             $globalFailureReceiverName,
@@ -342,6 +342,6 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $suggestions = $tester->complete(['--transport', $anotherFailureReceiverName, ' ']);
 
-        $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
+        self::assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 }

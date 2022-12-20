@@ -19,7 +19,7 @@ class UnauthorizedHttpExceptionTest extends HttpExceptionTest
     public function testHeadersDefault()
     {
         $exception = new UnauthorizedHttpException('Challenge');
-        $this->assertSame(['WWW-Authenticate' => 'Challenge'], $exception->getHeaders());
+        self::assertSame(['WWW-Authenticate' => 'Challenge'], $exception->getHeaders());
     }
 
     public function testWithHeaderConstruct()
@@ -32,7 +32,7 @@ class UnauthorizedHttpExceptionTest extends HttpExceptionTest
 
         $headers['WWW-Authenticate'] = 'Challenge';
 
-        $this->assertSame($headers, $exception->getHeaders());
+        self::assertSame($headers, $exception->getHeaders());
     }
 
     /**
@@ -42,7 +42,7 @@ class UnauthorizedHttpExceptionTest extends HttpExceptionTest
     {
         $exception = new UnauthorizedHttpException('Challenge');
         $exception->setHeaders($headers);
-        $this->assertSame($headers, $exception->getHeaders());
+        self::assertSame($headers, $exception->getHeaders());
     }
 
     protected function createException(string $message = '', \Throwable $previous = null, int $code = 0, array $headers = []): HttpException

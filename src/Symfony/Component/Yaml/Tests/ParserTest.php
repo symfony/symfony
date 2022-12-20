@@ -111,8 +111,8 @@ YAML;
   first line
 YAML;
         // @todo Fix the parser, eliminate this exception.
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 2 (near "!text |").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Unable to parse at line 2 (near "!text |").');
         $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
     }
 
@@ -121,7 +121,7 @@ YAML;
      */
     public function testSpecifications($expected, $yaml, $comment)
     {
-        $this->assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
+        self::assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
     }
 
     public function getDataFormSpecifications()
@@ -139,8 +139,8 @@ YAML;
      */
     public function testTabsAsIndentationInYaml(string $given, string $expectedMessage)
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage($expectedMessage);
         $this->parser->parse($given);
     }
 
@@ -174,8 +174,8 @@ YAML;
         $this->parser->parse($yamlString);
         $this->parser->parse($yamlString);
 
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage("A YAML file cannot contain tabs as indentation at line 2 (near \"\tabc\")");
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage("A YAML file cannot contain tabs as indentation at line 2 (near \"\tabc\")");
 
         $this->parser->parse("abc:\n\tabc");
     }
@@ -219,7 +219,7 @@ foo
 ...
 EOF;
 
-        $this->assertEquals('foo', $this->parser->parse($yaml));
+        self::assertEquals('foo', $this->parser->parse($yaml));
     }
 
     public function getBlockChompingTests()
@@ -534,7 +534,7 @@ EOF;
      */
     public function testBlockChomping($expected, $yaml)
     {
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     /**
@@ -555,7 +555,7 @@ EOF;
             'foo' => "\n\nbar",
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testObjectSupportEnabled()
@@ -651,7 +651,7 @@ YAML;
 
     public function testObjectsSupportDisabledWithExceptions()
     {
-        $this->expectException(ParseException::class);
+        self::expectException(ParseException::class);
         $yaml = <<<'EOF'
 foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
@@ -662,8 +662,8 @@ EOF;
 
     public function testMappingKeyInMultiLineStringTriggersDeprecationNotice()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Mapping values are not allowed in multi-line blocks at line 2 (near "dbal:wrong").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Mapping values are not allowed in multi-line blocks at line 2 (near "dbal:wrong").');
 
         $yaml = <<<'EOF'
 data:
@@ -681,7 +681,7 @@ EOF;
             'items' => ['foo' => 'bar'],
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     /**
@@ -699,16 +699,16 @@ EOF;
             try {
                 $this->parser->parse($yaml);
 
-                $this->fail('charsets other than UTF-8 are rejected.');
+                self::fail('charsets other than UTF-8 are rejected.');
             } catch (\Exception $e) {
-                $this->assertInstanceOf(ParseException::class, $e, 'charsets other than UTF-8 are rejected.');
+                self::assertInstanceOf(ParseException::class, $e, 'charsets other than UTF-8 are rejected.');
             }
         }
     }
 
     public function testUnindentedCollectionException()
     {
-        $this->expectException(ParseException::class);
+        self::expectException(ParseException::class);
         $yaml = <<<'EOF'
 
 collection:
@@ -723,7 +723,7 @@ EOF;
 
     public function testShortcutKeyUnindentedCollectionException()
     {
-        $this->expectException(ParseException::class);
+        self::expectException(ParseException::class);
         $yaml = <<<'EOF'
 
 collection:
@@ -737,8 +737,8 @@ EOF;
 
     public function testMultipleDocumentsNotSupportedException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessageMatches('/^Multiple documents are not supported.+/');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessageMatches('/^Multiple documents are not supported.+/');
         Yaml::parse(<<<'EOL'
 # Ranking of 1998 home runs
 ---
@@ -756,7 +756,7 @@ EOL
 
     public function testSequenceInAMapping()
     {
-        $this->expectException(ParseException::class);
+        self::expectException(ParseException::class);
         Yaml::parse(<<<'EOF'
 yaml:
   hash: me
@@ -790,7 +790,7 @@ EOT;
             'd' => 'e',
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testSequenceFollowedByCommentEmbeddedInMapping()
@@ -809,7 +809,7 @@ EOT;
             ],
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testNonStringFollowedByCommentEmbeddedInMapping()
@@ -830,7 +830,7 @@ EOT;
             ],
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function getParseExceptionNotAffectedMultiLineStringLastResortParsing()
@@ -864,7 +864,7 @@ EOT;
      */
     public function testParseExceptionNotAffectedByMultiLineStringLastResortParsing($yaml)
     {
-        $this->expectException(ParseException::class);
+        self::expectException(ParseException::class);
         $this->parser->parse($yaml);
     }
 
@@ -880,7 +880,7 @@ EOT;
             'test' => 'You can have things that don\'t look like strings here true yes you can',
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
 
         $yaml = <<<'EOT'
 a:
@@ -891,12 +891,12 @@ EOT;
             'a' => 'b c',
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testMappingInASequence()
     {
-        $this->expectException(ParseException::class);
+        self::expectException(ParseException::class);
         Yaml::parse(<<<'EOF'
 yaml:
   - array stuff
@@ -907,8 +907,8 @@ EOF
 
     public function testScalarInSequence()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('missing colon');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('missing colon');
         Yaml::parse(<<<'EOF'
 foo:
     - bar
@@ -930,8 +930,8 @@ EOF
      */
     public function testMappingDuplicateKeyBlock()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Duplicate key "child" detected');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Duplicate key "child" detected');
         $input = <<<'EOD'
 parent:
     child: first
@@ -945,13 +945,13 @@ EOD;
                 'child' => 'first',
             ],
         ];
-        $this->assertSame($expected, Yaml::parse($input));
+        self::assertSame($expected, Yaml::parse($input));
     }
 
     public function testMappingDuplicateKeyFlow()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Duplicate key "child" detected');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Duplicate key "child" detected');
         $input = <<<'EOD'
 parent: { child: first, child: duplicate }
 parent: { child: duplicate, child: duplicate }
@@ -961,7 +961,7 @@ EOD;
                 'child' => 'first',
             ],
         ];
-        $this->assertSame($expected, Yaml::parse($input));
+        self::assertSame($expected, Yaml::parse($input));
     }
 
     /**
@@ -969,8 +969,8 @@ EOD;
      */
     public function testParseExceptionOnDuplicate($input, $duplicateKey, $lineNumber)
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Duplicate key "%s" detected at line %d', $duplicateKey, $lineNumber));
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage(sprintf('Duplicate key "%s" detected at line %d', $duplicateKey, $lineNumber));
 
         Yaml::parse($input);
     }
@@ -1038,12 +1038,12 @@ EOD;
 hash:
 EOF;
 
-        $this->assertSame(['hash' => null], Yaml::parse($input));
+        self::assertSame(['hash' => null], Yaml::parse($input));
     }
 
     public function testCommentAtTheRootIndent()
     {
-        $this->assertSame([
+        self::assertSame([
             'services' => [
                 'app.foo_service' => [
                     'class' => 'Foo',
@@ -1069,7 +1069,7 @@ EOF
 
     public function testStringBlockWithComments()
     {
-        $this->assertSame(['content' => <<<'EOT'
+        self::assertSame(['content' => <<<'EOT'
 # comment 1
 header
 
@@ -1097,7 +1097,7 @@ EOF
 
     public function testFoldedStringBlockWithComments()
     {
-        $this->assertSame([['content' => <<<'EOT'
+        self::assertSame([['content' => <<<'EOT'
 # comment 1
 header
 
@@ -1126,7 +1126,7 @@ EOF
 
     public function testNestedFoldedStringBlockWithComments()
     {
-        $this->assertSame([[
+        self::assertSame([[
             'title' => 'some title',
             'content' => <<<'EOT'
 # comment 1
@@ -1158,7 +1158,7 @@ EOF
 
     public function testReferenceResolvingInInlineStrings()
     {
-        $this->assertSame([
+        self::assertSame([
             'var' => 'var-value',
             'scalar' => 'var-value',
             'list' => ['var-value'],
@@ -1198,13 +1198,13 @@ EOF
 foo: 1
 bar: 2
 EOF;
-        $this->assertSame(['foo' => 1, 'bar' => 2], $this->parser->parse($yaml));
+        self::assertSame(['foo' => 1, 'bar' => 2], $this->parser->parse($yaml));
     }
 
     public function testFloatKeys()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Numeric keys are not supported. Quote your evaluable mapping keys instead');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Numeric keys are not supported. Quote your evaluable mapping keys instead');
         $yaml = <<<'EOF'
 foo:
     1.2: "bar"
@@ -1216,8 +1216,8 @@ EOF;
 
     public function testBooleanKeys()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Non-string keys are not supported. Quote your evaluable mapping keys instead');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Non-string keys are not supported. Quote your evaluable mapping keys instead');
         $yaml = <<<'EOF'
 true: foo
 false: bar
@@ -1248,13 +1248,13 @@ EOF;
             '~' => 'null',
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testColonInMappingValueException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('A colon cannot be used in an unquoted mapping value');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('A colon cannot be used in an unquoted mapping value');
         $yaml = <<<'EOF'
 foo: bar: baz
 EOF;
@@ -1269,7 +1269,7 @@ foo:
     bar: foobar # Note: a comment after a colon
 EOT;
 
-        $this->assertSame(['foo' => ['bar' => 'foobar']], $this->parser->parse($yaml));
+        self::assertSame(['foo' => ['bar' => 'foobar']], $this->parser->parse($yaml));
     }
 
     /**
@@ -1277,7 +1277,7 @@ EOT;
      */
     public function testCommentLikeStringsAreNotStrippedInBlockScalars($yaml, $expectedParserResult)
     {
-        $this->assertSame($expectedParserResult, $this->parser->parse($yaml));
+        self::assertSame($expectedParserResult, $this->parser->parse($yaml));
     }
 
     public function getCommentLikeStringInScalarBlockData()
@@ -1418,16 +1418,13 @@ test: >
     </ul>
 EOT;
 
-        $this->assertSame(
-            [
-                'test' => <<<'EOT'
+        self::assertSame([
+            'test' => <<<'EOT'
 <h2>A heading</h2>
 <ul> <li>a list</li> <li>may be a good example</li> </ul>
 EOT
-                ,
-            ],
-            $this->parser->parse($yaml)
-        );
+            ,
+        ], $this->parser->parse($yaml));
     }
 
     public function testAdditionallyIndentedLinesAreParsedAsNewLinesInFoldedBlocks()
@@ -1442,19 +1439,16 @@ test: >
     </ul>
 EOT;
 
-        $this->assertSame(
-            [
-                'test' => <<<'EOT'
+        self::assertSame([
+            'test' => <<<'EOT'
 <h2>A heading</h2>
 <ul>
   <li>a list</li>
   <li>may be a good example</li>
 </ul>
 EOT
-                ,
-            ],
-            $this->parser->parse($yaml)
-        );
+            ,
+        ], $this->parser->parse($yaml));
     }
 
     /**
@@ -1462,7 +1456,7 @@ EOT
      */
     public function testParseBinaryData($data)
     {
-        $this->assertSame(['data' => 'Hello world'], $this->parser->parse($data));
+        self::assertSame(['data' => 'Hello world'], $this->parser->parse($data));
     }
 
     public function getBinaryData()
@@ -1491,8 +1485,8 @@ EOT
      */
     public function testParseInvalidBinaryData($data, $expectedMessage)
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessageMatches($expectedMessage);
+        self::expectException(ParseException::class);
+        self::expectExceptionMessageMatches($expectedMessage);
 
         $this->parser->parse($data);
     }
@@ -1557,8 +1551,8 @@ EOT;
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
 
         $this->parser->parse($yaml);
     }
@@ -1626,7 +1620,7 @@ foo"
 bar: baz
 EOT;
 
-        $this->assertSame(['foo' => 'bar baz foobar foo', 'bar' => 'baz'], $this->parser->parse($yaml));
+        self::assertSame(['foo' => 'bar baz foobar foo', 'bar' => 'baz'], $this->parser->parse($yaml));
     }
 
     public function testMultiLineQuotedStringWithTrailingBackslash()
@@ -1637,7 +1631,7 @@ foobar:
     bar"
 YAML;
 
-        $this->assertSame(['foobar' => 'foobar'], $this->parser->parse($yaml));
+        self::assertSame(['foobar' => 'foobar'], $this->parser->parse($yaml));
     }
 
     public function testCommentCharactersInMultiLineQuotedStrings()
@@ -1655,7 +1649,7 @@ YAML;
             ],
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testBlankLinesInQuotedMultiLineString()
@@ -1669,7 +1663,7 @@ YAML;
             'foobar' => "foo\nbar",
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testEscapedQuoteInQuotedMultiLineString()
@@ -1683,7 +1677,7 @@ YAML;
             'foobar' => 'foo "bar" baz',
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testBackslashInQuotedMultiLineString()
@@ -1696,7 +1690,7 @@ YAML;
             'foobar' => 'foo bar\\',
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testParseMultiLineUnquotedString()
@@ -1709,7 +1703,7 @@ foo: bar
 bar: baz
 EOT;
 
-        $this->assertSame(['foo' => 'bar baz foobar foo', 'bar' => 'baz'], $this->parser->parse($yaml));
+        self::assertSame(['foo' => 'bar baz foobar foo', 'bar' => 'baz'], $this->parser->parse($yaml));
     }
 
     /**
@@ -1717,7 +1711,7 @@ EOT;
      */
     public function testParseQuotedStringContainingEscapedQuotationCharacters(string $yaml, array $expected)
     {
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function escapedQuotationCharactersInQuotedStrings()
@@ -1762,12 +1756,12 @@ YAML
 
     public function testBackslashInSingleQuotedString()
     {
-        $this->assertSame(['foo' => 'bar\\'], $this->parser->parse("foo: 'bar\'"));
+        self::assertSame(['foo' => 'bar\\'], $this->parser->parse("foo: 'bar\'"));
     }
 
     public function testParseMultiLineString()
     {
-        $this->assertSame("foo bar\nbaz", $this->parser->parse("foo\nbar\n\nbaz"));
+        self::assertSame("foo bar\nbaz", $this->parser->parse("foo\nbar\n\nbaz"));
     }
 
     /**
@@ -1775,7 +1769,7 @@ YAML
      */
     public function testParseMultiLineMappingValue($yaml, $expected, $parseError)
     {
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function multiLineDataProvider()
@@ -1842,7 +1836,7 @@ EOF;
      */
     public function testInlineNotationSpanningMultipleLines($expected, string $yaml)
     {
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function inlineNotationSpanningMultipleLinesProvider(): array
@@ -2203,8 +2197,8 @@ YAML
 
     public function testRootLevelInlineMappingFollowedByMoreContentIsInvalid()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 2 (near "foobar").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Unable to parse at line 2 (near "foobar").');
 
         $yaml = <<<YAML
 { foo: bar }
@@ -2221,7 +2215,7 @@ YAML;
 
     public function testInvalidInlineSequenceContainingStringWithEscapedQuotationCharacter()
     {
-        $this->expectException(ParseException::class);
+        self::expectException(ParseException::class);
 
         $this->parser->parse('["\\"]');
     }
@@ -2306,41 +2300,41 @@ YAML
 
     public function testNonSpecificTagSupport()
     {
-        $this->assertSame(12, $this->parser->parse('! 12'));
+        self::assertSame(12, $this->parser->parse('! 12'));
     }
 
     public function testCustomTagsDisabled()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Tags support is not enabled. Enable the "Yaml::PARSE_CUSTOM_TAGS" flag to use "!iterator" at line 1 (near "!iterator [foo]").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Tags support is not enabled. Enable the "Yaml::PARSE_CUSTOM_TAGS" flag to use "!iterator" at line 1 (near "!iterator [foo]").');
         $this->parser->parse('!iterator [foo]');
     }
 
     public function testUnsupportedTagWithScalar()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Tags support is not enabled. Enable the "Yaml::PARSE_CUSTOM_TAGS" flag to use "!iterator" at line 1 (near "!iterator foo").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Tags support is not enabled. Enable the "Yaml::PARSE_CUSTOM_TAGS" flag to use "!iterator" at line 1 (near "!iterator foo").');
         $this->parser->parse('!iterator foo');
     }
 
     public function testUnsupportedBuiltInTagWithScalar()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('The string "!!iterator foo" could not be parsed as it uses an unsupported built-in tag at line 1 (near "!!iterator foo").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('The string "!!iterator foo" could not be parsed as it uses an unsupported built-in tag at line 1 (near "!!iterator foo").');
         $this->parser->parse('!!iterator foo');
     }
 
     public function testExceptionWhenUsingUnsupportedBuiltInTags()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('The built-in tag "!!foo" is not implemented at line 1 (near "!!foo").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('The built-in tag "!!foo" is not implemented at line 1 (near "!!foo").');
         $this->parser->parse('!!foo');
     }
 
     public function testComplexMappingThrowsParseException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "? "1"").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Complex mappings are not supported at line 1 (near "? "1"").');
         $yaml = <<<YAML
 ? "1"
 :
@@ -2352,8 +2346,8 @@ YAML;
 
     public function testComplexMappingNestedInMappingThrowsParseException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Complex mappings are not supported at line 2 (near "? "1"").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Complex mappings are not supported at line 2 (near "? "1"").');
         $yaml = <<<YAML
 diet:
   ? "1"
@@ -2366,8 +2360,8 @@ YAML;
 
     public function testComplexMappingNestedInSequenceThrowsParseException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "- ? "1"").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Complex mappings are not supported at line 1 (near "- ? "1"").');
         $yaml = <<<YAML
 - ? "1"
   :
@@ -2379,8 +2373,8 @@ YAML;
 
     public function testParsingIniThrowsException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 2 (near "  foo = bar").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Unable to parse at line 2 (near "  foo = bar").');
         $ini = <<<INI
 [parameters]
   foo = bar
@@ -2427,13 +2421,13 @@ INI;
         $yamlString = Yaml::dump($trickyVal);
         $arrayFromYaml = $this->parser->parse($yamlString);
 
-        $this->assertSame($trickyVal, $arrayFromYaml);
+        self::assertSame($trickyVal, $arrayFromYaml);
     }
 
     public function testParserCleansUpReferencesBetweenRuns()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Reference "foo" does not exist at line 2');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Reference "foo" does not exist at line 2');
         $yaml = <<<YAML
 foo: &foo
     baz: foobar
@@ -2469,13 +2463,13 @@ YAML;
             ],
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+        self::assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
     }
 
     public function testDeprecatedPhpConstantSyntax()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Missing value for tag "php/const:App\Kernel::SEMART_VERSION" at line 1 (near "!php/const:App\Kernel::SEMART_VERSION").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Missing value for tag "php/const:App\Kernel::SEMART_VERSION" at line 1 (near "!php/const:App\Kernel::SEMART_VERSION").');
 
         $this->parser->parse('!php/const:App\Kernel::SEMART_VERSION', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
     }
@@ -2490,7 +2484,7 @@ map2:
   - !php/const 'Symfony\Component\Yaml\Tests\B::FOO': 'value_0'
     bar: 'value_1'
 YAML;
-        $this->assertSame([
+        self::assertSame([
             'map1' => [['foo' => 'value_0', 'bar' => 'value_1']],
             'map2' => [['foo' => 'value_0', 'bar' => 'value_1']],
         ], $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
@@ -2503,7 +2497,7 @@ map1:
   - !!str 0: 'value_0'
     !!str 1: 'value_1'
 YAML;
-        $this->assertSame([
+        self::assertSame([
             'map1' => [['0' => 'value_0', '1' => 'value_1']],
         ], $this->parser->parse($yaml));
     }
@@ -2549,31 +2543,31 @@ YAML;
     {
         $file = __DIR__.'/Fixtures/index.yml';
 
-        $this->assertSame($file, $this->parser->parse($file));
+        self::assertSame($file, $this->parser->parse($file));
     }
 
     public function testParseFile()
     {
-        $this->assertIsArray($this->parser->parseFile(__DIR__.'/Fixtures/index.yml'));
+        self::assertIsArray($this->parser->parseFile(__DIR__.'/Fixtures/index.yml'));
     }
 
     public function testParsingNonExistentFilesThrowsException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessageMatches('#^File ".+/Fixtures/nonexistent.yml" does not exist\.$#');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessageMatches('#^File ".+/Fixtures/nonexistent.yml" does not exist\.$#');
         $this->parser->parseFile(__DIR__.'/Fixtures/nonexistent.yml');
     }
 
     public function testParsingNotReadableFilesThrowsException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessageMatches('#^File ".+/Fixtures/not_readable.yml" cannot be read\.$#');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessageMatches('#^File ".+/Fixtures/not_readable.yml" cannot be read\.$#');
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('chmod is not supported on Windows');
+            self::markTestSkipped('chmod is not supported on Windows');
         }
 
         if (!getenv('USER') || 'root' === getenv('USER')) {
-            $this->markTestSkipped('This test will fail if run under superuser');
+            self::markTestSkipped('This test will fail if run under superuser');
         }
 
         $file = __DIR__.'/Fixtures/not_readable.yml';
@@ -2607,7 +2601,7 @@ YAML;
             ],
         ];
 
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function testParseReferencesOnMergeKeysWithMappingsParsedAsObjects()
@@ -2640,8 +2634,8 @@ YAML;
 
     public function testEvalRefException()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Reference "foo" does not exist');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Reference "foo" does not exist');
         $yaml = <<<EOE
 foo: { &foo { a: Steve, <<: *foo} }
 EOE;
@@ -2653,8 +2647,8 @@ EOE;
      */
     public function testDetectCircularReferences($yaml)
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Circular reference [foo, bar, foo] detected');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Circular reference [foo, bar, foo] detected');
         $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS);
     }
 
@@ -2695,7 +2689,7 @@ YAML;
      */
     public function testParseIndentedMappings($yaml, $expected)
     {
-        $this->assertSame($expected, $this->parser->parse($yaml));
+        self::assertSame($expected, $this->parser->parse($yaml));
     }
 
     public function indentedMappingData()
@@ -2773,7 +2767,7 @@ parameters:
 # Comment
 YAML;
 
-        $this->assertSame(['parameters' => 'abc'], $this->parser->parse($yaml));
+        self::assertSame(['parameters' => 'abc'], $this->parser->parse($yaml));
     }
 
     public function testParseValueWithModifiers()
@@ -2787,14 +2781,11 @@ parameters:
          four
          five
 YAML;
-        $this->assertSame(
-            [
-                'parameters' => [
-                    'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
-                ],
+        self::assertSame([
+            'parameters' => [
+                'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
             ],
-            $this->parser->parse($yaml)
-        );
+        ], $this->parser->parse($yaml));
     }
 
     public function testParseValueWithNegativeModifiers()
@@ -2808,14 +2799,11 @@ parameters:
        four
        five
 YAML;
-        $this->assertSame(
-            [
-                'parameters' => [
-                    'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
-                ],
+        self::assertSame([
+            'parameters' => [
+                'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
             ],
-            $this->parser->parse($yaml)
-        );
+        ], $this->parser->parse($yaml));
     }
 
     public function testThrowExceptionIfInvalidAdditionalClosingTagOccurs()
@@ -2831,8 +2819,8 @@ YAML;
             }
         }';
 
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Malformed unquoted YAML string at line 8 (near "                ],").');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Malformed unquoted YAML string at line 8 (near "                ],").');
 
         $this->parser->parse($yaml);
     }
@@ -2840,32 +2828,23 @@ YAML;
     public function testWhitespaceAtEndOfLine()
     {
         $yaml = "\nfoo:\n    arguments: [ '@bar' ]  \n";
-        $this->assertSame(
-            [
-                'foo' => [
-                    'arguments' => ['@bar'],
-                ],
+        self::assertSame([
+            'foo' => [
+                'arguments' => ['@bar'],
             ],
-            $this->parser->parse($yaml)
-        );
+        ], $this->parser->parse($yaml));
 
         $yaml = "\nfoo:\n    bar: {} \n";
-        $this->assertSame(
-            [
-                'foo' => [
-                    'bar' => [],
-                ],
+        self::assertSame([
+            'foo' => [
+                'bar' => [],
             ],
-            $this->parser->parse($yaml)
-        );
+        ], $this->parser->parse($yaml));
 
-        $this->assertSame(
-            [
-                'foo' => 'bar',
-                'foobar' => 'baz',
-            ],
-            $this->parser->parse("foo: 'bar' \nfoobar: baz")
-        );
+        self::assertSame([
+            'foo' => 'bar',
+            'foobar' => 'baz',
+        ], $this->parser->parse("foo: 'bar' \nfoobar: baz"));
     }
 
     /**
@@ -2892,7 +2871,7 @@ YAML;
 
         // After the total number of lines has been reset the result will be the same as if a new parser was used
         // (before, there was no \n after row2)
-        $this->assertSame(['a' => ['b' => "row\nrow2\n"], 'c' => 'd'], $this->parser->parse($longDocument));
+        self::assertSame(['a' => ['b' => "row\nrow2\n"], 'c' => 'd'], $this->parser->parse($longDocument));
     }
 
     public function testParseIdeographicSpaces()
@@ -2903,7 +2882,7 @@ quoted: '\u{3000}'
 within_string: 'a　b'
 regular_space: 'a b'
 YAML;
-        $this->assertSame([
+        self::assertSame([
             'unquoted' => '　',
             'quoted' => '　',
             'within_string' => 'a　b',
@@ -2913,11 +2892,8 @@ YAML;
 
     private function assertSameData($expected, $actual)
     {
-        $this->assertEquals($expected, $actual);
-        $this->assertSame(
-            var_export($expected, true),
-            var_export($actual, true)
-        );
+        self::assertEquals($expected, $actual);
+        self::assertSame(var_export($expected, true), var_export($actual, true));
     }
 }
 

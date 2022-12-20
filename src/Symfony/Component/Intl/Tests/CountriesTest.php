@@ -527,7 +527,7 @@ class CountriesTest extends ResourceBundleTestCase
 
     public function testGetCountryCodes()
     {
-        $this->assertSame(self::COUNTRIES, Countries::getCountryCodes());
+        self::assertSame(self::COUNTRIES, Countries::getCountryCodes());
     }
 
     /**
@@ -539,14 +539,14 @@ class CountriesTest extends ResourceBundleTestCase
 
         sort($countries);
 
-        $this->assertSame(self::COUNTRIES, $countries);
+        self::assertSame(self::COUNTRIES, $countries);
     }
 
     public function testGetNamesDefaultLocale()
     {
         \Locale::setDefault('de_AT');
 
-        $this->assertSame(Countries::getNames('de_AT'), Countries::getNames());
+        self::assertSame(Countries::getNames('de_AT'), Countries::getNames());
     }
 
     /**
@@ -557,7 +557,7 @@ class CountriesTest extends ResourceBundleTestCase
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(Countries::getNames($ofLocale), Countries::getNames($alias));
+        self::assertEquals(Countries::getNames($ofLocale), Countries::getNames($alias));
     }
 
     /**
@@ -568,7 +568,7 @@ class CountriesTest extends ResourceBundleTestCase
         $names = Countries::getNames($displayLocale);
 
         foreach ($names as $country => $name) {
-            $this->assertSame($name, Countries::getName($country, $displayLocale));
+            self::assertSame($name, Countries::getName($country, $displayLocale));
         }
     }
 
@@ -586,31 +586,31 @@ class CountriesTest extends ResourceBundleTestCase
         \Locale::setDefault('zh');
         $countryNameZh = Countries::getName('AD');
 
-        $this->assertSame($countryNameZhTw, $countryNameHantZhTw, 'zh_TW is an alias to zh_Hant_TW');
-        $this->assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
+        self::assertSame($countryNameZhTw, $countryNameHantZhTw, 'zh_TW is an alias to zh_Hant_TW');
+        self::assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
     }
 
     public function testGetNameWithInvalidCountryCode()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Countries::getName('foo');
     }
 
     public function testExists()
     {
-        $this->assertTrue(Countries::exists('NL'));
-        $this->assertFalse(Countries::exists('ZZ'));
+        self::assertTrue(Countries::exists('NL'));
+        self::assertFalse(Countries::exists('ZZ'));
     }
 
     public function testGetAlpha3Codes()
     {
-        $this->assertSame(self::ALPHA2_TO_ALPHA3, Countries::getAlpha3Codes());
+        self::assertSame(self::ALPHA2_TO_ALPHA3, Countries::getAlpha3Codes());
     }
 
     public function testGetAlpha3Code()
     {
         foreach (self::COUNTRIES as $country) {
-            $this->assertSame(self::ALPHA2_TO_ALPHA3[$country], Countries::getAlpha3Code($country));
+            self::assertSame(self::ALPHA2_TO_ALPHA3[$country], Countries::getAlpha3Code($country));
         }
     }
 
@@ -618,17 +618,17 @@ class CountriesTest extends ResourceBundleTestCase
     {
         foreach (self::COUNTRIES as $alpha2Code) {
             $alpha3Code = self::ALPHA2_TO_ALPHA3[$alpha2Code];
-            $this->assertSame($alpha2Code, Countries::getAlpha2Code($alpha3Code));
+            self::assertSame($alpha2Code, Countries::getAlpha2Code($alpha3Code));
         }
     }
 
     public function testAlpha3CodeExists()
     {
-        $this->assertTrue(Countries::alpha3CodeExists('NOR'));
-        $this->assertTrue(Countries::alpha3CodeExists('NLD'));
-        $this->assertFalse(Countries::alpha3CodeExists('NL'));
-        $this->assertFalse(Countries::alpha3CodeExists('NIO'));
-        $this->assertFalse(Countries::alpha3CodeExists('ZZZ'));
+        self::assertTrue(Countries::alpha3CodeExists('NOR'));
+        self::assertTrue(Countries::alpha3CodeExists('NLD'));
+        self::assertFalse(Countries::alpha3CodeExists('NL'));
+        self::assertFalse(Countries::alpha3CodeExists('NIO'));
+        self::assertFalse(Countries::alpha3CodeExists('ZZZ'));
     }
 
     /**
@@ -640,13 +640,13 @@ class CountriesTest extends ResourceBundleTestCase
 
         foreach ($names as $alpha2 => $name) {
             $alpha3 = self::ALPHA2_TO_ALPHA3[$alpha2];
-            $this->assertSame($name, Countries::getAlpha3Name($alpha3, $displayLocale));
+            self::assertSame($name, Countries::getAlpha3Name($alpha3, $displayLocale));
         }
     }
 
     public function testGetAlpha3NameWithInvalidCountryCode()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
 
         Countries::getAlpha3Name('ZZZ');
     }
@@ -660,9 +660,9 @@ class CountriesTest extends ResourceBundleTestCase
 
         $alpha3Codes = array_keys($names);
         sort($alpha3Codes);
-        $this->assertSame(array_values(self::ALPHA2_TO_ALPHA3), $alpha3Codes);
+        self::assertSame(array_values(self::ALPHA2_TO_ALPHA3), $alpha3Codes);
 
         $alpha2Names = Countries::getNames($displayLocale);
-        $this->assertSame(array_values($alpha2Names), array_values($names));
+        self::assertSame(array_values($alpha2Names), array_values($names));
     }
 }

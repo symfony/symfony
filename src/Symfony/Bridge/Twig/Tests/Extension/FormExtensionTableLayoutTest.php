@@ -49,7 +49,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
             'form_table_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, self::createMock(CsrfTokenManagerInterface::class));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
@@ -62,7 +62,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get">', $html);
+        self::assertSame('<form name="form" method="get">', $html);
     }
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
@@ -74,7 +74,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get" action="0">', $html);
+        self::assertSame('<form name="form" method="get" action="0">', $html);
     }
 
     public function testHelpAttr()

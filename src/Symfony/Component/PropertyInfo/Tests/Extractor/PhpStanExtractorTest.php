@@ -50,12 +50,12 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtract($property, array $type = null)
     {
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        self::assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
     public function testParamTagTypeIsOmitted()
     {
-        $this->assertNull($this->extractor->getTypes(PhpStanOmittedParamTagTypeDocBlock::class, 'omittedType'));
+        self::assertNull($this->extractor->getTypes(PhpStanOmittedParamTagTypeDocBlock::class, 'omittedType'));
     }
 
     public function invalidTypesProvider()
@@ -73,7 +73,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testInvalid($property)
     {
-        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
+        self::assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy', $property));
     }
 
     /**
@@ -83,7 +83,7 @@ class PhpStanExtractorTest extends TestCase
     {
         $noPrefixExtractor = new PhpStanExtractor([], [], []);
 
-        $this->assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        self::assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
     public function typesProvider()
@@ -194,7 +194,7 @@ class PhpStanExtractorTest extends TestCase
     {
         $customExtractor = new PhpStanExtractor(['add', 'remove'], ['is', 'can']);
 
-        $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
+        self::assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
     public function typesWithCustomPrefixesProvider()
@@ -293,7 +293,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testDocBlockFallback($property, $types)
     {
-        $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
+        self::assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
     }
 
     /**
@@ -301,7 +301,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testPropertiesDefinedByTraits(string $property, Type $type)
     {
-        $this->assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
+        self::assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
     }
 
     public function propertiesDefinedByTraitsProvider(): array
@@ -318,7 +318,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testPropertiesStaticType(string $class, string $property, Type $type)
     {
-        $this->assertEquals([$type], $this->extractor->getTypes($class, $property));
+        self::assertEquals([$type], $this->extractor->getTypes($class, $property));
     }
 
     public function propertiesStaticTypeProvider(): array
@@ -334,7 +334,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testPropertiesParentType(string $class, string $property, ?array $types)
     {
-        $this->assertEquals($types, $this->extractor->getTypes($class, $property));
+        self::assertEquals($types, $this->extractor->getTypes($class, $property));
     }
 
     public function propertiesParentTypeProvider(): array
@@ -350,7 +350,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractConstructorTypes($property, array $type = null)
     {
-        $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
+        self::assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }
 
     public function constructorTypesProvider()
@@ -369,7 +369,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractorUnionTypes(string $property, ?array $types)
     {
-        $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyUnionType', $property));
+        self::assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyUnionType', $property));
     }
 
     public function unionTypesProvider(): array
@@ -387,10 +387,7 @@ class PhpStanExtractorTest extends TestCase
 
     public function testDummyNamespace()
     {
-        $this->assertEquals(
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')],
-            $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace', 'dummy')
-        );
+        self::assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')], $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace', 'dummy'));
     }
 
     public function testDummyNamespaceWithProperty()
@@ -398,8 +395,8 @@ class PhpStanExtractorTest extends TestCase
         $phpStanTypes = $this->extractor->getTypes(\B\Dummy::class, 'property');
         $phpDocTypes = $this->phpDocExtractor->getTypes(\B\Dummy::class, 'property');
 
-        $this->assertEquals('A\Property', $phpStanTypes[0]->getClassName());
-        $this->assertEquals($phpDocTypes[0]->getClassName(), $phpStanTypes[0]->getClassName());
+        self::assertEquals('A\Property', $phpStanTypes[0]->getClassName());
+        self::assertEquals($phpDocTypes[0]->getClassName(), $phpStanTypes[0]->getClassName());
     }
 
     /**
@@ -407,7 +404,7 @@ class PhpStanExtractorTest extends TestCase
      */
     public function testExtractorIntRangeType(string $property, ?array $types)
     {
-        $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy', $property));
+        self::assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy', $property));
     }
 
     public function intRangeTypeProvider(): array

@@ -30,7 +30,7 @@ class DumpDataCollectorPassTest extends TestCase
 
         $container->compile();
 
-        $this->assertNull($definition->getArgument(1));
+        self::assertNull($definition->getArgument(1));
     }
 
     public function testProcessWithToolbarEnabled()
@@ -45,7 +45,7 @@ class DumpDataCollectorPassTest extends TestCase
 
         $container->compile();
 
-        $this->assertSame($requestStack, $definition->getArgument(3));
+        self::assertSame($requestStack, $definition->getArgument(3));
     }
 
     public function testProcessWithToolbarDisabled()
@@ -59,7 +59,7 @@ class DumpDataCollectorPassTest extends TestCase
 
         $container->compile();
 
-        $this->assertNull($definition->getArgument(3));
+        self::assertNull($definition->getArgument(3));
     }
 
     public function testProcessWithoutToolbar()
@@ -72,6 +72,6 @@ class DumpDataCollectorPassTest extends TestCase
 
         $container->compile();
 
-        $this->assertNull($definition->getArgument(3));
+        self::assertNull($definition->getArgument(3));
     }
 }

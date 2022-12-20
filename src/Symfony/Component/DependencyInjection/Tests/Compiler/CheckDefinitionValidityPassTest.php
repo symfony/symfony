@@ -21,7 +21,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 {
     public function testProcessDetectsSyntheticNonPublicDefinitions()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(true)->setPublic(false);
 
@@ -30,7 +30,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
 
@@ -44,7 +44,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
         $this->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testProcessDetectsFactoryWithoutClass()
@@ -54,7 +54,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $container->register('.123_anonymous_service_id_should_not_throw_~1234567')->setFactory('factory');
         $this->process($container);
 
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $container->register('.any_non_anonymous_id_throws')->setFactory('factory');
 
         $this->process($container);
@@ -70,7 +70,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
         $this->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testValidTags()
@@ -83,12 +83,12 @@ class CheckDefinitionValidityPassTest extends TestCase
 
         $this->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testInvalidTags()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a', 'class')->addTag('foo', ['bar' => ['baz' => 'baz']]);
 
@@ -97,7 +97,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicServiceName()
     {
-        $this->expectException(EnvParameterException::class);
+        self::expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->register("foo.$env", 'class')->setPublic(true);
@@ -107,7 +107,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicAliasName()
     {
-        $this->expectException(EnvParameterException::class);
+        self::expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->setAlias("foo.$env", 'class')->setPublic(true);
@@ -124,7 +124,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
         $this->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     protected function process(ContainerBuilder $container)

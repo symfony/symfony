@@ -32,11 +32,11 @@ class TagAwareAndProxyAdapterIntegrationTest extends TestCase
         $item->set('bar');
         $cache->save($item);
 
-        $this->assertSame('bar', $cache->getItem('foo')->get());
+        self::assertSame('bar', $cache->getItem('foo')->get());
 
         $cache->invalidateTags(['tag2']);
 
-        $this->assertFalse($cache->getItem('foo')->isHit());
+        self::assertFalse($cache->getItem('foo')->isHit());
     }
 
     public function testIntegrationUsingProxiedAdapterForTagsPool()
@@ -50,12 +50,12 @@ class TagAwareAndProxyAdapterIntegrationTest extends TestCase
         $item->set('bar');
         $cache->save($item);
 
-        $this->assertSame('bar', $cache->getItem('foo')->get());
-        $this->assertTrue($cache->getItem('foo')->isHit());
+        self::assertSame('bar', $cache->getItem('foo')->get());
+        self::assertTrue($cache->getItem('foo')->isHit());
 
         $cache->invalidateTags(['baz']);
 
-        $this->assertFalse($cache->getItem('foo')->isHit());
+        self::assertFalse($cache->getItem('foo')->isHit());
     }
 
     public function dataProvider(): array

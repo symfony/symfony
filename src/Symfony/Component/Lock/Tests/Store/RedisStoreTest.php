@@ -47,7 +47,7 @@ class RedisStoreTest extends AbstractRedisStoreTest
 
     public function testInvalidTtl()
     {
-        $this->expectException(InvalidTtlException::class);
+        self::expectException(InvalidTtlException::class);
         new RedisStore($this->getRedisConnection(), -1);
     }
 }

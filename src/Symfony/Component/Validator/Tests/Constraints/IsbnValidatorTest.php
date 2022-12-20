@@ -139,7 +139,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $constraint = new Isbn(true);
 
         $this->validator->validate(new \stdClass(), $constraint);

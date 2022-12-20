@@ -29,7 +29,7 @@ final class OhMySmtpApiTransportTest extends TestCase
      */
     public function testToString(OhMySmtpApiTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData(): array
@@ -61,24 +61,24 @@ final class OhMySmtpApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('Headers', $payload);
-        $this->assertCount(1, $payload['Headers']);
+        self::assertArrayHasKey('Headers', $payload);
+        self::assertCount(1, $payload['Headers']);
 
-        $this->assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
+        self::assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
     }
 
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://app.ohmysmtp.com/api/v1/send', $url);
-            $this->assertStringContainsStringIgnoringCase('OhMySMTP-Server-Token: KEY', $options['headers'][1] ?? $options['request_headers'][1]);
+            self::assertSame('POST', $method);
+            self::assertSame('https://app.ohmysmtp.com/api/v1/send', $url);
+            self::assertStringContainsStringIgnoringCase('OhMySMTP-Server-Token: KEY', $options['headers'][1] ?? $options['request_headers'][1]);
 
             $body = json_decode($options['body'], true);
-            $this->assertSame('"Fabien" <fabpot@symfony.com>', $body['from']);
-            $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $body['to']);
-            $this->assertSame('Hello!', $body['subject']);
-            $this->assertSame('Hello There!', $body['textbody']);
+            self::assertSame('"Fabien" <fabpot@symfony.com>', $body['from']);
+            self::assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $body['to']);
+            self::assertSame('Hello!', $body['subject']);
+            self::assertSame('Hello There!', $body['textbody']);
 
             return new MockResponse(json_encode(['id' => 'foobar', 'status' => 'pending']), [
                 'http_code' => 200,
@@ -95,7 +95,7 @@ final class OhMySmtpApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        self::assertSame('foobar', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()
@@ -117,8 +117,8 @@ final class OhMySmtpApiTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: {"error":"i\'m a teapot"}');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: {"error":"i\'m a teapot"}');
         $transport->send($mail);
     }
 
@@ -141,8 +141,8 @@ final class OhMySmtpApiTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: {"errors":{"to":"undefined field"}}');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: {"errors":{"to":"undefined field"}}');
         $transport->send($mail);
     }
 
@@ -159,9 +159,9 @@ final class OhMySmtpApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayNotHasKey('Headers', $payload);
-        $this->assertArrayHasKey('tags', $payload);
+        self::assertArrayNotHasKey('Headers', $payload);
+        self::assertArrayHasKey('tags', $payload);
 
-        $this->assertSame(['password-reset', '2nd-tag'], $payload['tags']);
+        self::assertSame(['password-reset', '2nd-tag'], $payload['tags']);
     }
 }

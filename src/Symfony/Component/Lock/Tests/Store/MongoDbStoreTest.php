@@ -78,7 +78,7 @@ class MongoDbStoreTest extends AbstractStoreTest
         foreach ($collection->listIndexes() as $index) {
             $indexes[] = $index->getName();
         }
-        $this->assertContains('expires_at_1', $indexes);
+        self::assertContains('expires_at_1', $indexes);
     }
 
     /**
@@ -91,10 +91,10 @@ class MongoDbStoreTest extends AbstractStoreTest
         $store = new MongoDbStore($mongo, $options);
 
         $store->save($key);
-        $this->assertTrue($store->exists($key));
+        self::assertTrue($store->exists($key));
 
         $store->delete($key);
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
     }
 
     public function provideConstructorArgs()
@@ -124,8 +124,8 @@ class MongoDbStoreTest extends AbstractStoreTest
         $optionsProperty->setAccessible(true);
         $options = $optionsProperty->getValue($store);
 
-        $this->assertSame('test_uri', $options['database']);
-        $this->assertSame('lock_uri', $options['collection']);
+        self::assertSame('test_uri', $options['database']);
+        self::assertSame('lock_uri', $options['collection']);
     }
 
     /**
@@ -133,7 +133,7 @@ class MongoDbStoreTest extends AbstractStoreTest
      */
     public function testInvalidConstructionMethods($mongo, array $options)
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
         new MongoDbStore($mongo, $options);
     }
@@ -162,7 +162,7 @@ class MongoDbStoreTest extends AbstractStoreTest
         $uriProperty = $storeReflection->getProperty('uri');
         $uriProperty->setAccessible(true);
         $uri = $uriProperty->getValue($store);
-        $this->assertSame($driverUri, $uri);
+        self::assertSame($driverUri, $uri);
     }
 
     public function provideUriCollectionStripArgs()

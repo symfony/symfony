@@ -96,8 +96,8 @@ class ValidationListenerTest extends TestCase
         $listener = new ValidationListener($validator, new ViolationMapper());
         $listener->validateForm(new FormEvent($form, null));
 
-        $this->assertCount(1, $form->getErrors());
-        $this->assertSame($violation, $form->getErrors()[0]->getCause());
+        self::assertCount(1, $form->getErrors());
+        self::assertSame($violation, $form->getErrors()[0]->getCause());
     }
 
     public function testMapViolationAllowsNonSyncIfInvalid()
@@ -109,8 +109,8 @@ class ValidationListenerTest extends TestCase
         $listener = new ValidationListener($validator, new ViolationMapper());
         $listener->validateForm(new FormEvent($form, null));
 
-        $this->assertCount(1, $form->getErrors());
-        $this->assertSame($violation, $form->getErrors()[0]->getCause());
+        self::assertCount(1, $form->getErrors());
+        self::assertSame($violation, $form->getErrors()[0]->getCause());
     }
 
     public function testValidateIgnoresNonRoot()
@@ -124,7 +124,7 @@ class ValidationListenerTest extends TestCase
 
         $this->listener->validateForm(new FormEvent($childForm, null));
 
-        $this->assertTrue($childForm->isValid());
+        self::assertTrue($childForm->isValid());
     }
 
     public function testValidateWithEmptyViolationList()
@@ -134,7 +134,7 @@ class ValidationListenerTest extends TestCase
 
         $this->listener->validateForm(new FormEvent($form, null));
 
-        $this->assertTrue($form->isValid());
+        self::assertTrue($form->isValid());
     }
 }
 

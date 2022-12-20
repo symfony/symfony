@@ -21,7 +21,7 @@ final class EnvConfiguratorTest extends TestCase
      */
     public function test(string $expected, EnvConfigurator $envConfigurator)
     {
-        $this->assertSame($expected, (string) $envConfigurator);
+        self::assertSame($expected, (string) $envConfigurator);
     }
 
     public function provide()

@@ -24,12 +24,12 @@ class StopWorkerOnTimeLimitListenerTest extends TestCase
      */
     public function testWorkerStopsWhenTimeLimitIsReached()
     {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('info')
+        $logger = self::createMock(LoggerInterface::class);
+        $logger->expects(self::once())->method('info')
             ->with('Worker stopped due to time limit of {timeLimit}s exceeded', ['timeLimit' => 1]);
 
-        $worker = $this->createMock(Worker::class);
-        $worker->expects($this->once())->method('stop');
+        $worker = self::createMock(Worker::class);
+        $worker->expects(self::once())->method('stop');
         $event = new WorkerRunningEvent($worker, false);
 
         $timeoutListener = new StopWorkerOnTimeLimitListener(1, $logger);

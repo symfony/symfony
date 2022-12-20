@@ -25,6 +25,6 @@ foo', 'foo;foo' => 'bar']);
 
         $dumper = new CsvFileDumper();
 
-        $this->assertStringEqualsFile(__DIR__.'/../fixtures/valid.csv', $dumper->formatCatalogue($catalogue, 'messages'));
+        self::assertStringEqualsFile(__DIR__.'/../fixtures/valid.csv', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 }

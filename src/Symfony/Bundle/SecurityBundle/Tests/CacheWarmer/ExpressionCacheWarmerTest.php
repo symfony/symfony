@@ -22,8 +22,8 @@ class ExpressionCacheWarmerTest extends TestCase
     {
         $expressions = [new Expression('A'), new Expression('B')];
 
-        $expressionLang = $this->createMock(ExpressionLanguage::class);
-        $expressionLang->expects($this->exactly(2))
+        $expressionLang = self::createMock(ExpressionLanguage::class);
+        $expressionLang->expects(self::exactly(2))
             ->method('parse')
             ->withConsecutive(
                 [$expressions[0], ['token', 'user', 'object', 'subject', 'role_names', 'request', 'trust_resolver']],

@@ -24,7 +24,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
     {
         $form = $this->createForm();
 
-        $this->assertNull($form->getConfig()->getOption('validation_groups'));
+        self::assertNull($form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsTransformedToArray()
@@ -33,7 +33,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => 'group',
         ]);
 
-        $this->assertEquals(['group'], $form->getConfig()->getOption('validation_groups'));
+        self::assertEquals(['group'], $form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToArray()
@@ -42,7 +42,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => ['group1', 'group2'],
         ]);
 
-        $this->assertEquals(['group1', 'group2'], $form->getConfig()->getOption('validation_groups'));
+        self::assertEquals(['group1', 'group2'], $form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToFalse()
@@ -51,7 +51,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => false,
         ]);
 
-        $this->assertEquals([], $form->getConfig()->getOption('validation_groups'));
+        self::assertEquals([], $form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToCallback()
@@ -60,7 +60,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => [$this, 'testValidationGroupsCanBeSetToCallback'],
         ]);
 
-        $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));
+        self::assertIsCallable($form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToClosure()
@@ -69,7 +69,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => function (FormInterface $form) { },
         ]);
 
-        $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));
+        self::assertIsCallable($form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToGroupSequence()
@@ -78,7 +78,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => new GroupSequence(['group1', 'group2']),
         ]);
 
-        $this->assertInstanceOf(GroupSequence::class, $form->getConfig()->getOption('validation_groups'));
+        self::assertInstanceOf(GroupSequence::class, $form->getConfig()->getOption('validation_groups'));
     }
 
     abstract protected function createForm(array $options = []);

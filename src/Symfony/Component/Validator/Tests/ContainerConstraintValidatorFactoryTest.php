@@ -24,7 +24,7 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
     public function testGetInstanceCreatesValidator()
     {
         $factory = new ContainerConstraintValidatorFactory(new Container());
-        $this->assertInstanceOf(DummyConstraintValidator::class, $factory->getInstance(new DummyConstraint()));
+        self::assertInstanceOf(DummyConstraintValidator::class, $factory->getInstance(new DummyConstraint()));
     }
 
     public function testGetInstanceReturnsExistingValidator()
@@ -32,7 +32,7 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
         $factory = new ContainerConstraintValidatorFactory(new Container());
         $v1 = $factory->getInstance(new BlankConstraint());
         $v2 = $factory->getInstance(new BlankConstraint());
-        $this->assertSame($v1, $v2);
+        self::assertSame($v1, $v2);
     }
 
     public function testGetInstanceReturnsService()
@@ -43,15 +43,15 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 
         $factory = new ContainerConstraintValidatorFactory($container);
 
-        $this->assertSame($validator, $factory->getInstance(new DummyConstraint()));
+        self::assertSame($validator, $factory->getInstance(new DummyConstraint()));
     }
 
     public function testGetInstanceInvalidValidatorClass()
     {
-        $this->expectException(ValidatorException::class);
-        $constraint = $this->createMock(Constraint::class);
+        self::expectException(ValidatorException::class);
+        $constraint = self::createMock(Constraint::class);
         $constraint
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validatedBy')
             ->willReturn('Fully\\Qualified\\ConstraintValidator\\Class\\Name');
 

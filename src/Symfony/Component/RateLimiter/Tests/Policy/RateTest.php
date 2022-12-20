@@ -21,7 +21,7 @@ class RateTest extends TestCase
      */
     public function testFromString(Rate $rate)
     {
-        $this->assertEquals($rate, Rate::fromString((string) $rate));
+        self::assertEquals($rate, Rate::fromString((string) $rate));
     }
 
     public function provideRate(): iterable

@@ -34,7 +34,7 @@ class RedisTagAwareClusterAdapterTest extends RedisClusterAdapterTest
             self::$redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);
         }
 
-        $this->assertInstanceOf(RedisClusterProxy::class, self::$redis);
+        self::assertInstanceOf(RedisClusterProxy::class, self::$redis);
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 
         return $adapter;

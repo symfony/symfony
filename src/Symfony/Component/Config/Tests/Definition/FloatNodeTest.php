@@ -25,7 +25,7 @@ class FloatNodeTest extends TestCase
     public function testNormalize($value)
     {
         $node = new FloatNode('test');
-        $this->assertSame($value, $node->normalize($value));
+        self::assertSame($value, $node->normalize($value));
     }
 
     /**
@@ -38,7 +38,7 @@ class FloatNodeTest extends TestCase
         $node = new FloatNode('test');
         $node->setAllowEmptyValue(false);
 
-        $this->assertSame($value, $node->finalize($value));
+        self::assertSame($value, $node->finalize($value));
     }
 
     public function getValidValues(): array
@@ -60,7 +60,7 @@ class FloatNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException(InvalidTypeException::class);
+        self::expectException(InvalidTypeException::class);
         $node = new FloatNode('test');
         $node->normalize($value);
     }

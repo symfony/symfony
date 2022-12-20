@@ -22,7 +22,7 @@ class GroupsTest extends TestCase
 {
     public function testEmptyGroupsParameter()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new Groups([]);
     }
 
@@ -31,7 +31,7 @@ class GroupsTest extends TestCase
      */
     public function testEmptyGroupsParameterLegacy()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new Groups(['value' => []]);
     }
 
@@ -40,13 +40,13 @@ class GroupsTest extends TestCase
      */
     public function testNotAnArrayGroupsParameter()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new Groups(['value' => 12]);
     }
 
     public function testInvalidGroupsParameter()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new Groups(['a', 1, new \stdClass()]);
     }
 
@@ -55,7 +55,7 @@ class GroupsTest extends TestCase
         $validData = ['a', 'b'];
 
         $groups = new Groups($validData);
-        $this->assertEquals($validData, $groups->getGroups());
+        self::assertEquals($validData, $groups->getGroups());
     }
 
     /**
@@ -66,13 +66,13 @@ class GroupsTest extends TestCase
         $validData = ['a', 'b'];
 
         $groups = new Groups(['value' => $validData]);
-        $this->assertEquals($validData, $groups->getGroups());
+        self::assertEquals($validData, $groups->getGroups());
     }
 
     public function testSingleGroup()
     {
         $groups = new Groups('a');
-        $this->assertEquals(['a'], $groups->getGroups());
+        self::assertEquals(['a'], $groups->getGroups());
     }
 
     /**
@@ -81,6 +81,6 @@ class GroupsTest extends TestCase
     public function testSingleGroupLegacy()
     {
         $groups = new Groups(['value' => 'a']);
-        $this->assertEquals(['a'], $groups->getGroups());
+        self::assertEquals(['a'], $groups->getGroups());
     }
 }

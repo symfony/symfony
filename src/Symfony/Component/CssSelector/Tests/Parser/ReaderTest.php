@@ -19,78 +19,78 @@ class ReaderTest extends TestCase
     public function testIsEOF()
     {
         $reader = new Reader('');
-        $this->assertTrue($reader->isEOF());
+        self::assertTrue($reader->isEOF());
 
         $reader = new Reader('hello');
-        $this->assertFalse($reader->isEOF());
+        self::assertFalse($reader->isEOF());
 
         $this->assignPosition($reader, 2);
-        $this->assertFalse($reader->isEOF());
+        self::assertFalse($reader->isEOF());
 
         $this->assignPosition($reader, 5);
-        $this->assertTrue($reader->isEOF());
+        self::assertTrue($reader->isEOF());
     }
 
     public function testGetRemainingLength()
     {
         $reader = new Reader('hello');
-        $this->assertEquals(5, $reader->getRemainingLength());
+        self::assertEquals(5, $reader->getRemainingLength());
 
         $this->assignPosition($reader, 2);
-        $this->assertEquals(3, $reader->getRemainingLength());
+        self::assertEquals(3, $reader->getRemainingLength());
 
         $this->assignPosition($reader, 5);
-        $this->assertEquals(0, $reader->getRemainingLength());
+        self::assertEquals(0, $reader->getRemainingLength());
     }
 
     public function testGetSubstring()
     {
         $reader = new Reader('hello');
-        $this->assertEquals('he', $reader->getSubstring(2));
-        $this->assertEquals('el', $reader->getSubstring(2, 1));
+        self::assertEquals('he', $reader->getSubstring(2));
+        self::assertEquals('el', $reader->getSubstring(2, 1));
 
         $this->assignPosition($reader, 2);
-        $this->assertEquals('ll', $reader->getSubstring(2));
-        $this->assertEquals('lo', $reader->getSubstring(2, 1));
+        self::assertEquals('ll', $reader->getSubstring(2));
+        self::assertEquals('lo', $reader->getSubstring(2, 1));
     }
 
     public function testGetOffset()
     {
         $reader = new Reader('hello');
-        $this->assertEquals(2, $reader->getOffset('ll'));
-        $this->assertFalse($reader->getOffset('w'));
+        self::assertEquals(2, $reader->getOffset('ll'));
+        self::assertFalse($reader->getOffset('w'));
 
         $this->assignPosition($reader, 2);
-        $this->assertEquals(0, $reader->getOffset('ll'));
-        $this->assertFalse($reader->getOffset('he'));
+        self::assertEquals(0, $reader->getOffset('ll'));
+        self::assertFalse($reader->getOffset('he'));
     }
 
     public function testFindPattern()
     {
         $reader = new Reader('hello');
 
-        $this->assertFalse($reader->findPattern('/world/'));
-        $this->assertEquals(['hello', 'h'], $reader->findPattern('/^([a-z]).*/'));
+        self::assertFalse($reader->findPattern('/world/'));
+        self::assertEquals(['hello', 'h'], $reader->findPattern('/^([a-z]).*/'));
 
         $this->assignPosition($reader, 2);
-        $this->assertFalse($reader->findPattern('/^h.*/'));
-        $this->assertEquals(['llo'], $reader->findPattern('/^llo$/'));
+        self::assertFalse($reader->findPattern('/^h.*/'));
+        self::assertEquals(['llo'], $reader->findPattern('/^llo$/'));
     }
 
     public function testMoveForward()
     {
         $reader = new Reader('hello');
-        $this->assertEquals(0, $reader->getPosition());
+        self::assertEquals(0, $reader->getPosition());
 
         $reader->moveForward(2);
-        $this->assertEquals(2, $reader->getPosition());
+        self::assertEquals(2, $reader->getPosition());
     }
 
     public function testToEnd()
     {
         $reader = new Reader('hello');
         $reader->moveToEnd();
-        $this->assertTrue($reader->isEOF());
+        self::assertTrue($reader->isEOF());
     }
 
     private function assignPosition(Reader $reader, int $value)

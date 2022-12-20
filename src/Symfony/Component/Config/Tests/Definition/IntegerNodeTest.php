@@ -23,7 +23,7 @@ class IntegerNodeTest extends TestCase
     public function testNormalize(int $value)
     {
         $node = new IntegerNode('test');
-        $this->assertSame($value, $node->normalize($value));
+        self::assertSame($value, $node->normalize($value));
     }
 
     /**
@@ -34,7 +34,7 @@ class IntegerNodeTest extends TestCase
         $node = new IntegerNode('test');
         $node->setAllowEmptyValue(false);
 
-        $this->assertSame($value, $node->finalize($value));
+        self::assertSame($value, $node->finalize($value));
     }
 
     public function getValidValues(): array
@@ -51,7 +51,7 @@ class IntegerNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException(InvalidTypeException::class);
+        self::expectException(InvalidTypeException::class);
         $node = new IntegerNode('test');
         $node->normalize($value);
     }

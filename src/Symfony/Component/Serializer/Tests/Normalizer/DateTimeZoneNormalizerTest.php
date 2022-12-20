@@ -33,45 +33,45 @@ class DateTimeZoneNormalizerTest extends TestCase
 
     public function testSupportsNormalization()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new \DateTimeZone('UTC')));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \DateTimeImmutable()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertTrue($this->normalizer->supportsNormalization(new \DateTimeZone('UTC')));
+        self::assertFalse($this->normalizer->supportsNormalization(new \DateTimeImmutable()));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     public function testNormalize()
     {
-        $this->assertEquals('UTC', $this->normalizer->normalize(new \DateTimeZone('UTC')));
-        $this->assertEquals('Asia/Tokyo', $this->normalizer->normalize(new \DateTimeZone('Asia/Tokyo')));
+        self::assertEquals('UTC', $this->normalizer->normalize(new \DateTimeZone('UTC')));
+        self::assertEquals('Asia/Tokyo', $this->normalizer->normalize(new \DateTimeZone('Asia/Tokyo')));
     }
 
     public function testNormalizeBadObjectTypeThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $this->normalizer->normalize(new \stdClass());
     }
 
     public function testSupportsDenormalization()
     {
-        $this->assertTrue($this->normalizer->supportsDenormalization(null, \DateTimeZone::class));
-        $this->assertFalse($this->normalizer->supportsDenormalization(null, \DateTimeImmutable::class));
-        $this->assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
+        self::assertTrue($this->normalizer->supportsDenormalization(null, \DateTimeZone::class));
+        self::assertFalse($this->normalizer->supportsDenormalization(null, \DateTimeImmutable::class));
+        self::assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
     }
 
     public function testDenormalize()
     {
-        $this->assertEquals(new \DateTimeZone('UTC'), $this->normalizer->denormalize('UTC', \DateTimeZone::class, null));
-        $this->assertEquals(new \DateTimeZone('Asia/Tokyo'), $this->normalizer->denormalize('Asia/Tokyo', \DateTimeZone::class, null));
+        self::assertEquals(new \DateTimeZone('UTC'), $this->normalizer->denormalize('UTC', \DateTimeZone::class, null));
+        self::assertEquals(new \DateTimeZone('Asia/Tokyo'), $this->normalizer->denormalize('Asia/Tokyo', \DateTimeZone::class, null));
     }
 
     public function testDenormalizeNullTimeZoneThrowsException()
     {
-        $this->expectException(NotNormalizableValueException::class);
+        self::expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize(null, \DateTimeZone::class, null);
     }
 
     public function testDenormalizeBadTimeZoneThrowsException()
     {
-        $this->expectException(NotNormalizableValueException::class);
+        self::expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize('Jupiter/Europa', \DateTimeZone::class, null);
     }
 }

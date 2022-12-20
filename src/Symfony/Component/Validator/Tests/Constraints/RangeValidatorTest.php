@@ -591,8 +591,8 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testThrowsOnInvalidStringDates($expectedMessage, $value, $min, $max)
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage($expectedMessage);
 
         $this->validator->validate($value, new Range([
             'min' => $min,

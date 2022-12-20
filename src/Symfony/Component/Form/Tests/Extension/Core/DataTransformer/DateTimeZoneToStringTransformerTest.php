@@ -21,33 +21,33 @@ class DateTimeZoneToStringTransformerTest extends TestCase
     {
         $transformer = new DateTimeZoneToStringTransformer();
 
-        $this->assertNull($transformer->transform(null));
-        $this->assertNull($transformer->reverseTransform(null));
+        self::assertNull($transformer->transform(null));
+        self::assertNull($transformer->reverseTransform(null));
 
-        $this->assertSame('Europe/Amsterdam', $transformer->transform(new \DateTimeZone('Europe/Amsterdam')));
-        $this->assertEquals(new \DateTimeZone('Europe/Amsterdam'), $transformer->reverseTransform('Europe/Amsterdam'));
+        self::assertSame('Europe/Amsterdam', $transformer->transform(new \DateTimeZone('Europe/Amsterdam')));
+        self::assertEquals(new \DateTimeZone('Europe/Amsterdam'), $transformer->reverseTransform('Europe/Amsterdam'));
     }
 
     public function testMultiple()
     {
         $transformer = new DateTimeZoneToStringTransformer(true);
 
-        $this->assertNull($transformer->transform(null));
-        $this->assertNull($transformer->reverseTransform(null));
+        self::assertNull($transformer->transform(null));
+        self::assertNull($transformer->reverseTransform(null));
 
-        $this->assertSame(['Europe/Amsterdam'], $transformer->transform([new \DateTimeZone('Europe/Amsterdam')]));
-        $this->assertEquals([new \DateTimeZone('Europe/Amsterdam')], $transformer->reverseTransform(['Europe/Amsterdam']));
+        self::assertSame(['Europe/Amsterdam'], $transformer->transform([new \DateTimeZone('Europe/Amsterdam')]));
+        self::assertEquals([new \DateTimeZone('Europe/Amsterdam')], $transformer->reverseTransform(['Europe/Amsterdam']));
     }
 
     public function testInvalidTimezone()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         (new DateTimeZoneToStringTransformer())->transform(1);
     }
 
     public function testUnknownTimezone()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         (new DateTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);
     }
 }

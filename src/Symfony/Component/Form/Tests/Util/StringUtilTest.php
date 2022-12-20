@@ -29,7 +29,7 @@ class StringUtilTest extends TestCase
      */
     public function testTrim($data, $expectedData)
     {
-        $this->assertSame($expectedData, StringUtil::trim($data));
+        self::assertSame($expectedData, StringUtil::trim($data));
     }
 
     /**
@@ -46,7 +46,7 @@ class StringUtilTest extends TestCase
         $symbol = mb_convert_encoding($binary, 'UTF-8', 'UCS-2BE');
         $symbol .= "ab\ncd".$symbol;
 
-        $this->assertSame("ab\ncd", StringUtil::trim($symbol));
+        self::assertSame("ab\ncd", StringUtil::trim($symbol));
     }
 
     public function spaceProvider()
@@ -94,7 +94,7 @@ class StringUtilTest extends TestCase
     {
         $blockPrefix = StringUtil::fqcnToBlockPrefix($fqcn);
 
-        $this->assertSame($expectedBlockPrefix, $blockPrefix);
+        self::assertSame($expectedBlockPrefix, $blockPrefix);
     }
 
     public function fqcnToBlockPrefixProvider()

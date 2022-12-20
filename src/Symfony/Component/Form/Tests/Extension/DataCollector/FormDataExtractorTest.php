@@ -52,7 +52,7 @@ class FormDataExtractorTest extends TestCase
             ->setType(new ResolvedFormType(new HiddenType()))
             ->getForm();
 
-        $this->assertSame([
+        self::assertSame([
             'id' => 'name',
             'name' => 'name',
             'type_class' => HiddenType::class,
@@ -77,7 +77,7 @@ class FormDataExtractorTest extends TestCase
             ->setAttribute('data_collector/passed_options', $options)
             ->getForm();
 
-        $this->assertSame([
+        self::assertSame([
             'id' => 'name',
             'name' => 'name',
             'type_class' => HiddenType::class,
@@ -103,7 +103,7 @@ class FormDataExtractorTest extends TestCase
             ->setType(new ResolvedFormType(new HiddenType()))
             ->getForm();
 
-        $this->assertSame([
+        self::assertSame([
             'id' => 'name',
             'name' => 'name',
             'type_class' => HiddenType::class,
@@ -134,7 +134,7 @@ class FormDataExtractorTest extends TestCase
         $grandParent->add($parent);
         $parent->add($form);
 
-        $this->assertSame([
+        self::assertSame([
             'id' => 'grandParent_parent_name',
             'name' => 'name',
             'type_class' => HiddenType::class,
@@ -150,7 +150,7 @@ class FormDataExtractorTest extends TestCase
 
         $form->setData('Foobar');
 
-        $this->assertSame([
+        self::assertSame([
             'default_data' => [
                 'norm' => 'Foobar',
             ],
@@ -168,7 +168,7 @@ class FormDataExtractorTest extends TestCase
 
         $form->setData('Foo');
 
-        $this->assertSame([
+        self::assertSame([
             'default_data' => [
                 'norm' => 'Bar',
                 'model' => 'Foo',
@@ -187,7 +187,7 @@ class FormDataExtractorTest extends TestCase
 
         $form->setData('Foo');
 
-        $this->assertSame([
+        self::assertSame([
             'default_data' => [
                 'norm' => 'Foo',
                 'view' => 'Bar',
@@ -202,7 +202,7 @@ class FormDataExtractorTest extends TestCase
 
         $form->submit('Foobar');
 
-        $this->assertSame([
+        self::assertSame([
             'submitted_data' => [
                 'norm' => 'Foobar',
             ],
@@ -222,7 +222,7 @@ class FormDataExtractorTest extends TestCase
 
         $form->submit('Bar');
 
-        $this->assertSame([
+        self::assertSame([
             'submitted_data' => [
                 'norm' => 'Bar',
                 'model' => 'Foo',
@@ -243,7 +243,7 @@ class FormDataExtractorTest extends TestCase
 
         $form->submit('Bar');
 
-        $this->assertSame([
+        self::assertSame([
             'submitted_data' => [
                 'norm' => 'Foo',
                 'view' => 'Bar',
@@ -260,7 +260,7 @@ class FormDataExtractorTest extends TestCase
         $form->submit('Foobar');
         $form->addError(new FormError('Invalid!'));
 
-        $this->assertSame([
+        self::assertSame([
             'submitted_data' => [
                 'norm' => 'Foobar',
             ],
@@ -281,7 +281,7 @@ class FormDataExtractorTest extends TestCase
         $form->submit('Foobar');
         $form->addError($error);
 
-        $this->assertSame([
+        self::assertSame([
             'submitted_data' => [
                 'norm' => 'Foobar',
             ],
@@ -350,7 +350,7 @@ EODUMP
 
         $form->submit('Foobar');
 
-        $this->assertSame([
+        self::assertSame([
             'submitted_data' => [
                 'norm' => 'Foobar',
                 'model' => null,
@@ -372,7 +372,7 @@ EODUMP
             'name' => 'bar',
         ];
 
-        $this->assertSame([
+        self::assertSame([
             'id' => 'foo_bar',
             'name' => 'bar',
             'view_vars' => [

@@ -27,10 +27,10 @@ class PostgreSqlConnectionTest extends TestCase
 {
     public function testSerialize()
     {
-        $this->expectException(\BadMethodCallException::class);
-        $this->expectExceptionMessage('Cannot serialize '.PostgreSqlConnection::class);
+        self::expectException(\BadMethodCallException::class);
+        self::expectExceptionMessage('Cannot serialize '.PostgreSqlConnection::class);
 
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = self::createMock(\Doctrine\DBAL\Connection::class);
 
         $connection = new PostgreSqlConnection([], $driverConnection);
         serialize($connection);
@@ -38,10 +38,10 @@ class PostgreSqlConnectionTest extends TestCase
 
     public function testUnserialize()
     {
-        $this->expectException(\BadMethodCallException::class);
-        $this->expectExceptionMessage('Cannot unserialize '.PostgreSqlConnection::class);
+        self::expectException(\BadMethodCallException::class);
+        self::expectExceptionMessage('Cannot unserialize '.PostgreSqlConnection::class);
 
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = self::createMock(\Doctrine\DBAL\Connection::class);
 
         $connection = new PostgreSqlConnection([], $driverConnection);
         $connection->__wakeup();
@@ -49,7 +49,7 @@ class PostgreSqlConnectionTest extends TestCase
 
     public function testListenOnConnection()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = self::createMock(\Doctrine\DBAL\Connection::class);
 
         $driverConnection
             ->expects(self::any())
@@ -106,45 +106,45 @@ class PostgreSqlConnectionTest extends TestCase
         $connection->get();
         $connection->get();
 
-        $this->assertSame(2, $wrappedConnection->countNotifyCalls());
+        self::assertSame(2, $wrappedConnection->countNotifyCalls());
     }
 
     public function testGetExtraSetupSql()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = self::createMock(\Doctrine\DBAL\Connection::class);
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
         $table = new Table('queue_table');
         $table->addOption('_symfony_messenger_table_name', 'queue_table');
         $sql = implode("\n", $connection->getExtraSetupSqlForTable($table));
 
-        $this->assertStringContainsString('CREATE TRIGGER', $sql);
+        self::assertStringContainsString('CREATE TRIGGER', $sql);
 
         // We MUST NOT use transaction, that will mess with the PDO in PHP 8
-        $this->assertStringNotContainsString('BEGIN;', $sql);
-        $this->assertStringNotContainsString('COMMIT;', $sql);
+        self::assertStringNotContainsString('BEGIN;', $sql);
+        self::assertStringNotContainsString('COMMIT;', $sql);
     }
 
     public function testTransformTableNameWithSchemaToValidProcedureName()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = self::createMock(\Doctrine\DBAL\Connection::class);
         $connection = new PostgreSqlConnection(['table_name' => 'schema.queue_table'], $driverConnection);
 
         $table = new Table('schema.queue_table');
         $table->addOption('_symfony_messenger_table_name', 'schema.queue_table');
         $sql = implode("\n", $connection->getExtraSetupSqlForTable($table));
 
-        $this->assertStringContainsString('CREATE OR REPLACE FUNCTION schema.notify_queue_table', $sql);
-        $this->assertStringContainsString('FOR EACH ROW EXECUTE PROCEDURE schema.notify_queue_table()', $sql);
+        self::assertStringContainsString('CREATE OR REPLACE FUNCTION schema.notify_queue_table', $sql);
+        self::assertStringContainsString('FOR EACH ROW EXECUTE PROCEDURE schema.notify_queue_table()', $sql);
     }
 
     public function testGetExtraSetupSqlWrongTable()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = self::createMock(\Doctrine\DBAL\Connection::class);
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
         $table = new Table('queue_table');
         // don't set the _symfony_messenger_table_name option
-        $this->assertSame([], $connection->getExtraSetupSqlForTable($table));
+        self::assertSame([], $connection->getExtraSetupSqlForTable($table));
     }
 }

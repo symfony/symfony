@@ -90,21 +90,18 @@ class SMimeEncrypterTest extends SMimeTestCase
         file_put_contents($messageFile, $messageString = $message->toString());
 
         // Ensure the proper line-ending is used for compatibility with the RFC
-        $this->assertStringContainsString("\n\r", $messageString);
-        $this->assertStringNotContainsString("\n\n", $messageString);
+        self::assertStringContainsString("\n\r", $messageString);
+        self::assertStringNotContainsString("\n\n", $messageString);
 
         $outputFile = $this->generateTmpFilename();
 
         $this->assertMessageHeaders($message, $originalMessage);
-        $this->assertTrue(
-            openssl_pkcs7_decrypt(
-                $messageFile,
-                $outputFile,
-                'file://'.$this->samplesDir.'encrypt.crt',
-                'file://'.$this->samplesDir.'encrypt.key'
-            ),
-            sprintf('Decryption of the message failed. Internal error "%s".', openssl_error_string())
-        );
-        $this->assertEquals(str_replace("\r", '', $originalMessage->toString()), str_replace("\r", '', file_get_contents($outputFile)));
+        self::assertTrue(openssl_pkcs7_decrypt(
+            $messageFile,
+            $outputFile,
+            'file://'.$this->samplesDir.'encrypt.crt',
+            'file://'.$this->samplesDir.'encrypt.key'
+        ), sprintf('Decryption of the message failed. Internal error "%s".', openssl_error_string()));
+        self::assertEquals(str_replace("\r", '', $originalMessage->toString()), str_replace("\r", '', file_get_contents($outputFile)));
     }
 }

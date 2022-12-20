@@ -21,8 +21,8 @@ class CompoundTest extends TestCase
 {
     public function testItCannotRedefineConstraintsOption()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('You can\'t redefine the "constraints" option. Use the "Symfony\Component\Validator\Constraints\Compound::getConstraints()" method instead.');
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage('You can\'t redefine the "constraints" option. Use the "Symfony\Component\Validator\Constraints\Compound::getConstraints()" method instead.');
         new EmptyCompound(['constraints' => [new NotBlank()]]);
     }
 
@@ -30,7 +30,7 @@ class CompoundTest extends TestCase
     {
         $constraint = new ForwardingOptionCompound($min = 3);
 
-        $this->assertSame($min, $constraint->constraints[0]->min);
+        self::assertSame($min, $constraint->constraints[0]->min);
     }
 }
 

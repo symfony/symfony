@@ -58,7 +58,7 @@ abstract class TransportFactoryTestCase extends TestCase
     {
         $factory = $this->getFactory();
 
-        $this->assertSame($supports, $factory->supports($dsn));
+        self::assertSame($supports, $factory->supports($dsn));
     }
 
     /**
@@ -68,9 +68,9 @@ abstract class TransportFactoryTestCase extends TestCase
     {
         $factory = $this->getFactory();
 
-        $this->assertEquals($transport, $factory->create($dsn));
+        self::assertEquals($transport, $factory->create($dsn));
         if (str_contains('smtp', $dsn->getScheme())) {
-            $this->assertStringMatchesFormat($dsn->getScheme().'://%S'.$dsn->getHost().'%S', (string) $transport);
+            self::assertStringMatchesFormat($dsn->getScheme().'://%S'.$dsn->getHost().'%S', (string) $transport);
         }
     }
 
@@ -81,9 +81,9 @@ abstract class TransportFactoryTestCase extends TestCase
     {
         $factory = $this->getFactory();
 
-        $this->expectException(UnsupportedSchemeException::class);
+        self::expectException(UnsupportedSchemeException::class);
         if (null !== $message) {
-            $this->expectExceptionMessage($message);
+            self::expectExceptionMessage($message);
         }
 
         $factory->create($dsn);
@@ -96,22 +96,22 @@ abstract class TransportFactoryTestCase extends TestCase
     {
         $factory = $this->getFactory();
 
-        $this->expectException(IncompleteDsnException::class);
+        self::expectException(IncompleteDsnException::class);
         $factory->create($dsn);
     }
 
     protected function getDispatcher(): EventDispatcherInterface
     {
-        return $this->dispatcher ?? $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        return $this->dispatcher ?? $this->dispatcher = self::createMock(EventDispatcherInterface::class);
     }
 
     protected function getClient(): HttpClientInterface
     {
-        return $this->client ?? $this->client = $this->createMock(HttpClientInterface::class);
+        return $this->client ?? $this->client = self::createMock(HttpClientInterface::class);
     }
 
     protected function getLogger(): LoggerInterface
     {
-        return $this->logger ?? $this->logger = $this->createMock(LoggerInterface::class);
+        return $this->logger ?? $this->logger = self::createMock(LoggerInterface::class);
     }
 }

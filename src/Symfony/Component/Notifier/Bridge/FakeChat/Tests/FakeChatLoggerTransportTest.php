@@ -25,7 +25,7 @@ final class FakeChatLoggerTransportTest extends TransportTestCase
 {
     public function createTransport(HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
     {
-        return new FakeChatLoggerTransport($logger ?? $this->createMock(LoggerInterface::class), $client ?? $this->createMock(HttpClientInterface::class));
+        return new FakeChatLoggerTransport($logger ?? self::createMock(LoggerInterface::class), $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -41,7 +41,7 @@ final class FakeChatLoggerTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSendWithDefaultTransport()
@@ -57,13 +57,13 @@ final class FakeChatLoggerTransportTest extends TransportTestCase
         $transport->send($message2);
 
         $logs = $logger->logs;
-        $this->assertNotEmpty($logs);
+        self::assertNotEmpty($logs);
 
         $log1 = $logs[0];
-        $this->assertSame(sprintf('New Chat message for recipient: %s: %s', $recipient1, $subject1), $log1['message']);
-        $this->assertSame('info', $log1['level']);
+        self::assertSame(sprintf('New Chat message for recipient: %s: %s', $recipient1, $subject1), $log1['message']);
+        self::assertSame('info', $log1['level']);
 
         $log2 = $logs[1];
-        $this->assertSame(sprintf('New Chat message without specified recipient!: %s', $subject2), $log2['message']);
+        self::assertSame(sprintf('New Chat message without specified recipient!: %s', $subject2), $log2['message']);
     }
 }

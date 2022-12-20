@@ -26,9 +26,9 @@ class ContainerCommandLoaderTest extends TestCase
             'bar-service' => function () { return new Command('bar'); },
         ]), ['foo' => 'foo-service', 'bar' => 'bar-service']);
 
-        $this->assertTrue($loader->has('foo'));
-        $this->assertTrue($loader->has('bar'));
-        $this->assertFalse($loader->has('baz'));
+        self::assertTrue($loader->has('foo'));
+        self::assertTrue($loader->has('bar'));
+        self::assertFalse($loader->has('baz'));
     }
 
     public function testGet()
@@ -38,13 +38,13 @@ class ContainerCommandLoaderTest extends TestCase
             'bar-service' => function () { return new Command('bar'); },
         ]), ['foo' => 'foo-service', 'bar' => 'bar-service']);
 
-        $this->assertInstanceOf(Command::class, $loader->get('foo'));
-        $this->assertInstanceOf(Command::class, $loader->get('bar'));
+        self::assertInstanceOf(Command::class, $loader->get('foo'));
+        self::assertInstanceOf(Command::class, $loader->get('bar'));
     }
 
     public function testGetUnknownCommandThrows()
     {
-        $this->expectException(CommandNotFoundException::class);
+        self::expectException(CommandNotFoundException::class);
         (new ContainerCommandLoader(new ServiceLocator([]), []))->get('unknown');
     }
 
@@ -55,6 +55,6 @@ class ContainerCommandLoaderTest extends TestCase
             'bar-service' => function () { return new Command('bar'); },
         ]), ['foo' => 'foo-service', 'bar' => 'bar-service']);
 
-        $this->assertSame(['foo', 'bar'], $loader->getNames());
+        self::assertSame(['foo', 'bar'], $loader->getNames());
     }
 }

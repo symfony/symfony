@@ -22,7 +22,7 @@ class StopwatchExtensionTest extends TestCase
 {
     public function testFailIfStoppingWrongEvent()
     {
-        $this->expectException(\Twig\Error\SyntaxError::class);
+        self::expectException(\Twig\Error\SyntaxError::class);
         $this->testTiming('{% stopwatch "foo" %}{% endstopwatch "bar" %}', []);
     }
 
@@ -56,21 +56,21 @@ class StopwatchExtensionTest extends TestCase
     protected function getStopwatch($events = [])
     {
         $events = \is_array($events) ? $events : [$events];
-        $stopwatch = $this->createMock(Stopwatch::class);
+        $stopwatch = self::createMock(Stopwatch::class);
 
         $expectedCalls = 0;
         $expectedStartCalls = [];
         $expectedStopCalls = [];
         foreach ($events as $eventName) {
             ++$expectedCalls;
-            $expectedStartCalls[] = [$this->equalTo($eventName), 'template'];
-            $expectedStopCalls[] = [$this->equalTo($eventName)];
+            $expectedStartCalls[] = [self::equalTo($eventName), 'template'];
+            $expectedStopCalls[] = [self::equalTo($eventName)];
         }
 
-        $startInvocationMocker = $stopwatch->expects($this->exactly($expectedCalls))
+        $startInvocationMocker = $stopwatch->expects(self::exactly($expectedCalls))
             ->method('start');
         \call_user_func_array([$startInvocationMocker, 'withConsecutive'], $expectedStartCalls);
-        $stopInvocationMocker = $stopwatch->expects($this->exactly($expectedCalls))
+        $stopInvocationMocker = $stopwatch->expects(self::exactly($expectedCalls))
             ->method('stop');
         \call_user_func_array([$stopInvocationMocker, 'withConsecutive'], $expectedStopCalls);
 

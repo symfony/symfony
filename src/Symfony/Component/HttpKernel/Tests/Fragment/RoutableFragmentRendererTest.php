@@ -23,7 +23,7 @@ class RoutableFragmentRendererTest extends TestCase
      */
     public function testGenerateFragmentUri($uri, $controller)
     {
-        $this->assertEquals($uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/')));
+        self::assertEquals($uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/')));
     }
 
     /**
@@ -31,7 +31,7 @@ class RoutableFragmentRendererTest extends TestCase
      */
     public function testGenerateAbsoluteFragmentUri($uri, $controller)
     {
-        $this->assertEquals('http://localhost'.$uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/'), true));
+        self::assertEquals('http://localhost'.$uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/'), true));
     }
 
     public function getGenerateFragmentUriData()
@@ -53,7 +53,7 @@ class RoutableFragmentRendererTest extends TestCase
         $request->setLocale('fr');
         $controller = new ControllerReference('controller', [], []);
 
-        $this->assertEquals('/_fragment?_path=_format%3Djson%26_locale%3Dfr%26_controller%3Dcontroller', $this->callGenerateFragmentUriMethod($controller, $request));
+        self::assertEquals('/_fragment?_path=_format%3Djson%26_locale%3Dfr%26_controller%3Dcontroller', $this->callGenerateFragmentUriMethod($controller, $request));
     }
 
     /**
@@ -61,7 +61,7 @@ class RoutableFragmentRendererTest extends TestCase
      */
     public function testGenerateFragmentUriWithNonScalar($controller)
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $this->callGenerateFragmentUriMethod($controller, Request::create('/'));
     }
 
@@ -75,7 +75,7 @@ class RoutableFragmentRendererTest extends TestCase
 
     private function callGenerateFragmentUriMethod(ControllerReference $reference, Request $request, $absolute = false)
     {
-        $renderer = $this->getMockForAbstractClass(RoutableFragmentRenderer::class);
+        $renderer = self::getMockForAbstractClass(RoutableFragmentRenderer::class);
         $r = new \ReflectionObject($renderer);
         $m = $r->getMethod('generateFragmentUri');
         $m->setAccessible(true);

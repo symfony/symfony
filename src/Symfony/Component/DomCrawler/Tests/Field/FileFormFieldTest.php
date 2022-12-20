@@ -20,22 +20,22 @@ class FileFormFieldTest extends FormFieldTestCase
         $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);
 
-        $this->assertEquals(['name' => '', 'type' => '', 'tmp_name' => '', 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0], $field->getValue(), '->initialize() sets the value of the field to no file uploaded');
+        self::assertEquals(['name' => '', 'type' => '', 'tmp_name' => '', 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0], $field->getValue(), '->initialize() sets the value of the field to no file uploaded');
 
         $node = $this->createNode('textarea', '');
         try {
             new FileFormField($node);
-            $this->fail('->initialize() throws a \LogicException if the node is not an input field');
+            self::fail('->initialize() throws a \LogicException if the node is not an input field');
         } catch (\LogicException $e) {
-            $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input field');
+            self::assertTrue(true, '->initialize() throws a \LogicException if the node is not an input field');
         }
 
         $node = $this->createNode('input', '', ['type' => 'text']);
         try {
             new FileFormField($node);
-            $this->fail('->initialize() throws a \LogicException if the node is not a file input field');
+            self::fail('->initialize() throws a \LogicException if the node is not a file input field');
         } catch (\LogicException $e) {
-            $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not a file input field');
+            self::assertTrue(true, '->initialize() throws a \LogicException if the node is not a file input field');
         }
     }
 
@@ -48,34 +48,26 @@ class FileFormFieldTest extends FormFieldTestCase
         $field = new FileFormField($node);
 
         $field->$method(null);
-        $this->assertEquals(['name' => '', 'type' => '', 'tmp_name' => '', 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0], $field->getValue(), "->$method() clears the uploaded file if the value is null");
+        self::assertEquals(['name' => '', 'type' => '', 'tmp_name' => '', 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0], $field->getValue(), "->$method() clears the uploaded file if the value is null");
 
         $field->$method(__FILE__);
         $value = $field->getValue();
 
-        $this->assertEquals(basename(__FILE__), $value['name'], "->$method() sets the name of the file field");
-        $this->assertEquals('', $value['type'], "->$method() sets the type of the file field");
-        $this->assertIsString($value['tmp_name'], "->$method() sets the tmp_name of the file field");
-        $this->assertFileExists($value['tmp_name'], "->$method() creates a copy of the file at the tmp_name path");
-        $this->assertEquals(0, $value['error'], "->$method() sets the error of the file field");
-        $this->assertEquals(filesize(__FILE__), $value['size'], "->$method() sets the size of the file field");
+        self::assertEquals(basename(__FILE__), $value['name'], "->$method() sets the name of the file field");
+        self::assertEquals('', $value['type'], "->$method() sets the type of the file field");
+        self::assertIsString($value['tmp_name'], "->$method() sets the tmp_name of the file field");
+        self::assertFileExists($value['tmp_name'], "->$method() creates a copy of the file at the tmp_name path");
+        self::assertEquals(0, $value['error'], "->$method() sets the error of the file field");
+        self::assertEquals(filesize(__FILE__), $value['size'], "->$method() sets the size of the file field");
 
         $origInfo = pathinfo(__FILE__);
         $tmpInfo = pathinfo($value['tmp_name']);
-        $this->assertEquals(
-            $origInfo['extension'],
-            $tmpInfo['extension'],
-            "->$method() keeps the same file extension in the tmp_name copy"
-        );
+        self::assertEquals($origInfo['extension'], $tmpInfo['extension'], "->$method() keeps the same file extension in the tmp_name copy");
 
         $field->$method(__DIR__.'/../Fixtures/no-extension');
         $value = $field->getValue();
 
-        $this->assertArrayNotHasKey(
-            'extension',
-            pathinfo($value['tmp_name']),
-            "->$method() does not add a file extension in the tmp_name copy"
-        );
+        self::assertArrayNotHasKey('extension', pathinfo($value['tmp_name']), "->$method() does not add a file extension in the tmp_name copy");
     }
 
     public function getSetValueMethods()
@@ -93,13 +85,13 @@ class FileFormFieldTest extends FormFieldTestCase
 
         $field->setErrorCode(\UPLOAD_ERR_FORM_SIZE);
         $value = $field->getValue();
-        $this->assertEquals(\UPLOAD_ERR_FORM_SIZE, $value['error'], '->setErrorCode() sets the file input field error code');
+        self::assertEquals(\UPLOAD_ERR_FORM_SIZE, $value['error'], '->setErrorCode() sets the file input field error code');
 
         try {
             $field->setErrorCode(12345);
-            $this->fail('->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');
+            self::fail('->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');
         } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');
+            self::assertTrue(true, '->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');
         }
     }
 
@@ -109,6 +101,6 @@ class FileFormFieldTest extends FormFieldTestCase
         $field = new FileFormField($node);
         $field->setFilePath(__FILE__);
 
-        $this->assertEquals(__FILE__, $field->getValue());
+        self::assertEquals(__FILE__, $field->getValue());
     }
 }

@@ -24,9 +24,9 @@ class LazyStringTest extends TestCase
             return ++$count;
         });
 
-        $this->assertSame(0, $count);
-        $this->assertSame('1', (string) $s);
-        $this->assertSame(1, $count);
+        self::assertSame(0, $count);
+        self::assertSame('1', (string) $s);
+        self::assertSame(1, $count);
     }
 
     public function testLazyCallable()
@@ -48,11 +48,11 @@ class LazyStringTest extends TestCase
             };
         }]);
 
-        $this->assertSame(0, $count);
-        $this->assertSame('1', (string) $s);
-        $this->assertSame(1, $count);
-        $this->assertSame('1', (string) $s); // ensure the value is memoized
-        $this->assertSame(1, $count);
+        self::assertSame(0, $count);
+        self::assertSame('1', (string) $s);
+        self::assertSame(1, $count);
+        self::assertSame('1', (string) $s); // ensure the value is memoized
+        self::assertSame(1, $count);
     }
 
     /**
@@ -64,48 +64,48 @@ class LazyStringTest extends TestCase
 
         $s = LazyString::fromCallable(function () { return []; });
 
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Return value of '.__NAMESPACE__.'\{closure}() passed to '.LazyString::class.'::fromCallable() must be of the type string, array returned.');
+        self::expectException(\TypeError::class);
+        self::expectExceptionMessage('Return value of '.__NAMESPACE__.'\{closure}() passed to '.LazyString::class.'::fromCallable() must be of the type string, array returned.');
 
         (string) $s;
     }
 
     public function testFromStringable()
     {
-        $this->assertInstanceOf(LazyString::class, LazyString::fromStringable('abc'));
-        $this->assertSame('abc', (string) LazyString::fromStringable('abc'));
-        $this->assertSame('1', (string) LazyString::fromStringable(true));
-        $this->assertSame('', (string) LazyString::fromStringable(false));
-        $this->assertSame('123', (string) LazyString::fromStringable(123));
-        $this->assertSame('123.456', (string) LazyString::fromStringable(123.456));
-        $this->assertStringContainsString('hello', (string) LazyString::fromStringable(new \Exception('hello')));
+        self::assertInstanceOf(LazyString::class, LazyString::fromStringable('abc'));
+        self::assertSame('abc', (string) LazyString::fromStringable('abc'));
+        self::assertSame('1', (string) LazyString::fromStringable(true));
+        self::assertSame('', (string) LazyString::fromStringable(false));
+        self::assertSame('123', (string) LazyString::fromStringable(123));
+        self::assertSame('123.456', (string) LazyString::fromStringable(123.456));
+        self::assertStringContainsString('hello', (string) LazyString::fromStringable(new \Exception('hello')));
     }
 
     public function testResolve()
     {
-        $this->assertSame('abc', LazyString::resolve('abc'));
-        $this->assertSame('1', LazyString::resolve(true));
-        $this->assertSame('', LazyString::resolve(false));
-        $this->assertSame('123', LazyString::resolve(123));
-        $this->assertSame('123.456', LazyString::resolve(123.456));
-        $this->assertStringContainsString('hello', LazyString::resolve(new \Exception('hello')));
+        self::assertSame('abc', LazyString::resolve('abc'));
+        self::assertSame('1', LazyString::resolve(true));
+        self::assertSame('', LazyString::resolve(false));
+        self::assertSame('123', LazyString::resolve(123));
+        self::assertSame('123.456', LazyString::resolve(123.456));
+        self::assertStringContainsString('hello', LazyString::resolve(new \Exception('hello')));
     }
 
     public function testIsStringable()
     {
-        $this->assertTrue(LazyString::isStringable('abc'));
-        $this->assertTrue(LazyString::isStringable(true));
-        $this->assertTrue(LazyString::isStringable(false));
-        $this->assertTrue(LazyString::isStringable(123));
-        $this->assertTrue(LazyString::isStringable(123.456));
-        $this->assertTrue(LazyString::isStringable(new \Exception('hello')));
+        self::assertTrue(LazyString::isStringable('abc'));
+        self::assertTrue(LazyString::isStringable(true));
+        self::assertTrue(LazyString::isStringable(false));
+        self::assertTrue(LazyString::isStringable(123));
+        self::assertTrue(LazyString::isStringable(123.456));
+        self::assertTrue(LazyString::isStringable(new \Exception('hello')));
     }
 
     public function testIsNotStringable()
     {
-        $this->assertFalse(LazyString::isStringable(null));
-        $this->assertFalse(LazyString::isStringable([]));
-        $this->assertFalse(LazyString::isStringable(\STDIN));
-        $this->assertFalse(LazyString::isStringable(new \stdClass()));
+        self::assertFalse(LazyString::isStringable(null));
+        self::assertFalse(LazyString::isStringable([]));
+        self::assertFalse(LazyString::isStringable(\STDIN));
+        self::assertFalse(LazyString::isStringable(new \stdClass()));
     }
 }

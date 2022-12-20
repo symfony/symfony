@@ -22,20 +22,20 @@ class HandledStampTest extends TestCase
     {
         $stamp = new HandledStamp('some result', 'FooHandler::__invoke()');
 
-        $this->assertSame('some result', $stamp->getResult());
-        $this->assertSame('FooHandler::__invoke()', $stamp->getHandlerName());
+        self::assertSame('some result', $stamp->getResult());
+        self::assertSame('FooHandler::__invoke()', $stamp->getHandlerName());
 
         $stamp = new HandledStamp('some result', 'FooHandler::__invoke()');
 
-        $this->assertSame('some result', $stamp->getResult());
-        $this->assertSame('FooHandler::__invoke()', $stamp->getHandlerName());
+        self::assertSame('some result', $stamp->getResult());
+        self::assertSame('FooHandler::__invoke()', $stamp->getHandlerName());
     }
 
     public function testFromDescriptor()
     {
         $stamp = HandledStamp::fromDescriptor(new HandlerDescriptor(new DummyCommandHandler()), 'some_result');
 
-        $this->assertEquals(DummyCommandHandler::class.'::__invoke', $stamp->getHandlerName());
-        $this->assertSame('some_result', $stamp->getResult(), 'result is forwarded to construct');
+        self::assertEquals(DummyCommandHandler::class.'::__invoke', $stamp->getHandlerName());
+        self::assertSame('some_result', $stamp->getResult(), 'result is forwarded to construct');
     }
 }

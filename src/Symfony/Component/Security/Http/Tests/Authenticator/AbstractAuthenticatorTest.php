@@ -32,10 +32,7 @@ class AbstractAuthenticatorTest extends TestCase
     public function testCreateToken()
     {
         $authenticator = new ConcreteAuthenticator();
-        $this->assertInstanceOf(
-            PostAuthenticationToken::class,
-            $authenticator->createToken(new SelfValidatingPassport(new UserBadge('dummy', function () { return new InMemoryUser('robin', 'hood'); })), 'dummy')
-        );
+        self::assertInstanceOf(PostAuthenticationToken::class, $authenticator->createToken(new SelfValidatingPassport(new UserBadge('dummy', function () { return new InMemoryUser('robin', 'hood'); })), 'dummy'));
     }
 
     /**
@@ -45,10 +42,7 @@ class AbstractAuthenticatorTest extends TestCase
     {
         $authenticator = new ConcreteAuthenticator();
         $this->expectDeprecation('Since symfony/security-http 5.4: Method "Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator::createAuthenticatedToken()" is deprecated, use "Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator::createToken()" instead.');
-        $this->assertInstanceOf(
-            PostAuthenticationToken::class,
-            $authenticator->createAuthenticatedToken(new SelfValidatingPassport(new UserBadge('dummy', function () { return new InMemoryUser('robin', 'hood'); })), 'dummy')
-        );
+        self::assertInstanceOf(PostAuthenticationToken::class, $authenticator->createAuthenticatedToken(new SelfValidatingPassport(new UserBadge('dummy', function () { return new InMemoryUser('robin', 'hood'); })), 'dummy'));
     }
 }
 

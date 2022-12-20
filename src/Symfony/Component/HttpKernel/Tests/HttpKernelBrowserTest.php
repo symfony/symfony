@@ -30,18 +30,18 @@ class HttpKernelBrowserTest extends TestCase
         $client = new HttpKernelBrowser(new TestHttpKernel());
 
         $client->request('GET', '/');
-        $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
-        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Request::class, $client->getInternalRequest());
-        $this->assertInstanceOf(Request::class, $client->getRequest());
-        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Response::class, $client->getInternalResponse());
-        $this->assertInstanceOf(Response::class, $client->getResponse());
+        self::assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
+        self::assertInstanceOf(\Symfony\Component\BrowserKit\Request::class, $client->getInternalRequest());
+        self::assertInstanceOf(Request::class, $client->getRequest());
+        self::assertInstanceOf(\Symfony\Component\BrowserKit\Response::class, $client->getInternalResponse());
+        self::assertInstanceOf(Response::class, $client->getResponse());
 
         $client->request('GET', 'http://www.example.com/');
-        $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
-        $this->assertEquals('www.example.com', $client->getRequest()->getHost(), '->doRequest() uses the request handler to make the request');
+        self::assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
+        self::assertEquals('www.example.com', $client->getRequest()->getHost(), '->doRequest() uses the request handler to make the request');
 
         $client->request('GET', 'http://www.example.com/?parameter=http://example.com');
-        $this->assertEquals('http://www.example.com/?parameter='.urlencode('http://example.com'), $client->getRequest()->getUri(), '->doRequest() uses the request handler to make the request');
+        self::assertEquals('http://www.example.com/?parameter='.urlencode('http://example.com'), $client->getRequest()->getUri(), '->doRequest() uses the request handler to make the request');
     }
 
     public function testGetScript()
@@ -50,7 +50,7 @@ class HttpKernelBrowserTest extends TestCase
         $client->insulate();
         $client->request('GET', '/');
 
-        $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->getScript() returns a script that uses the request handler to make the request');
+        self::assertEquals('Request: /', $client->getResponse()->getContent(), '->getScript() returns a script that uses the request handler to make the request');
     }
 
     public function testFilterResponseConvertsCookies()
@@ -64,14 +64,14 @@ class HttpKernelBrowserTest extends TestCase
         $response = new Response();
         $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $domResponse = $m->invoke($client, $response);
-        $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
+        self::assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
         $response->headers->setCookie($cookie1 = new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true, false, null));
         $domResponse = $m->invoke($client, $response);
-        $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
-        $this->assertSame([(string) $cookie1, (string) $cookie2], $domResponse->getHeader('Set-Cookie', false));
+        self::assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
+        self::assertSame([(string) $cookie1, (string) $cookie2], $domResponse->getHeader('Set-Cookie', false));
     }
 
     public function testFilterResponseSupportsStreamedResponses()
@@ -87,7 +87,7 @@ class HttpKernelBrowserTest extends TestCase
         });
 
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals('foo', $domResponse->getContent());
+        self::assertEquals('foo', $domResponse->getContent());
     }
 
     public function testUploadedFile()
@@ -111,18 +111,18 @@ class HttpKernelBrowserTest extends TestCase
 
             $files = $client->getRequest()->files->all();
 
-            $this->assertCount(1, $files);
+            self::assertCount(1, $files);
 
             $file = $files['foo'];
 
-            $this->assertEquals('original', $file->getClientOriginalName());
-            $this->assertEquals('mime/original', $file->getClientMimeType());
-            $this->assertEquals(1, $file->getSize());
+            self::assertEquals('original', $file->getClientOriginalName());
+            self::assertEquals('mime/original', $file->getClientMimeType());
+            self::assertEquals(1, $file->getSize());
         }
 
         $file->move(\dirname($target), basename($target));
 
-        $this->assertFileExists($target);
+        self::assertFileExists($target);
         unlink($target);
     }
 
@@ -137,14 +137,14 @@ class HttpKernelBrowserTest extends TestCase
 
         $files = $client->getRequest()->files->all();
 
-        $this->assertCount(1, $files);
-        $this->assertNull($files['foo']);
+        self::assertCount(1, $files);
+        self::assertNull($files['foo']);
     }
 
     public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
     {
         if (UploadedFile::getMaxFilesize() > \PHP_INT_MAX) {
-            $this->markTestSkipped('Requires PHP_INT_MAX to be greater than "upload_max_filesize" and "post_max_size" ini settings');
+            self::markTestSkipped('Requires PHP_INT_MAX to be greater than "upload_max_filesize" and "post_max_size" ini settings');
         }
 
         $source = tempnam(sys_get_temp_dir(), 'source');
@@ -152,18 +152,17 @@ class HttpKernelBrowserTest extends TestCase
         $kernel = new TestHttpKernel();
         $client = new HttpKernelBrowser($kernel);
 
-        $file = $this
-            ->getMockBuilder(UploadedFile::class)
+        $file = self::getMockBuilder(UploadedFile::class)
             ->setConstructorArgs([$source, 'original', 'mime/original', \UPLOAD_ERR_OK, true])
             ->setMethods(['getSize', 'getClientSize'])
             ->getMock()
         ;
         /* should be modified when the getClientSize will be removed */
-        $file->expects($this->any())
+        $file->expects(self::any())
             ->method('getSize')
             ->willReturn(\PHP_INT_MAX)
         ;
-        $file->expects($this->any())
+        $file->expects(self::any())
             ->method('getClientSize')
             ->willReturn(\PHP_INT_MAX)
         ;
@@ -172,15 +171,15 @@ class HttpKernelBrowserTest extends TestCase
 
         $files = $client->getRequest()->files->all();
 
-        $this->assertCount(1, $files);
+        self::assertCount(1, $files);
 
         $file = $files[0];
 
-        $this->assertFalse($file->isValid());
-        $this->assertEquals(\UPLOAD_ERR_INI_SIZE, $file->getError());
-        $this->assertEquals('mime/original', $file->getClientMimeType());
-        $this->assertEquals('original', $file->getClientOriginalName());
-        $this->assertEquals(0, $file->getSize());
+        self::assertFalse($file->isValid());
+        self::assertEquals(\UPLOAD_ERR_INI_SIZE, $file->getError());
+        self::assertEquals('mime/original', $file->getClientMimeType());
+        self::assertEquals('original', $file->getClientOriginalName());
+        self::assertEquals(0, $file->getSize());
 
         unlink($source);
     }
@@ -190,9 +189,9 @@ class HttpKernelBrowserTest extends TestCase
         $client = new HttpKernelBrowser(new TestHttpKernel());
 
         $client->request('GET', '/');
-        $this->assertFalse($client->getRequest()->headers->has('Accept'));
+        self::assertFalse($client->getRequest()->headers->has('Accept'));
 
         $client->request('GET', '/', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
-        $this->assertSame('application/ld+json', $client->getRequest()->headers->get('Accept'));
+        self::assertSame('application/ld+json', $client->getRequest()->headers->get('Accept'));
     }
 }

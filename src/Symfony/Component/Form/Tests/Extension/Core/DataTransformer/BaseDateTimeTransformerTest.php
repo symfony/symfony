@@ -19,15 +19,15 @@ abstract class BaseDateTimeTransformerTest extends TestCase
 {
     public function testConstructFailsIfInputTimezoneIsInvalid()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('this_timezone_does_not_exist');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('this_timezone_does_not_exist');
         $this->createDateTimeTransformer('this_timezone_does_not_exist');
     }
 
     public function testConstructFailsIfOutputTimezoneIsInvalid()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('that_timezone_does_not_exist');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('that_timezone_does_not_exist');
         $this->createDateTimeTransformer(null, 'that_timezone_does_not_exist');
     }
 

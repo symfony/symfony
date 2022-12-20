@@ -22,7 +22,7 @@ final class HttpPostActionTest extends TestCase
         $action = (new HttpPostAction())
             ->name($value = 'My name');
 
-        $this->assertSame($value, $action->toArray()['name']);
+        self::assertSame($value, $action->toArray()['name']);
     }
 
     public function testTarget()
@@ -30,7 +30,7 @@ final class HttpPostActionTest extends TestCase
         $action = (new HttpPostAction())
             ->target($value = 'https://symfony.com');
 
-        $this->assertSame($value, $action->toArray()['target']);
+        self::assertSame($value, $action->toArray()['target']);
     }
 
     public function testHeader()
@@ -42,13 +42,10 @@ final class HttpPostActionTest extends TestCase
         $action = (new HttpPostAction())
             ->header($header);
 
-        $this->assertCount(1, $action->toArray()['headers']);
-        $this->assertSame(
-            [
-                ['name' => $name, 'value' => $value],
-            ],
-            $action->toArray()['headers']
-        );
+        self::assertCount(1, $action->toArray()['headers']);
+        self::assertSame([
+            ['name' => $name, 'value' => $value],
+        ], $action->toArray()['headers']);
     }
 
     public function testBody()
@@ -56,7 +53,7 @@ final class HttpPostActionTest extends TestCase
         $action = (new HttpPostAction())
             ->body($value = 'content');
 
-        $this->assertSame($value, $action->toArray()['body']);
+        self::assertSame($value, $action->toArray()['body']);
     }
 
     public function testBodyContentType()
@@ -64,16 +61,13 @@ final class HttpPostActionTest extends TestCase
         $action = (new HttpPostAction())
             ->bodyContentType($value = 'application/json');
 
-        $this->assertSame($value, $action->toArray()['bodyContentType']);
+        self::assertSame($value, $action->toArray()['bodyContentType']);
     }
 
     public function testToArray()
     {
-        $this->assertSame(
-            [
-                '@type' => 'HttpPOST',
-            ],
-            (new HttpPostAction())->toArray()
-        );
+        self::assertSame([
+            '@type' => 'HttpPOST',
+        ], (new HttpPostAction())->toArray());
     }
 }

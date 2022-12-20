@@ -33,9 +33,9 @@ class FlattenExceptionNormalizerTest extends TestCase
 
     public function testSupportsNormalization()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new FlattenException(), null, $this->getMessengerContext()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new FlattenException()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertTrue($this->normalizer->supportsNormalization(new FlattenException(), null, $this->getMessengerContext()));
+        self::assertFalse($this->normalizer->supportsNormalization(new FlattenException()));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     /**
@@ -46,21 +46,21 @@ class FlattenExceptionNormalizerTest extends TestCase
         $normalized = $this->normalizer->normalize($exception, null, $this->getMessengerContext());
         $previous = null === $exception->getPrevious() ? null : $this->normalizer->normalize($exception->getPrevious());
 
-        $this->assertSame($exception->getMessage(), $normalized['message']);
-        $this->assertSame($exception->getCode(), $normalized['code']);
+        self::assertSame($exception->getMessage(), $normalized['message']);
+        self::assertSame($exception->getCode(), $normalized['code']);
         if (null !== $exception->getStatusCode()) {
-            $this->assertSame($exception->getStatusCode(), $normalized['status']);
+            self::assertSame($exception->getStatusCode(), $normalized['status']);
         } else {
-            $this->assertArrayNotHasKey('status', $normalized);
+            self::assertArrayNotHasKey('status', $normalized);
         }
-        $this->assertSame($exception->getHeaders(), $normalized['headers']);
-        $this->assertSame($exception->getClass(), $normalized['class']);
-        $this->assertSame($exception->getFile(), $normalized['file']);
-        $this->assertSame($exception->getLine(), $normalized['line']);
-        $this->assertSame($previous, $normalized['previous']);
-        $this->assertSame($exception->getTrace(), $normalized['trace']);
-        $this->assertSame($exception->getTraceAsString(), $normalized['trace_as_string']);
-        $this->assertSame($exception->getStatusText(), $normalized['status_text']);
+        self::assertSame($exception->getHeaders(), $normalized['headers']);
+        self::assertSame($exception->getClass(), $normalized['class']);
+        self::assertSame($exception->getFile(), $normalized['file']);
+        self::assertSame($exception->getLine(), $normalized['line']);
+        self::assertSame($previous, $normalized['previous']);
+        self::assertSame($exception->getTrace(), $normalized['trace']);
+        self::assertSame($exception->getTraceAsString(), $normalized['trace_as_string']);
+        self::assertSame($exception->getStatusText(), $normalized['status_text']);
     }
 
     public function provideFlattenException(): array
@@ -74,9 +74,9 @@ class FlattenExceptionNormalizerTest extends TestCase
 
     public function testSupportsDenormalization()
     {
-        $this->assertFalse($this->normalizer->supportsDenormalization(null, FlattenException::class));
-        $this->assertTrue($this->normalizer->supportsDenormalization(null, FlattenException::class, null, $this->getMessengerContext()));
-        $this->assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
+        self::assertFalse($this->normalizer->supportsDenormalization(null, FlattenException::class));
+        self::assertTrue($this->normalizer->supportsDenormalization(null, FlattenException::class, null, $this->getMessengerContext()));
+        self::assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
     }
 
     public function testDenormalizeValidData()
@@ -114,22 +114,22 @@ class FlattenExceptionNormalizerTest extends TestCase
         ];
         $exception = $this->normalizer->denormalize($normalized, FlattenException::class);
 
-        $this->assertInstanceOf(FlattenException::class, $exception);
-        $this->assertSame($normalized['message'], $exception->getMessage());
-        $this->assertSame($normalized['code'], $exception->getCode());
-        $this->assertSame($normalized['status'], $exception->getStatusCode());
-        $this->assertSame($normalized['headers'], $exception->getHeaders());
-        $this->assertSame($normalized['class'], $exception->getClass());
-        $this->assertSame($normalized['file'], $exception->getFile());
-        $this->assertSame($normalized['line'], $exception->getLine());
-        $this->assertSame($normalized['trace'], $exception->getTrace());
-        $this->assertSame($normalized['trace_as_string'], $exception->getTraceAsString());
-        $this->assertSame($normalized['status_text'], $exception->getStatusText());
+        self::assertInstanceOf(FlattenException::class, $exception);
+        self::assertSame($normalized['message'], $exception->getMessage());
+        self::assertSame($normalized['code'], $exception->getCode());
+        self::assertSame($normalized['status'], $exception->getStatusCode());
+        self::assertSame($normalized['headers'], $exception->getHeaders());
+        self::assertSame($normalized['class'], $exception->getClass());
+        self::assertSame($normalized['file'], $exception->getFile());
+        self::assertSame($normalized['line'], $exception->getLine());
+        self::assertSame($normalized['trace'], $exception->getTrace());
+        self::assertSame($normalized['trace_as_string'], $exception->getTraceAsString());
+        self::assertSame($normalized['status_text'], $exception->getStatusText());
 
-        $this->assertInstanceOf(FlattenException::class, $previous = $exception->getPrevious());
-        $this->assertSame($normalized['previous']['message'], $previous->getMessage());
-        $this->assertSame($normalized['previous']['code'], $previous->getCode());
-        $this->assertSame($normalized['previous']['status_text'], $previous->getStatusText());
+        self::assertInstanceOf(FlattenException::class, $previous = $exception->getPrevious());
+        self::assertSame($normalized['previous']['message'], $previous->getMessage());
+        self::assertSame($normalized['previous']['code'], $previous->getCode());
+        self::assertSame($normalized['previous']['status_text'], $previous->getStatusText());
     }
 
     private function getMessengerContext(): array

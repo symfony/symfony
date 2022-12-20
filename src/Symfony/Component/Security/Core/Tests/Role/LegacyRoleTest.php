@@ -22,7 +22,7 @@ class LegacyRoleTest extends TestCase
 
         $token = unserialize($serialized);
 
-        $this->assertInstanceOf(UsernamePasswordToken::class, $token);
-        $this->assertSame(['ROLE_USER'], $token->getRoleNames());
+        self::assertInstanceOf(UsernamePasswordToken::class, $token);
+        self::assertSame(['ROLE_USER'], $token->getRoleNames());
     }
 }

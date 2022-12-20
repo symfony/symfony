@@ -24,23 +24,22 @@ class LoggerDataCollectorTest extends TestCase
 {
     public function testCollectWithUnexpectedFormat()
     {
-        $logger = $this
-            ->getMockBuilder(DebugLoggerInterface::class)
+        $logger = self::getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
-        $logger->expects($this->once())->method('countErrors')->willReturn(123);
-        $logger->expects($this->exactly(2))->method('getLogs')->willReturn([]);
+        $logger->expects(self::once())->method('countErrors')->willReturn(123);
+        $logger->expects(self::exactly(2))->method('getLogs')->willReturn([]);
 
         $c = new LoggerDataCollector($logger, __DIR__.'/');
         $c->lateCollect();
         $compilerLogs = $c->getCompilerLogs()->getValue('message');
 
-        $this->assertSame([
+        self::assertSame([
             ['message' => 'Removed service "Psr\Container\ContainerInterface"; reason: private alias.'],
             ['message' => 'Removed service "Symfony\Component\DependencyInjection\ContainerInterface"; reason: private alias.'],
         ], $compilerLogs['Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass']);
 
-        $this->assertSame([
+        self::assertSame([
             ['message' => 'Some custom logging message'],
             ['message' => 'With ending :'],
         ], $compilerLogs['Unknown Compiler Pass']);
@@ -64,30 +63,29 @@ class LoggerDataCollectorTest extends TestCase
             'count' => 1,
         ]]));
 
-        $logger = $this
-            ->getMockBuilder(DebugLoggerInterface::class)
+        $logger = self::getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
 
-        $logger->expects($this->once())->method('countErrors')->willReturn(0);
-        $logger->expects($this->exactly(2))->method('getLogs')->willReturn([]);
+        $logger->expects(self::once())->method('countErrors')->willReturn(0);
+        $logger->expects(self::exactly(2))->method('getLogs')->willReturn([]);
 
         $c = new LoggerDataCollector($logger, $containerPathPrefix);
         $c->lateCollect();
 
         $processedLogs = $c->getProcessedLogs();
 
-        $this->assertCount(1, $processedLogs);
+        self::assertCount(1, $processedLogs);
 
-        $this->assertEquals($processedLogs[0]['type'], 'deprecation');
-        $this->assertEquals($processedLogs[0]['errorCount'], 1);
-        $this->assertEquals($processedLogs[0]['timestamp'], (new \DateTimeImmutable())->setTimestamp(filemtime($path))->format(\DateTimeInterface::RFC3339_EXTENDED));
-        $this->assertEquals($processedLogs[0]['priority'], 100);
-        $this->assertEquals($processedLogs[0]['priorityName'], 'DEBUG');
-        $this->assertNull($processedLogs[0]['channel']);
+        self::assertEquals($processedLogs[0]['type'], 'deprecation');
+        self::assertEquals($processedLogs[0]['errorCount'], 1);
+        self::assertEquals($processedLogs[0]['timestamp'], (new \DateTimeImmutable())->setTimestamp(filemtime($path))->format(\DateTimeInterface::RFC3339_EXTENDED));
+        self::assertEquals($processedLogs[0]['priority'], 100);
+        self::assertEquals($processedLogs[0]['priorityName'], 'DEBUG');
+        self::assertNull($processedLogs[0]['channel']);
 
-        $this->assertInstanceOf(Data::class, $processedLogs[0]['message']);
-        $this->assertInstanceOf(Data::class, $processedLogs[0]['context']);
+        self::assertInstanceOf(Data::class, $processedLogs[0]['message']);
+        self::assertInstanceOf(Data::class, $processedLogs[0]['context']);
 
         @unlink($path);
     }
@@ -98,12 +96,11 @@ class LoggerDataCollectorTest extends TestCase
         $stack = new RequestStack();
         $stack->push($mainRequest);
 
-        $logger = $this
-            ->getMockBuilder(DebugLoggerInterface::class)
+        $logger = self::getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
-        $logger->expects($this->once())->method('countErrors')->with(null);
-        $logger->expects($this->exactly(2))->method('getLogs')->with(null)->willReturn([]);
+        $logger->expects(self::once())->method('countErrors')->with(null);
+        $logger->expects(self::exactly(2))->method('getLogs')->with(null)->willReturn([]);
 
         $c = new LoggerDataCollector($logger, __DIR__.'/', $stack);
 
@@ -119,12 +116,11 @@ class LoggerDataCollectorTest extends TestCase
         $stack->push($mainRequest);
         $stack->push($subRequest);
 
-        $logger = $this
-            ->getMockBuilder(DebugLoggerInterface::class)
+        $logger = self::getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
-        $logger->expects($this->once())->method('countErrors')->with($subRequest);
-        $logger->expects($this->exactly(2))->method('getLogs')->with($subRequest)->willReturn([]);
+        $logger->expects(self::once())->method('countErrors')->with($subRequest);
+        $logger->expects(self::exactly(2))->method('getLogs')->with($subRequest)->willReturn([]);
 
         $c = new LoggerDataCollector($logger, __DIR__.'/', $stack);
 
@@ -137,18 +133,17 @@ class LoggerDataCollectorTest extends TestCase
      */
     public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null)
     {
-        $logger = $this
-            ->getMockBuilder(DebugLoggerInterface::class)
+        $logger = self::getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
-        $logger->expects($this->once())->method('countErrors')->willReturn($nb);
-        $logger->expects($this->exactly(2))->method('getLogs')->willReturn($logs);
+        $logger->expects(self::once())->method('countErrors')->willReturn($nb);
+        $logger->expects(self::exactly(2))->method('getLogs')->willReturn($logs);
 
         $c = new LoggerDataCollector($logger);
         $c->lateCollect();
 
-        $this->assertEquals('logger', $c->getName());
-        $this->assertEquals($nb, $c->countErrors());
+        self::assertEquals('logger', $c->getName());
+        self::assertEquals($nb, $c->countErrors());
 
         $logs = array_map(function ($v) {
             if (isset($v['context']['exception'])) {
@@ -158,22 +153,21 @@ class LoggerDataCollectorTest extends TestCase
 
             return $v;
         }, $c->getLogs()->getValue(true));
-        $this->assertEquals($expectedLogs, $logs);
-        $this->assertEquals($expectedDeprecationCount, $c->countDeprecations());
-        $this->assertEquals($expectedScreamCount, $c->countScreams());
+        self::assertEquals($expectedLogs, $logs);
+        self::assertEquals($expectedDeprecationCount, $c->countDeprecations());
+        self::assertEquals($expectedScreamCount, $c->countScreams());
 
         if (isset($expectedPriorities)) {
-            $this->assertSame($expectedPriorities, $c->getPriorities()->getValue(true));
+            self::assertSame($expectedPriorities, $c->getPriorities()->getValue(true));
         }
     }
 
     public function testReset()
     {
-        $logger = $this
-            ->getMockBuilder(DebugLoggerInterface::class)
+        $logger = self::getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
-        $logger->expects($this->once())->method('clear');
+        $logger->expects(self::once())->method('clear');
 
         $c = new LoggerDataCollector($logger);
         $c->reset();

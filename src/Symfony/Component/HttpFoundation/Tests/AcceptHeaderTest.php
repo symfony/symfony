@@ -20,7 +20,7 @@ class AcceptHeaderTest extends TestCase
     public function testFirst()
     {
         $header = AcceptHeader::fromString('text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c');
-        $this->assertSame('text/html', $header->first()->getValue());
+        self::assertSame('text/html', $header->first()->getValue());
     }
 
     /**
@@ -34,7 +34,7 @@ class AcceptHeaderTest extends TestCase
         foreach ($parsed as $item) {
             $item->setIndex(0);
         }
-        $this->assertEquals($items, $parsed);
+        self::assertEquals($items, $parsed);
     }
 
     public function provideFromStringData()
@@ -54,7 +54,7 @@ class AcceptHeaderTest extends TestCase
     public function testToString(array $items, $string)
     {
         $header = new AcceptHeader($items);
-        $this->assertEquals($string, (string) $header);
+        self::assertEquals($string, (string) $header);
     }
 
     public function provideToStringData()
@@ -73,7 +73,7 @@ class AcceptHeaderTest extends TestCase
     public function testFilter($string, $filter, array $values)
     {
         $header = AcceptHeader::fromString($string)->filter($filter);
-        $this->assertEquals($values, array_keys($header->all()));
+        self::assertEquals($values, array_keys($header->all()));
     }
 
     public function provideFilterData()
@@ -89,7 +89,7 @@ class AcceptHeaderTest extends TestCase
     public function testSorting($string, array $values)
     {
         $header = AcceptHeader::fromString($string);
-        $this->assertEquals($values, array_keys($header->all()));
+        self::assertEquals($values, array_keys($header->all()));
     }
 
     public function provideSortingData()
@@ -107,7 +107,7 @@ class AcceptHeaderTest extends TestCase
     public function testDefaultValue($acceptHeader, $value, $expectedQuality)
     {
         $header = AcceptHeader::fromString($acceptHeader);
-        $this->assertSame($expectedQuality, $header->get($value)->getQuality());
+        self::assertSame($expectedQuality, $header->get($value)->getQuality());
     }
 
     public function provideDefaultValueData()

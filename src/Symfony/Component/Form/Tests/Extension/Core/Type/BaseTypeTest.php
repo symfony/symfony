@@ -27,7 +27,7 @@ abstract class BaseTypeTest extends TypeTestCase
     {
         $form = $this->factory->create($this->getTestedType(), null, array_merge($this->getTestOptions(), ['disabled' => true]));
 
-        $this->assertTrue($form->isDisabled());
+        self::assertTrue($form->isDisabled());
     }
 
     public function testPassIdAndNameToView()
@@ -35,9 +35,9 @@ abstract class BaseTypeTest extends TypeTestCase
         $view = $this->factory->createNamed('name', $this->getTestedType(), null, $this->getTestOptions())
             ->createView();
 
-        $this->assertEquals('name', $view->vars['id']);
-        $this->assertEquals('name', $view->vars['name']);
-        $this->assertEquals('name', $view->vars['full_name']);
+        self::assertEquals('name', $view->vars['id']);
+        self::assertEquals('name', $view->vars['name']);
+        self::assertEquals('name', $view->vars['full_name']);
     }
 
     public function testStripLeadingUnderscoresAndDigitsFromId()
@@ -45,9 +45,9 @@ abstract class BaseTypeTest extends TypeTestCase
         $view = $this->factory->createNamed('_09name', $this->getTestedType(), null, $this->getTestOptions())
             ->createView();
 
-        $this->assertEquals('name', $view->vars['id']);
-        $this->assertEquals('_09name', $view->vars['name']);
-        $this->assertEquals('_09name', $view->vars['full_name']);
+        self::assertEquals('name', $view->vars['id']);
+        self::assertEquals('_09name', $view->vars['name']);
+        self::assertEquals('_09name', $view->vars['full_name']);
     }
 
     public function testPassIdAndNameToViewWithParent()
@@ -57,9 +57,9 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals('parent_child', $view['child']->vars['id']);
-        $this->assertEquals('child', $view['child']->vars['name']);
-        $this->assertEquals('parent[child]', $view['child']->vars['full_name']);
+        self::assertEquals('parent_child', $view['child']->vars['id']);
+        self::assertEquals('child', $view['child']->vars['name']);
+        self::assertEquals('parent[child]', $view['child']->vars['full_name']);
     }
 
     public function testPassIdAndNameToViewWithGrandParent()
@@ -69,9 +69,9 @@ abstract class BaseTypeTest extends TypeTestCase
         $builder->get('child')->add('grand_child', $this->getTestedType(), $this->getTestOptions());
         $view = $builder->getForm()->createView();
 
-        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
-        $this->assertEquals('grand_child', $view['child']['grand_child']->vars['name']);
-        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
+        self::assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
+        self::assertEquals('grand_child', $view['child']['grand_child']->vars['name']);
+        self::assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
     }
 
     public function testPassTranslationDomainToView()
@@ -81,7 +81,7 @@ abstract class BaseTypeTest extends TypeTestCase
         ]))
             ->createView();
 
-        $this->assertSame('domain', $view->vars['translation_domain']);
+        self::assertSame('domain', $view->vars['translation_domain']);
     }
 
     public function testInheritTranslationDomainFromParent()
@@ -94,7 +94,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals('domain', $view['child']->vars['translation_domain']);
+        self::assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
     public function testPreferOwnTranslationDomain()
@@ -109,7 +109,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals('domain', $view['child']->vars['translation_domain']);
+        self::assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
     public function testDefaultTranslationDomain()
@@ -119,7 +119,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertNull($view['child']->vars['translation_domain']);
+        self::assertNull($view['child']->vars['translation_domain']);
     }
 
     public function testPassLabelTranslationParametersToView()
@@ -131,7 +131,7 @@ abstract class BaseTypeTest extends TypeTestCase
         ]))
             ->createView();
 
-        $this->assertSame(['%param%' => 'value'], $view->vars['label_translation_parameters']);
+        self::assertSame(['%param%' => 'value'], $view->vars['label_translation_parameters']);
     }
 
     public function testPassAttrTranslationParametersToView()
@@ -143,7 +143,7 @@ abstract class BaseTypeTest extends TypeTestCase
         ]))
             ->createView();
 
-        $this->assertSame(['%param%' => 'value'], $view->vars['attr_translation_parameters']);
+        self::assertSame(['%param%' => 'value'], $view->vars['attr_translation_parameters']);
     }
 
     public function testInheritLabelTranslationParametersFromParent()
@@ -158,7 +158,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['label_translation_parameters']);
+        self::assertEquals(['%param%' => 'value'], $view['child']->vars['label_translation_parameters']);
     }
 
     public function testInheritAttrTranslationParametersFromParent()
@@ -173,7 +173,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['attr_translation_parameters']);
+        self::assertEquals(['%param%' => 'value'], $view['child']->vars['attr_translation_parameters']);
     }
 
     public function testPreferOwnLabelTranslationParameters()
@@ -190,7 +190,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['label_translation_parameters']);
+        self::assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['label_translation_parameters']);
     }
 
     public function testPreferOwnAttrTranslationParameters()
@@ -207,7 +207,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['attr_translation_parameters']);
+        self::assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['attr_translation_parameters']);
     }
 
     public function testDefaultLabelTranslationParameters()
@@ -219,7 +219,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals([], $view['child']->vars['label_translation_parameters']);
+        self::assertEquals([], $view['child']->vars['label_translation_parameters']);
     }
 
     public function testDefaultAttrTranslationParameters()
@@ -231,7 +231,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ->getForm()
             ->createView();
 
-        $this->assertEquals([], $view['child']->vars['attr_translation_parameters']);
+        self::assertEquals([], $view['child']->vars['attr_translation_parameters']);
     }
 
     public function testPassLabelToView()
@@ -242,7 +242,7 @@ abstract class BaseTypeTest extends TypeTestCase
         ))
             ->createView();
 
-        $this->assertSame('My label', $view->vars['label']);
+        self::assertSame('My label', $view->vars['label']);
     }
 
     public function testPassMultipartFalseToView()
@@ -250,7 +250,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $view = $this->factory->create($this->getTestedType(), null, $this->getTestOptions())
             ->createView();
 
-        $this->assertFalse($view->vars['multipart']);
+        self::assertFalse($view->vars['multipart']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -258,9 +258,9 @@ abstract class BaseTypeTest extends TypeTestCase
         $form = $this->factory->create($this->getTestedType(), null, $this->getTestOptions());
         $form->submit(null);
 
-        $this->assertSame($expected, $form->getData());
-        $this->assertSame($norm, $form->getNormData());
-        $this->assertSame($view, $form->getViewData());
+        self::assertSame($expected, $form->getData());
+        self::assertSame($norm, $form->getNormData());
+        self::assertSame($view, $form->getViewData());
     }
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
@@ -280,9 +280,9 @@ abstract class BaseTypeTest extends TypeTestCase
 
         $form = $builder->setEmptyData($emptyData)->getForm()->submit(null);
 
-        $this->assertSame($emptyData, $form->getViewData());
-        $this->assertSame($expectedData, $form->getNormData());
-        $this->assertSame($expectedData, $form->getData());
+        self::assertSame($emptyData, $form->getViewData());
+        self::assertSame($expectedData, $form->getNormData());
+        self::assertSame($expectedData, $form->getData());
     }
 
     protected function getTestedType()

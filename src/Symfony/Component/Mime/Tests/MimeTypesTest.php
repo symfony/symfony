@@ -39,28 +39,28 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
                 throw new RuntimeException('Should never be called.');
             }
         });
-        $this->assertEquals('image/gif', $guesser->guessMimeType(__DIR__.'/Fixtures/mimetypes/test'));
+        self::assertEquals('image/gif', $guesser->guessMimeType(__DIR__.'/Fixtures/mimetypes/test'));
     }
 
     public function testGetExtensions()
     {
         $mt = new MimeTypes();
-        $this->assertSame(['mbox'], $mt->getExtensions('application/mbox'));
-        $this->assertSame(['ai', 'eps', 'ps'], $mt->getExtensions('application/postscript'));
-        $this->assertContains('svg', $mt->getExtensions('image/svg+xml'));
-        $this->assertContains('svg', $mt->getExtensions('image/svg'));
-        $this->assertSame([], $mt->getExtensions('application/whatever-symfony'));
+        self::assertSame(['mbox'], $mt->getExtensions('application/mbox'));
+        self::assertSame(['ai', 'eps', 'ps'], $mt->getExtensions('application/postscript'));
+        self::assertContains('svg', $mt->getExtensions('image/svg+xml'));
+        self::assertContains('svg', $mt->getExtensions('image/svg'));
+        self::assertSame([], $mt->getExtensions('application/whatever-symfony'));
     }
 
     public function testGetMimeTypes()
     {
         $mt = new MimeTypes();
-        $this->assertSame(['application/mbox'], $mt->getMimeTypes('mbox'));
-        $this->assertContains('application/postscript', $mt->getMimeTypes('ai'));
-        $this->assertContains('application/postscript', $mt->getMimeTypes('ps'));
-        $this->assertContains('image/svg+xml', $mt->getMimeTypes('svg'));
-        $this->assertContains('image/svg', $mt->getMimeTypes('svg'));
-        $this->assertSame([], $mt->getMimeTypes('symfony'));
+        self::assertSame(['application/mbox'], $mt->getMimeTypes('mbox'));
+        self::assertContains('application/postscript', $mt->getMimeTypes('ai'));
+        self::assertContains('application/postscript', $mt->getMimeTypes('ps'));
+        self::assertContains('image/svg+xml', $mt->getMimeTypes('svg'));
+        self::assertContains('image/svg', $mt->getMimeTypes('svg'));
+        self::assertSame([], $mt->getMimeTypes('symfony'));
     }
 
     public function testCustomMimeTypes()
@@ -69,9 +69,9 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
             'text/bar' => ['foo'],
             'text/baz' => ['foo', 'moof'],
         ]);
-        $this->assertContains('text/bar', $mt->getMimeTypes('foo'));
-        $this->assertContains('text/baz', $mt->getMimeTypes('foo'));
-        $this->assertSame(['foo', 'moof'], $mt->getExtensions('text/baz'));
+        self::assertContains('text/bar', $mt->getMimeTypes('foo'));
+        self::assertContains('text/baz', $mt->getMimeTypes('foo'));
+        self::assertSame(['foo', 'moof'], $mt->getExtensions('text/baz'));
     }
 
     /**
@@ -89,7 +89,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
         $mt = new MimeTypes();
 
         $mime = $mt->guessMimeType(__DIR__.'/Fixtures/mimetypes/abc.csv');
-        $this->assertContains($mime, ['application/csv', 'text/csv']);
-        $this->assertSame(['csv'], $mt->getExtensions($mime));
+        self::assertContains($mime, ['application/csv', 'text/csv']);
+        self::assertSame(['csv'], $mt->getExtensions($mime));
     }
 }

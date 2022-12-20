@@ -192,20 +192,20 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidConstraint()
     {
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $this->validator->validate(null, new Luhn());
     }
 
     public function testInvalidValue()
     {
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $this->validator->validate([], new NotCompromisedPassword());
     }
 
     public function testApiError()
     {
-        $this->expectException(ExceptionInterface::class);
-        $this->expectExceptionMessage('Problem contacting the Have I been Pwned API.');
+        self::expectException(ExceptionInterface::class);
+        self::expectExceptionMessage('Problem contacting the Have I been Pwned API.');
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
     }
 
@@ -215,7 +215,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function testApiErrorSkipped(NotCompromisedPassword $constraint)
     {
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, $constraint);
-        $this->assertTrue(true); // No exception have been thrown
+        self::assertTrue(true); // No exception have been thrown
     }
 
     public function provideErrorSkippingConstraints(): iterable
@@ -229,7 +229,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 
     private function createHttpClientStub(?string $returnValue = null): HttpClientInterface
     {
-        $httpClientStub = $this->createMock(HttpClientInterface::class);
+        $httpClientStub = self::createMock(HttpClientInterface::class);
         $httpClientStub->method('request')->willReturnCallback(
             function (string $method, string $url) use ($returnValue): ResponseInterface {
                 if (self::PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL === $url) {
@@ -241,7 +241,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
                     };
                 }
 
-                $responseStub = $this->createMock(ResponseInterface::class);
+                $responseStub = self::createMock(ResponseInterface::class);
                 $responseStub
                     ->method('getContent')
                     ->willReturn($returnValue ?? implode("\r\n", self::RETURN));
@@ -255,10 +255,10 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 
     private function createHttpClientStubCustomEndpoint($expectedEndpoint): HttpClientInterface
     {
-        $httpClientStub = $this->createMock(HttpClientInterface::class);
+        $httpClientStub = self::createMock(HttpClientInterface::class);
         $httpClientStub->method('request')->with('GET', $expectedEndpoint)->willReturnCallback(
             function (string $method, string $url): ResponseInterface {
-                $responseStub = $this->createMock(ResponseInterface::class);
+                $responseStub = self::createMock(ResponseInterface::class);
                 $responseStub
                     ->method('getContent')
                     ->willReturn(implode("\r\n", self::RETURN));

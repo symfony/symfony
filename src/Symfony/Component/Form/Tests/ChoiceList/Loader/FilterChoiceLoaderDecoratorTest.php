@@ -26,7 +26,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
 
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(range(1, 4)), $filter);
 
-        $this->assertEquals(new ArrayChoiceList([1 => 2, 3 => 4]), $loader->loadChoiceList());
+        self::assertEquals(new ArrayChoiceList([1 => 2, 3 => 4]), $loader->loadChoiceList());
     }
 
     public function testLoadChoiceListWithGroupedChoices()
@@ -37,7 +37,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
 
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(['units' => range(1, 9), 'tens' => range(10, 90, 10)]), $filter);
 
-        $this->assertEquals(new ArrayChoiceList([
+        self::assertEquals(new ArrayChoiceList([
             'units' => [
                 1 => 2,
                 3 => 4,
@@ -56,7 +56,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
         $choices = array_merge(range(1, 9), ['grouped' => range(10, 40, 5)]);
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader($choices), $filter);
 
-        $this->assertEquals(new ArrayChoiceList([
+        self::assertEquals(new ArrayChoiceList([
             1 => 2,
             3 => 4,
             5 => 6,
@@ -80,7 +80,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
 
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader([range(1, 4)]), $filter);
 
-        $this->assertSame($evenValues, $loader->loadValuesForChoices(range(1, 4)));
+        self::assertSame($evenValues, $loader->loadValuesForChoices(range(1, 4)));
     }
 
     public function testLoadChoicesForValues()
@@ -94,6 +94,6 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
 
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(range(1, 4)), $filter);
 
-        $this->assertEquals($evenChoices, $loader->loadChoicesForValues($values));
+        self::assertEquals($evenChoices, $loader->loadChoicesForValues($values));
     }
 }

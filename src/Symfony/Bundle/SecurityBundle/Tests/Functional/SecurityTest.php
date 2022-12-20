@@ -31,8 +31,8 @@ class SecurityTest extends AbstractWebTestCase
         $container->get('functional.test.security.token_storage')->setToken($token);
 
         $security = $container->get('functional_test.security.helper');
-        $this->assertTrue($security->isGranted('ROLE_USER'));
-        $this->assertSame($token, $security->getToken());
+        self::assertTrue($security->isGranted('ROLE_USER'));
+        self::assertSame($token, $security->getToken());
     }
 
     /**
@@ -40,7 +40,7 @@ class SecurityTest extends AbstractWebTestCase
      */
     public function testUserWillBeMarkedAsChangedIfRolesHasChanged(UserInterface $userWithAdminRole, UserInterface $userWithoutAdminRole)
     {
-        $client = $this->createClient(['test_case' => 'AbstractTokenCompareRoles', 'root_config' => 'config.yml']);
+        $client = self::createClient(['test_case' => 'AbstractTokenCompareRoles', 'root_config' => 'config.yml']);
         $client->disableReboot();
 
         /** @var ArrayUserProvider $userProvider */
@@ -54,14 +54,14 @@ class SecurityTest extends AbstractWebTestCase
 
         // user1 has ROLE_ADMIN and can visit secure page
         $client->request('GET', '/admin');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        self::assertEquals(200, $client->getResponse()->getStatusCode());
 
         // updating user provider with same user but revoked ROLE_ADMIN from user1
         $userProvider->setUser('user1', $userWithoutAdminRole);
 
         // user1 has lost ROLE_ADMIN and MUST be redirected away from secure page
         $client->request('GET', '/admin');
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        self::assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     /**
@@ -70,7 +70,7 @@ class SecurityTest extends AbstractWebTestCase
      */
     public function testLegacyUserWillBeMarkedAsChangedIfRolesHasChanged(UserInterface $userWithAdminRole, UserInterface $userWithoutAdminRole)
     {
-        $client = $this->createClient(['test_case' => 'AbstractTokenCompareRoles', 'root_config' => 'legacy_config.yml']);
+        $client = self::createClient(['test_case' => 'AbstractTokenCompareRoles', 'root_config' => 'legacy_config.yml']);
         $client->disableReboot();
 
         /** @var ArrayUserProvider $userProvider */
@@ -84,14 +84,14 @@ class SecurityTest extends AbstractWebTestCase
 
         // user1 has ROLE_ADMIN and can visit secure page
         $client->request('GET', '/admin');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        self::assertEquals(200, $client->getResponse()->getStatusCode());
 
         // updating user provider with same user but revoked ROLE_ADMIN from user1
         $userProvider->setUser('user1', $userWithoutAdminRole);
 
         // user1 has lost ROLE_ADMIN and MUST be redirected away from secure page
         $client->request('GET', '/admin');
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        self::assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     /**
@@ -109,8 +109,8 @@ class SecurityTest extends AbstractWebTestCase
         $container->get('functional.test.security.token_storage')->setToken($token);
 
         $security = $container->get('functional_test.security.helper');
-        $this->assertTrue($security->isGranted('ROLE_USER'));
-        $this->assertSame($token, $security->getToken());
+        self::assertTrue($security->isGranted('ROLE_USER'));
+        self::assertSame($token, $security->getToken());
     }
 
     public function userWillBeMarkedAsChangedIfRolesHasChangedProvider()

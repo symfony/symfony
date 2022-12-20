@@ -53,7 +53,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         $user = $this->createUser();
         $this->tokenStorage = $this->createTokenStorage($user);
-        $this->hasher = $this->createMock(PasswordHasherInterface::class);
+        $this->hasher = self::createMock(PasswordHasherInterface::class);
         $this->hasherFactory = $this->createHasherFactory($this->hasher);
 
         parent::setUp();
@@ -64,7 +64,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
      */
     public function testPasswordIsValid(UserPassword $constraint)
     {
-        $this->hasher->expects($this->once())
+        $this->hasher->expects(self::once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
             ->willReturn(true);
@@ -79,7 +79,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
      */
     public function testPasswordIsNotValid(UserPassword $constraint)
     {
-        $this->hasher->expects($this->once())
+        $this->hasher->expects(self::once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
             ->willReturn(false);
@@ -124,7 +124,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testUserIsNotValid()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $user = new \stdClass();
 
         $this->tokenStorage = $this->createTokenStorage($user);
@@ -136,16 +136,16 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     protected function createUser()
     {
-        $mock = $this->createMock(UserInterface::class);
+        $mock = self::createMock(UserInterface::class);
 
         $mock
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPassword')
             ->willReturn(static::PASSWORD)
         ;
 
         $mock
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getSalt')
             ->willReturn(static::SALT)
         ;
@@ -155,10 +155,10 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     protected function createHasherFactory($hasher = null)
     {
-        $mock = $this->createMock(PasswordHasherFactoryInterface::class);
+        $mock = self::createMock(PasswordHasherFactoryInterface::class);
 
         $mock
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPasswordHasher')
             ->willReturn($hasher)
         ;
@@ -170,9 +170,9 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         $token = $this->createAuthenticationToken($user);
 
-        $mock = $this->createMock(TokenStorageInterface::class);
+        $mock = self::createMock(TokenStorageInterface::class);
         $mock
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn($token)
         ;
@@ -182,9 +182,9 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     protected function createAuthenticationToken($user = null)
     {
-        $mock = $this->createMock(TokenInterface::class);
+        $mock = self::createMock(TokenInterface::class);
         $mock
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getUser')
             ->willReturn($user)
         ;

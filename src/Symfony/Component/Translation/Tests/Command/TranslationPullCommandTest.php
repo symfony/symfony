@@ -69,21 +69,21 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
             'say_hello' => 'Bonjour, {firstname}!',
         ], 'fr', 'messages+intl-icu'));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::once())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages', 'messages+intl-icu']]);
 
-        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages, messages+intl-icu"', trim($tester->getDisplay()));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+        self::assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages, messages+intl-icu"', trim($tester->getDisplay()));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
@@ -102,9 +102,8 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameEn));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameEn));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
@@ -119,9 +118,8 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameEnIcu));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameEnIcu));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
@@ -140,9 +138,8 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameFr));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameFr));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
@@ -157,8 +154,7 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameFrIcu));
+XLIFF, file_get_contents($filenameFrIcu));
     }
 
     public function testPullNewXlf20Messages()
@@ -179,21 +175,21 @@ XLIFF
             'new.foo' => 'nouveauFoo',
         ], 'fr'));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::once())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--format' => 'xlf20']);
 
-        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+        self::assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="en">
   <file id="messages.en">
@@ -211,9 +207,8 @@ XLIFF
     </unit>
   </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameEn));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameEn));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="fr">
   <file id="messages.fr">
@@ -231,8 +226,7 @@ XLIFF
     </unit>
   </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameFr));
+XLIFF, file_get_contents($filenameFr));
     }
 
     public function testPullForceMessages()
@@ -263,21 +257,21 @@ XLIFF
             'bar.error' => 'Bar erreur',
         ], 'fr', 'validators'));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::once())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
         $tester->execute(['--locales' => $locales, '--domains' => $domains, '--force' => true]);
 
-        $this->assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+        self::assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
@@ -296,9 +290,8 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameMessagesEn));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameMessagesEn));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
@@ -317,10 +310,9 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameMessagesFr));
+XLIFF, file_get_contents($filenameMessagesFr));
 
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
@@ -339,9 +331,8 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameValidatorsEn));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameValidatorsEn));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
@@ -360,8 +351,7 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameValidatorsFr));
+XLIFF, file_get_contents($filenameValidatorsFr));
     }
 
     /**
@@ -386,21 +376,21 @@ XLIFF
             'new.foo' => 'nouveauFoo',
         ], 'fr'));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::once())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains);
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true, '--intl-icu' => true]);
 
-        $this->assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+        self::assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
@@ -419,9 +409,8 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameEn));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameEn));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
@@ -440,8 +429,7 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameFr));
+XLIFF, file_get_contents($filenameFr));
     }
 
     public function testPullMessagesWithDefaultLocale()
@@ -462,21 +450,21 @@ XLIFF
             'new.foo' => 'newFoo',
         ], 'en'));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::once())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains, 'fr');
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages']]);
 
-        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+        self::assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="fr" target-language="en" datatype="plaintext" original="file.ext">
@@ -495,9 +483,8 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameEn));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameEn));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="fr" target-language="fr" datatype="plaintext" original="file.ext">
@@ -516,8 +503,7 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameFr));
+XLIFF, file_get_contents($filenameFr));
     }
 
     public function testPullMessagesMultipleDomains()
@@ -539,21 +525,21 @@ XLIFF
             'domain'
         ));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::once())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
         $tester = $this->createCommandTester($provider, $locales, $domains, 'en');
         $tester->execute(['--locales' => ['en'], '--domains' => ['messages', 'domain']]);
 
-        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en" locale(s), and "messages, domain" domain(s)).', trim($tester->getDisplay()));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+        self::assertStringContainsString('[OK] New translations from "null" has been written locally (for "en" locale(s), and "messages, domain" domain(s)).', trim($tester->getDisplay()));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
@@ -572,9 +558,8 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameMessages));
-        $this->assertXmlStringEqualsXmlString(<<<XLIFF
+XLIFF, file_get_contents($filenameMessages));
+        self::assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
@@ -593,8 +578,7 @@ XLIFF
         </body>
     </file>
 </xliff>
-XLIFF
-            , file_get_contents($filenameDomain));
+XLIFF, file_get_contents($filenameDomain));
     }
 
     /**
@@ -603,15 +587,15 @@ XLIFF
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $application = new Application();
-        $application->add($this->createCommand($this->createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], 'en', ['loco', 'crowdin', 'lokalise']));
+        $application->add($this->createCommand(self::createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], 'en', ['loco', 'crowdin', 'lokalise']));
 
         $tester = new CommandCompletionTester($application->get('translation:pull'));
         $suggestions = $tester->complete($input);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions(): \Generator

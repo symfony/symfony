@@ -25,12 +25,12 @@ class InMemoryTokenProviderTest extends TestCase
         $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTime());
         $provider->createNewToken($token);
 
-        $this->assertSame($provider->loadTokenBySeries('foo'), $token);
+        self::assertSame($provider->loadTokenBySeries('foo'), $token);
     }
 
     public function testLoadTokenBySeriesThrowsNotFoundException()
     {
-        $this->expectException(TokenNotFoundException::class);
+        self::expectException(TokenNotFoundException::class);
         $provider = new InMemoryTokenProvider();
         $provider->loadTokenBySeries('foo');
     }
@@ -44,13 +44,13 @@ class InMemoryTokenProviderTest extends TestCase
         $provider->updateToken('foo', 'newFoo', $lastUsed = new \DateTime());
         $token = $provider->loadTokenBySeries('foo');
 
-        $this->assertEquals('newFoo', $token->getTokenValue());
-        $this->assertSame($token->getLastUsed(), $lastUsed);
+        self::assertEquals('newFoo', $token->getTokenValue());
+        self::assertSame($token->getLastUsed(), $lastUsed);
     }
 
     public function testDeleteToken()
     {
-        $this->expectException(TokenNotFoundException::class);
+        self::expectException(TokenNotFoundException::class);
         $provider = new InMemoryTokenProvider();
 
         $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTime());

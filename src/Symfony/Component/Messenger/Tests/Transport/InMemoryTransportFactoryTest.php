@@ -39,41 +39,41 @@ class InMemoryTransportFactoryTest extends TestCase
      */
     public function testSupports(string $dsn, bool $expected = true)
     {
-        $this->assertSame($expected, $this->factory->supports($dsn, []), 'InMemoryTransportFactory::supports returned unexpected result.');
+        self::assertSame($expected, $this->factory->supports($dsn, []), 'InMemoryTransportFactory::supports returned unexpected result.');
     }
 
     public function testCreateTransport()
     {
         /** @var SerializerInterface $serializer */
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
 
-        $this->assertInstanceOf(InMemoryTransport::class, $this->factory->createTransport('in-memory://', [], $serializer));
+        self::assertInstanceOf(InMemoryTransport::class, $this->factory->createTransport('in-memory://', [], $serializer));
     }
 
     public function testCreateTransportWithoutSerializer()
     {
         /** @var SerializerInterface $serializer */
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $serializer
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('encode')
         ;
         $transport = $this->factory->createTransport('in-memory://?serialize=false', [], $serializer);
         $message = Envelope::wrap(new DummyMessage('Hello.'));
         $transport->send($message);
 
-        $this->assertEquals([$message->with(new TransportMessageIdStamp(1))], $transport->get());
+        self::assertEquals([$message->with(new TransportMessageIdStamp(1))], $transport->get());
     }
 
     public function testCreateTransportWithSerializer()
     {
         /** @var SerializerInterface $serializer */
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $message = Envelope::wrap(new DummyMessage('Hello.'));
         $serializer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('encode')
-            ->with($this->equalTo($message->with(new TransportMessageIdStamp(1))))
+            ->with(self::equalTo($message->with(new TransportMessageIdStamp(1))))
         ;
         $transport = $this->factory->createTransport('in-memory://?serialize=true', [], $serializer);
         $transport->send($message);
@@ -81,12 +81,12 @@ class InMemoryTransportFactoryTest extends TestCase
 
     public function testResetCreatedTransports()
     {
-        $transport = $this->factory->createTransport('in-memory://', [], $this->createMock(SerializerInterface::class));
+        $transport = $this->factory->createTransport('in-memory://', [], self::createMock(SerializerInterface::class));
         $transport->send(Envelope::wrap(new DummyMessage('Hello.')));
 
-        $this->assertCount(1, $transport->get());
+        self::assertCount(1, $transport->get());
         $this->factory->reset();
-        $this->assertCount(0, $transport->get());
+        self::assertCount(0, $transport->get());
     }
 
     public function provideDSN(): array

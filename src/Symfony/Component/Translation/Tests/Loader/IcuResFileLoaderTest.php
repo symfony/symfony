@@ -28,21 +28,21 @@ class IcuResFileLoaderTest extends LocalizedTestCase
         $resource = __DIR__.'/../fixtures/resourcebundle/res';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new DirectoryResource($resource)], $catalogue->getResources());
+        self::assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new DirectoryResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(NotFoundResourceException::class);
+        self::expectException(NotFoundResourceException::class);
         $loader = new IcuResFileLoader();
         $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');
     }
 
     public function testLoadInvalidResource()
     {
-        $this->expectException(InvalidResourceException::class);
+        self::expectException(InvalidResourceException::class);
         $loader = new IcuResFileLoader();
         $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted', 'en', 'domain1');
     }

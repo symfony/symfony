@@ -19,7 +19,7 @@ class MethodNotAllowedHttpExceptionTest extends HttpExceptionTest
     public function testHeadersDefault()
     {
         $exception = new MethodNotAllowedHttpException(['GET', 'PUT']);
-        $this->assertSame(['Allow' => 'GET, PUT'], $exception->getHeaders());
+        self::assertSame(['Allow' => 'GET, PUT'], $exception->getHeaders());
     }
 
     public function testWithHeaderConstruct()
@@ -32,7 +32,7 @@ class MethodNotAllowedHttpExceptionTest extends HttpExceptionTest
 
         $headers['Allow'] = 'GET';
 
-        $this->assertSame($headers, $exception->getHeaders());
+        self::assertSame($headers, $exception->getHeaders());
     }
 
     /**
@@ -42,7 +42,7 @@ class MethodNotAllowedHttpExceptionTest extends HttpExceptionTest
     {
         $exception = new MethodNotAllowedHttpException(['GET']);
         $exception->setHeaders($headers);
-        $this->assertSame($headers, $exception->getHeaders());
+        self::assertSame($headers, $exception->getHeaders());
     }
 
     protected function createException(string $message = '', \Throwable $previous = null, int $code = 0, array $headers = []): HttpException

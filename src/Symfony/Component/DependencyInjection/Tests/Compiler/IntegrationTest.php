@@ -88,11 +88,11 @@ class IntegrationTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue($container->hasDefinition('a'));
+        self::assertTrue($container->hasDefinition('a'));
         $arguments = $a->getArguments();
-        $this->assertSame($c, $arguments[0]);
-        $this->assertFalse($container->hasDefinition('b'));
-        $this->assertFalse($container->hasDefinition('c'));
+        self::assertSame($c, $arguments[0]);
+        self::assertFalse($container->hasDefinition('b'));
+        self::assertFalse($container->hasDefinition('c'));
     }
 
     public function testProcessInlinesReferencesToAliases()
@@ -114,11 +114,11 @@ class IntegrationTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue($container->hasDefinition('a'));
+        self::assertTrue($container->hasDefinition('a'));
         $arguments = $a->getArguments();
-        $this->assertSame($c, $arguments[0]);
-        $this->assertFalse($container->hasAlias('b'));
-        $this->assertFalse($container->hasDefinition('c'));
+        self::assertSame($c, $arguments[0]);
+        self::assertFalse($container->hasAlias('b'));
+        self::assertFalse($container->hasDefinition('c'));
     }
 
     public function testProcessInlinesWhenThereAreMultipleReferencesButFromTheSameDefinition()
@@ -144,9 +144,9 @@ class IntegrationTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue($container->hasDefinition('a'));
-        $this->assertFalse($container->hasDefinition('b'));
-        $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
+        self::assertTrue($container->hasDefinition('a'));
+        self::assertFalse($container->hasDefinition('b'));
+        self::assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
 
     public function testCanDecorateServiceSubscriberUsingBinding()
@@ -162,9 +162,9 @@ class IntegrationTest extends TestCase
 
         $container->compile();
 
-        $this->assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
-        $this->assertInstanceOf(ServiceSubscriberStub::class, $container->get(ServiceSubscriberStub::class)->inner);
-        $this->assertInstanceOf(ServiceLocator::class, $container->get(ServiceSubscriberStub::class)->inner->container);
+        self::assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
+        self::assertInstanceOf(ServiceSubscriberStub::class, $container->get(ServiceSubscriberStub::class)->inner);
+        self::assertInstanceOf(ServiceLocator::class, $container->get(ServiceSubscriberStub::class)->inner->container);
     }
 
     public function testCanDecorateServiceSubscriberReplacingArgument()
@@ -181,9 +181,9 @@ class IntegrationTest extends TestCase
 
         $container->compile();
 
-        $this->assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
-        $this->assertInstanceOf(ServiceSubscriberStub::class, $container->get(ServiceSubscriberStub::class)->inner);
-        $this->assertInstanceOf(ServiceLocator::class, $container->get(ServiceSubscriberStub::class)->inner->container);
+        self::assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
+        self::assertInstanceOf(ServiceSubscriberStub::class, $container->get(ServiceSubscriberStub::class)->inner);
+        self::assertInstanceOf(ServiceLocator::class, $container->get(ServiceSubscriberStub::class)->inner->container);
     }
 
     public function testCanDecorateServiceLocator()
@@ -205,8 +205,8 @@ class IntegrationTest extends TestCase
 
         $container->compile();
 
-        $this->assertInstanceOf(DecoratedServiceLocator::class, $container->get(DecoratedServiceLocator::class));
-        $this->assertSame($container->get('foo'), $container->get(DecoratedServiceLocator::class)->get('foo'));
+        self::assertInstanceOf(DecoratedServiceLocator::class, $container->get(DecoratedServiceLocator::class));
+        self::assertSame($container->get('foo'), $container->get(DecoratedServiceLocator::class)->get('foo'));
     }
 
     public function testAliasDecoratedService()
@@ -231,9 +231,9 @@ class IntegrationTest extends TestCase
 
         $container->compile();
 
-        $this->assertInstanceOf(DecoratedServiceLocator::class, $container->get('service'));
-        $this->assertInstanceOf(ServiceLocator::class, $container->get(ServiceLocator::class));
-        $this->assertSame($container->get('service'), $container->get('decorator'));
+        self::assertInstanceOf(DecoratedServiceLocator::class, $container->get('service'));
+        self::assertInstanceOf(ServiceLocator::class, $container->get(ServiceLocator::class));
+        self::assertSame($container->get('service'), $container->get('decorator'));
     }
 
     /**
@@ -261,7 +261,7 @@ class IntegrationTest extends TestCase
         $actualService->setChanges([]);
         $expectedService->setChanges([]);
 
-        $this->assertEquals($expectedService, $actualService);
+        self::assertEquals($expectedService, $actualService);
     }
 
     public function getYamlCompileTests()
@@ -356,7 +356,7 @@ class IntegrationTest extends TestCase
         $s = $container->get(FooBarTaggedClass::class);
 
         $param = iterator_to_array($s->getParam()->getIterator());
-        $this->assertSame(['bar' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
+        self::assertSame(['bar' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
     }
 
     public function testTaggedServiceWithIndexAttributeAndDefaultMethod()
@@ -380,7 +380,7 @@ class IntegrationTest extends TestCase
         $s = $container->get(FooBarTaggedClass::class);
 
         $param = iterator_to_array($s->getParam()->getIterator());
-        $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
+        self::assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
     /**
@@ -407,7 +407,7 @@ class IntegrationTest extends TestCase
         $s = $container->get(IteratorConsumer::class);
 
         $param = iterator_to_array($s->getParam()->getIterator());
-        $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
+        self::assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
     /**
@@ -434,7 +434,7 @@ class IntegrationTest extends TestCase
         $s = $container->get(IteratorConsumerWithDefaultIndexMethod::class);
 
         $param = iterator_to_array($s->getParam()->getIterator());
-        $this->assertSame(['bar_tag_class' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
+        self::assertSame(['bar_tag_class' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
     }
 
     /**
@@ -461,7 +461,7 @@ class IntegrationTest extends TestCase
         $s = $container->get(IteratorConsumerWithDefaultPriorityMethod::class);
 
         $param = iterator_to_array($s->getParam()->getIterator());
-        $this->assertSame([0 => $container->get(FooTagClass::class), 1 => $container->get(BarTagClass::class)], $param);
+        self::assertSame([0 => $container->get(FooTagClass::class), 1 => $container->get(BarTagClass::class)], $param);
     }
 
     /**
@@ -488,7 +488,7 @@ class IntegrationTest extends TestCase
         $s = $container->get(IteratorConsumerWithDefaultIndexMethodAndWithDefaultPriorityMethod::class);
 
         $param = iterator_to_array($s->getParam()->getIterator());
-        $this->assertSame(['foo_tag_class' => $container->get(FooTagClass::class), 'bar_tag_class' => $container->get(BarTagClass::class)], $param);
+        self::assertSame(['foo_tag_class' => $container->get(FooTagClass::class), 'bar_tag_class' => $container->get(BarTagClass::class)], $param);
     }
 
     /**
@@ -720,7 +720,7 @@ class IntegrationTest extends TestCase
         $s = $container->get(FooBarTaggedForDefaultPriorityClass::class);
 
         $param = iterator_to_array($s->getParam()->getIterator());
-        $this->assertSame([$container->get(FooTagClass::class), $container->get(BarTagClass::class)], $param);
+        self::assertSame([$container->get(FooTagClass::class), $container->get(BarTagClass::class)], $param);
     }
 
     public function testTaggedServiceLocatorWithIndexAttribute()
@@ -745,13 +745,13 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        self::assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $same = [
             'bar' => $serviceLocator->get('bar'),
             'foo_tag_class' => $serviceLocator->get('foo_tag_class'),
         ];
-        $this->assertSame(['bar' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
+        self::assertSame(['bar' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
     }
 
     public function testTaggedServiceLocatorWithMultipleIndexAttribute()
@@ -778,14 +778,14 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        self::assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $same = [
             'bar' => $serviceLocator->get('bar'),
             'bar_duplicate' => $serviceLocator->get('bar_duplicate'),
             'foo_tag_class' => $serviceLocator->get('foo_tag_class'),
         ];
-        $this->assertSame(['bar' => $container->get('bar_tag'), 'bar_duplicate' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
+        self::assertSame(['bar' => $container->get('bar_tag'), 'bar_duplicate' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
     }
 
     public function testTaggedServiceLocatorWithIndexAttributeAndDefaultMethod()
@@ -810,13 +810,13 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        self::assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $same = [
             'bar_tab_class_with_defaultmethod' => $serviceLocator->get('bar_tab_class_with_defaultmethod'),
             'foo' => $serviceLocator->get('foo'),
         ];
-        $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get('bar_tag'), 'foo' => $container->get('foo_tag')], $same);
+        self::assertSame(['bar_tab_class_with_defaultmethod' => $container->get('bar_tag'), 'foo' => $container->get('foo_tag')], $same);
     }
 
     public function testTaggedServiceLocatorWithFallback()
@@ -837,12 +837,12 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        self::assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $expected = [
             'bar_tag' => $container->get('bar_tag'),
         ];
-        $this->assertSame($expected, ['bar_tag' => $serviceLocator->get('bar_tag')]);
+        self::assertSame($expected, ['bar_tag' => $serviceLocator->get('bar_tag')]);
     }
 
     public function testTaggedServiceLocatorWithDefaultIndex()
@@ -863,12 +863,12 @@ class IntegrationTest extends TestCase
 
         /** @var ServiceLocator $serviceLocator */
         $serviceLocator = $s->getParam();
-        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
+        self::assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', get_debug_type($serviceLocator)));
 
         $expected = [
             'baz' => $container->get('bar_tag'),
         ];
-        $this->assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
+        self::assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
     }
 
     /**

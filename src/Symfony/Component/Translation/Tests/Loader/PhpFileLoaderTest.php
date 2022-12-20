@@ -25,14 +25,14 @@ class PhpFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/resources.php';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        self::assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(NotFoundResourceException::class);
+        self::expectException(NotFoundResourceException::class);
         $loader = new PhpFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.php';
         $loader->load($resource, 'en', 'domain1');
@@ -40,7 +40,7 @@ class PhpFileLoaderTest extends TestCase
 
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
-        $this->expectException(InvalidResourceException::class);
+        self::expectException(InvalidResourceException::class);
         $loader = new PhpFileLoader();
         $resource = 'http://example.com/resources.php';
         $loader->load($resource, 'en', 'domain1');

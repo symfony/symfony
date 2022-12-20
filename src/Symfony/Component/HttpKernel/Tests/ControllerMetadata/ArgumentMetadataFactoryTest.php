@@ -37,7 +37,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([$this, 'signature1']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('foo', self::class, false, false, null),
             new ArgumentMetadata('bar', 'array', false, false, null),
             new ArgumentMetadata('baz', 'callable', false, false, null),
@@ -48,7 +48,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([$this, 'signature2']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('foo', self::class, false, true, null, true),
             new ArgumentMetadata('bar', FakeClassThatDoesNotExist::class, false, true, null, true),
             new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, true, null, true),
@@ -59,7 +59,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([$this, 'signature3']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('bar', FakeClassThatDoesNotExist::class, false, false, null),
             new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, false, null),
         ], $arguments);
@@ -69,7 +69,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([$this, 'signature4']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('foo', null, false, true, 'default'),
             new ArgumentMetadata('bar', null, false, true, 500),
             new ArgumentMetadata('baz', null, false, true, []),
@@ -80,7 +80,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([$this, 'signature5']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('foo', 'array', false, true, null, true),
             new ArgumentMetadata('bar', null, false, true, null, true),
         ], $arguments);
@@ -90,7 +90,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([new VariadicController(), 'action']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('foo', null, false, false, null),
             new ArgumentMetadata('bar', null, true, false, null),
         ], $arguments);
@@ -100,7 +100,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([new BasicTypesController(), 'action']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('foo', 'string', false, false, null),
             new ArgumentMetadata('bar', 'int', false, false, null),
             new ArgumentMetadata('baz', 'float', false, false, null),
@@ -111,7 +111,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata(\Closure::fromCallable([$this, 'signature1']));
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('foo', self::class, false, false, null),
             new ArgumentMetadata('bar', 'array', false, false, null),
             new ArgumentMetadata('baz', 'callable', false, false, null),
@@ -122,7 +122,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([new NullableController(), 'action']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('foo', 'string', false, false, null, true),
             new ArgumentMetadata('bar', \stdClass::class, false, false, null, true),
             new ArgumentMetadata('baz', 'string', false, true, 'value', true),
@@ -137,7 +137,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
         $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'action']);
 
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
         ], $arguments);
     }
@@ -148,7 +148,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     public function testMultipleAttributes()
     {
         $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg']);
-        $this->assertCount(1, $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg'])[0]->getAttributes());
+        self::assertCount(1, $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg'])[0]->getAttributes());
     }
 
     /**
@@ -157,7 +157,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     public function testIssue41478()
     {
         $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'issue41478']);
-        $this->assertEquals([
+        self::assertEquals([
             new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
             new ArgumentMetadata('bat', 'string', false, false, null, false, []),
         ], $arguments);

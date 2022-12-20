@@ -51,16 +51,16 @@ class CsrfTokenClearingLogoutHandlerTest extends TestCase
 
     public function testCsrfTokenCookieWithSameNamespaceIsRemoved()
     {
-        $this->assertSame('bar', $this->session->get('foo/foo'));
-        $this->assertSame('baz', $this->session->get('foo/foobar'));
+        self::assertSame('bar', $this->session->get('foo/foo'));
+        self::assertSame('baz', $this->session->get('foo/foobar'));
 
-        $this->csrfTokenClearingLogoutHandler->logout(new Request(), new Response(), $this->createMock(TokenInterface::class));
+        $this->csrfTokenClearingLogoutHandler->logout(new Request(), new Response(), self::createMock(TokenInterface::class));
 
-        $this->assertFalse($this->csrfTokenStorage->hasToken('foo'));
-        $this->assertFalse($this->csrfTokenStorage->hasToken('foobar'));
+        self::assertFalse($this->csrfTokenStorage->hasToken('foo'));
+        self::assertFalse($this->csrfTokenStorage->hasToken('foobar'));
 
-        $this->assertFalse($this->session->has('foo/foo'));
-        $this->assertFalse($this->session->has('foo/foobar'));
+        self::assertFalse($this->session->has('foo/foo'));
+        self::assertFalse($this->session->has('foo/foobar'));
     }
 
     public function testCsrfTokenCookieWithDifferentNamespaceIsNotRemoved()
@@ -69,23 +69,23 @@ class CsrfTokenClearingLogoutHandlerTest extends TestCase
         $barNamespaceCsrfSessionStorage->setToken('foo', 'bar');
         $barNamespaceCsrfSessionStorage->setToken('foobar', 'baz');
 
-        $this->assertSame('bar', $this->session->get('foo/foo'));
-        $this->assertSame('baz', $this->session->get('foo/foobar'));
-        $this->assertSame('bar', $this->session->get('bar/foo'));
-        $this->assertSame('baz', $this->session->get('bar/foobar'));
+        self::assertSame('bar', $this->session->get('foo/foo'));
+        self::assertSame('baz', $this->session->get('foo/foobar'));
+        self::assertSame('bar', $this->session->get('bar/foo'));
+        self::assertSame('baz', $this->session->get('bar/foobar'));
 
-        $this->csrfTokenClearingLogoutHandler->logout(new Request(), new Response(), $this->createMock(TokenInterface::class));
+        $this->csrfTokenClearingLogoutHandler->logout(new Request(), new Response(), self::createMock(TokenInterface::class));
 
-        $this->assertTrue($barNamespaceCsrfSessionStorage->hasToken('foo'));
-        $this->assertTrue($barNamespaceCsrfSessionStorage->hasToken('foobar'));
-        $this->assertSame('bar', $barNamespaceCsrfSessionStorage->getToken('foo'));
-        $this->assertSame('baz', $barNamespaceCsrfSessionStorage->getToken('foobar'));
-        $this->assertFalse($this->csrfTokenStorage->hasToken('foo'));
-        $this->assertFalse($this->csrfTokenStorage->hasToken('foobar'));
+        self::assertTrue($barNamespaceCsrfSessionStorage->hasToken('foo'));
+        self::assertTrue($barNamespaceCsrfSessionStorage->hasToken('foobar'));
+        self::assertSame('bar', $barNamespaceCsrfSessionStorage->getToken('foo'));
+        self::assertSame('baz', $barNamespaceCsrfSessionStorage->getToken('foobar'));
+        self::assertFalse($this->csrfTokenStorage->hasToken('foo'));
+        self::assertFalse($this->csrfTokenStorage->hasToken('foobar'));
 
-        $this->assertFalse($this->session->has('foo/foo'));
-        $this->assertFalse($this->session->has('foo/foobar'));
-        $this->assertSame('bar', $this->session->get('bar/foo'));
-        $this->assertSame('baz', $this->session->get('bar/foobar'));
+        self::assertFalse($this->session->has('foo/foo'));
+        self::assertFalse($this->session->has('foo/foobar'));
+        self::assertSame('bar', $this->session->get('bar/foo'));
+        self::assertSame('baz', $this->session->get('bar/foobar'));
     }
 }

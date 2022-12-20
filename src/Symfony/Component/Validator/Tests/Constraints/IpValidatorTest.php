@@ -40,13 +40,13 @@ class IpValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Ip());
     }
 
     public function testInvalidValidatorVersion()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         new Ip([
             'version' => 666,
         ]);

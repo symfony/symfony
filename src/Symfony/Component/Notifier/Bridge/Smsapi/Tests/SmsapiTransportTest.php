@@ -29,7 +29,7 @@ final class SmsapiTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host');
+        return (new SmsapiTransport('testToken', 'testFrom', $client ?? self::createMock(HttpClientInterface::class)))->setHost('test.host');
     }
 
     public function toStringProvider(): iterable
@@ -45,7 +45,7 @@ final class SmsapiTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function createClient(int $statusCode, string $content): HttpClientInterface
@@ -78,8 +78,8 @@ final class SmsapiTransportTest extends TransportTestCase
         $transport = $this->createTransport($client);
         $message = new SmsMessage('0611223344', 'Hello!');
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage($errorMessage);
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage($errorMessage);
 
         $transport->send($message);
     }

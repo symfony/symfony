@@ -30,7 +30,7 @@ class AuthenticatedVoterTest extends TestCase
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
-        $this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
+        self::assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
     }
 
     public function getVoteTests()
@@ -90,7 +90,7 @@ class AuthenticatedVoterTest extends TestCase
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
-        $this->assertSame($expected, $voter->supportsAttribute($attribute));
+        self::assertSame($expected, $voter->supportsAttribute($attribute));
     }
 
     public function provideAttributes()
@@ -112,9 +112,9 @@ class AuthenticatedVoterTest extends TestCase
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
-        $this->assertTrue($voter->supportsType(get_debug_type('foo')));
-        $this->assertTrue($voter->supportsType(get_debug_type(null)));
-        $this->assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
+        self::assertTrue($voter->supportsType(get_debug_type('foo')));
+        self::assertTrue($voter->supportsType(get_debug_type(null)));
+        self::assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
     }
 
     protected function getToken($authenticated)
@@ -138,7 +138,7 @@ class AuthenticatedVoterTest extends TestCase
         }
 
         if ('impersonated' === $authenticated) {
-            return $this->getMockBuilder(SwitchUserToken::class)->disableOriginalConstructor()->getMock();
+            return self::getMockBuilder(SwitchUserToken::class)->disableOriginalConstructor()->getMock();
         }
 
         return new NullToken();

@@ -32,9 +32,9 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $container->compile();
 
         $calls = $container->getDefinition('security.expression_language')->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertEquals('registerProvider', $calls[0][0]);
-        $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
+        self::assertCount(1, $calls);
+        self::assertEquals('registerProvider', $calls[0][0]);
+        self::assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
     }
 
     public function testProcessForSecurityAlias()
@@ -51,8 +51,8 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $container->compile();
 
         $calls = $container->getDefinition('my_security.expression_language')->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertEquals('registerProvider', $calls[0][0]);
-        $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
+        self::assertCount(1, $calls);
+        self::assertEquals('registerProvider', $calls[0][0]);
+        self::assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
     }
 }

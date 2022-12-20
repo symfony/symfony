@@ -82,15 +82,15 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      */
     public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires either the "value" or "propertyPath" option to be set.');
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage('requires either the "value" or "propertyPath" option to be set.');
         $this->createConstraint($options);
     }
 
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('requires only one of the "value" or "propertyPath" options to be set, not both.');
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage('requires only one of the "value" or "propertyPath" options to be set, not both.');
         $this->createConstraint([
             'value' => 'value',
             'propertyPath' => 'propertyPath',
@@ -156,8 +156,8 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     {
         $constraint = $this->createConstraint(['propertyPath' => 'foo']);
 
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
 
         $object = new ComparisonTest_Class(5);
 
@@ -227,8 +227,8 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      */
     public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage($expectedMessage);
 
         $this->validator->validate($value, $constraint);
     }

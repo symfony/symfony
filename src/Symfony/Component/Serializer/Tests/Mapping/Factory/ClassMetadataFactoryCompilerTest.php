@@ -54,10 +54,10 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
         file_put_contents($this->dumpPath, $code);
         $compiledMetadata = require $this->dumpPath;
 
-        $this->assertCount(3, $compiledMetadata);
+        self::assertCount(3, $compiledMetadata);
 
-        $this->assertArrayHasKey(Dummy::class, $compiledMetadata);
-        $this->assertEquals([
+        self::assertArrayHasKey(Dummy::class, $compiledMetadata);
+        self::assertEquals([
             [
                 'foo' => [[], null, null],
                 'bar' => [[], null, null],
@@ -67,8 +67,8 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
             null,
         ], $compiledMetadata[Dummy::class]);
 
-        $this->assertArrayHasKey(MaxDepthDummy::class, $compiledMetadata);
-        $this->assertEquals([
+        self::assertArrayHasKey(MaxDepthDummy::class, $compiledMetadata);
+        self::assertEquals([
             [
                 'foo' => [[], 2, null],
                 'bar' => [[], 3, null],
@@ -77,8 +77,8 @@ final class ClassMetadataFactoryCompilerTest extends TestCase
             null,
         ], $compiledMetadata[MaxDepthDummy::class]);
 
-        $this->assertArrayHasKey(SerializedNameDummy::class, $compiledMetadata);
-        $this->assertEquals([
+        self::assertArrayHasKey(SerializedNameDummy::class, $compiledMetadata);
+        self::assertEquals([
             [
                 'foo' => [[], null, 'baz'],
                 'bar' => [[], null, 'qux'],

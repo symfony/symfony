@@ -55,7 +55,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
 
     public function testThrowsExceptionIfNotTraversable()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate('foobar', new Collection(['fields' => [
             'foo' => new Range(['min' => 4]),
         ]]));
@@ -399,7 +399,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
             ],
         ]));
 
-        $this->assertEquals([
+        self::assertEquals([
             'foo' => 3,
         ], (array) $value);
     }

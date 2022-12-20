@@ -32,12 +32,12 @@ class SerializerCacheWarmerTest extends TestCase
         $warmer = new SerializerCacheWarmer($loaders, $file);
         $warmer->warmUp(\dirname($file));
 
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
 
         $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
 
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+        self::assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
+        self::assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
     public function loaderProvider()
@@ -68,7 +68,7 @@ class SerializerCacheWarmerTest extends TestCase
         $warmer = new SerializerCacheWarmer([], $file);
         $warmer->warmUp(\dirname($file));
 
-        $this->assertFileExists($file);
+        self::assertFileExists($file);
     }
 
     /**
@@ -77,7 +77,7 @@ class SerializerCacheWarmerTest extends TestCase
      */
     public function testClassAutoloadException()
     {
-        $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
+        self::assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
         $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__));
 
@@ -98,10 +98,10 @@ class SerializerCacheWarmerTest extends TestCase
      */
     public function testClassAutoloadExceptionWithUnrelatedException()
     {
-        $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage('This exception should not be caught by the warmer.');
+        self::expectException(\DomainException::class);
+        self::expectExceptionMessage('This exception should not be caught by the warmer.');
 
-        $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
+        self::assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
         $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__));
 

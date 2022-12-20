@@ -36,12 +36,12 @@ class PdoCasterTest extends TestCase
 
         $cast = PdoCaster::castPdo($pdo, [], new Stub(), false);
 
-        $this->assertInstanceOf(EnumStub::class, $cast["\0~\0attributes"]);
+        self::assertInstanceOf(EnumStub::class, $cast["\0~\0attributes"]);
 
         $attr = $cast["\0~\0attributes"] = $cast["\0~\0attributes"]->value;
-        $this->assertInstanceOf(ConstStub::class, $attr['CASE']);
-        $this->assertSame('NATURAL', $attr['CASE']->class);
-        $this->assertSame('BOTH', $attr['DEFAULT_FETCH_MODE']->class);
+        self::assertInstanceOf(ConstStub::class, $attr['CASE']);
+        self::assertSame('NATURAL', $attr['CASE']->class);
+        self::assertSame('BOTH', $attr['DEFAULT_FETCH_MODE']->class);
 
         $xDump = <<<'EODUMP'
 array:2 [

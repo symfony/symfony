@@ -26,8 +26,8 @@ class SerializerPassTest extends TestCase
 {
     public function testThrowExceptionWhenNoNormalizers()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('You must tag at least one service as "serializer.normalizer" to use the "serializer" service');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('You must tag at least one service as "serializer.normalizer" to use the "serializer" service');
         $container = new ContainerBuilder();
         $container->register('serializer');
 
@@ -37,8 +37,8 @@ class SerializerPassTest extends TestCase
 
     public function testThrowExceptionWhenNoEncoders()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('You must tag at least one service as "serializer.encoder" to use the "serializer" service');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('You must tag at least one service as "serializer.encoder" to use the "serializer" service');
         $container = new ContainerBuilder();
         $container->register('serializer')
             ->addArgument([])
@@ -66,8 +66,8 @@ class SerializerPassTest extends TestCase
             new Reference('n2'),
             new Reference('n3'),
         ];
-        $this->assertEquals($expected, $definition->getArgument(0));
-        $this->assertEquals($expected, $definition->getArgument(1));
+        self::assertEquals($expected, $definition->getArgument(0));
+        self::assertEquals($expected, $definition->getArgument(1));
     }
 
     public function testBindSerializerDefaultContext()
@@ -81,6 +81,6 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
 
         $bindings = $definition->getBindings();
-        $this->assertEquals($bindings['array $defaultContext'], new BoundArgument(['enable_max_depth' => true], false));
+        self::assertEquals($bindings['array $defaultContext'], new BoundArgument(['enable_max_depth' => true], false));
     }
 }

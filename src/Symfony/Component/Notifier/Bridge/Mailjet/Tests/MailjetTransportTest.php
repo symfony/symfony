@@ -26,7 +26,7 @@ final class MailjetTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new MailjetTransport('authtoken', 'Mailjet', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MailjetTransport('authtoken', 'Mailjet', $client ?? self::createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
@@ -42,6 +42,6 @@ final class MailjetTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

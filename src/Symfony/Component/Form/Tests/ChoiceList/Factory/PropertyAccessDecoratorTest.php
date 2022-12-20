@@ -39,14 +39,14 @@ class PropertyAccessDecoratorTest extends TestCase
     {
         $object = (object) ['property' => 'value'];
 
-        $this->assertSame(['value' => $object], $this->factory->createListFromChoices([$object], 'property')->getChoices());
+        self::assertSame(['value' => $object], $this->factory->createListFromChoices([$object], 'property')->getChoices());
     }
 
     public function testCreateFromChoicesPropertyPathInstance()
     {
         $object = (object) ['property' => 'value'];
 
-        $this->assertSame(['value' => $object], $this->factory->createListFromChoices([$object], new PropertyPath('property'))->getChoices());
+        self::assertSame(['value' => $object], $this->factory->createListFromChoices([$object], new PropertyPath('property'))->getChoices());
     }
 
     public function testCreateFromChoicesFilterPropertyPath()
@@ -58,7 +58,7 @@ class PropertyAccessDecoratorTest extends TestCase
             'two' => $object2,
         ];
 
-        $this->assertSame(['value 2' => $object2], $this->factory->createListFromChoices($choices, 'property', 'filter')->getChoices());
+        self::assertSame(['value 2' => $object2], $this->factory->createListFromChoices($choices, 'property', 'filter')->getChoices());
     }
 
     public function testCreateFromChoicesFilterPropertyPathInstance()
@@ -70,10 +70,7 @@ class PropertyAccessDecoratorTest extends TestCase
             'two' => $object2,
         ];
 
-        $this->assertSame(
-            ['value 2' => $object2],
-            $this->factory->createListFromChoices($choices, new PropertyPath('property'), new PropertyPath('filter'))->getChoices()
-        );
+        self::assertSame(['value 2' => $object2], $this->factory->createListFromChoices($choices, new PropertyPath('property'), new PropertyPath('filter'))->getChoices());
     }
 
     public function testCreateFromLoaderPropertyPath()
@@ -81,7 +78,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['property' => 'value'];
         $loader = new ArrayChoiceLoader([$object]);
 
-        $this->assertSame(['value' => $object], $this->factory->createListFromLoader($loader, 'property')->getChoices());
+        self::assertSame(['value' => $object], $this->factory->createListFromLoader($loader, 'property')->getChoices());
     }
 
     public function testCreateFromLoaderFilterPropertyPath()
@@ -94,7 +91,7 @@ class PropertyAccessDecoratorTest extends TestCase
         ];
         $loader = new ArrayChoiceLoader($choices);
 
-        $this->assertSame(['value 2' => $object2], $this->factory->createListFromLoader($loader, 'property', 'filter')->getChoices());
+        self::assertSame(['value 2' => $object2], $this->factory->createListFromLoader($loader, 'property', 'filter')->getChoices());
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -102,7 +99,7 @@ class PropertyAccessDecoratorTest extends TestCase
     {
         $choices = [null];
 
-        $this->assertSame(['' => null], $this->factory->createListFromChoices($choices, 'property')->getChoices());
+        self::assertSame(['' => null], $this->factory->createListFromChoices($choices, 'property')->getChoices());
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -110,7 +107,7 @@ class PropertyAccessDecoratorTest extends TestCase
     {
         $loader = new ArrayChoiceLoader([null]);
 
-        $this->assertSame(['' => null], $this->factory->createListFromLoader($loader, 'property')->getChoices());
+        self::assertSame(['' => null], $this->factory->createListFromLoader($loader, 'property')->getChoices());
     }
 
     public function testCreateFromLoaderPropertyPathInstance()
@@ -118,7 +115,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['property' => 'value'];
         $loader = new ArrayChoiceLoader([$object]);
 
-        $this->assertSame(['value' => $object], $this->factory->createListFromLoader($loader, new PropertyPath('property'))->getChoices());
+        self::assertSame(['value' => $object], $this->factory->createListFromLoader($loader, new PropertyPath('property'))->getChoices());
     }
 
     public function testCreateViewPreferredChoicesAsPropertyPath()
@@ -126,8 +123,8 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, 'preferred_choice')->choices);
-        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, 'preferred_choice')->preferredChoices);
+        self::assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, 'preferred_choice')->choices);
+        self::assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, 'preferred_choice')->preferredChoices);
     }
 
     public function testCreateViewPreferredChoicesAsPropertyPathInstance()
@@ -135,8 +132,8 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice'))->choices);
-        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice'))->preferredChoices);
+        self::assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice'))->choices);
+        self::assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice'))->preferredChoices);
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -145,8 +142,8 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice.property'))->choices);
-        $this->assertEquals([], $this->factory->createView($list, new PropertyPath('preferred_choice.property'))->preferredChoices);
+        self::assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, new PropertyPath('preferred_choice.property'))->choices);
+        self::assertEquals([], $this->factory->createView($list, new PropertyPath('preferred_choice.property'))->preferredChoices);
     }
 
     public function testCreateViewLabelsAsPropertyPath()
@@ -154,7 +151,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals([new ChoiceView($object, '0', 'foo')], $this->factory->createView($list, null, 'view_label')->choices);
+        self::assertEquals([new ChoiceView($object, '0', 'foo')], $this->factory->createView($list, null, 'view_label')->choices);
     }
 
     public function testCreateViewLabelsAsPropertyPathInstance()
@@ -162,7 +159,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals([new ChoiceView($object, '0', 'foo')], $this->factory->createView($list, null, new PropertyPath('view_label'))->choices);
+        self::assertEquals([new ChoiceView($object, '0', 'foo')], $this->factory->createView($list, null, new PropertyPath('view_label'))->choices);
     }
 
     public function testCreateViewIndicesAsPropertyPath()
@@ -170,7 +167,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals(['key' => new ChoiceView($object, '0', '0')], $this->factory->createView($list, null, null, 'view_index')->choices);
+        self::assertEquals(['key' => new ChoiceView($object, '0', '0')], $this->factory->createView($list, null, null, 'view_index')->choices);
     }
 
     public function testCreateViewIndicesAsPropertyPathInstance()
@@ -178,7 +175,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals(['key' => new ChoiceView($object, '0', '0')], $this->factory->createView($list, null, null, new PropertyPath('view_index'))->choices);
+        self::assertEquals(['key' => new ChoiceView($object, '0', '0')], $this->factory->createView($list, null, null, new PropertyPath('view_index'))->choices);
     }
 
     public function testCreateViewGroupsAsPropertyPath()
@@ -186,7 +183,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals(['bar' => new ChoiceGroupView('bar', [new ChoiceView($object, '0', '0')])], $this->factory->createView($list, null, null, null, 'view_group')->choices);
+        self::assertEquals(['bar' => new ChoiceGroupView('bar', [new ChoiceView($object, '0', '0')])], $this->factory->createView($list, null, null, null, 'view_group')->choices);
     }
 
     public function testCreateViewGroupsAsPropertyPathInstance()
@@ -194,7 +191,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals(['bar' => new ChoiceGroupView('bar', [new ChoiceView($object, '0', '0')])], $this->factory->createView($list, null, null, null, new PropertyPath('view_group'))->choices);
+        self::assertEquals(['bar' => new ChoiceGroupView('bar', [new ChoiceView($object, '0', '0')])], $this->factory->createView($list, null, null, null, new PropertyPath('view_group'))->choices);
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -202,7 +199,7 @@ class PropertyAccessDecoratorTest extends TestCase
     {
         $list = new ArrayChoiceList([]);
 
-        $this->assertSame([], $this->factory->createView($list, null, null, null, 'group.name')->choices);
+        self::assertSame([], $this->factory->createView($list, null, null, null, 'group.name')->choices);
     }
 
     public function testCreateViewAttrAsPropertyPath()
@@ -210,7 +207,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals([new ChoiceView($object, '0', '0', ['baz' => 'foobar'])], $this->factory->createView($list, null, null, null, null, 'view_attribute')->choices);
+        self::assertEquals([new ChoiceView($object, '0', '0', ['baz' => 'foobar'])], $this->factory->createView($list, null, null, null, null, 'view_attribute')->choices);
     }
 
     public function testCreateViewAttrAsPropertyPathInstance()
@@ -218,6 +215,6 @@ class PropertyAccessDecoratorTest extends TestCase
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
 
-        $this->assertEquals([new ChoiceView($object, '0', '0', ['baz' => 'foobar'])], $this->factory->createView($list, null, null, null, null, new PropertyPath('view_attribute'))->choices);
+        self::assertEquals([new ChoiceView($object, '0', '0', ['baz' => 'foobar'])], $this->factory->createView($list, null, null, null, null, new PropertyPath('view_attribute'))->choices);
     }
 }

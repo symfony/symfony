@@ -28,9 +28,9 @@ class SessionPassTest extends TestCase
 
         (new SessionPass())->process($container);
 
-        $this->assertTrue($container->hasAlias('session'));
-        $this->assertSame($container->findDefinition('session'), $container->getDefinition('.session.do-not-use'));
-        $this->assertTrue($container->getAlias('session')->isDeprecated());
+        self::assertTrue($container->hasAlias('session'));
+        self::assertSame($container->findDefinition('session'), $container->getDefinition('.session.do-not-use'));
+        self::assertTrue($container->getAlias('session')->isDeprecated());
     }
 
     public function testProcessUserDefinedSession()
@@ -54,12 +54,12 @@ class SessionPassTest extends TestCase
 
         (new SessionPass())->process($container);
 
-        $this->assertSame($arguments, $container->getDefinition('session')->getArguments());
-        $this->assertNull($container->getDefinition('session.flash_bag')->getFactory());
-        $this->assertNull($container->getDefinition('session.attribute_bag')->getFactory());
-        $this->assertTrue($container->hasAlias('.session.do-not-use'));
-        $this->assertSame($container->getDefinition('session'), $container->findDefinition('.session.do-not-use'));
-        $this->assertTrue($container->getDefinition('session')->isDeprecated());
+        self::assertSame($arguments, $container->getDefinition('session')->getArguments());
+        self::assertNull($container->getDefinition('session.flash_bag')->getFactory());
+        self::assertNull($container->getDefinition('session.attribute_bag')->getFactory());
+        self::assertTrue($container->hasAlias('.session.do-not-use'));
+        self::assertSame($container->getDefinition('session'), $container->findDefinition('.session.do-not-use'));
+        self::assertTrue($container->getDefinition('session')->isDeprecated());
     }
 
     public function testProcessUserDefinedAlias()
@@ -85,11 +85,11 @@ class SessionPassTest extends TestCase
 
         (new SessionPass())->process($container);
 
-        $this->assertSame($arguments, $container->findDefinition('session')->getArguments());
-        $this->assertNull($container->getDefinition('session.flash_bag')->getFactory());
-        $this->assertNull($container->getDefinition('session.attribute_bag')->getFactory());
-        $this->assertTrue($container->hasAlias('.session.do-not-use'));
-        $this->assertSame($container->findDefinition('session'), $container->findDefinition('.session.do-not-use'));
-        $this->assertTrue($container->getAlias('session')->isDeprecated());
+        self::assertSame($arguments, $container->findDefinition('session')->getArguments());
+        self::assertNull($container->getDefinition('session.flash_bag')->getFactory());
+        self::assertNull($container->getDefinition('session.attribute_bag')->getFactory());
+        self::assertTrue($container->hasAlias('.session.do-not-use'));
+        self::assertSame($container->findDefinition('session'), $container->findDefinition('.session.do-not-use'));
+        self::assertTrue($container->getAlias('session')->isDeprecated());
     }
 }

@@ -39,7 +39,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
@@ -64,17 +64,17 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->redisClient = null;
         $this->storage = null;
 
-        parent::tearDown();
+        self::tearDown();
     }
 
     public function testOpenSession()
     {
-        $this->assertTrue($this->storage->open('', ''));
+        self::assertTrue($this->storage->open('', ''));
     }
 
     public function testCloseSession()
     {
-        $this->assertTrue($this->storage->close());
+        self::assertTrue($this->storage->close());
     }
 
     public function testReadSession()
@@ -82,16 +82,16 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->redisClient->set(self::PREFIX.'id1', null);
         $this->redisClient->set(self::PREFIX.'id2', 'abc123');
 
-        $this->assertEquals('', $this->storage->read('id1'));
-        $this->assertEquals('abc123', $this->storage->read('id2'));
+        self::assertEquals('', $this->storage->read('id1'));
+        self::assertEquals('abc123', $this->storage->read('id2'));
     }
 
     public function testWriteSession()
     {
-        $this->assertTrue($this->storage->write('id', 'data'));
+        self::assertTrue($this->storage->write('id', 'data'));
 
-        $this->assertTrue((bool) $this->redisClient->exists(self::PREFIX.'id'));
-        $this->assertEquals('data', $this->redisClient->get(self::PREFIX.'id'));
+        self::assertTrue((bool) $this->redisClient->exists(self::PREFIX.'id'));
+        self::assertEquals('data', $this->redisClient->get(self::PREFIX.'id'));
     }
 
     public function testUseSessionGcMaxLifetimeAsTimeToLive()
@@ -99,22 +99,22 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->storage->write('id', 'data');
         $ttl = $this->redisClient->ttl(self::PREFIX.'id');
 
-        $this->assertLessThanOrEqual(\ini_get('session.gc_maxlifetime'), $ttl);
-        $this->assertGreaterThanOrEqual(0, $ttl);
+        self::assertLessThanOrEqual(\ini_get('session.gc_maxlifetime'), $ttl);
+        self::assertGreaterThanOrEqual(0, $ttl);
     }
 
     public function testDestroySession()
     {
         $this->redisClient->set(self::PREFIX.'id', 'foo');
 
-        $this->assertTrue((bool) $this->redisClient->exists(self::PREFIX.'id'));
-        $this->assertTrue($this->storage->destroy('id'));
-        $this->assertFalse((bool) $this->redisClient->exists(self::PREFIX.'id'));
+        self::assertTrue((bool) $this->redisClient->exists(self::PREFIX.'id'));
+        self::assertTrue($this->storage->destroy('id'));
+        self::assertFalse((bool) $this->redisClient->exists(self::PREFIX.'id'));
     }
 
     public function testGcSession()
     {
-        $this->assertIsInt($this->storage->gc(123));
+        self::assertIsInt($this->storage->gc(123));
     }
 
     public function testUpdateTimestamp()
@@ -124,7 +124,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->redisClient->setex(self::PREFIX.'id', $lowTtl, 'foo');
         $this->storage->updateTimestamp('id', 'data');
 
-        $this->assertGreaterThan($lowTtl, $this->redisClient->ttl(self::PREFIX.'id'));
+        self::assertGreaterThan($lowTtl, $this->redisClient->ttl(self::PREFIX.'id'));
     }
 
     /**
@@ -134,9 +134,9 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
     {
         try {
             new RedisSessionHandler($this->redisClient, $options);
-            $this->assertTrue($supported);
+            self::assertTrue($supported);
         } catch (\InvalidArgumentException $e) {
-            $this->assertFalse($supported);
+            self::assertFalse($supported);
         }
     }
 
@@ -165,8 +165,8 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $handler->write('id', 'data');
         $redisTtl = $this->redisClient->ttl(self::PREFIX.'id');
 
-        $this->assertLessThan($redisTtl, $ttl - 5);
-        $this->assertGreaterThan($redisTtl, $ttl + 5);
+        self::assertLessThan($redisTtl, $ttl - 5);
+        self::assertGreaterThan($redisTtl, $ttl + 5);
     }
 
     public function getTtlFixtures(): array

@@ -30,12 +30,12 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection = self::createMock(Connection::class);
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = self::createMock(EntityManagerInterface::class);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
 
-        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->managerRegistry = self::createMock(ManagerRegistry::class);
         $this->managerRegistry->method('getManager')->willReturn($this->entityManager);
 
         $this->middleware = new DoctrineCloseConnectionMiddleware(
@@ -46,7 +46,7 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewareCloseConnection()
     {
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('close')
         ;
 
@@ -58,22 +58,22 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testInvalidEntityManagerThrowsException()
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = self::createMock(ManagerRegistry::class);
         $managerRegistry
             ->method('getManager')
             ->with('unknown_manager')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->will(self::throwException(new \InvalidArgumentException()));
 
         $middleware = new DoctrineCloseConnectionMiddleware($managerRegistry, 'unknown_manager');
 
-        $this->expectException(UnrecoverableMessageHandlingException::class);
+        self::expectException(UnrecoverableMessageHandlingException::class);
 
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
     }
 
     public function testMiddlewareNotCloseInNonWorkerContext()
     {
-        $this->connection->expects($this->never())
+        $this->connection->expects(self::never())
             ->method('close')
         ;
 

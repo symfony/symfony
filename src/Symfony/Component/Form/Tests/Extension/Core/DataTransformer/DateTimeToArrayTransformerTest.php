@@ -32,7 +32,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'second' => '6',
         ];
 
-        $this->assertSame($output, $transformer->transform($input));
+        self::assertSame($output, $transformer->transform($input));
     }
 
     public function testTransformEmpty()
@@ -48,7 +48,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'second' => '',
         ];
 
-        $this->assertSame($output, $transformer->transform(null));
+        self::assertSame($output, $transformer->transform(null));
     }
 
     public function testTransformEmptyWithFields()
@@ -61,7 +61,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'second' => '',
         ];
 
-        $this->assertSame($output, $transformer->transform(null));
+        self::assertSame($output, $transformer->transform(null));
     }
 
     public function testTransformWithFields()
@@ -77,7 +77,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'second' => '6',
         ];
 
-        $this->assertSame($output, $transformer->transform($input));
+        self::assertSame($output, $transformer->transform($input));
     }
 
     public function testTransformWithPadding()
@@ -95,7 +95,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'second' => '06',
         ];
 
-        $this->assertSame($output, $transformer->transform($input));
+        self::assertSame($output, $transformer->transform($input));
     }
 
     public function testTransformDifferentTimezones()
@@ -115,7 +115,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'second' => (string) (int) $dateTime->format('s'),
         ];
 
-        $this->assertSame($output, $transformer->transform($input));
+        self::assertSame($output, $transformer->transform($input));
     }
 
     public function testTransformDateTimeImmutable()
@@ -135,12 +135,12 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'second' => (string) (int) $dateTime->format('s'),
         ];
 
-        $this->assertSame($output, $transformer->transform($input));
+        self::assertSame($output, $transformer->transform($input));
     }
 
     public function testTransformRequiresDateTime()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform('12345');
     }
@@ -160,7 +160,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        self::assertEquals($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformWithSomeZero()
@@ -178,7 +178,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
         $output = new \DateTime('2010-02-03 04:00:00 UTC');
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        self::assertEquals($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyEmpty()
@@ -194,7 +194,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'second' => '',
         ];
 
-        $this->assertNull($transformer->reverseTransform($input));
+        self::assertNull($transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyEmptySubsetOfFields()
@@ -207,12 +207,12 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
             'day' => '',
         ];
 
-        $this->assertNull($transformer->reverseTransform($input));
+        self::assertNull($transformer->reverseTransform($input));
     }
 
     public function testReverseTransformPartiallyEmptyYear()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'month' => '2',
@@ -225,7 +225,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformPartiallyEmptyMonth()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -238,7 +238,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformPartiallyEmptyDay()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -251,7 +251,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformPartiallyEmptyHour()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -264,7 +264,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformPartiallyEmptyMinute()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -277,7 +277,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformPartiallyEmptySecond()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -292,7 +292,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
     {
         $transformer = new DateTimeToArrayTransformer();
 
-        $this->assertNull($transformer->reverseTransform(null));
+        self::assertNull($transformer->reverseTransform(null));
     }
 
     public function testReverseTransformDifferentTimezones()
@@ -311,7 +311,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
         $output = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
         $output->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        self::assertEquals($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformToDifferentTimezone()
@@ -330,19 +330,19 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        self::assertEquals($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformRequiresArray()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform('12345');
     }
 
     public function testReverseTransformWithNegativeYear()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '-1',
@@ -356,7 +356,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithNegativeMonth()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -370,7 +370,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithNegativeDay()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -384,7 +384,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithNegativeHour()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -398,7 +398,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithNegativeMinute()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -412,7 +412,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithNegativeSecond()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -426,7 +426,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithInvalidMonth()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -440,7 +440,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithInvalidDay()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -454,7 +454,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithStringDay()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -468,7 +468,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithStringMonth()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -482,7 +482,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithStringYear()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => 'bazinga',
@@ -496,7 +496,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithEmptyStringHour()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -510,7 +510,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithEmptyStringMinute()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -524,7 +524,7 @@ class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
 
     public function testReverseTransformWithEmptyStringSecond()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',

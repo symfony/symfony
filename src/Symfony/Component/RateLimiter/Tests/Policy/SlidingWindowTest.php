@@ -24,24 +24,24 @@ class SlidingWindowTest extends TestCase
     public function testGetExpirationTime()
     {
         $window = new SlidingWindow('foo', 10);
-        $this->assertSame(2 * 10, $window->getExpirationTime());
-        $this->assertSame(2 * 10, $window->getExpirationTime());
+        self::assertSame(2 * 10, $window->getExpirationTime());
+        self::assertSame(2 * 10, $window->getExpirationTime());
 
         $data = serialize($window);
         sleep(10);
         $cachedWindow = unserialize($data);
-        $this->assertSame(10, $cachedWindow->getExpirationTime());
+        self::assertSame(10, $cachedWindow->getExpirationTime());
 
         $new = SlidingWindow::createFromPreviousWindow($cachedWindow, 15);
-        $this->assertSame(2 * 15, $new->getExpirationTime());
+        self::assertSame(2 * 15, $new->getExpirationTime());
 
         usleep(10.1);
-        $this->assertIsInt($new->getExpirationTime());
+        self::assertIsInt($new->getExpirationTime());
     }
 
     public function testInvalidInterval()
     {
-        $this->expectException(InvalidIntervalException::class);
+        self::expectException(InvalidIntervalException::class);
         new SlidingWindow('foo', 0);
     }
 
@@ -49,22 +49,22 @@ class SlidingWindowTest extends TestCase
     {
         ClockMock::register(SlidingWindow::class);
         $window = new SlidingWindow('foo', 60);
-        $this->assertSame(0, $window->getHitCount());
+        self::assertSame(0, $window->getHitCount());
         $window->add(20);
-        $this->assertSame(20, $window->getHitCount());
+        self::assertSame(20, $window->getHitCount());
 
         sleep(60);
         $new = SlidingWindow::createFromPreviousWindow($window, 60);
-        $this->assertSame(20, $new->getHitCount());
+        self::assertSame(20, $new->getHitCount());
 
         sleep(30);
-        $this->assertSame(10, $new->getHitCount());
+        self::assertSame(10, $new->getHitCount());
 
         sleep(30);
-        $this->assertSame(0, $new->getHitCount());
+        self::assertSame(0, $new->getHitCount());
 
         sleep(30);
-        $this->assertSame(0, $new->getHitCount());
+        self::assertSame(0, $new->getHitCount());
     }
 
     public function testLongIntervalCreate()
@@ -74,7 +74,7 @@ class SlidingWindowTest extends TestCase
 
         sleep(300);
         $new = SlidingWindow::createFromPreviousWindow($window, 60);
-        $this->assertFalse($new->isExpired());
+        self::assertFalse($new->isExpired());
     }
 
     public function testCreateFromPreviousWindowUsesMicrotime()
@@ -86,7 +86,7 @@ class SlidingWindowTest extends TestCase
         $new = SlidingWindow::createFromPreviousWindow($window, 4);
 
         // should be 400ms left (12 - 11.6)
-        $this->assertEqualsWithDelta(0.4, $new->getRetryAfter()->format('U.u') - microtime(true), 0.2);
+        self::assertEqualsWithDelta(0.4, $new->getRetryAfter()->format('U.u') - microtime(true), 0.2);
     }
 
     public function testIsExpiredUsesMicrotime()
@@ -95,7 +95,7 @@ class SlidingWindowTest extends TestCase
         $window = new SlidingWindow('foo', 10);
 
         usleep(10.1 * 1e6);
-        $this->assertTrue($window->isExpired());
+        self::assertTrue($window->isExpired());
     }
 
     public function testGetRetryAfterUsesMicrotime()
@@ -104,7 +104,7 @@ class SlidingWindowTest extends TestCase
 
         usleep(9.5 * 1e6);
         // should be 500ms left (10 - 9.5)
-        $this->assertEqualsWithDelta(0.5, $window->getRetryAfter()->format('U.u') - microtime(true), 0.2);
+        self::assertEqualsWithDelta(0.5, $window->getRetryAfter()->format('U.u') - microtime(true), 0.2);
     }
 
     public function testCreateAtExactTime()
@@ -113,6 +113,6 @@ class SlidingWindowTest extends TestCase
         ClockMock::withClockMock(1234567890.000000);
         $window = new SlidingWindow('foo', 10);
         $window->getRetryAfter();
-        $this->assertEquals('1234567900.000000', $window->getRetryAfter()->format('U.u'));
+        self::assertEquals('1234567900.000000', $window->getRetryAfter()->format('U.u'));
     }
 }

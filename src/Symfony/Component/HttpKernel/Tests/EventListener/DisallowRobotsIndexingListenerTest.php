@@ -29,11 +29,11 @@ class DisallowRobotsIndexingListenerTest extends TestCase
         $response = new Response(...$responseArgs);
         $listener = new DisallowRobotsIndexingListener();
 
-        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), KernelInterface::MAIN_REQUEST, $response);
+        $event = new ResponseEvent(self::createMock(HttpKernelInterface::class), new Request(), KernelInterface::MAIN_REQUEST, $response);
 
         $listener->onResponse($event);
 
-        $this->assertSame($expected, $response->headers->get('X-Robots-Tag'), 'Header doesn\'t match expectations');
+        self::assertSame($expected, $response->headers->get('X-Robots-Tag'), 'Header doesn\'t match expectations');
     }
 
     public function provideResponses(): iterable

@@ -53,13 +53,13 @@ class WebProfilerExtensionTest extends TestCase
     {
         parent::setUp();
 
-        $this->kernel = $this->createMock(KernelInterface::class);
+        $this->kernel = self::createMock(KernelInterface::class);
 
         $this->container = new ContainerBuilder();
         $this->container->register('data_collector.dump', DumpDataCollector::class)->setPublic(true);
         $this->container->register('error_handler.error_renderer.html', HtmlErrorRenderer::class)->setPublic(true);
         $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
-        $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'))->setPublic(true);
+        $this->container->register('router', self::getMockClass('Symfony\\Component\\Routing\\RouterInterface'))->setPublic(true);
         $this->container->register('twig', 'Twig\Environment')->setPublic(true);
         $this->container->register('twig_loader', 'Twig\Loader\ArrayLoader')->addArgument([])->setPublic(true);
         $this->container->register('twig', 'Twig\Environment')->addArgument(new Reference('twig_loader'))->setPublic(true);
@@ -71,9 +71,9 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('kernel.charset', 'UTF-8');
         $this->container->setParameter('debug.file_link_format', null);
         $this->container->setParameter('profiler.class', ['Symfony\\Component\\HttpKernel\\Profiler\\Profiler']);
-        $this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
+        $this->container->register('profiler', self::getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
             ->setPublic(true)
-            ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
+            ->addArgument(new Definition(self::getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
         $this->container->setParameter('data_collector.templates', []);
         $this->container->set('kernel', $this->kernel);
         $this->container->addCompilerPass(new RegisterListenersPass());
@@ -98,7 +98,7 @@ class WebProfilerExtensionTest extends TestCase
         $extension->load([[]], $this->container);
         $this->container->removeDefinition('web_profiler.controller.exception');
 
-        $this->assertFalse($this->container->has('web_profiler.debug_toolbar'));
+        self::assertFalse($this->container->has('web_profiler.debug_toolbar'));
 
         self::assertSaneContainer($this->getCompiledContainer());
     }
@@ -120,12 +120,12 @@ class WebProfilerExtensionTest extends TestCase
         $extension->load([['toolbar' => $toolbarEnabled]], $this->container);
         $this->container->removeDefinition('web_profiler.controller.exception');
 
-        $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
+        self::assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
         self::assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
 
         if ($listenerInjected) {
-            $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
+            self::assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
         }
     }
 
@@ -161,12 +161,12 @@ class WebProfilerExtensionTest extends TestCase
         );
         $this->container->removeDefinition('web_profiler.controller.exception');
 
-        $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
+        self::assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
         self::assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
 
         if ($listenerInjected) {
-            $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
+            self::assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
         }
     }
 

@@ -28,38 +28,38 @@ class CacheMetadataFactoryTest extends TestCase
     {
         $metadata = new ClassMetadata(Dummy::class);
 
-        $decorated = $this->createMock(ClassMetadataFactoryInterface::class);
+        $decorated = self::createMock(ClassMetadataFactoryInterface::class);
         $decorated
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMetadataFor')
             ->willReturn($metadata)
         ;
 
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
 
-        $this->assertEquals($metadata, $factory->getMetadataFor(Dummy::class));
+        self::assertEquals($metadata, $factory->getMetadataFor(Dummy::class));
         // The second call should retrieve the value from the cache
-        $this->assertEquals($metadata, $factory->getMetadataFor(Dummy::class));
+        self::assertEquals($metadata, $factory->getMetadataFor(Dummy::class));
     }
 
     public function testHasMetadataFor()
     {
-        $decorated = $this->createMock(ClassMetadataFactoryInterface::class);
+        $decorated = self::createMock(ClassMetadataFactoryInterface::class);
         $decorated
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('hasMetadataFor')
             ->willReturn(true)
         ;
 
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
 
-        $this->assertTrue($factory->hasMetadataFor(Dummy::class));
+        self::assertTrue($factory->hasMetadataFor(Dummy::class));
     }
 
     public function testInvalidClassThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $decorated = $this->createMock(ClassMetadataFactoryInterface::class);
+        self::expectException(InvalidArgumentException::class);
+        $decorated = self::createMock(ClassMetadataFactoryInterface::class);
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
 
         $factory->getMetadataFor('Not\Exist');
@@ -71,13 +71,13 @@ class CacheMetadataFactoryTest extends TestCase
         };
 
         $metadata = new ClassMetadata(\get_class($anonymousObject));
-        $decorated = $this->createMock(ClassMetadataFactoryInterface::class);
+        $decorated = self::createMock(ClassMetadataFactoryInterface::class);
         $decorated
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMetadataFor')
             ->willReturn($metadata);
 
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
-        $this->assertEquals($metadata, $factory->getMetadataFor($anonymousObject));
+        self::assertEquals($metadata, $factory->getMetadataFor($anonymousObject));
     }
 }

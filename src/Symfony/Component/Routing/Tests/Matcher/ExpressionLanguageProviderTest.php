@@ -56,7 +56,7 @@ class ExpressionLanguageProviderTest extends TestCase
      */
     public function testCompile(string $expression, string $expected)
     {
-        $this->assertSame($expected, $this->expressionLanguage->compile($expression));
+        self::assertSame($expected, $this->expressionLanguage->compile($expression));
     }
 
     public function compileProvider(): iterable
@@ -73,7 +73,7 @@ class ExpressionLanguageProviderTest extends TestCase
      */
     public function testEvaluate(string $expression, $expected)
     {
-        $this->assertSame($expected, $this->expressionLanguage->evaluate($expression, ['context' => $this->context]));
+        self::assertSame($expected, $this->expressionLanguage->evaluate($expression, ['context' => $this->context]));
     }
 
     public function evaluateProvider(): iterable

@@ -24,7 +24,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
     {
         $voter = new RoleHierarchyVoter(new RoleHierarchy(['ROLE_FOO' => ['ROLE_FOOBAR']]));
 
-        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
+        self::assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
     public function getVoteTests()
@@ -41,7 +41,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
     {
         $voter = new RoleHierarchyVoter(new RoleHierarchy([]));
 
-        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
+        self::assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
     public function getVoteWithEmptyHierarchyTests()

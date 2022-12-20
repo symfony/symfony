@@ -46,16 +46,16 @@ class AddConsoleCommandPassTest extends TestCase
         $alias = 'console.command.public_alias.my-command';
 
         if ($public) {
-            $this->assertFalse($container->hasAlias($alias));
+            self::assertFalse($container->hasAlias($alias));
         } else {
             // The alias is replaced by a Definition by the ReplaceAliasByActualDefinitionPass
             // in case the original service is private
-            $this->assertFalse($container->hasDefinition($id));
-            $this->assertTrue($container->hasDefinition($alias));
+            self::assertFalse($container->hasDefinition($id));
+            self::assertTrue($container->hasDefinition($alias));
         }
 
-        $this->assertTrue($container->hasParameter('console.command.ids'));
-        $this->assertSame([$public ? $id : $alias], $container->getParameter('console.command.ids'));
+        self::assertTrue($container->hasParameter('console.command.ids'));
+        self::assertSame([$public ? $id : $alias], $container->getParameter('console.command.ids'));
     }
 
     public function testProcessRegistersLazyCommands()
@@ -73,11 +73,11 @@ class AddConsoleCommandPassTest extends TestCase
         $commandLoader = $container->getDefinition('console.command_loader');
         $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
 
-        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
-        $this->assertSame(['my:command' => 'my-command', 'my:alias' => 'my-command'], $commandLoader->getArgument(1));
-        $this->assertEquals([['my-command' => new ServiceClosureArgument(new TypedReference('my-command', MyCommand::class))]], $commandLocator->getArguments());
-        $this->assertSame([], $container->getParameter('console.command.ids'));
-        $this->assertSame([['setName', ['my:command']], ['setAliases', [['my:alias']]]], $command->getMethodCalls());
+        self::assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        self::assertSame(['my:command' => 'my-command', 'my:alias' => 'my-command'], $commandLoader->getArgument(1));
+        self::assertEquals([['my-command' => new ServiceClosureArgument(new TypedReference('my-command', MyCommand::class))]], $commandLocator->getArguments());
+        self::assertSame([], $container->getParameter('console.command.ids'));
+        self::assertSame([['setName', ['my:command']], ['setAliases', [['my:alias']]]], $command->getMethodCalls());
     }
 
     public function testProcessFallsBackToDefaultName()
@@ -95,10 +95,10 @@ class AddConsoleCommandPassTest extends TestCase
         $commandLoader = $container->getDefinition('console.command_loader');
         $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
 
-        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
-        $this->assertSame(['default' => 'with-default-name'], $commandLoader->getArgument(1));
-        $this->assertEquals([['with-default-name' => new ServiceClosureArgument(new TypedReference('with-default-name', NamedCommand::class))]], $commandLocator->getArguments());
-        $this->assertSame([], $container->getParameter('console.command.ids'));
+        self::assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        self::assertSame(['default' => 'with-default-name'], $commandLoader->getArgument(1));
+        self::assertEquals([['with-default-name' => new ServiceClosureArgument(new TypedReference('with-default-name', NamedCommand::class))]], $commandLocator->getArguments());
+        self::assertSame([], $container->getParameter('console.command.ids'));
 
         $container = new ContainerBuilder();
         $container
@@ -109,7 +109,7 @@ class AddConsoleCommandPassTest extends TestCase
 
         $pass->process($container);
 
-        $this->assertSame(['new-name' => 'with-default-name'], $container->getDefinition('console.command_loader')->getArgument(1));
+        self::assertSame(['new-name' => 'with-default-name'], $container->getDefinition('console.command_loader')->getArgument(1));
     }
 
     public function visibilityProvider()
@@ -134,23 +134,23 @@ class AddConsoleCommandPassTest extends TestCase
         $commandLoader = $container->getDefinition('console.command_loader');
         $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
 
-        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
-        $this->assertSame(['cmdname' => 'with-defaults', 'cmdalias' => 'with-defaults'], $commandLoader->getArgument(1));
-        $this->assertEquals([['with-defaults' => new ServiceClosureArgument(new Reference('.with-defaults.lazy'))]], $commandLocator->getArguments());
-        $this->assertSame([], $container->getParameter('console.command.ids'));
+        self::assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        self::assertSame(['cmdname' => 'with-defaults', 'cmdalias' => 'with-defaults'], $commandLoader->getArgument(1));
+        self::assertEquals([['with-defaults' => new ServiceClosureArgument(new Reference('.with-defaults.lazy'))]], $commandLocator->getArguments());
+        self::assertSame([], $container->getParameter('console.command.ids'));
 
         $initCounter = DescribedCommand::$initCounter;
         $command = $container->get('console.command_loader')->get('cmdname');
 
-        $this->assertInstanceOf(LazyCommand::class, $command);
-        $this->assertSame(['cmdalias'], $command->getAliases());
-        $this->assertSame('Just testing', $command->getDescription());
-        $this->assertTrue($command->isHidden());
-        $this->assertTrue($command->isEnabled());
-        $this->assertSame($initCounter, DescribedCommand::$initCounter);
+        self::assertInstanceOf(LazyCommand::class, $command);
+        self::assertSame(['cmdalias'], $command->getAliases());
+        self::assertSame('Just testing', $command->getDescription());
+        self::assertTrue($command->isHidden());
+        self::assertTrue($command->isEnabled());
+        self::assertSame($initCounter, DescribedCommand::$initCounter);
 
-        $this->assertSame('', $command->getHelp());
-        $this->assertSame(1 + $initCounter, DescribedCommand::$initCounter);
+        self::assertSame('', $command->getHelp());
+        self::assertSame(1 + $initCounter, DescribedCommand::$initCounter);
     }
 
     public function testEscapesDefaultFromPhp()
@@ -167,23 +167,23 @@ class AddConsoleCommandPassTest extends TestCase
         $commandLoader = $container->getDefinition('console.command_loader');
         $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
 
-        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
-        $this->assertSame(['%%cmd%%' => 'to-escape', '%%cmdalias%%' => 'to-escape'], $commandLoader->getArgument(1));
-        $this->assertEquals([['to-escape' => new ServiceClosureArgument(new Reference('.to-escape.lazy'))]], $commandLocator->getArguments());
-        $this->assertSame([], $container->getParameter('console.command.ids'));
+        self::assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        self::assertSame(['%%cmd%%' => 'to-escape', '%%cmdalias%%' => 'to-escape'], $commandLoader->getArgument(1));
+        self::assertEquals([['to-escape' => new ServiceClosureArgument(new Reference('.to-escape.lazy'))]], $commandLocator->getArguments());
+        self::assertSame([], $container->getParameter('console.command.ids'));
 
         $command = $container->get('console.command_loader')->get('%%cmd%%');
 
-        $this->assertInstanceOf(LazyCommand::class, $command);
-        $this->assertSame('%cmd%', $command->getName());
-        $this->assertSame(['%cmdalias%'], $command->getAliases());
-        $this->assertSame('Creates a 80% discount', $command->getDescription());
+        self::assertInstanceOf(LazyCommand::class, $command);
+        self::assertSame('%cmd%', $command->getName());
+        self::assertSame(['%cmdalias%'], $command->getAliases());
+        self::assertSame('Creates a 80% discount', $command->getDescription());
     }
 
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must not be abstract.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The service "my-command" tagged "console.command" must not be abstract.');
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -198,8 +198,8 @@ class AddConsoleCommandPassTest extends TestCase
 
     public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".');
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -228,8 +228,8 @@ class AddConsoleCommandPassTest extends TestCase
         (new AddConsoleCommandPass())->process($container);
 
         $aliasPrefix = 'console.command.public_alias.';
-        $this->assertTrue($container->hasAlias($aliasPrefix.'my-command1'));
-        $this->assertTrue($container->hasAlias($aliasPrefix.'my-command2'));
+        self::assertTrue($container->hasAlias($aliasPrefix.'my-command1'));
+        self::assertTrue($container->hasAlias($aliasPrefix.'my-command2'));
     }
 
     public function testProcessOnChildDefinitionWithClass()
@@ -254,7 +254,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->compile();
         $command = $container->get($childId);
 
-        $this->assertInstanceOf($className, $command);
+        self::assertInstanceOf($className, $command);
     }
 
     public function testProcessOnChildDefinitionWithParentClass()
@@ -278,13 +278,13 @@ class AddConsoleCommandPassTest extends TestCase
         $container->compile();
         $command = $container->get($childId);
 
-        $this->assertInstanceOf($className, $command);
+        self::assertInstanceOf($className, $command);
     }
 
     public function testProcessOnChildDefinitionWithoutClass()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('The definition for "my-child-command" has no class.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('The definition for "my-child-command" has no class.');
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
 

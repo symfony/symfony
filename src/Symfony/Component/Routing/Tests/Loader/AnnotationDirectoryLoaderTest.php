@@ -29,16 +29,16 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     public function testLoad()
     {
-        $this->reader->expects($this->exactly(4))->method('getClassAnnotation');
+        $this->reader->expects(self::exactly(4))->method('getClassAnnotation');
 
         $this->reader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMethodAnnotations')
             ->willReturn([])
         ;
 
         $this->reader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getClassAnnotations')
             ->willReturn([])
         ;
@@ -56,13 +56,13 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         ]);
 
         $this->reader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMethodAnnotations')
             ->willReturn([])
         ;
 
         $this->reader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getClassAnnotations')
             ->willReturn([])
         ;
@@ -74,24 +74,24 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
     {
         $fixturesDir = __DIR__.'/../Fixtures';
 
-        $this->assertTrue($this->loader->supports($fixturesDir), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($this->loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        self::assertTrue($this->loader->supports($fixturesDir), '->supports() returns true if the resource is loadable');
+        self::assertFalse($this->loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
-        $this->assertTrue($this->loader->supports($fixturesDir, 'annotation'), '->supports() checks the resource type if specified');
-        $this->assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports() checks the resource type if specified');
+        self::assertTrue($this->loader->supports($fixturesDir, 'annotation'), '->supports() checks the resource type if specified');
+        self::assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports() checks the resource type if specified');
     }
 
     public function testItSupportsAnyAnnotation()
     {
-        $this->assertTrue($this->loader->supports(__DIR__.'/../Fixtures/even-with-not-existing-folder', 'annotation'));
+        self::assertTrue($this->loader->supports(__DIR__.'/../Fixtures/even-with-not-existing-folder', 'annotation'));
     }
 
     public function testLoadFileIfLocatedResourceIsFile()
     {
-        $this->reader->expects($this->exactly(1))->method('getClassAnnotation');
+        $this->reader->expects(self::exactly(1))->method('getClassAnnotation');
 
         $this->reader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMethodAnnotations')
             ->willReturn([])
         ;
@@ -101,9 +101,9 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     private function expectAnnotationsToBeReadFrom(array $classes)
     {
-        $this->reader->expects($this->exactly(\count($classes)))
+        $this->reader->expects(self::exactly(\count($classes)))
             ->method('getClassAnnotation')
-            ->with($this->callback(function (\ReflectionClass $class) use ($classes) {
+            ->with(self::callback(function (\ReflectionClass $class) use ($classes) {
                 return \in_array($class->getName(), $classes);
             }));
     }

@@ -26,16 +26,16 @@ class ExceptionDataCollectorTest extends TestCase
         $flattened = FlattenException::createFromThrowable($e);
         $trace = $flattened->getTrace();
 
-        $this->assertFalse($c->hasException());
+        self::assertFalse($c->hasException());
 
         $c->collect(new Request(), new Response(), $e);
 
-        $this->assertTrue($c->hasException());
-        $this->assertEquals($flattened, $c->getException());
-        $this->assertSame('foo', $c->getMessage());
-        $this->assertSame(500, $c->getCode());
-        $this->assertSame('exception', $c->getName());
-        $this->assertSame($trace, $c->getTrace());
+        self::assertTrue($c->hasException());
+        self::assertEquals($flattened, $c->getException());
+        self::assertSame('foo', $c->getMessage());
+        self::assertSame(500, $c->getCode());
+        self::assertSame('exception', $c->getName());
+        self::assertSame($trace, $c->getTrace());
     }
 
     public function testCollectWithoutException()
@@ -43,7 +43,7 @@ class ExceptionDataCollectorTest extends TestCase
         $c = new ExceptionDataCollector();
         $c->collect(new Request(), new Response());
 
-        $this->assertFalse($c->hasException());
+        self::assertFalse($c->hasException());
     }
 
     public function testReset()
@@ -54,6 +54,6 @@ class ExceptionDataCollectorTest extends TestCase
         $c->reset();
         $c->collect(new Request(), new Response());
 
-        $this->assertFalse($c->hasException());
+        self::assertFalse($c->hasException());
     }
 }

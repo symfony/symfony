@@ -21,11 +21,11 @@ class SluggerLocaleAwareTest extends AbstractWebTestCase
      */
     public function testLocalizedSlugger()
     {
-        $kernel = static::createKernel(['test_case' => 'Slugger', 'root_config' => 'config.yml']);
+        $kernel = self::createKernel(['test_case' => 'Slugger', 'root_config' => 'config.yml']);
         $kernel->boot();
 
         $service = $kernel->getContainer()->get('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Slugger\SlugConstructArgService');
 
-        $this->assertSame('Stoinostta-tryabva-da-bude-luzha', $service->hello());
+        self::assertSame('Stoinostta-tryabva-da-bude-luzha', $service->hello());
     }
 }

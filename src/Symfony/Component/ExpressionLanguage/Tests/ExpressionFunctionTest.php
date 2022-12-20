@@ -23,15 +23,15 @@ class ExpressionFunctionTest extends TestCase
 {
     public function testFunctionDoesNotExist()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('PHP function "fn_does_not_exist" does not exist.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('PHP function "fn_does_not_exist" does not exist.');
         ExpressionFunction::fromPhp('fn_does_not_exist');
     }
 
     public function testFunctionNamespaced()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('An expression function name must be defined when PHP function "Symfony\Component\ExpressionLanguage\Tests\fn_namespaced" is namespaced.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('An expression function name must be defined when PHP function "Symfony\Component\ExpressionLanguage\Tests\fn_namespaced" is namespaced.');
         ExpressionFunction::fromPhp('Symfony\Component\ExpressionLanguage\Tests\fn_namespaced');
     }
 }

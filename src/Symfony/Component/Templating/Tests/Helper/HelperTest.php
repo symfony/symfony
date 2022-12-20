@@ -20,7 +20,7 @@ class HelperTest extends TestCase
     {
         $helper = new ProjectTemplateHelper();
         $helper->setCharset('ISO-8859-1');
-        $this->assertSame('ISO-8859-1', $helper->getCharset(), '->setCharset() sets the charset set related to this helper');
+        self::assertSame('ISO-8859-1', $helper->getCharset(), '->setCharset() sets the charset set related to this helper');
     }
 }
 

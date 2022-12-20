@@ -41,8 +41,8 @@ class ExceptionListenerTest extends TestCase
         $listener = $this->createExceptionListener();
         $listener->onKernelException($event);
 
-        $this->assertNull($event->getResponse());
-        $this->assertEquals($eventException, $event->getThrowable());
+        self::assertNull($event->getResponse());
+        self::assertEquals($eventException, $event->getThrowable());
     }
 
     /**
@@ -57,11 +57,11 @@ class ExceptionListenerTest extends TestCase
         $listener = $this->createExceptionListener(null, null, null, $this->createEntryPoint($response));
         $listener->onKernelException($event);
 
-        $this->assertTrue($event->isAllowingCustomResponseCode());
+        self::assertTrue($event->isAllowingCustomResponseCode());
 
-        $this->assertEquals('Forbidden', $event->getResponse()->getContent());
-        $this->assertEquals(403, $event->getResponse()->getStatusCode());
-        $this->assertSame($exception, $event->getThrowable());
+        self::assertEquals('Forbidden', $event->getResponse()->getContent());
+        self::assertEquals(403, $event->getResponse()->getStatusCode());
+        self::assertSame($exception, $event->getThrowable());
     }
 
     public function getAuthenticationExceptionProvider()
@@ -79,14 +79,14 @@ class ExceptionListenerTest extends TestCase
     {
         $event = $this->createEvent(new AuthenticationException());
 
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint->expects($this->once())->method('start')->willReturn('NOT A RESPONSE');
+        $entryPoint = self::createMock(AuthenticationEntryPointInterface::class);
+        $entryPoint->expects(self::once())->method('start')->willReturn('NOT A RESPONSE');
 
         $listener = $this->createExceptionListener(null, null, null, $entryPoint);
         $listener->onKernelException($event);
         // the exception has been replaced by our LogicException
-        $this->assertInstanceOf(\LogicException::class, $event->getThrowable());
-        $this->assertStringEndsWith('start()" method must return a Response object ("string" returned).', $event->getThrowable()->getMessage());
+        self::assertInstanceOf(\LogicException::class, $event->getThrowable());
+        self::assertStringEndsWith('start()" method must return a Response object ("string" returned).', $event->getThrowable()->getMessage());
     }
 
     /**
@@ -99,8 +99,8 @@ class ExceptionListenerTest extends TestCase
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true));
         $listener->onKernelException($event);
 
-        $this->assertNull($event->getResponse());
-        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
+        self::assertNull($event->getResponse());
+        self::assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -108,22 +108,22 @@ class ExceptionListenerTest extends TestCase
      */
     public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, \Exception $eventException = null)
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturn(new Response('Unauthorized', 401));
+        $kernel = self::createMock(HttpKernelInterface::class);
+        $kernel->expects(self::once())->method('handle')->willReturn(new Response('Unauthorized', 401));
 
         $event = $this->createEvent($exception, $kernel);
 
-        $httpUtils = $this->createMock(HttpUtils::class);
-        $httpUtils->expects($this->once())->method('createRequest')->willReturn(Request::create('/error'));
+        $httpUtils = self::createMock(HttpUtils::class);
+        $httpUtils->expects(self::once())->method('createRequest')->willReturn(Request::create('/error'));
 
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), $httpUtils, null, '/error');
         $listener->onKernelException($event);
 
-        $this->assertTrue($event->isAllowingCustomResponseCode());
+        self::assertTrue($event->isAllowingCustomResponseCode());
 
-        $this->assertEquals('Unauthorized', $event->getResponse()->getContent());
-        $this->assertEquals(401, $event->getResponse()->getStatusCode());
-        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
+        self::assertEquals('Unauthorized', $event->getResponse()->getContent());
+        self::assertEquals(401, $event->getResponse()->getStatusCode());
+        self::assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -133,14 +133,14 @@ class ExceptionListenerTest extends TestCase
     {
         $event = $this->createEvent($exception);
 
-        $accessDeniedHandler = $this->createMock(AccessDeniedHandlerInterface::class);
-        $accessDeniedHandler->expects($this->once())->method('handle')->willReturn(new Response('error'));
+        $accessDeniedHandler = self::createMock(AccessDeniedHandlerInterface::class);
+        $accessDeniedHandler->expects(self::once())->method('handle')->willReturn(new Response('error'));
 
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), null, null, null, $accessDeniedHandler);
         $listener->onKernelException($event);
 
-        $this->assertEquals('error', $event->getResponse()->getContent());
-        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
+        self::assertEquals('error', $event->getResponse()->getContent());
+        self::assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     /**
@@ -150,14 +150,14 @@ class ExceptionListenerTest extends TestCase
     {
         $event = $this->createEvent($exception);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage->expects($this->once())->method('getToken')->willReturn($this->createMock(TokenInterface::class));
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
+        $tokenStorage->expects(self::once())->method('getToken')->willReturn(self::createMock(TokenInterface::class));
 
         $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false), null, $this->createEntryPoint());
         $listener->onKernelException($event);
 
-        $this->assertEquals('OK', $event->getResponse()->getContent());
-        $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
+        self::assertEquals('OK', $event->getResponse()->getContent());
+        self::assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
     public function testLogoutException()
@@ -167,8 +167,8 @@ class ExceptionListenerTest extends TestCase
         $listener = $this->createExceptionListener();
         $listener->onKernelException($event);
 
-        $this->assertEquals('Invalid CSRF.', $event->getThrowable()->getMessage());
-        $this->assertEquals(403, $event->getThrowable()->getStatusCode());
+        self::assertEquals('Invalid CSRF.', $event->getThrowable()->getMessage());
+        self::assertEquals(403, $event->getThrowable()->getStatusCode());
     }
 
     public function testUnregister()
@@ -177,10 +177,10 @@ class ExceptionListenerTest extends TestCase
         $dispatcher = new EventDispatcher();
 
         $listener->register($dispatcher);
-        $this->assertNotEmpty($dispatcher->getListeners());
+        self::assertNotEmpty($dispatcher->getListeners());
 
         $listener->unregister($dispatcher);
-        $this->assertEmpty($dispatcher->getListeners());
+        self::assertEmpty($dispatcher->getListeners());
     }
 
     public function getAccessDeniedExceptionProvider()
@@ -196,16 +196,16 @@ class ExceptionListenerTest extends TestCase
 
     private function createEntryPoint(Response $response = null)
     {
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
-        $entryPoint->expects($this->once())->method('start')->willReturn($response ?? new Response('OK'));
+        $entryPoint = self::createMock(AuthenticationEntryPointInterface::class);
+        $entryPoint->expects(self::once())->method('start')->willReturn($response ?? new Response('OK'));
 
         return $entryPoint;
     }
 
     private function createTrustResolver($fullFledged)
     {
-        $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
-        $trustResolver->expects($this->once())->method('isFullFledged')->willReturn($fullFledged);
+        $trustResolver = self::createMock(AuthenticationTrustResolverInterface::class);
+        $trustResolver->expects(self::once())->method('isFullFledged')->willReturn($fullFledged);
 
         return $trustResolver;
     }
@@ -213,7 +213,7 @@ class ExceptionListenerTest extends TestCase
     private function createEvent(\Exception $exception, $kernel = null)
     {
         if (null === $kernel) {
-            $kernel = $this->createMock(HttpKernelInterface::class);
+            $kernel = self::createMock(HttpKernelInterface::class);
         }
 
         return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $exception);
@@ -222,9 +222,9 @@ class ExceptionListenerTest extends TestCase
     private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)
     {
         return new ExceptionListener(
-            $tokenStorage ?? $this->createMock(TokenStorageInterface::class),
-            $trustResolver ?? $this->createMock(AuthenticationTrustResolverInterface::class),
-            $httpUtils ?? $this->createMock(HttpUtils::class),
+            $tokenStorage ?? self::createMock(TokenStorageInterface::class),
+            $trustResolver ?? self::createMock(AuthenticationTrustResolverInterface::class),
+            $httpUtils ?? self::createMock(HttpUtils::class),
             'key',
             $authenticationEntryPoint,
             $errorPage,

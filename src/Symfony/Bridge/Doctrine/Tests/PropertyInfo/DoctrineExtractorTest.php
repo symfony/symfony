@@ -78,25 +78,19 @@ class DoctrineExtractorTest extends TestCase
             'dummyGeneratedValueList',
         ]);
 
-        $this->assertEquals(
-            $expected,
-            $this->createExtractor()->getProperties(DoctrineDummy::class)
-        );
+        self::assertEquals($expected, $this->createExtractor()->getProperties(DoctrineDummy::class));
     }
 
     public function testTestGetPropertiesWithEmbedded()
     {
         if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
-            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
+            self::markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
-        $this->assertEquals(
-            [
-                'id',
-                'embedded',
-            ],
-            $this->createExtractor()->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
-        );
+        self::assertEquals([
+            'id',
+            'embedded',
+        ], $this->createExtractor()->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded'));
     }
 
     /**
@@ -104,13 +98,13 @@ class DoctrineExtractorTest extends TestCase
      */
     public function testExtract($property, array $type = null)
     {
-        $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property, []));
+        self::assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property, []));
     }
 
     public function testExtractWithEmbedded()
     {
         if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
-            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
+            self::markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
         $expectedTypes = [new Type(
@@ -125,7 +119,7 @@ class DoctrineExtractorTest extends TestCase
             []
         );
 
-        $this->assertEquals($expectedTypes, $actualTypes);
+        self::assertEquals($expectedTypes, $actualTypes);
     }
 
     /**
@@ -134,13 +128,13 @@ class DoctrineExtractorTest extends TestCase
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {
-            $this->markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
+            self::markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
         }
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString', []));
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt', []));
-        $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumStringArray', []));
-        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class))], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumIntArray', []));
-        $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom', []));
+        self::assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString', []));
+        self::assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt', []));
+        self::assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumStringArray', []));
+        self::assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class))], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumIntArray', []));
+        self::assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom', []));
     }
 
     public function typesProvider()
@@ -234,20 +228,20 @@ class DoctrineExtractorTest extends TestCase
 
     public function testGetPropertiesCatchException()
     {
-        $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
+        self::assertNull($this->createExtractor()->getProperties('Not\Exist'));
     }
 
     public function testGetTypesCatchException()
     {
-        $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
+        self::assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
     }
 
     public function testGeneratedValueNotWritable()
     {
         $extractor = $this->createExtractor();
-        $this->assertFalse($extractor->isWritable(DoctrineGeneratedValue::class, 'id'));
-        $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'id'));
-        $this->assertNull($extractor->isWritable(DoctrineGeneratedValue::class, 'foo'));
-        $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
+        self::assertFalse($extractor->isWritable(DoctrineGeneratedValue::class, 'id'));
+        self::assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'id'));
+        self::assertNull($extractor->isWritable(DoctrineGeneratedValue::class, 'foo'));
+        self::assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
     }
 }

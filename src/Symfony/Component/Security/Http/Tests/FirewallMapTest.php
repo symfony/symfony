@@ -25,31 +25,31 @@ class FirewallMapTest extends TestCase
 
         $request = new Request();
 
-        $notMatchingMatcher = $this->createMock(RequestMatcher::class);
+        $notMatchingMatcher = self::createMock(RequestMatcher::class);
         $notMatchingMatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('matches')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn(false)
         ;
 
         $map->add($notMatchingMatcher, [function () {}]);
 
-        $matchingMatcher = $this->createMock(RequestMatcher::class);
+        $matchingMatcher = self::createMock(RequestMatcher::class);
         $matchingMatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('matches')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn(true)
         ;
         $theListener = function () {};
-        $theException = $this->createMock(ExceptionListener::class);
+        $theException = self::createMock(ExceptionListener::class);
 
         $map->add($matchingMatcher, [$theListener], $theException);
 
-        $tooLateMatcher = $this->createMock(RequestMatcher::class);
+        $tooLateMatcher = self::createMock(RequestMatcher::class);
         $tooLateMatcher
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('matches')
         ;
 
@@ -57,8 +57,8 @@ class FirewallMapTest extends TestCase
 
         [$listeners, $exception] = $map->getListeners($request);
 
-        $this->assertEquals([$theListener], $listeners);
-        $this->assertEquals($theException, $exception);
+        self::assertEquals([$theListener], $listeners);
+        self::assertEquals($theException, $exception);
     }
 
     public function testGetListenersWithAnEntryHavingNoRequestMatcher()
@@ -67,24 +67,24 @@ class FirewallMapTest extends TestCase
 
         $request = new Request();
 
-        $notMatchingMatcher = $this->createMock(RequestMatcher::class);
+        $notMatchingMatcher = self::createMock(RequestMatcher::class);
         $notMatchingMatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('matches')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn(false)
         ;
 
         $map->add($notMatchingMatcher, [function () {}]);
 
         $theListener = function () {};
-        $theException = $this->createMock(ExceptionListener::class);
+        $theException = self::createMock(ExceptionListener::class);
 
         $map->add(null, [$theListener], $theException);
 
-        $tooLateMatcher = $this->createMock(RequestMatcher::class);
+        $tooLateMatcher = self::createMock(RequestMatcher::class);
         $tooLateMatcher
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('matches')
         ;
 
@@ -92,8 +92,8 @@ class FirewallMapTest extends TestCase
 
         [$listeners, $exception] = $map->getListeners($request);
 
-        $this->assertEquals([$theListener], $listeners);
-        $this->assertEquals($theException, $exception);
+        self::assertEquals([$theListener], $listeners);
+        self::assertEquals($theException, $exception);
     }
 
     public function testGetListenersWithNoMatchingEntry()
@@ -102,11 +102,11 @@ class FirewallMapTest extends TestCase
 
         $request = new Request();
 
-        $notMatchingMatcher = $this->createMock(RequestMatcher::class);
+        $notMatchingMatcher = self::createMock(RequestMatcher::class);
         $notMatchingMatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('matches')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn(false)
         ;
 
@@ -114,7 +114,7 @@ class FirewallMapTest extends TestCase
 
         [$listeners, $exception] = $map->getListeners($request);
 
-        $this->assertEquals([], $listeners);
-        $this->assertNull($exception);
+        self::assertEquals([], $listeners);
+        self::assertNull($exception);
     }
 }

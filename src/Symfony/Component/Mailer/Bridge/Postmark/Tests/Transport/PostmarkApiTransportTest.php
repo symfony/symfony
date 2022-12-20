@@ -32,7 +32,7 @@ class PostmarkApiTransportTest extends TestCase
      */
     public function testToString(PostmarkApiTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -64,24 +64,24 @@ class PostmarkApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('Headers', $payload);
-        $this->assertCount(1, $payload['Headers']);
+        self::assertArrayHasKey('Headers', $payload);
+        self::assertCount(1, $payload['Headers']);
 
-        $this->assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
+        self::assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
     }
 
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.postmarkapp.com/email', $url);
-            $this->assertStringContainsStringIgnoringCase('X-Postmark-Server-Token: KEY', $options['headers'][1] ?? $options['request_headers'][1]);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.postmarkapp.com/email', $url);
+            self::assertStringContainsStringIgnoringCase('X-Postmark-Server-Token: KEY', $options['headers'][1] ?? $options['request_headers'][1]);
 
             $body = json_decode($options['body'], true);
-            $this->assertSame('"Fabien" <fabpot@symfony.com>', $body['From']);
-            $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $body['To']);
-            $this->assertSame('Hello!', $body['Subject']);
-            $this->assertSame('Hello There!', $body['TextBody']);
+            self::assertSame('"Fabien" <fabpot@symfony.com>', $body['From']);
+            self::assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $body['To']);
+            self::assertSame('Hello!', $body['Subject']);
+            self::assertSame('Hello There!', $body['TextBody']);
 
             return new MockResponse(json_encode(['MessageID' => 'foobar']), [
                 'http_code' => 200,
@@ -98,7 +98,7 @@ class PostmarkApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        self::assertSame('foobar', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()
@@ -120,8 +120,8 @@ class PostmarkApiTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
     }
 
@@ -139,14 +139,14 @@ class PostmarkApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayNotHasKey('Headers', $payload);
-        $this->assertArrayHasKey('Tag', $payload);
-        $this->assertArrayHasKey('Metadata', $payload);
-        $this->assertArrayHasKey('MessageStream', $payload);
+        self::assertArrayNotHasKey('Headers', $payload);
+        self::assertArrayHasKey('Tag', $payload);
+        self::assertArrayHasKey('Metadata', $payload);
+        self::assertArrayHasKey('MessageStream', $payload);
 
-        $this->assertSame('password-reset', $payload['Tag']);
-        $this->assertSame(['Color' => 'blue', 'Client-ID' => '12345'], $payload['Metadata']);
-        $this->assertSame('broadcasts', $payload['MessageStream']);
+        self::assertSame('password-reset', $payload['Tag']);
+        self::assertSame(['Color' => 'blue', 'Client-ID' => '12345'], $payload['Metadata']);
+        self::assertSame('broadcasts', $payload['MessageStream']);
     }
 
     public function testMultipleTagsAreNotAllowed()
@@ -160,7 +160,7 @@ class PostmarkApiTransportTest extends TestCase
         $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
         $method->setAccessible(true);
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
 
         $method->invoke($transport, $email, $envelope);
     }

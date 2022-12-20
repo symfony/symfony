@@ -48,27 +48,24 @@ class ResettableServicePassTest extends TestCase
 
         $definition = $container->getDefinition('services_resetter');
 
-        $this->assertEquals(
+        self::assertEquals([
+            new IteratorArgument([
+                'one' => new Reference('one', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
+                'two' => new Reference('two', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
+                'three' => new Reference('three', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
+            ]),
             [
-                new IteratorArgument([
-                    'one' => new Reference('one', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
-                    'two' => new Reference('two', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
-                    'three' => new Reference('three', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
-                ]),
-                [
-                    'one' => ['reset'],
-                    'two' => ['clear'],
-                    'three' => ['resetFirst', 'resetSecond'],
-                ],
+                'one' => ['reset'],
+                'two' => ['clear'],
+                'three' => ['resetFirst', 'resetSecond'],
             ],
-            $definition->getArguments()
-        );
+        ], $definition->getArguments());
     }
 
     public function testMissingMethod()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set.');
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
             ->addTag('kernel.reset');
@@ -92,7 +89,7 @@ class ResettableServicePassTest extends TestCase
 
         $container->compile();
 
-        $this->assertSame([ResettableService::class => ['?missingMethod']], $container->getDefinition('services_resetter')->getArgument(1));
+        self::assertSame([ResettableService::class => ['?missingMethod']], $container->getDefinition('services_resetter')->getArgument(1));
 
         $resettable = $container->get(ResettableService::class);
         $resetter = $container->get('services_resetter');
@@ -108,6 +105,6 @@ class ResettableServicePassTest extends TestCase
 
         $container->compile();
 
-        $this->assertFalse($container->has('services_resetter'));
+        self::assertFalse($container->has('services_resetter'));
     }
 }

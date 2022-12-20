@@ -35,21 +35,21 @@ class LexerTest extends TestCase
     public function testTokenize($tokens, $expression)
     {
         $tokens[] = new Token('end of expression', null, \strlen($expression) + 1);
-        $this->assertEquals(new TokenStream($tokens, $expression), $this->lexer->tokenize($expression));
+        self::assertEquals(new TokenStream($tokens, $expression), $this->lexer->tokenize($expression));
     }
 
     public function testTokenizeThrowsErrorWithMessage()
     {
-        $this->expectException(SyntaxError::class);
-        $this->expectExceptionMessage('Unexpected character "\'" around position 33 for expression `service(faulty.expression.example\').dummyMethod()`.');
+        self::expectException(SyntaxError::class);
+        self::expectExceptionMessage('Unexpected character "\'" around position 33 for expression `service(faulty.expression.example\').dummyMethod()`.');
         $expression = "service(faulty.expression.example').dummyMethod()";
         $this->lexer->tokenize($expression);
     }
 
     public function testTokenizeThrowsErrorOnUnclosedBrace()
     {
-        $this->expectException(SyntaxError::class);
-        $this->expectExceptionMessage('Unclosed "(" around position 7 for expression `service(unclosed.expression.dummyMethod()`.');
+        self::expectException(SyntaxError::class);
+        self::expectExceptionMessage('Unclosed "(" around position 7 for expression `service(unclosed.expression.dummyMethod()`.');
         $expression = 'service(unclosed.expression.dummyMethod()';
         $this->lexer->tokenize($expression);
     }

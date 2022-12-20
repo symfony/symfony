@@ -29,7 +29,7 @@ class FragmentRendererPassTest extends TestCase
      */
     public function testContentRendererWithoutInterface()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $fragmentHandlerDefinition = $builder->register('fragment.handler');
         $builder->register('my_content_renderer', 'Symfony\Component\DependencyInjection\Definition')
@@ -38,7 +38,7 @@ class FragmentRendererPassTest extends TestCase
         $pass = new FragmentRendererPass();
         $pass->process($builder);
 
-        $this->assertEquals([['addRendererService', ['foo', 'my_content_renderer']]], $fragmentHandlerDefinition->getMethodCalls());
+        self::assertEquals([['addRendererService', ['foo', 'my_content_renderer']]], $fragmentHandlerDefinition->getMethodCalls());
     }
 
     public function testValidContentRenderer()
@@ -53,8 +53,8 @@ class FragmentRendererPassTest extends TestCase
         $pass->process($builder);
 
         $serviceLocatorDefinition = $builder->getDefinition((string) $fragmentHandlerDefinition->getArgument(0));
-        $this->assertSame(ServiceLocator::class, $serviceLocatorDefinition->getClass());
-        $this->assertEquals(['foo' => new ServiceClosureArgument(new Reference('my_content_renderer'))], $serviceLocatorDefinition->getArgument(0));
+        self::assertSame(ServiceLocator::class, $serviceLocatorDefinition->getClass());
+        self::assertEquals(['foo' => new ServiceClosureArgument(new Reference('my_content_renderer'))], $serviceLocatorDefinition->getArgument(0));
     }
 }
 

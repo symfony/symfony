@@ -20,7 +20,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 {
     public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(%foo%)');
     }
@@ -41,9 +41,9 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $placeholderForVariable = $mergedPlaceholders[$envVariableName];
         $placeholder = array_values($placeholderForVariable)[0];
 
-        $this->assertCount(1, $placeholderForVariable);
-        $this->assertIsString($placeholder);
-        $this->assertStringContainsString($envVariableName, $placeholder);
+        self::assertCount(1, $placeholderForVariable);
+        self::assertIsString($placeholder);
+        self::assertStringContainsString($envVariableName, $placeholder);
     }
 
     public function testMergeWhereFirstBagIsEmptyWillWork()
@@ -56,7 +56,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         // initialize placeholder only in second bag
         $secondBag->get($parameter);
 
-        $this->assertEmpty($firstBag->getEnvPlaceholders());
+        self::assertEmpty($firstBag->getEnvPlaceholders());
 
         $firstBag->mergeEnvPlaceholders($secondBag);
         $mergedPlaceholders = $firstBag->getEnvPlaceholders();
@@ -64,9 +64,9 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $placeholderForVariable = $mergedPlaceholders[$envVariableName];
         $placeholder = array_values($placeholderForVariable)[0];
 
-        $this->assertCount(1, $placeholderForVariable);
-        $this->assertIsString($placeholder);
-        $this->assertStringContainsString($envVariableName, $placeholder);
+        self::assertCount(1, $placeholderForVariable);
+        self::assertIsString($placeholder);
+        self::assertStringContainsString($envVariableName, $placeholder);
     }
 
     public function testMergeWherePlaceholderOnlyExistsInSecond()
@@ -88,9 +88,9 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $firstBag->mergeEnvPlaceholders($secondBag);
         $merged = $firstBag->getEnvPlaceholders();
 
-        $this->assertCount(1, $merged[$uniqueEnvName]);
+        self::assertCount(1, $merged[$uniqueEnvName]);
         // second bag has same placeholder for commonEnvName
-        $this->assertCount(1, $merged[$commonEnvName]);
+        self::assertCount(1, $merged[$commonEnvName]);
     }
 
     public function testMergeWithDifferentIdentifiersForPlaceholders()
@@ -107,14 +107,14 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $firstBag->mergeEnvPlaceholders($secondBag);
         $merged = $firstBag->getEnvPlaceholders();
 
-        $this->assertNotEquals($firstPlaceholder, $secondPlaceholder);
-        $this->assertCount(2, $merged[$envName]);
+        self::assertNotEquals($firstPlaceholder, $secondPlaceholder);
+        self::assertCount(2, $merged[$envName]);
     }
 
     public function testResolveEnvRequiresStrings()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The default value of env parameter "INT_VAR" must be a string or null, "int" given.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('The default value of env parameter "INT_VAR" must be a string or null, "int" given.');
 
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(INT_VAR)');
@@ -124,8 +124,8 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testGetDefaultScalarEnv()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "int" given to "env(INT_VAR)".');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('The default value of an env() parameter must be a string or null, but "int" given to "env(INT_VAR)".');
 
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(INT_VAR)', 2);
@@ -135,13 +135,13 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testGetDefaultEnv()
     {
         $bag = new EnvPlaceholderParameterBag();
-        $this->assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
+        self::assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
         $bag->set('env(INT_VAR)', '2');
-        $this->assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
-        $this->assertSame('2', $bag->all()['env(INT_VAR)']);
+        self::assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
+        self::assertSame('2', $bag->all()['env(INT_VAR)']);
         $bag->resolve();
-        $this->assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
-        $this->assertSame('2', $bag->all()['env(INT_VAR)']);
+        self::assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
+        self::assertSame('2', $bag->all()['env(INT_VAR)']);
     }
 
     public function testResolveEnvAllowsNull()
@@ -150,13 +150,13 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->get('env(NULL_VAR)');
         $bag->set('env(NULL_VAR)', null);
         $bag->resolve();
-        $this->assertNull($bag->all()['env(NULL_VAR)']);
+        self::assertNull($bag->all()['env(NULL_VAR)']);
     }
 
     public function testResolveThrowsOnBadDefaultValue()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be a string or null, "array" given.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be a string or null, "array" given.');
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
         $bag->set('env(ARRAY_VAR)', []);
@@ -170,13 +170,13 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->get('env(NULL_VAR)');
         $bag->resolve();
 
-        $this->assertNull($bag->all()['env(NULL_VAR)']);
+        self::assertNull($bag->all()['env(NULL_VAR)']);
     }
 
     public function testGetThrowsOnBadDefaultValue()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "array" given to "env(ARRAY_VAR)".');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('The default value of an env() parameter must be a string or null, but "array" given to "env(ARRAY_VAR)".');
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(ARRAY_VAR)', []);
         $bag->get('env(ARRAY_VAR)');
@@ -187,13 +187,13 @@ class EnvPlaceholderParameterBagTest extends TestCase
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->resolve();
-        $this->assertNotNull($bag->get('env(default::BAR)'));
+        self::assertNotNull($bag->get('env(default::BAR)'));
     }
 
     public function testExtraCharsInProcessor()
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->resolve();
-        $this->assertStringMatchesFormat('env_%s_key_a_b_c_FOO_%s', $bag->get('env(key:a.b-c:FOO)'));
+        self::assertStringMatchesFormat('env_%s_key_a_b_c_FOO_%s', $bag->get('env(key:a.b-c:FOO)'));
     }
 }

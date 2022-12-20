@@ -24,7 +24,7 @@ class ClassMetadataTest extends TestCase
     public function testInterface()
     {
         $classMetadata = new ClassMetadata('name');
-        $this->assertInstanceOf(ClassMetadataInterface::class, $classMetadata);
+        self::assertInstanceOf(ClassMetadataInterface::class, $classMetadata);
     }
 
     public function testAttributeMetadata()
@@ -37,7 +37,7 @@ class ClassMetadataTest extends TestCase
         $classMetadata->addAttributeMetadata($a1);
         $classMetadata->addAttributeMetadata($a2);
 
-        $this->assertEquals(['a1' => $a1, 'a2' => $a2], $classMetadata->getAttributesMetadata());
+        self::assertEquals(['a1' => $a1, 'a2' => $a2], $classMetadata->getAttributesMetadata());
     }
 
     public function testMerge()
@@ -57,8 +57,8 @@ class ClassMetadataTest extends TestCase
 
         $classMetadata1->merge($classMetadata2);
 
-        $this->assertSame(['a', 'b', 'c'], $ac1->getGroups());
-        $this->assertEquals(['a1' => $ac1], $classMetadata1->getAttributesMetadata());
+        self::assertSame(['a', 'b', 'c'], $ac1->getGroups());
+        self::assertEquals(['a1' => $ac1], $classMetadata1->getAttributesMetadata());
     }
 
     public function testSerialize()
@@ -72,6 +72,6 @@ class ClassMetadataTest extends TestCase
         $classMetadata->addAttributeMetadata($a2);
 
         $serialized = serialize($classMetadata);
-        $this->assertEquals($classMetadata, unserialize($serialized));
+        self::assertEquals($classMetadata, unserialize($serialized));
     }
 }

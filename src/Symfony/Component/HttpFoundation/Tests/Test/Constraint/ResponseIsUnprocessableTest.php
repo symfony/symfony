@@ -21,7 +21,7 @@ class ResponseIsUnprocessableTest extends TestCase
     {
         $constraint = new ResponseIsUnprocessable();
 
-        $this->assertTrue($constraint->evaluate(new Response('', 422), '', true));
-        $this->assertFalse($constraint->evaluate(new Response(), '', true));
+        self::assertTrue($constraint->evaluate(new Response('', 422), '', true));
+        self::assertFalse($constraint->evaluate(new Response(), '', true));
     }
 }

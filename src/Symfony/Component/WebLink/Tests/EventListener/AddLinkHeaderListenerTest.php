@@ -34,22 +34,22 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $subscriber = new AddLinkHeaderListener();
 
-        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        $event = new ResponseEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $subscriber->onKernelResponse($event);
 
-        $this->assertInstanceOf(EventSubscriberInterface::class, $subscriber);
+        self::assertInstanceOf(EventSubscriberInterface::class, $subscriber);
 
         $expected = [
             '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"',
             '</foo>; rel="preload"',
         ];
 
-        $this->assertEquals($expected, $response->headers->all()['link']);
+        self::assertEquals($expected, $response->headers->all()['link']);
     }
 
     public function testSubscribedEvents()
     {
-        $this->assertEquals([KernelEvents::RESPONSE => 'onKernelResponse'], AddLinkHeaderListener::getSubscribedEvents());
+        self::assertEquals([KernelEvents::RESPONSE => 'onKernelResponse'], AddLinkHeaderListener::getSubscribedEvents());
     }
 }

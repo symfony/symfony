@@ -35,9 +35,9 @@ class Base64EncoderTest extends TestCase
          */
 
         $encoder = new Base64Encoder();
-        $this->assertEquals('MTIz', $encoder->encodeString('123'), '3 bytes of input should yield 4 bytes of output');
-        $this->assertEquals('MTIzNDU2', $encoder->encodeString('123456'), '6 bytes in input should yield 8 bytes of output');
-        $this->assertEquals('MTIzNDU2Nzg5', $encoder->encodeString('123456789'), '%s: 9 bytes in input should yield 12 bytes of output');
+        self::assertEquals('MTIz', $encoder->encodeString('123'), '3 bytes of input should yield 4 bytes of output');
+        self::assertEquals('MTIzNDU2', $encoder->encodeString('123456'), '6 bytes in input should yield 8 bytes of output');
+        self::assertEquals('MTIzNDU2Nzg5', $encoder->encodeString('123456789'), '%s: 9 bytes in input should yield 12 bytes of output');
     }
 
     public function testPadLength()
@@ -65,17 +65,17 @@ class Base64EncoderTest extends TestCase
         $encoder = new Base64Encoder();
         for ($i = 0; $i < 30; ++$i) {
             $input = pack('C', random_int(0, 255));
-            $this->assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{2}==$~', $encoder->encodeString($input), 'A single byte should have 2 bytes of padding');
+            self::assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{2}==$~', $encoder->encodeString($input), 'A single byte should have 2 bytes of padding');
         }
 
         for ($i = 0; $i < 30; ++$i) {
             $input = pack('C*', random_int(0, 255), random_int(0, 255));
-            $this->assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{3}=$~', $encoder->encodeString($input), 'Two bytes should have 1 byte of padding');
+            self::assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{3}=$~', $encoder->encodeString($input), 'Two bytes should have 1 byte of padding');
         }
 
         for ($i = 0; $i < 30; ++$i) {
             $input = pack('C*', random_int(0, 255), random_int(0, 255), random_int(0, 255));
-            $this->assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{4}$~', $encoder->encodeString($input), 'Three bytes should have no padding');
+            self::assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{4}$~', $encoder->encodeString($input), 'Three bytes should have no padding');
         }
     }
 
@@ -105,7 +105,7 @@ class Base64EncoderTest extends TestCase
         'NUVVZXWFla';                                       // 48
 
         $encoder = new Base64Encoder();
-        $this->assertEquals($output, $encoder->encodeString($input), 'Lines should be no more than 76 characters');
+        self::assertEquals($output, $encoder->encodeString($input), 'Lines should be no more than 76 characters');
     }
 
     public function testMaximumLineLengthCanBeSpecified()
@@ -130,7 +130,7 @@ class Base64EncoderTest extends TestCase
         'UlNUVVZXWFla';                                     // 50 *
 
         $encoder = new Base64Encoder();
-        $this->assertEquals($output, $encoder->encodeString($input, 'utf-8', 0, 50), 'Lines should be no more than 100 characters');
+        self::assertEquals($output, $encoder->encodeString($input, 'utf-8', 0, 50), 'Lines should be no more than 100 characters');
     }
 
     public function testFirstLineLengthCanBeDifferent()
@@ -153,6 +153,6 @@ class Base64EncoderTest extends TestCase
         'FRkdISUpLTE1OT1BRUlNUVVZXWFla';                    // 67
 
         $encoder = new Base64Encoder();
-        $this->assertEquals($output, $encoder->encodeString($input, 'utf-8', 19), 'First line offset is 19 so first line should be 57 chars long');
+        self::assertEquals($output, $encoder->encodeString($input, 'utf-8', 19), 'First line offset is 19 so first line should be 57 chars long');
     }
 }

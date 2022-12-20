@@ -21,16 +21,16 @@ final class InspectUlidCommandTest extends TestCase
     {
         $commandTester = new CommandTester(new InspectUlidCommand());
 
-        $this->assertSame(1, $commandTester->execute(['ulid' => 'foobar']));
-        $this->assertStringContainsString('Invalid ULID: "foobar"', $commandTester->getDisplay());
+        self::assertSame(1, $commandTester->execute(['ulid' => 'foobar']));
+        self::assertStringContainsString('Invalid ULID: "foobar"', $commandTester->getDisplay());
 
         foreach ([
             '01E439TP9XJZ9RPFH3T1PYBCR8',
             '1BKocMc5BnrVcuq2ti4Eqm',
             '0171069d-593d-97d3-8b3e-23d06de5b308',
         ] as $ulid) {
-            $this->assertSame(0, $commandTester->execute(['ulid' => $ulid]));
-            $this->assertSame(<<<EOF
+            self::assertSame(0, $commandTester->execute(['ulid' => $ulid]));
+            self::assertSame(<<<EOF
  ---------------------- -------------------------------------- 
   Label                  Value                                 
  ---------------------- -------------------------------------- 
@@ -42,8 +42,7 @@ final class InspectUlidCommandTest extends TestCase
  ---------------------- -------------------------------------- 
 
 
-EOF
-                , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
         }
     }
 }

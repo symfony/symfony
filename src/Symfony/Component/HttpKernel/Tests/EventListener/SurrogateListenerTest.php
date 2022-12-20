@@ -26,7 +26,7 @@ class SurrogateListenerTest extends TestCase
     public function testFilterDoesNothingForSubRequests()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $response = new Response('foo <esi:include src="" />');
         $listener = new SurrogateListener(new Esi());
 
@@ -34,13 +34,13 @@ class SurrogateListenerTest extends TestCase
         $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
+        self::assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
     }
 
     public function testFilterWhenThereIsSomeEsiIncludes()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $response = new Response('foo <esi:include src="" />');
         $listener = new SurrogateListener(new Esi());
 
@@ -48,13 +48,13 @@ class SurrogateListenerTest extends TestCase
         $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('content="ESI/1.0"', $event->getResponse()->headers->get('Surrogate-Control'));
+        self::assertEquals('content="ESI/1.0"', $event->getResponse()->headers->get('Surrogate-Control'));
     }
 
     public function testFilterWhenThereIsNoEsiIncludes()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $response = new Response('foo');
         $listener = new SurrogateListener(new Esi());
 
@@ -62,6 +62,6 @@ class SurrogateListenerTest extends TestCase
         $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
-        $this->assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
+        self::assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
     }
 }

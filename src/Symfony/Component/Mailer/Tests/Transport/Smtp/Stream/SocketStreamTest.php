@@ -19,8 +19,8 @@ class SocketStreamTest extends TestCase
 {
     public function testSocketErrorNoConnection()
     {
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/Connection refused|unable to connect/i');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessageMatches('/Connection refused|unable to connect/i');
         $s = new SocketStream();
         $s->setTimeout(0.1);
         $s->setPort(9999);
@@ -29,8 +29,8 @@ class SocketStreamTest extends TestCase
 
     public function testSocketErrorBeforeConnectError()
     {
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/no valid certs found cafile stream|Unable to find the socket transport "ssl"/');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessageMatches('/no valid certs found cafile stream|Unable to find the socket transport "ssl"/');
         $s = new SocketStream();
         $s->setStreamOptions([
             'ssl' => [

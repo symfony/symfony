@@ -57,6 +57,6 @@ class LoaderResolverTest extends TestCase
      */
     public function testResolvesForcedType($resource, $type, $expectedClass)
     {
-        $this->assertInstanceOf($expectedClass, $this->resolver->resolve($resource, $type));
+        self::assertInstanceOf($expectedClass, $this->resolver->resolve($resource, $type));
     }
 }

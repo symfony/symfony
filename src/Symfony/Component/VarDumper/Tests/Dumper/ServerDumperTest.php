@@ -25,14 +25,14 @@ class ServerDumperTest extends TestCase
 
     public function testDumpForwardsToWrappedDumperWhenServerIsUnavailable()
     {
-        $wrappedDumper = $this->createMock(DataDumperInterface::class);
+        $wrappedDumper = self::createMock(DataDumperInterface::class);
 
         $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper);
 
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');
 
-        $wrappedDumper->expects($this->once())->method('dump')->with($data);
+        $wrappedDumper->expects(self::once())->method('dump')->with($data);
 
         $dumper->dump($data);
     }
@@ -40,11 +40,11 @@ class ServerDumperTest extends TestCase
     public function testDump()
     {
         if ('True' === getenv('APPVEYOR')) {
-            $this->markTestSkipped('Skip transient test on AppVeyor');
+            self::markTestSkipped('Skip transient test on AppVeyor');
         }
 
-        $wrappedDumper = $this->createMock(DataDumperInterface::class);
-        $wrappedDumper->expects($this->never())->method('dump'); // test wrapped dumper is not used
+        $wrappedDumper = self::createMock(DataDumperInterface::class);
+        $wrappedDumper->expects(self::never())->method('dump'); // test wrapped dumper is not used
 
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');
@@ -62,7 +62,7 @@ class ServerDumperTest extends TestCase
         $process->start(function ($type, $buffer) use ($process, &$dumped, $dumper, $data) {
             if (Process::ERR === $type) {
                 $process->stop();
-                $this->fail();
+                self::fail();
             } elseif ("READY\n" === $buffer) {
                 $dumper->dump($data);
             } else {
@@ -72,8 +72,8 @@ class ServerDumperTest extends TestCase
 
         $process->wait();
 
-        $this->assertTrue($process->isSuccessful());
-        $this->assertStringMatchesFormat(<<<'DUMP'
+        self::assertTrue($process->isSuccessful());
+        self::assertStringMatchesFormat(<<<'DUMP'
 (3) "foo"
 [
   "timestamp" => %d.%d
@@ -82,8 +82,7 @@ class ServerDumperTest extends TestCase
   ]
 ]
 %d
-DUMP
-            , $dumped);
+DUMP, $dumped);
     }
 
     private function getServerProcess(): Process

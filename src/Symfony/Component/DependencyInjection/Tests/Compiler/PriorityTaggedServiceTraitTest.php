@@ -86,14 +86,14 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 
-        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+        self::assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
     }
 
     public function testWithEmptyArray()
     {
         $container = new ContainerBuilder();
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
-        $this->assertEquals([], $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+        self::assertEquals([], $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
     }
 
     public function testOnlyTheFirstNonIndexedTagIsListed()
@@ -111,7 +111,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
             new Reference('service2'),
             new Reference('service1'),
         ];
-        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+        self::assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
     }
 
     public function testOnlyTheIndexedTagsAreListed()
@@ -136,8 +136,8 @@ class PriorityTaggedServiceTraitTest extends TestCase
             'a' => new TypedReference('service2', BarTagClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
-        $this->assertSame(array_keys($expected), array_keys($services));
-        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+        self::assertSame(array_keys($expected), array_keys($services));
+        self::assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
 
     public function testTheIndexedTagsByDefaultIndexMethod()
@@ -160,8 +160,8 @@ class PriorityTaggedServiceTraitTest extends TestCase
             '10' => new TypedReference('service3', IntTagClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
-        $this->assertSame(array_keys($expected), array_keys($services));
-        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+        self::assertSame(array_keys($expected), array_keys($services));
+        self::assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
 
     /**
@@ -169,8 +169,8 @@ class PriorityTaggedServiceTraitTest extends TestCase
      */
     public function testTheIndexedTagsByDefaultIndexMethodFailure(string $defaultIndexMethod, ?string $indexAttribute, string $expectedExceptionMessage)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage($expectedExceptionMessage);
 
         $container = new ContainerBuilder();
 
@@ -220,8 +220,8 @@ class PriorityTaggedServiceTraitTest extends TestCase
             'service1' => new TypedReference('service1', FooTagClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
-        $this->assertSame(array_keys($expected), array_keys($services));
-        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+        self::assertSame(array_keys($expected), array_keys($services));
+        self::assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
 }
 

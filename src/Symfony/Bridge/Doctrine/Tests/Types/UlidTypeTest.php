@@ -53,21 +53,21 @@ final class UlidTypeTest extends TestCase
         $expected = $ulid->toRfc4122();
         $actual = $this->type->convertToDatabaseValue($ulid, new PostgreSQLPlatform());
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function testUlidInterfaceConvertsToDatabaseValue()
     {
-        $ulid = $this->createMock(AbstractUid::class);
+        $ulid = self::createMock(AbstractUid::class);
 
         $ulid
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('toRfc4122')
             ->willReturn('foo');
 
         $actual = $this->type->convertToDatabaseValue($ulid, new PostgreSQLPlatform());
 
-        $this->assertEquals('foo', $actual);
+        self::assertEquals('foo', $actual);
     }
 
     public function testUlidStringConvertsToDatabaseValue()
@@ -77,59 +77,59 @@ final class UlidTypeTest extends TestCase
 
         $expected = $ulid->toRfc4122();
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function testNotSupportedTypeConversionForDatabaseValue()
     {
-        $this->expectException(ConversionException::class);
+        self::expectException(ConversionException::class);
 
         $this->type->convertToDatabaseValue(new \stdClass(), new SqlitePlatform());
     }
 
     public function testNullConversionForDatabaseValue()
     {
-        $this->assertNull($this->type->convertToDatabaseValue(null, new SqlitePlatform()));
+        self::assertNull($this->type->convertToDatabaseValue(null, new SqlitePlatform()));
     }
 
     public function testUlidInterfaceConvertsToPHPValue()
     {
-        $ulid = $this->createMock(AbstractUid::class);
+        $ulid = self::createMock(AbstractUid::class);
         $actual = $this->type->convertToPHPValue($ulid, new SqlitePlatform());
 
-        $this->assertSame($ulid, $actual);
+        self::assertSame($ulid, $actual);
     }
 
     public function testUlidConvertsToPHPValue()
     {
         $ulid = $this->type->convertToPHPValue(self::DUMMY_ULID, new SqlitePlatform());
 
-        $this->assertInstanceOf(Ulid::class, $ulid);
-        $this->assertEquals(self::DUMMY_ULID, $ulid->__toString());
+        self::assertInstanceOf(Ulid::class, $ulid);
+        self::assertEquals(self::DUMMY_ULID, $ulid->__toString());
     }
 
     public function testInvalidUlidConversionForPHPValue()
     {
-        $this->expectException(ConversionException::class);
+        self::expectException(ConversionException::class);
 
         $this->type->convertToPHPValue('abcdefg', new SqlitePlatform());
     }
 
     public function testNullConversionForPHPValue()
     {
-        $this->assertNull($this->type->convertToPHPValue(null, new SqlitePlatform()));
+        self::assertNull($this->type->convertToPHPValue(null, new SqlitePlatform()));
     }
 
     public function testReturnValueIfUlidForPHPValue()
     {
         $ulid = new Ulid();
 
-        $this->assertSame($ulid, $this->type->convertToPHPValue($ulid, new SqlitePlatform()));
+        self::assertSame($ulid, $this->type->convertToPHPValue($ulid, new SqlitePlatform()));
     }
 
     public function testGetName()
     {
-        $this->assertEquals('ulid', $this->type->getName());
+        self::assertEquals('ulid', $this->type->getName());
     }
 
     /**
@@ -137,7 +137,7 @@ final class UlidTypeTest extends TestCase
      */
     public function testGetGuidTypeDeclarationSQL(AbstractPlatform $platform, string $expectedDeclaration)
     {
-        $this->assertEquals($expectedDeclaration, $this->type->getSqlDeclaration(['length' => 36], $platform));
+        self::assertEquals($expectedDeclaration, $this->type->getSqlDeclaration(['length' => 36], $platform));
     }
 
     public function provideSqlDeclarations(): array
@@ -151,6 +151,6 @@ final class UlidTypeTest extends TestCase
 
     public function testRequiresSQLCommentHint()
     {
-        $this->assertTrue($this->type->requiresSQLCommentHint(new SqlitePlatform()));
+        self::assertTrue($this->type->requiresSQLCommentHint(new SqlitePlatform()));
     }
 }

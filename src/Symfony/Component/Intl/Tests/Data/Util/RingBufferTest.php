@@ -35,10 +35,10 @@ class RingBufferTest extends TestCase
         $this->buffer[0] = 'foo';
         $this->buffer['bar'] = 'baz';
 
-        $this->assertArrayHasKey(0, $this->buffer);
-        $this->assertArrayHasKey('bar', $this->buffer);
-        $this->assertSame('foo', $this->buffer[0]);
-        $this->assertSame('baz', $this->buffer['bar']);
+        self::assertArrayHasKey(0, $this->buffer);
+        self::assertArrayHasKey('bar', $this->buffer);
+        self::assertSame('foo', $this->buffer[0]);
+        self::assertSame('baz', $this->buffer['bar']);
     }
 
     public function testWritePastBuffer()
@@ -47,33 +47,33 @@ class RingBufferTest extends TestCase
         $this->buffer['bar'] = 'baz';
         $this->buffer[2] = 'bam';
 
-        $this->assertArrayHasKey('bar', $this->buffer);
-        $this->assertArrayHasKey(2, $this->buffer);
-        $this->assertSame('baz', $this->buffer['bar']);
-        $this->assertSame('bam', $this->buffer[2]);
+        self::assertArrayHasKey('bar', $this->buffer);
+        self::assertArrayHasKey(2, $this->buffer);
+        self::assertSame('baz', $this->buffer['bar']);
+        self::assertSame('bam', $this->buffer[2]);
     }
 
     public function testReadNonExistingFails()
     {
-        $this->expectException(OutOfBoundsException::class);
+        self::expectException(OutOfBoundsException::class);
         $this->buffer['foo'];
     }
 
     public function testQueryNonExisting()
     {
-        $this->assertArrayNotHasKey('foo', $this->buffer);
+        self::assertArrayNotHasKey('foo', $this->buffer);
     }
 
     public function testUnsetNonExistingSucceeds()
     {
         unset($this->buffer['foo']);
 
-        $this->assertArrayNotHasKey('foo', $this->buffer);
+        self::assertArrayNotHasKey('foo', $this->buffer);
     }
 
     public function testReadOverwrittenFails()
     {
-        $this->expectException(OutOfBoundsException::class);
+        self::expectException(OutOfBoundsException::class);
         $this->buffer[0] = 'foo';
         $this->buffer['bar'] = 'baz';
         $this->buffer[2] = 'bam';
@@ -83,7 +83,7 @@ class RingBufferTest extends TestCase
 
     public function testQueryOverwritten()
     {
-        $this->assertArrayNotHasKey(0, $this->buffer);
+        self::assertArrayNotHasKey(0, $this->buffer);
     }
 
     public function testUnsetOverwrittenSucceeds()
@@ -94,6 +94,6 @@ class RingBufferTest extends TestCase
 
         unset($this->buffer[0]);
 
-        $this->assertArrayNotHasKey(0, $this->buffer);
+        self::assertArrayNotHasKey(0, $this->buffer);
     }
 }

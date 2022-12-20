@@ -19,36 +19,33 @@ class LoaderLoadExceptionTest extends TestCase
     public function testMessageCannotLoadResource()
     {
         $exception = new LoaderLoadException('resource', null);
-        $this->assertEquals('Cannot load resource "resource".', $exception->getMessage());
+        self::assertEquals('Cannot load resource "resource".', $exception->getMessage());
     }
 
     public function testMessageCannotLoadResourceWithType()
     {
         $exception = new LoaderLoadException('resource', null, 0, null, 'foobar');
-        $this->assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "foobar" type.', $exception->getMessage());
+        self::assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "foobar" type.', $exception->getMessage());
     }
 
     public function testMessageCannotLoadResourceWithAnnotationType()
     {
         $exception = new LoaderLoadException('resource', null, 0, null, 'annotation');
-        $this->assertEquals('Cannot load resource "resource". Make sure to use PHP 8+ or that annotations are installed and enabled.', $exception->getMessage());
+        self::assertEquals('Cannot load resource "resource". Make sure to use PHP 8+ or that annotations are installed and enabled.', $exception->getMessage());
     }
 
     public function testMessageCannotImportResourceFromSource()
     {
         $exception = new LoaderLoadException('resource', 'sourceResource');
-        $this->assertEquals('Cannot import resource "resource" from "sourceResource".', $exception->getMessage());
+        self::assertEquals('Cannot import resource "resource" from "sourceResource".', $exception->getMessage());
     }
 
     public function testMessageCannotImportBundleResource()
     {
         $exception = new LoaderLoadException('@resource', 'sourceResource');
-        $this->assertEquals(
-            'Cannot import resource "@resource" from "sourceResource". '.
-            'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
-            'If the bundle is registered, make sure the bundle path "@resource" is not empty.',
-            $exception->getMessage()
-        );
+        self::assertEquals('Cannot import resource "@resource" from "sourceResource". '.
+        'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
+        'If the bundle is registered, make sure the bundle path "@resource" is not empty.', $exception->getMessage());
     }
 
     public function testMessageHasPreviousErrorWithDotAndUnableToLoad()
@@ -59,10 +56,7 @@ class LoaderLoadExceptionTest extends TestCase
             0,
             new \Exception('There was a previous error with an ending dot.')
         );
-        $this->assertEquals(
-            'There was a previous error with an ending dot in resource (which is loaded in resource "resource").',
-            $exception->getMessage()
-        );
+        self::assertEquals('There was a previous error with an ending dot in resource (which is loaded in resource "resource").', $exception->getMessage());
     }
 
     public function testMessageHasPreviousErrorWithoutDotAndUnableToLoad()
@@ -73,10 +67,7 @@ class LoaderLoadExceptionTest extends TestCase
             0,
             new \Exception('There was a previous error with no ending dot')
         );
-        $this->assertEquals(
-            'There was a previous error with no ending dot in resource (which is loaded in resource "resource").',
-            $exception->getMessage()
-        );
+        self::assertEquals('There was a previous error with no ending dot in resource (which is loaded in resource "resource").', $exception->getMessage());
     }
 
     public function testMessageHasPreviousErrorAndUnableToLoadBundle()
@@ -87,12 +78,9 @@ class LoaderLoadExceptionTest extends TestCase
             0,
             new \Exception('There was a previous error with an ending dot.')
         );
-        $this->assertEquals(
-            'There was a previous error with an ending dot in @resource '.
-            '(which is loaded in resource "@resource"). '.
-            'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
-            'If the bundle is registered, make sure the bundle path "@resource" is not empty.',
-            $exception->getMessage()
-        );
+        self::assertEquals('There was a previous error with an ending dot in @resource '.
+        '(which is loaded in resource "@resource"). '.
+        'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class. '.
+        'If the bundle is registered, make sure the bundle path "@resource" is not empty.', $exception->getMessage());
     }
 }

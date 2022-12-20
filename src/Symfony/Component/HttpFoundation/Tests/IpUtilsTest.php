@@ -24,7 +24,7 @@ class IpUtilsTest extends TestCase
      */
     public function testIpv4($matches, $remoteAddr, $cidr)
     {
-        $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
+        self::assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
     }
 
     public function getIpv4Data()
@@ -52,10 +52,10 @@ class IpUtilsTest extends TestCase
     public function testIpv6($matches, $remoteAddr, $cidr)
     {
         if (!\defined('AF_INET6')) {
-            $this->markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
+            self::markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
         }
 
-        $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
+        self::assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
     }
 
     public function getIpv6Data()
@@ -88,7 +88,7 @@ class IpUtilsTest extends TestCase
     public function testIpTriggersDeprecationOnNull()
     {
         $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp(null, '192.168.1.1'));
+        self::assertFalse(IpUtils::checkIp(null, '192.168.1.1'));
     }
 
     /**
@@ -97,7 +97,7 @@ class IpUtilsTest extends TestCase
     public function testIp4TriggersDeprecationOnNull()
     {
         $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp4()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp4(null, '192.168.1.1'));
+        self::assertFalse(IpUtils::checkIp4(null, '192.168.1.1'));
     }
 
     /**
@@ -106,7 +106,7 @@ class IpUtilsTest extends TestCase
     public function testIp6TriggersDeprecationOnNull()
     {
         $this->expectDeprecation('Since symfony/http-foundation 5.4: Passing null as $requestIp to "Symfony\Component\HttpFoundation\IpUtils::checkIp6()" is deprecated, pass an empty string instead.');
-        $this->assertFalse(IpUtils::checkIp6(null, '2a01:198:603:0::/65'));
+        self::assertFalse(IpUtils::checkIp6(null, '2a01:198:603:0::/65'));
     }
 
     /**
@@ -114,9 +114,9 @@ class IpUtilsTest extends TestCase
      */
     public function testAnIpv6WithOptionDisabledIpv6()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         if (\defined('AF_INET6')) {
-            $this->markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
+            self::markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
         }
 
         IpUtils::checkIp('2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65');
@@ -127,7 +127,7 @@ class IpUtilsTest extends TestCase
      */
     public function testInvalidIpAddressesDoNotMatch($requestIp, $proxyIp)
     {
-        $this->assertFalse(IpUtils::checkIp4($requestIp, $proxyIp));
+        self::assertFalse(IpUtils::checkIp4($requestIp, $proxyIp));
     }
 
     public function invalidIpAddressData()
@@ -144,7 +144,7 @@ class IpUtilsTest extends TestCase
      */
     public function testAnonymize($ip, $expected)
     {
-        $this->assertSame($expected, IpUtils::anonymize($ip));
+        self::assertSame($expected, IpUtils::anonymize($ip));
     }
 
     public function anonymizedIpData()

@@ -45,22 +45,22 @@ class ChainAdapterTest extends AdapterTestCase
 
     public function testEmptyAdaptersException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('At least one adapter must be specified.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('At least one adapter must be specified.');
         new ChainAdapter([]);
     }
 
     public function testInvalidAdapterException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The class "stdClass" does not implement');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The class "stdClass" does not implement');
         new ChainAdapter([new \stdClass()]);
     }
 
     public function testPrune()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = new ChainAdapter([
@@ -68,20 +68,20 @@ class ChainAdapterTest extends AdapterTestCase
             $this->getNonPruneableMock(),
             $this->getPruneableMock(),
         ]);
-        $this->assertTrue($cache->prune());
+        self::assertTrue($cache->prune());
 
         $cache = new ChainAdapter([
             $this->getPruneableMock(),
             $this->getFailingPruneableMock(),
             $this->getPruneableMock(),
         ]);
-        $this->assertFalse($cache->prune());
+        self::assertFalse($cache->prune());
     }
 
     public function testMultipleCachesExpirationWhenCommonTtlIsNotSet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $adapter1 = new ArrayAdapter(4);
@@ -92,52 +92,52 @@ class ChainAdapterTest extends AdapterTestCase
         $cache->save($cache->getItem('key')->set('value'));
 
         $item = $adapter1->getItem('key');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value', $item->get());
 
         $item = $adapter2->getItem('key');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value', $item->get());
 
         sleep(2);
 
         $item = $adapter1->getItem('key');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value', $item->get());
 
         $item = $adapter2->getItem('key');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
 
         sleep(2);
 
         $item = $adapter1->getItem('key');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
 
         $adapter2->save($adapter2->getItem('key1')->set('value1'));
 
         $item = $cache->getItem('key1');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value1', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value1', $item->get());
 
         sleep(2);
 
         $item = $adapter1->getItem('key1');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value1', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value1', $item->get());
 
         $item = $adapter2->getItem('key1');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
 
         sleep(2);
 
         $item = $adapter1->getItem('key1');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
     }
 
     public function testMultipleCachesExpirationWhenCommonTtlIsSet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $adapter1 = new ArrayAdapter(4);
@@ -148,58 +148,58 @@ class ChainAdapterTest extends AdapterTestCase
         $cache->save($cache->getItem('key')->set('value'));
 
         $item = $adapter1->getItem('key');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value', $item->get());
 
         $item = $adapter2->getItem('key');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value', $item->get());
 
         sleep(2);
 
         $item = $adapter1->getItem('key');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value', $item->get());
 
         $item = $adapter2->getItem('key');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
 
         sleep(2);
 
         $item = $adapter1->getItem('key');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
 
         $adapter2->save($adapter2->getItem('key1')->set('value1'));
 
         $item = $cache->getItem('key1');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value1', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value1', $item->get());
 
         sleep(2);
 
         $item = $adapter1->getItem('key1');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value1', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value1', $item->get());
 
         $item = $adapter2->getItem('key1');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
 
         sleep(2);
 
         $item = $adapter1->getItem('key1');
-        $this->assertTrue($item->isHit());
-        $this->assertEquals('value1', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertEquals('value1', $item->get());
 
         sleep(2);
 
         $item = $adapter1->getItem('key1');
-        $this->assertFalse($item->isHit());
+        self::assertFalse($item->isHit());
     }
 
     public function testExpirationOnAllAdapters()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+            self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $itemValidator = function (CacheItem $item) {
@@ -207,27 +207,27 @@ class ChainAdapterTest extends AdapterTestCase
             $propExpiry = $refl->getProperty('expiry');
             $propExpiry->setAccessible(true);
             $expiry = $propExpiry->getValue($item);
-            $this->assertGreaterThan(10, $expiry - time(), 'Item should be saved with the given ttl, not the default for the adapter.');
+            self::assertGreaterThan(10, $expiry - time(), 'Item should be saved with the given ttl, not the default for the adapter.');
 
             return true;
         };
 
-        $adapter1 = $this->getMockBuilder(FilesystemAdapter::class)
+        $adapter1 = self::getMockBuilder(FilesystemAdapter::class)
             ->setConstructorArgs(['', 2])
             ->setMethods(['save'])
             ->getMock();
-        $adapter1->expects($this->once())
+        $adapter1->expects(self::once())
             ->method('save')
-            ->with($this->callback($itemValidator))
+            ->with(self::callback($itemValidator))
             ->willReturn(true);
 
-        $adapter2 = $this->getMockBuilder(FilesystemAdapter::class)
+        $adapter2 = self::getMockBuilder(FilesystemAdapter::class)
             ->setConstructorArgs(['', 4])
             ->setMethods(['save'])
             ->getMock();
-        $adapter2->expects($this->once())
+        $adapter2->expects(self::once())
             ->method('save')
-            ->with($this->callback($itemValidator))
+            ->with(self::callback($itemValidator))
             ->willReturn(true);
 
         $cache = new ChainAdapter([$adapter1, $adapter2], 6);
@@ -240,10 +240,10 @@ class ChainAdapterTest extends AdapterTestCase
 
     private function getPruneableMock(): AdapterInterface
     {
-        $pruneable = $this->createMock(PrunableAdapter::class);
+        $pruneable = self::createMock(PrunableAdapter::class);
 
         $pruneable
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('prune')
             ->willReturn(true);
 
@@ -252,10 +252,10 @@ class ChainAdapterTest extends AdapterTestCase
 
     private function getFailingPruneableMock(): AdapterInterface
     {
-        $pruneable = $this->createMock(PrunableAdapter::class);
+        $pruneable = self::createMock(PrunableAdapter::class);
 
         $pruneable
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('prune')
             ->willReturn(false);
 
@@ -264,6 +264,6 @@ class ChainAdapterTest extends AdapterTestCase
 
     private function getNonPruneableMock(): AdapterInterface
     {
-        return $this->createMock(AdapterInterface::class);
+        return self::createMock(AdapterInterface::class);
     }
 }

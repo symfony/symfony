@@ -61,13 +61,13 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTest
         $item = $cache->getItem('baz');
         $cache->save($item->set($value));
 
-        $this->assertSame($value, $this->cache->getItem('foo')->get());
-        $this->assertSame($value, $this->cache->getItem('bar')->get());
-        $this->assertSame($value, $this->cache->getItem('baz')->get());
+        self::assertSame($value, $this->cache->getItem('foo')->get());
+        self::assertSame($value, $this->cache->getItem('bar')->get());
+        self::assertSame($value, $this->cache->getItem('baz')->get());
 
         sleep(1);
-        $this->assertSame($value, $this->cache->getItem('foo')->get());
-        $this->assertSame($value, $this->cache->getItem('bar')->get());
-        $this->assertFalse($this->cache->getItem('baz')->isHit());
+        self::assertSame($value, $this->cache->getItem('foo')->get());
+        self::assertSame($value, $this->cache->getItem('bar')->get());
+        self::assertFalse($this->cache->getItem('baz')->isHit());
     }
 }

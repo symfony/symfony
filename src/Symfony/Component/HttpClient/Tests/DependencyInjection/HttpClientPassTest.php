@@ -27,7 +27,7 @@ class HttpClientPassTest extends TestCase
         $sut = new HttpClientPass();
         $sut->process($container);
 
-        $this->assertFalse($container->hasDefinition('.debug.http_client'));
+        self::assertFalse($container->hasDefinition('.debug.http_client'));
     }
 
     public function testItDecoratesHttpClientWithTraceableHttpClient()
@@ -36,9 +36,9 @@ class HttpClientPassTest extends TestCase
         $container->register('data_collector.http_client', HttpClientDataCollector::class);
         $sut = new HttpClientPass();
         $sut->process($container);
-        $this->assertTrue($container->hasDefinition('.debug.foo'));
-        $this->assertSame(TraceableHttpClient::class, $container->getDefinition('.debug.foo')->getClass());
-        $this->assertSame(['foo', null, 5], $container->getDefinition('.debug.foo')->getDecoratedService());
+        self::assertTrue($container->hasDefinition('.debug.foo'));
+        self::assertSame(TraceableHttpClient::class, $container->getDefinition('.debug.foo')->getClass());
+        self::assertSame(['foo', null, 5], $container->getDefinition('.debug.foo')->getDecoratedService());
     }
 
     public function testItRegistersDebugHttpClientToCollector()
@@ -47,10 +47,7 @@ class HttpClientPassTest extends TestCase
         $container->register('data_collector.http_client', HttpClientDataCollector::class);
         $sut = new HttpClientPass();
         $sut->process($container);
-        $this->assertEquals(
-            [['registerClient', ['foo_client', new Reference('.debug.foo_client')]]],
-            $container->getDefinition('data_collector.http_client')->getMethodCalls()
-        );
+        self::assertEquals([['registerClient', ['foo_client', new Reference('.debug.foo_client')]]], $container->getDefinition('data_collector.http_client')->getMethodCalls());
     }
 
     private function buildContainerBuilder(string $clientId = 'http_client'): ContainerBuilder

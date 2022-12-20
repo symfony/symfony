@@ -55,8 +55,8 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'en'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'fr'));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::once())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
@@ -74,11 +74,11 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $localTranslatorBag->addCatalogue($xliffLoader->load($filenameEn, 'en'));
         $localTranslatorBag->addCatalogue($xliffLoader->load($filenameFr, 'fr'));
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('write')
             ->with($localTranslatorBag->diff($providerReadTranslatorBag));
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
@@ -86,7 +86,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages']]);
 
-        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
     public function testPushForceMessages()
@@ -111,7 +111,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $locales = ['en', 'fr'];
         $domains = ['messages', 'validators'];
 
-        $provider = $this->createMock(ProviderInterface::class);
+        $provider = self::createMock(ProviderInterface::class);
 
         $localTranslatorBag = new TranslatorBag();
         $localTranslatorBag->addCatalogue($xliffLoader->load($filenameMessagesEn, 'en', 'messages'));
@@ -119,11 +119,11 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $localTranslatorBag->addCatalogue($xliffLoader->load($filenameValidatorsEn, 'en', 'validators'));
         $localTranslatorBag->addCatalogue($xliffLoader->load($filenameValidatorsFr, 'fr', 'validators'));
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('write')
             ->with($localTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
@@ -131,7 +131,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => $locales, '--domains' => $domains, '--force' => true]);
 
-        $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
     }
 
     public function testDeleteMissingMessages()
@@ -152,8 +152,8 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
             'obsolete.foo' => 'obsolèteFoo',
         ], 'fr'));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->any())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::any())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
@@ -165,7 +165,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $missingTranslatorBag = $providerReadTranslatorBag->diff($localTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('delete')
             ->with($missingTranslatorBag);
 
@@ -175,16 +175,16 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'en'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'fr'));
 
-        $provider->expects($this->any())
+        $provider->expects(self::any())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('write')
             ->with($localTranslatorBag->diff($providerReadTranslatorBag));
 
-        $provider->expects($this->exactly(2))
+        $provider->expects(self::exactly(2))
             ->method('__toString')
             ->willReturn('null://default');
 
@@ -192,8 +192,8 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--delete-missing' => true]);
 
-        $this->assertStringContainsString('[OK] Missing translations on "null" has been deleted (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
-        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] Missing translations on "null" has been deleted (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
     public function testPushForceAndDeleteMissingMessages()
@@ -214,8 +214,8 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
             'obsolete.foo' => 'obsolèteFoo',
         ], 'fr'));
 
-        $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->any())
+        $provider = self::createMock(ProviderInterface::class);
+        $provider->expects(self::any())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
@@ -227,7 +227,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $missingTranslatorBag = $providerReadTranslatorBag->diff($localTranslatorBag);
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('delete')
             ->with($missingTranslatorBag);
 
@@ -237,7 +237,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'en'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'fr'));
 
-        $provider->expects($this->any())
+        $provider->expects(self::any())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
@@ -245,11 +245,11 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $translationBagToWrite = $localTranslatorBag->diff($providerReadTranslatorBag);
         $translationBagToWrite->addBag($localTranslatorBag->intersect($providerReadTranslatorBag));
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('write')
             ->with($translationBagToWrite);
 
-        $provider->expects($this->exactly(2))
+        $provider->expects(self::exactly(2))
             ->method('__toString')
             ->willReturn('null://default');
 
@@ -257,8 +257,8 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true, '--delete-missing' => true]);
 
-        $this->assertStringContainsString('[OK] Missing translations on "null" has been deleted (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
-        $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] Missing translations on "null" has been deleted (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
     public function testPushWithProviderDomains()
@@ -273,12 +273,12 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'en'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'fr'));
 
-        $provider = $this->createMock(FilteringProvider::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(FilteringProvider::class);
+        $provider->expects(self::once())
             ->method('read')
             ->with($domains, $locales)
             ->willReturn($providerReadTranslatorBag);
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('getDomains')
             ->willReturn(['messages']);
 
@@ -294,11 +294,11 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $localTranslatorBag->addCatalogue($xliffLoader->load($filenameEn, 'en'));
         $localTranslatorBag->addCatalogue($xliffLoader->load($filenameFr, 'fr'));
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('write')
             ->with($localTranslatorBag->diff($providerReadTranslatorBag));
 
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('__toString')
             ->willReturn('null://default');
 
@@ -320,7 +320,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr']]);
 
-        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
     /**
@@ -329,15 +329,15 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $application = new Application();
-        $application->add($this->createCommand($this->createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], ['loco', 'crowdin', 'lokalise']));
+        $application->add($this->createCommand(self::createMock(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], ['loco', 'crowdin', 'lokalise']));
 
         $tester = new CommandCompletionTester($application->get('translation:push'));
         $suggestions = $tester->complete($input);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions(): \Generator

@@ -28,7 +28,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testAssetsCannotHavePathAndUrl()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -41,7 +41,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testAssetPackageCannotHavePathAndUrl()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -58,8 +58,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testWorkflowValidationStateMachine()
     {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
+        self::expectException(InvalidDefinitionException::class);
+        self::expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'workflows' => [
@@ -97,9 +97,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
                 ]);
             });
 
-            $this->fail('No LogicException thrown');
+            self::fail('No LogicException thrown');
         } catch (LogicException $e) {
-            $this->assertEquals('Rate limiter "with_lock" requires the Lock component to be installed and configured.', $e->getMessage());
+            self::assertEquals('Rate limiter "with_lock" requires the Lock component to be installed and configured.', $e->getMessage());
         }
 
         $container = $this->createContainerFromClosure(function (ContainerBuilder $container) {
@@ -112,7 +112,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
 
         $withLock = $container->getDefinition('limiter.with_lock');
-        $this->assertEquals('lock.factory', (string) $withLock->getArgument(2));
+        self::assertEquals('lock.factory', (string) $withLock->getArgument(2));
     }
 
     public function testRateLimiterLockFactory()
@@ -125,8 +125,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
             ]);
         });
 
-        $this->expectException(OutOfBoundsException::class);
-        $this->expectExceptionMessageMatches('/^The argument "2" doesn\'t exist.*\.$/');
+        self::expectException(OutOfBoundsException::class);
+        self::expectExceptionMessageMatches('/^The argument "2" doesn\'t exist.*\.$/');
 
         $container->getDefinition('limiter.without_lock')->getArgument(2);
     }

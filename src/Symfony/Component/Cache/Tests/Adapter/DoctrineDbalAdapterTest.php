@@ -52,10 +52,10 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     {
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
         if (!interface_exists(Middleware::class)) {
-            $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
+            self::markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
         }
 
-        $middleware = $this->createMock(Middleware::class);
+        $middleware = self::createMock(Middleware::class);
         $middleware
             ->method('wrap')
             ->willReturn(new DriverWrapper($connection->getDriver()));
@@ -70,7 +70,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
         $item = $adapter->getItem('key');
         $item->set('value');
-        $this->assertTrue($adapter->save($item));
+        self::assertTrue($adapter->save($item));
     }
 
     public function testConfigureSchema()
@@ -80,7 +80,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
         $adapter = new DoctrineDbalAdapter($connection);
         $adapter->configureSchema($schema, $connection);
-        $this->assertTrue($schema->hasTable('cache_items'));
+        self::assertTrue($schema->hasTable('cache_items'));
     }
 
     public function testConfigureSchemaDifferentDbalConnection()
@@ -90,7 +90,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
         $adapter = $this->createCachePool();
         $adapter->configureSchema($schema, $otherConnection);
-        $this->assertFalse($schema->hasTable('cache_items'));
+        self::assertFalse($schema->hasTable('cache_items'));
     }
 
     public function testConfigureSchemaTableExists()
@@ -102,7 +102,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $adapter = new DoctrineDbalAdapter($connection);
         $adapter->configureSchema($schema, $connection);
         $table = $schema->getTable('cache_items');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        self::assertEmpty($table->getColumns(), 'The table was not overwritten');
     }
 
     /**
@@ -116,7 +116,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
             $item = $pool->getItem('key');
             $item->set('value');
-            $this->assertTrue($pool->save($item));
+            self::assertTrue($pool->save($item));
         } finally {
             if (null !== $file) {
                 @unlink($file);
@@ -147,9 +147,9 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     private function createConnectionMock()
     {
-        $connection = $this->createMock(Connection::class);
-        $driver = $this->createMock(AbstractMySQLDriver::class);
-        $connection->expects($this->any())
+        $connection = self::createMock(Connection::class);
+        $driver = self::createMock(AbstractMySQLDriver::class);
+        $connection->expects(self::any())
             ->method('getDriver')
             ->willReturn($driver);
 

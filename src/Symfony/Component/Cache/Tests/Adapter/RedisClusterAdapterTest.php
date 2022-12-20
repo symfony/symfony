@@ -42,7 +42,7 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
             self::$redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);
         }
 
-        $this->assertInstanceOf(RedisClusterProxy::class, self::$redis);
+        self::assertInstanceOf(RedisClusterProxy::class, self::$redis);
         $adapter = new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 
         return $adapter;
@@ -53,8 +53,8 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
      */
     public function testFailedCreateConnection(string $dsn)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis connection ');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Redis connection ');
         RedisAdapter::createConnection($dsn);
     }
 

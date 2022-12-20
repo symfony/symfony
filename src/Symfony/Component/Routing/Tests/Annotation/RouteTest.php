@@ -67,7 +67,7 @@ class RouteTest extends TestCase
         $this->expectDeprecation('Since symfony/routing 5.3: Passing an array as first argument to "Symfony\Component\Routing\Annotation\Route::__construct" is deprecated. Use named arguments instead.');
 
         $route = new Route([$parameter => $value]);
-        $this->assertEquals($route->$getter(), $value);
+        self::assertEquals($route->$getter(), $value);
     }
 
     /**
@@ -77,7 +77,7 @@ class RouteTest extends TestCase
     public function testLoadFromAttribute(string $methodName, string $getter, $expectedReturn)
     {
         $route = $this->getMethodAnnotation($methodName, true);
-        $this->assertEquals($route->$getter(), $expectedReturn);
+        self::assertEquals($route->$getter(), $expectedReturn);
     }
 
     /**
@@ -86,7 +86,7 @@ class RouteTest extends TestCase
     public function testLoadFromDoctrineAnnotation(string $methodName, string $getter, $expectedReturn)
     {
         $route = $this->getMethodAnnotation($methodName, false);
-        $this->assertEquals($route->$getter(), $expectedReturn);
+        self::assertEquals($route->$getter(), $expectedReturn);
     }
 
     public function getValidParameters(): iterable

@@ -33,7 +33,7 @@ class RedisTagAwareArrayAdapterTest extends RedisArrayAdapterTest
             self::$redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);
         }
 
-        $this->assertInstanceOf(\RedisArray::class, self::$redis);
+        self::assertInstanceOf(\RedisArray::class, self::$redis);
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 
         return $adapter;

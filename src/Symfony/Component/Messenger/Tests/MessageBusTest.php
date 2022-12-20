@@ -29,7 +29,7 @@ class MessageBusTest extends TestCase
     {
         $bus = new MessageBus();
 
-        $this->assertInstanceOf(MessageBusInterface::class, $bus);
+        self::assertInstanceOf(MessageBusInterface::class, $bus);
     }
 
     public function testItCallsMiddleware()
@@ -37,18 +37,18 @@ class MessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
 
-        $firstMiddleware = $this->createMock(MiddlewareInterface::class);
-        $firstMiddleware->expects($this->once())
+        $firstMiddleware = self::createMock(MiddlewareInterface::class);
+        $firstMiddleware->expects(self::once())
             ->method('handle')
-            ->with($envelope, $this->anything())
+            ->with($envelope, self::anything())
             ->willReturnCallback(function ($envelope, $stack) {
                 return $stack->next()->handle($envelope, $stack);
             });
 
-        $secondMiddleware = $this->createMock(MiddlewareInterface::class);
-        $secondMiddleware->expects($this->once())
+        $secondMiddleware = self::createMock(MiddlewareInterface::class);
+        $secondMiddleware->expects(self::once())
             ->method('handle')
-            ->with($envelope, $this->anything())
+            ->with($envelope, self::anything())
             ->willReturn($envelope)
         ;
 
@@ -66,26 +66,26 @@ class MessageBusTest extends TestCase
         $envelope = new Envelope($message, [new ReceivedStamp('transport')]);
         $envelopeWithAnotherStamp = $envelope->with(new AnEnvelopeStamp());
 
-        $firstMiddleware = $this->createMock(MiddlewareInterface::class);
-        $firstMiddleware->expects($this->once())
+        $firstMiddleware = self::createMock(MiddlewareInterface::class);
+        $firstMiddleware->expects(self::once())
             ->method('handle')
-            ->with($envelope, $this->anything())
+            ->with($envelope, self::anything())
             ->willReturnCallback(function ($envelope, $stack) {
                 return $stack->next()->handle($envelope->with(new AnEnvelopeStamp()), $stack);
             });
 
-        $secondMiddleware = $this->createMock(MiddlewareInterface::class);
-        $secondMiddleware->expects($this->once())
+        $secondMiddleware = self::createMock(MiddlewareInterface::class);
+        $secondMiddleware->expects(self::once())
             ->method('handle')
-            ->with($envelopeWithAnotherStamp, $this->anything())
+            ->with($envelopeWithAnotherStamp, self::anything())
             ->willReturnCallback(function ($envelope, $stack) {
                 return $stack->next()->handle($envelope, $stack);
             });
 
-        $thirdMiddleware = $this->createMock(MiddlewareInterface::class);
-        $thirdMiddleware->expects($this->once())
+        $thirdMiddleware = self::createMock(MiddlewareInterface::class);
+        $thirdMiddleware->expects(self::once())
             ->method('handle')
-            ->with($envelopeWithAnotherStamp, $this->anything())
+            ->with($envelopeWithAnotherStamp, self::anything())
             ->willReturn($envelopeWithAnotherStamp)
         ;
 
@@ -106,18 +106,18 @@ class MessageBusTest extends TestCase
         $changedMessage = new DummyMessage('Changed');
         $expectedEnvelope = new Envelope($changedMessage, $stamps);
 
-        $firstMiddleware = $this->createMock(MiddlewareInterface::class);
-        $firstMiddleware->expects($this->once())
+        $firstMiddleware = self::createMock(MiddlewareInterface::class);
+        $firstMiddleware->expects(self::once())
             ->method('handle')
-            ->with($envelope, $this->anything())
+            ->with($envelope, self::anything())
             ->willReturnCallback(function ($envelope, $stack) use ($expectedEnvelope) {
                 return $stack->next()->handle($expectedEnvelope, $stack);
             });
 
-        $secondMiddleware = $this->createMock(MiddlewareInterface::class);
-        $secondMiddleware->expects($this->once())
+        $secondMiddleware = self::createMock(MiddlewareInterface::class);
+        $secondMiddleware->expects(self::once())
             ->method('handle')
-            ->with($expectedEnvelope, $this->anything())
+            ->with($expectedEnvelope, self::anything())
             ->willReturn($envelope)
         ;
 
@@ -132,13 +132,13 @@ class MessageBusTest extends TestCase
     public function testItAddsTheStamps()
     {
         $finalEnvelope = (new MessageBus())->dispatch(new \stdClass(), [new DelayStamp(5), new BusNameStamp('bar')]);
-        $this->assertCount(2, $finalEnvelope->all());
+        self::assertCount(2, $finalEnvelope->all());
     }
 
     public function testItAddsTheStampsToEnvelope()
     {
         $finalEnvelope = (new MessageBus())->dispatch(new Envelope(new \stdClass()), [new DelayStamp(5), new BusNameStamp('bar')]);
-        $this->assertCount(2, $finalEnvelope->all());
+        self::assertCount(2, $finalEnvelope->all());
     }
 
     public function provideConstructorDataStucture(): iterable
@@ -165,12 +165,12 @@ class MessageBusTest extends TestCase
         $bus = new MessageBus($dataStructure);
         $envelope = new Envelope(new DummyMessage('Hello'));
         $newEnvelope = $bus->dispatch($envelope);
-        $this->assertSame($envelope->getMessage(), $newEnvelope->getMessage());
+        self::assertSame($envelope->getMessage(), $newEnvelope->getMessage());
 
         // Test rewindable capacity
         $envelope = new Envelope(new DummyMessage('Hello'));
         $newEnvelope = $bus->dispatch($envelope);
-        $this->assertSame($envelope->getMessage(), $newEnvelope->getMessage());
+        self::assertSame($envelope->getMessage(), $newEnvelope->getMessage());
     }
 }
 

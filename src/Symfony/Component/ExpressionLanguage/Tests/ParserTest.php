@@ -21,8 +21,8 @@ class ParserTest extends TestCase
 {
     public function testParseWithInvalidName()
     {
-        $this->expectException(SyntaxError::class);
-        $this->expectExceptionMessage('Variable "foo" is not valid around position 1 for expression `foo`.');
+        self::expectException(SyntaxError::class);
+        self::expectExceptionMessage('Variable "foo" is not valid around position 1 for expression `foo`.');
         $lexer = new Lexer();
         $parser = new Parser([]);
         $parser->parse($lexer->tokenize('foo'));
@@ -30,8 +30,8 @@ class ParserTest extends TestCase
 
     public function testParseWithZeroInNames()
     {
-        $this->expectException(SyntaxError::class);
-        $this->expectExceptionMessage('Variable "foo" is not valid around position 1 for expression `foo`.');
+        self::expectException(SyntaxError::class);
+        self::expectExceptionMessage('Variable "foo" is not valid around position 1 for expression `foo`.');
         $lexer = new Lexer();
         $parser = new Parser([]);
         $parser->parse($lexer->tokenize('foo'), [0]);
@@ -44,7 +44,7 @@ class ParserTest extends TestCase
     {
         $lexer = new Lexer();
         $parser = new Parser([]);
-        $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
+        self::assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
     public function getParseData()
@@ -202,7 +202,7 @@ class ParserTest extends TestCase
      */
     public function testParseWithInvalidPostfixData($expr, $names = [])
     {
-        $this->expectException(SyntaxError::class);
+        self::expectException(SyntaxError::class);
         $lexer = new Lexer();
         $parser = new Parser([]);
         $parser->parse($lexer->tokenize($expr), $names);
@@ -232,8 +232,8 @@ class ParserTest extends TestCase
 
     public function testNameProposal()
     {
-        $this->expectException(SyntaxError::class);
-        $this->expectExceptionMessage('Did you mean "baz"?');
+        self::expectException(SyntaxError::class);
+        self::expectExceptionMessage('Did you mean "baz"?');
         $lexer = new Lexer();
         $parser = new Parser([]);
 
@@ -246,8 +246,8 @@ class ParserTest extends TestCase
     public function testLint($expression, $names, string $exception = null)
     {
         if ($exception) {
-            $this->expectException(SyntaxError::class);
-            $this->expectExceptionMessage($exception);
+            self::expectException(SyntaxError::class);
+            self::expectExceptionMessage($exception);
         }
 
         $lexer = new Lexer();
@@ -255,7 +255,7 @@ class ParserTest extends TestCase
         $parser->lint($lexer->tokenize($expression), $names);
 
         // Parser does't return anything when the correct expression is passed
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
     }
 
     public function getLintData(): array

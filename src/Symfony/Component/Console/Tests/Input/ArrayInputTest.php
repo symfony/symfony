@@ -22,46 +22,46 @@ class ArrayInputTest extends TestCase
     public function testGetFirstArgument()
     {
         $input = new ArrayInput([]);
-        $this->assertNull($input->getFirstArgument(), '->getFirstArgument() returns null if no argument were passed');
+        self::assertNull($input->getFirstArgument(), '->getFirstArgument() returns null if no argument were passed');
         $input = new ArrayInput(['name' => 'Fabien']);
-        $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
+        self::assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
         $input = new ArrayInput(['--foo' => 'bar', 'name' => 'Fabien']);
-        $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
+        self::assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
     }
 
     public function testHasParameterOption()
     {
         $input = new ArrayInput(['name' => 'Fabien', '--foo' => 'bar']);
-        $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if an option is present in the passed parameters');
-        $this->assertFalse($input->hasParameterOption('--bar'), '->hasParameterOption() returns false if an option is not present in the passed parameters');
+        self::assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if an option is present in the passed parameters');
+        self::assertFalse($input->hasParameterOption('--bar'), '->hasParameterOption() returns false if an option is not present in the passed parameters');
 
         $input = new ArrayInput(['--foo']);
-        $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if an option is present in the passed parameters');
+        self::assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if an option is present in the passed parameters');
 
         $input = new ArrayInput(['--foo', '--', '--bar']);
-        $this->assertTrue($input->hasParameterOption('--bar'), '->hasParameterOption() returns true if an option is present in the passed parameters');
-        $this->assertFalse($input->hasParameterOption('--bar', true), '->hasParameterOption() returns false if an option is present in the passed parameters after an end of options signal');
+        self::assertTrue($input->hasParameterOption('--bar'), '->hasParameterOption() returns true if an option is present in the passed parameters');
+        self::assertFalse($input->hasParameterOption('--bar', true), '->hasParameterOption() returns false if an option is present in the passed parameters after an end of options signal');
     }
 
     public function testGetParameterOption()
     {
         $input = new ArrayInput(['name' => 'Fabien', '--foo' => 'bar']);
-        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
-        $this->assertEquals('default', $input->getParameterOption('--bar', 'default'), '->getParameterOption() returns the default value if an option is not present in the passed parameters');
+        self::assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
+        self::assertEquals('default', $input->getParameterOption('--bar', 'default'), '->getParameterOption() returns the default value if an option is not present in the passed parameters');
 
         $input = new ArrayInput(['Fabien', '--foo' => 'bar']);
-        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
+        self::assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
 
         $input = new ArrayInput(['--foo', '--', '--bar' => 'woop']);
-        $this->assertEquals('woop', $input->getParameterOption('--bar'), '->getParameterOption() returns the correct value if an option is present in the passed parameters');
-        $this->assertEquals('default', $input->getParameterOption('--bar', 'default', true), '->getParameterOption() returns the default value if an option is present in the passed parameters after an end of options signal');
+        self::assertEquals('woop', $input->getParameterOption('--bar'), '->getParameterOption() returns the correct value if an option is present in the passed parameters');
+        self::assertEquals('default', $input->getParameterOption('--bar', 'default', true), '->getParameterOption() returns the default value if an option is present in the passed parameters after an end of options signal');
     }
 
     public function testParseArguments()
     {
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name')]));
 
-        $this->assertEquals(['name' => 'foo'], $input->getArguments(), '->parse() parses required arguments');
+        self::assertEquals(['name' => 'foo'], $input->getArguments(), '->parse() parses required arguments');
     }
 
     /**
@@ -71,7 +71,7 @@ class ArrayInputTest extends TestCase
     {
         $input = new ArrayInput($input, new InputDefinition($options));
 
-        $this->assertEquals($expectedOptions, $input->getOptions(), $message);
+        self::assertEquals($expectedOptions, $input->getOptions(), $message);
     }
 
     public function provideOptions()
@@ -127,8 +127,8 @@ class ArrayInputTest extends TestCase
      */
     public function testParseInvalidInput($parameters, $definition, $expectedExceptionMessage)
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage($expectedExceptionMessage);
 
         new ArrayInput($parameters, $definition);
     }
@@ -162,12 +162,12 @@ class ArrayInputTest extends TestCase
     public function testToString()
     {
         $input = new ArrayInput(['-f' => null, '-b' => 'bar', '--foo' => 'b a z', '--lala' => null, 'test' => 'Foo', 'test2' => "A\nB'C"]);
-        $this->assertEquals('-f -b bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);
+        self::assertEquals('-f -b bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);
 
         $input = new ArrayInput(['-b' => ['bval_1', 'bval_2'], '--f' => ['fval_1', 'fval_2']]);
-        $this->assertSame('-b bval_1 -b bval_2 --f=fval_1 --f=fval_2', (string) $input);
+        self::assertSame('-b bval_1 -b bval_2 --f=fval_1 --f=fval_2', (string) $input);
 
         $input = new ArrayInput(['array_arg' => ['val_1', 'val_2']]);
-        $this->assertSame('val_1 val_2', (string) $input);
+        self::assertSame('val_1 val_2', (string) $input);
     }
 }

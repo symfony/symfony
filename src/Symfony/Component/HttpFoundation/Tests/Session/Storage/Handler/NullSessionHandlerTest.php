@@ -29,7 +29,7 @@ class NullSessionHandlerTest extends TestCase
     public function testSaveHandlers()
     {
         $this->getStorage();
-        $this->assertEquals('user', \ini_get('session.save_handler'));
+        self::assertEquals('user', \ini_get('session.save_handler'));
     }
 
     public function testSession()
@@ -37,9 +37,9 @@ class NullSessionHandlerTest extends TestCase
         session_id('nullsessionstorage');
         $storage = $this->getStorage();
         $session = new Session($storage);
-        $this->assertNull($session->get('something'));
+        self::assertNull($session->get('something'));
         $session->set('something', 'unique');
-        $this->assertEquals('unique', $session->get('something'));
+        self::assertEquals('unique', $session->get('something'));
     }
 
     public function testNothingIsPersisted()
@@ -48,8 +48,8 @@ class NullSessionHandlerTest extends TestCase
         $storage = $this->getStorage();
         $session = new Session($storage);
         $session->start();
-        $this->assertEquals('nullsessionstorage', $session->getId());
-        $this->assertNull($session->get('something'));
+        self::assertEquals('nullsessionstorage', $session->getId());
+        self::assertNull($session->get('something'));
     }
 
     public function getStorage()

@@ -73,16 +73,16 @@ class DebugProcessorTest extends TestCase
         $processor(self::getRecord());
         $processor(self::getRecord(Logger::ERROR));
 
-        $this->assertCount(2, $processor->getLogs());
-        $this->assertSame(1, $processor->countErrors());
+        self::assertCount(2, $processor->getLogs());
+        self::assertSame(1, $processor->countErrors());
     }
 
     public function testDebugProcessorWithoutLogs()
     {
         $processor = new DebugProcessor();
 
-        $this->assertCount(0, $processor->getLogs());
-        $this->assertSame(0, $processor->countErrors());
+        self::assertCount(0, $processor->getLogs());
+        self::assertSame(0, $processor->countErrors());
     }
 
     public function testWithRequestStack()
@@ -92,8 +92,8 @@ class DebugProcessorTest extends TestCase
         $processor(self::getRecord());
         $processor(self::getRecord(Logger::ERROR));
 
-        $this->assertCount(2, $processor->getLogs());
-        $this->assertSame(1, $processor->countErrors());
+        self::assertCount(2, $processor->getLogs());
+        self::assertSame(1, $processor->countErrors());
 
         $request = new Request();
         $stack->push($request);
@@ -101,26 +101,26 @@ class DebugProcessorTest extends TestCase
         $processor(self::getRecord());
         $processor(self::getRecord(Logger::ERROR));
 
-        $this->assertCount(4, $processor->getLogs());
-        $this->assertSame(2, $processor->countErrors());
+        self::assertCount(4, $processor->getLogs());
+        self::assertSame(2, $processor->countErrors());
 
-        $this->assertCount(2, $processor->getLogs($request));
-        $this->assertSame(1, $processor->countErrors($request));
+        self::assertCount(2, $processor->getLogs($request));
+        self::assertSame(1, $processor->countErrors($request));
 
-        $this->assertCount(0, $processor->getLogs(new Request()));
-        $this->assertSame(0, $processor->countErrors(new Request()));
+        self::assertCount(0, $processor->getLogs(new Request()));
+        self::assertSame(0, $processor->countErrors(new Request()));
     }
 
     public function testInheritedClassCallGetLogsWithoutArgument()
     {
         $debugProcessorChild = new ClassThatInheritDebugProcessor();
-        $this->assertSame([], $debugProcessorChild->getLogs());
+        self::assertSame([], $debugProcessorChild->getLogs());
     }
 
     public function testInheritedClassCallCountErrorsWithoutArgument()
     {
         $debugProcessorChild = new ClassThatInheritDebugProcessor();
-        $this->assertEquals(0, $debugProcessorChild->countErrors());
+        self::assertEquals(0, $debugProcessorChild->countErrors());
     }
 
     private static function getRecord($level = Logger::WARNING, $message = 'test'): array

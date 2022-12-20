@@ -29,7 +29,7 @@ class WeekTypeTest extends BaseTypeTest
             'week' => '1',
         ]);
 
-        $this->assertSame(['year' => 2019, 'week' => 1], $form->getData());
+        self::assertSame(['year' => 2019, 'week' => 1], $form->getData());
     }
 
     public function testSubmitString()
@@ -45,7 +45,7 @@ class WeekTypeTest extends BaseTypeTest
             'week' => '1',
         ]);
 
-        $this->assertEquals('2019-W01', $form->getData());
+        self::assertEquals('2019-W01', $form->getData());
     }
 
     public function testSubmitStringSingleText()
@@ -58,7 +58,7 @@ class WeekTypeTest extends BaseTypeTest
 
         $form->submit('2019-W01');
 
-        $this->assertEquals('2019-W01', $form->getData());
+        self::assertEquals('2019-W01', $form->getData());
     }
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()
@@ -69,8 +69,8 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('', $view['year']->vars['placeholder']);
-        $this->assertSame('', $view['week']->vars['placeholder']);
+        self::assertSame('', $view['year']->vars['placeholder']);
+        self::assertSame('', $view['week']->vars['placeholder']);
     }
 
     public function testPassNoPlaceholderToViewIfRequired()
@@ -81,8 +81,8 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertNull($view['year']->vars['placeholder']);
-        $this->assertNull($view['week']->vars['placeholder']);
+        self::assertNull($view['year']->vars['placeholder']);
+        self::assertNull($view['week']->vars['placeholder']);
     }
 
     public function testPassPlaceholderAsString()
@@ -93,8 +93,8 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('Empty', $view['year']->vars['placeholder']);
-        $this->assertSame('Empty', $view['week']->vars['placeholder']);
+        self::assertSame('Empty', $view['year']->vars['placeholder']);
+        self::assertSame('Empty', $view['week']->vars['placeholder']);
     }
 
     public function testPassPlaceholderAsArray()
@@ -108,8 +108,8 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('Empty year', $view['year']->vars['placeholder']);
-        $this->assertSame('Empty week', $view['week']->vars['placeholder']);
+        self::assertSame('Empty year', $view['year']->vars['placeholder']);
+        self::assertSame('Empty week', $view['week']->vars['placeholder']);
     }
 
     public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
@@ -123,8 +123,8 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('Empty year', $view['year']->vars['placeholder']);
-        $this->assertSame('', $view['week']->vars['placeholder']);
+        self::assertSame('Empty year', $view['year']->vars['placeholder']);
+        self::assertSame('', $view['week']->vars['placeholder']);
     }
 
     public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
@@ -138,8 +138,8 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('Empty year', $view['year']->vars['placeholder']);
-        $this->assertNull($view['week']->vars['placeholder']);
+        self::assertSame('Empty year', $view['year']->vars['placeholder']);
+        self::assertNull($view['week']->vars['placeholder']);
     }
 
     public function testPassHtml5TypeIfSingleTextAndHtml5Format()
@@ -149,7 +149,7 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('week', $view->vars['type']);
+        self::assertSame('week', $view->vars['type']);
     }
 
     public function testDontPassHtml5TypeIfHtml5NotAllowed()
@@ -160,7 +160,7 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertArrayNotHasKey('type', $view->vars);
+        self::assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotSingleText()
@@ -170,7 +170,7 @@ class WeekTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertArrayNotHasKey('type', $view->vars);
+        self::assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testYearTypeChoiceErrorsBubbleUp()
@@ -182,8 +182,8 @@ class WeekTypeTest extends BaseTypeTest
 
         $form['year']->addError($error);
 
-        $this->assertSame([], iterator_to_array($form['year']->getErrors()));
-        $this->assertSame([$error], iterator_to_array($form->getErrors()));
+        self::assertSame([], iterator_to_array($form['year']->getErrors()));
+        self::assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
     public function testWeekTypeChoiceErrorsBubbleUp()
@@ -195,8 +195,8 @@ class WeekTypeTest extends BaseTypeTest
 
         $form['week']->addError($error);
 
-        $this->assertSame([], iterator_to_array($form['week']->getErrors()));
-        $this->assertSame([$error], iterator_to_array($form->getErrors()));
+        self::assertSame([], iterator_to_array($form['week']->getErrors()));
+        self::assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
     public function testPassDefaultChoiceTranslationDomain()
@@ -207,8 +207,8 @@ class WeekTypeTest extends BaseTypeTest
 
         $view = $form->createView();
 
-        $this->assertFalse($view['year']->vars['choice_translation_domain']);
-        $this->assertFalse($view['week']->vars['choice_translation_domain']);
+        self::assertFalse($view['year']->vars['choice_translation_domain']);
+        self::assertFalse($view['week']->vars['choice_translation_domain']);
     }
 
     public function testPassChoiceTranslationDomainAsString()
@@ -219,8 +219,8 @@ class WeekTypeTest extends BaseTypeTest
         ]);
 
         $view = $form->createView();
-        $this->assertSame('messages', $view['year']->vars['choice_translation_domain']);
-        $this->assertSame('messages', $view['week']->vars['choice_translation_domain']);
+        self::assertSame('messages', $view['year']->vars['choice_translation_domain']);
+        self::assertSame('messages', $view['week']->vars['choice_translation_domain']);
     }
 
     public function testPassChoiceTranslationDomainAsArray()
@@ -234,8 +234,8 @@ class WeekTypeTest extends BaseTypeTest
         ]);
 
         $view = $form->createView();
-        $this->assertSame('foo', $view['year']->vars['choice_translation_domain']);
-        $this->assertSame('test', $view['week']->vars['choice_translation_domain']);
+        self::assertSame('foo', $view['year']->vars['choice_translation_domain']);
+        self::assertSame('test', $view['week']->vars['choice_translation_domain']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -245,9 +245,9 @@ class WeekTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertSame(['year' => null, 'week' => null], $form->getData());
-        $this->assertSame(['year' => null, 'week' => null], $form->getNormData());
-        $this->assertSame(['year' => null, 'week' => null], $form->getViewData());
+        self::assertSame(['year' => null, 'week' => null], $form->getData());
+        self::assertSame(['year' => null, 'week' => null], $form->getNormData());
+        self::assertSame(['year' => null, 'week' => null], $form->getViewData());
     }
 
     public function testSubmitFromChoiceEmpty()
@@ -262,7 +262,7 @@ class WeekTypeTest extends BaseTypeTest
             'week' => '',
         ]);
 
-        $this->assertSame(['year' => null, 'week' => null], $form->getData());
+        self::assertSame(['year' => null, 'week' => null], $form->getData());
     }
 
     public function testSubmitNullWithText()
@@ -272,7 +272,7 @@ class WeekTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertSame(['year' => null, 'week' => null], $form->getViewData());
+        self::assertSame(['year' => null, 'week' => null], $form->getViewData());
     }
 
     public function testSubmitNullWithSingleText()
@@ -283,9 +283,9 @@ class WeekTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getViewData());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertSame('', $form->getViewData());
     }
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = [], $expectedData = null)
@@ -296,7 +296,7 @@ class WeekTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertSame(['year' => null, 'week' => null], $form->getData());
+        self::assertSame(['year' => null, 'week' => null], $form->getData());
     }
 
     /**
@@ -310,7 +310,7 @@ class WeekTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertSame($expectedData, $form->getData());
+        self::assertSame($expectedData, $form->getData());
     }
 
     public function provideEmptyData()

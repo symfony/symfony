@@ -21,8 +21,8 @@ class ClosureLoaderTest extends TestCase
     {
         $loader = new ClosureLoader(new ContainerBuilder());
 
-        $this->assertTrue($loader->supports(function ($container) {}), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        self::assertTrue($loader->supports(function ($container) {}), '->supports() returns true if the resource is loadable');
+        self::assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
     }
 
     public function testLoad()
@@ -34,6 +34,6 @@ class ClosureLoaderTest extends TestCase
             $container->setParameter('env', $env);
         });
 
-        $this->assertSame(['foo' => 'foo', 'env' => 'some-env'], $container->getParameterBag()->all());
+        self::assertSame(['foo' => 'foo', 'env' => 'some-env'], $container->getParameterBag()->all());
     }
 }

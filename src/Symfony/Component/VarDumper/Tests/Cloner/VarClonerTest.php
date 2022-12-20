@@ -61,7 +61,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 )
 
 EOTXT;
-        $this->assertSame(sprintf($expected, \PHP_INT_MAX), print_r($clone, true));
+        self::assertSame(sprintf($expected, \PHP_INT_MAX), print_r($clone, true));
     }
 
     public function testClone()
@@ -153,7 +153,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 )
 
 EOTXT;
-        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+        self::assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
     public function testLimits()
@@ -325,13 +325,13 @@ Symfony\Component\VarDumper\Cloner\Data Object
 )
 
 EOTXT;
-        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+        self::assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
     public function testJsonCast()
     {
         if (2 == \ini_get('xdebug.overload_var_dump')) {
-            $this->markTestSkipped('xdebug is active');
+            self::markTestSkipped('xdebug is active');
         }
 
         $data = (array) json_decode('{"1":{}}');
@@ -393,7 +393,7 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%d (7) {
 EOTXT;
         ob_start();
         var_dump($clone);
-        $this->assertStringMatchesFormat(str_replace('"1"', '1', $expected), ob_get_clean());
+        self::assertStringMatchesFormat(str_replace('"1"', '1', $expected), ob_get_clean());
     }
 
     public function testCaster()
@@ -455,7 +455,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 )
 
 EOTXT;
-        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+        self::assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
     /**
@@ -571,7 +571,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 )
 
 EOTXT;
-        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+        self::assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
     /**
@@ -673,6 +673,6 @@ Symfony\Component\VarDumper\Cloner\Data Object
 )
 
 EOTXT;
-        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+        self::assertStringMatchesFormat($expected, print_r($clone, true));
     }
 }

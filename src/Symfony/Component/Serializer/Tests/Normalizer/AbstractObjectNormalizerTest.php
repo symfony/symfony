@@ -45,9 +45,9 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new AbstractObjectNormalizerDummy();
         $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'], Dummy::class);
 
-        $this->assertSame('foo', $normalizedData->foo);
-        $this->assertNull($normalizedData->bar);
-        $this->assertSame('baz', $normalizedData->baz);
+        self::assertSame('foo', $normalizedData->foo);
+        self::assertNull($normalizedData->bar);
+        self::assertSame('baz', $normalizedData->baz);
     }
 
     public function testInstantiateObjectDenormalizer()
@@ -58,13 +58,13 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $normalizer = new AbstractObjectNormalizerDummy();
 
-        $this->assertInstanceOf(Dummy::class, $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), []));
+        self::assertInstanceOf(Dummy::class, $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), []));
     }
 
     public function testDenormalizeWithExtraAttribute()
     {
-        $this->expectException(ExtraAttributesException::class);
-        $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo" is unknown).');
+        self::expectException(ExtraAttributesException::class);
+        self::expectExceptionMessage('Extra attributes are not allowed ("fooFoo" is unknown).');
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $normalizer = new AbstractObjectNormalizerDummy($factory);
         $normalizer->denormalize(
@@ -77,8 +77,8 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeWithExtraAttributes()
     {
-        $this->expectException(ExtraAttributesException::class);
-        $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
+        self::expectException(ExtraAttributesException::class);
+        self::expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $normalizer = new AbstractObjectNormalizerDummy($factory);
         $normalizer->denormalize(
@@ -91,8 +91,8 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeWithExtraAttributesAndNoGroupsWithMetadataFactory()
     {
-        $this->expectException(ExtraAttributesException::class);
-        $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
+        self::expectException(ExtraAttributesException::class);
+        self::expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
         $normalizer = new AbstractObjectNormalizerWithMetadata();
         $normalizer->denormalize(
             ['fooFoo' => 'foo', 'fooBar' => 'bar', 'bar' => 'bar'],
@@ -116,10 +116,10 @@ class AbstractObjectNormalizerTest extends TestCase
             'xml'
         );
 
-        $this->assertInstanceOf(DummyCollection::class, $dummyCollection);
-        $this->assertIsArray($dummyCollection->children);
-        $this->assertCount(1, $dummyCollection->children);
-        $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[0]);
+        self::assertInstanceOf(DummyCollection::class, $dummyCollection);
+        self::assertIsArray($dummyCollection->children);
+        self::assertCount(1, $dummyCollection->children);
+        self::assertInstanceOf(DummyChild::class, $dummyCollection->children[0]);
     }
 
     public function testDenormalizeCollectionDecodedFromXmlWithTwoChildren()
@@ -137,21 +137,18 @@ class AbstractObjectNormalizerTest extends TestCase
             'xml'
         );
 
-        $this->assertInstanceOf(DummyCollection::class, $dummyCollection);
-        $this->assertIsArray($dummyCollection->children);
-        $this->assertCount(2, $dummyCollection->children);
-        $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[0]);
-        $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[1]);
+        self::assertInstanceOf(DummyCollection::class, $dummyCollection);
+        self::assertIsArray($dummyCollection->children);
+        self::assertCount(2, $dummyCollection->children);
+        self::assertInstanceOf(DummyChild::class, $dummyCollection->children[0]);
+        self::assertInstanceOf(DummyChild::class, $dummyCollection->children[1]);
     }
 
     private function getDenormalizerForDummyCollection()
     {
-        $extractor = $this->createMock(PhpDocExtractor::class);
+        $extractor = self::createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
-                [new Type('array', false, null, true, new Type('int'), new Type('object', false, DummyChild::class))],
-                null
-            ));
+            ->will(self::onConsecutiveCalls([new Type('array', false, null, true, new Type('int'), new Type('object', false, DummyChild::class))], null));
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -170,10 +167,10 @@ class AbstractObjectNormalizerTest extends TestCase
         // and only one child exists
         $stringCollection = $denormalizer->denormalize(['children' => 'foo'], StringCollection::class, 'xml');
 
-        $this->assertInstanceOf(StringCollection::class, $stringCollection);
-        $this->assertIsArray($stringCollection->children);
-        $this->assertCount(1, $stringCollection->children);
-        $this->assertEquals('foo', $stringCollection->children[0]);
+        self::assertInstanceOf(StringCollection::class, $stringCollection);
+        self::assertIsArray($stringCollection->children);
+        self::assertCount(1, $stringCollection->children);
+        self::assertEquals('foo', $stringCollection->children[0]);
     }
 
     public function testDenormalizeStringCollectionDecodedFromXmlWithTwoChildren()
@@ -184,11 +181,11 @@ class AbstractObjectNormalizerTest extends TestCase
         // and only one child exists
         $stringCollection = $denormalizer->denormalize(['children' => ['foo', 'bar']], StringCollection::class, 'xml');
 
-        $this->assertInstanceOf(StringCollection::class, $stringCollection);
-        $this->assertIsArray($stringCollection->children);
-        $this->assertCount(2, $stringCollection->children);
-        $this->assertEquals('foo', $stringCollection->children[0]);
-        $this->assertEquals('bar', $stringCollection->children[1]);
+        self::assertInstanceOf(StringCollection::class, $stringCollection);
+        self::assertIsArray($stringCollection->children);
+        self::assertCount(2, $stringCollection->children);
+        self::assertEquals('foo', $stringCollection->children[0]);
+        self::assertEquals('bar', $stringCollection->children[1]);
     }
 
     public function testDenormalizeNotSerializableObjectToPopulate()
@@ -196,17 +193,14 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new AbstractObjectNormalizerDummy();
         $normalizedData = $normalizer->denormalize(['foo' => 'foo'], Dummy::class, null, [AbstractObjectNormalizer::OBJECT_TO_POPULATE => new NotSerializable()]);
 
-        $this->assertSame('foo', $normalizedData->foo);
+        self::assertSame('foo', $normalizedData->foo);
     }
 
     private function getDenormalizerForStringCollection()
     {
-        $extractor = $this->createMock(PhpDocExtractor::class);
+        $extractor = self::createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
-                [new Type('array', false, null, true, new Type('int'), new Type('string'))],
-                null
-            ));
+            ->will(self::onConsecutiveCalls([new Type('array', false, null, true, new Type('int'), new Type('string'))], null));
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -249,7 +243,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer->setSerializer($serializer);
         $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'baz' => 'baz', 'quux' => ['value' => 'quux'], 'type' => 'second'], AbstractDummy::class);
 
-        $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
+        self::assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
     }
 
     public function testDenormalizeWithNestedDiscriminatorMap()
@@ -286,7 +280,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $denormalizedData = $normalizer->denormalize(['type' => 'foo', 'nested_type' => 'bar'], AbstractDummy::class);
 
-        $this->assertInstanceOf(AbstractDummySecondChild::class, $denormalizedData);
+        self::assertInstanceOf(AbstractDummySecondChild::class, $denormalizedData);
     }
 
     public function testDenormalizeBasicTypePropertiesFromXml()
@@ -313,45 +307,32 @@ class AbstractObjectNormalizerTest extends TestCase
             'xml'
         );
 
-        $this->assertInstanceOf(ObjectWithBasicProperties::class, $objectWithBooleanProperties);
+        self::assertInstanceOf(ObjectWithBasicProperties::class, $objectWithBooleanProperties);
 
         // Bool Properties
-        $this->assertTrue($objectWithBooleanProperties->boolTrue1);
-        $this->assertFalse($objectWithBooleanProperties->boolFalse1);
-        $this->assertTrue($objectWithBooleanProperties->boolTrue2);
-        $this->assertFalse($objectWithBooleanProperties->boolFalse2);
+        self::assertTrue($objectWithBooleanProperties->boolTrue1);
+        self::assertFalse($objectWithBooleanProperties->boolFalse1);
+        self::assertTrue($objectWithBooleanProperties->boolTrue2);
+        self::assertFalse($objectWithBooleanProperties->boolFalse2);
 
         // Integer Properties
-        $this->assertEquals(4711, $objectWithBooleanProperties->int1);
-        $this->assertEquals(-4711, $objectWithBooleanProperties->int2);
+        self::assertEquals(4711, $objectWithBooleanProperties->int1);
+        self::assertEquals(-4711, $objectWithBooleanProperties->int2);
 
         // Float Properties
-        $this->assertEqualsWithDelta(123.456, $objectWithBooleanProperties->float1, 0.01);
-        $this->assertEqualsWithDelta(-1.2344e56, $objectWithBooleanProperties->float2, 1);
-        $this->assertEqualsWithDelta(45E-6, $objectWithBooleanProperties->float3, 1);
-        $this->assertNan($objectWithBooleanProperties->floatNaN);
-        $this->assertInfinite($objectWithBooleanProperties->floatInf);
-        $this->assertEquals(-\INF, $objectWithBooleanProperties->floatNegInf);
+        self::assertEqualsWithDelta(123.456, $objectWithBooleanProperties->float1, 0.01);
+        self::assertEqualsWithDelta(-1.2344e56, $objectWithBooleanProperties->float2, 1);
+        self::assertEqualsWithDelta(45E-6, $objectWithBooleanProperties->float3, 1);
+        self::assertNan($objectWithBooleanProperties->floatNaN);
+        self::assertInfinite($objectWithBooleanProperties->floatInf);
+        self::assertEquals(-\INF, $objectWithBooleanProperties->floatNegInf);
     }
 
     private function getDenormalizerForObjectWithBasicProperties()
     {
-        $extractor = $this->createMock(PhpDocExtractor::class);
+        $extractor = self::createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
-            ->will($this->onConsecutiveCalls(
-                [new Type('bool')],
-                [new Type('bool')],
-                [new Type('bool')],
-                [new Type('bool')],
-                [new Type('int')],
-                [new Type('int')],
-                [new Type('float')],
-                [new Type('float')],
-                [new Type('float')],
-                [new Type('float')],
-                [new Type('float')],
-                [new Type('float')]
-            ));
+            ->will(self::onConsecutiveCalls([new Type('bool')], [new Type('bool')], [new Type('bool')], [new Type('bool')], [new Type('int')], [new Type('int')], [new Type('float')], [new Type('float')], [new Type('float')], [new Type('float')], [new Type('float')], [new Type('float')]));
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -367,8 +348,8 @@ class AbstractObjectNormalizerTest extends TestCase
      */
     public function testExtraAttributesException()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('A class metadata factory must be provided in the constructor when setting "allow_extra_attributes" to false.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('A class metadata factory must be provided in the constructor when setting "allow_extra_attributes" to false.');
         $normalizer = new ObjectNormalizer();
 
         $normalizer->denormalize([], \stdClass::class, 'xml', [
@@ -382,10 +363,10 @@ class AbstractObjectNormalizerTest extends TestCase
 
         // This results in objects turning into arrays in some encoders
         $normalizedData = $normalizer->normalize(new EmptyDummy());
-        $this->assertEquals([], $normalizedData);
+        self::assertEquals([], $normalizedData);
 
         $normalizedData = $normalizer->normalize(new EmptyDummy(), 'any', ['preserve_empty_objects' => true]);
-        $this->assertEquals(new \ArrayObject(), $normalizedData);
+        self::assertEquals(new \ArrayObject(), $normalizedData);
     }
 }
 

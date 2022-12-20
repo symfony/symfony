@@ -153,7 +153,7 @@ EOTXT;
         $current = $var->current();
 
         $this->assertDumpMatchesFormat('%A', $var);
-        $this->assertSame($current, $var->current());
+        self::assertSame($current, $var->current());
     }
 
     public function testCastObjectStorageDumpsInfo()

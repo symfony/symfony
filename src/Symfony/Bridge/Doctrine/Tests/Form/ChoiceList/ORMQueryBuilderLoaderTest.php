@@ -46,7 +46,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
+        $query = self::getMockBuilder(\QueryMock::class)
             ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
@@ -54,17 +54,17 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->method('getResult')
             ->willReturn([]);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('setParameter')
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [1, 2], $expectedType)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = self::getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->setMethods(['getQuery'])
             ->getMock();
 
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
@@ -79,7 +79,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
+        $query = self::getMockBuilder(\QueryMock::class)
             ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
@@ -87,17 +87,17 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->method('getResult')
             ->willReturn([]);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('setParameter')
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [1, 2, 3, '9223372036854775808'], Connection::PARAM_INT_ARRAY)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = self::getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->setMethods(['getQuery'])
             ->getMock();
 
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
@@ -115,7 +115,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
+        $query = self::getMockBuilder(\QueryMock::class)
             ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
@@ -123,17 +123,17 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->method('getResult')
             ->willReturn([]);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('setParameter')
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', 'b98e8e11-2897-44df-ad24-d2627eb7f499'], Connection::PARAM_STR_ARRAY)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = self::getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->setMethods(['getQuery'])
             ->getMock();
 
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
@@ -160,7 +160,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
+        $query = self::getMockBuilder(\QueryMock::class)
             ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
@@ -168,17 +168,17 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->method('getResult')
             ->willReturn([]);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('setParameter')
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d')->toBinary(), Uuid::fromString('b98e8e11-2897-44df-ad24-d2627eb7f499')->toBinary()], Connection::PARAM_STR_ARRAY)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = self::getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->setMethods(['getQuery'])
             ->getMock();
 
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
@@ -205,12 +205,12 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = self::getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->setMethods(['getQuery'])
             ->getMock();
 
-        $qb->expects($this->never())
+        $qb->expects(self::never())
             ->method('getQuery');
 
         $qb->select('e')
@@ -218,8 +218,8 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $loader = new ORMQueryBuilderLoader($qb);
 
-        $this->expectException(TransformationFailedException::class);
-        $this->expectExceptionMessageMatches('/^Failed to transform "hello" into "(uuid|ulid)"\.$/');
+        self::expectException(TransformationFailedException::class);
+        self::expectExceptionMessageMatches('/^Failed to transform "hello" into "(uuid|ulid)"\.$/');
 
         $loader->getEntitiesByIds('id', ['hello']);
     }
@@ -227,14 +227,14 @@ class ORMQueryBuilderLoaderTest extends TestCase
     public function testEmbeddedIdentifierName()
     {
         if (Version::compare('2.5.0') > 0) {
-            $this->markTestSkipped('Applicable only for Doctrine >= 2.5.0');
+            self::markTestSkipped('Applicable only for Doctrine >= 2.5.0');
 
             return;
         }
 
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder(\QueryMock::class)
+        $query = self::getMockBuilder(\QueryMock::class)
             ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
@@ -242,16 +242,16 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->method('getResult')
             ->willReturn([]);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('setParameter')
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id_value', [1, 2, 3], Connection::PARAM_INT_ARRAY)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+        $qb = self::getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->setMethods(['getQuery'])
             ->getMock();
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 

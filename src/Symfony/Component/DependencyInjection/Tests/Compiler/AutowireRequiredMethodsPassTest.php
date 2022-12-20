@@ -41,18 +41,12 @@ class AutowireRequiredMethodsPassTest extends TestCase
 
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
-        $this->assertEquals(
-            ['setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'],
-            array_column($methodCalls, 0)
-        );
+        self::assertEquals(['setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'], array_column($methodCalls, 0));
 
         // test setWithCallsConfigured args
-        $this->assertEquals(
-            ['manual_arg1', 'manual_arg2'],
-            $methodCalls[0][1]
-        );
+        self::assertEquals(['manual_arg1', 'manual_arg2'], $methodCalls[0][1]);
         // test setFoo args
-        $this->assertEquals([], $methodCalls[1][1]);
+        self::assertEquals([], $methodCalls[1][1]);
     }
 
     /**
@@ -61,7 +55,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
     public function testSetterInjectionWithAttribute()
     {
         if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+            self::markTestSkipped('symfony/service-contracts 2.2 required');
         }
 
         $container = new ContainerBuilder();
@@ -75,7 +69,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
         (new AutowireRequiredMethodsPass())->process($container);
 
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
-        $this->assertSame([['setFoo', []]], $methodCalls);
+        self::assertSame([['setFoo', []]], $methodCalls);
     }
 
     public function testExplicitMethodInjection()
@@ -96,11 +90,8 @@ class AutowireRequiredMethodsPassTest extends TestCase
 
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
-        $this->assertEquals(
-            ['notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'],
-            array_column($methodCalls, 0)
-        );
-        $this->assertEquals([], $methodCalls[0][1]);
+        self::assertEquals(['notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'], array_column($methodCalls, 0));
+        self::assertEquals([], $methodCalls[0][1]);
     }
 
     public function testWitherInjection()
@@ -122,7 +113,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
             ['withFoo2', [], true],
             ['setFoo', []],
         ];
-        $this->assertSame($expected, $methodCalls);
+        self::assertSame($expected, $methodCalls);
     }
 
     /**
@@ -146,7 +137,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
             ['withFoo', [], true],
             ['setFoo', []],
         ];
-        $this->assertSame($expected, $methodCalls);
+        self::assertSame($expected, $methodCalls);
     }
 
     /**
@@ -155,7 +146,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
     public function testWitherInjectionWithAttribute()
     {
         if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+            self::markTestSkipped('symfony/service-contracts 2.2 required');
         }
 
         $container = new ContainerBuilder();
@@ -168,6 +159,6 @@ class AutowireRequiredMethodsPassTest extends TestCase
         (new ResolveClassPass())->process($container);
         (new AutowireRequiredMethodsPass())->process($container);
 
-        $this->assertSame([['withFoo', [], true]], $container->getDefinition('wither')->getMethodCalls());
+        self::assertSame([['withFoo', [], true]], $container->getDefinition('wither')->getMethodCalls());
     }
 }

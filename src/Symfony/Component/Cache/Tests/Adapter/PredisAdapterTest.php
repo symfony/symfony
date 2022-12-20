@@ -30,10 +30,10 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
         $redisHost = getenv('REDIS_HOST');
 
         $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/1', ['class' => \Predis\Client::class, 'timeout' => 3]);
-        $this->assertInstanceOf(\Predis\Client::class, $redis);
+        self::assertInstanceOf(\Predis\Client::class, $redis);
 
         $connection = $redis->getConnection();
-        $this->assertInstanceOf(StreamConnection::class, $connection);
+        self::assertInstanceOf(StreamConnection::class, $connection);
 
         $redisHost = explode(':', $redisHost);
         $params = [
@@ -46,6 +46,6 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
             'tcp_nodelay' => true,
             'database' => '1',
         ];
-        $this->assertSame($params, $connection->getParameters()->toArray());
+        self::assertSame($params, $connection->getParameters()->toArray());
     }
 }

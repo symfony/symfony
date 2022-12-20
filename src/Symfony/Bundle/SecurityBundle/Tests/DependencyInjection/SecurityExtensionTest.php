@@ -47,8 +47,8 @@ class SecurityExtensionTest extends TestCase
 
     public function testInvalidCheckPath()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The check_path "/some_area/login_check" for login method "form_login" is not matched by the firewall pattern "/secured_area/.*".');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('The check_path "/some_area/login_check" for login method "form_login" is not matched by the firewall pattern "/secured_area/.*".');
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
@@ -75,8 +75,8 @@ class SecurityExtensionTest extends TestCase
      */
     public function testFirewallWithoutAuthenticationListener()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('No authentication listener registered for firewall "some_firewall"');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('No authentication listener registered for firewall "some_firewall"');
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
@@ -96,8 +96,8 @@ class SecurityExtensionTest extends TestCase
 
     public function testFirewallWithInvalidUserProvider()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Unable to create definition for "security.user.provider.concrete.my_foo" user provider');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('Unable to create definition for "security.user.provider.concrete.my_foo" user provider');
         $container = $this->getRawContainer();
 
         $extension = $container->getExtension('security');
@@ -142,7 +142,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
+        self::assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
     /**
@@ -172,7 +172,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
         $definition = $container->getDefinition('security.authentication.guard_handler');
-        $this->assertSame(['stateless_firewall'], $definition->getArgument(2));
+        self::assertSame(['stateless_firewall'], $definition->getArgument(2));
     }
 
     public function testSwitchUserNotStatelessOnStatelessFirewall()
@@ -196,7 +196,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue($container->getDefinition('security.authentication.switchuser_listener.some_firewall')->getArgument(9));
+        self::assertTrue($container->getDefinition('security.authentication.switchuser_listener.some_firewall')->getArgument(9));
     }
 
     public function testPerListenerProvider()
@@ -217,13 +217,13 @@ class SecurityExtensionTest extends TestCase
         ]);
 
         $container->compile();
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testMissingProviderForListener()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Not configuring explicitly the provider for the "http_basic" authenticator on "ambiguous" firewall is ambiguous as there is more than one registered provider.');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('Not configuring explicitly the provider for the "http_basic" authenticator on "ambiguous" firewall is ambiguous as there is more than one registered provider.');
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
             'enable_authenticator_manager' => true,
@@ -262,7 +262,7 @@ class SecurityExtensionTest extends TestCase
         ]);
 
         $container->compile();
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testRegisterRequestMatchersWithAllowIfExpression()
@@ -289,22 +289,19 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
         $accessMap = $container->getDefinition('security.access_map');
-        $this->assertCount(1, $accessMap->getMethodCalls());
+        self::assertCount(1, $accessMap->getMethodCalls());
         $call = $accessMap->getMethodCalls()[0];
-        $this->assertSame('add', $call[0]);
+        self::assertSame('add', $call[0]);
         $args = $call[1];
-        $this->assertCount(3, $args);
+        self::assertCount(3, $args);
         $expressionId = $args[1][0];
-        $this->assertTrue($container->hasDefinition($expressionId));
+        self::assertTrue($container->hasDefinition($expressionId));
         $expressionDef = $container->getDefinition($expressionId);
-        $this->assertSame(Expression::class, $expressionDef->getClass());
-        $this->assertSame($rawExpression, $expressionDef->getArgument(0));
+        self::assertSame(Expression::class, $expressionDef->getClass());
+        self::assertSame($rawExpression, $expressionDef->getArgument(0));
 
-        $this->assertTrue($container->hasDefinition('security.cache_warmer.expression'));
-        $this->assertEquals(
-            new IteratorArgument([new Reference($expressionId)]),
-            $container->getDefinition('security.cache_warmer.expression')->getArgument(0)
-        );
+        self::assertTrue($container->hasDefinition('security.cache_warmer.expression'));
+        self::assertEquals(new IteratorArgument([new Reference($expressionId)]), $container->getDefinition('security.cache_warmer.expression')->getArgument(0));
     }
 
     public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()
@@ -324,7 +321,7 @@ class SecurityExtensionTest extends TestCase
         ]);
         $container->compile();
 
-        $this->assertFalse($container->hasDefinition('security.cache_warmer.expression'));
+        self::assertFalse($container->hasDefinition('security.cache_warmer.expression'));
     }
 
     public function testRegisterTheUserProviderAlias()
@@ -347,7 +344,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue($container->hasAlias(UserProviderInterface::class));
+        self::assertTrue($container->hasAlias(UserProviderInterface::class));
     }
 
     public function testDoNotRegisterTheUserProviderAliasWithMultipleProviders()
@@ -371,7 +368,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertFalse($container->has(UserProviderInterface::class));
+        self::assertFalse($container->has(UserProviderInterface::class));
     }
 
     /**
@@ -431,9 +428,9 @@ class SecurityExtensionTest extends TestCase
 
         $definition = $container->getDefinition('security.authentication.rememberme.services.simplehash.default');
 
-        $this->assertEquals($samesite, $definition->getArgument(3)['samesite']);
-        $this->assertEquals($secure, $definition->getArgument(3)['secure']);
-        $this->assertSame('%kernel.secret%', $definition->getArgument(1));
+        self::assertEquals($samesite, $definition->getArgument(3)['samesite']);
+        self::assertEquals($secure, $definition->getArgument(3)['secure']);
+        self::assertSame('%kernel.secret%', $definition->getArgument(1));
     }
 
     /**
@@ -461,7 +458,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue(true, 'Ip addresses is successfully consumed: '.(\is_string($ips) ? $ips : json_encode($ips)));
+        self::assertTrue(true, 'Ip addresses is successfully consumed: '.(\is_string($ips) ? $ips : json_encode($ips)));
     }
 
     public function testCustomRememberMeHandler()
@@ -481,8 +478,8 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
-        $this->assertEquals(\stdClass::class, $handler->getClass());
-        $this->assertEquals([['firewall' => 'default']], $handler->getTag('security.remember_me_handler'));
+        self::assertEquals(\stdClass::class, $handler->getClass());
+        self::assertEquals([['firewall' => 'default']], $handler->getTag('security.remember_me_handler'));
     }
 
     public function testSecretRememberMeHasher()
@@ -502,7 +499,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $handler = $container->getDefinition('security.authenticator.remember_me_signature_hasher.default');
-        $this->assertSame('very', $handler->getArgument(2));
+        self::assertSame('very', $handler->getArgument(2));
     }
 
     public function testSecretRememberMeHandler()
@@ -522,7 +519,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
-        $this->assertSame('very', $handler->getArgument(1));
+        self::assertSame('very', $handler->getArgument(1));
     }
 
     public function sessionConfigurationProvider()
@@ -577,7 +574,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertEquals(new Reference('security.user.provider.concrete.second'), $container->getDefinition('security.authentication.switchuser_listener.foobar')->getArgument(1));
+        self::assertEquals(new Reference('security.user.provider.concrete.second'), $container->getDefinition('security.authentication.switchuser_listener.foobar')->getArgument(1));
     }
 
     public function testInvalidAccessControlWithEmptyRow()
@@ -601,8 +598,8 @@ class SecurityExtensionTest extends TestCase
             ],
         ]);
 
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('One or more access control items are empty. Did you accidentally add lines only containing a "-" under "security.access_control"?');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('One or more access control items are empty. Did you accidentally add lines only containing a "-" under "security.access_control"?');
         $container->compile();
     }
 
@@ -629,7 +626,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue(true, 'extension throws an InvalidConfigurationException if there is one more more empty access control items');
+        self::assertTrue(true, 'extension throws an InvalidConfigurationException if there is one more more empty access control items');
     }
 
     /**
@@ -653,8 +650,8 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertEquals($entryPointId, (string) $container->getDefinition('security.firewall.map.config.main')->getArgument(7));
-        $this->assertEquals($entryPointId, (string) $container->getDefinition('security.exception_listener.main')->getArgument(4));
+        self::assertEquals($entryPointId, (string) $container->getDefinition('security.firewall.map.config.main')->getArgument(7));
+        self::assertEquals($entryPointId, (string) $container->getDefinition('security.exception_listener.main')->getArgument(4));
     }
 
     public function provideEntryPointFirewalls()
@@ -679,8 +676,8 @@ class SecurityExtensionTest extends TestCase
      */
     public function testEntryPointRequired(array $firewall, $messageRegex)
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageMatches($messageRegex);
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessageMatches($messageRegex);
 
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -711,8 +708,8 @@ class SecurityExtensionTest extends TestCase
      */
     public function testAlwaysAuthenticateBeforeGrantingCannotBeTrueWithAuthenticatorManager()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
 
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -744,7 +741,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
+        self::assertEquals($expectedAuthenticators, array_map('strval', $container->getDefinition('security.authenticator.manager.main')->getArgument(0)));
     }
 
     public function provideConfigureCustomAuthenticatorData()
@@ -778,7 +775,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertFalse($container->has('security.listener.session.'.$firewallId));
+        self::assertFalse($container->has('security.listener.session.'.$firewallId));
     }
 
     public function testCompilesWithSessionListenerWithStatefulllFirewallWithAuthenticatorManager()
@@ -799,7 +796,7 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue($container->has('security.listener.session.'.$firewallId));
+        self::assertTrue($container->has('security.listener.session.'.$firewallId));
     }
 
     /**
@@ -823,8 +820,8 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $userCheckerId = (string) $container->getDefinition('security.listener.user_checker.main')->getArgument(0);
-        $this->assertTrue($container->has($userCheckerId));
-        $this->assertEquals($expectedUserCheckerClass, $container->findDefinition($userCheckerId)->getClass());
+        self::assertTrue($container->has($userCheckerId));
+        self::assertEquals($expectedUserCheckerClass, $container->findDefinition($userCheckerId)->getClass());
     }
 
     public function provideUserCheckerConfig()
@@ -856,7 +853,7 @@ class SecurityExtensionTest extends TestCase
         /** @var IteratorArgument $listenersIteratorArgument */
         $listenersIteratorArgument = $container->getDefinition('security.firewall.map.context.main')->getArgument(0);
         $firewallListeners = array_map('strval', $listenersIteratorArgument->getValues());
-        $this->assertContains('custom_firewall_listener_id', $firewallListeners);
+        self::assertContains('custom_firewall_listener_id', $firewallListeners);
     }
 
     /**
@@ -873,10 +870,10 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $args = $container->getDefinition('security.authorization_checker')->getArguments();
-        $this->assertEquals('security.token_storage', (string) $args[0]);
-        $this->assertEquals('security.authentication.manager', (string) $args[1]);
-        $this->assertEquals('security.access.decision_manager', (string) $args[2]);
-        $this->assertEquals('%security.access.always_authenticate_before_granting%', (string) $args[3]);
+        self::assertEquals('security.token_storage', (string) $args[0]);
+        self::assertEquals('security.authentication.manager', (string) $args[1]);
+        self::assertEquals('security.access.decision_manager', (string) $args[2]);
+        self::assertEquals('%security.access.always_authenticate_before_granting%', (string) $args[3]);
     }
 
     protected function getRawContainer()

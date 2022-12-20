@@ -30,7 +30,7 @@ class RegisterUidTypePassTest extends TestCase
             'uuid' => ['class' => UuidType::class],
             'ulid' => ['class' => UlidType::class],
         ];
-        $this->assertSame($expected, $container->getParameter('doctrine.dbal.connection_factory.types'));
+        self::assertSame($expected, $container->getParameter('doctrine.dbal.connection_factory.types'));
     }
 
     public function testRegisteredDontFail()
@@ -38,6 +38,6 @@ class RegisterUidTypePassTest extends TestCase
         $container = new ContainerBuilder();
         (new RegisterUidTypePass())->process($container);
 
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
     }
 }

@@ -24,13 +24,13 @@ class AbstractRequestRateLimiterTest extends TestCase
     public function testConsume(array $rateLimits, ?RateLimit $expected)
     {
         $rateLimiter = new MockAbstractRequestRateLimiter(array_map(function (RateLimit $rateLimit) {
-            $limiter = $this->createStub(LimiterInterface::class);
+            $limiter = self::createStub(LimiterInterface::class);
             $limiter->method('consume')->willReturn($rateLimit);
 
             return $limiter;
         }, $rateLimits));
 
-        $this->assertSame($expected, $rateLimiter->consume(new Request()));
+        self::assertSame($expected, $rateLimiter->consume(new Request()));
     }
 
     public function provideRateLimits()

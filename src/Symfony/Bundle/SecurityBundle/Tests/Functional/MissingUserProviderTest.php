@@ -17,10 +17,10 @@ class MissingUserProviderTest extends AbstractWebTestCase
 {
     public function testUserProviderIsNeeded()
     {
-        $client = $this->createClient(['enable_authenticator_manager' => true, 'test_case' => 'MissingUserProvider', 'root_config' => 'config.yml', 'debug' => true]);
+        $client = self::createClient(['enable_authenticator_manager' => true, 'test_case' => 'MissingUserProvider', 'root_config' => 'config.yml', 'debug' => true]);
 
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('"default" firewall requires a user provider but none was defined');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('"default" firewall requires a user provider but none was defined');
 
         $client->request('GET', '/', [], [], [
             'PHP_AUTH_USER' => 'username',
@@ -33,7 +33,7 @@ class MissingUserProviderTest extends AbstractWebTestCase
      */
     public function testLegacyUserProviderIsNeeded()
     {
-        $client = $this->createClient(['test_case' => 'MissingUserProvider', 'root_config' => 'config.yml', 'debug' => true]);
+        $client = self::createClient(['test_case' => 'MissingUserProvider', 'root_config' => 'config.yml', 'debug' => true]);
 
         $client->request('GET', '/', [], [], [
             'PHP_AUTH_USER' => 'username',
@@ -41,8 +41,8 @@ class MissingUserProviderTest extends AbstractWebTestCase
         ]);
 
         $response = $client->getResponse();
-        $this->assertSame(500, $response->getStatusCode());
-        $this->assertStringContainsString('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException', $response->getContent());
-        $this->assertStringContainsString('"default" firewall requires a user provider but none was defined', html_entity_decode($response->getContent()));
+        self::assertSame(500, $response->getStatusCode());
+        self::assertStringContainsString('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException', $response->getContent());
+        self::assertStringContainsString('"default" firewall requires a user provider but none was defined', html_entity_decode($response->getContent()));
     }
 }

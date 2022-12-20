@@ -36,7 +36,7 @@ class WorkflowGuardListenerPassTest extends TestCase
     {
         $this->compilerPass->process($this->container);
 
-        $this->assertFalse($this->container->hasParameter('workflow.has_guard_listeners'));
+        self::assertFalse($this->container->hasParameter('workflow.has_guard_listeners'));
     }
 
     public function testNoExeptionIfAllDependenciesArePresent()
@@ -50,13 +50,13 @@ class WorkflowGuardListenerPassTest extends TestCase
 
         $this->compilerPass->process($this->container);
 
-        $this->assertFalse($this->container->hasParameter('workflow.has_guard_listeners'));
+        self::assertFalse($this->container->hasParameter('workflow.has_guard_listeners'));
     }
 
     public function testExceptionIfTheTokenStorageServiceIsNotPresent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "security.token_storage" service is needed to be able to use the workflow guard listener.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The "security.token_storage" service is needed to be able to use the workflow guard listener.');
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.authorization_checker', AuthorizationCheckerInterface::class);
         $this->container->register('security.authentication.trust_resolver', AuthenticationTrustResolverInterface::class);
@@ -67,8 +67,8 @@ class WorkflowGuardListenerPassTest extends TestCase
 
     public function testExceptionIfTheAuthorizationCheckerServiceIsNotPresent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "security.authorization_checker" service is needed to be able to use the workflow guard listener.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The "security.authorization_checker" service is needed to be able to use the workflow guard listener.');
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.token_storage', TokenStorageInterface::class);
         $this->container->register('security.authentication.trust_resolver', AuthenticationTrustResolverInterface::class);
@@ -79,8 +79,8 @@ class WorkflowGuardListenerPassTest extends TestCase
 
     public function testExceptionIfTheAuthenticationTrustResolverServiceIsNotPresent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "security.authentication.trust_resolver" service is needed to be able to use the workflow guard listener.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The "security.authentication.trust_resolver" service is needed to be able to use the workflow guard listener.');
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.token_storage', TokenStorageInterface::class);
         $this->container->register('security.authorization_checker', AuthorizationCheckerInterface::class);
@@ -91,8 +91,8 @@ class WorkflowGuardListenerPassTest extends TestCase
 
     public function testExceptionIfTheRoleHierarchyServiceIsNotPresent()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The "security.role_hierarchy" service is needed to be able to use the workflow guard listener.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('The "security.role_hierarchy" service is needed to be able to use the workflow guard listener.');
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.token_storage', TokenStorageInterface::class);
         $this->container->register('security.authorization_checker', AuthorizationCheckerInterface::class);

@@ -28,7 +28,7 @@ class SendgridApiTransportTest extends TestCase
      */
     public function testToString(SendgridApiTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -57,21 +57,21 @@ class SendgridApiTransportTest extends TestCase
             ->bcc('baz@example.com')
             ->text('content');
 
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
 
         $response
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getStatusCode')
             ->willReturn(202);
         $response
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getHeaders')
             ->willReturn(['x-message-id' => '1']);
 
-        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient = self::createMock(HttpClientInterface::class);
 
         $httpClient
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('request')
             ->with('POST', 'https://api.sendgrid.com/v3/mail/send', [
                 'json' => [
@@ -109,21 +109,21 @@ class SendgridApiTransportTest extends TestCase
             // even if content doesn't include new lines, the base64 encoding performed later may add them
             ->attach('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod', 'lorem.txt');
 
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
 
         $response
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getStatusCode')
             ->willReturn(202);
         $response
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getHeaders')
             ->willReturn(['x-message-id' => '1']);
 
-        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient = self::createMock(HttpClientInterface::class);
 
         $httpClient
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('request')
             ->with('POST', 'https://api.sendgrid.com/v3/mail/send', [
                 'json' => [
@@ -164,9 +164,9 @@ class SendgridApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('headers', $payload);
-        $this->assertArrayHasKey('foo', $payload['headers']);
-        $this->assertEquals('bar', $payload['headers']['foo']);
+        self::assertArrayHasKey('headers', $payload);
+        self::assertArrayHasKey('foo', $payload['headers']);
+        self::assertEquals('bar', $payload['headers']['foo']);
     }
 
     public function testReplyTo()
@@ -186,13 +186,13 @@ class SendgridApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('from', $payload);
-        $this->assertArrayHasKey('email', $payload['from']);
-        $this->assertSame($from, $payload['from']['email']);
+        self::assertArrayHasKey('from', $payload);
+        self::assertArrayHasKey('email', $payload['from']);
+        self::assertSame($from, $payload['from']['email']);
 
-        $this->assertArrayHasKey('reply_to', $payload);
-        $this->assertArrayHasKey('email', $payload['reply_to']);
-        $this->assertSame($replyTo, $payload['reply_to']['email']);
+        self::assertArrayHasKey('reply_to', $payload);
+        self::assertArrayHasKey('email', $payload['reply_to']);
+        self::assertSame($replyTo, $payload['reply_to']['email']);
     }
 
     public function testEnvelopeSenderAndRecipients()
@@ -214,21 +214,21 @@ class SendgridApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('from', $payload);
-        $this->assertArrayHasKey('email', $payload['from']);
-        $this->assertSame($envelopeFrom, $payload['from']['email']);
+        self::assertArrayHasKey('from', $payload);
+        self::assertArrayHasKey('email', $payload['from']);
+        self::assertSame($envelopeFrom, $payload['from']['email']);
 
-        $this->assertArrayHasKey('personalizations', $payload);
-        $this->assertArrayHasKey('to', $payload['personalizations'][0]);
-        $this->assertArrayHasKey('email', $payload['personalizations'][0]['to'][0]);
-        $this->assertCount(1, $payload['personalizations'][0]['to']);
-        $this->assertSame($envelopeTo, $payload['personalizations'][0]['to'][0]['email']);
+        self::assertArrayHasKey('personalizations', $payload);
+        self::assertArrayHasKey('to', $payload['personalizations'][0]);
+        self::assertArrayHasKey('email', $payload['personalizations'][0]['to'][0]);
+        self::assertCount(1, $payload['personalizations'][0]['to']);
+        self::assertSame($envelopeTo, $payload['personalizations'][0]['to'][0]['email']);
     }
 
     public function testTagAndMetadataHeaders()
     {
         if (!class_exists(TagHeader::class)) {
-            $this->markTestSkipped('This test requires symfony/mailer 5.1 or higher.');
+            self::markTestSkipped('This test requires symfony/mailer 5.1 or higher.');
         }
 
         $email = new Email();
@@ -242,14 +242,14 @@ class SendgridApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('categories', $payload);
-        $this->assertArrayHasKey('custom_args', $payload['personalizations'][0]);
+        self::assertArrayHasKey('categories', $payload);
+        self::assertArrayHasKey('custom_args', $payload['personalizations'][0]);
 
-        $this->assertCount(1, $payload['categories']);
-        $this->assertCount(2, $payload['personalizations'][0]['custom_args']);
+        self::assertCount(1, $payload['categories']);
+        self::assertCount(2, $payload['personalizations'][0]['custom_args']);
 
-        $this->assertSame(['category-one'], $payload['categories']);
-        $this->assertSame('blue', $payload['personalizations'][0]['custom_args']['Color']);
-        $this->assertSame('12345', $payload['personalizations'][0]['custom_args']['Client-ID']);
+        self::assertSame(['category-one'], $payload['categories']);
+        self::assertSame('blue', $payload['personalizations'][0]['custom_args']['Color']);
+        self::assertSame('12345', $payload['personalizations'][0]['custom_args']['Client-ID']);
     }
 }

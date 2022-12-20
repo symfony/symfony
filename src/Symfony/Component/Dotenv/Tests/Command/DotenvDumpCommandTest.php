@@ -47,10 +47,10 @@ EOF
             'env' => 'test',
         ]);
 
-        $this->assertFileExists(__DIR__.'/.env.local.php');
+        self::assertFileExists(__DIR__.'/.env.local.php');
 
         $vars = require __DIR__.'/.env.local.php';
-        $this->assertSame([
+        self::assertSame([
             'APP_ENV' => 'test',
             'APP_SECRET' => 'abc123',
         ], $vars);
@@ -64,10 +64,10 @@ EOF
             '--empty' => true,
         ]);
 
-        $this->assertFileExists(__DIR__.'/.env.local.php');
+        self::assertFileExists(__DIR__.'/.env.local.php');
 
         $vars = require __DIR__.'/.env.local.php';
-        $this->assertSame(['APP_ENV' => 'test'], $vars);
+        self::assertSame(['APP_ENV' => 'test'], $vars);
     }
 
     public function testExecuteTestEnvs()
@@ -82,10 +82,10 @@ EOF
             'env' => 'test',
         ]);
 
-        $this->assertFileExists(__DIR__.'/.env.local.php');
+        self::assertFileExists(__DIR__.'/.env.local.php');
 
         $vars = require __DIR__.'/.env.local.php';
-        $this->assertSame([
+        self::assertSame([
             'APP_ENV' => 'test',
             'APP_SECRET' => 'abc123',
             'APP_LOCAL' => 'yes',

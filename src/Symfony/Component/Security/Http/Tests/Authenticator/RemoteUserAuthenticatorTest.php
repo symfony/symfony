@@ -28,14 +28,14 @@ class RemoteUserAuthenticatorTest extends TestCase
     {
         $request = $this->createRequest([$parameterName => 'TheUsername']);
 
-        $this->assertTrue($authenticator->supports($request));
+        self::assertTrue($authenticator->supports($request));
     }
 
     public function testSupportNoUser()
     {
         $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), new TokenStorage(), 'main');
 
-        $this->assertFalse($authenticator->supports($this->createRequest([])));
+        self::assertFalse($authenticator->supports($this->createRequest([])));
     }
 
     public function testSupportTokenStorageWithToken()
@@ -45,8 +45,8 @@ class RemoteUserAuthenticatorTest extends TestCase
 
         $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), $tokenStorage, 'main');
 
-        $this->assertFalse($authenticator->supports($this->createRequest(['REMOTE_USER' => 'username'])));
-        $this->assertTrue($authenticator->supports($this->createRequest(['REMOTE_USER' => 'another_username'])));
+        self::assertFalse($authenticator->supports($this->createRequest(['REMOTE_USER' => 'username'])));
+        self::assertTrue($authenticator->supports($this->createRequest(['REMOTE_USER' => 'another_username'])));
     }
 
     /**
@@ -61,7 +61,7 @@ class RemoteUserAuthenticatorTest extends TestCase
         $userProvider->createUser($user = new InMemoryUser('TheUsername', null));
 
         $passport = $authenticator->authenticate($request);
-        $this->assertTrue($user->isEqualTo($passport->getUser()));
+        self::assertTrue($user->isEqualTo($passport->getUser()));
     }
 
     public function provideAuthenticators()

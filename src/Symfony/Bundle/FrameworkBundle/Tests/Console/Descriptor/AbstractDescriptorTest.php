@@ -230,7 +230,7 @@ abstract class AbstractDescriptorTest extends TestCase
     /** @dataProvider getClassDescriptionTestData */
     public function testGetClassDescription($object, $expectedDescription)
     {
-        $this->assertEquals($expectedDescription, $this->getDescriptor()->getClassDescription($object));
+        self::assertEquals($expectedDescription, $this->getDescriptor()->getClassDescription($object));
     }
 
     public function getClassDescriptionTestData()
@@ -274,9 +274,9 @@ abstract class AbstractDescriptorTest extends TestCase
         $this->getDescriptor()->describe($output, $describedObject, $options);
 
         if ('json' === $this->getFormat()) {
-            $this->assertEquals(json_encode(json_decode($expectedDescription), \JSON_PRETTY_PRINT), json_encode(json_decode($output->fetch()), \JSON_PRETTY_PRINT));
+            self::assertEquals(json_encode(json_decode($expectedDescription), \JSON_PRETTY_PRINT), json_encode(json_decode($output->fetch()), \JSON_PRETTY_PRINT));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(\PHP_EOL, "\n", $output->fetch())));
+            self::assertEquals(trim($expectedDescription), trim(str_replace(\PHP_EOL, "\n", $output->fetch())));
         }
     }
 

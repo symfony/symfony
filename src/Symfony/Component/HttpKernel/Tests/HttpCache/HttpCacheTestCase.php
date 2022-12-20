@@ -50,7 +50,7 @@ class HttpCacheTestCase extends TestCase
 
         $this->catch = false;
 
-        $this->clearDirectory(sys_get_temp_dir().'/http_cache');
+        self::clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
     protected function tearDown(): void
@@ -68,22 +68,22 @@ class HttpCacheTestCase extends TestCase
         $this->catch = null;
         $this->esi = null;
 
-        $this->clearDirectory(sys_get_temp_dir().'/http_cache');
+        self::clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
     public function assertHttpKernelIsCalled()
     {
-        $this->assertTrue($this->kernel->hasBeenCalled());
+        self::assertTrue($this->kernel->hasBeenCalled());
     }
 
     public function assertHttpKernelIsNotCalled()
     {
-        $this->assertFalse($this->kernel->hasBeenCalled());
+        self::assertFalse($this->kernel->hasBeenCalled());
     }
 
     public function assertResponseOk()
     {
-        $this->assertEquals(200, $this->response->getStatusCode());
+        self::assertEquals(200, $this->response->getStatusCode());
     }
 
     public function assertTraceContains($trace)
@@ -91,7 +91,7 @@ class HttpCacheTestCase extends TestCase
         $traces = $this->cache->getTraces();
         $traces = current($traces);
 
-        $this->assertMatchesRegularExpression('/'.$trace.'/', implode(', ', $traces));
+        self::assertMatchesRegularExpression('/'.$trace.'/', implode(', ', $traces));
     }
 
     public function assertTraceNotContains($trace)
@@ -99,17 +99,17 @@ class HttpCacheTestCase extends TestCase
         $traces = $this->cache->getTraces();
         $traces = current($traces);
 
-        $this->assertDoesNotMatchRegularExpression('/'.$trace.'/', implode(', ', $traces));
+        self::assertDoesNotMatchRegularExpression('/'.$trace.'/', implode(', ', $traces));
     }
 
     public function assertExceptionsAreCaught()
     {
-        $this->assertTrue($this->kernel->isCatchingExceptions());
+        self::assertTrue($this->kernel->isCatchingExceptions());
     }
 
     public function assertExceptionsAreNotCaught()
     {
-        $this->assertFalse($this->kernel->isCatchingExceptions());
+        self::assertFalse($this->kernel->isCatchingExceptions());
     }
 
     public function request($method, $uri = '/', $server = [], $cookies = [], $esi = false, $headers = [])

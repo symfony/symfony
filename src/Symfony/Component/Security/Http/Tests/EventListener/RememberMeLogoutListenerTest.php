@@ -24,8 +24,8 @@ class RememberMeLogoutListenerTest extends TestCase
 {
     public function testOnLogoutDoesNothingIfNoToken()
     {
-        $rememberMeServices = $this->createMock(AbstractRememberMeServices::class);
-        $rememberMeServices->expects($this->never())->method('logout');
+        $rememberMeServices = self::createMock(AbstractRememberMeServices::class);
+        $rememberMeServices->expects(self::never())->method('logout');
 
         $rememberMeLogoutListener = new RememberMeLogoutListener($rememberMeServices);
         $rememberMeLogoutListener->onLogout(new LogoutEvent(new Request(), null));

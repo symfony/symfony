@@ -29,7 +29,7 @@ final class ExpoTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new ExpoTransport('token', $client ?? $this->createMock(HttpClientInterface::class));
+        return new ExpoTransport('token', $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -45,6 +45,6 @@ final class ExpoTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0670802161', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

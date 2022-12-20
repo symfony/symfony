@@ -23,13 +23,13 @@ class EmailTest extends TestCase
     {
         $subject = new Email(['mode' => Email::VALIDATION_MODE_STRICT]);
 
-        $this->assertEquals(Email::VALIDATION_MODE_STRICT, $subject->mode);
+        self::assertEquals(Email::VALIDATION_MODE_STRICT, $subject->mode);
     }
 
     public function testUnknownModesTriggerException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "mode" parameter value is not valid.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "mode" parameter value is not valid.');
         new Email(['mode' => 'Unknown Mode']);
     }
 
@@ -37,20 +37,20 @@ class EmailTest extends TestCase
     {
         $email = new Email(['normalizer' => 'trim']);
 
-        $this->assertEquals('trim', $email->normalizer);
+        self::assertEquals('trim', $email->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Email(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Email(['normalizer' => new \stdClass()]);
     }
 

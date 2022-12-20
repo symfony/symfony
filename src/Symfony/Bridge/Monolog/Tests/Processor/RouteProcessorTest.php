@@ -33,12 +33,9 @@ class RouteProcessorTest extends TestCase
 
         $record = $processor(['extra' => []]);
 
-        $this->assertArrayHasKey('requests', $record['extra']);
-        $this->assertCount(1, $record['extra']['requests']);
-        $this->assertEquals(
-            ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE, 'route_params' => self::TEST_PARAMS],
-            $record['extra']['requests'][0]
-        );
+        self::assertArrayHasKey('requests', $record['extra']);
+        self::assertCount(1, $record['extra']['requests']);
+        self::assertEquals(['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE, 'route_params' => self::TEST_PARAMS], $record['extra']['requests'][0]);
     }
 
     public function testProcessorWithoutParams()
@@ -49,12 +46,9 @@ class RouteProcessorTest extends TestCase
 
         $record = $processor(['extra' => []]);
 
-        $this->assertArrayHasKey('requests', $record['extra']);
-        $this->assertCount(1, $record['extra']['requests']);
-        $this->assertEquals(
-            ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
-            $record['extra']['requests'][0]
-        );
+        self::assertArrayHasKey('requests', $record['extra']);
+        self::assertCount(1, $record['extra']['requests']);
+        self::assertEquals(['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE], $record['extra']['requests'][0]);
     }
 
     public function testProcessorWithSubRequests()
@@ -69,16 +63,10 @@ class RouteProcessorTest extends TestCase
 
         $record = $processor(['extra' => []]);
 
-        $this->assertArrayHasKey('requests', $record['extra']);
-        $this->assertCount(2, $record['extra']['requests']);
-        $this->assertEquals(
-            ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
-            $record['extra']['requests'][0]
-        );
-        $this->assertEquals(
-            ['controller' => $controllerFromSubRequest, 'route' => self::TEST_ROUTE],
-            $record['extra']['requests'][1]
-        );
+        self::assertArrayHasKey('requests', $record['extra']);
+        self::assertCount(2, $record['extra']['requests']);
+        self::assertEquals(['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE], $record['extra']['requests'][0]);
+        self::assertEquals(['controller' => $controllerFromSubRequest, 'route' => self::TEST_ROUTE], $record['extra']['requests'][1]);
     }
 
     public function testFinishRequestRemovesRelatedEntry()
@@ -92,17 +80,14 @@ class RouteProcessorTest extends TestCase
         $processor->removeRouteData($this->getFinishRequestEvent($subRequest));
         $record = $processor(['extra' => []]);
 
-        $this->assertArrayHasKey('requests', $record['extra']);
-        $this->assertCount(1, $record['extra']['requests']);
-        $this->assertEquals(
-            ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
-            $record['extra']['requests'][0]
-        );
+        self::assertArrayHasKey('requests', $record['extra']);
+        self::assertCount(1, $record['extra']['requests']);
+        self::assertEquals(['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE], $record['extra']['requests'][0]);
 
         $processor->removeRouteData($this->getFinishRequestEvent($mainRequest));
         $record = $processor(['extra' => []]);
 
-        $this->assertArrayNotHasKey('requests', $record['extra']);
+        self::assertArrayNotHasKey('requests', $record['extra']);
     }
 
     public function testProcessorWithEmptyRequest()
@@ -112,7 +97,7 @@ class RouteProcessorTest extends TestCase
         $processor->addRouteData($this->getRequestEvent($request));
 
         $record = $processor(['extra' => []]);
-        $this->assertEquals(['extra' => []], $record);
+        self::assertEquals(['extra' => []], $record);
     }
 
     public function testProcessorDoesNothingWhenNoRequest()
@@ -120,17 +105,17 @@ class RouteProcessorTest extends TestCase
         $processor = new RouteProcessor();
 
         $record = $processor(['extra' => []]);
-        $this->assertEquals(['extra' => []], $record);
+        self::assertEquals(['extra' => []], $record);
     }
 
     private function getRequestEvent(Request $request, int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
-        return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, $requestType);
+        return new RequestEvent(self::createMock(HttpKernelInterface::class), $request, $requestType);
     }
 
     private function getFinishRequestEvent(Request $request): FinishRequestEvent
     {
-        return new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        return new FinishRequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
     private function mockEmptyRequest(): Request
@@ -149,7 +134,7 @@ class RouteProcessorTest extends TestCase
 
     private function mockRequest(array $attributes): Request
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request->attributes = new ParameterBag($attributes);
 
         return $request;

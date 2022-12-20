@@ -25,9 +25,9 @@ class JsonFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/resources.json';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        self::assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadDoesNothingIfEmpty()
@@ -36,14 +36,14 @@ class JsonFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/empty.json';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals([], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        self::assertEquals([], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(NotFoundResourceException::class);
+        self::expectException(NotFoundResourceException::class);
         $loader = new JsonFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.json';
         $loader->load($resource, 'en', 'domain1');
@@ -51,8 +51,8 @@ class JsonFileLoaderTest extends TestCase
 
     public function testParseException()
     {
-        $this->expectException(InvalidResourceException::class);
-        $this->expectExceptionMessage('Error parsing JSON: Syntax error, malformed JSON');
+        self::expectException(InvalidResourceException::class);
+        self::expectExceptionMessage('Error parsing JSON: Syntax error, malformed JSON');
         $loader = new JsonFileLoader();
         $resource = __DIR__.'/../fixtures/malformed.json';
         $loader->load($resource, 'en', 'domain1');

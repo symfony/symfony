@@ -39,7 +39,7 @@ class MessengerDataCollectorTest extends TestCase
         $message = new DummyMessage('dummy message');
         $envelope = new Envelope($message);
 
-        $bus = $this->createMock(MessageBusInterface::class);
+        $bus = self::createMock(MessageBusInterface::class);
         $bus->method('dispatch')->with($message)->willReturn($envelope);
         $bus = new TraceableMessageBus($bus);
 
@@ -51,7 +51,7 @@ class MessengerDataCollectorTest extends TestCase
         $collector->lateCollect();
 
         $messages = $collector->getMessages();
-        $this->assertCount(1, $messages);
+        self::assertCount(1, $messages);
 
         $file = __FILE__;
         $expected = <<<DUMP
@@ -73,14 +73,14 @@ array:5 [
 ]
 DUMP;
 
-        $this->assertStringMatchesFormat($expected, $this->getDataAsString($messages[0]));
+        self::assertStringMatchesFormat($expected, $this->getDataAsString($messages[0]));
     }
 
     public function testHandleWithException()
     {
         $message = new DummyMessage('dummy message');
 
-        $bus = $this->createMock(MessageBusInterface::class);
+        $bus = self::createMock(MessageBusInterface::class);
         $bus->method('dispatch')->with($message)->willThrowException(new \RuntimeException('foo'));
         $bus = new TraceableMessageBus($bus);
 
@@ -97,10 +97,10 @@ DUMP;
         $collector->lateCollect();
 
         $messages = $collector->getMessages();
-        $this->assertCount(1, $messages);
+        self::assertCount(1, $messages);
 
         $file = __FILE__;
-        $this->assertStringMatchesFormat(<<<DUMP
+        self::assertStringMatchesFormat(<<<DUMP
 array:6 [
   "bus" => "default"
   "stamps" => []
@@ -121,17 +121,16 @@ array:6 [
     "value" => RuntimeException %A
   ]
 ]
-DUMP
-            , $this->getDataAsString($messages[0]));
+DUMP, $this->getDataAsString($messages[0]));
     }
 
     public function testKeepsOrderedDispatchCalls()
     {
-        $firstBus = $this->createMock(MessageBusInterface::class);
+        $firstBus = self::createMock(MessageBusInterface::class);
         $firstBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
         $firstBus = new TraceableMessageBus($firstBus);
 
-        $secondBus = $this->createMock(MessageBusInterface::class);
+        $secondBus = self::createMock(MessageBusInterface::class);
         $secondBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
         $secondBus = new TraceableMessageBus($secondBus);
 
@@ -148,22 +147,22 @@ DUMP
         $collector->lateCollect();
 
         $messages = $collector->getMessages();
-        $this->assertCount(5, $messages);
+        self::assertCount(5, $messages);
 
-        $this->assertSame('#1', $messages[0]['message']['value']['message']);
-        $this->assertSame('first bus', $messages[0]['bus']);
+        self::assertSame('#1', $messages[0]['message']['value']['message']);
+        self::assertSame('first bus', $messages[0]['bus']);
 
-        $this->assertSame('#2', $messages[1]['message']['value']['message']);
-        $this->assertSame('second bus', $messages[1]['bus']);
+        self::assertSame('#2', $messages[1]['message']['value']['message']);
+        self::assertSame('second bus', $messages[1]['bus']);
 
-        $this->assertSame('#3', $messages[2]['message']['value']['message']);
-        $this->assertSame('second bus', $messages[2]['bus']);
+        self::assertSame('#3', $messages[2]['message']['value']['message']);
+        self::assertSame('second bus', $messages[2]['bus']);
 
-        $this->assertSame('#4', $messages[3]['message']['value']['message']);
-        $this->assertSame('first bus', $messages[3]['bus']);
+        self::assertSame('#4', $messages[3]['message']['value']['message']);
+        self::assertSame('first bus', $messages[3]['bus']);
 
-        $this->assertSame('#5', $messages[4]['message']['value']['message']);
-        $this->assertSame('second bus', $messages[4]['bus']);
+        self::assertSame('#5', $messages[4]['message']['value']['message']);
+        self::assertSame('second bus', $messages[4]['bus']);
     }
 
     private function getDataAsString(Data $data): string

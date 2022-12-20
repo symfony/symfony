@@ -18,10 +18,10 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
         $client->request('GET', '/protected_resource');
 
-        $this->assertRedirect($client->getResponse(), '/login');
+        self::assertRedirect($client->getResponse(), '/login');
     }
 
     /**
@@ -29,10 +29,10 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testRoutingErrorIsExposedWhenNotProtected(array $options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
         $client->request('GET', '/unprotected_resource');
 
-        $this->assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
+        self::assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
     }
 
     /**
@@ -40,7 +40,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -49,7 +49,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
         $client->request('GET', '/highly_protected_resource');
 
-        $this->assertNotEquals(404, $client->getResponse()->getStatusCode());
+        self::assertNotEquals(404, $client->getResponse()->getStatusCode());
     }
 
     /**
@@ -57,11 +57,11 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testSecurityConfigurationForSingleIPAddress(array $options)
     {
-        $allowedClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.10.10']);
+        $allowedClient = self::createClient($options, ['REMOTE_ADDR' => '10.10.10.10']);
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $barredClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.20.10']);
+        $barredClient = self::createClient($options, ['REMOTE_ADDR' => '10.10.20.10']);
 
         $this->assertAllowed($allowedClient, '/secured-by-one-ip');
         $this->assertRestricted($barredClient, '/secured-by-one-ip');
@@ -72,19 +72,19 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testSecurityConfigurationForMultipleIPAddresses(array $options)
     {
-        $allowedClientA = $this->createClient($options, ['REMOTE_ADDR' => '1.1.1.1']);
+        $allowedClientA = self::createClient($options, ['REMOTE_ADDR' => '1.1.1.1']);
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $allowedClientB = $this->createClient($options, ['REMOTE_ADDR' => '2.2.2.2']);
+        $allowedClientB = self::createClient($options, ['REMOTE_ADDR' => '2.2.2.2']);
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $allowedClientC = $this->createClient($options, ['REMOTE_ADDR' => '203.0.113.0']);
+        $allowedClientC = self::createClient($options, ['REMOTE_ADDR' => '203.0.113.0']);
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $barredClient = $this->createClient($options, ['REMOTE_ADDR' => '192.168.1.1']);
+        $barredClient = self::createClient($options, ['REMOTE_ADDR' => '192.168.1.1']);
 
         $this->assertAllowed($allowedClientA, '/secured-by-two-ips');
         $this->assertAllowed($allowedClientB, '/secured-by-two-ips');
@@ -101,42 +101,42 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testSecurityConfigurationForExpression(array $options)
     {
-        $allowedClient = $this->createClient($options, ['HTTP_USER_AGENT' => 'Firefox 1.0']);
+        $allowedClient = self::createClient($options, ['HTTP_USER_AGENT' => 'Firefox 1.0']);
         $this->assertAllowed($allowedClient, '/protected-via-expression');
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $barredClient = $this->createClient($options, []);
+        $barredClient = self::createClient($options, []);
         $this->assertRestricted($barredClient, '/protected-via-expression');
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $allowedClient = $this->createClient($options, []);
+        $allowedClient = self::createClient($options, []);
 
         $allowedClient->request('GET', '/protected-via-expression');
         $form = $allowedClient->followRedirect()->selectButton('login')->form();
         $form['_username'] = 'johannes';
         $form['_password'] = 'test';
         $allowedClient->submit($form);
-        $this->assertRedirect($allowedClient->getResponse(), '/protected-via-expression');
+        self::assertRedirect($allowedClient->getResponse(), '/protected-via-expression');
         $this->assertAllowed($allowedClient, '/protected-via-expression');
     }
 
     public function testInvalidIpsInAccessControl()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
 
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
+        $client = self::createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
         $client->request('GET', '/unprotected_resource');
     }
 
     public function testPublicHomepage()
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
+        $client = self::createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
         $client->request('GET', '/en/');
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
-        $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
-        $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
+        self::assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
+        self::assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
+        self::assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
     /**
@@ -145,10 +145,10 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testLegacyRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
         $client->request('GET', '/protected_resource');
 
-        $this->assertRedirect($client->getResponse(), '/login');
+        self::assertRedirect($client->getResponse(), '/login');
     }
 
     /**
@@ -157,10 +157,10 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testLegacyRoutingErrorIsExposedWhenNotProtected(array $options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
         $client->request('GET', '/unprotected_resource');
 
-        $this->assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
+        self::assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
     }
 
     /**
@@ -169,7 +169,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testLegacyRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -178,7 +178,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
         $client->request('GET', '/highly_protected_resource');
 
-        $this->assertNotEquals(404, $client->getResponse()->getStatusCode());
+        self::assertNotEquals(404, $client->getResponse()->getStatusCode());
     }
 
     /**
@@ -187,11 +187,11 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testLegacySecurityConfigurationForSingleIPAddress(array $options)
     {
-        $allowedClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.10.10']);
+        $allowedClient = self::createClient($options, ['REMOTE_ADDR' => '10.10.10.10']);
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $barredClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.20.10']);
+        $barredClient = self::createClient($options, ['REMOTE_ADDR' => '10.10.20.10']);
 
         $this->assertAllowed($allowedClient, '/secured-by-one-ip');
         $this->assertRestricted($barredClient, '/secured-by-one-ip');
@@ -203,19 +203,19 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testLegacySecurityConfigurationForMultipleIPAddresses(array $options)
     {
-        $allowedClientA = $this->createClient($options, ['REMOTE_ADDR' => '1.1.1.1']);
+        $allowedClientA = self::createClient($options, ['REMOTE_ADDR' => '1.1.1.1']);
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $allowedClientB = $this->createClient($options, ['REMOTE_ADDR' => '2.2.2.2']);
+        $allowedClientB = self::createClient($options, ['REMOTE_ADDR' => '2.2.2.2']);
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $allowedClientC = $this->createClient($options, ['REMOTE_ADDR' => '203.0.113.0']);
+        $allowedClientC = self::createClient($options, ['REMOTE_ADDR' => '203.0.113.0']);
 
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $barredClient = $this->createClient($options, ['REMOTE_ADDR' => '192.168.1.1']);
+        $barredClient = self::createClient($options, ['REMOTE_ADDR' => '192.168.1.1']);
 
         $this->assertAllowed($allowedClientA, '/secured-by-two-ips');
         $this->assertAllowed($allowedClientB, '/secured-by-two-ips');
@@ -233,22 +233,22 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testLegacySecurityConfigurationForExpression(array $options)
     {
-        $allowedClient = $this->createClient($options, ['HTTP_USER_AGENT' => 'Firefox 1.0']);
+        $allowedClient = self::createClient($options, ['HTTP_USER_AGENT' => 'Firefox 1.0']);
         $this->assertAllowed($allowedClient, '/protected-via-expression');
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $barredClient = $this->createClient($options, []);
+        $barredClient = self::createClient($options, []);
         $this->assertRestricted($barredClient, '/protected-via-expression');
-        $this->ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $allowedClient = $this->createClient($options, []);
+        $allowedClient = self::createClient($options, []);
 
         $allowedClient->request('GET', '/protected-via-expression');
         $form = $allowedClient->followRedirect()->selectButton('login')->form();
         $form['_username'] = 'johannes';
         $form['_password'] = 'test';
         $allowedClient->submit($form);
-        $this->assertRedirect($allowedClient->getResponse(), '/protected-via-expression');
+        self::assertRedirect($allowedClient->getResponse(), '/protected-via-expression');
         $this->assertAllowed($allowedClient, '/protected-via-expression');
     }
 
@@ -257,10 +257,10 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testLegacyInvalidIpsInAccessControl()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
 
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml', 'enable_authenticator_manager' => false]);
+        $client = self::createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml', 'enable_authenticator_manager' => false]);
         $client->request('GET', '/unprotected_resource');
     }
 
@@ -269,24 +269,24 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
      */
     public function testLegacyPublicHomepage()
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml']);
+        $client = self::createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml']);
         $client->request('GET', '/en/');
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
-        $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
-        $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
+        self::assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
+        self::assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
+        self::assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
     private function assertAllowed($client, $path)
     {
         $client->request('GET', $path);
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        self::assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
     private function assertRestricted($client, $path)
     {
         $client->request('GET', $path);
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        self::assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function provideClientOptions()

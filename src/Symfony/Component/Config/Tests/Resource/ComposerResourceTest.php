@@ -31,7 +31,7 @@ class ComposerResourceTest extends TestCase
             }
         }
 
-        $this->assertTrue($found);
+        self::assertTrue($found);
     }
 
     public function testSerializeUnserialize()
@@ -39,9 +39,9 @@ class ComposerResourceTest extends TestCase
         $res = new ComposerResource();
         $ser = unserialize(serialize($res));
 
-        $this->assertTrue($res->isFresh(0));
-        $this->assertTrue($ser->isFresh(0));
+        self::assertTrue($res->isFresh(0));
+        self::assertTrue($ser->isFresh(0));
 
-        $this->assertEquals($res, $ser);
+        self::assertEquals($res, $ser);
     }
 }

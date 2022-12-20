@@ -169,7 +169,7 @@ class ExprBuilderTest extends TestCase
 
     public function testThenInvalid()
     {
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $test = $this->getTestBuilder()
             ->ifString()
             ->thenInvalid('Invalid value')
@@ -183,20 +183,20 @@ class ExprBuilderTest extends TestCase
             ->ifString()
             ->thenUnset()
         ->end();
-        $this->assertEquals([], $this->finalizeTestBuilder($test));
+        self::assertEquals([], $this->finalizeTestBuilder($test));
     }
 
     public function testEndIfPartNotSpecified()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('You must specify an if part.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('You must specify an if part.');
         $this->getTestBuilder()->end();
     }
 
     public function testEndThenPartNotSpecified()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('You must specify a then part.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('You must specify a then part.');
         $builder = $this->getTestBuilder();
         $builder->ifPart = 'test';
         $builder->end();
@@ -254,6 +254,6 @@ class ExprBuilderTest extends TestCase
      */
     protected function assertFinalizedValueIs($value, NodeDefinition $nodeDefinition, $config = null): void
     {
-        $this->assertEquals(['key' => $value], $this->finalizeTestBuilder($nodeDefinition, $config));
+        self::assertEquals(['key' => $value], $this->finalizeTestBuilder($nodeDefinition, $config));
     }
 }

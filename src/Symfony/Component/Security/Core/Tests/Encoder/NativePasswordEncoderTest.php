@@ -22,13 +22,13 @@ class NativePasswordEncoderTest extends TestCase
 {
     public function testCostBelowRange()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new NativePasswordEncoder(null, null, 3);
     }
 
     public function testCostAboveRange()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new NativePasswordEncoder(null, null, 32);
     }
 
@@ -37,7 +37,7 @@ class NativePasswordEncoderTest extends TestCase
      */
     public function testCostInRange($cost)
     {
-        $this->assertInstanceOf(NativePasswordEncoder::class, new NativePasswordEncoder(null, null, $cost));
+        self::assertInstanceOf(NativePasswordEncoder::class, new NativePasswordEncoder(null, null, $cost));
     }
 
     public function validRangeData()
@@ -52,34 +52,34 @@ class NativePasswordEncoderTest extends TestCase
     {
         $encoder = new NativePasswordEncoder();
         $result = $encoder->encodePassword('password', null);
-        $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
-        $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
-        $this->assertFalse($encoder->isPasswordValid($result, '', null));
+        self::assertTrue($encoder->isPasswordValid($result, 'password', null));
+        self::assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
+        self::assertFalse($encoder->isPasswordValid($result, '', null));
     }
 
     public function testNonArgonValidation()
     {
         $encoder = new NativePasswordEncoder();
-        $this->assertTrue($encoder->isPasswordValid('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'password', null));
-        $this->assertFalse($encoder->isPasswordValid('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'anotherPassword', null));
-        $this->assertTrue($encoder->isPasswordValid('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'password', null));
-        $this->assertFalse($encoder->isPasswordValid('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'anotherPassword', null));
+        self::assertTrue($encoder->isPasswordValid('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'password', null));
+        self::assertFalse($encoder->isPasswordValid('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'anotherPassword', null));
+        self::assertTrue($encoder->isPasswordValid('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'password', null));
+        self::assertFalse($encoder->isPasswordValid('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'anotherPassword', null));
     }
 
     public function testConfiguredAlgorithm()
     {
         $encoder = new NativePasswordEncoder(null, null, null, \PASSWORD_BCRYPT);
         $result = $encoder->encodePassword('password', null);
-        $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
-        $this->assertStringStartsWith('$2', $result);
+        self::assertTrue($encoder->isPasswordValid($result, 'password', null));
+        self::assertStringStartsWith('$2', $result);
     }
 
     public function testConfiguredAlgorithmWithLegacyConstValue()
     {
         $encoder = new NativePasswordEncoder(null, null, null, '1');
         $result = $encoder->encodePassword('password', null);
-        $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
-        $this->assertStringStartsWith('$2', $result);
+        self::assertTrue($encoder->isPasswordValid($result, 'password', null));
+        self::assertStringStartsWith('$2', $result);
     }
 
     public function testCheckPasswordLength()
@@ -87,20 +87,20 @@ class NativePasswordEncoderTest extends TestCase
         $encoder = new NativePasswordEncoder(null, null, 4);
         $result = password_hash(str_repeat('a', 72), \PASSWORD_BCRYPT, ['cost' => 4]);
 
-        $this->assertFalse($encoder->isPasswordValid($result, str_repeat('a', 73), 'salt'));
-        $this->assertTrue($encoder->isPasswordValid($result, str_repeat('a', 72), 'salt'));
+        self::assertFalse($encoder->isPasswordValid($result, str_repeat('a', 73), 'salt'));
+        self::assertTrue($encoder->isPasswordValid($result, str_repeat('a', 72), 'salt'));
     }
 
     public function testNeedsRehash()
     {
         $encoder = new NativePasswordEncoder(4, 11000, 4);
 
-        $this->assertTrue($encoder->needsRehash('dummyhash'));
+        self::assertTrue($encoder->needsRehash('dummyhash'));
 
         $hash = $encoder->encodePassword('foo', 'salt');
-        $this->assertFalse($encoder->needsRehash($hash));
+        self::assertFalse($encoder->needsRehash($hash));
 
         $encoder = new NativePasswordEncoder(5, 11000, 5);
-        $this->assertTrue($encoder->needsRehash($hash));
+        self::assertTrue($encoder->needsRehash($hash));
     }
 }

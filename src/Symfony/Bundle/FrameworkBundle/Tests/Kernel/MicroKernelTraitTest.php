@@ -50,9 +50,9 @@ class MicroKernelTraitTest extends TestCase
         $request = Request::create('/');
         $response = $kernel->handle($request);
 
-        $this->assertEquals('halloween', $response->getContent());
-        $this->assertEquals('Have a great day!', $kernel->getContainer()->getParameter('halloween'));
-        $this->assertInstanceOf(\stdClass::class, $kernel->getContainer()->get('halloween'));
+        self::assertEquals('halloween', $response->getContent());
+        self::assertEquals('Have a great day!', $kernel->getContainer()->getParameter('halloween'));
+        self::assertInstanceOf(\stdClass::class, $kernel->getContainer()->get('halloween'));
     }
 
     public function testAsEventSubscriber()
@@ -63,21 +63,21 @@ class MicroKernelTraitTest extends TestCase
         $request = Request::create('/danger');
         $response = $kernel->handle($request);
 
-        $this->assertSame('It\'s dangerous to go alone. Take this ⚔', $response->getContent());
+        self::assertSame('It\'s dangerous to go alone. Take this ⚔', $response->getContent());
     }
 
     public function testRoutingRouteLoaderTagIsAdded()
     {
-        $frameworkExtension = $this->createMock(ExtensionInterface::class);
+        $frameworkExtension = self::createMock(ExtensionInterface::class);
         $frameworkExtension
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getAlias')
             ->willReturn('framework');
         $container = new ContainerBuilder();
         $container->registerExtension($frameworkExtension);
         $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
         $kernel->registerContainerConfiguration(new ClosureLoader($container));
-        $this->assertTrue($container->getDefinition('kernel')->hasTag('routing.route_loader'));
+        self::assertTrue($container->getDefinition('kernel')->hasTag('routing.route_loader'));
     }
 
     public function testFlexStyle()
@@ -88,7 +88,7 @@ class MicroKernelTraitTest extends TestCase
         $request = Request::create('/');
         $response = $kernel->handle($request);
 
-        $this->assertEquals('Have a great day!', $response->getContent());
+        self::assertEquals('Have a great day!', $response->getContent());
     }
 
     public function testSecretLoadedFromExtension()
@@ -124,7 +124,7 @@ class MicroKernelTraitTest extends TestCase
         $request = Request::create('/');
         $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
 
-        $this->assertSame('Hello World!', $response->getContent());
+        self::assertSame('Hello World!', $response->getContent());
     }
 }
 

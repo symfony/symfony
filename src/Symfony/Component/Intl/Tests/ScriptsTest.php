@@ -227,7 +227,7 @@ class ScriptsTest extends ResourceBundleTestCase
 
     public function testGetScriptCodes()
     {
-        $this->assertSame(self::$scripts, Scripts::getScriptCodes());
+        self::assertSame(self::$scripts, Scripts::getScriptCodes());
     }
 
     /**
@@ -241,15 +241,15 @@ class ScriptsTest extends ResourceBundleTestCase
 
         // We can't assert on exact list of scripts, as there's too many variations between locales.
         // The best we can do is to make sure getNames() returns a subset of what getScripts() returns.
-        $this->assertNotEmpty($scripts);
-        $this->assertEmpty(array_diff($scripts, self::$scripts));
+        self::assertNotEmpty($scripts);
+        self::assertEmpty(array_diff($scripts, self::$scripts));
     }
 
     public function testGetNamesDefaultLocale()
     {
         \Locale::setDefault('de_AT');
 
-        $this->assertSame(Scripts::getNames('de_AT'), Scripts::getNames());
+        self::assertSame(Scripts::getNames('de_AT'), Scripts::getNames());
     }
 
     /**
@@ -260,7 +260,7 @@ class ScriptsTest extends ResourceBundleTestCase
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(Scripts::getNames($ofLocale), Scripts::getNames($alias));
+        self::assertEquals(Scripts::getNames($ofLocale), Scripts::getNames($alias));
     }
 
     /**
@@ -271,7 +271,7 @@ class ScriptsTest extends ResourceBundleTestCase
         $names = Scripts::getNames($displayLocale);
 
         foreach ($names as $script => $name) {
-            $this->assertSame($name, Scripts::getName($script, $displayLocale));
+            self::assertSame($name, Scripts::getName($script, $displayLocale));
         }
     }
 
@@ -282,19 +282,19 @@ class ScriptsTest extends ResourceBundleTestCase
         $names = Scripts::getNames('de_AT');
 
         foreach ($names as $script => $name) {
-            $this->assertSame($name, Scripts::getName($script));
+            self::assertSame($name, Scripts::getName($script));
         }
     }
 
     public function testGetNameWithInvalidScriptCode()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Scripts::getName('foo');
     }
 
     public function testExists()
     {
-        $this->assertTrue(Scripts::exists('Hans'));
-        $this->assertFalse(Scripts::exists('Zzzz'));
+        self::assertTrue(Scripts::exists('Hans'));
+        self::assertFalse(Scripts::exists('Zzzz'));
     }
 }

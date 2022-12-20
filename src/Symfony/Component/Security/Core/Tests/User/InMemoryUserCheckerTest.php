@@ -23,18 +23,18 @@ class InMemoryUserCheckerTest extends TestCase
     {
         $checker = new InMemoryUserChecker();
 
-        $this->assertNull($checker->checkPostAuth($this->createMock(UserInterface::class)));
+        self::assertNull($checker->checkPostAuth(self::createMock(UserInterface::class)));
     }
 
     public function testCheckPostAuthPass()
     {
         $checker = new InMemoryUserChecker();
-        $this->assertNull($checker->checkPostAuth(new InMemoryUser('John', 'password')));
+        self::assertNull($checker->checkPostAuth(new InMemoryUser('John', 'password')));
     }
 
     public function testCheckPreAuthDisabled()
     {
-        $this->expectException(DisabledException::class);
+        self::expectException(DisabledException::class);
         $checker = new InMemoryUserChecker();
         $checker->checkPreAuth(new InMemoryUser('John', 'password', [], false));
     }

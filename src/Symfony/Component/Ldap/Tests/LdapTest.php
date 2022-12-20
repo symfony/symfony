@@ -29,20 +29,20 @@ class LdapTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->adapter = $this->createMock(AdapterInterface::class);
+        $this->adapter = self::createMock(AdapterInterface::class);
         $this->ldap = new Ldap($this->adapter);
     }
 
     public function testLdapBind()
     {
-        $connection = $this->createMock(ConnectionInterface::class);
+        $connection = self::createMock(ConnectionInterface::class);
         $connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('bind')
             ->with('foo', 'bar')
         ;
         $this->adapter
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection)
         ;
@@ -52,7 +52,7 @@ class LdapTest extends TestCase
     public function testLdapEscape()
     {
         $this->adapter
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('escape')
             ->with('foo', 'bar', 0)
             ->willReturn('')
@@ -64,10 +64,10 @@ class LdapTest extends TestCase
     public function testLdapQuery()
     {
         $this->adapter
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('createQuery')
             ->with('foo', 'bar', ['baz'])
-            ->willReturn($this->createMock(QueryInterface::class))
+            ->willReturn(self::createMock(QueryInterface::class))
         ;
         $this->ldap->query('foo', 'bar', ['baz']);
     }
@@ -78,12 +78,12 @@ class LdapTest extends TestCase
     public function testLdapCreate()
     {
         $ldap = Ldap::create('ext_ldap');
-        $this->assertInstanceOf(Ldap::class, $ldap);
+        self::assertInstanceOf(Ldap::class, $ldap);
     }
 
     public function testCreateWithInvalidAdapterName()
     {
-        $this->expectException(DriverNotFoundException::class);
+        self::expectException(DriverNotFoundException::class);
         Ldap::create('foo');
     }
 }

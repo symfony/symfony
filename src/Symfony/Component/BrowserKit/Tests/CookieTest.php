@@ -19,19 +19,19 @@ class CookieTest extends TestCase
     public function testToString()
     {
         $cookie = new Cookie('foo', 'bar', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true);
-        $this->assertEquals('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; domain=.myfoodomain.com; path=/; secure; httponly', (string) $cookie, '->__toString() returns string representation of the cookie');
+        self::assertEquals('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; domain=.myfoodomain.com; path=/; secure; httponly', (string) $cookie, '->__toString() returns string representation of the cookie');
 
         $cookie = new Cookie('foo', 'bar with white spaces', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true);
-        $this->assertEquals('foo=bar%20with%20white%20spaces; expires=Fri, 20 May 2011 15:25:52 GMT; domain=.myfoodomain.com; path=/; secure; httponly', (string) $cookie, '->__toString() encodes the value of the cookie according to RFC 3986 (white space = %20)');
+        self::assertEquals('foo=bar%20with%20white%20spaces; expires=Fri, 20 May 2011 15:25:52 GMT; domain=.myfoodomain.com; path=/; secure; httponly', (string) $cookie, '->__toString() encodes the value of the cookie according to RFC 3986 (white space = %20)');
 
         $cookie = new Cookie('foo', null, 1, '/admin/', '.myfoodomain.com');
-        $this->assertEquals('foo=; expires=Thu, 01 Jan 1970 00:00:01 GMT; domain=.myfoodomain.com; path=/admin/; httponly', (string) $cookie, '->__toString() returns string representation of a cleared cookie if value is NULL');
+        self::assertEquals('foo=; expires=Thu, 01 Jan 1970 00:00:01 GMT; domain=.myfoodomain.com; path=/admin/; httponly', (string) $cookie, '->__toString() returns string representation of a cleared cookie if value is NULL');
 
         $cookie = new Cookie('foo', 'bar', 0, '/', '');
-        $this->assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; httponly', (string) $cookie);
+        self::assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; httponly', (string) $cookie);
 
         $cookie = new Cookie('foo', 'bar', 2, '/', '', true, true, false, 'lax');
-        $this->assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:02 GMT; path=/; secure; httponly; samesite=lax', (string) $cookie);
+        self::assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:02 GMT; path=/; secure; httponly; samesite=lax', (string) $cookie);
     }
 
     /**
@@ -39,7 +39,7 @@ class CookieTest extends TestCase
      */
     public function testToFromString($cookie, $url = null)
     {
-        $this->assertEquals($cookie, (string) Cookie::fromString($cookie, $url));
+        self::assertEquals($cookie, (string) Cookie::fromString($cookie, $url));
     }
 
     public function getTestsForToFromString()
@@ -59,8 +59,8 @@ class CookieTest extends TestCase
 
     public function testFromStringIgnoreSecureFlag()
     {
-        $this->assertFalse(Cookie::fromString('foo=bar; secure')->isSecure());
-        $this->assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
+        self::assertFalse(Cookie::fromString('foo=bar; secure')->isSecure());
+        self::assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
     }
 
     /**
@@ -68,7 +68,7 @@ class CookieTest extends TestCase
      */
     public function testFromStringAcceptsSeveralExpiresDateFormats($cookie)
     {
-        $this->assertEquals(1596185377, Cookie::fromString($cookie)->getExpiresTime());
+        self::assertEquals(1596185377, Cookie::fromString($cookie)->getExpiresTime());
     }
 
     public function getExpireCookieStrings()
@@ -87,24 +87,24 @@ class CookieTest extends TestCase
 
     public function testFromStringWithCapitalization()
     {
-        $this->assertEquals('Foo=Bar; path=/', (string) Cookie::fromString('Foo=Bar'));
-        $this->assertEquals('foo=bar; expires=Fri, 31 Dec 2010 23:59:59 GMT; path=/', (string) Cookie::fromString('foo=bar; Expires=Fri, 31 Dec 2010 23:59:59 GMT'));
-        $this->assertEquals('foo=bar; domain=www.example.org; path=/; httponly', (string) Cookie::fromString('foo=bar; DOMAIN=www.example.org; HttpOnly'));
+        self::assertEquals('Foo=Bar; path=/', (string) Cookie::fromString('Foo=Bar'));
+        self::assertEquals('foo=bar; expires=Fri, 31 Dec 2010 23:59:59 GMT; path=/', (string) Cookie::fromString('foo=bar; Expires=Fri, 31 Dec 2010 23:59:59 GMT'));
+        self::assertEquals('foo=bar; domain=www.example.org; path=/; httponly', (string) Cookie::fromString('foo=bar; DOMAIN=www.example.org; HttpOnly'));
     }
 
     public function testFromStringWithUrl()
     {
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com/'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com?foo'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::fromString('foo=bar', 'http://www.example.com/foo/bar'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
-        $this->assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::fromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
+        self::assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com/'));
+        self::assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com'));
+        self::assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com?foo'));
+        self::assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::fromString('foo=bar', 'http://www.example.com/foo/bar'));
+        self::assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
+        self::assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::fromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         Cookie::fromString('foo');
     }
 
@@ -112,105 +112,105 @@ class CookieTest extends TestCase
     {
         $cookie = Cookie::fromString('foo=bar; expires=Flursday July 31st 2020, 08:49:37 GMT');
 
-        $this->assertFalse($cookie->isExpired());
+        self::assertFalse($cookie->isExpired());
     }
 
     public function testFromStringThrowsAnExceptionIfUrlIsNotValid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         Cookie::fromString('foo=bar', 'foobar');
     }
 
     public function testGetName()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals('foo', $cookie->getName(), '->getName() returns the cookie name');
+        self::assertEquals('foo', $cookie->getName(), '->getName() returns the cookie name');
     }
 
     public function testGetValue()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals('bar', $cookie->getValue(), '->getValue() returns the cookie value');
+        self::assertEquals('bar', $cookie->getValue(), '->getValue() returns the cookie value');
 
         $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
-        $this->assertEquals('bar=baz', $cookie->getValue(), '->getValue() returns the urldecoded cookie value');
+        self::assertEquals('bar=baz', $cookie->getValue(), '->getValue() returns the urldecoded cookie value');
     }
 
     public function testGetRawValue()
     {
         $cookie = new Cookie('foo', 'bar=baz'); // decoded value
-        $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the urlencoded cookie value');
+        self::assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the urlencoded cookie value');
         $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
-        $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the non-urldecoded cookie value');
+        self::assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the non-urldecoded cookie value');
     }
 
     public function testGetPath()
     {
         $cookie = new Cookie('foo', 'bar', 0);
-        $this->assertEquals('/', $cookie->getPath(), '->getPath() returns / is no path is defined');
+        self::assertEquals('/', $cookie->getPath(), '->getPath() returns / is no path is defined');
 
         $cookie = new Cookie('foo', 'bar', 0, '/foo');
-        $this->assertEquals('/foo', $cookie->getPath(), '->getPath() returns the cookie path');
+        self::assertEquals('/foo', $cookie->getPath(), '->getPath() returns the cookie path');
     }
 
     public function testGetDomain()
     {
         $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com');
-        $this->assertEquals('foo.com', $cookie->getDomain(), '->getDomain() returns the cookie domain');
+        self::assertEquals('foo.com', $cookie->getDomain(), '->getDomain() returns the cookie domain');
     }
 
     public function testIsSecure()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertFalse($cookie->isSecure(), '->isSecure() returns false if not defined');
+        self::assertFalse($cookie->isSecure(), '->isSecure() returns false if not defined');
 
         $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', true);
-        $this->assertTrue($cookie->isSecure(), '->isSecure() returns the cookie secure flag');
+        self::assertTrue($cookie->isSecure(), '->isSecure() returns the cookie secure flag');
     }
 
     public function testIsHttponly()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns false if not defined');
+        self::assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns false if not defined');
 
         $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', false, true);
-        $this->assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns the cookie httponly flag');
+        self::assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns the cookie httponly flag');
     }
 
     public function testGetExpiresTime()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertNull($cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
+        self::assertNull($cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
 
         $cookie = new Cookie('foo', 'bar', $time = time() - 86400);
-        $this->assertEquals($time, $cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
+        self::assertEquals($time, $cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
     }
 
     public function testIsExpired()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertFalse($cookie->isExpired(), '->isExpired() returns false when the cookie never expires (null as expires time)');
+        self::assertFalse($cookie->isExpired(), '->isExpired() returns false when the cookie never expires (null as expires time)');
 
         $cookie = new Cookie('foo', 'bar', time() - 86400);
-        $this->assertTrue($cookie->isExpired(), '->isExpired() returns true when the cookie is expired');
+        self::assertTrue($cookie->isExpired(), '->isExpired() returns true when the cookie is expired');
 
         $cookie = new Cookie('foo', 'bar', 0);
-        $this->assertFalse($cookie->isExpired());
+        self::assertFalse($cookie->isExpired());
     }
 
     public function testConstructException()
     {
-        $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('The cookie expiration time "string" is not valid.');
+        self::expectException(\UnexpectedValueException::class);
+        self::expectExceptionMessage('The cookie expiration time "string" is not valid.');
         new Cookie('foo', 'bar', 'string');
     }
 
     public function testSameSite()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertNull($cookie->getSameSite());
+        self::assertNull($cookie->getSameSite());
 
         $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', false, true, false, 'lax');
-        $this->assertSame('lax', $cookie->getSameSite());
+        self::assertSame('lax', $cookie->getSameSite());
     }
 }

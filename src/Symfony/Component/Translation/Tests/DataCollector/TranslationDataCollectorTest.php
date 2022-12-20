@@ -21,22 +21,22 @@ class TranslationDataCollectorTest extends TestCase
     protected function setUp(): void
     {
         if (!class_exists(DataCollector::class)) {
-            $this->markTestSkipped('The "DataCollector" is not available');
+            self::markTestSkipped('The "DataCollector" is not available');
         }
     }
 
     public function testCollectEmptyMessages()
     {
         $translator = $this->getTranslator();
-        $translator->expects($this->any())->method('getCollectedMessages')->willReturn([]);
+        $translator->expects(self::any())->method('getCollectedMessages')->willReturn([]);
 
         $dataCollector = new TranslationDataCollector($translator);
         $dataCollector->lateCollect();
 
-        $this->assertEquals(0, $dataCollector->getCountMissings());
-        $this->assertEquals(0, $dataCollector->getCountFallbacks());
-        $this->assertEquals(0, $dataCollector->getCountDefines());
-        $this->assertEquals([], $dataCollector->getMessages()->getValue());
+        self::assertEquals(0, $dataCollector->getCountMissings());
+        self::assertEquals(0, $dataCollector->getCountFallbacks());
+        self::assertEquals(0, $dataCollector->getCountDefines());
+        self::assertEquals([], $dataCollector->getMessages()->getValue());
     }
 
     public function testCollect()
@@ -126,22 +126,21 @@ class TranslationDataCollectorTest extends TestCase
         ];
 
         $translator = $this->getTranslator();
-        $translator->expects($this->any())->method('getCollectedMessages')->willReturn($collectedMessages);
+        $translator->expects(self::any())->method('getCollectedMessages')->willReturn($collectedMessages);
 
         $dataCollector = new TranslationDataCollector($translator);
         $dataCollector->lateCollect();
 
-        $this->assertEquals(1, $dataCollector->getCountMissings());
-        $this->assertEquals(1, $dataCollector->getCountFallbacks());
-        $this->assertEquals(1, $dataCollector->getCountDefines());
+        self::assertEquals(1, $dataCollector->getCountMissings());
+        self::assertEquals(1, $dataCollector->getCountFallbacks());
+        self::assertEquals(1, $dataCollector->getCountDefines());
 
-        $this->assertEquals($expectedMessages, array_values($dataCollector->getMessages()->getValue(true)));
+        self::assertEquals($expectedMessages, array_values($dataCollector->getMessages()->getValue(true)));
     }
 
     private function getTranslator()
     {
-        $translator = $this
-            ->getMockBuilder(DataCollectorTranslator::class)
+        $translator = self::getMockBuilder(DataCollectorTranslator::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;

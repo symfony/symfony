@@ -19,6 +19,6 @@ class ReferenceTest extends TestCase
     public function testConstructor()
     {
         $ref = new Reference('foo');
-        $this->assertEquals('foo', (string) $ref, '__construct() sets the id of the reference, which is used for the __toString() method');
+        self::assertEquals('foo', (string) $ref, '__construct() sets the id of the reference, which is used for the __toString() method');
     }
 }

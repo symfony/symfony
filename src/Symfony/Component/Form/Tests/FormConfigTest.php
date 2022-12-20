@@ -68,19 +68,19 @@ class FormConfigTest extends TestCase
     public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null)
     {
         if (null !== $expectedException) {
-            $this->expectException($expectedException);
+            self::expectException($expectedException);
         }
 
         $formConfigBuilder = new FormConfigBuilder($name, null, new EventDispatcher());
 
-        $this->assertSame((string) $name, $formConfigBuilder->getName());
+        self::assertSame((string) $name, $formConfigBuilder->getName());
     }
 
     public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet()
     {
         $config = $this->getConfigBuilder()->getFormConfig();
 
-        $this->assertInstanceOf(NativeRequestHandler::class, $config->getRequestHandler());
+        self::assertInstanceOf(NativeRequestHandler::class, $config->getRequestHandler());
     }
 
     public function testGetRequestHandlerReusesNativeRequestHandlerInstance()
@@ -88,7 +88,7 @@ class FormConfigTest extends TestCase
         $config1 = $this->getConfigBuilder()->getFormConfig();
         $config2 = $this->getConfigBuilder()->getFormConfig();
 
-        $this->assertSame($config1->getRequestHandler(), $config2->getRequestHandler());
+        self::assertSame($config1->getRequestHandler(), $config2->getRequestHandler());
     }
 
     public function testSetMethodAllowsGet()

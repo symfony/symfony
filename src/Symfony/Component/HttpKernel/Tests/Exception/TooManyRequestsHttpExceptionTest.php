@@ -19,7 +19,7 @@ class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
     public function testHeadersDefaultRertyAfter()
     {
         $exception = new TooManyRequestsHttpException(10);
-        $this->assertSame(['Retry-After' => 10], $exception->getHeaders());
+        self::assertSame(['Retry-After' => 10], $exception->getHeaders());
     }
 
     public function testWithHeaderConstruct()
@@ -32,7 +32,7 @@ class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
 
         $headers['Retry-After'] = 69;
 
-        $this->assertSame($headers, $exception->getHeaders());
+        self::assertSame($headers, $exception->getHeaders());
     }
 
     /**
@@ -42,7 +42,7 @@ class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
     {
         $exception = new TooManyRequestsHttpException(10);
         $exception->setHeaders($headers);
-        $this->assertSame($headers, $exception->getHeaders());
+        self::assertSame($headers, $exception->getHeaders());
     }
 
     protected function createException(string $message = '', \Throwable $previous = null, int $code = 0, array $headers = []): HttpException

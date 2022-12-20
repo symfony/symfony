@@ -59,8 +59,8 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadUnExistFile()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/The file ".+" does not exist./');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/The file ".+" does not exist./');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('loadFile');
@@ -71,8 +71,8 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadInvalidYamlFile()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/The file ".+" does not contain valid YAML./');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/The file ".+" does not contain valid YAML./');
         $path = self::$fixturesPath.'/ini';
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator($path));
         $r = new \ReflectionObject($loader);
@@ -87,7 +87,7 @@ class YamlFileLoaderTest extends TestCase
      */
     public function testLoadInvalidFile($file)
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
 
         $loader->load($file.'.yml');
@@ -113,7 +113,7 @@ class YamlFileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services2.yml');
-        $this->assertEquals(['foo' => 'bar', 'mixedcase' => ['MixedCaseKey' => 'value'], 'values' => [true, false, 0, 1000.3, \PHP_INT_MAX], 'bar' => 'foo', 'escape' => '@escapeme', 'foo_bar' => new Reference('foo_bar')], $container->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
+        self::assertEquals(['foo' => 'bar', 'mixedcase' => ['MixedCaseKey' => 'value'], 'values' => [true, false, 0, 1000.3, \PHP_INT_MAX], 'bar' => 'foo', 'escape' => '@escapeme', 'foo_bar' => new Reference('foo_bar')], $container->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
     }
 
     public function testLoadImports()
@@ -140,8 +140,8 @@ class YamlFileLoaderTest extends TestCase
             'imported_from_xml' => true,
             'with_wrong_ext' => 'from yaml',
         ];
-        $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
-        $this->assertTrue($actual['imported_from_ini']);
+        self::assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
+        self::assertTrue($actual['imported_from_ini']);
 
         // Bad import throws no exception due to ignore_errors value.
         $loader->load('services4_bad_import.yml');
@@ -151,26 +151,26 @@ class YamlFileLoaderTest extends TestCase
 
         try {
             $loader->load('services4_bad_import_with_errors.yml');
-            $this->fail('->load() throws a LoaderLoadException if the imported yaml file does not exist');
+            self::fail('->load() throws a LoaderLoadException if the imported yaml file does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(LoaderLoadException::class, $e, '->load() throws a LoaderLoadException if the imported yaml file does not exist');
-            $this->assertMatchesRegularExpression(sprintf('#^The file "%1$s" does not exist \(in: .+\) in %1$s \(which is being imported from ".+%2$s"\)\.$#', 'foo_fake\.yml', 'services4_bad_import_with_errors\.yml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported yaml file does not exist');
+            self::assertInstanceOf(LoaderLoadException::class, $e, '->load() throws a LoaderLoadException if the imported yaml file does not exist');
+            self::assertMatchesRegularExpression(sprintf('#^The file "%1$s" does not exist \(in: .+\) in %1$s \(which is being imported from ".+%2$s"\)\.$#', 'foo_fake\.yml', 'services4_bad_import_with_errors\.yml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported yaml file does not exist');
 
             $e = $e->getPrevious();
-            $this->assertInstanceOf(FileLocatorFileNotFoundException::class, $e, '->load() throws a FileLocatorFileNotFoundException if the imported yaml file does not exist');
-            $this->assertMatchesRegularExpression(sprintf('#^The file "%s" does not exist \(in: .+\)\.$#', 'foo_fake\.yml'), $e->getMessage(), '->load() throws a FileLocatorFileNotFoundException if the imported yaml file does not exist');
+            self::assertInstanceOf(FileLocatorFileNotFoundException::class, $e, '->load() throws a FileLocatorFileNotFoundException if the imported yaml file does not exist');
+            self::assertMatchesRegularExpression(sprintf('#^The file "%s" does not exist \(in: .+\)\.$#', 'foo_fake\.yml'), $e->getMessage(), '->load() throws a FileLocatorFileNotFoundException if the imported yaml file does not exist');
         }
 
         try {
             $loader->load('services4_bad_import_nonvalid.yml');
-            $this->fail('->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
+            self::fail('->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(LoaderLoadException::class, $e, '->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
-            $this->assertMatchesRegularExpression(sprintf('#^The service file ".+%1$s" is not valid\. It should contain an array\. Check your YAML syntax in .+%1$s \(which is being imported from ".+%2$s"\)\.$#', 'nonvalid2\.yml', 'services4_bad_import_nonvalid.yml'), $e->getMessage(), '->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
+            self::assertInstanceOf(LoaderLoadException::class, $e, '->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
+            self::assertMatchesRegularExpression(sprintf('#^The service file ".+%1$s" is not valid\. It should contain an array\. Check your YAML syntax in .+%1$s \(which is being imported from ".+%2$s"\)\.$#', 'nonvalid2\.yml', 'services4_bad_import_nonvalid.yml'), $e->getMessage(), '->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
 
             $e = $e->getPrevious();
-            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tag in the imported yaml file is not valid');
-            $this->assertMatchesRegularExpression(sprintf('#^The service file ".+%s" is not valid\. It should contain an array\. Check your YAML syntax\.$#', 'nonvalid2\.yml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the tag in the imported yaml file is not valid');
+            self::assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tag in the imported yaml file is not valid');
+            self::assertMatchesRegularExpression(sprintf('#^The service file ".+%s" is not valid\. It should contain an array\. Check your YAML syntax\.$#', 'nonvalid2\.yml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the tag in the imported yaml file is not valid');
         }
     }
 
@@ -217,36 +217,36 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services6.yml');
         $services = $container->getDefinitions();
-        $this->assertArrayHasKey('foo', $services, '->load() parses service elements');
-        $this->assertFalse($services['not_shared']->isShared(), '->load() parses the shared flag');
-        $this->assertInstanceOf(Definition::class, $services['foo'], '->load() converts service element to Definition instances');
-        $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
-        $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
-        $this->assertEquals(['foo', new Reference('foo'), [true, false]], $services['arguments']->getArguments(), '->load() parses the argument tags');
-        $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
-        $this->assertEquals([new Reference('baz'), 'configure'], $services['configurator2']->getConfigurator(), '->load() parses the configurator tag');
-        $this->assertEquals(['BazClass', 'configureStatic'], $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
-        $this->assertEquals([['setBar', []], ['setBar', []], ['setBar', [new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')]]], $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
-        $this->assertEquals([['setBar', ['foo', new Reference('foo'), [true, false]]]], $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
-        $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');
-        $this->assertEquals([new Reference('baz'), 'getClass'], $services['new_factory2']->getFactory(), '->load() parses the factory tag');
-        $this->assertEquals(['BazClass', 'getInstance'], $services['new_factory3']->getFactory(), '->load() parses the factory tag');
-        $this->assertSame([null, 'getInstance'], $services['new_factory4']->getFactory(), '->load() accepts factory tag without class');
-        $this->assertEquals([new Reference('baz'), '__invoke'], $services['new_factory5']->getFactory(), '->load() accepts service reference as invokable factory');
-        $this->assertEquals(['foo', new Reference('baz')], $services['Acme\WithShortCutArgs']->getArguments(), '->load() parses short service definition');
+        self::assertArrayHasKey('foo', $services, '->load() parses service elements');
+        self::assertFalse($services['not_shared']->isShared(), '->load() parses the shared flag');
+        self::assertInstanceOf(Definition::class, $services['foo'], '->load() converts service element to Definition instances');
+        self::assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
+        self::assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
+        self::assertEquals(['foo', new Reference('foo'), [true, false]], $services['arguments']->getArguments(), '->load() parses the argument tags');
+        self::assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
+        self::assertEquals([new Reference('baz'), 'configure'], $services['configurator2']->getConfigurator(), '->load() parses the configurator tag');
+        self::assertEquals(['BazClass', 'configureStatic'], $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
+        self::assertEquals([['setBar', []], ['setBar', []], ['setBar', [new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')]]], $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
+        self::assertEquals([['setBar', ['foo', new Reference('foo'), [true, false]]]], $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
+        self::assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');
+        self::assertEquals([new Reference('baz'), 'getClass'], $services['new_factory2']->getFactory(), '->load() parses the factory tag');
+        self::assertEquals(['BazClass', 'getInstance'], $services['new_factory3']->getFactory(), '->load() parses the factory tag');
+        self::assertSame([null, 'getInstance'], $services['new_factory4']->getFactory(), '->load() accepts factory tag without class');
+        self::assertEquals([new Reference('baz'), '__invoke'], $services['new_factory5']->getFactory(), '->load() accepts service reference as invokable factory');
+        self::assertEquals(['foo', new Reference('baz')], $services['Acme\WithShortCutArgs']->getArguments(), '->load() parses short service definition');
 
         $aliases = $container->getAliases();
-        $this->assertArrayHasKey('alias_for_foo', $aliases, '->load() parses aliases');
-        $this->assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');
-        $this->assertFalse($aliases['alias_for_foo']->isPublic());
-        $this->assertArrayHasKey('another_alias_for_foo', $aliases);
-        $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
-        $this->assertTrue($aliases['another_alias_for_foo']->isPublic());
+        self::assertArrayHasKey('alias_for_foo', $aliases, '->load() parses aliases');
+        self::assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');
+        self::assertFalse($aliases['alias_for_foo']->isPublic());
+        self::assertArrayHasKey('another_alias_for_foo', $aliases);
+        self::assertEquals('foo', (string) $aliases['another_alias_for_foo']);
+        self::assertTrue($aliases['another_alias_for_foo']->isPublic());
 
-        $this->assertEquals(['decorated', null, 0], $services['decorator_service']->getDecoratedService());
-        $this->assertEquals(['decorated', 'decorated.pif-pouf', 0], $services['decorator_service_with_name']->getDecoratedService());
-        $this->assertEquals(['decorated', 'decorated.pif-pouf', 5], $services['decorator_service_with_name_and_priority']->getDecoratedService());
-        $this->assertEquals(['decorated', 'decorated.pif-pouf', 5, ContainerInterface::IGNORE_ON_INVALID_REFERENCE], $services['decorator_service_with_name_and_priority_and_on_invalid']->getDecoratedService());
+        self::assertEquals(['decorated', null, 0], $services['decorator_service']->getDecoratedService());
+        self::assertEquals(['decorated', 'decorated.pif-pouf', 0], $services['decorator_service_with_name']->getDecoratedService());
+        self::assertEquals(['decorated', 'decorated.pif-pouf', 5], $services['decorator_service_with_name_and_priority']->getDecoratedService());
+        self::assertEquals(['decorated', 'decorated.pif-pouf', 5, ContainerInterface::IGNORE_ON_INVALID_REFERENCE], $services['decorator_service_with_name_and_priority_and_on_invalid']->getDecoratedService());
     }
 
     public function testLoadShortSyntax()
@@ -256,8 +256,8 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_short_syntax.yml');
         $services = $container->getDefinitions();
 
-        $this->assertSame([1, 2], $services['foo_bar']->getArguments());
-        $this->assertSame(['$a' => 'a', 'App\Foo' => 'foo'], $services['bar_foo']->getArguments());
+        self::assertSame([1, 2], $services['foo_bar']->getArguments());
+        self::assertSame(['$a' => 'a', 'App\Foo' => 'foo'], $services['bar_foo']->getArguments());
     }
 
     public function testLoadDeprecatedDefinitionWithoutMessageKey()
@@ -266,19 +266,19 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('deprecated_definition_without_message.yml');
 
-        $this->assertTrue($container->getDefinition('service_without_deprecation_message')->isDeprecated());
+        self::assertTrue($container->getDefinition('service_without_deprecation_message')->isDeprecated());
         $deprecation = $container->getDefinition('service_without_deprecation_message')->getDeprecation('service_without_deprecation_message');
         $message = 'The "service_without_deprecation_message" service is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $deprecation['message']);
-        $this->assertSame('vendor/package', $deprecation['package']);
-        $this->assertSame('1.1', $deprecation['version']);
+        self::assertSame($message, $deprecation['message']);
+        self::assertSame('vendor/package', $deprecation['package']);
+        self::assertSame('1.1', $deprecation['version']);
 
-        $this->assertTrue($container->getAlias('alias_without_deprecation_message')->isDeprecated());
+        self::assertTrue($container->getAlias('alias_without_deprecation_message')->isDeprecated());
         $deprecation = $container->getAlias('alias_without_deprecation_message')->getDeprecation('alias_without_deprecation_message');
         $message = 'The "alias_without_deprecation_message" service alias is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $deprecation['message']);
-        $this->assertSame('vendor/package', $deprecation['package']);
-        $this->assertSame('1.1', $deprecation['version']);
+        self::assertSame($message, $deprecation['message']);
+        self::assertSame('vendor/package', $deprecation['package']);
+        self::assertSame('1.1', $deprecation['version']);
     }
 
     public function testDeprecatedAliases()
@@ -287,12 +287,12 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('deprecated_alias_definitions.yml');
 
-        $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
+        self::assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
         $message = 'The "alias_for_foobar" service alias is deprecated.';
         $deprecation = $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar');
-        $this->assertSame($message, $deprecation['message']);
-        $this->assertSame('vendor/package', $deprecation['package']);
-        $this->assertSame('1.1', $deprecation['version']);
+        self::assertSame($message, $deprecation['message']);
+        self::assertSame('vendor/package', $deprecation['package']);
+        self::assertSame('1.1', $deprecation['version']);
     }
 
     /**
@@ -307,20 +307,20 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('deprecated_alias_definitions_without_package_and_version.yml');
 
-        $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
+        self::assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
         $message = 'The "alias_for_foobar" service alias is deprecated.';
         $deprecation = $container->getAlias('alias_for_foobar')->getDeprecation('alias_for_foobar');
-        $this->assertSame($message, $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
+        self::assertSame($message, $deprecation['message']);
+        self::assertSame('', $deprecation['package']);
+        self::assertSame('', $deprecation['version']);
     }
 
     public function testFactorySyntaxError()
     {
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The value of the "factory" option for the "invalid_factory" service must be the id of the service without the "@" prefix (replace "@factory:method" with "factory:method"');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The value of the "factory" option for the "invalid_factory" service must be the id of the service without the "@" prefix (replace "@factory:method" with "factory:method"');
         $loader->load('bad_factory_syntax.yml');
     }
 
@@ -334,18 +334,18 @@ class YamlFileLoaderTest extends TestCase
         $services = $container->getDefinitions();
         $parameters = $container->getParameterBag()->all();
 
-        $this->assertArrayHasKey('project.service.bar', $services, '->load() parses extension elements');
-        $this->assertArrayHasKey('project.parameter.bar', $parameters, '->load() parses extension elements');
+        self::assertArrayHasKey('project.service.bar', $services, '->load() parses extension elements');
+        self::assertArrayHasKey('project.parameter.bar', $parameters, '->load() parses extension elements');
 
-        $this->assertEquals('BAR', $services['project.service.foo']->getClass(), '->load() parses extension elements');
-        $this->assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');
+        self::assertEquals('BAR', $services['project.service.foo']->getClass(), '->load() parses extension elements');
+        self::assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');
 
         try {
             $loader->load('services11.yml');
-            $this->fail('->load() throws an InvalidArgumentException if the tag is not valid');
+            self::fail('->load() throws an InvalidArgumentException if the tag is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tag is not valid');
-            $this->assertStringStartsWith('There is no extension able to load the configuration for "foobarfoobar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
+            self::assertInstanceOf(\InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tag is not valid');
+            self::assertStringStartsWith('There is no extension able to load the configuration for "foobarfoobar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
         }
     }
 
@@ -357,18 +357,18 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('null_config.yml');
         $container->compile();
 
-        $this->assertSame([[]], $container->getParameter('project.configs'));
+        self::assertSame([[]], $container->getParameter('project.configs'));
     }
 
     public function testSupports()
     {
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator());
 
-        $this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
-        $this->assertTrue($loader->supports('foo.yaml'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
-        $this->assertTrue($loader->supports('with_wrong_ext.xml', 'yml'), '->supports() returns true if the resource with forced type is loadable');
-        $this->assertTrue($loader->supports('with_wrong_ext.xml', 'yaml'), '->supports() returns true if the resource with forced type is loadable');
+        self::assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
+        self::assertTrue($loader->supports('foo.yaml'), '->supports() returns true if the resource is loadable');
+        self::assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        self::assertTrue($loader->supports('with_wrong_ext.xml', 'yml'), '->supports() returns true if the resource with forced type is loadable');
+        self::assertTrue($loader->supports('with_wrong_ext.xml', 'yaml'), '->supports() returns true if the resource with forced type is loadable');
     }
 
     public function testNonArrayTagsThrowsException()
@@ -376,10 +376,10 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         try {
             $loader->load('badtag1.yml');
-            $this->fail('->load() should throw an exception when the tags key of a service is not an array');
+            self::fail('->load() should throw an exception when the tags key of a service is not an array');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tags key is not an array');
-            $this->assertStringStartsWith('Parameter "tags" must be an array for service', $e->getMessage(), '->load() throws an InvalidArgumentException if the tags key is not an array');
+            self::assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tags key is not an array');
+            self::assertStringStartsWith('Parameter "tags" must be an array for service', $e->getMessage(), '->load() throws an InvalidArgumentException if the tags key is not an array');
         }
     }
 
@@ -388,10 +388,10 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         try {
             $loader->load('badtag2.yml');
-            $this->fail('->load() should throw an exception when a tag is missing the name key');
+            self::fail('->load() should throw an exception when a tag is missing the name key');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
-            $this->assertStringStartsWith('A "tags" entry is missing a "name" key for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
+            self::assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
+            self::assertStringStartsWith('A "tags" entry is missing a "name" key for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
         }
     }
 
@@ -401,18 +401,18 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_with_tagged_argument.yml');
 
-        $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
-        $this->assertCount(1, $container->getDefinition('foo_service_tagged_iterator')->getArguments());
-        $this->assertCount(1, $container->getDefinition('foo_service_tagged_locator')->getArguments());
+        self::assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
+        self::assertCount(1, $container->getDefinition('foo_service_tagged_iterator')->getArguments());
+        self::assertCount(1, $container->getDefinition('foo_service_tagged_locator')->getArguments());
 
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
-        $this->assertEquals($taggedIterator, $container->getDefinition('foo_service_tagged_iterator')->getArgument(0));
+        self::assertEquals($taggedIterator, $container->getDefinition('foo_service_tagged_iterator')->getArgument(0));
 
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', true, 'getPriority');
-        $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_service_tagged_locator')->getArgument(0));
+        self::assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_service_tagged_locator')->getArgument(0));
 
         $taggedIterator = new TaggedIteratorArgument('foo', null, null, true);
-        $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
+        self::assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
     }
 
     public function testParseServiceClosure()
@@ -421,7 +421,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_with_service_closure.yml');
 
-        $this->assertEquals(new ServiceClosureArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)), $container->getDefinition('foo')->getArgument(0));
+        self::assertEquals(new ServiceClosureArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)), $container->getDefinition('foo')->getArgument(0));
     }
 
     public function testNameOnlyTagsAreAllowedAsString()
@@ -430,7 +430,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('tag_name_only.yml');
 
-        $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
+        self::assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
     }
 
     public function testTagWithAttributeArrayThrowsException()
@@ -438,10 +438,10 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         try {
             $loader->load('badtag3.yml');
-            $this->fail('->load() should throw an exception when a tag-attribute is not a scalar');
+            self::fail('->load() should throw an exception when a tag-attribute is not a scalar');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
-            $this->assertStringStartsWith('A "tags" attribute must be of a scalar-type for service "foo_service", tag "foo", attribute "bar"', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
+            self::assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
+            self::assertStringStartsWith('A "tags" attribute must be of a scalar-type for service "foo_service", tag "foo", attribute "bar"', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
         }
     }
 
@@ -452,23 +452,23 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services21.yml');
 
         $definition = $container->getDefinition('manager');
-        $this->assertEquals([['setLogger', [new Reference('logger')]], ['setClass', ['User']]], $definition->getMethodCalls());
-        $this->assertEquals([true], $definition->getArguments());
-        $this->assertEquals(['manager' => [['alias' => 'user']]], $definition->getTags());
+        self::assertEquals([['setLogger', [new Reference('logger')]], ['setClass', ['User']]], $definition->getMethodCalls());
+        self::assertEquals([true], $definition->getArguments());
+        self::assertEquals(['manager' => [['alias' => 'user']]], $definition->getTags());
     }
 
     public function testTagWithEmptyNameThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/The tag name for service ".+" in .+ must be a non-empty string/');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/The tag name for service ".+" in .+ must be a non-empty string/');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('tag_name_empty_string.yml');
     }
 
     public function testTagWithNonStringNameThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/The tag name for service ".+" in .+ must be a non-empty string/');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/The tag name for service ".+" in .+ must be a non-empty string/');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('tag_name_no_string.yml');
     }
@@ -481,10 +481,10 @@ class YamlFileLoaderTest extends TestCase
 
         $lazyDefinition = $container->getDefinition('lazy_context');
 
-        $this->assertEquals([new IteratorArgument(['k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')]), new IteratorArgument([])], $lazyDefinition->getArguments(), '->load() parses lazy arguments');
+        self::assertEquals([new IteratorArgument(['k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')]), new IteratorArgument([])], $lazyDefinition->getArguments(), '->load() parses lazy arguments');
 
         $message = 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getDefinition('deprecated_service')->getDeprecation('deprecated_service')['message']);
+        self::assertSame($message, $container->getDefinition('deprecated_service')->getDeprecation('deprecated_service')['message']);
     }
 
     public function testAutowire()
@@ -493,7 +493,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services23.yml');
 
-        $this->assertTrue($container->getDefinition('bar_service')->isAutowired());
+        self::assertTrue($container->getDefinition('bar_service')->isAutowired());
     }
 
     public function testClassFromId()
@@ -503,7 +503,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('class_from_id.yml');
         $container->compile();
 
-        $this->assertEquals(CaseSensitiveClass::class, $container->getDefinition(CaseSensitiveClass::class)->getClass());
+        self::assertEquals(CaseSensitiveClass::class, $container->getDefinition(CaseSensitiveClass::class)->getClass());
     }
 
     public function testPrototype()
@@ -514,12 +514,12 @@ class YamlFileLoaderTest extends TestCase
 
         $ids = array_keys($container->getDefinitions());
         sort($ids);
-        $this->assertSame([Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
+        self::assertSame([Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
 
         $resources = array_map('strval', $container->getResources());
 
         $fixturesDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR;
-        $this->assertContains((string) new FileResource($fixturesDir.'yaml'.\DIRECTORY_SEPARATOR.'services_prototype.yml'), $resources);
+        self::assertContains((string) new FileResource($fixturesDir.'yaml'.\DIRECTORY_SEPARATOR.'services_prototype.yml'), $resources);
 
         $prototypeRealPath = realpath(__DIR__.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Prototype');
         $globResource = new GlobResource(
@@ -532,9 +532,9 @@ class YamlFileLoaderTest extends TestCase
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'SinglyImplementedInterface') => true,
             ]
         );
-        $this->assertContains((string) $globResource, $resources);
-        $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo', $resources);
-        $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
+        self::assertContains((string) $globResource, $resources);
+        self::assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo', $resources);
+        self::assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
     public function testPrototypeWithNamespace()
@@ -546,7 +546,7 @@ class YamlFileLoaderTest extends TestCase
         $ids = array_keys($container->getDefinitions());
         sort($ids);
 
-        $this->assertSame([
+        self::assertSame([
             Prototype\OtherDir\Component1\Dir1\Service1::class,
             Prototype\OtherDir\Component1\Dir2\Service2::class,
             Prototype\OtherDir\Component2\Dir1\Service4::class,
@@ -554,21 +554,21 @@ class YamlFileLoaderTest extends TestCase
             'service_container',
         ], $ids);
 
-        $this->assertTrue($container->getDefinition(Prototype\OtherDir\Component1\Dir1\Service1::class)->hasTag('foo'));
-        $this->assertTrue($container->getDefinition(Prototype\OtherDir\Component2\Dir1\Service4::class)->hasTag('foo'));
-        $this->assertFalse($container->getDefinition(Prototype\OtherDir\Component1\Dir1\Service1::class)->hasTag('bar'));
-        $this->assertFalse($container->getDefinition(Prototype\OtherDir\Component2\Dir1\Service4::class)->hasTag('bar'));
+        self::assertTrue($container->getDefinition(Prototype\OtherDir\Component1\Dir1\Service1::class)->hasTag('foo'));
+        self::assertTrue($container->getDefinition(Prototype\OtherDir\Component2\Dir1\Service4::class)->hasTag('foo'));
+        self::assertFalse($container->getDefinition(Prototype\OtherDir\Component1\Dir1\Service1::class)->hasTag('bar'));
+        self::assertFalse($container->getDefinition(Prototype\OtherDir\Component2\Dir1\Service4::class)->hasTag('bar'));
 
-        $this->assertTrue($container->getDefinition(Prototype\OtherDir\Component1\Dir2\Service2::class)->hasTag('bar'));
-        $this->assertTrue($container->getDefinition(Prototype\OtherDir\Component2\Dir2\Service5::class)->hasTag('bar'));
-        $this->assertFalse($container->getDefinition(Prototype\OtherDir\Component1\Dir2\Service2::class)->hasTag('foo'));
-        $this->assertFalse($container->getDefinition(Prototype\OtherDir\Component2\Dir2\Service5::class)->hasTag('foo'));
+        self::assertTrue($container->getDefinition(Prototype\OtherDir\Component1\Dir2\Service2::class)->hasTag('bar'));
+        self::assertTrue($container->getDefinition(Prototype\OtherDir\Component2\Dir2\Service5::class)->hasTag('bar'));
+        self::assertFalse($container->getDefinition(Prototype\OtherDir\Component1\Dir2\Service2::class)->hasTag('foo'));
+        self::assertFalse($container->getDefinition(Prototype\OtherDir\Component2\Dir2\Service5::class)->hasTag('foo'));
     }
 
     public function testPrototypeWithNamespaceAndNoResource()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/A "resource" attribute must be set when the "namespace" attribute is set for service ".+" in .+/');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/A "resource" attribute must be set when the "namespace" attribute is set for service ".+" in .+/');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_prototype_namespace_without_resource.yml');
@@ -580,34 +580,34 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services28.yml');
 
-        $this->assertFalse($container->getDefinition('with_defaults')->isPublic());
-        $this->assertSame(['foo' => [[]]], $container->getDefinition('with_defaults')->getTags());
-        $this->assertTrue($container->getDefinition('with_defaults')->isAutowired());
-        $this->assertArrayNotHasKey('public', $container->getDefinition('with_defaults')->getChanges());
-        $this->assertArrayNotHasKey('autowire', $container->getDefinition('with_defaults')->getChanges());
+        self::assertFalse($container->getDefinition('with_defaults')->isPublic());
+        self::assertSame(['foo' => [[]]], $container->getDefinition('with_defaults')->getTags());
+        self::assertTrue($container->getDefinition('with_defaults')->isAutowired());
+        self::assertArrayNotHasKey('public', $container->getDefinition('with_defaults')->getChanges());
+        self::assertArrayNotHasKey('autowire', $container->getDefinition('with_defaults')->getChanges());
 
-        $this->assertFalse($container->getAlias('with_defaults_aliased')->isPublic());
-        $this->assertFalse($container->getAlias('with_defaults_aliased_short')->isPublic());
+        self::assertFalse($container->getAlias('with_defaults_aliased')->isPublic());
+        self::assertFalse($container->getAlias('with_defaults_aliased_short')->isPublic());
 
-        $this->assertFalse($container->getDefinition('Acme\WithShortCutArgs')->isPublic());
-        $this->assertSame(['foo' => [[]]], $container->getDefinition('Acme\WithShortCutArgs')->getTags());
-        $this->assertTrue($container->getDefinition('Acme\WithShortCutArgs')->isAutowired());
+        self::assertFalse($container->getDefinition('Acme\WithShortCutArgs')->isPublic());
+        self::assertSame(['foo' => [[]]], $container->getDefinition('Acme\WithShortCutArgs')->getTags());
+        self::assertTrue($container->getDefinition('Acme\WithShortCutArgs')->isAutowired());
 
         $container->compile();
 
-        $this->assertTrue($container->getDefinition('with_null')->isPublic());
-        $this->assertTrue($container->getDefinition('no_defaults')->isPublic());
+        self::assertTrue($container->getDefinition('with_null')->isPublic());
+        self::assertTrue($container->getDefinition('no_defaults')->isPublic());
 
         // foo tag is inherited from defaults
-        $this->assertSame(['foo' => [[]]], $container->getDefinition('with_null')->getTags());
-        $this->assertSame(['foo' => [[]]], $container->getDefinition('no_defaults')->getTags());
+        self::assertSame(['foo' => [[]]], $container->getDefinition('with_null')->getTags());
+        self::assertSame(['foo' => [[]]], $container->getDefinition('no_defaults')->getTags());
 
-        $this->assertTrue($container->getDefinition('with_null')->isAutowired());
-        $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());
+        self::assertTrue($container->getDefinition('with_null')->isAutowired());
+        self::assertFalse($container->getDefinition('no_defaults')->isAutowired());
 
-        $this->assertTrue($container->getDefinition('child_def')->isPublic());
-        $this->assertSame(['foo' => [[]]], $container->getDefinition('child_def')->getTags());
-        $this->assertFalse($container->getDefinition('child_def')->isAutowired());
+        self::assertTrue($container->getDefinition('child_def')->isPublic());
+        self::assertSame(['foo' => [[]]], $container->getDefinition('child_def')->getTags());
+        self::assertFalse($container->getDefinition('child_def')->isAutowired());
     }
 
     public function testNamedArguments()
@@ -616,14 +616,14 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_named_args.yml');
 
-        $this->assertEquals([null, '$apiKey' => 'ABCD'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
-        $this->assertEquals(['$apiKey' => 'ABCD', CaseSensitiveClass::class => null], $container->getDefinition('another_one')->getArguments());
+        self::assertEquals([null, '$apiKey' => 'ABCD'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+        self::assertEquals(['$apiKey' => 'ABCD', CaseSensitiveClass::class => null], $container->getDefinition('another_one')->getArguments());
 
         $container->compile();
 
-        $this->assertEquals([null, 'ABCD'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
-        $this->assertEquals([null, 'ABCD'], $container->getDefinition('another_one')->getArguments());
-        $this->assertEquals([['setApiKey', ['123']]], $container->getDefinition('another_one')->getMethodCalls());
+        self::assertEquals([null, 'ABCD'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+        self::assertEquals([null, 'ABCD'], $container->getDefinition('another_one')->getArguments());
+        self::assertEquals([['setApiKey', ['123']]], $container->getDefinition('another_one')->getMethodCalls());
     }
 
     public function testInstanceof()
@@ -634,9 +634,9 @@ class YamlFileLoaderTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition(Bar::class);
-        $this->assertTrue($definition->isAutowired());
-        $this->assertTrue($definition->isLazy());
-        $this->assertSame(['foo' => [[]], 'bar' => [[]]], $definition->getTags());
+        self::assertTrue($definition->isAutowired());
+        self::assertTrue($definition->isLazy());
+        self::assertSame(['foo' => [[]], 'bar' => [[]]], $definition->getTags());
     }
 
     public function testInstanceOfAndChildDefinition()
@@ -646,7 +646,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_instanceof_with_parent.yml');
         $container->compile();
 
-        $this->assertTrue($container->getDefinition('child_service')->isAutowired());
+        self::assertTrue($container->getDefinition('child_service')->isAutowired());
     }
 
     public function testAutoConfigureAndChildDefinition()
@@ -656,7 +656,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_autoconfigure_with_parent.yml');
         $container->compile();
 
-        $this->assertTrue($container->getDefinition('child_service')->isAutoconfigured());
+        self::assertTrue($container->getDefinition('child_service')->isAutoconfigured());
     }
 
     public function testDefaultsAndChildDefinition()
@@ -666,45 +666,45 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_defaults_with_parent.yml');
         $container->compile();
 
-        $this->assertTrue($container->getDefinition('child_service')->isAutowired());
+        self::assertTrue($container->getDefinition('child_service')->isAutowired());
     }
 
     public function testChildDefinitionWithWrongSyntaxThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The value of the "parent" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The value of the "parent" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_parent.yml');
     }
 
     public function testDecoratedServicesWithWrongSyntaxThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The value of the "decorates" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The value of the "decorates" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_decorates.yml');
     }
 
     public function testDecoratedServicesWithWrongOnInvalidSyntaxThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Did you mean null (without quotes)');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Did you mean null (without quotes)');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_decoration_on_invalid_null.yml');
     }
 
     public function testInvalidTagsWithDefaults()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Parameter "tags" must be an array for service "Foo\\\Bar" in ".+services31_invalid_tags\.yml"\. Check your YAML syntax./');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/Parameter "tags" must be an array for service "Foo\\\Bar" in ".+services31_invalid_tags\.yml"\. Check your YAML syntax./');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services31_invalid_tags.yml');
     }
 
     public function testUnderscoreServiceId()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service names that start with an underscore are reserved. Rename the "_foo" service or define it in XML instead.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Service names that start with an underscore are reserved. Rename the "_foo" service or define it in XML instead.');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_underscore.yml');
@@ -717,32 +717,32 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('anonymous_services.yml');
 
         $definition = $container->getDefinition('Foo');
-        $this->assertTrue($definition->isAutowired());
+        self::assertTrue($definition->isAutowired());
 
         // Anonymous service in an argument
         $args = $definition->getArguments();
-        $this->assertCount(1, $args);
-        $this->assertInstanceOf(Reference::class, $args[0]);
-        $this->assertTrue($container->has((string) $args[0]));
-        $this->assertMatchesRegularExpression('/^\.\d+_Bar~[._A-Za-z0-9]{7}$/', (string) $args[0]);
+        self::assertCount(1, $args);
+        self::assertInstanceOf(Reference::class, $args[0]);
+        self::assertTrue($container->has((string) $args[0]));
+        self::assertMatchesRegularExpression('/^\.\d+_Bar~[._A-Za-z0-9]{7}$/', (string) $args[0]);
 
         $anonymous = $container->getDefinition((string) $args[0]);
-        $this->assertEquals('Bar', $anonymous->getClass());
-        $this->assertFalse($anonymous->isPublic());
-        $this->assertTrue($anonymous->isAutowired());
+        self::assertEquals('Bar', $anonymous->getClass());
+        self::assertFalse($anonymous->isPublic());
+        self::assertTrue($anonymous->isAutowired());
 
         // Anonymous service in a callable
         $factory = $definition->getFactory();
-        $this->assertIsArray($factory);
-        $this->assertInstanceOf(Reference::class, $factory[0]);
-        $this->assertTrue($container->has((string) $factory[0]));
-        $this->assertMatchesRegularExpression('/^\.\d+_Quz~[._A-Za-z0-9]{7}$/', (string) $factory[0]);
-        $this->assertEquals('constructFoo', $factory[1]);
+        self::assertIsArray($factory);
+        self::assertInstanceOf(Reference::class, $factory[0]);
+        self::assertTrue($container->has((string) $factory[0]));
+        self::assertMatchesRegularExpression('/^\.\d+_Quz~[._A-Za-z0-9]{7}$/', (string) $factory[0]);
+        self::assertEquals('constructFoo', $factory[1]);
 
         $anonymous = $container->getDefinition((string) $factory[0]);
-        $this->assertEquals('Quz', $anonymous->getClass());
-        $this->assertFalse($anonymous->isPublic());
-        $this->assertFalse($anonymous->isAutowired());
+        self::assertEquals('Quz', $anonymous->getClass());
+        self::assertFalse($anonymous->isPublic());
+        self::assertFalse($anonymous->isAutowired());
     }
 
     public function testAnonymousServicesInDifferentFilesWithSameNameDoNotConflict()
@@ -755,7 +755,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml/bar'));
         $loader->load('services.yml');
 
-        $this->assertCount(5, $container->getDefinitions());
+        self::assertCount(5, $container->getDefinitions());
     }
 
     public function testAnonymousServicesInInstanceof()
@@ -767,26 +767,26 @@ class YamlFileLoaderTest extends TestCase
         $definition = $container->getDefinition('Dummy');
 
         $instanceof = $definition->getInstanceofConditionals();
-        $this->assertCount(3, $instanceof);
-        $this->assertArrayHasKey('DummyInterface', $instanceof);
+        self::assertCount(3, $instanceof);
+        self::assertArrayHasKey('DummyInterface', $instanceof);
 
         $args = $instanceof['DummyInterface']->getProperties();
-        $this->assertCount(1, $args);
-        $this->assertInstanceOf(Reference::class, $args['foo']);
-        $this->assertTrue($container->has((string) $args['foo']));
+        self::assertCount(1, $args);
+        self::assertInstanceOf(Reference::class, $args['foo']);
+        self::assertTrue($container->has((string) $args['foo']));
 
         $anonymous = $container->getDefinition((string) $args['foo']);
-        $this->assertEquals('Anonymous', $anonymous->getClass());
-        $this->assertFalse($anonymous->isPublic());
-        $this->assertEmpty($anonymous->getInstanceofConditionals());
+        self::assertEquals('Anonymous', $anonymous->getClass());
+        self::assertFalse($anonymous->isPublic());
+        self::assertEmpty($anonymous->getInstanceofConditionals());
 
-        $this->assertFalse($container->has('Bar'));
+        self::assertFalse($container->has('Bar'));
     }
 
     public function testAnonymousServicesWithAliases()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Creating an alias using the tag "!service" is not allowed in ".+anonymous_services_alias\.yml"\./');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/Creating an alias using the tag "!service" is not allowed in ".+anonymous_services_alias\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('anonymous_services_alias.yml');
@@ -794,8 +794,8 @@ class YamlFileLoaderTest extends TestCase
 
     public function testAnonymousServicesInParameters()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Using an anonymous service in a parameter is not allowed in ".+anonymous_services_in_parameters\.yml"\./');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/Using an anonymous service in a parameter is not allowed in ".+anonymous_services_in_parameters\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('anonymous_services_in_parameters.yml');
@@ -807,14 +807,14 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_autoconfigure.yml');
 
-        $this->assertTrue($container->getDefinition('use_defaults_settings')->isAutoconfigured());
-        $this->assertFalse($container->getDefinition('override_defaults_settings_to_false')->isAutoconfigured());
+        self::assertTrue($container->getDefinition('use_defaults_settings')->isAutoconfigured());
+        self::assertFalse($container->getDefinition('override_defaults_settings_to_false')->isAutoconfigured());
     }
 
     public function testEmptyDefaultsThrowsClearException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Service "_defaults" key must be an array, "null" given in ".+bad_empty_defaults\.yml"\./');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/Service "_defaults" key must be an array, "null" given in ".+bad_empty_defaults\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_empty_defaults.yml');
@@ -822,8 +822,8 @@ class YamlFileLoaderTest extends TestCase
 
     public function testEmptyInstanceofThrowsClearException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Service "_instanceof" key must be an array, "null" given in ".+bad_empty_instanceof\.yml"\./');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/Service "_instanceof" key must be an array, "null" given in ".+bad_empty_instanceof\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_empty_instanceof.yml');
@@ -831,8 +831,8 @@ class YamlFileLoaderTest extends TestCase
 
     public function testUnsupportedKeywordThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/^The configuration key "private" is unsupported for definition "bar"/');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/^The configuration key "private" is unsupported for definition "bar"/');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_keyword.yml');
@@ -840,8 +840,8 @@ class YamlFileLoaderTest extends TestCase
 
     public function testUnsupportedKeywordInServiceAliasThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/^The configuration key "calls" is unsupported for the service "bar" which is defined as an alias/');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/^The configuration key "calls" is unsupported for the service "bar" which is defined as an alias/');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_alias.yml');
@@ -854,12 +854,12 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_case.yml');
         $container->compile();
 
-        $this->assertTrue($container->has('bar'));
-        $this->assertTrue($container->has('BAR'));
-        $this->assertFalse($container->has('baR'));
-        $this->assertNotSame($container->get('BAR'), $container->get('bar'));
-        $this->assertSame($container->get('BAR')->arguments->bar, $container->get('bar'));
-        $this->assertSame($container->get('BAR')->bar, $container->get('bar'));
+        self::assertTrue($container->has('bar'));
+        self::assertTrue($container->has('BAR'));
+        self::assertFalse($container->has('baR'));
+        self::assertNotSame($container->get('BAR'), $container->get('bar'));
+        self::assertSame($container->get('BAR')->arguments->bar, $container->get('bar'));
+        self::assertSame($container->get('BAR')->bar, $container->get('bar'));
     }
 
     public function testBindings()
@@ -870,7 +870,7 @@ class YamlFileLoaderTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition('bar');
-        $this->assertEquals([
+        self::assertEquals([
             'NonExistent' => null,
             BarInterface::class => new Reference(Bar::class),
             '$foo' => [null],
@@ -878,7 +878,7 @@ class YamlFileLoaderTest extends TestCase
             '$factory' => 'factory',
             'iterable $baz' => new TaggedIteratorArgument('bar'),
         ], array_map(function (BoundArgument $v) { return $v->getValues()[0]; }, $definition->getBindings()));
-        $this->assertEquals([
+        self::assertEquals([
             'quz',
             null,
             new Reference(Bar::class),
@@ -887,11 +887,11 @@ class YamlFileLoaderTest extends TestCase
         ], $definition->getArguments());
 
         $definition = $container->getDefinition(Bar::class);
-        $this->assertEquals([
+        self::assertEquals([
             null,
             'factory',
         ], $definition->getArguments());
-        $this->assertEquals([
+        self::assertEquals([
             'NonExistent' => null,
             '$quz' => 'quz',
             '$factory' => 'factory',
@@ -900,8 +900,8 @@ class YamlFileLoaderTest extends TestCase
 
     public function testProcessNotExistingActionParam()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Cannot autowire service "Symfony\Component\DependencyInjection\Tests\Fixtures\ConstructNotExists": argument "$notExist" of method "__construct()" has type "Symfony\Component\DependencyInjection\Tests\Fixtures\NotExist" but this class was not found.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Cannot autowire service "Symfony\Component\DependencyInjection\Tests\Fixtures\ConstructNotExists": argument "$notExist" of method "__construct()" has type "Symfony\Component\DependencyInjection\Tests\Fixtures\NotExist" but this class was not found.');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_not_existing.yml');
@@ -915,7 +915,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_lazy_fqcn.yml');
 
         $definition = $container->getDefinition('foo');
-        $this->assertSame([['interface' => 'SomeInterface']], $definition->getTag('proxy'));
+        self::assertSame([['interface' => 'SomeInterface']], $definition->getTag('proxy'));
     }
 
     public function testServiceWithSameNameAsInterfaceAndFactoryIsNotTagged()
@@ -926,7 +926,7 @@ class YamlFileLoaderTest extends TestCase
         $container->compile();
 
         $tagged = $container->findTaggedServiceIds('bar');
-        $this->assertCount(1, $tagged);
+        self::assertCount(1, $tagged);
     }
 
     /**
@@ -942,7 +942,7 @@ class YamlFileLoaderTest extends TestCase
 
         (new ResolveBindingsPass())->process($container);
 
-        $this->assertSame('overridden', $container->get('bar')->quz);
+        self::assertSame('overridden', $container->get('bar')->quz);
     }
 
     /**
@@ -955,8 +955,8 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('tagged_iterator_optional.yml');
 
         $iteratorArgument = $container->getDefinition('iterator_service')->getArgument(0);
-        $this->assertInstanceOf(TaggedIteratorArgument::class, $iteratorArgument);
-        $this->assertNull($iteratorArgument->getIndexAttribute());
+        self::assertInstanceOf(TaggedIteratorArgument::class, $iteratorArgument);
+        self::assertNull($iteratorArgument->getIndexAttribute());
     }
 
     /**
@@ -970,7 +970,7 @@ class YamlFileLoaderTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition(FooClassWithEnumAttribute::class);
-        $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
+        self::assertSame([FooUnitEnum::BAR], $definition->getArguments());
     }
 
     /**
@@ -981,8 +981,8 @@ class YamlFileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The constant "Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAZ" is not defined');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The constant "Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAZ" is not defined');
         $loader->load('services_with_invalid_enumeration.yml');
     }
 
@@ -996,7 +996,7 @@ class YamlFileLoaderTest extends TestCase
             ['bar', [1], true],
             ['bar', [2], true],
         ];
-        $this->assertSame($expected, $container->getDefinition('foo')->getMethodCalls());
+        self::assertSame($expected, $container->getDefinition('foo')->getMethodCalls());
     }
 
     public function testSinglyImplementedInterfacesInMultipleResources()
@@ -1008,7 +1008,7 @@ class YamlFileLoaderTest extends TestCase
 
         $alias = $container->getAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class);
 
-        $this->assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
+        self::assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
     }
 
     public function testNotSinglyImplementedInterfacesInMultipleResources()
@@ -1018,7 +1018,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('not_singly_implemented_interface_in_multiple_resources.yml');
 
-        $this->assertFalse($container->hasAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class));
+        self::assertFalse($container->hasAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class));
     }
 
     public function testNotSinglyImplementedInterfacesInMultipleResourcesWithPreviouslyRegisteredAlias()
@@ -1030,7 +1030,7 @@ class YamlFileLoaderTest extends TestCase
 
         $alias = $container->getAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class);
 
-        $this->assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
+        self::assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
     }
 
     public function testNotSinglyImplementedInterfacesInMultipleResourcesWithPreviouslyRegisteredAlias2()
@@ -1042,7 +1042,7 @@ class YamlFileLoaderTest extends TestCase
 
         $alias = $container->getAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class);
 
-        $this->assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
+        self::assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
     }
 
     public function testAlternativeMethodCalls()
@@ -1058,7 +1058,7 @@ class YamlFileLoaderTest extends TestCase
             ['method', ['url']],
         ];
 
-        $this->assertSame($expected, $container->getDefinition('foo')->getMethodCalls());
+        self::assertSame($expected, $container->getDefinition('foo')->getMethodCalls());
     }
 
     public function testStack()
@@ -1068,7 +1068,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('stack.yaml');
 
-        $this->assertSame([1, 2], $container->getDefinition('stack_short')->getArguments()[0]->getArguments());
+        self::assertSame([1, 2], $container->getDefinition('stack_short')->getArguments()[0]->getArguments());
 
         $container->compile();
 
@@ -1081,24 +1081,24 @@ class YamlFileLoaderTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $container->get('stack_a'));
-        $this->assertEquals($expected, $container->get('stack_b'));
+        self::assertEquals($expected, $container->get('stack_a'));
+        self::assertEquals($expected, $container->get('stack_b'));
 
         $expected = (object) [
             'label' => 'Z',
             'inner' => $expected,
         ];
-        $this->assertEquals($expected, $container->get('stack_c'));
+        self::assertEquals($expected, $container->get('stack_c'));
 
         $expected = $expected->inner;
         $expected->label = 'Z';
-        $this->assertEquals($expected, $container->get('stack_d'));
+        self::assertEquals($expected, $container->get('stack_d'));
 
         $expected = (object) [
             'label' => 'Y',
             'inner' => $expected,
         ];
-        $this->assertEquals($expected, $container->get('stack_e'));
+        self::assertEquals($expected, $container->get('stack_e'));
     }
 
     public function testWhenEnv()
@@ -1107,6 +1107,6 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'some-env');
         $loader->load('when-env.yaml');
 
-        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
+        self::assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
     }
 }

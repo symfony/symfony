@@ -25,8 +25,8 @@ class ValidValidatorTest extends TestCase
 
         $violations = $validator->validate(new Foo(), null, ['nested']);
 
-        $this->assertCount(1, $violations);
-        $this->assertSame('fooBar.fooBarBaz.foo', $violations->get(0)->getPropertyPath());
+        self::assertCount(1, $violations);
+        self::assertSame('fooBar.fooBarBaz.foo', $violations->get(0)->getPropertyPath());
     }
 
     public function testNullValues()
@@ -38,7 +38,7 @@ class ValidValidatorTest extends TestCase
         $foo->fooBar = null;
         $violations = $validator->validate($foo, null, ['nested']);
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     protected function createValidator()

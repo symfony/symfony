@@ -26,7 +26,7 @@ final class MessageBirdTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new MessageBirdTransport('token', 'from', $client ?? $this->createMock(HttpClientInterface::class));
+        return new MessageBirdTransport('token', 'from', $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -42,6 +42,6 @@ final class MessageBirdTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

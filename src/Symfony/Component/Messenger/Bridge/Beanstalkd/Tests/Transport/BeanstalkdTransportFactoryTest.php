@@ -23,18 +23,15 @@ final class BeanstalkdTransportFactoryTest extends TestCase
     {
         $factory = new BeanstalkdTransportFactory();
 
-        $this->assertTrue($factory->supports('beanstalkd://127.0.0.1', []));
-        $this->assertFalse($factory->supports('doctrine://127.0.0.1', []));
+        self::assertTrue($factory->supports('beanstalkd://127.0.0.1', []));
+        self::assertFalse($factory->supports('doctrine://127.0.0.1', []));
     }
 
     public function testCreateTransport()
     {
         $factory = new BeanstalkdTransportFactory();
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
 
-        $this->assertEquals(
-            new BeanstalkdTransport(Connection::fromDsn('beanstalkd://127.0.0.1'), $serializer),
-            $factory->createTransport('beanstalkd://127.0.0.1', [], $serializer)
-        );
+        self::assertEquals(new BeanstalkdTransport(Connection::fromDsn('beanstalkd://127.0.0.1'), $serializer), $factory->createTransport('beanstalkd://127.0.0.1', [], $serializer));
     }
 }

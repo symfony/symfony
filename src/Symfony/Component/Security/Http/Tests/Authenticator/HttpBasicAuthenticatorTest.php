@@ -32,10 +32,10 @@ class HttpBasicAuthenticatorTest extends TestCase
     protected function setUp(): void
     {
         $this->userProvider = new InMemoryUserProvider();
-        $this->hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $this->hasher = $this->createMock(PasswordHasherInterface::class);
+        $this->hasherFactory = self::createMock(PasswordHasherFactoryInterface::class);
+        $this->hasher = self::createMock(PasswordHasherInterface::class);
         $this->hasherFactory
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPasswordHasher')
             ->willReturn($this->hasher);
 
@@ -52,9 +52,9 @@ class HttpBasicAuthenticatorTest extends TestCase
         $this->userProvider->createUser($user = new InMemoryUser('TheUsername', 'ThePassword'));
 
         $passport = $this->authenticator->authenticate($request);
-        $this->assertEquals('ThePassword', $passport->getBadge(PasswordCredentials::class)->getPassword());
+        self::assertEquals('ThePassword', $passport->getBadge(PasswordCredentials::class)->getPassword());
 
-        $this->assertTrue($user->isEqualTo($passport->getUser()));
+        self::assertTrue($user->isEqualTo($passport->getUser()));
     }
 
     /**
@@ -64,7 +64,7 @@ class HttpBasicAuthenticatorTest extends TestCase
     {
         $request = new Request([], [], [], [], [], $serverParameters);
 
-        $this->assertFalse($this->authenticator->supports($request));
+        self::assertFalse($this->authenticator->supports($request));
     }
 
     public function provideMissingHttpBasicServerParameters()
@@ -87,8 +87,8 @@ class HttpBasicAuthenticatorTest extends TestCase
         $authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
 
         $passport = $authenticator->authenticate($request);
-        $this->assertTrue($passport->hasBadge(PasswordUpgradeBadge::class));
+        self::assertTrue($passport->hasBadge(PasswordUpgradeBadge::class));
         $badge = $passport->getBadge(PasswordUpgradeBadge::class);
-        $this->assertEquals('ThePassword', $badge->getAndErasePlaintextPassword());
+        self::assertEquals('ThePassword', $badge->getAndErasePlaintextPassword());
     }
 }

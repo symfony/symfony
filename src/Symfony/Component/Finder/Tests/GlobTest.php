@@ -19,10 +19,10 @@ class GlobTest extends TestCase
 {
     public function testGlobToRegexDelimiters()
     {
-        $this->assertEquals('#^(?=[^\.])\#$#', Glob::toRegex('#'));
-        $this->assertEquals('#^\.[^/]*$#', Glob::toRegex('.*'));
-        $this->assertEquals('^\.[^/]*$', Glob::toRegex('.*', true, true, ''));
-        $this->assertEquals('/^\.[^/]*$/', Glob::toRegex('.*', true, true, '/'));
+        self::assertEquals('#^(?=[^\.])\#$#', Glob::toRegex('#'));
+        self::assertEquals('#^\.[^/]*$#', Glob::toRegex('.*'));
+        self::assertEquals('^\.[^/]*$', Glob::toRegex('.*', true, true, ''));
+        self::assertEquals('/^\.[^/]*$/', Glob::toRegex('.*', true, true, '/'));
     }
 
     public function testGlobToRegexDoubleStarStrictDots()
@@ -39,7 +39,7 @@ class GlobTest extends TestCase
         }
         sort($match);
 
-        $this->assertSame(['one/b/c.neon', 'one/b/d.neon'], $match);
+        self::assertSame(['one/b/c.neon', 'one/b/d.neon'], $match);
     }
 
     public function testGlobToRegexDoubleStarNonStrictDots()
@@ -56,7 +56,7 @@ class GlobTest extends TestCase
         }
         sort($match);
 
-        $this->assertSame(['.dot/b/c.neon', '.dot/b/d.neon', 'one/b/c.neon', 'one/b/d.neon'], $match);
+        self::assertSame(['.dot/b/c.neon', '.dot/b/d.neon', 'one/b/c.neon', 'one/b/d.neon'], $match);
     }
 
     public function testGlobToRegexDoubleStarWithoutLeadingSlash()
@@ -73,7 +73,7 @@ class GlobTest extends TestCase
         }
         sort($match);
 
-        $this->assertSame(['one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'], $match);
+        self::assertSame(['one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'], $match);
     }
 
     public function testGlobToRegexDoubleStarWithoutLeadingSlashNotStrictLeadingDot()
@@ -90,6 +90,6 @@ class GlobTest extends TestCase
         }
         sort($match);
 
-        $this->assertSame(['one/.dot', 'one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'], $match);
+        self::assertSame(['one/.dot', 'one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'], $match);
     }
 }

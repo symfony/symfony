@@ -28,7 +28,7 @@ final class ApplicationDescriptionTest extends TestCase
             $application->add(new Command($name));
         }
 
-        $this->assertSame($expected, array_keys((new ApplicationDescription($application))->getNamespaces()));
+        self::assertSame($expected, array_keys((new ApplicationDescription($application))->getNamespaces()));
     }
 
     public function getNamespacesProvider()

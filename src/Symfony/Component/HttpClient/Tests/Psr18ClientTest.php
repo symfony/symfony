@@ -35,12 +35,12 @@ class Psr18ClientTest extends TestCase
 
         $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:8057'));
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('application/json', $response->getHeaderLine('content-type'));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $body = json_decode((string) $response->getBody(), true);
 
-        $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
+        self::assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }
 
     public function testPostRequest()
@@ -54,7 +54,7 @@ class Psr18ClientTest extends TestCase
         $response = $client->sendRequest($request);
         $body = json_decode((string) $response->getBody(), true);
 
-        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
+        self::assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
     }
 
     public function testNetworkException()
@@ -62,7 +62,7 @@ class Psr18ClientTest extends TestCase
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
 
-        $this->expectException(Psr18NetworkException::class);
+        self::expectException(Psr18NetworkException::class);
         $client->sendRequest($factory->createRequest('GET', 'http://localhost:8058'));
     }
 
@@ -71,7 +71,7 @@ class Psr18ClientTest extends TestCase
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
 
-        $this->expectException(Psr18RequestException::class);
+        self::expectException(Psr18RequestException::class);
         $client->sendRequest($factory->createRequest('BAD.METHOD', 'http://localhost:8057'));
     }
 
@@ -81,7 +81,7 @@ class Psr18ClientTest extends TestCase
         $client = new Psr18Client(new NativeHttpClient());
 
         $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:8057/404'));
-        $this->assertSame(404, $response->getStatusCode());
+        self::assertSame(404, $response->getStatusCode());
     }
 
     public function testInvalidHeaderResponse()
@@ -92,13 +92,13 @@ class Psr18ClientTest extends TestCase
             'Cache-Control' => 'no-cache',
         ];
         $response = new MockResponse('body', ['response_headers' => $responseHeaders]);
-        $this->assertArrayHasKey(' x-xss-protection', $response->getHeaders());
+        self::assertArrayHasKey(' x-xss-protection', $response->getHeaders());
 
         $client = new Psr18Client(new MockHttpClient($response));
         $request = $client->createRequest('POST', 'http://localhost:8057/post')
             ->withBody($client->createStream('foo=0123456789'));
 
         $resultResponse = $client->sendRequest($request);
-        $this->assertCount(1, $resultResponse->getHeaders());
+        self::assertCount(1, $resultResponse->getHeaders());
     }
 }

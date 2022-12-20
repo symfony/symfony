@@ -49,9 +49,9 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->registerClient('http_client2', $httpClient2);
         $sut->registerClient('http_client3', $httpClient3);
-        $this->assertEquals(0, $sut->getRequestCount());
+        self::assertEquals(0, $sut->getRequestCount());
         $sut->collect(new Request(), new Response());
-        $this->assertEquals(3, $sut->getRequestCount());
+        self::assertEquals(3, $sut->getRequestCount());
     }
 
     public function testItCollectsErrorCount()
@@ -78,9 +78,9 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->registerClient('http_client2', $httpClient2);
         $sut->registerClient('http_client3', $httpClient3);
-        $this->assertEquals(0, $sut->getErrorCount());
+        self::assertEquals(0, $sut->getErrorCount());
         $sut->collect(new Request(), new Response());
-        $this->assertEquals(1, $sut->getErrorCount());
+        self::assertEquals(1, $sut->getErrorCount());
     }
 
     public function testItCollectsErrorCountByClient()
@@ -107,12 +107,12 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->registerClient('http_client2', $httpClient2);
         $sut->registerClient('http_client3', $httpClient3);
-        $this->assertEquals([], $sut->getClients());
+        self::assertEquals([], $sut->getClients());
         $sut->collect(new Request(), new Response());
         $collectedData = $sut->getClients();
-        $this->assertEquals(0, $collectedData['http_client1']['error_count']);
-        $this->assertEquals(1, $collectedData['http_client2']['error_count']);
-        $this->assertEquals(0, $collectedData['http_client3']['error_count']);
+        self::assertEquals(0, $collectedData['http_client1']['error_count']);
+        self::assertEquals(1, $collectedData['http_client2']['error_count']);
+        self::assertEquals(0, $collectedData['http_client3']['error_count']);
     }
 
     public function testItCollectsTracesByClient()
@@ -139,12 +139,12 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->registerClient('http_client2', $httpClient2);
         $sut->registerClient('http_client3', $httpClient3);
-        $this->assertEquals([], $sut->getClients());
+        self::assertEquals([], $sut->getClients());
         $sut->collect(new Request(), new Response());
         $collectedData = $sut->getClients();
-        $this->assertCount(2, $collectedData['http_client1']['traces']);
-        $this->assertCount(1, $collectedData['http_client2']['traces']);
-        $this->assertCount(0, $collectedData['http_client3']['traces']);
+        self::assertCount(2, $collectedData['http_client1']['traces']);
+        self::assertCount(1, $collectedData['http_client2']['traces']);
+        self::assertCount(0, $collectedData['http_client3']['traces']);
     }
 
     public function testItIsEmptyAfterReset()
@@ -159,11 +159,11 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->collect(new Request(), new Response());
         $collectedData = $sut->getClients();
-        $this->assertCount(1, $collectedData['http_client1']['traces']);
+        self::assertCount(1, $collectedData['http_client1']['traces']);
         $sut->reset();
-        $this->assertEquals([], $sut->getClients());
-        $this->assertEquals(0, $sut->getErrorCount());
-        $this->assertEquals(0, $sut->getRequestCount());
+        self::assertEquals([], $sut->getClients());
+        self::assertEquals(0, $sut->getErrorCount());
+        self::assertEquals(0, $sut->getRequestCount());
     }
 
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient

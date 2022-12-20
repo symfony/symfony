@@ -31,8 +31,8 @@ class FormDataPartTest extends TestCase
             'bar' => clone $b,
             'baz' => clone $c,
         ]);
-        $this->assertEquals('multipart', $f->getMediaType());
-        $this->assertEquals('form-data', $f->getMediaSubtype());
+        self::assertEquals('multipart', $f->getMediaType());
+        self::assertEquals('form-data', $f->getMediaSubtype());
         $t = new TextPart($content, 'utf-8', 'plain', '8bit');
         $t->setDisposition('form-data');
         $t->setName('foo');
@@ -45,7 +45,7 @@ class FormDataPartTest extends TestCase
         $c->setName('baz');
         $c->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
         $r->setValue($c, '8bit');
-        $this->assertEquals([$t, $b, $c], $f->getParts());
+        self::assertEquals([$t, $b, $c], $f->getParts());
     }
 
     public function testNestedArrayParts()
@@ -95,8 +95,8 @@ class FormDataPartTest extends TestCase
             ['0[1]' => clone $p1],
         ]);
 
-        $this->assertEquals('multipart', $f->getMediaType());
-        $this->assertEquals('form-data', $f->getMediaSubtype());
+        self::assertEquals('multipart', $f->getMediaType());
+        self::assertEquals('form-data', $f->getMediaSubtype());
 
         $parts = [];
 
@@ -162,7 +162,7 @@ class FormDataPartTest extends TestCase
         $parts[] = $p19 = clone $p1;
         $p19->setName('0[1]');
 
-        $this->assertEquals($parts, $f->getParts());
+        self::assertEquals($parts, $f->getParts());
     }
 
     public function testExceptionOnFormFieldsWithIntegerKeysAndMultipleValues()
@@ -175,8 +175,8 @@ class FormDataPartTest extends TestCase
             ],
         ]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Form field values with integer keys can only have one array element, the key being the field name and the value being the field value, 2 provided.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Form field values with integer keys can only have one array element, the key being the field name and the value being the field value, 2 provided.');
 
         $f->getParts();
     }
@@ -184,7 +184,7 @@ class FormDataPartTest extends TestCase
     public function testToString()
     {
         $p = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
-        $this->assertEquals(base64_encode(file_get_contents($file)), $p->bodyToString());
+        self::assertEquals(base64_encode(file_get_contents($file)), $p->bodyToString());
     }
 
     public function testContentLineLength()
@@ -194,8 +194,8 @@ class FormDataPartTest extends TestCase
             'bar' => $bar = str_repeat('bar', 1000),
         ]);
         $parts = $f->getParts();
-        $this->assertEquals($foo, $parts[0]->bodyToString());
-        $this->assertEquals($bar, $parts[1]->bodyToString());
+        self::assertEquals($foo, $parts[0]->bodyToString());
+        self::assertEquals($bar, $parts[1]->bodyToString());
     }
 
     public function testBoundaryContentTypeHeader()
@@ -204,9 +204,6 @@ class FormDataPartTest extends TestCase
             'file' => new DataPart('data.csv', 'data.csv', 'text/csv'),
         ]);
         $headers = $f->getPreparedHeaders()->toArray();
-        $this->assertMatchesRegularExpression(
-            '/^Content-Type: multipart\/form-data; boundary=[a-zA-Z0-9\-_]{8}$/',
-            $headers[0]
-        );
+        self::assertMatchesRegularExpression('/^Content-Type: multipart\/form-data; boundary=[a-zA-Z0-9\-_]{8}$/', $headers[0]);
     }
 }

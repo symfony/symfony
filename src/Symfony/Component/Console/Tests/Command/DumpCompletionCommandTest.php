@@ -25,7 +25,7 @@ class DumpCompletionCommandTest extends TestCase
         $tester = new CommandCompletionTester(new DumpCompletionCommand());
         $suggestions = $tester->complete($input);
 
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()

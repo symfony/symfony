@@ -22,7 +22,7 @@ class RecipientTest extends TestCase
 {
     public function testCannotBeConstructedWithoutEmailAndWithoutPhone()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
         new Recipient('', '');
     }
@@ -34,8 +34,8 @@ class RecipientTest extends TestCase
     {
         $recipient = new Recipient($email, $phone);
 
-        $this->assertSame($email, $recipient->getEmail());
-        $this->assertSame($phone, $recipient->getPhone());
+        self::assertSame($email, $recipient->getEmail());
+        self::assertSame($phone, $recipient->getPhone());
     }
 
     public function provideValidEmailAndPhone()
@@ -49,13 +49,13 @@ class RecipientTest extends TestCase
     {
         $recipient = new Recipient('test@test.de', '+0815');
 
-        $this->assertSame('test@test.de', $recipient->getEmail());
-        $this->assertSame('+0815', $recipient->getPhone());
+        self::assertSame('test@test.de', $recipient->getEmail());
+        self::assertSame('+0815', $recipient->getPhone());
 
         $recipient->email('test@test.com');
         $recipient->phone('+49815');
 
-        $this->assertSame('test@test.com', $recipient->getEmail());
-        $this->assertSame('+49815', $recipient->getPhone());
+        self::assertSame('test@test.com', $recipient->getEmail());
+        self::assertSame('+49815', $recipient->getPhone());
     }
 }

@@ -24,21 +24,21 @@ class LockFactoryTest extends TestCase
 {
     public function testCreateLock()
     {
-        $store = $this->createMock(PersistingStoreInterface::class);
-        $store->expects($this->any())->method('exists')->willReturn(false);
+        $store = self::createMock(PersistingStoreInterface::class);
+        $store->expects(self::any())->method('exists')->willReturn(false);
 
         $keys = [];
         $store
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('save')
-            ->with($this->callback(function ($key) use (&$keys) {
+            ->with(self::callback(function ($key) use (&$keys) {
                 $keys[] = $key;
 
                 return true;
             }))
             ->willReturn(true);
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $factory = new LockFactory($store);
         $factory->setLogger($logger);
 
@@ -49,26 +49,26 @@ class LockFactoryTest extends TestCase
         $lock1->acquire();
         $lock2->acquire();
 
-        $this->assertNotSame($keys[0], $keys[1]);
+        self::assertNotSame($keys[0], $keys[1]);
     }
 
     public function testCreateLockFromKey()
     {
-        $store = $this->createMock(PersistingStoreInterface::class);
-        $store->expects($this->any())->method('exists')->willReturn(false);
+        $store = self::createMock(PersistingStoreInterface::class);
+        $store->expects(self::any())->method('exists')->willReturn(false);
 
         $keys = [];
         $store
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('save')
-            ->with($this->callback(function ($key) use (&$keys) {
+            ->with(self::callback(function ($key) use (&$keys) {
                 $keys[] = $key;
 
                 return true;
             }))
             ->willReturn(true);
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $factory = new LockFactory($store);
         $factory->setLogger($logger);
 
@@ -80,6 +80,6 @@ class LockFactoryTest extends TestCase
         $lock1->acquire();
         $lock2->acquire();
 
-        $this->assertSame($keys[0], $keys[1]);
+        self::assertSame($keys[0], $keys[1]);
     }
 }

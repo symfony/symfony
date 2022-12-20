@@ -36,7 +36,7 @@ class CursorTest extends TestCase
 
         $cursor->moveUp();
 
-        $this->assertEquals("\x1b[1A", $this->getOutputContent($output));
+        self::assertEquals("\x1b[1A", $this->getOutputContent($output));
     }
 
     public function testMoveUpMultipleLines()
@@ -45,7 +45,7 @@ class CursorTest extends TestCase
 
         $cursor->moveUp(12);
 
-        $this->assertEquals("\x1b[12A", $this->getOutputContent($output));
+        self::assertEquals("\x1b[12A", $this->getOutputContent($output));
     }
 
     public function testMoveDownOneLine()
@@ -54,7 +54,7 @@ class CursorTest extends TestCase
 
         $cursor->moveDown();
 
-        $this->assertEquals("\x1b[1B", $this->getOutputContent($output));
+        self::assertEquals("\x1b[1B", $this->getOutputContent($output));
     }
 
     public function testMoveDownMultipleLines()
@@ -63,7 +63,7 @@ class CursorTest extends TestCase
 
         $cursor->moveDown(12);
 
-        $this->assertEquals("\x1b[12B", $this->getOutputContent($output));
+        self::assertEquals("\x1b[12B", $this->getOutputContent($output));
     }
 
     public function testMoveLeftOneLine()
@@ -72,7 +72,7 @@ class CursorTest extends TestCase
 
         $cursor->moveLeft();
 
-        $this->assertEquals("\x1b[1D", $this->getOutputContent($output));
+        self::assertEquals("\x1b[1D", $this->getOutputContent($output));
     }
 
     public function testMoveLeftMultipleLines()
@@ -81,7 +81,7 @@ class CursorTest extends TestCase
 
         $cursor->moveLeft(12);
 
-        $this->assertEquals("\x1b[12D", $this->getOutputContent($output));
+        self::assertEquals("\x1b[12D", $this->getOutputContent($output));
     }
 
     public function testMoveRightOneLine()
@@ -90,7 +90,7 @@ class CursorTest extends TestCase
 
         $cursor->moveRight();
 
-        $this->assertEquals("\x1b[1C", $this->getOutputContent($output));
+        self::assertEquals("\x1b[1C", $this->getOutputContent($output));
     }
 
     public function testMoveRightMultipleLines()
@@ -99,7 +99,7 @@ class CursorTest extends TestCase
 
         $cursor->moveRight(12);
 
-        $this->assertEquals("\x1b[12C", $this->getOutputContent($output));
+        self::assertEquals("\x1b[12C", $this->getOutputContent($output));
     }
 
     public function testMoveToColumn()
@@ -108,7 +108,7 @@ class CursorTest extends TestCase
 
         $cursor->moveToColumn(6);
 
-        $this->assertEquals("\x1b[6G", $this->getOutputContent($output));
+        self::assertEquals("\x1b[6G", $this->getOutputContent($output));
     }
 
     public function testMoveToPosition()
@@ -117,7 +117,7 @@ class CursorTest extends TestCase
 
         $cursor->moveToPosition(18, 16);
 
-        $this->assertEquals("\x1b[17;18H", $this->getOutputContent($output));
+        self::assertEquals("\x1b[17;18H", $this->getOutputContent($output));
     }
 
     public function testClearLine()
@@ -126,7 +126,7 @@ class CursorTest extends TestCase
 
         $cursor->clearLine();
 
-        $this->assertEquals("\x1b[2K", $this->getOutputContent($output));
+        self::assertEquals("\x1b[2K", $this->getOutputContent($output));
     }
 
     public function testSavePosition()
@@ -135,7 +135,7 @@ class CursorTest extends TestCase
 
         $cursor->savePosition();
 
-        $this->assertEquals("\x1b7", $this->getOutputContent($output));
+        self::assertEquals("\x1b7", $this->getOutputContent($output));
     }
 
     public function testHide()
@@ -144,7 +144,7 @@ class CursorTest extends TestCase
 
         $cursor->hide();
 
-        $this->assertEquals("\x1b[?25l", $this->getOutputContent($output));
+        self::assertEquals("\x1b[?25l", $this->getOutputContent($output));
     }
 
     public function testShow()
@@ -153,7 +153,7 @@ class CursorTest extends TestCase
 
         $cursor->show();
 
-        $this->assertEquals("\x1b[?25h\x1b[?0c", $this->getOutputContent($output));
+        self::assertEquals("\x1b[?25h\x1b[?0c", $this->getOutputContent($output));
     }
 
     public function testRestorePosition()
@@ -162,7 +162,7 @@ class CursorTest extends TestCase
 
         $cursor->restorePosition();
 
-        $this->assertEquals("\x1b8", $this->getOutputContent($output));
+        self::assertEquals("\x1b8", $this->getOutputContent($output));
     }
 
     public function testClearOutput()
@@ -171,7 +171,7 @@ class CursorTest extends TestCase
 
         $cursor->clearOutput();
 
-        $this->assertEquals("\x1b[0J", $this->getOutputContent($output));
+        self::assertEquals("\x1b[0J", $this->getOutputContent($output));
     }
 
     public function testGetCurrentPosition()
@@ -181,16 +181,16 @@ class CursorTest extends TestCase
         $cursor->moveToPosition(10, 10);
         $position = $cursor->getCurrentPosition();
 
-        $this->assertEquals("\x1b[11;10H", $this->getOutputContent($output));
+        self::assertEquals("\x1b[11;10H", $this->getOutputContent($output));
 
         $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', [['file', '/dev/tty', 'r'], ['file', '/dev/tty', 'w'], ['file', '/dev/tty', 'w']], $pipes);
 
         if ($isTtySupported) {
             // When tty is supported, we can't validate the exact cursor position since it depends where the cursor is when the test runs.
             // Instead we just make sure that it doesn't return 1,1
-            $this->assertNotEquals([1, 1], $position);
+            self::assertNotEquals([1, 1], $position);
         } else {
-            $this->assertEquals([1, 1], $position);
+            self::assertEquals([1, 1], $position);
         }
     }
 

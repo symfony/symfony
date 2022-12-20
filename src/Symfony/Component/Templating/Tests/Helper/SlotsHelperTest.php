@@ -20,11 +20,11 @@ class SlotsHelperTest extends TestCase
     {
         $helper = new SlotsHelper();
         $helper->set('foo', 'bar');
-        $this->assertEquals('bar', $helper->get('foo'), '->set() sets a slot value');
-        $this->assertEquals('bar', $helper->get('bar', 'bar'), '->get() takes a default value to return if the slot does not exist');
+        self::assertEquals('bar', $helper->get('foo'), '->set() sets a slot value');
+        self::assertEquals('bar', $helper->get('bar', 'bar'), '->get() takes a default value to return if the slot does not exist');
 
-        $this->assertTrue($helper->has('foo'), '->has() returns true if the slot exists');
-        $this->assertFalse($helper->has('bar'), '->has() returns false if the slot does not exist');
+        self::assertTrue($helper->has('foo'), '->has() returns true if the slot exists');
+        self::assertFalse($helper->has('bar'), '->has() returns false if the slot does not exist');
     }
 
     public function testOutput()
@@ -34,20 +34,20 @@ class SlotsHelperTest extends TestCase
         ob_start();
         $ret = $helper->output('foo');
         $output = ob_get_clean();
-        $this->assertEquals('bar', $output, '->output() outputs the content of a slot');
-        $this->assertTrue($ret, '->output() returns true if the slot exists');
+        self::assertEquals('bar', $output, '->output() outputs the content of a slot');
+        self::assertTrue($ret, '->output() returns true if the slot exists');
 
         ob_start();
         $ret = $helper->output('bar', 'bar');
         $output = ob_get_clean();
-        $this->assertEquals('bar', $output, '->output() takes a default value to return if the slot does not exist');
-        $this->assertTrue($ret, '->output() returns true if the slot does not exist but a default value is provided');
+        self::assertEquals('bar', $output, '->output() takes a default value to return if the slot does not exist');
+        self::assertTrue($ret, '->output() returns true if the slot does not exist but a default value is provided');
 
         ob_start();
         $ret = $helper->output('bar');
         $output = ob_get_clean();
-        $this->assertEquals('', $output, '->output() outputs nothing if the slot does not exist');
-        $this->assertFalse($ret, '->output() returns false if the slot does not exist');
+        self::assertEquals('', $output, '->output() outputs nothing if the slot does not exist');
+        self::assertFalse($ret, '->output() returns false if the slot does not exist');
     }
 
     public function testStartStop()
@@ -56,26 +56,26 @@ class SlotsHelperTest extends TestCase
         $helper->start('bar');
         echo 'foo';
         $helper->stop();
-        $this->assertEquals('foo', $helper->get('bar'), '->start() starts a slot');
-        $this->assertTrue($helper->has('bar'), '->starts() starts a slot');
+        self::assertEquals('foo', $helper->get('bar'), '->start() starts a slot');
+        self::assertTrue($helper->has('bar'), '->starts() starts a slot');
 
         $helper->start('bar');
         try {
             $helper->start('bar');
             $helper->stop();
-            $this->fail('->start() throws an InvalidArgumentException if a slot with the same name is already started');
+            self::fail('->start() throws an InvalidArgumentException if a slot with the same name is already started');
         } catch (\Exception $e) {
             $helper->stop();
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->start() throws an InvalidArgumentException if a slot with the same name is already started');
-            $this->assertEquals('A slot named "bar" is already started.', $e->getMessage(), '->start() throws an InvalidArgumentException if a slot with the same name is already started');
+            self::assertInstanceOf(\InvalidArgumentException::class, $e, '->start() throws an InvalidArgumentException if a slot with the same name is already started');
+            self::assertEquals('A slot named "bar" is already started.', $e->getMessage(), '->start() throws an InvalidArgumentException if a slot with the same name is already started');
         }
 
         try {
             $helper->stop();
-            $this->fail('->stop() throws an LogicException if no slot is started');
+            self::fail('->stop() throws an LogicException if no slot is started');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\LogicException::class, $e, '->stop() throws an LogicException if no slot is started');
-            $this->assertEquals('No slot started.', $e->getMessage(), '->stop() throws an LogicException if no slot is started');
+            self::assertInstanceOf(\LogicException::class, $e, '->stop() throws an LogicException if no slot is started');
+            self::assertEquals('No slot started.', $e->getMessage(), '->stop() throws an LogicException if no slot is started');
         }
     }
 }

@@ -26,13 +26,13 @@ class TraceableAccessDecisionManagerTest extends TestCase
      */
     public function testDecideLog(array $expectedLog, array $attributes, $object, array $voterVotes, bool $result)
     {
-        $token = $this->createMock(TokenInterface::class);
-        $admMock = $this->createMock(AccessDecisionManagerInterface::class);
+        $token = self::createMock(TokenInterface::class);
+        $admMock = self::createMock(AccessDecisionManagerInterface::class);
 
         $adm = new TraceableAccessDecisionManager($admMock);
 
         $admMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('decide')
             ->with($token, $attributes, $object)
             ->willReturnCallback(function ($token, $attributes, $object) use ($voterVotes, $adm, $result) {
@@ -47,13 +47,13 @@ class TraceableAccessDecisionManagerTest extends TestCase
 
         $adm->decide($token, $attributes, $object);
 
-        $this->assertEquals($expectedLog, $adm->getDecisionLog());
+        self::assertEquals($expectedLog, $adm->getDecisionLog());
     }
 
     public function provideObjectsAndLogs(): \Generator
     {
-        $voter1 = $this->getMockForAbstractClass(VoterInterface::class);
-        $voter2 = $this->getMockForAbstractClass(VoterInterface::class);
+        $voter1 = self::getMockForAbstractClass(VoterInterface::class);
+        $voter2 = self::getMockForAbstractClass(VoterInterface::class);
 
         yield [
             [[
@@ -175,7 +175,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
 
-        $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm, 'For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
+        self::assertInstanceOf(DebugAccessDecisionManager::class, $adm, 'For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
     }
 
     /**
@@ -183,25 +183,22 @@ class TraceableAccessDecisionManagerTest extends TestCase
      */
     public function testAccessDecisionManagerCalledByVoter()
     {
-        $voter1 = $this
-            ->getMockBuilder(VoterInterface::class)
+        $voter1 = self::getMockBuilder(VoterInterface::class)
             ->setMethods(['vote'])
             ->getMock();
 
-        $voter2 = $this
-            ->getMockBuilder(VoterInterface::class)
+        $voter2 = self::getMockBuilder(VoterInterface::class)
             ->setMethods(['vote'])
             ->getMock();
 
-        $voter3 = $this
-            ->getMockBuilder(VoterInterface::class)
+        $voter3 = self::getMockBuilder(VoterInterface::class)
             ->setMethods(['vote'])
             ->getMock();
 
         $sut = new TraceableAccessDecisionManager(new AccessDecisionManager([$voter1, $voter2, $voter3]));
 
         $voter1
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('vote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter1) {
                 $vote = \in_array('attr1', $attributes) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_ABSTAIN;
@@ -211,7 +208,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             });
 
         $voter2
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('vote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter2) {
                 if (\in_array('attr2', $attributes)) {
@@ -226,7 +223,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             });
 
         $voter3
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('vote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter3) {
                 if (\in_array('attr2', $attributes) && $subject) {
@@ -240,11 +237,11 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 return $vote;
             });
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $sut->decide($token, ['attr1'], null);
         $sut->decide($token, ['attr2'], $obj = new \stdClass());
 
-        $this->assertEquals([
+        self::assertEquals([
             [
                 'attributes' => ['attr1'],
                 'object' => null,

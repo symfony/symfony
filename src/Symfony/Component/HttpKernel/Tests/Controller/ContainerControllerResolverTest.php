@@ -32,11 +32,11 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $service = new ControllerTestService('foo');
 
         $container = $this->createMockContainer();
-        $container->expects($this->once())
+        $container->expects(self::once())
             ->method('has')
             ->with('foo')
             ->willReturn(true);
-        $container->expects($this->once())
+        $container->expects(self::once())
             ->method('get')
             ->with('foo')
             ->willReturn($service)
@@ -48,8 +48,8 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertSame($service, $controller[0]);
-        $this->assertSame('action', $controller[1]);
+        self::assertSame($service, $controller[0]);
+        self::assertSame('action', $controller[1]);
     }
 
     public function testGetControllerService()
@@ -57,11 +57,11 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $service = new ControllerTestService('foo');
 
         $container = $this->createMockContainer();
-        $container->expects($this->once())
+        $container->expects(self::once())
             ->method('has')
             ->with('foo')
             ->willReturn(true);
-        $container->expects($this->once())
+        $container->expects(self::once())
             ->method('get')
             ->with('foo')
             ->willReturn($service)
@@ -73,8 +73,8 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertSame($service, $controller[0]);
-        $this->assertSame('action', $controller[1]);
+        self::assertSame($service, $controller[0]);
+        self::assertSame('action', $controller[1]);
     }
 
     public function testGetControllerInvokableService()
@@ -82,12 +82,12 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $service = new InvokableControllerService('bar');
 
         $container = $this->createMockContainer();
-        $container->expects($this->once())
+        $container->expects(self::once())
             ->method('has')
             ->with('foo')
             ->willReturn(true)
         ;
-        $container->expects($this->once())
+        $container->expects(self::once())
             ->method('get')
             ->with('foo')
             ->willReturn($service)
@@ -99,7 +99,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertSame($service, $controller);
+        self::assertSame($service, $controller);
     }
 
     public function testGetControllerInvokableServiceWithClassNameAsName()
@@ -107,12 +107,12 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $service = new InvokableControllerService('bar');
 
         $container = $this->createMockContainer();
-        $container->expects($this->once())
+        $container->expects(self::once())
             ->method('has')
             ->with(InvokableControllerService::class)
             ->willReturn(true)
         ;
-        $container->expects($this->once())
+        $container->expects(self::once())
             ->method('get')
             ->with(InvokableControllerService::class)
             ->willReturn($service)
@@ -124,7 +124,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertSame($service, $controller);
+        self::assertSame($service, $controller);
     }
 
     /**
@@ -136,8 +136,8 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $class = ControllerTestService::class;
 
         $container = $this->createMockContainer();
-        $container->expects($this->once())->method('has')->with($class)->willReturn(true);
-        $container->expects($this->once())->method('get')->with($class)->willReturn($service);
+        $container->expects(self::once())->method('has')->with($class)->willReturn(true);
+        $container->expects(self::once())->method('get')->with($class)->willReturn($service);
 
         $resolver = $this->createControllerResolver(null, $container);
         $request = Request::create('/');
@@ -145,8 +145,8 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf(ControllerTestService::class, $controller[0]);
-        $this->assertSame('action', $controller[1]);
+        self::assertInstanceOf(ControllerTestService::class, $controller[0]);
+        self::assertSame('action', $controller[1]);
     }
 
     public function getControllers()
@@ -158,16 +158,16 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
     public function testExceptionWhenUsingRemovedControllerServiceWithClassNameAsName()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
-        $container = $this->createMock(Container::class);
-        $container->expects($this->once())
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
+        $container = self::createMock(Container::class);
+        $container->expects(self::once())
             ->method('has')
             ->with(ControllerTestService::class)
             ->willReturn(false)
         ;
 
-        $container->expects($this->atLeastOnce())
+        $container->expects(self::atLeastOnce())
             ->method('getRemovedIds')
             ->with()
             ->willReturn([ControllerTestService::class => true])
@@ -182,16 +182,16 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
     public function testExceptionWhenUsingRemovedControllerService()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
-        $container = $this->createMock(Container::class);
-        $container->expects($this->once())
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
+        $container = self::createMock(Container::class);
+        $container->expects(self::once())
             ->method('has')
             ->with('app.my_controller')
             ->willReturn(false)
         ;
 
-        $container->expects($this->atLeastOnce())
+        $container->expects(self::atLeastOnce())
             ->method('getRemovedIds')
             ->with()
             ->willReturn(['app.my_controller' => true])
@@ -239,7 +239,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
     protected function createMockContainer()
     {
-        return $this->createMock(ContainerInterface::class);
+        return self::createMock(ContainerInterface::class);
     }
 }
 

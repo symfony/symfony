@@ -20,19 +20,19 @@ class RedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
 
-        $this->assertMatchesRegularExpression('#<meta http-equiv="refresh" content="\d+;url=\'foo\.bar\'" />#', preg_replace('/\s+/', ' ', $response->getContent()));
+        self::assertMatchesRegularExpression('#<meta http-equiv="refresh" content="\d+;url=\'foo\.bar\'" />#', preg_replace('/\s+/', ' ', $response->getContent()));
     }
 
     public function testRedirectResponseConstructorEmptyUrl()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot redirect to an empty URL.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Cannot redirect to an empty URL.');
         new RedirectResponse('');
     }
 
     public function testRedirectResponseConstructorWrongStatusCode()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new RedirectResponse('foo.bar', 404);
     }
 
@@ -40,15 +40,15 @@ class RedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
 
-        $this->assertTrue($response->headers->has('Location'));
-        $this->assertEquals('foo.bar', $response->headers->get('Location'));
+        self::assertTrue($response->headers->has('Location'));
+        self::assertEquals('foo.bar', $response->headers->get('Location'));
     }
 
     public function testGetTargetUrl()
     {
         $response = new RedirectResponse('foo.bar');
 
-        $this->assertEquals('foo.bar', $response->getTargetUrl());
+        self::assertEquals('foo.bar', $response->getTargetUrl());
     }
 
     public function testSetTargetUrl()
@@ -56,7 +56,7 @@ class RedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->setTargetUrl('baz.beep');
 
-        $this->assertEquals('baz.beep', $response->getTargetUrl());
+        self::assertEquals('baz.beep', $response->getTargetUrl());
     }
 
     /**
@@ -66,24 +66,24 @@ class RedirectResponseTest extends TestCase
     {
         $response = RedirectResponse::create('foo', 301);
 
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals(301, $response->getStatusCode());
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertEquals(301, $response->getStatusCode());
     }
 
     public function testCacheHeaders()
     {
         $response = new RedirectResponse('foo.bar', 301);
-        $this->assertFalse($response->headers->hasCacheControlDirective('no-cache'));
+        self::assertFalse($response->headers->hasCacheControlDirective('no-cache'));
 
         $response = new RedirectResponse('foo.bar', 301, ['cache-control' => 'max-age=86400']);
-        $this->assertFalse($response->headers->hasCacheControlDirective('no-cache'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('max-age'));
+        self::assertFalse($response->headers->hasCacheControlDirective('no-cache'));
+        self::assertTrue($response->headers->hasCacheControlDirective('max-age'));
 
         $response = new RedirectResponse('foo.bar', 301, ['Cache-Control' => 'max-age=86400']);
-        $this->assertFalse($response->headers->hasCacheControlDirective('no-cache'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('max-age'));
+        self::assertFalse($response->headers->hasCacheControlDirective('no-cache'));
+        self::assertTrue($response->headers->hasCacheControlDirective('max-age'));
 
         $response = new RedirectResponse('foo.bar', 302);
-        $this->assertTrue($response->headers->hasCacheControlDirective('no-cache'));
+        self::assertTrue($response->headers->hasCacheControlDirective('no-cache'));
     }
 }

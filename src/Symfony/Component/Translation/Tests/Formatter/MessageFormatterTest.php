@@ -21,7 +21,7 @@ class MessageFormatterTest extends TestCase
      */
     public function testFormat($expected, $message, $parameters = [])
     {
-        $this->assertEquals($expected, $this->getMessageFormatter()->format($message, 'en', $parameters));
+        self::assertEquals($expected, $this->getMessageFormatter()->format($message, 'en', $parameters));
     }
 
     public function getTransMessages()

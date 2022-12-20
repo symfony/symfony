@@ -28,7 +28,7 @@ class PropertyMetadataTest extends TestCase
 
     public function testInvalidPropertyName()
     {
-        $this->expectException(ValidatorException::class);
+        self::expectException(ValidatorException::class);
 
         new PropertyMetadata(self::CLASSNAME, 'foobar');
     }
@@ -38,7 +38,7 @@ class PropertyMetadataTest extends TestCase
         $entity = new Entity('foobar');
         $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
 
-        $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
+        self::assertEquals('foobar', $metadata->getPropertyValue($entity));
     }
 
     public function testGetPropertyValueFromOverriddenPrivateProperty()
@@ -46,8 +46,8 @@ class PropertyMetadataTest extends TestCase
         $entity = new Entity('foobar');
         $metadata = new PropertyMetadata(self::PARENTCLASS, 'data');
 
-        $this->assertTrue($metadata->isPublic($entity));
-        $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
+        self::assertTrue($metadata->isPublic($entity));
+        self::assertEquals('Overridden data', $metadata->getPropertyValue($entity));
     }
 
     public function testGetPropertyValueFromRemovedProperty()
@@ -56,7 +56,7 @@ class PropertyMetadataTest extends TestCase
         $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
         $metadata->name = 'test';
 
-        $this->expectException(ValidatorException::class);
+        self::expectException(ValidatorException::class);
         $metadata->getPropertyValue($entity);
     }
 
@@ -68,7 +68,7 @@ class PropertyMetadataTest extends TestCase
         $entity = new Entity_74();
         $metadata = new PropertyMetadata(self::CLASSNAME_74, 'uninitialized');
 
-        $this->assertNull($metadata->getPropertyValue($entity));
+        self::assertNull($metadata->getPropertyValue($entity));
     }
 
     /**
@@ -80,7 +80,7 @@ class PropertyMetadataTest extends TestCase
         $metadata = new PropertyMetadata(self::CLASSNAME_74_PROXY, 'uninitialized');
         $notUnsetMetadata = new PropertyMetadata(self::CLASSNAME_74_PROXY, 'notUnset');
 
-        $this->assertNull($notUnsetMetadata->getPropertyValue($entity));
-        $this->assertEquals(42, $metadata->getPropertyValue($entity));
+        self::assertNull($notUnsetMetadata->getPropertyValue($entity));
+        self::assertEquals(42, $metadata->getPropertyValue($entity));
     }
 }

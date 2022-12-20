@@ -38,13 +38,13 @@ class GuardAuthenticationProviderTest extends TestCase
     {
         $providerKey = 'my_cool_firewall';
 
-        $authenticatorA = $this->createMock(AuthenticatorInterface::class);
-        $authenticatorB = $this->createMock(AuthenticatorInterface::class);
-        $authenticatorC = $this->createMock(AuthenticatorInterface::class);
+        $authenticatorA = self::createMock(AuthenticatorInterface::class);
+        $authenticatorB = self::createMock(AuthenticatorInterface::class);
+        $authenticatorC = self::createMock(AuthenticatorInterface::class);
         $authenticators = [$authenticatorA, $authenticatorB, $authenticatorC];
 
         // called 2 times - for authenticator A and B (stops on B because of match)
-        $this->preAuthenticationToken->expects($this->exactly(2))
+        $this->preAuthenticationToken->expects(self::exactly(2))
             ->method('getGuardProviderKey')
             // it will return the "1" index, which will match authenticatorB
             ->willReturn('my_cool_firewall_1');
@@ -53,69 +53,69 @@ class GuardAuthenticationProviderTest extends TestCase
             'username' => '_weaverryan_test_user',
             'password' => 'guard_auth_ftw',
         ];
-        $this->preAuthenticationToken->expects($this->atLeastOnce())
+        $this->preAuthenticationToken->expects(self::atLeastOnce())
             ->method('getCredentials')
             ->willReturn($enteredCredentials);
 
         // authenticators A and C are never called
-        $authenticatorA->expects($this->never())
+        $authenticatorA->expects(self::never())
             ->method('getUser');
-        $authenticatorC->expects($this->never())
+        $authenticatorC->expects(self::never())
             ->method('getUser');
 
-        $mockedUser = $this->createMock(UserInterface::class);
-        $authenticatorB->expects($this->once())
+        $mockedUser = self::createMock(UserInterface::class);
+        $authenticatorB->expects(self::once())
             ->method('getUser')
             ->with($enteredCredentials, $this->userProvider)
             ->willReturn($mockedUser);
         // checkCredentials is called
-        $authenticatorB->expects($this->once())
+        $authenticatorB->expects(self::once())
             ->method('checkCredentials')
             ->with($enteredCredentials, $mockedUser)
             // authentication works!
             ->willReturn(true);
-        $authedToken = $this->createMock(GuardTokenInterface::class);
-        $authenticatorB->expects($this->once())
+        $authedToken = self::createMock(GuardTokenInterface::class);
+        $authenticatorB->expects(self::once())
             ->method('createAuthenticatedToken')
             ->with($mockedUser, $providerKey)
             ->willReturn($authedToken);
 
         // user checker should be called
-        $this->userChecker->expects($this->once())
+        $this->userChecker->expects(self::once())
             ->method('checkPreAuth')
             ->with($mockedUser);
-        $this->userChecker->expects($this->once())
+        $this->userChecker->expects(self::once())
             ->method('checkPostAuth')
             ->with($mockedUser);
 
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, $providerKey, $this->userChecker);
         $actualAuthedToken = $provider->authenticate($this->preAuthenticationToken);
-        $this->assertSame($authedToken, $actualAuthedToken);
+        self::assertSame($authedToken, $actualAuthedToken);
     }
 
     public function testCheckCredentialsReturningFalseFailsAuthentication()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $providerKey = 'my_uncool_firewall';
 
-        $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $authenticator = self::createMock(AuthenticatorInterface::class);
 
         // make sure the authenticator is used
-        $this->preAuthenticationToken->expects($this->any())
+        $this->preAuthenticationToken->expects(self::any())
             ->method('getGuardProviderKey')
             // the 0 index, to match the only authenticator
             ->willReturn('my_uncool_firewall_0');
 
-        $this->preAuthenticationToken->expects($this->atLeastOnce())
+        $this->preAuthenticationToken->expects(self::atLeastOnce())
             ->method('getCredentials')
             ->willReturn('non-null-value');
 
-        $mockedUser = $this->createMock(UserInterface::class);
-        $authenticator->expects($this->once())
+        $mockedUser = self::createMock(UserInterface::class);
+        $authenticator->expects(self::once())
             ->method('getUser')
             ->willReturn($mockedUser);
         // checkCredentials is called
-        $authenticator->expects($this->once())
+        $authenticator->expects(self::once())
             ->method('checkCredentials')
             // authentication fails :(
             ->willReturn(false);
@@ -126,12 +126,12 @@ class GuardAuthenticationProviderTest extends TestCase
 
     public function testGuardWithNoLongerAuthenticatedTriggersLogout()
     {
-        $this->expectException(AuthenticationExpiredException::class);
+        self::expectException(AuthenticationExpiredException::class);
         $providerKey = 'my_firewall_abc';
 
         // create a token and mark it as NOT authenticated anymore
         // this mimics what would happen if a user "changed" between request
-        $mockedUser = $this->createMock(UserInterface::class);
+        $mockedUser = self::createMock(UserInterface::class);
         $token = new PostAuthenticationGuardToken($mockedUser, $providerKey, ['ROLE_USER']);
         $token->setAuthenticated(false);
 
@@ -141,30 +141,30 @@ class GuardAuthenticationProviderTest extends TestCase
 
     public function testSupportsChecksGuardAuthenticatorsTokenOrigin()
     {
-        $authenticatorA = $this->createMock(AuthenticatorInterface::class);
-        $authenticatorB = $this->createMock(AuthenticatorInterface::class);
+        $authenticatorA = self::createMock(AuthenticatorInterface::class);
+        $authenticatorB = self::createMock(AuthenticatorInterface::class);
         $authenticators = [$authenticatorA, $authenticatorB];
 
-        $mockedUser = $this->createMock(UserInterface::class);
+        $mockedUser = self::createMock(UserInterface::class);
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, 'first_firewall', $this->userChecker);
 
         $token = new PreAuthenticationGuardToken($mockedUser, 'first_firewall_1');
         $supports = $provider->supports($token);
-        $this->assertTrue($supports);
+        self::assertTrue($supports);
 
         $token = new PreAuthenticationGuardToken($mockedUser, 'second_firewall_0');
         $supports = $provider->supports($token);
-        $this->assertFalse($supports);
+        self::assertFalse($supports);
     }
 
     public function testAuthenticateFailsOnNonOriginatingToken()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessageMatches('/second_firewall_0/');
-        $authenticatorA = $this->createMock(AuthenticatorInterface::class);
+        self::expectException(AuthenticationException::class);
+        self::expectExceptionMessageMatches('/second_firewall_0/');
+        $authenticatorA = self::createMock(AuthenticatorInterface::class);
         $authenticators = [$authenticatorA];
 
-        $mockedUser = $this->createMock(UserInterface::class);
+        $mockedUser = self::createMock(UserInterface::class);
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, 'first_firewall', $this->userChecker);
 
         $token = new PreAuthenticationGuardToken($mockedUser, 'second_firewall_0');
@@ -173,9 +173,9 @@ class GuardAuthenticationProviderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
-        $this->userChecker = $this->createMock(UserCheckerInterface::class);
-        $this->preAuthenticationToken = $this->createMock(PreAuthenticationGuardToken::class);
+        $this->userProvider = self::createMock(UserProviderInterface::class);
+        $this->userChecker = self::createMock(UserCheckerInterface::class);
+        $this->preAuthenticationToken = self::createMock(PreAuthenticationGuardToken::class);
     }
 
     protected function tearDown(): void

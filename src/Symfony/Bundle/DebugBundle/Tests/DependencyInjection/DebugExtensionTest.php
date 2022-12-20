@@ -38,13 +38,13 @@ class DebugExtensionTest extends TestCase
             ],
         ];
 
-        $this->assertSame($expectedTags, $container->getDefinition('data_collector.dump')->getTag('data_collector'));
+        self::assertSame($expectedTags, $container->getDefinition('data_collector.dump')->getTag('data_collector'));
     }
 
     public function testUnsetClosureFileInfoShouldBeRegisteredInVarCloner()
     {
         if (!method_exists(ReflectionCaster::class, 'unsetClosureFileInfo')) {
-            $this->markTestSkipped('Method not available');
+            self::markTestSkipped('Method not available');
         }
 
         $container = $this->createContainer();
@@ -71,7 +71,7 @@ class DebugExtensionTest extends TestCase
             }
         }
 
-        $this->assertTrue($called);
+        self::assertTrue($called);
     }
 
     public function provideServicesUsingDumpDestinationCreation(): array
@@ -98,16 +98,16 @@ class DebugExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $dumpServer = $container->get('dump_server_public');
-        $this->assertInstanceOf(DumpServer::class, $dumpServer);
-        $this->assertSame($expectedHost, $container->findDefinition('dump_server_public')->getArgument(0));
+        self::assertInstanceOf(DumpServer::class, $dumpServer);
+        self::assertSame($expectedHost, $container->findDefinition('dump_server_public')->getArgument(0));
 
         $serverConn = $container->get('server_conn_public');
-        $this->assertInstanceOf(Connection::class, $serverConn);
-        $this->assertSame($expectedHost, $container->findDefinition('server_conn_public')->getArgument(0));
+        self::assertInstanceOf(Connection::class, $serverConn);
+        self::assertSame($expectedHost, $container->findDefinition('server_conn_public')->getArgument(0));
 
         $cliDumper = $container->get('cli_dumper_public');
-        $this->assertInstanceOf(CliDumper::class, $cliDumper);
-        $this->assertSame($expectedOutput, $container->findDefinition('cli_dumper_public')->getArgument(0));
+        self::assertInstanceOf(CliDumper::class, $cliDumper);
+        self::assertSame($expectedOutput, $container->findDefinition('cli_dumper_public')->getArgument(0));
     }
 
     private function createContainer()

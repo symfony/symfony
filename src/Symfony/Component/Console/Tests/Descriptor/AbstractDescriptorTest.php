@@ -95,7 +95,7 @@ abstract class AbstractDescriptorTest extends TestCase
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $this->getDescriptor()->describe($output, $describedObject, $options + ['raw_output' => true]);
-        $this->assertEquals($this->normalizeOutput($expectedDescription), $this->normalizeOutput($output->fetch()));
+        self::assertEquals($this->normalizeOutput($expectedDescription), $this->normalizeOutput($output->fetch()));
     }
 
     protected function normalizeOutput(string $output)

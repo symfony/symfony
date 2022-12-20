@@ -26,7 +26,7 @@ final class MercureTransportFactoryTest extends TransportFactoryTestCase
 {
     public function createFactory(): TransportFactoryInterface
     {
-        $hub = $this->createMock(HubInterface::class);
+        $hub = self::createMock(HubInterface::class);
         $hubRegistry = new HubRegistry($hub, ['hubId' => $hub]);
 
         return new MercureTransportFactory($hubRegistry);
@@ -63,12 +63,12 @@ final class MercureTransportFactoryTest extends TransportFactoryTestCase
 
     public function testNotFoundHubThrows()
     {
-        $hub = $this->createMock(HubInterface::class);
+        $hub = self::createMock(HubInterface::class);
         $hubRegistry = new HubRegistry($hub, ['hubId' => $hub, 'anotherHubId' => $hub]);
         $factory = new MercureTransportFactory($hubRegistry);
 
-        $this->expectException(IncompleteDsnException::class);
-        $this->expectExceptionMessage('Hub "wrongHubId" not found. Did you mean one of: "hubId", "anotherHubId"?');
+        self::expectException(IncompleteDsnException::class);
+        self::expectExceptionMessage('Hub "wrongHubId" not found. Did you mean one of: "hubId", "anotherHubId"?');
         $factory->create(new Dsn('mercure://wrongHubId'));
     }
 }

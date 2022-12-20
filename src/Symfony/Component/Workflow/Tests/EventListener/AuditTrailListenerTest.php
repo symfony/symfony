@@ -45,7 +45,7 @@ class AuditTrailListenerTest extends TestCase
             'Entering "b" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
         ];
 
-        $this->assertSame($expected, $logger->logs);
+        self::assertSame($expected, $logger->logs);
     }
 }
 

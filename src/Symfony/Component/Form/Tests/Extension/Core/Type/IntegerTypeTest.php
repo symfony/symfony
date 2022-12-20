@@ -41,8 +41,8 @@ class IntegerTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit('123456');
 
-        $this->assertSame(123456, $form->getData());
-        $this->assertSame('123456', $form->getViewData());
+        self::assertSame(123456, $form->getData());
+        self::assertSame('123456', $form->getViewData());
     }
 
     /**
@@ -55,8 +55,8 @@ class IntegerTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE, null, ['grouping' => true]);
         $form->submit('123456');
 
-        $this->assertSame(123456, $form->getData());
-        $this->assertSame('١٢٣٬٤٥٦', $form->getViewData());
+        self::assertSame(123456, $form->getData());
+        self::assertSame('١٢٣٬٤٥٦', $form->getViewData());
     }
 
     public function testSubmitRejectsFloats()
@@ -65,9 +65,9 @@ class IntegerTypeTest extends BaseTypeTest
 
         $form->submit('1.678');
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertFalse($form->isValid());
-        $this->assertFalse($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertFalse($form->isValid());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -82,22 +82,22 @@ class IntegerTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertSame($emptyData, $form->getViewData());
-        $this->assertSame($expectedData, $form->getNormData());
-        $this->assertSame($expectedData, $form->getData());
+        self::assertSame($emptyData, $form->getViewData());
+        self::assertSame($expectedData, $form->getNormData());
+        self::assertSame($expectedData, $form->getData());
     }
 
     public function testSubmittedLargeIntegersAreNotCastToFloat()
     {
         if (4 === \PHP_INT_SIZE) {
-            $this->markTestSkipped('This test requires a 64bit PHP.');
+            self::markTestSkipped('This test requires a 64bit PHP.');
         }
 
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit('201803221011791');
 
-        $this->assertSame(201803221011791, $form->getData());
-        $this->assertSame('201803221011791', $form->getViewData());
+        self::assertSame(201803221011791, $form->getData());
+        self::assertSame('201803221011791', $form->getViewData());
     }
 
     public function testTooSmallIntegersAreNotValid()
@@ -111,7 +111,7 @@ class IntegerTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit($min);
 
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testTooGreatIntegersAreNotValid()
@@ -125,6 +125,6 @@ class IntegerTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit($max);
 
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 }

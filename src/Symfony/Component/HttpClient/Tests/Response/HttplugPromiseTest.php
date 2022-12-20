@@ -31,6 +31,6 @@ class HttplugPromiseTest extends TestCase
         $promise2 = $promise1->then($mkPromise);
         $promise3 = $promise2->then(function ($result) { return $result; });
 
-        $this->assertSame('result', $promise3->wait());
+        self::assertSame('result', $promise3->wait());
     }
 }

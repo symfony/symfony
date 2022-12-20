@@ -25,7 +25,7 @@ final class UuidTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->setData(new Uuid($uuid));
 
-        $this->assertSame($uuid, $form->createView()->vars['value']);
+        self::assertSame($uuid, $form->createView()->vars['value']);
     }
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = '', $expectedData = null)
@@ -35,8 +35,8 @@ final class UuidTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertSame($expectedData, $form->getViewData());
-        $this->assertSame($expectedData, $form->getNormData());
-        $this->assertSame($expectedData, $form->getData());
+        self::assertSame($expectedData, $form->getViewData());
+        self::assertSame($expectedData, $form->getNormData());
+        self::assertSame($expectedData, $form->getData());
     }
 }

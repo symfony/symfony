@@ -54,94 +54,94 @@ final class UuidTypeTest extends TestCase
         $expected = $uuid->__toString();
         $actual = $this->type->convertToDatabaseValue($uuid, new PostgreSQLPlatform());
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function testUuidInterfaceConvertsToNativeUidDatabaseValue()
     {
-        $uuid = $this->createMock(AbstractUid::class);
+        $uuid = self::createMock(AbstractUid::class);
 
         $uuid
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('toRfc4122')
             ->willReturn('foo');
 
         $actual = $this->type->convertToDatabaseValue($uuid, new PostgreSQLPlatform());
 
-        $this->assertEquals('foo', $actual);
+        self::assertEquals('foo', $actual);
     }
 
     public function testUuidInterfaceConvertsToBinaryDatabaseValue()
     {
-        $uuid = $this->createMock(AbstractUid::class);
+        $uuid = self::createMock(AbstractUid::class);
 
         $uuid
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('toBinary')
             ->willReturn('foo');
 
         $actual = $this->type->convertToDatabaseValue($uuid, new MySQLPlatform());
 
-        $this->assertEquals('foo', $actual);
+        self::assertEquals('foo', $actual);
     }
 
     public function testUuidStringConvertsToDatabaseValue()
     {
         $actual = $this->type->convertToDatabaseValue(self::DUMMY_UUID, new PostgreSQLPlatform());
 
-        $this->assertEquals(self::DUMMY_UUID, $actual);
+        self::assertEquals(self::DUMMY_UUID, $actual);
     }
 
     public function testNotSupportedTypeConversionForDatabaseValue()
     {
-        $this->expectException(ConversionException::class);
+        self::expectException(ConversionException::class);
 
         $this->type->convertToDatabaseValue(new \stdClass(), new SqlitePlatform());
     }
 
     public function testNullConversionForDatabaseValue()
     {
-        $this->assertNull($this->type->convertToDatabaseValue(null, new SqlitePlatform()));
+        self::assertNull($this->type->convertToDatabaseValue(null, new SqlitePlatform()));
     }
 
     public function testUuidInterfaceConvertsToPHPValue()
     {
-        $uuid = $this->createMock(AbstractUid::class);
+        $uuid = self::createMock(AbstractUid::class);
         $actual = $this->type->convertToPHPValue($uuid, new SqlitePlatform());
 
-        $this->assertSame($uuid, $actual);
+        self::assertSame($uuid, $actual);
     }
 
     public function testUuidConvertsToPHPValue()
     {
         $uuid = $this->type->convertToPHPValue(self::DUMMY_UUID, new SqlitePlatform());
 
-        $this->assertInstanceOf(Uuid::class, $uuid);
-        $this->assertEquals(self::DUMMY_UUID, $uuid->__toString());
+        self::assertInstanceOf(Uuid::class, $uuid);
+        self::assertEquals(self::DUMMY_UUID, $uuid->__toString());
     }
 
     public function testInvalidUuidConversionForPHPValue()
     {
-        $this->expectException(ConversionException::class);
+        self::expectException(ConversionException::class);
 
         $this->type->convertToPHPValue('abcdefg', new SqlitePlatform());
     }
 
     public function testNullConversionForPHPValue()
     {
-        $this->assertNull($this->type->convertToPHPValue(null, new SqlitePlatform()));
+        self::assertNull($this->type->convertToPHPValue(null, new SqlitePlatform()));
     }
 
     public function testReturnValueIfUuidForPHPValue()
     {
         $uuid = Uuid::v4();
 
-        $this->assertSame($uuid, $this->type->convertToPHPValue($uuid, new SqlitePlatform()));
+        self::assertSame($uuid, $this->type->convertToPHPValue($uuid, new SqlitePlatform()));
     }
 
     public function testGetName()
     {
-        $this->assertEquals('uuid', $this->type->getName());
+        self::assertEquals('uuid', $this->type->getName());
     }
 
     /**
@@ -149,7 +149,7 @@ final class UuidTypeTest extends TestCase
      */
     public function testGetGuidTypeDeclarationSQL(AbstractPlatform $platform, string $expectedDeclaration)
     {
-        $this->assertEquals($expectedDeclaration, $this->type->getSqlDeclaration(['length' => 36], $platform));
+        self::assertEquals($expectedDeclaration, $this->type->getSqlDeclaration(['length' => 36], $platform));
     }
 
     public function provideSqlDeclarations(): array
@@ -163,6 +163,6 @@ final class UuidTypeTest extends TestCase
 
     public function testRequiresSQLCommentHint()
     {
-        $this->assertTrue($this->type->requiresSQLCommentHint(new SqlitePlatform()));
+        self::assertTrue($this->type->requiresSQLCommentHint(new SqlitePlatform()));
     }
 }

@@ -36,7 +36,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->process($container);
 
         $arguments = $def->getArguments();
-        $this->assertEquals('foo', (string) $arguments[0]);
+        self::assertEquals('foo', (string) $arguments[0]);
     }
 
     public function testProcessRecursively()
@@ -52,12 +52,12 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->process($container);
 
         $arguments = $def->getArguments();
-        $this->assertEquals('foo', (string) $arguments[0]);
+        self::assertEquals('foo', (string) $arguments[0]);
     }
 
     public function testAliasCircularReference()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
+        self::expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
         $container->setAlias('bar', 'foo');
         $container->setAlias('foo', 'bar');
@@ -81,8 +81,8 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $resolvedFooFactory = $container->getDefinition('foo')->getFactory();
         $resolvedBarFactory = $container->getDefinition('bar')->getFactory();
 
-        $this->assertSame('factory', (string) $resolvedFooFactory[0]);
-        $this->assertSame('Factory', (string) $resolvedBarFactory[0]);
+        self::assertSame('factory', (string) $resolvedFooFactory[0]);
+        self::assertSame('Factory', (string) $resolvedBarFactory[0]);
     }
 
     /**
@@ -142,7 +142,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $container->setAlias('alias', $alias);
 
         $this->process($container);
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testNoDeprecationNoticeWhenReferencedByDeprecatedDefinition()
@@ -162,7 +162,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         ;
 
         $this->process($container);
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     protected function process(ContainerBuilder $container)

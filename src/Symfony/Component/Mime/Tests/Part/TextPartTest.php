@@ -22,16 +22,16 @@ class TextPartTest extends TestCase
     public function testConstructor()
     {
         $p = new TextPart('content');
-        $this->assertEquals('content', $p->getBody());
-        $this->assertEquals('content', $p->bodyToString());
-        $this->assertEquals('content', implode('', iterator_to_array($p->bodyToIterable())));
+        self::assertEquals('content', $p->getBody());
+        self::assertEquals('content', $p->bodyToString());
+        self::assertEquals('content', implode('', iterator_to_array($p->bodyToIterable())));
         // bodyToIterable() can be called several times
-        $this->assertEquals('content', implode('', iterator_to_array($p->bodyToIterable())));
-        $this->assertEquals('text', $p->getMediaType());
-        $this->assertEquals('plain', $p->getMediaSubType());
+        self::assertEquals('content', implode('', iterator_to_array($p->bodyToIterable())));
+        self::assertEquals('text', $p->getMediaType());
+        self::assertEquals('plain', $p->getMediaSubType());
 
         $p = new TextPart('content', null, 'html');
-        $this->assertEquals('html', $p->getMediaSubType());
+        self::assertEquals('html', $p->getMediaSubType());
     }
 
     public function testConstructorWithResource()
@@ -40,28 +40,28 @@ class TextPartTest extends TestCase
         fwrite($f, 'content');
         rewind($f);
         $p = new TextPart($f);
-        $this->assertEquals('content', $p->getBody());
-        $this->assertEquals('content', $p->bodyToString());
-        $this->assertEquals('content', implode('', iterator_to_array($p->bodyToIterable())));
+        self::assertEquals('content', $p->getBody());
+        self::assertEquals('content', $p->bodyToString());
+        self::assertEquals('content', implode('', iterator_to_array($p->bodyToIterable())));
         fclose($f);
     }
 
     public function testConstructorWithNonStringOrResource()
     {
-        $this->expectException(\TypeError::class);
+        self::expectException(\TypeError::class);
         new TextPart(new \stdClass());
     }
 
     public function testHeaders()
     {
         $p = new TextPart('content');
-        $this->assertEquals(new Headers(
+        self::assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'utf-8']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'quoted-printable')
         ), $p->getPreparedHeaders());
 
         $p = new TextPart('content', 'iso-8859-1');
-        $this->assertEquals(new Headers(
+        self::assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'iso-8859-1']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'quoted-printable')
         ), $p->getPreparedHeaders());
@@ -70,9 +70,9 @@ class TextPartTest extends TestCase
     public function testEncoding()
     {
         $p = new TextPart('content', 'utf-8', 'plain', 'base64');
-        $this->assertEquals(base64_encode('content'), $p->bodyToString());
-        $this->assertEquals(base64_encode('content'), implode('', iterator_to_array($p->bodyToIterable())));
-        $this->assertEquals(new Headers(
+        self::assertEquals(base64_encode('content'), $p->bodyToString());
+        self::assertEquals(base64_encode('content'), implode('', iterator_to_array($p->bodyToIterable())));
+        self::assertEquals(new Headers(
             new ParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'utf-8']),
             new UnstructuredHeader('Content-Transfer-Encoding', 'base64')
         ), $p->getPreparedHeaders());
@@ -88,7 +88,7 @@ class TextPartTest extends TestCase
         $p->getHeaders()->addTextHeader('foo', 'bar');
         $expected = clone $p;
         $n = unserialize(serialize($p));
-        $this->assertEquals($expected->toString(), $p->toString());
-        $this->assertEquals($expected->toString(), $n->toString());
+        self::assertEquals($expected->toString(), $p->toString());
+        self::assertEquals($expected->toString(), $n->toString());
     }
 }

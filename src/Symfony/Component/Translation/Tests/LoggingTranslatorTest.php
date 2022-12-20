@@ -20,8 +20,8 @@ class LoggingTranslatorTest extends TestCase
 {
     public function testTransWithNoTranslationIsLogged()
     {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->exactly(1))
+        $logger = self::createMock(LoggerInterface::class);
+        $logger->expects(self::exactly(1))
             ->method('warning')
             ->with('Translation not found.')
         ;

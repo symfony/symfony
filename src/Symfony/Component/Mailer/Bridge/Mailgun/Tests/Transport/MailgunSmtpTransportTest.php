@@ -35,9 +35,9 @@ class MailgunSmtpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(3, $email->getHeaders()->toArray());
-        $this->assertSame('foo: bar', $email->getHeaders()->get('foo')->toString());
-        $this->assertSame('X-Mailgun-Tag: password-reset', $email->getHeaders()->get('X-Mailgun-Tag')->toString());
-        $this->assertSame('X-Mailgun-Variables: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-Mailgun-Variables')->toString());
+        self::assertCount(3, $email->getHeaders()->toArray());
+        self::assertSame('foo: bar', $email->getHeaders()->get('foo')->toString());
+        self::assertSame('X-Mailgun-Tag: password-reset', $email->getHeaders()->get('X-Mailgun-Tag')->toString());
+        self::assertSame('X-Mailgun-Variables: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-Mailgun-Variables')->toString());
     }
 }

@@ -27,9 +27,9 @@ class InMemoryUserProviderTest extends TestCase
         $provider = $this->createProvider();
 
         $user = $provider->loadUserByIdentifier('fabien');
-        $this->assertEquals('foo', $user->getPassword());
-        $this->assertEquals(['ROLE_USER'], $user->getRoles());
-        $this->assertFalse($user->isEnabled());
+        self::assertEquals('foo', $user->getPassword());
+        self::assertEquals(['ROLE_USER'], $user->getRoles());
+        self::assertFalse($user->isEnabled());
     }
 
     public function testRefresh()
@@ -39,9 +39,9 @@ class InMemoryUserProviderTest extends TestCase
         $provider = $this->createProvider();
 
         $refreshedUser = $provider->refreshUser($user);
-        $this->assertEquals('foo', $refreshedUser->getPassword());
-        $this->assertEquals(['ROLE_USER'], $refreshedUser->getRoles());
-        $this->assertFalse($refreshedUser->isEnabled());
+        self::assertEquals('foo', $refreshedUser->getPassword());
+        self::assertEquals(['ROLE_USER'], $refreshedUser->getRoles());
+        self::assertFalse($refreshedUser->isEnabled());
     }
 
     /**
@@ -54,10 +54,10 @@ class InMemoryUserProviderTest extends TestCase
         $provider = $this->createProvider();
 
         $refreshedUser = $provider->refreshUser($user);
-        $this->assertEquals('foo', $refreshedUser->getPassword());
-        $this->assertEquals(['ROLE_USER'], $refreshedUser->getRoles());
-        $this->assertFalse($refreshedUser->isEnabled());
-        $this->assertFalse($refreshedUser->isCredentialsNonExpired());
+        self::assertEquals('foo', $refreshedUser->getPassword());
+        self::assertEquals(['ROLE_USER'], $refreshedUser->getRoles());
+        self::assertFalse($refreshedUser->isEnabled());
+        self::assertFalse($refreshedUser->isCredentialsNonExpired());
     }
 
     protected function createProvider(): InMemoryUserProvider
@@ -77,12 +77,12 @@ class InMemoryUserProviderTest extends TestCase
         $provider->createUser(new InMemoryUser('fabien', 'foo'));
 
         $user = $provider->loadUserByIdentifier('fabien');
-        $this->assertEquals('foo', $user->getPassword());
+        self::assertEquals('foo', $user->getPassword());
     }
 
     public function testCreateUserAlreadyExist()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $provider = new InMemoryUserProvider();
         $provider->createUser(new InMemoryUser('fabien', 'foo'));
         $provider->createUser(new InMemoryUser('fabien', 'foo'));
@@ -90,7 +90,7 @@ class InMemoryUserProviderTest extends TestCase
 
     public function testLoadUserByUsernameDoesNotExist()
     {
-        $this->expectException(UserNotFoundException::class);
+        self::expectException(UserNotFoundException::class);
         $provider = new InMemoryUserProvider();
         $provider->loadUserByIdentifier('fabien');
     }

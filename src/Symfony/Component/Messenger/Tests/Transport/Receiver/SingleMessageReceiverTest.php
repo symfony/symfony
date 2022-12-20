@@ -20,24 +20,24 @@ class SingleMessageReceiverTest extends TestCase
 {
     public function testItReceivesOnlyOneMessage()
     {
-        $innerReceiver = $this->createMock(ReceiverInterface::class);
+        $innerReceiver = self::createMock(ReceiverInterface::class);
         $envelope = new Envelope(new \stdClass());
 
         $receiver = new SingleMessageReceiver($innerReceiver, $envelope);
         $received = $receiver->get();
-        $this->assertCount(1, $received);
-        $this->assertSame($received[0], $envelope);
+        self::assertCount(1, $received);
+        self::assertSame($received[0], $envelope);
 
-        $this->assertEmpty($receiver->get());
+        self::assertEmpty($receiver->get());
     }
 
     public function testCallsAreForwarded()
     {
         $envelope = new Envelope(new \stdClass());
 
-        $innerReceiver = $this->createMock(ReceiverInterface::class);
-        $innerReceiver->expects($this->once())->method('ack')->with($envelope);
-        $innerReceiver->expects($this->once())->method('reject')->with($envelope);
+        $innerReceiver = self::createMock(ReceiverInterface::class);
+        $innerReceiver->expects(self::once())->method('ack')->with($envelope);
+        $innerReceiver->expects(self::once())->method('reject')->with($envelope);
 
         $receiver = new SingleMessageReceiver($innerReceiver, $envelope);
         $receiver->ack($envelope);

@@ -28,10 +28,7 @@ class DumpListenerTest extends TestCase
 {
     public function testSubscribedEvents()
     {
-        $this->assertSame(
-            [ConsoleEvents::COMMAND => ['configure', 1024]],
-            DumpListener::getSubscribedEvents()
-        );
+        self::assertSame([ConsoleEvents::COMMAND => ['configure', 1024]], DumpListener::getSubscribedEvents());
     }
 
     public function testConfigure()
@@ -52,7 +49,7 @@ class DumpListenerTest extends TestCase
             VarDumper::dump('foo');
             VarDumper::dump('bar');
 
-            $this->assertSame('+foo-+bar-', ob_get_clean());
+            self::assertSame('+foo-+bar-', ob_get_clean());
         } catch (\Exception $exception) {
         }
 

@@ -49,19 +49,19 @@ class XmlFileLoaderTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf(LoaderInterface::class, $this->loader);
+        self::assertInstanceOf(LoaderInterface::class, $this->loader);
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
-        $this->assertTrue($this->loader->loadClassMetadata($this->metadata));
+        self::assertTrue($this->loader->loadClassMetadata($this->metadata));
     }
 
     public function testLoadClassMetadata()
     {
         $this->loader->loadClassMetadata($this->metadata);
 
-        $this->assertEquals(TestClassMetadataFactory::createXmlCLassMetadata(), $this->metadata);
+        self::assertEquals(TestClassMetadataFactory::createXmlCLassMetadata(), $this->metadata);
     }
 
     public function testMaxDepth()
@@ -70,8 +70,8 @@ class XmlFileLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertEquals(2, $attributesMetadata['foo']->getMaxDepth());
-        $this->assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
+        self::assertEquals(2, $attributesMetadata['foo']->getMaxDepth());
+        self::assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
     }
 
     public function testSerializedName()
@@ -80,8 +80,8 @@ class XmlFileLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
-        $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+        self::assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
+        self::assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
     }
 
     public function testLoadDiscriminatorMap()
@@ -96,7 +96,7 @@ class XmlFileLoaderTest extends TestCase
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
 
-        $this->assertEquals($expected, $classMetadata);
+        self::assertEquals($expected, $classMetadata);
     }
 
     public function testLoadIgnore()
@@ -105,9 +105,9 @@ class XmlFileLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
-        $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
-        $this->assertFalse($attributesMetadata['notIgnored']->isIgnored());
+        self::assertTrue($attributesMetadata['ignored1']->isIgnored());
+        self::assertTrue($attributesMetadata['ignored2']->isIgnored());
+        self::assertFalse($attributesMetadata['notIgnored']->isIgnored());
     }
 
     protected function getLoaderForContextMapping(): LoaderInterface

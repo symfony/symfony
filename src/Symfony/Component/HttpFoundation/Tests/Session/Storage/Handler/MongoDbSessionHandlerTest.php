@@ -32,13 +32,13 @@ class MongoDbSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
         if (!class_exists(Client::class)) {
-            $this->markTestSkipped('The mongodb/mongodb package is required.');
+            self::markTestSkipped('The mongodb/mongodb package is required.');
         }
 
-        $this->mongo = $this->getMockBuilder(Client::class)
+        $this->mongo = self::getMockBuilder(Client::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -56,25 +56,25 @@ class MongoDbSessionHandlerTest extends TestCase
 
     public function testConstructorShouldThrowExceptionForMissingOptions()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new MongoDbSessionHandler($this->mongo, []);
     }
 
     public function testOpenMethodAlwaysReturnTrue()
     {
-        $this->assertTrue($this->storage->open('test', 'test'), 'The "open" method should always return true');
+        self::assertTrue($this->storage->open('test', 'test'), 'The "open" method should always return true');
     }
 
     public function testCloseMethodAlwaysReturnTrue()
     {
-        $this->assertTrue($this->storage->close(), 'The "close" method should always return true');
+        self::assertTrue($this->storage->close(), 'The "close" method should always return true');
     }
 
     public function testRead()
     {
         $collection = $this->createMongoCollectionMock();
 
-        $this->mongo->expects($this->once())
+        $this->mongo->expects(self::once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
             ->willReturn($collection);
@@ -83,17 +83,17 @@ class MongoDbSessionHandlerTest extends TestCase
         // allows to test for "greater than" values in the $criteria
         $testTimeout = time() + 1;
 
-        $collection->expects($this->once())
+        $collection->expects(self::once())
             ->method('findOne')
             ->willReturnCallback(function ($criteria) use ($testTimeout) {
-                $this->assertArrayHasKey($this->options['id_field'], $criteria);
-                $this->assertEquals('foo', $criteria[$this->options['id_field']]);
+                self::assertArrayHasKey($this->options['id_field'], $criteria);
+                self::assertEquals('foo', $criteria[$this->options['id_field']]);
 
-                $this->assertArrayHasKey($this->options['expiry_field'], $criteria);
-                $this->assertArrayHasKey('$gte', $criteria[$this->options['expiry_field']]);
+                self::assertArrayHasKey($this->options['expiry_field'], $criteria);
+                self::assertArrayHasKey('$gte', $criteria[$this->options['expiry_field']]);
 
-                $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $criteria[$this->options['expiry_field']]['$gte']);
-                $this->assertGreaterThanOrEqual(round((string) $criteria[$this->options['expiry_field']]['$gte'] / 1000), $testTimeout);
+                self::assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $criteria[$this->options['expiry_field']]['$gte']);
+                self::assertGreaterThanOrEqual(round((string) $criteria[$this->options['expiry_field']]['$gte'] / 1000), $testTimeout);
 
                 return [
                     $this->options['id_field'] => 'foo',
@@ -102,48 +102,48 @@ class MongoDbSessionHandlerTest extends TestCase
                 ];
             });
 
-        $this->assertEquals('bar', $this->storage->read('foo'));
+        self::assertEquals('bar', $this->storage->read('foo'));
     }
 
     public function testWrite()
     {
         $collection = $this->createMongoCollectionMock();
 
-        $this->mongo->expects($this->once())
+        $this->mongo->expects(self::once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
             ->willReturn($collection);
 
-        $collection->expects($this->once())
+        $collection->expects(self::once())
             ->method('updateOne')
             ->willReturnCallback(function ($criteria, $updateData, $options) {
-                $this->assertEquals([$this->options['id_field'] => 'foo'], $criteria);
-                $this->assertEquals(['upsert' => true], $options);
+                self::assertEquals([$this->options['id_field'] => 'foo'], $criteria);
+                self::assertEquals(['upsert' => true], $options);
 
                 $data = $updateData['$set'];
                 $expectedExpiry = time() + (int) \ini_get('session.gc_maxlifetime');
-                $this->assertInstanceOf(\MongoDB\BSON\Binary::class, $data[$this->options['data_field']]);
-                $this->assertEquals('bar', $data[$this->options['data_field']]->getData());
-                $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $data[$this->options['time_field']]);
-                $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $data[$this->options['expiry_field']]);
-                $this->assertGreaterThanOrEqual($expectedExpiry, round((string) $data[$this->options['expiry_field']] / 1000));
+                self::assertInstanceOf(\MongoDB\BSON\Binary::class, $data[$this->options['data_field']]);
+                self::assertEquals('bar', $data[$this->options['data_field']]->getData());
+                self::assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $data[$this->options['time_field']]);
+                self::assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $data[$this->options['expiry_field']]);
+                self::assertGreaterThanOrEqual($expectedExpiry, round((string) $data[$this->options['expiry_field']] / 1000));
             });
 
-        $this->assertTrue($this->storage->write('foo', 'bar'));
+        self::assertTrue($this->storage->write('foo', 'bar'));
     }
 
     public function testReplaceSessionData()
     {
         $collection = $this->createMongoCollectionMock();
 
-        $this->mongo->expects($this->once())
+        $this->mongo->expects(self::once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
             ->willReturn($collection);
 
         $data = [];
 
-        $collection->expects($this->exactly(2))
+        $collection->expects(self::exactly(2))
             ->method('updateOne')
             ->willReturnCallback(function ($criteria, $updateData, $options) use (&$data) {
                 $data = $updateData;
@@ -152,47 +152,47 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->storage->write('foo', 'bar');
         $this->storage->write('foo', 'foobar');
 
-        $this->assertEquals('foobar', $data['$set'][$this->options['data_field']]->getData());
+        self::assertEquals('foobar', $data['$set'][$this->options['data_field']]->getData());
     }
 
     public function testDestroy()
     {
         $collection = $this->createMongoCollectionMock();
 
-        $this->mongo->expects($this->once())
+        $this->mongo->expects(self::once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
             ->willReturn($collection);
 
-        $collection->expects($this->once())
+        $collection->expects(self::once())
             ->method('deleteOne')
             ->with([$this->options['id_field'] => 'foo']);
 
-        $this->assertTrue($this->storage->destroy('foo'));
+        self::assertTrue($this->storage->destroy('foo'));
     }
 
     public function testGc()
     {
         $collection = $this->createMongoCollectionMock();
 
-        $this->mongo->expects($this->once())
+        $this->mongo->expects(self::once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
             ->willReturn($collection);
 
-        $collection->expects($this->once())
+        $collection->expects(self::once())
             ->method('deleteMany')
             ->willReturnCallback(function ($criteria) {
-                $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $criteria[$this->options['expiry_field']]['$lt']);
-                $this->assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$this->options['expiry_field']]['$lt'] / 1000));
+                self::assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $criteria[$this->options['expiry_field']]['$lt']);
+                self::assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$this->options['expiry_field']]['$lt'] / 1000));
 
-                $result = $this->createMock(\MongoDB\DeleteResult::class);
+                $result = self::createMock(\MongoDB\DeleteResult::class);
                 $result->method('getDeletedCount')->willReturn(42);
 
                 return $result;
             });
 
-        $this->assertSame(42, $this->storage->gc(1));
+        self::assertSame(42, $this->storage->gc(1));
     }
 
     public function testGetConnection()
@@ -200,12 +200,12 @@ class MongoDbSessionHandlerTest extends TestCase
         $method = new \ReflectionMethod($this->storage, 'getMongo');
         $method->setAccessible(true);
 
-        $this->assertInstanceOf(Client::class, $method->invoke($this->storage));
+        self::assertInstanceOf(Client::class, $method->invoke($this->storage));
     }
 
     private function createMongoCollectionMock(): \MongoDB\Collection
     {
-        $collection = $this->getMockBuilder(\MongoDB\Collection::class)
+        $collection = self::getMockBuilder(\MongoDB\Collection::class)
             ->disableOriginalConstructor()
             ->getMock();
 

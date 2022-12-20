@@ -49,19 +49,19 @@ class DirectoryLoaderTest extends TestCase
     public function testDirectoryCanBeLoadedRecursively()
     {
         $this->loader->load('directory/');
-        $this->assertEquals(['ini' => 'ini', 'yaml' => 'yaml', 'php' => 'php'], $this->container->getParameterBag()->all(), '->load() takes a single directory');
+        self::assertEquals(['ini' => 'ini', 'yaml' => 'yaml', 'php' => 'php'], $this->container->getParameterBag()->all(), '->load() takes a single directory');
     }
 
     public function testImports()
     {
         $this->loader->resolve('directory/import/import.yml')->load('directory/import/import.yml');
-        $this->assertEquals(['ini' => 'ini', 'yaml' => 'yaml'], $this->container->getParameterBag()->all(), '->load() takes a single file that imports a directory');
+        self::assertEquals(['ini' => 'ini', 'yaml' => 'yaml'], $this->container->getParameterBag()->all(), '->load() takes a single file that imports a directory');
     }
 
     public function testExceptionIsRaisedWhenDirectoryDoesNotExist()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The file "foo" does not exist (in:');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The file "foo" does not exist (in:');
         $this->loader->load('foo/');
     }
 
@@ -69,10 +69,10 @@ class DirectoryLoaderTest extends TestCase
     {
         $loader = new DirectoryLoader(new ContainerBuilder(), new FileLocator());
 
-        $this->assertTrue($loader->supports('directory/'), '->supports("directory/") returns true');
-        $this->assertTrue($loader->supports('directory/', 'directory'), '->supports("directory/", "directory") returns true');
-        $this->assertFalse($loader->supports('directory'), '->supports("directory") returns false');
-        $this->assertTrue($loader->supports('directory', 'directory'), '->supports("directory", "directory") returns true');
-        $this->assertFalse($loader->supports('directory', 'foo'), '->supports("directory", "foo") returns false');
+        self::assertTrue($loader->supports('directory/'), '->supports("directory/") returns true');
+        self::assertTrue($loader->supports('directory/', 'directory'), '->supports("directory/", "directory") returns true');
+        self::assertFalse($loader->supports('directory'), '->supports("directory") returns false');
+        self::assertTrue($loader->supports('directory', 'directory'), '->supports("directory", "directory") returns true');
+        self::assertFalse($loader->supports('directory', 'foo'), '->supports("directory", "foo") returns false');
     }
 }

@@ -100,9 +100,9 @@ class GenericRetryStrategyTest extends TestCase
             $min = min($min, $delay);
             $max = max($max, $delay);
         }
-        $this->assertGreaterThanOrEqual(1000, $max - $min);
-        $this->assertGreaterThanOrEqual(1000, $max);
-        $this->assertLessThanOrEqual(1000, $min);
+        self::assertGreaterThanOrEqual(1000, $max - $min);
+        self::assertGreaterThanOrEqual(1000, $max);
+        self::assertLessThanOrEqual(1000, $min);
     }
 
     private function getContext($retryCount, $method, $url, $statusCode): AsyncContext

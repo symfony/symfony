@@ -42,14 +42,14 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->assertEquals('1,23', $transformer->transform(123));
+        self::assertEquals('1,23', $transformer->transform(123));
     }
 
     public function testTransformExpectsNumeric()
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $transformer->transform('abcd');
     }
@@ -58,7 +58,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer();
 
-        $this->assertSame('', $transformer->transform(null));
+        self::assertSame('', $transformer->transform(null));
     }
 
     public function testReverseTransform()
@@ -70,14 +70,14 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->assertEquals(123, $transformer->reverseTransform('1,23'));
+        self::assertEquals(123, $transformer->reverseTransform('1,23'));
     }
 
     public function testReverseTransformExpectsString()
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $transformer->reverseTransform(12345);
     }
@@ -86,7 +86,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer();
 
-        $this->assertNull($transformer->reverseTransform(''));
+        self::assertNull($transformer->reverseTransform(''));
     }
 
     public function testFloatToIntConversionMismatchOnReverseTransform()
@@ -95,7 +95,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
         IntlTestHelper::requireFullIntl($this, false);
         \Locale::setDefault('de_AT');
 
-        $this->assertSame(3655, (int) $transformer->reverseTransform('36,55'));
+        self::assertSame(3655, (int) $transformer->reverseTransform('36,55'));
     }
 
     public function testFloatToIntConversionMismatchOnTransform()
@@ -104,7 +104,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
         IntlTestHelper::requireFullIntl($this, false);
         \Locale::setDefault('de_AT');
 
-        $this->assertSame('10,20', $transformer->transform(1020));
+        self::assertSame('10,20', $transformer->transform(1020));
     }
 
     public function testValidNumericValuesWithNonDotDecimalPointCharacter()
@@ -116,6 +116,6 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
         IntlTestHelper::requireFullIntl($this, false);
         \Locale::setDefault('de_AT');
 
-        $this->assertSame('0,0035', $transformer->transform(12 / 34));
+        self::assertSame('0,0035', $transformer->transform(12 / 34));
     }
 }

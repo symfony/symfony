@@ -21,7 +21,7 @@ final class ImageTest extends TestCase
         $field = (new Image())
             ->image($value = 'https://symfony.com/logo.png');
 
-        $this->assertSame($value, $field->toArray()['image']);
+        self::assertSame($value, $field->toArray()['image']);
     }
 
     public function testTitle()
@@ -29,6 +29,6 @@ final class ImageTest extends TestCase
         $field = (new Image())
             ->title($value = 'Symfony is great!');
 
-        $this->assertSame($value, $field->toArray()['title']);
+        self::assertSame($value, $field->toArray()['title']);
     }
 }

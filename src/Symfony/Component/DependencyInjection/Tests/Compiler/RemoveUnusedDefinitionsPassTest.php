@@ -37,9 +37,9 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertFalse($container->hasDefinition('foo'));
-        $this->assertTrue($container->hasDefinition('bar'));
-        $this->assertTrue($container->hasDefinition('moo'));
+        self::assertFalse($container->hasDefinition('foo'));
+        self::assertTrue($container->hasDefinition('bar'));
+        self::assertTrue($container->hasDefinition('moo'));
     }
 
     public function testProcessRemovesUnusedDefinitionsRecursively()
@@ -55,8 +55,8 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertFalse($container->hasDefinition('foo'));
-        $this->assertFalse($container->hasDefinition('bar'));
+        self::assertFalse($container->hasDefinition('foo'));
+        self::assertFalse($container->hasDefinition('bar'));
     }
 
     public function testProcessWorksWithInlinedDefinitions()
@@ -73,8 +73,8 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertTrue($container->hasDefinition('foo'));
-        $this->assertTrue($container->hasDefinition('bar'));
+        self::assertTrue($container->hasDefinition('foo'));
+        self::assertTrue($container->hasDefinition('bar'));
     }
 
     public function testProcessWontRemovePrivateFactory()
@@ -99,9 +99,9 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertTrue($container->hasDefinition('foo'));
-        $this->assertTrue($container->hasDefinition('bar'));
-        $this->assertTrue($container->hasDefinition('foobar'));
+        self::assertTrue($container->hasDefinition('foo'));
+        self::assertTrue($container->hasDefinition('bar'));
+        self::assertTrue($container->hasDefinition('foobar'));
     }
 
     public function testProcessConsiderEnvVariablesAsUsedEvenInPrivateServices()
@@ -118,11 +118,11 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertFalse($container->hasDefinition('foo'));
+        self::assertFalse($container->hasDefinition('foo'));
 
         $envCounters = $container->getEnvCounters();
-        $this->assertArrayHasKey('FOOBAR', $envCounters);
-        $this->assertSame(1, $envCounters['FOOBAR']);
+        self::assertArrayHasKey('FOOBAR', $envCounters);
+        self::assertSame(1, $envCounters['FOOBAR']);
     }
 
     public function testProcessDoesNotErrorOnServicesThatDoNotHaveDefinitions()
@@ -137,7 +137,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertFalse($container->hasDefinition('not.defined'));
+        self::assertFalse($container->hasDefinition('not.defined'));
     }
 
     public function testProcessWorksWithClosureErrorsInDefinitions()
@@ -154,7 +154,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertFalse($container->hasDefinition('foo'));
+        self::assertFalse($container->hasDefinition('foo'));
     }
 
     protected function process(ContainerBuilder $container)

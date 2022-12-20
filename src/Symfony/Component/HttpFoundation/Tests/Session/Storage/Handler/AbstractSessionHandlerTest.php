@@ -48,7 +48,7 @@ class AbstractSessionHandlerTest extends TestCase
         $result = file_get_contents(sprintf('http://localhost:8053/%s.php', $fixture), false, $context);
         $result = preg_replace_callback('/expires=[^;]++/', function ($m) { return str_replace('-', ' ', $m[0]); }, $result);
 
-        $this->assertStringEqualsFile(__DIR__.sprintf('/Fixtures/%s.expected', $fixture), $result);
+        self::assertStringEqualsFile(__DIR__.sprintf('/Fixtures/%s.expected', $fixture), $result);
     }
 
     public function provideSession()

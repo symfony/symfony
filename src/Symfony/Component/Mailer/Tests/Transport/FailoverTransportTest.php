@@ -25,26 +25,26 @@ class FailoverTransportTest extends TestCase
 {
     public function testSendNoTransports()
     {
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
         new FailoverTransport([]);
     }
 
     public function testToString()
     {
-        $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->once())->method('__toString')->willReturn('t1://local');
-        $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->once())->method('__toString')->willReturn('t2://local');
+        $t1 = self::createMock(TransportInterface::class);
+        $t1->expects(self::once())->method('__toString')->willReturn('t1://local');
+        $t2 = self::createMock(TransportInterface::class);
+        $t2->expects(self::once())->method('__toString')->willReturn('t2://local');
         $t = new FailoverTransport([$t1, $t2]);
-        $this->assertEquals('failover(t1://local t2://local)', (string) $t);
+        self::assertEquals('failover(t1://local t2://local)', (string) $t);
     }
 
     public function testSendFirstWork()
     {
-        $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->exactly(3))->method('send');
-        $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->never())->method('send');
+        $t1 = self::createMock(TransportInterface::class);
+        $t1->expects(self::exactly(3))->method('send');
+        $t2 = self::createMock(TransportInterface::class);
+        $t2->expects(self::never())->method('send');
         $t = new FailoverTransport([$t1, $t2]);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, []);
@@ -56,23 +56,23 @@ class FailoverTransportTest extends TestCase
 
     public function testSendAllDead()
     {
-        $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
-        $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
+        $t1 = self::createMock(TransportInterface::class);
+        $t1->expects(self::once())->method('send')->will(self::throwException(new TransportException()));
+        $t2 = self::createMock(TransportInterface::class);
+        $t2->expects(self::once())->method('send')->will(self::throwException(new TransportException()));
         $t = new FailoverTransport([$t1, $t2]);
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('All transports failed.');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage('All transports failed.');
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 0, [$t1, $t2]);
     }
 
     public function testSendOneDead()
     {
-        $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
-        $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->exactly(3))->method('send');
+        $t1 = self::createMock(TransportInterface::class);
+        $t1->expects(self::once())->method('send')->will(self::throwException(new TransportException()));
+        $t2 = self::createMock(TransportInterface::class);
+        $t2->expects(self::exactly(3))->method('send');
         $t = new FailoverTransport([$t1, $t2]);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 0, [$t1]);
@@ -84,16 +84,16 @@ class FailoverTransportTest extends TestCase
 
     public function testSendOneDeadAndRecoveryWithinRetryPeriod()
     {
-        $t1 = $this->createMock(TransportInterface::class);
-        $t1->method('send')->willReturnOnConsecutiveCalls($this->throwException(new TransportException()));
-        $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->exactly(4))
+        $t1 = self::createMock(TransportInterface::class);
+        $t1->method('send')->willReturnOnConsecutiveCalls(self::throwException(new TransportException()));
+        $t2 = self::createMock(TransportInterface::class);
+        $t2->expects(self::exactly(4))
             ->method('send')
             ->willReturnOnConsecutiveCalls(
                 null,
                 null,
                 null,
-                $this->throwException(new TransportException())
+                self::throwException(new TransportException())
             );
         $t = new FailoverTransport([$t1, $t2], 6);
         $t->send(new RawMessage('')); // t1>fail - t2>sent
@@ -114,37 +114,37 @@ class FailoverTransportTest extends TestCase
 
     public function testSendAllDeadWithinRetryPeriod()
     {
-        $t1 = $this->createMock(TransportInterface::class);
-        $t1->method('send')->will($this->throwException(new TransportException()));
-        $t1->expects($this->once())->method('send');
-        $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->exactly(3))
+        $t1 = self::createMock(TransportInterface::class);
+        $t1->method('send')->will(self::throwException(new TransportException()));
+        $t1->expects(self::once())->method('send');
+        $t2 = self::createMock(TransportInterface::class);
+        $t2->expects(self::exactly(3))
             ->method('send')
             ->willReturnOnConsecutiveCalls(
                 null,
                 null,
-                $this->throwException(new TransportException())
+                self::throwException(new TransportException())
             );
         $t = new FailoverTransport([$t1, $t2], 40);
         $t->send(new RawMessage(''));
         sleep(4);
         $t->send(new RawMessage(''));
         sleep(4);
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('All transports failed.');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage('All transports failed.');
         $t->send(new RawMessage(''));
     }
 
     public function testSendOneDeadButRecover()
     {
-        $t1 = $this->createMock(TransportInterface::class);
-        $t1->method('send')->willReturnOnConsecutiveCalls($this->throwException(new TransportException()));
-        $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->exactly(3))
+        $t1 = self::createMock(TransportInterface::class);
+        $t1->method('send')->willReturnOnConsecutiveCalls(self::throwException(new TransportException()));
+        $t2 = self::createMock(TransportInterface::class);
+        $t2->expects(self::exactly(3))
             ->method('send')->willReturnOnConsecutiveCalls(
                 null,
                 null,
-                $this->throwException(new TransportException())
+                self::throwException(new TransportException())
             );
         $t = new FailoverTransport([$t1, $t2], 1);
         $t->send(new RawMessage(''));
@@ -158,10 +158,10 @@ class FailoverTransportTest extends TestCase
     {
         $p = new \ReflectionProperty(RoundRobinTransport::class, 'cursor');
         $p->setAccessible(true);
-        $this->assertSame($cursor, $p->getValue($transport));
+        self::assertSame($cursor, $p->getValue($transport));
 
         $p = new \ReflectionProperty(RoundRobinTransport::class, 'deadTransports');
         $p->setAccessible(true);
-        $this->assertSame($deadTransports, iterator_to_array($p->getValue($transport)));
+        self::assertSame($deadTransports, iterator_to_array($p->getValue($transport)));
     }
 }

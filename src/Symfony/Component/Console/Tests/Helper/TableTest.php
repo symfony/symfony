@@ -51,7 +51,7 @@ class TableTest extends TestCase
         ;
         $table->render();
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     /**
@@ -67,7 +67,7 @@ class TableTest extends TestCase
         ;
         $table->render();
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     /**
@@ -85,7 +85,7 @@ class TableTest extends TestCase
         }
         $table->render();
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function renderProvider()
@@ -856,7 +856,7 @@ TABLE
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testTableCellWithNumericIntValue()
@@ -874,7 +874,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testTableCellWithNumericFloatValue()
@@ -892,7 +892,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testStyle()
@@ -922,7 +922,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testRowSeparator()
@@ -953,9 +953,9 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
 
-        $this->assertEquals($table, $table->addRow(new TableSeparator()), 'fluent interface on addRow() with a single TableSeparator() works');
+        self::assertEquals($table, $table->addRow(new TableSeparator()), 'fluent interface on addRow() with a single TableSeparator() works');
     }
 
     public function testRenderMultiCalls()
@@ -982,7 +982,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testColumnStyle()
@@ -1012,13 +1012,13 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testThrowsWhenTheCellInAnArray()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
         $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders(['ISBN', 'Title', 'Author', 'Price'])
@@ -1058,7 +1058,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testColumnWidths()
@@ -1089,7 +1089,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testSectionOutput()
@@ -1124,7 +1124,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testSectionOutputDoesntClearIfTableIsntRendered()
@@ -1152,7 +1152,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testSectionOutputWithoutDecoration()
@@ -1187,13 +1187,13 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testAppendRowWithoutSectionOutput()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput" when calling "Symfony\Component\Console\Helper\Table::appendRow".');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput" when calling "Symfony\Component\Console\Helper\Table::appendRow".');
         $table = new Table($this->getOutputStream());
 
         $table->appendRow(['9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25']);
@@ -1228,21 +1228,21 @@ My Table
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testIsNotDefinedStyleException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Style "absent" is not defined.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Style "absent" is not defined.');
         $table = new Table($this->getOutputStream());
         $table->setStyle('absent');
     }
 
     public function testGetStyleDefinition()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Style "absent" is not defined.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Style "absent" is not defined.');
         Table::getStyleDefinition('absent');
     }
 
@@ -1265,7 +1265,7 @@ TABLE;
             ->render()
         ;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function renderSetTitle()
@@ -1360,7 +1360,7 @@ TABLE
 
 TABLE;
 
-        $this->assertSame($expected, $this->getOutputContent($output));
+        self::assertSame($expected, $this->getOutputContent($output));
     }
 
     public function testColumnMaxWidths()
@@ -1387,7 +1387,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testColumnMaxWidthsHeaders()
@@ -1422,7 +1422,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testColumnMaxWidthsWithTrailingBackslash()
@@ -1442,7 +1442,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testBoxedStyleWithColspan()
@@ -1478,7 +1478,7 @@ TABLE;
 
 TABLE;
 
-        $this->assertSame($expected, $this->getOutputContent($output));
+        self::assertSame($expected, $this->getOutputContent($output));
     }
 
     public function provideRenderHorizontalTests()
@@ -1533,7 +1533,7 @@ EOTXT;
         ;
         $table->render();
 
-        $this->assertEquals($expected, $this->getOutputContent($output));
+        self::assertEquals($expected, $this->getOutputContent($output));
     }
 
     protected function getOutputStream($decorated = false)
@@ -1597,7 +1597,7 @@ EOTXT;
 
 TABLE;
 
-        $this->assertSame($expected, $this->getOutputContent($output));
+        self::assertSame($expected, $this->getOutputContent($output));
     }
 
     public function testWithHyperlinkAndMaxWidth()
@@ -1622,6 +1622,6 @@ TABLE;
 
 TABLE;
 
-        $this->assertSame($expected, $this->getOutputContent($output));
+        self::assertSame($expected, $this->getOutputContent($output));
     }
 }

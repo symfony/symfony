@@ -27,14 +27,14 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtract($template, $messages)
     {
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
         $twig = new Environment($loader, [
             'strict_variables' => true,
             'debug' => true,
             'cache' => false,
             'autoescape' => false,
         ]);
-        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
+        $twig->addExtension(new TranslationExtension(self::createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $extractor->setPrefix('prefix');
@@ -45,12 +45,12 @@ class TwigExtractorTest extends TestCase
         $m->invoke($extractor, $template, $catalogue);
 
         if (0 === \count($messages)) {
-            $this->assertSame($catalogue->all(), $messages);
+            self::assertSame($catalogue->all(), $messages);
         }
 
         foreach ($messages as $key => $domain) {
-            $this->assertTrue($catalogue->has($key, $domain));
-            $this->assertEquals('prefix'.$key, $catalogue->get($key, $domain));
+            self::assertTrue($catalogue->has($key, $domain));
+            self::assertEquals('prefix'.$key, $catalogue->get($key, $domain));
         }
     }
 
@@ -93,13 +93,13 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtractSyntaxError($resources, array $messages)
     {
-        $twig = new Environment($this->createMock(LoaderInterface::class));
-        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
+        $twig = new Environment(self::createMock(LoaderInterface::class));
+        $twig->addExtension(new TranslationExtension(self::createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');
         $extractor->extract($resources, $catalogue);
-        $this->assertSame($messages, $catalogue->all());
+        self::assertSame($messages, $catalogue->all());
     }
 
     public function resourcesWithSyntaxErrorsProvider(): array
@@ -123,14 +123,14 @@ class TwigExtractorTest extends TestCase
             'cache' => false,
             'autoescape' => false,
         ]);
-        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
+        $twig->addExtension(new TranslationExtension(self::createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');
         $extractor->extract($resource, $catalogue);
 
-        $this->assertTrue($catalogue->has('Hi!', 'messages'));
-        $this->assertEquals('Hi!', $catalogue->get('Hi!', 'messages'));
+        self::assertTrue($catalogue->has('Hi!', 'messages'));
+        self::assertEquals('Hi!', $catalogue->get('Hi!', 'messages'));
     }
 
     public function resourceProvider(): array

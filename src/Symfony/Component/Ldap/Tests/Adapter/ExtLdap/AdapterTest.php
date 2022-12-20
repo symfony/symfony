@@ -30,7 +30,7 @@ class AdapterTest extends LdapTestCase
     {
         $ldap = new Adapter();
 
-        $this->assertEquals('\20foo\3dbar\0d(baz)*\20', $ldap->escape(" foo=bar\r(baz)* ", '', LdapInterface::ESCAPE_DN));
+        self::assertEquals('\20foo\3dbar\0d(baz)*\20', $ldap->escape(" foo=bar\r(baz)* ", '', LdapInterface::ESCAPE_DN));
     }
 
     /**
@@ -44,13 +44,13 @@ class AdapterTest extends LdapTestCase
         $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', []);
         $result = $query->execute();
 
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertCount(1, $result);
+        self::assertInstanceOf(Collection::class, $result);
+        self::assertCount(1, $result);
 
         $entry = $result[0];
-        $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
-        $this->assertEquals(['fabpot@symfony.com', 'fabien@potencier.com'], $entry->getAttribute('mail'));
+        self::assertInstanceOf(Entry::class, $entry);
+        self::assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
+        self::assertEquals(['fabpot@symfony.com', 'fabien@potencier.com'], $entry->getAttribute('mail'));
     }
 
     /**
@@ -66,9 +66,9 @@ class AdapterTest extends LdapTestCase
         $iterator = $result->getIterator();
         $iterator->rewind();
         $entry = $iterator->current();
-        $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
-        $this->assertEquals(['fabpot@symfony.com', 'fabien@potencier.com'], $entry->getAttribute('mail'));
+        self::assertInstanceOf(Entry::class, $entry);
+        self::assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
+        self::assertEquals(['fabpot@symfony.com', 'fabien@potencier.com'], $entry->getAttribute('mail'));
     }
 
     /**
@@ -77,7 +77,7 @@ class AdapterTest extends LdapTestCase
     public function testLdapQueryWithoutBind()
     {
         $ldap = new Adapter($this->getLdapConfig());
-        $this->expectException(NotBoundException::class);
+        self::expectException(NotBoundException::class);
         $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', []);
         $query->execute();
     }
@@ -94,8 +94,8 @@ class AdapterTest extends LdapTestCase
         $result = $query->execute();
 
         $entry = $result[0];
-        $this->assertEquals(1, $result->count());
-        $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
+        self::assertEquals(1, $result->count());
+        self::assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
     }
 
     public function testLdapQueryScopeOneLevel()
@@ -110,9 +110,9 @@ class AdapterTest extends LdapTestCase
 
         $subtree_count = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)')->execute()->count();
 
-        $this->assertNotEquals($one_level_result->count(), $subtree_count);
-        $this->assertEquals(1, $one_level_result->count());
-        $this->assertEquals(['Ldap'], $one_level_result[0]->getAttribute('ou'));
+        self::assertNotEquals($one_level_result->count(), $subtree_count);
+        self::assertEquals(1, $one_level_result->count());
+        self::assertEquals(['Ldap'], $one_level_result[0]->getAttribute('ou'));
     }
 
     public function testLdapPagination()
@@ -139,14 +139,14 @@ class AdapterTest extends LdapTestCase
             $paged_results = $paged_query->execute();
 
             // All four of the above queries should result in the 25 'users' being returned
-            $this->assertEquals($unpaged_results->count(), 25);
-            $this->assertEquals($fully_paged_results->count(), 25);
-            $this->assertEquals($paged_results->count(), 25);
+            self::assertEquals($unpaged_results->count(), 25);
+            self::assertEquals($fully_paged_results->count(), 25);
+            self::assertEquals($paged_results->count(), 25);
 
             // They should also result in 1 or 25 / pageSize results
-            $this->assertEquals(\count($unpaged_query->getResources()), 1);
-            $this->assertEquals(\count($fully_paged_query->getResources()), 1);
-            $this->assertEquals(\count($paged_query->getResources()), 5);
+            self::assertEquals(\count($unpaged_query->getResources()), 1);
+            self::assertEquals(\count($fully_paged_query->getResources()), 1);
+            self::assertEquals(\count($paged_query->getResources()), 5);
 
             // This last query is to ensure that we haven't botched the state of our connection
             // by not resetting pagination properly. extldap <= PHP 7.1 do not implement the necessary
@@ -157,10 +157,10 @@ class AdapterTest extends LdapTestCase
 
             $final_results = $final_query->execute();
 
-            $this->assertEquals($final_results->count(), 25);
-            $this->assertEquals(\count($final_query->getResources()), 1);
+            self::assertEquals($final_results->count(), 25);
+            self::assertEquals(\count($final_query->getResources()), 1);
         } catch (LdapException $exc) {
-            $this->markTestSkipped('Test LDAP server does not support pagination');
+            self::markTestSkipped('Test LDAP server does not support pagination');
         }
 
         $this->destroyEntries($ldap, $entries);
@@ -218,13 +218,13 @@ class AdapterTest extends LdapTestCase
             $low_max_results = $low_max_query->execute();
             $high_max_results = $high_max_query->execute();
 
-            $this->assertEquals($low_max_results->count(), 5);
-            $this->assertEquals($high_max_results->count(), 13);
+            self::assertEquals($low_max_results->count(), 5);
+            self::assertEquals($high_max_results->count(), 13);
 
-            $this->assertEquals(\count($low_max_query->getResources()), 1);
-            $this->assertEquals(\count($high_max_query->getResources()), 2);
+            self::assertEquals(\count($low_max_query->getResources()), 1);
+            self::assertEquals(\count($high_max_query->getResources()), 2);
         } catch (LdapException $exc) {
-            $this->markTestSkipped('Test LDAP server does not support pagination');
+            self::markTestSkipped('Test LDAP server does not support pagination');
         }
 
         $this->destroyEntries($ldap, $entries);

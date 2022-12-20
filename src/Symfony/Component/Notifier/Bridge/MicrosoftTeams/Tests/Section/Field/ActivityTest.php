@@ -21,7 +21,7 @@ final class ActivityTest extends TestCase
         $field = (new Activity())
             ->image($value = 'https://symfony.com/logo.png');
 
-        $this->assertSame($value, $field->toArray()['activityImage']);
+        self::assertSame($value, $field->toArray()['activityImage']);
     }
 
     public function testTitle()
@@ -29,7 +29,7 @@ final class ActivityTest extends TestCase
         $field = (new Activity())
             ->title($value = 'Symfony is great!');
 
-        $this->assertSame($value, $field->toArray()['activityTitle']);
+        self::assertSame($value, $field->toArray()['activityTitle']);
     }
 
     public function testSubtitle()
@@ -37,7 +37,7 @@ final class ActivityTest extends TestCase
         $field = (new Activity())
             ->subtitle($value = 'I am a subtitle!');
 
-        $this->assertSame($value, $field->toArray()['activitySubtitle']);
+        self::assertSame($value, $field->toArray()['activitySubtitle']);
     }
 
     public function testText()
@@ -45,6 +45,6 @@ final class ActivityTest extends TestCase
         $field = (new Activity())
             ->text($value = 'Text goes here');
 
-        $this->assertSame($value, $field->toArray()['activityText']);
+        self::assertSame($value, $field->toArray()['activityText']);
     }
 }

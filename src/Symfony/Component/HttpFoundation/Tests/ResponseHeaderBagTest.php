@@ -36,67 +36,67 @@ class ResponseHeaderBagTest extends TestCase
         $allPreservedCase = $bag->allPreserveCase();
 
         foreach (array_keys($headers) as $headerName) {
-            $this->assertArrayHasKey($headerName, $allPreservedCase, '->allPreserveCase() gets all input keys in original case');
+            self::assertArrayHasKey($headerName, $allPreservedCase, '->allPreserveCase() gets all input keys in original case');
         }
     }
 
     public function testCacheControlHeader()
     {
         $bag = new ResponseHeaderBag([]);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        self::assertEquals('no-cache, private', $bag->get('Cache-Control'));
+        self::assertTrue($bag->hasCacheControlDirective('no-cache'));
 
         $bag = new ResponseHeaderBag(['Cache-Control' => 'public']);
-        $this->assertEquals('public', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('public'));
+        self::assertEquals('public', $bag->get('Cache-Control'));
+        self::assertTrue($bag->hasCacheControlDirective('public'));
 
         $bag = new ResponseHeaderBag(['ETag' => 'abcde']);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('private'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
-        $this->assertFalse($bag->hasCacheControlDirective('max-age'));
+        self::assertEquals('no-cache, private', $bag->get('Cache-Control'));
+        self::assertTrue($bag->hasCacheControlDirective('private'));
+        self::assertTrue($bag->hasCacheControlDirective('no-cache'));
+        self::assertFalse($bag->hasCacheControlDirective('max-age'));
 
         $bag = new ResponseHeaderBag(['Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT']);
-        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
+        self::assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag([
             'Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT',
             'Cache-Control' => 'max-age=3600',
         ]);
-        $this->assertEquals('max-age=3600, private', $bag->get('Cache-Control'));
+        self::assertEquals('max-age=3600, private', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(['Last-Modified' => 'abcde']);
-        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
+        self::assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(['Etag' => 'abcde', 'Last-Modified' => 'abcde']);
-        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
+        self::assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(['cache-control' => 'max-age=100']);
-        $this->assertEquals('max-age=100, private', $bag->get('Cache-Control'));
+        self::assertEquals('max-age=100, private', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(['cache-control' => 's-maxage=100']);
-        $this->assertEquals('s-maxage=100', $bag->get('Cache-Control'));
+        self::assertEquals('s-maxage=100', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(['cache-control' => 'private, max-age=100']);
-        $this->assertEquals('max-age=100, private', $bag->get('Cache-Control'));
+        self::assertEquals('max-age=100, private', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(['cache-control' => 'public, max-age=100']);
-        $this->assertEquals('max-age=100, public', $bag->get('Cache-Control'));
+        self::assertEquals('max-age=100, public', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag();
         $bag->set('Last-Modified', 'abcde');
-        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
+        self::assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag();
         $bag->set('Cache-Control', ['public', 'must-revalidate']);
-        $this->assertCount(1, $bag->all('Cache-Control'));
-        $this->assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
+        self::assertCount(1, $bag->all('Cache-Control'));
+        self::assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag();
         $bag->set('Cache-Control', 'public');
         $bag->set('Cache-Control', 'must-revalidate', false);
-        $this->assertCount(1, $bag->all('Cache-Control'));
-        $this->assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
+        self::assertCount(1, $bag->all('Cache-Control'));
+        self::assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
     }
 
     public function testCacheControlClone()
@@ -104,7 +104,7 @@ class ResponseHeaderBagTest extends TestCase
         $headers = ['foo' => 'bar'];
         $bag1 = new ResponseHeaderBag($headers);
         $bag2 = new ResponseHeaderBag($bag1->allPreserveCase());
-        $this->assertEquals($bag1->allPreserveCase(), $bag2->allPreserveCase());
+        self::assertEquals($bag1->allPreserveCase(), $bag2->allPreserveCase());
     }
 
     public function testToStringIncludesCookieHeaders()
@@ -139,24 +139,24 @@ class ResponseHeaderBagTest extends TestCase
     public function testReplace()
     {
         $bag = new ResponseHeaderBag([]);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        self::assertEquals('no-cache, private', $bag->get('Cache-Control'));
+        self::assertTrue($bag->hasCacheControlDirective('no-cache'));
 
         $bag->replace(['Cache-Control' => 'public']);
-        $this->assertEquals('public', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('public'));
+        self::assertEquals('public', $bag->get('Cache-Control'));
+        self::assertTrue($bag->hasCacheControlDirective('public'));
     }
 
     public function testReplaceWithRemove()
     {
         $bag = new ResponseHeaderBag([]);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        self::assertEquals('no-cache, private', $bag->get('Cache-Control'));
+        self::assertTrue($bag->hasCacheControlDirective('no-cache'));
 
         $bag->remove('Cache-Control');
         $bag->replace([]);
-        $this->assertEquals('no-cache, private', $bag->get('Cache-Control'));
-        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+        self::assertEquals('no-cache, private', $bag->get('Cache-Control'));
+        self::assertTrue($bag->hasCacheControlDirective('no-cache'));
     }
 
     public function testCookiesWithSameNames()
@@ -167,9 +167,9 @@ class ResponseHeaderBagTest extends TestCase
         $bag->setCookie(Cookie::create('foo', 'bar', 0, '/path/bar', 'bar.foo'));
         $bag->setCookie(Cookie::create('foo', 'bar'));
 
-        $this->assertCount(4, $bag->getCookies());
-        $this->assertEquals('foo=bar; path=/path/foo; domain=foo.bar; httponly; samesite=lax', $bag->get('set-cookie'));
-        $this->assertEquals([
+        self::assertCount(4, $bag->getCookies());
+        self::assertEquals('foo=bar; path=/path/foo; domain=foo.bar; httponly; samesite=lax', $bag->get('set-cookie'));
+        self::assertEquals([
             'foo=bar; path=/path/foo; domain=foo.bar; httponly; samesite=lax',
             'foo=bar; path=/path/bar; domain=foo.bar; httponly; samesite=lax',
             'foo=bar; path=/path/bar; domain=bar.foo; httponly; samesite=lax',
@@ -183,35 +183,35 @@ class ResponseHeaderBagTest extends TestCase
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
 
-        $this->assertArrayHasKey('foo', $cookies['foo.bar']['/path/foo']);
-        $this->assertArrayHasKey('foo', $cookies['foo.bar']['/path/bar']);
-        $this->assertArrayHasKey('foo', $cookies['bar.foo']['/path/bar']);
-        $this->assertArrayHasKey('foo', $cookies['']['/']);
+        self::assertArrayHasKey('foo', $cookies['foo.bar']['/path/foo']);
+        self::assertArrayHasKey('foo', $cookies['foo.bar']['/path/bar']);
+        self::assertArrayHasKey('foo', $cookies['bar.foo']['/path/bar']);
+        self::assertArrayHasKey('foo', $cookies['']['/']);
     }
 
     public function testRemoveCookie()
     {
         $bag = new ResponseHeaderBag();
-        $this->assertFalse($bag->has('set-cookie'));
+        self::assertFalse($bag->has('set-cookie'));
 
         $bag->setCookie(Cookie::create('foo', 'bar', 0, '/path/foo', 'foo.bar'));
         $bag->setCookie(Cookie::create('bar', 'foo', 0, '/path/bar', 'foo.bar'));
-        $this->assertTrue($bag->has('set-cookie'));
+        self::assertTrue($bag->has('set-cookie'));
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertArrayHasKey('/path/foo', $cookies['foo.bar']);
+        self::assertArrayHasKey('/path/foo', $cookies['foo.bar']);
 
         $bag->removeCookie('foo', '/path/foo', 'foo.bar');
-        $this->assertTrue($bag->has('set-cookie'));
+        self::assertTrue($bag->has('set-cookie'));
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertArrayNotHasKey('/path/foo', $cookies['foo.bar']);
+        self::assertArrayNotHasKey('/path/foo', $cookies['foo.bar']);
 
         $bag->removeCookie('bar', '/path/bar', 'foo.bar');
-        $this->assertFalse($bag->has('set-cookie'));
+        self::assertFalse($bag->has('set-cookie'));
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertArrayNotHasKey('foo.bar', $cookies);
+        self::assertArrayNotHasKey('foo.bar', $cookies);
     }
 
     public function testRemoveCookieWithNullRemove()
@@ -221,36 +221,36 @@ class ResponseHeaderBagTest extends TestCase
         $bag->setCookie(Cookie::create('bar', 'foo'));
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertArrayHasKey('/', $cookies['']);
+        self::assertArrayHasKey('/', $cookies['']);
 
         $bag->removeCookie('foo', null);
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertArrayNotHasKey('foo', $cookies['']['/']);
+        self::assertArrayNotHasKey('foo', $cookies['']['/']);
 
         $bag->removeCookie('bar', null);
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $this->assertFalse(isset($cookies['']['/']['bar']));
+        self::assertFalse(isset($cookies['']['/']['bar']));
     }
 
     public function testSetCookieHeader()
     {
         $bag = new ResponseHeaderBag();
         $bag->set('set-cookie', 'foo=bar');
-        $this->assertEquals([Cookie::create('foo', 'bar', 0, '/', null, false, false, true, null)], $bag->getCookies());
+        self::assertEquals([Cookie::create('foo', 'bar', 0, '/', null, false, false, true, null)], $bag->getCookies());
 
         $bag->set('set-cookie', 'foo2=bar2', false);
-        $this->assertEquals([
+        self::assertEquals([
             Cookie::create('foo', 'bar', 0, '/', null, false, false, true, null),
             Cookie::create('foo2', 'bar2', 0, '/', null, false, false, true, null),
         ], $bag->getCookies());
 
         $bag->remove('set-cookie');
-        $this->assertEquals([], $bag->getCookies());
+        self::assertEquals([], $bag->getCookies());
     }
 
     public function testGetCookiesWithInvalidArgument()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $bag = new ResponseHeaderBag();
 
         $bag->getCookies('invalid_argument');
@@ -266,8 +266,8 @@ class ResponseHeaderBagTest extends TestCase
         (string) $headers;
 
         $allHeaders = $headers->allPreserveCase();
-        $this->assertEquals(['http://www.symfony.com'], $allHeaders['Location']);
-        $this->assertEquals(['text/html'], $allHeaders['Content-type']);
+        self::assertEquals(['http://www.symfony.com'], $allHeaders['Location']);
+        self::assertEquals(['text/html'], $allHeaders['Content-type']);
     }
 
     public function testDateHeaderAddedOnCreation()
@@ -275,9 +275,9 @@ class ResponseHeaderBagTest extends TestCase
         $now = time();
 
         $bag = new ResponseHeaderBag();
-        $this->assertTrue($bag->has('Date'));
+        self::assertTrue($bag->has('Date'));
 
-        $this->assertEquals($now, $bag->getDate('Date')->getTimestamp());
+        self::assertEquals($now, $bag->getDate('Date')->getTimestamp());
     }
 
     public function testDateHeaderCanBeSetOnCreation()
@@ -285,7 +285,7 @@ class ResponseHeaderBagTest extends TestCase
         $someDate = 'Thu, 23 Mar 2017 09:15:12 GMT';
         $bag = new ResponseHeaderBag(['Date' => $someDate]);
 
-        $this->assertEquals($someDate, $bag->get('Date'));
+        self::assertEquals($someDate, $bag->get('Date'));
     }
 
     public function testDateHeaderWillBeRecreatedWhenRemoved()
@@ -295,8 +295,8 @@ class ResponseHeaderBagTest extends TestCase
         $bag->remove('Date');
 
         // a (new) Date header is still present
-        $this->assertTrue($bag->has('Date'));
-        $this->assertNotEquals($someDate, $bag->get('Date'));
+        self::assertTrue($bag->has('Date'));
+        self::assertNotEquals($someDate, $bag->get('Date'));
     }
 
     public function testDateHeaderWillBeRecreatedWhenHeadersAreReplaced()
@@ -304,11 +304,11 @@ class ResponseHeaderBagTest extends TestCase
         $bag = new ResponseHeaderBag();
         $bag->replace([]);
 
-        $this->assertTrue($bag->has('Date'));
+        self::assertTrue($bag->has('Date'));
     }
 
     private function assertSetCookieHeader(string $expected, ResponseHeaderBag $actual)
     {
-        $this->assertMatchesRegularExpression('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));
+        self::assertMatchesRegularExpression('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));
     }
 }

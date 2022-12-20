@@ -39,7 +39,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new CssColor(CssColor::HEX_LONG));
     }
 
@@ -420,8 +420,8 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function testUnknownFormatsOnValidateTriggerException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "formats" parameter value is not valid. It must contain one or more of the following values: "hex_long, hex_long_with_alpha, hex_short, hex_short_with_alpha, basic_named_colors, extended_named_colors, system_colors, keywords, rgb, rgba, hsl, hsla".');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The "formats" parameter value is not valid. It must contain one or more of the following values: "hex_long, hex_long_with_alpha, hex_short, hex_short_with_alpha, basic_named_colors, extended_named_colors, system_colors, keywords, rgb, rgba, hsl, hsla".');
         $constraint = new CssColor('Unknown Format');
         $this->validator->validate('#F4B907', $constraint);
     }

@@ -49,11 +49,11 @@ class Psr16CacheProxyTest extends SimpleCacheTest
         $pool = new ArrayAdapter();
         $cache = new Psr16Cache(new ProxyAdapter($pool, 'my-namespace.'));
 
-        $this->assertNull($cache->get('some-key'));
-        $this->assertTrue($cache->set('some-other-key', 'value'));
+        self::assertNull($cache->get('some-key'));
+        self::assertTrue($cache->set('some-other-key', 'value'));
 
         $item = $pool->getItem('my-namespace.some-other-key', 'value');
-        $this->assertTrue($item->isHit());
-        $this->assertSame('value', $item->get());
+        self::assertTrue($item->isHit());
+        self::assertSame('value', $item->get());
     }
 }

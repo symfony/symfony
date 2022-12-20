@@ -33,40 +33,40 @@ class ClockMockTest extends TestCase
 
     public function testTime()
     {
-        $this->assertSame(1234567890, time());
+        self::assertSame(1234567890, time());
     }
 
     public function testSleep()
     {
         sleep(2);
-        $this->assertSame(1234567892, time());
+        self::assertSame(1234567892, time());
     }
 
     public function testMicrotime()
     {
-        $this->assertSame('0.12500000 1234567890', microtime());
+        self::assertSame('0.12500000 1234567890', microtime());
     }
 
     public function testMicrotimeAsFloat()
     {
-        $this->assertSame(1234567890.125, microtime(true));
+        self::assertSame(1234567890.125, microtime(true));
     }
 
     public function testUsleep()
     {
         usleep(2);
-        $this->assertSame(1234567890.125002, microtime(true));
+        self::assertSame(1234567890.125002, microtime(true));
     }
 
     public function testDate()
     {
-        $this->assertSame('1234567890', date('U'));
+        self::assertSame('1234567890', date('U'));
     }
 
     public function testGmDate()
     {
         ClockMock::withClockMock(1555075769);
 
-        $this->assertSame('1555075769', gmdate('U'));
+        self::assertSame('1555075769', gmdate('U'));
     }
 }

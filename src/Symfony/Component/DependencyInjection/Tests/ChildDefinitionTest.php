@@ -20,8 +20,8 @@ class ChildDefinitionTest extends TestCase
     {
         $def = new ChildDefinition('foo');
 
-        $this->assertSame('foo', $def->getParent());
-        $this->assertSame([], $def->getChanges());
+        self::assertSame('foo', $def->getParent());
+        self::assertSame([], $def->getChanges());
     }
 
     /**
@@ -34,10 +34,10 @@ class ChildDefinitionTest extends TestCase
         $getter = 'get'.ucfirst($property);
         $setter = 'set'.ucfirst($property);
 
-        $this->assertNull($def->$getter());
-        $this->assertSame($def, $def->$setter('foo'));
-        $this->assertSame('foo', $def->$getter());
-        $this->assertSame([$changeKey => true], $def->getChanges());
+        self::assertNull($def->$getter());
+        self::assertSame($def, $def->$setter('foo'));
+        self::assertSame('foo', $def->$getter());
+        self::assertSame([$changeKey => true], $def->getChanges());
     }
 
     public function getPropertyTests()
@@ -54,44 +54,44 @@ class ChildDefinitionTest extends TestCase
     {
         $def = new ChildDefinition('foo');
 
-        $this->assertFalse($def->isPublic());
-        $this->assertSame($def, $def->setPublic(true));
-        $this->assertTrue($def->isPublic());
-        $this->assertSame(['public' => true], $def->getChanges());
+        self::assertFalse($def->isPublic());
+        self::assertSame($def, $def->setPublic(true));
+        self::assertTrue($def->isPublic());
+        self::assertSame(['public' => true], $def->getChanges());
     }
 
     public function testSetLazy()
     {
         $def = new ChildDefinition('foo');
 
-        $this->assertFalse($def->isLazy());
-        $this->assertSame($def, $def->setLazy(false));
-        $this->assertFalse($def->isLazy());
-        $this->assertSame(['lazy' => true], $def->getChanges());
+        self::assertFalse($def->isLazy());
+        self::assertSame($def, $def->setLazy(false));
+        self::assertFalse($def->isLazy());
+        self::assertSame(['lazy' => true], $def->getChanges());
     }
 
     public function testSetAutowired()
     {
         $def = new ChildDefinition('foo');
 
-        $this->assertFalse($def->isAutowired());
-        $this->assertSame($def, $def->setAutowired(true));
-        $this->assertTrue($def->isAutowired());
-        $this->assertSame(['autowired' => true], $def->getChanges());
+        self::assertFalse($def->isAutowired());
+        self::assertSame($def, $def->setAutowired(true));
+        self::assertTrue($def->isAutowired());
+        self::assertSame(['autowired' => true], $def->getChanges());
     }
 
     public function testSetArgument()
     {
         $def = new ChildDefinition('foo');
 
-        $this->assertSame([], $def->getArguments());
-        $this->assertSame($def, $def->replaceArgument(0, 'foo'));
-        $this->assertSame(['index_0' => 'foo'], $def->getArguments());
+        self::assertSame([], $def->getArguments());
+        self::assertSame($def, $def->replaceArgument(0, 'foo'));
+        self::assertSame(['index_0' => 'foo'], $def->getArguments());
     }
 
     public function testReplaceArgumentShouldRequireIntegerIndex()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $def = new ChildDefinition('foo');
 
         $def->replaceArgument('0', 'foo');
@@ -102,23 +102,23 @@ class ChildDefinitionTest extends TestCase
         $def = new ChildDefinition('foo');
 
         $def->setArguments([0 => 'foo', 1 => 'bar']);
-        $this->assertSame('foo', $def->getArgument(0));
-        $this->assertSame('bar', $def->getArgument(1));
+        self::assertSame('foo', $def->getArgument(0));
+        self::assertSame('bar', $def->getArgument(1));
 
-        $this->assertSame($def, $def->replaceArgument(1, 'baz'));
-        $this->assertSame('foo', $def->getArgument(0));
-        $this->assertSame('baz', $def->getArgument(1));
+        self::assertSame($def, $def->replaceArgument(1, 'baz'));
+        self::assertSame('foo', $def->getArgument(0));
+        self::assertSame('baz', $def->getArgument(1));
 
-        $this->assertSame([0 => 'foo', 1 => 'bar', 'index_1' => 'baz'], $def->getArguments());
+        self::assertSame([0 => 'foo', 1 => 'bar', 'index_1' => 'baz'], $def->getArguments());
 
-        $this->assertSame($def, $def->replaceArgument('$bar', 'val'));
-        $this->assertSame('val', $def->getArgument('$bar'));
-        $this->assertSame([0 => 'foo', 1 => 'bar', 'index_1' => 'baz', '$bar' => 'val'], $def->getArguments());
+        self::assertSame($def, $def->replaceArgument('$bar', 'val'));
+        self::assertSame('val', $def->getArgument('$bar'));
+        self::assertSame([0 => 'foo', 1 => 'bar', 'index_1' => 'baz', '$bar' => 'val'], $def->getArguments());
     }
 
     public function testGetArgumentShouldCheckBounds()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $def = new ChildDefinition('foo');
 
         $def->setArguments([0 => 'foo']);
@@ -132,7 +132,7 @@ class ChildDefinitionTest extends TestCase
         $def = new ChildDefinition('foo');
         $def->setAutoconfigured(true);
 
-        $this->assertTrue($def->isAutoconfigured());
+        self::assertTrue($def->isAutoconfigured());
     }
 
     public function testInstanceofConditionals()
@@ -141,6 +141,6 @@ class ChildDefinitionTest extends TestCase
         $def = new ChildDefinition('foo');
         $def->setInstanceofConditionals($conditionals);
 
-        $this->assertSame($conditionals, $def->getInstanceofConditionals());
+        self::assertSame($conditionals, $def->getInstanceofConditionals());
     }
 }

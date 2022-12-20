@@ -37,7 +37,7 @@ final class MercureTransportTest extends TransportTestCase
 {
     public function createTransport(HttpClientInterface $client = null, HubInterface $hub = null, string $hubId = 'hubId', $topics = null): TransportInterface
     {
-        $hub = $hub ?? $this->createMock(HubInterface::class);
+        $hub = $hub ?? self::createMock(HubInterface::class);
 
         return new MercureTransport($hub, $hubId, $topics);
     }
@@ -57,34 +57,34 @@ final class MercureTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testCanSetCustomPort()
     {
-        $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
+        self::markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
     public function testCanSetCustomHost()
     {
-        $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
+        self::markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
     public function testCanSetCustomHostAndPort()
     {
-        $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
+        self::markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
     public function testConstructWithWrongTopicsThrows()
     {
-        $this->expectException(TypeError::class);
+        self::expectException(TypeError::class);
         $this->createTransport(null, null, 'publisherId', new \stdClass());
     }
 
     public function testSendWithNonMercureOptionsThrows()
     {
-        $this->expectException(LogicException::class);
-        $this->createTransport()->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
+        self::expectException(LogicException::class);
+        $this->createTransport()->send(new ChatMessage('testMessage', self::createMock(MessageOptionsInterface::class)));
     }
 
     public function testSendWithTransportFailureThrows()
@@ -93,8 +93,8 @@ final class MercureTransportTest extends TransportTestCase
             throw new MercureRuntimeException('Cannot connect to mercure');
         });
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to post the Mercure message: Cannot connect to mercure');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Unable to post the Mercure message: Cannot connect to mercure');
 
         $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
@@ -105,8 +105,8 @@ final class MercureTransportTest extends TransportTestCase
             throw new InvalidArgumentException('The provided JWT is not valid');
         });
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to post the Mercure message: The provided JWT is not valid');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Unable to post the Mercure message: The provided JWT is not valid');
 
         $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
@@ -114,12 +114,12 @@ final class MercureTransportTest extends TransportTestCase
     public function testSendWithMercureOptions()
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
-            $this->assertSame(['/topic/1', '/topic/2'], $update->getTopics());
-            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
-            $this->assertSame('id', $update->getId());
-            $this->assertSame('type', $update->getType());
-            $this->assertSame(1, $update->getRetry());
-            $this->assertTrue($update->isPrivate());
+            self::assertSame(['/topic/1', '/topic/2'], $update->getTopics());
+            self::assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
+            self::assertSame('id', $update->getId());
+            self::assertSame('type', $update->getType());
+            self::assertSame(1, $update->getRetry());
+            self::assertTrue($update->isPrivate());
 
             return 'id';
         });
@@ -130,12 +130,12 @@ final class MercureTransportTest extends TransportTestCase
     public function testSendWithMercureOptionsButWithoutOptionTopic()
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
-            $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
-            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
-            $this->assertSame('id', $update->getId());
-            $this->assertSame('type', $update->getType());
-            $this->assertSame(1, $update->getRetry());
-            $this->assertTrue($update->isPrivate());
+            self::assertSame(['https://symfony.com/notifier'], $update->getTopics());
+            self::assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
+            self::assertSame('id', $update->getId());
+            self::assertSame('type', $update->getType());
+            self::assertSame(1, $update->getRetry());
+            self::assertTrue($update->isPrivate());
 
             return 'id';
         });
@@ -146,9 +146,9 @@ final class MercureTransportTest extends TransportTestCase
     public function testSendWithoutMercureOptions()
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
-            $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
-            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
-            $this->assertFalse($update->isPrivate());
+            self::assertSame(['https://symfony.com/notifier'], $update->getTopics());
+            self::assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
+            self::assertFalse($update->isPrivate());
 
             return 'id';
         });
@@ -165,6 +165,6 @@ final class MercureTransportTest extends TransportTestCase
         });
 
         $sentMessage = $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
-        $this->assertSame($messageId, $sentMessage->getMessageId());
+        self::assertSame($messageId, $sentMessage->getMessageId());
     }
 }

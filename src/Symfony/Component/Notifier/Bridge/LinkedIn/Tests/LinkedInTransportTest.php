@@ -32,7 +32,7 @@ final class LinkedInTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? self::createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
@@ -48,16 +48,16 @@ final class LinkedInTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSendWithEmptyArrayResponseThrowsTransportException()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(500);
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn('[]');
 
@@ -67,22 +67,22 @@ final class LinkedInTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client);
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
 
         $transport->send(new ChatMessage('testMessage'));
     }
 
     public function testSendWithErrorResponseThrowsTransportException()
     {
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('testErrorCode');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage('testErrorCode');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(400);
 
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn('testErrorCode');
 
@@ -99,13 +99,13 @@ final class LinkedInTransportTest extends TransportTestCase
     {
         $message = 'testMessage';
 
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
 
-        $response->expects($this->exactly(2))
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(201);
 
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn(json_encode(['id' => '42']));
 
@@ -130,7 +130,7 @@ final class LinkedInTransportTest extends TransportTestCase
             $response,
             $expectedBody
         ): ResponseInterface {
-            $this->assertSame($expectedBody, $options['body']);
+            self::assertSame($expectedBody, $options['body']);
 
             return $response;
         });
@@ -143,13 +143,13 @@ final class LinkedInTransportTest extends TransportTestCase
     {
         $message = 'testMessage';
 
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
 
-        $response->expects($this->exactly(2))
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(201);
 
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn(json_encode(['id' => '42']));
 
@@ -177,7 +177,7 @@ final class LinkedInTransportTest extends TransportTestCase
             $response,
             $expectedBody
         ): ResponseInterface {
-            $this->assertSame($expectedBody, $options['body']);
+            self::assertSame($expectedBody, $options['body']);
 
             return $response;
         });
@@ -189,14 +189,14 @@ final class LinkedInTransportTest extends TransportTestCase
 
     public function testSendWithInvalidOptions()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
-            return $this->createMock(ResponseInterface::class);
+            return self::createMock(ResponseInterface::class);
         });
 
         $transport = $this->createTransport($client);
 
-        $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
+        $transport->send(new ChatMessage('testMessage', self::createMock(MessageOptionsInterface::class)));
     }
 }

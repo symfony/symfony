@@ -38,10 +38,10 @@ EOBODY;
                 $body = str_replace(',"monolog_level":300', '', $body);
             }
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('http://es:9200/_bulk', $url);
-            $this->assertSame($body, $options['body']);
-            $this->assertSame('Content-Type: application/json', $options['normalized_headers']['content-type'][0]);
+            self::assertSame('POST', $method);
+            self::assertSame('http://es:9200/_bulk', $url);
+            self::assertSame($body, $options['body']);
+            self::assertSame('Content-Type: application/json', $options['normalized_headers']['content-type'][0]);
             ++$callCount;
 
             return new MockResponse();
@@ -61,7 +61,7 @@ EOBODY;
 
         $handler->handle($record);
 
-        $this->assertSame(1, $callCount);
+        self::assertSame(1, $callCount);
     }
 
     public function testHandleWithElasticsearch8()
@@ -81,10 +81,10 @@ EOBODY;
                 $body = str_replace(',"monolog_level":300', '', $body);
             }
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('http://es:9200/_bulk', $url);
-            $this->assertSame($body, $options['body']);
-            $this->assertSame('Content-Type: application/json', $options['normalized_headers']['content-type'][0]);
+            self::assertSame('POST', $method);
+            self::assertSame('http://es:9200/_bulk', $url);
+            self::assertSame($body, $options['body']);
+            self::assertSame('Content-Type: application/json', $options['normalized_headers']['content-type'][0]);
             ++$callCount;
 
             return new MockResponse();
@@ -104,7 +104,7 @@ EOBODY;
 
         $handler->handle($record);
 
-        $this->assertSame(1, $callCount);
+        self::assertSame(1, $callCount);
     }
 
     public function testBandleBatch()
@@ -127,10 +127,10 @@ EOBODY;
                 $body = str_replace(',"monolog_level":300', '', $body);
             }
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('http://es:9200/_bulk', $url);
-            $this->assertSame($body, $options['body']);
-            $this->assertSame('Content-Type: application/json', $options['normalized_headers']['content-type'][0]);
+            self::assertSame('POST', $method);
+            self::assertSame('http://es:9200/_bulk', $url);
+            self::assertSame($body, $options['body']);
+            self::assertSame('Content-Type: application/json', $options['normalized_headers']['content-type'][0]);
             ++$callCount;
 
             return new MockResponse();
@@ -161,7 +161,7 @@ EOBODY;
 
         $handler->handleBatch($records);
 
-        $this->assertSame(1, $callCount);
+        self::assertSame(1, $callCount);
     }
 }
 

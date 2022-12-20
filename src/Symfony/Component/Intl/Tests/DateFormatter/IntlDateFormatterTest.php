@@ -26,24 +26,24 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     public function testConstructor()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, 'y-M-d');
-        $this->assertEquals('y-M-d', $formatter->getPattern());
+        self::assertEquals('y-M-d', $formatter->getPattern());
     }
 
     public function testConstructorWithoutLocale()
     {
         $formatter = $this->getDateFormatter(null, IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, 'y-M-d');
-        $this->assertEquals('y-M-d', $formatter->getPattern());
+        self::assertEquals('y-M-d', $formatter->getPattern());
     }
 
     public function testConstructorWithoutCalendar()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', null, 'y-M-d');
-        $this->assertEquals('y-M-d', $formatter->getPattern());
+        self::assertEquals('y-M-d', $formatter->getPattern());
     }
 
     public function testConstructorWithUnsupportedLocale()
     {
-        $this->expectException(MethodArgumentValueNotImplementedException::class);
+        self::expectException(MethodArgumentValueNotImplementedException::class);
         $this->getDateFormatter('pt_BR', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
     }
 
@@ -51,7 +51,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
         $formatter = $formatter::create('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
-        $this->assertInstanceOf(IntlDateFormatter::class, $formatter);
+        self::assertInstanceOf(IntlDateFormatter::class, $formatter);
     }
 
     public function testFormatWithUnsupportedTimestampArgument()
@@ -73,15 +73,15 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         try {
             $formatter->format($localtime);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(MethodArgumentValueNotImplementedException::class, $e);
+            self::assertInstanceOf(MethodArgumentValueNotImplementedException::class, $e);
 
-            $this->assertStringEndsWith('Only Unix timestamps and DateTime objects are supported.  Please install the "intl" extension for full localization capabilities.', $e->getMessage());
+            self::assertStringEndsWith('Only Unix timestamps and DateTime objects are supported.  Please install the "intl" extension for full localization capabilities.', $e->getMessage());
         }
     }
 
     public function testFormatWithUnimplementedChars()
     {
-        $this->expectException(NotImplementedException::class);
+        self::expectException(NotImplementedException::class);
         $pattern = 'Y';
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, $pattern);
         $formatter->format(0);
@@ -89,7 +89,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     public function testFormatWithNonIntegerTimestamp()
     {
-        $this->expectException(NotImplementedException::class);
+        self::expectException(NotImplementedException::class);
         $formatter = $this->getDefaultDateFormatter();
         $formatter->format([]);
     }
@@ -97,59 +97,59 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     public function testGetErrorCode()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $this->assertEquals(IntlGlobals::getErrorCode(), $formatter->getErrorCode());
+        self::assertEquals(IntlGlobals::getErrorCode(), $formatter->getErrorCode());
     }
 
     public function testGetErrorMessage()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $this->assertEquals(IntlGlobals::getErrorMessage(), $formatter->getErrorMessage());
+        self::assertEquals(IntlGlobals::getErrorMessage(), $formatter->getErrorMessage());
     }
 
     public function testIsLenient()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $this->assertFalse($formatter->isLenient());
+        self::assertFalse($formatter->isLenient());
     }
 
     public function testLocaltime()
     {
-        $this->expectException(MethodNotImplementedException::class);
+        self::expectException(MethodNotImplementedException::class);
         $formatter = $this->getDefaultDateFormatter();
         $formatter->localtime('Wednesday, December 31, 1969 4:00:00 PM PT');
     }
 
     public function testParseWithNotNullPositionValue()
     {
-        $this->expectException(MethodArgumentNotImplementedException::class);
+        self::expectException(MethodArgumentNotImplementedException::class);
         $position = 0;
         $formatter = $this->getDefaultDateFormatter('y');
-        $this->assertSame(0, $formatter->parse('1970', $position));
+        self::assertSame(0, $formatter->parse('1970', $position));
     }
 
     public function testSetCalendar()
     {
-        $this->expectException(MethodNotImplementedException::class);
+        self::expectException(MethodNotImplementedException::class);
         $formatter = $this->getDefaultDateFormatter();
         $formatter->setCalendar(IntlDateFormatter::GREGORIAN);
     }
 
     public function testSetLenient()
     {
-        $this->expectException(MethodArgumentValueNotImplementedException::class);
+        self::expectException(MethodArgumentValueNotImplementedException::class);
         $formatter = $this->getDefaultDateFormatter();
         $formatter->setLenient(true);
     }
 
     public function testFormatWithGmtTimeZoneAndMinutesOffset()
     {
-        $this->expectException(NotImplementedException::class);
+        self::expectException(NotImplementedException::class);
         parent::testFormatWithGmtTimeZoneAndMinutesOffset();
     }
 
     public function testFormatWithNonStandardTimezone()
     {
-        $this->expectException(NotImplementedException::class);
+        self::expectException(NotImplementedException::class);
         parent::testFormatWithNonStandardTimezone();
     }
 
@@ -176,11 +176,11 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     public function testParseThreeDigitsYears()
     {
         if (\PHP_INT_SIZE < 8) {
-            $this->markTestSkipped('Parsing three digits years requires a 64bit PHP.');
+            self::markTestSkipped('Parsing three digits years requires a 64bit PHP.');
         }
 
         $formatter = $this->getDefaultDateFormatter('yyyy-M-d');
-        $this->assertSame(-32157648000, $formatter->parse('950-12-19'));
+        self::assertSame(-32157648000, $formatter->parse('950-12-19'));
         $this->assertIsIntlSuccess($formatter, 'U_ZERO_ERROR', IntlGlobals::U_ZERO_ERROR);
     }
 

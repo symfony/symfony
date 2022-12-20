@@ -30,17 +30,14 @@ class TransNodeTest extends TestCase
         $vars = new NameExpression('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
-        $env = new Environment($this->createMock(LoaderInterface::class), ['strict_variables' => true]);
+        $env = new Environment(self::createMock(LoaderInterface::class), ['strict_variables' => true]);
         $compiler = new Compiler($env);
 
-        $this->assertEquals(
-            sprintf(
-                'echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans("trans %%var%%", array_merge(["%%var%%" => %s], %s), "messages");',
-                $this->getVariableGetterWithoutStrictCheck('var'),
-                $this->getVariableGetterWithStrictCheck('foo')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            'echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans("trans %%var%%", array_merge(["%%var%%" => %s], %s), "messages");',
+            $this->getVariableGetterWithoutStrictCheck('var'),
+            $this->getVariableGetterWithStrictCheck('foo')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     protected function getVariableGetterWithoutStrictCheck($name)

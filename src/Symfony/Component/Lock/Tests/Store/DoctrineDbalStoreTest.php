@@ -63,7 +63,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
 
     public function testAbortAfterExpiration()
     {
-        $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
+        self::markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
     /**
@@ -77,7 +77,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
             $store = new DoctrineDbalStore($dsn);
 
             $store->save($key);
-            $this->assertTrue($store->exists($key));
+            self::assertTrue($store->exists($key));
         } finally {
             if (null !== $file) {
                 @unlink($file);
@@ -98,28 +98,22 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
      */
     public function testCreatesTableInTransaction(string $platform)
     {
-        $conn = $this->createMock(Connection::class);
-        $conn->expects($this->atLeast(3))
+        $conn = self::createMock(Connection::class);
+        $conn->expects(self::atLeast(3))
             ->method('executeStatement')
             ->withConsecutive(
-                [$this->stringContains('INSERT INTO')],
-                [$this->matches('create sql stmt')],
-                [$this->stringContains('INSERT INTO')]
+                [self::stringContains('INSERT INTO')],
+                [self::matches('create sql stmt')],
+                [self::stringContains('INSERT INTO')]
             )
             ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(
-                        $this->createMock(TableNotFoundException::class)
-                    ),
-                    1,
-                    1
-                )
+                self::onConsecutiveCalls(self::throwException(self::createMock(TableNotFoundException::class)), 1, 1)
             );
 
         $conn->method('isTransactionActive')
             ->willReturn(true);
 
-        $platform = $this->createMock($platform);
+        $platform = self::createMock($platform);
         $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 
@@ -144,31 +138,25 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
 
     public function testTableCreationInTransactionNotSupported()
     {
-        $conn = $this->createMock(Connection::class);
-        $conn->expects($this->atLeast(2))
+        $conn = self::createMock(Connection::class);
+        $conn->expects(self::atLeast(2))
             ->method('executeStatement')
             ->withConsecutive(
-                [$this->stringContains('INSERT INTO')],
-                [$this->stringContains('INSERT INTO')]
+                [self::stringContains('INSERT INTO')],
+                [self::stringContains('INSERT INTO')]
             )
             ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(
-                        $this->createMock(TableNotFoundException::class)
-                    ),
-                    1,
-                    1
-                )
+                self::onConsecutiveCalls(self::throwException(self::createMock(TableNotFoundException::class)), 1, 1)
             );
 
         $conn->method('isTransactionActive')
             ->willReturn(true);
 
-        $platform = $this->createMock(AbstractPlatform::class);
+        $platform = self::createMock(AbstractPlatform::class);
         $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 
-        $conn->expects($this->atLeast(2))
+        $conn->expects(self::atLeast(2))
             ->method('getDatabasePlatform');
 
         $store = new DoctrineDbalStore($conn);
@@ -180,28 +168,22 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
 
     public function testCreatesTableOutsideTransaction()
     {
-        $conn = $this->createMock(Connection::class);
-        $conn->expects($this->atLeast(3))
+        $conn = self::createMock(Connection::class);
+        $conn->expects(self::atLeast(3))
             ->method('executeStatement')
             ->withConsecutive(
-                [$this->stringContains('INSERT INTO')],
-                [$this->matches('create sql stmt')],
-                [$this->stringContains('INSERT INTO')]
+                [self::stringContains('INSERT INTO')],
+                [self::matches('create sql stmt')],
+                [self::stringContains('INSERT INTO')]
             )
             ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(
-                        $this->createMock(TableNotFoundException::class)
-                    ),
-                    1,
-                    1
-                )
+                self::onConsecutiveCalls(self::throwException(self::createMock(TableNotFoundException::class)), 1, 1)
             );
 
         $conn->method('isTransactionActive')
             ->willReturn(false);
 
-        $platform = $this->createMock(AbstractPlatform::class);
+        $platform = self::createMock(AbstractPlatform::class);
         $platform->method(method_exists(AbstractPlatform::class, 'getCreateTablesSQL') ? 'getCreateTablesSQL' : 'getCreateTableSQL')
             ->willReturn(['create sql stmt']);
 

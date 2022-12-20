@@ -21,12 +21,12 @@ class LocalesTest extends ResourceBundleTestCase
 {
     public function testGetLocales()
     {
-        $this->assertSame($this->getLocales(), Locales::getLocales());
+        self::assertSame($this->getLocales(), Locales::getLocales());
     }
 
     public function testGetAliases()
     {
-        $this->assertSame($this->getLocaleAliases(), Locales::getAliases());
+        self::assertSame($this->getLocaleAliases(), Locales::getAliases());
     }
 
     /**
@@ -40,15 +40,15 @@ class LocalesTest extends ResourceBundleTestCase
 
         // We can't assert on exact list of locale, as there's too many variations.
         // The best we can do is to make sure getNames() returns a subset of what getLocales() returns.
-        $this->assertNotEmpty($locales);
-        $this->assertEmpty(array_diff($locales, $this->getLocales()));
+        self::assertNotEmpty($locales);
+        self::assertEmpty(array_diff($locales, $this->getLocales()));
     }
 
     public function testGetNamesDefaultLocale()
     {
         \Locale::setDefault('de_AT');
 
-        $this->assertSame(Locales::getNames('de_AT'), Locales::getNames());
+        self::assertSame(Locales::getNames('de_AT'), Locales::getNames());
     }
 
     /**
@@ -59,7 +59,7 @@ class LocalesTest extends ResourceBundleTestCase
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(Locales::getNames($ofLocale), Locales::getNames($alias));
+        self::assertEquals(Locales::getNames($ofLocale), Locales::getNames($alias));
     }
 
     /**
@@ -70,7 +70,7 @@ class LocalesTest extends ResourceBundleTestCase
         $names = Locales::getNames($displayLocale);
 
         foreach ($names as $locale => $name) {
-            $this->assertSame($name, Locales::getName($locale, $displayLocale));
+            self::assertSame($name, Locales::getName($locale, $displayLocale));
         }
     }
 
@@ -81,27 +81,27 @@ class LocalesTest extends ResourceBundleTestCase
         $names = Locales::getNames('de_AT');
 
         foreach ($names as $locale => $name) {
-            $this->assertSame($name, Locales::getName($locale));
+            self::assertSame($name, Locales::getName($locale));
         }
     }
 
     public function testGetNameWithInvalidLocale()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Locales::getName('foo');
     }
 
     public function testGetNameWithAliasLocale()
     {
-        $this->assertSame(Locales::getName('tl_PH'), Locales::getName('fil_PH'));
+        self::assertSame(Locales::getName('tl_PH'), Locales::getName('fil_PH'));
     }
 
     public function testExists()
     {
-        $this->assertTrue(Locales::exists('nl_NL'));
-        $this->assertTrue(Locales::exists('tl_PH'));
-        $this->assertTrue(Locales::exists('fil_PH')); // alias for "tl_PH"
-        $this->assertTrue(Locales::exists('es_419'));
-        $this->assertFalse(Locales::exists('zxx_ZZ'));
+        self::assertTrue(Locales::exists('nl_NL'));
+        self::assertTrue(Locales::exists('tl_PH'));
+        self::assertTrue(Locales::exists('fil_PH')); // alias for "tl_PH"
+        self::assertTrue(Locales::exists('es_419'));
+        self::assertFalse(Locales::exists('zxx_ZZ'));
     }
 }

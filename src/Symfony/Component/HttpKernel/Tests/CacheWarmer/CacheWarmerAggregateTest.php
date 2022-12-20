@@ -31,9 +31,9 @@ class CacheWarmerAggregateTest extends TestCase
 
     public function testInjectWarmersUsingConstructor()
     {
-        $warmer = $this->createMock(CacheWarmerInterface::class);
+        $warmer = self::createMock(CacheWarmerInterface::class);
         $warmer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('warmUp');
         $aggregate = new CacheWarmerAggregate([$warmer]);
         $aggregate->warmUp(self::$cacheDir);
@@ -41,12 +41,12 @@ class CacheWarmerAggregateTest extends TestCase
 
     public function testWarmupDoesCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsEnabled()
     {
-        $warmer = $this->createMock(CacheWarmerInterface::class);
+        $warmer = self::createMock(CacheWarmerInterface::class);
         $warmer
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('isOptional');
         $warmer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('warmUp');
 
         $aggregate = new CacheWarmerAggregate([$warmer]);
@@ -56,13 +56,13 @@ class CacheWarmerAggregateTest extends TestCase
 
     public function testWarmupDoesNotCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsNotEnabled()
     {
-        $warmer = $this->createMock(CacheWarmerInterface::class);
+        $warmer = self::createMock(CacheWarmerInterface::class);
         $warmer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isOptional')
             ->willReturn(true);
         $warmer
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('warmUp');
 
         $aggregate = new CacheWarmerAggregate([$warmer]);

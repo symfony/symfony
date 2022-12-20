@@ -29,12 +29,9 @@ class MailerTest extends AbstractWebTestCase
         $onDoSend = function (SentMessage $message) {
             $envelope = $message->getEnvelope();
 
-            $this->assertEquals(
-                [new Address('redirected@example.org')],
-                $envelope->getRecipients()
-            );
+            self::assertEquals([new Address('redirected@example.org')], $envelope->getRecipients());
 
-            $this->assertEquals('sender@example.org', $envelope->getSender()->getAddress());
+            self::assertEquals('sender@example.org', $envelope->getSender()->getAddress());
         };
 
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
@@ -77,35 +74,35 @@ class MailerTest extends AbstractWebTestCase
 
     public function testMailerAssertions()
     {
-        $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
+        $client = self::createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
         $client->request('GET', '/send_email');
 
-        $this->assertEmailCount(2);
+        self::assertEmailCount(2);
         $first = 0;
         $second = 1;
         if (!class_exists(FullStack::class)) {
-            $this->assertQueuedEmailCount(2);
+            self::assertQueuedEmailCount(2);
             $first = 1;
             $second = 3;
-            $this->assertEmailIsQueued($this->getMailerEvent(0));
-            $this->assertEmailIsQueued($this->getMailerEvent(2));
+            self::assertEmailIsQueued(self::getMailerEvent(0));
+            self::assertEmailIsQueued(self::getMailerEvent(2));
         }
-        $this->assertEmailIsNotQueued($this->getMailerEvent($first));
-        $this->assertEmailIsNotQueued($this->getMailerEvent($second));
+        self::assertEmailIsNotQueued(self::getMailerEvent($first));
+        self::assertEmailIsNotQueued(self::getMailerEvent($second));
 
-        $email = $this->getMailerMessage($first);
-        $this->assertEmailHasHeader($email, 'To');
-        $this->assertEmailHeaderSame($email, 'To', 'fabien@symfony.com');
-        $this->assertEmailHeaderNotSame($email, 'To', 'helene@symfony.com');
-        $this->assertEmailTextBodyContains($email, 'Bar');
-        $this->assertEmailTextBodyNotContains($email, 'Foo');
-        $this->assertEmailHtmlBodyContains($email, 'Foo');
-        $this->assertEmailHtmlBodyNotContains($email, 'Bar');
-        $this->assertEmailAttachmentCount($email, 1);
+        $email = self::getMailerMessage($first);
+        self::assertEmailHasHeader($email, 'To');
+        self::assertEmailHeaderSame($email, 'To', 'fabien@symfony.com');
+        self::assertEmailHeaderNotSame($email, 'To', 'helene@symfony.com');
+        self::assertEmailTextBodyContains($email, 'Bar');
+        self::assertEmailTextBodyNotContains($email, 'Foo');
+        self::assertEmailHtmlBodyContains($email, 'Foo');
+        self::assertEmailHtmlBodyNotContains($email, 'Bar');
+        self::assertEmailAttachmentCount($email, 1);
 
-        $email = $this->getMailerMessage($second);
-        $this->assertEmailAddressContains($email, 'To', 'fabien@symfony.com');
-        $this->assertEmailAddressContains($email, 'To', 'thomas@symfony.com');
-        $this->assertEmailAddressContains($email, 'Reply-To', 'me@symfony.com');
+        $email = self::getMailerMessage($second);
+        self::assertEmailAddressContains($email, 'To', 'fabien@symfony.com');
+        self::assertEmailAddressContains($email, 'To', 'thomas@symfony.com');
+        self::assertEmailAddressContains($email, 'Reply-To', 'me@symfony.com');
     }
 }

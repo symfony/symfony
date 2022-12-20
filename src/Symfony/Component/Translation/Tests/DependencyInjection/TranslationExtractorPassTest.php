@@ -29,7 +29,7 @@ class TranslationExtractorPassTest extends TestCase
         $translationDumperPass = new TranslationExtractorPass();
         $translationDumperPass->process($container);
 
-        $this->assertEquals([['addExtractor', ['bar.alias', new Reference('foo.id')]]], $extractorDefinition->getMethodCalls());
+        self::assertEquals([['addExtractor', ['bar.alias', new Reference('foo.id')]]], $extractorDefinition->getMethodCalls());
     }
 
     public function testProcessNoDefinitionFound()
@@ -43,14 +43,14 @@ class TranslationExtractorPassTest extends TestCase
         $translationDumperPass->process($container);
 
         // the container is untouched (i.e. no new definitions or aliases)
-        $this->assertCount($definitionsBefore, $container->getDefinitions());
-        $this->assertCount($aliasesBefore, $container->getAliases());
+        self::assertCount($definitionsBefore, $container->getDefinitions());
+        self::assertCount($aliasesBefore, $container->getAliases());
     }
 
     public function testProcessMissingAlias()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The alias for the tag "translation.extractor" of service "foo.id" must be set.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('The alias for the tag "translation.extractor" of service "foo.id" must be set.');
         $container = new ContainerBuilder();
         $container->register('translation.extractor');
         $container->register('foo.id')

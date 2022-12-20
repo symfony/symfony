@@ -28,10 +28,10 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $token->setUser('fabien');
-        $this->assertEquals('fabien', $token->getUsername());
+        self::assertEquals('fabien', $token->getUsername());
 
         $token->setUser(new TestUser('fabien'));
-        $this->assertEquals('fabien', $token->getUsername());
+        self::assertEquals('fabien', $token->getUsername());
 
         $legacyUser = new class() implements UserInterface {
             public function getUsername()
@@ -57,10 +57,10 @@ class AbstractTokenTest extends TestCase
             }
         };
         $token->setUser($legacyUser);
-        $this->assertEquals('fabien', $token->getUsername());
+        self::assertEquals('fabien', $token->getUsername());
 
         $token->setUser($legacyUser);
-        $this->assertEquals('fabien', $token->getUserIdentifier());
+        self::assertEquals('fabien', $token->getUserIdentifier());
     }
 
     /**
@@ -70,7 +70,7 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $token->setUser($user);
-        $this->assertEquals($username, $token->getUserIdentifier());
+        self::assertEquals($username, $token->getUserIdentifier());
     }
 
     public function provideUsers()
@@ -86,7 +86,7 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $token->setUser($user);
-        $this->assertEquals($username, $token->getUserIdentifier());
+        self::assertEquals($username, $token->getUserIdentifier());
     }
 
     public function provideLegacyUsers()
@@ -101,8 +101,8 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_FOO']);
 
-        $user = $this->createMock(UserInterface::class);
-        $user->expects($this->once())->method('eraseCredentials');
+        $user = self::createMock(UserInterface::class);
+        $user->expects(self::once())->method('eraseCredentials');
         $token->setUser($user);
 
         $token->eraseCredentials();
@@ -115,14 +115,14 @@ class AbstractTokenTest extends TestCase
 
         $uToken = unserialize(serialize($token));
 
-        $this->assertEquals($token->getRoleNames(), $uToken->getRoleNames());
-        $this->assertEquals($token->getAttributes(), $uToken->getAttributes());
+        self::assertEquals($token->getRoleNames(), $uToken->getRoleNames());
+        self::assertEquals($token->getAttributes(), $uToken->getAttributes());
     }
 
     public function testConstructor()
     {
         $token = new ConcreteToken(['ROLE_FOO']);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        self::assertEquals(['ROLE_FOO'], $token->getRoleNames());
     }
 
     /**
@@ -131,13 +131,13 @@ class AbstractTokenTest extends TestCase
     public function testAuthenticatedFlag()
     {
         $token = new ConcreteToken();
-        $this->assertFalse($token->isAuthenticated());
+        self::assertFalse($token->isAuthenticated());
 
         $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
 
         $token->setAuthenticated(false);
-        $this->assertFalse($token->isAuthenticated());
+        self::assertFalse($token->isAuthenticated());
     }
 
     public function testAttributes()
@@ -146,19 +146,19 @@ class AbstractTokenTest extends TestCase
         $token = new ConcreteToken();
         $token->setAttributes($attributes);
 
-        $this->assertEquals($attributes, $token->getAttributes(), '->getAttributes() returns the token attributes');
-        $this->assertEquals('bar', $token->getAttribute('foo'), '->getAttribute() returns the value of an attribute');
+        self::assertEquals($attributes, $token->getAttributes(), '->getAttributes() returns the token attributes');
+        self::assertEquals('bar', $token->getAttribute('foo'), '->getAttribute() returns the value of an attribute');
         $token->setAttribute('foo', 'foo');
-        $this->assertEquals('foo', $token->getAttribute('foo'), '->setAttribute() changes the value of an attribute');
-        $this->assertTrue($token->hasAttribute('foo'), '->hasAttribute() returns true if the attribute is defined');
-        $this->assertFalse($token->hasAttribute('oof'), '->hasAttribute() returns false if the attribute is not defined');
+        self::assertEquals('foo', $token->getAttribute('foo'), '->setAttribute() changes the value of an attribute');
+        self::assertTrue($token->hasAttribute('foo'), '->hasAttribute() returns true if the attribute is defined');
+        self::assertFalse($token->hasAttribute('oof'), '->hasAttribute() returns false if the attribute is not defined');
 
         try {
             $token->getAttribute('foobar');
-            $this->fail('->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
+            self::fail('->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
-            $this->assertEquals('This token has no "foobar" attribute.', $e->getMessage(), '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
+            self::assertInstanceOf(\InvalidArgumentException::class, $e, '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
+            self::assertEquals('This token has no "foobar" attribute.', $e->getMessage(), '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
         }
     }
 
@@ -169,7 +169,7 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken();
         $token->setUser($user);
-        $this->assertSame($user, $token->getUser());
+        self::assertSame($user, $token->getUser());
     }
 
     /**
@@ -180,18 +180,18 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken();
         $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
 
         $token->setUser($firstUser);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
 
         $token->setUser($secondUser);
-        $this->assertFalse($token->isAuthenticated());
+        self::assertFalse($token->isAuthenticated());
     }
 
     public function getUserChanges()
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = self::createMock(UserInterface::class);
 
         return [
             ['foo', 'bar'],
@@ -214,13 +214,13 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken();
         $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
 
         $token->setUser($user);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
 
         $token->setUser($user);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
     }
 
     /**
@@ -230,15 +230,15 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_ADMIN']);
         $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
 
         $user = new SerializableUser('wouter', ['ROLE_ADMIN']);
         $token->setUser($user);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
 
         $token = unserialize(serialize($token));
         $token->setUser($user);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
     }
 }
 

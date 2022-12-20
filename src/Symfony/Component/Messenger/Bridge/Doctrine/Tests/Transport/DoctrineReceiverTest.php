@@ -37,37 +37,37 @@ class DoctrineReceiverTest extends TestCase
         $serializer = $this->createSerializer();
 
         $doctrineEnvelope = $this->createDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $connection->method('get')->willReturn($doctrineEnvelope);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->get();
-        $this->assertCount(1, $actualEnvelopes);
+        self::assertCount(1, $actualEnvelopes);
         /** @var Envelope $actualEnvelope */
         $actualEnvelope = $actualEnvelopes[0];
-        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+        self::assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
 
         /** @var DoctrineReceivedStamp $doctrineReceivedStamp */
         $doctrineReceivedStamp = $actualEnvelope->last(DoctrineReceivedStamp::class);
-        $this->assertNotNull($doctrineReceivedStamp);
-        $this->assertSame('1', $doctrineReceivedStamp->getId());
+        self::assertNotNull($doctrineReceivedStamp);
+        self::assertSame('1', $doctrineReceivedStamp->getId());
 
         /** @var TransportMessageIdStamp $transportMessageIdStamp */
         $transportMessageIdStamp = $actualEnvelope->last(TransportMessageIdStamp::class);
-        $this->assertNotNull($transportMessageIdStamp);
-        $this->assertSame(1, $transportMessageIdStamp->getId());
+        self::assertNotNull($transportMessageIdStamp);
+        self::assertSame(1, $transportMessageIdStamp->getId());
     }
 
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-        $serializer = $this->createMock(PhpSerializer::class);
+        self::expectException(MessageDecodingFailedException::class);
+        $serializer = self::createMock(PhpSerializer::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $doctrineEnvelop = $this->createDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $connection->method('get')->willReturn($doctrineEnvelop);
-        $connection->expects($this->once())->method('reject');
+        $connection->expects(self::once())->method('reject');
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $receiver->get();
@@ -76,7 +76,7 @@ class DoctrineReceiverTest extends TestCase
     public function testOccursRetryableExceptionFromConnection()
     {
         $serializer = $this->createSerializer();
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
         if (!class_exists(Version::class)) {
             // This is doctrine/dbal 3.x
@@ -87,16 +87,16 @@ class DoctrineReceiverTest extends TestCase
 
         $connection->method('get')->willThrowException($deadlockException);
         $receiver = new DoctrineReceiver($connection, $serializer);
-        $this->assertSame([], $receiver->get());
-        $this->assertSame([], $receiver->get());
+        self::assertSame([], $receiver->get());
+        self::assertSame([], $receiver->get());
         try {
             $receiver->get();
         } catch (TransportException $exception) {
             // skip, and retry
         }
-        $this->assertSame([], $receiver->get());
-        $this->assertSame([], $receiver->get());
-        $this->expectException(TransportException::class);
+        self::assertSame([], $receiver->get());
+        self::assertSame([], $receiver->get());
+        self::expectException(TransportException::class);
         $receiver->get();
     }
 
@@ -106,13 +106,13 @@ class DoctrineReceiverTest extends TestCase
 
         $doctrineEnvelope1 = $this->createDoctrineEnvelope();
         $doctrineEnvelope2 = $this->createDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $connection->method('findAll')->with(50)->willReturn([$doctrineEnvelope1, $doctrineEnvelope2]);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelopes = iterator_to_array($receiver->all(50));
-        $this->assertCount(2, $actualEnvelopes);
-        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+        self::assertCount(2, $actualEnvelopes);
+        self::assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
 
     public function testFind()
@@ -120,12 +120,12 @@ class DoctrineReceiverTest extends TestCase
         $serializer = $this->createSerializer();
 
         $doctrineEnvelope = $this->createDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $connection->method('find')->with(10)->willReturn($doctrineEnvelope);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelope = $receiver->find(10);
-        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelope->getMessage());
+        self::assertEquals(new DummyMessage('Hi'), $actualEnvelope->getMessage());
     }
 
     private function createDoctrineEnvelope(): array

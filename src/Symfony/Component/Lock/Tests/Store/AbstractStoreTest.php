@@ -29,11 +29,11 @@ abstract class AbstractStoreTest extends TestCase
 
         $key = new Key(uniqid(__METHOD__, true));
 
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
         $store->save($key);
-        $this->assertTrue($store->exists($key));
+        self::assertTrue($store->exists($key));
         $store->delete($key);
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
     }
 
     public function testSaveWithDifferentResources()
@@ -44,20 +44,20 @@ abstract class AbstractStoreTest extends TestCase
         $key2 = new Key(uniqid(__METHOD__, true));
 
         $store->save($key1);
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         $store->save($key2);
-        $this->assertTrue($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertTrue($store->exists($key2));
 
         $store->delete($key1);
-        $this->assertFalse($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertTrue($store->exists($key2));
 
         $store->delete($key2);
-        $this->assertFalse($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertFalse($store->exists($key2));
     }
 
     public function testSaveWithDifferentKeysOnSameResources()
@@ -69,30 +69,30 @@ abstract class AbstractStoreTest extends TestCase
         $key2 = new Key($resource);
 
         $store->save($key1);
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         try {
             $store->save($key2);
-            $this->fail('The store shouldn\'t save the second key');
+            self::fail('The store shouldn\'t save the second key');
         } catch (LockConflictedException $e) {
         }
 
         // The failure of previous attempt should not impact the state of current locks
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         $store->delete($key1);
-        $this->assertFalse($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         $store->save($key2);
-        $this->assertFalse($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertTrue($store->exists($key2));
 
         $store->delete($key2);
-        $this->assertFalse($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertFalse($store->exists($key2));
     }
 
     public function testSaveTwice()
@@ -105,7 +105,7 @@ abstract class AbstractStoreTest extends TestCase
         $store->save($key);
         $store->save($key);
         // just asserts it don't throw an exception
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
 
         $store->delete($key);
     }
@@ -118,11 +118,11 @@ abstract class AbstractStoreTest extends TestCase
         $key2 = new Key(uniqid(__METHOD__, true));
 
         $store->save($key1);
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         $store->delete($key2);
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
     }
 }

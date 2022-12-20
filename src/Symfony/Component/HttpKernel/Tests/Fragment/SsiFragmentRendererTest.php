@@ -35,8 +35,8 @@ class SsiFragmentRendererTest extends TestCase
         $request->setLocale('fr');
         $request->headers->set('Surrogate-Capability', 'SSI/1.0');
 
-        $this->assertEquals('<!--#include virtual="/" -->', $strategy->render('/', $request)->getContent());
-        $this->assertEquals('<!--#include virtual="/" -->', $strategy->render('/', $request, ['comment' => 'This is a comment'])->getContent(), 'Strategy options should not impact the ssi include tag');
+        self::assertEquals('<!--#include virtual="/" -->', $strategy->render('/', $request)->getContent());
+        self::assertEquals('<!--#include virtual="/" -->', $strategy->render('/', $request, ['comment' => 'This is a comment'])->getContent(), 'Strategy options should not impact the ssi include tag');
     }
 
     public function testRenderControllerReference()
@@ -51,15 +51,12 @@ class SsiFragmentRendererTest extends TestCase
         $reference = new ControllerReference('main_controller', [], []);
         $altReference = new ControllerReference('alt_controller', [], []);
 
-        $this->assertEquals(
-            '<!--#include virtual="/_fragment?_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->',
-            $strategy->render($reference, $request, ['alt' => $altReference])->getContent()
-        );
+        self::assertEquals('<!--#include virtual="/_fragment?_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->', $strategy->render($reference, $request, ['alt' => $altReference])->getContent());
     }
 
     public function testRenderControllerReferenceWithoutSignerThrowsException()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -71,7 +68,7 @@ class SsiFragmentRendererTest extends TestCase
 
     public function testRenderAltControllerReferenceWithoutSignerThrowsException()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -83,10 +80,10 @@ class SsiFragmentRendererTest extends TestCase
 
     private function getInlineStrategy($called = false)
     {
-        $inline = $this->createMock(InlineFragmentRenderer::class);
+        $inline = self::createMock(InlineFragmentRenderer::class);
 
         if ($called) {
-            $inline->expects($this->once())->method('render');
+            $inline->expects(self::once())->method('render');
         }
 
         return $inline;

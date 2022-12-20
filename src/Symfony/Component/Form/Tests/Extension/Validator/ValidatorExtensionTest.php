@@ -37,13 +37,13 @@ class ValidatorExtensionTest extends TestCase
 
         $extension = new ValidatorExtension($validator, false);
 
-        $this->assertInstanceOf(ValidatorTypeGuesser::class, $extension->loadTypeGuesser());
+        self::assertInstanceOf(ValidatorTypeGuesser::class, $extension->loadTypeGuesser());
 
-        $this->assertCount(1, $metadata->getConstraints());
-        $this->assertInstanceOf(FormConstraint::class, $metadata->getConstraints()[0]);
+        self::assertCount(1, $metadata->getConstraints());
+        self::assertInstanceOf(FormConstraint::class, $metadata->getConstraints()[0]);
 
-        $this->assertSame(CascadingStrategy::NONE, $metadata->cascadingStrategy);
-        $this->assertSame(TraversalStrategy::NONE, $metadata->traversalStrategy);
-        $this->assertCount(0, $metadata->getPropertyMetadata('children'));
+        self::assertSame(CascadingStrategy::NONE, $metadata->cascadingStrategy);
+        self::assertSame(TraversalStrategy::NONE, $metadata->traversalStrategy);
+        self::assertCount(0, $metadata->getPropertyMetadata('children'));
     }
 }

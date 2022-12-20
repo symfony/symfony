@@ -24,6 +24,6 @@ class SerializerStampTest extends TestCase
     {
         $stamp = new SerializerStamp([ObjectNormalizer::GROUPS => ['Default', 'Extra']]);
 
-        $this->assertEquals($stamp, unserialize(serialize($stamp)));
+        self::assertEquals($stamp, unserialize(serialize($stamp)));
     }
 }

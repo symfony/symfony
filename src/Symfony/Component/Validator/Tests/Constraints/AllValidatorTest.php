@@ -34,7 +34,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
 
     public function testThrowsExceptionIfNotTraversable()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate('foo.barbar', new All(new Range(['min' => 4])));
     }
 

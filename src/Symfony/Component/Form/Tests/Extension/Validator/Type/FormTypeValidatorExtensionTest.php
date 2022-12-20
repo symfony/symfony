@@ -46,9 +46,9 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $builder->add('firstName', FormTypeTest::TESTED_TYPE);
         $form = $builder->getForm();
 
-        $this->validator->expects($this->once())
+        $this->validator->expects(self::once())
             ->method('validate')
-            ->with($this->equalTo($form))
+            ->with(self::equalTo($form))
             ->willReturn(new ConstraintViolationList());
 
         // specific data is irrelevant
@@ -59,19 +59,19 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     {
         $form = $this->createForm(['constraints' => $valid = new Valid()]);
 
-        $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
+        self::assertSame([$valid], $form->getConfig()->getOption('constraints'));
     }
 
     public function testValidConstraintsArray()
     {
         $form = $this->createForm(['constraints' => [$valid = new Valid()]]);
 
-        $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
+        self::assertSame([$valid], $form->getConfig()->getOption('constraints'));
     }
 
     public function testInvalidConstraint()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->createForm(['constraints' => ['foo' => 'bar']]);
     }
 
@@ -93,8 +93,8 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
         $errors = $form->getErrors(true);
 
-        $this->assertCount(1, $errors);
-        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+        self::assertCount(1, $errors);
+        self::assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
     public function testManyFieldsGroupSequenceWithConstraintsOption()
@@ -103,8 +103,8 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $authorMetadata = (new ClassMetadata(Author::class))
             ->addPropertyConstraint('firstName', new NotBlank(['groups' => 'Second']))
         ;
-        $metadataFactory = $this->createMock(MetadataFactoryInterface::class);
-        $metadataFactory->expects($this->any())
+        $metadataFactory = self::createMock(MetadataFactoryInterface::class);
+        $metadataFactory->expects(self::any())
             ->method('getMetadataFor')
             ->willReturnCallback(static function ($classOrObject) use ($formMetadata, $authorMetadata) {
                 if (Author::class === $classOrObject || $classOrObject instanceof Author) {
@@ -144,16 +144,16 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
         $errors = $form->getErrors(true);
 
-        $this->assertCount(1, $errors);
-        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
-        $this->assertSame('children[lastName].data', $errors[0]->getCause()->getPropertyPath());
+        self::assertCount(1, $errors);
+        self::assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+        self::assertSame('children[lastName].data', $errors[0]->getCause()->getPropertyPath());
     }
 
     public function testInvalidMessage()
     {
         $form = $this->createForm();
 
-        $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
+        self::assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 
     /**
@@ -165,7 +165,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
         $form = $this->createForm(['legacy_error_messages' => true]);
 
-        $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
+        self::assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 
     protected function createForm(array $options = [])

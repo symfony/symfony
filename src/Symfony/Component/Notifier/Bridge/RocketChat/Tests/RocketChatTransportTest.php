@@ -29,7 +29,7 @@ final class RocketChatTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null, string $channel = null): TransportInterface
     {
-        return new RocketChatTransport('testAccessToken', $channel, $client ?? $this->createMock(HttpClientInterface::class));
+        return new RocketChatTransport('testAccessToken', $channel, $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -46,6 +46,6 @@ final class RocketChatTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

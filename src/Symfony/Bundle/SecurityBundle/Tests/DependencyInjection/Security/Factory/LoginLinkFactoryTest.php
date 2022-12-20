@@ -34,8 +34,8 @@ class LoginLinkFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig($config, $factory);
         $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
 
-        $this->assertTrue($container->hasDefinition('security.authenticator.login_link'));
-        $this->assertTrue($container->hasDefinition('security.authenticator.login_link_handler.firewall1'));
+        self::assertTrue($container->hasDefinition('security.authenticator.login_link'));
+        self::assertTrue($container->hasDefinition('security.authenticator.login_link_handler.firewall1'));
     }
 
     private function processConfig(array $config, LoginLinkFactory $factory)

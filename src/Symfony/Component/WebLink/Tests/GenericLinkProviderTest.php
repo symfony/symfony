@@ -31,7 +31,7 @@ class GenericLinkProviderTest extends TestCase
         $provider = (new GenericLinkProvider())
             ->withLink($link);
 
-        $this->assertContains($link, $provider->getLinks());
+        self::assertContains($link, $provider->getLinks());
     }
 
     public function testCanAddLinksByConstructor()
@@ -45,7 +45,7 @@ class GenericLinkProviderTest extends TestCase
         $provider = (new GenericLinkProvider())
             ->withLink($link);
 
-        $this->assertContains($link, $provider->getLinks());
+        self::assertContains($link, $provider->getLinks());
     }
 
     public function testCanGetLinksByRel()
@@ -66,8 +66,8 @@ class GenericLinkProviderTest extends TestCase
             ->withLink($link2);
 
         $links = $provider->getLinksByRel('home');
-        $this->assertContains($link2, $links);
-        $this->assertNotContains($link1, $links);
+        self::assertContains($link2, $links);
+        self::assertNotContains($link1, $links);
     }
 
     public function testCanRemoveLinks()
@@ -82,6 +82,6 @@ class GenericLinkProviderTest extends TestCase
             ->withLink($link)
             ->withoutLink($link);
 
-        $this->assertNotContains($link, $provider->getLinks());
+        self::assertNotContains($link, $provider->getLinks());
     }
 }

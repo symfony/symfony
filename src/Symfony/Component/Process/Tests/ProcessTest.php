@@ -52,14 +52,14 @@ class ProcessTest extends TestCase
 
     public function testInvalidCwd()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageMatches('/The provided cwd ".*" does not exist\./');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessageMatches('/The provided cwd ".*" does not exist\./');
         try {
             // Check that it works fine if the CWD exists
             $cmd = new Process(['echo', 'test'], __DIR__);
             $cmd->run();
         } catch (\Exception $e) {
-            $this->fail($e);
+            self::fail($e);
         }
 
         $cmd = new Process(['echo', 'test'], __DIR__.'/notfound/');
@@ -69,25 +69,25 @@ class ProcessTest extends TestCase
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is transient on Windows');
+            self::markTestSkipped('This test is transient on Windows');
         }
         @trigger_error('Test Error', \E_USER_NOTICE);
         $process = $this->getProcessForCode('sleep(3)');
         $process->run();
         $actualError = error_get_last();
-        $this->assertEquals('Test Error', $actualError['message']);
-        $this->assertEquals(\E_USER_NOTICE, $actualError['type']);
+        self::assertEquals('Test Error', $actualError['message']);
+        self::assertEquals(\E_USER_NOTICE, $actualError['type']);
     }
 
     public function testNegativeTimeoutFromConstructor()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $this->getProcess('', null, null, null, -1);
     }
 
     public function testNegativeTimeoutFromSetter()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $p = $this->getProcess('');
         $p->setTimeout(-1);
     }
@@ -97,13 +97,13 @@ class ProcessTest extends TestCase
         $p = $this->getProcess('');
 
         $p->setTimeout(10);
-        $this->assertSame(10.0, $p->getTimeout());
+        self::assertSame(10.0, $p->getTimeout());
 
         $p->setTimeout(null);
-        $this->assertNull($p->getTimeout());
+        self::assertNull($p->getTimeout());
 
         $p->setTimeout(0.0);
-        $this->assertNull($p->getTimeout());
+        self::assertNull($p->getTimeout());
     }
 
     /**
@@ -127,13 +127,13 @@ class ProcessTest extends TestCase
 
         $p->wait();
 
-        $this->assertLessThan(15, microtime(true) - $start);
+        self::assertLessThan(15, microtime(true) - $start);
     }
 
     public function testWaitUntilSpecificOutput()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestIncomplete('This test is too transient on Windows, help wanted to improve it');
+            self::markTestIncomplete('This test is too transient on Windows, help wanted to improve it');
         }
 
         $p = $this->getProcess([self::$phpBin, __DIR__.'/KillableProcessWithOutput.php']);
@@ -145,9 +145,9 @@ class ProcessTest extends TestCase
         $result = $p->waitUntil(function ($type, $output) use (&$completeOutput) {
             return str_contains($completeOutput .= $output, 'One more');
         });
-        $this->assertTrue($result);
-        $this->assertLessThan(20, microtime(true) - $start);
-        $this->assertStringStartsWith("First iteration output\nSecond iteration output\nOne more", $completeOutput);
+        self::assertTrue($result);
+        self::assertLessThan(20, microtime(true) - $start);
+        self::assertStringStartsWith("First iteration output\nSecond iteration output\nOne more", $completeOutput);
         $p->stop();
     }
 
@@ -155,7 +155,7 @@ class ProcessTest extends TestCase
     {
         $p = $this->getProcess('echo foo');
         $p->start();
-        $this->assertFalse($p->waitUntil(function () { return false; }));
+        self::assertFalse($p->waitUntil(function () { return false; }));
     }
 
     public function testAllOutputIsActuallyReadOnTermination()
@@ -187,7 +187,7 @@ class ProcessTest extends TestCase
 
         $o = $p->getOutput();
 
-        $this->assertEquals($expectedOutputSize, \strlen($o));
+        self::assertEquals($expectedOutputSize, \strlen($o));
     }
 
     public function testCallbacksAreExecutedWithStart()
@@ -199,7 +199,7 @@ class ProcessTest extends TestCase
 
         $process->wait();
 
-        $this->assertSame('foo'.\PHP_EOL, $data);
+        self::assertSame('foo'.\PHP_EOL, $data);
     }
 
     /**
@@ -212,7 +212,7 @@ class ProcessTest extends TestCase
         $p = $this->getProcessForCode($code);
         $p->run();
 
-        $this->assertSame($expected, $p->$getter());
+        self::assertSame($expected, $p->$getter());
     }
 
     /**
@@ -229,8 +229,8 @@ class ProcessTest extends TestCase
         $p->setInput($expected);
         $p->run();
 
-        $this->assertEquals($expectedLength, \strlen($p->getOutput()));
-        $this->assertEquals($expectedLength, \strlen($p->getErrorOutput()));
+        self::assertEquals($expectedLength, \strlen($p->getOutput()));
+        self::assertEquals($expectedLength, \strlen($p->getErrorOutput()));
     }
 
     /**
@@ -251,8 +251,8 @@ class ProcessTest extends TestCase
 
         fclose($stream);
 
-        $this->assertEquals($expectedLength, \strlen($p->getOutput()));
-        $this->assertEquals($expectedLength, \strlen($p->getErrorOutput()));
+        self::assertEquals($expectedLength, \strlen($p->getOutput()));
+        self::assertEquals($expectedLength, \strlen($p->getErrorOutput()));
     }
 
     public function testLiveStreamAsInput()
@@ -270,19 +270,19 @@ class ProcessTest extends TestCase
         });
         $p->wait();
 
-        $this->assertSame('hello', $p->getOutput());
+        self::assertSame('hello', $p->getOutput());
     }
 
     public function testSetInputWhileRunningThrowsAnException()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Input cannot be set while the process is running.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Input cannot be set while the process is running.');
         $process = $this->getProcessForCode('sleep(30);');
         $process->start();
         try {
             $process->setInput('foobar');
             $process->stop();
-            $this->fail('A LogicException should have been raised.');
+            self::fail('A LogicException should have been raised.');
         } catch (LogicException $e) {
         }
         $process->stop();
@@ -295,8 +295,8 @@ class ProcessTest extends TestCase
      */
     public function testInvalidInput($value)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('"Symfony\Component\Process\Process::setInput" only accepts strings, Traversable objects or stream resources.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('"Symfony\Component\Process\Process::setInput" only accepts strings, Traversable objects or stream resources.');
         $process = $this->getProcess('foo');
         $process->setInput($value);
     }
@@ -316,7 +316,7 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('foo');
         $process->setInput($value);
-        $this->assertSame($expected, $process->getInput());
+        self::assertSame($expected, $process->getInput());
     }
 
     public function provideInputValues()
@@ -349,7 +349,7 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess(sprintf('echo %s %s echo %s', $input, $operator, $input));
         $process->run();
-        $this->assertEquals($expected, $process->getOutput());
+        self::assertEquals($expected, $process->getOutput());
     }
 
     public function testCallbackIsExecutedForOutput()
@@ -361,7 +361,7 @@ class ProcessTest extends TestCase
             $called = 'foo' === $buffer;
         });
 
-        $this->assertTrue($called, 'The callback should be executed with the output');
+        self::assertTrue($called, 'The callback should be executed with the output');
     }
 
     public function testCallbackIsExecutedForOutputWheneverOutputIsDisabled()
@@ -374,7 +374,7 @@ class ProcessTest extends TestCase
             $called = 'foo' === $buffer;
         });
 
-        $this->assertTrue($called, 'The callback should be executed with the output');
+        self::assertTrue($called, 'The callback should be executed with the output');
     }
 
     public function testGetErrorOutput()
@@ -382,7 +382,7 @@ class ProcessTest extends TestCase
         $p = $this->getProcessForCode('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }');
 
         $p->run();
-        $this->assertEquals(3, preg_match_all('/ERROR/', $p->getErrorOutput(), $matches));
+        self::assertEquals(3, preg_match_all('/ERROR/', $p->getErrorOutput(), $matches));
     }
 
     public function testFlushErrorOutput()
@@ -391,7 +391,7 @@ class ProcessTest extends TestCase
 
         $p->run();
         $p->clearErrorOutput();
-        $this->assertEmpty($p->getErrorOutput());
+        self::assertEmpty($p->getErrorOutput());
     }
 
     /**
@@ -413,8 +413,8 @@ class ProcessTest extends TestCase
                 usleep(1000);
             }
 
-            $this->assertSame($s, $p->$getIncrementalOutput());
-            $this->assertSame('', $p->$getIncrementalOutput());
+            self::assertSame($s, $p->$getIncrementalOutput());
+            self::assertSame('', $p->$getIncrementalOutput());
 
             flock($h, \LOCK_UN);
         }
@@ -435,7 +435,7 @@ class ProcessTest extends TestCase
         $p = $this->getProcessForCode('$n = 0; while ($n < 3) { echo \' foo \'; $n++; }');
 
         $p->run();
-        $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
+        self::assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
     }
 
     public function testFlushOutput()
@@ -444,7 +444,7 @@ class ProcessTest extends TestCase
 
         $p->run();
         $p->clearOutput();
-        $this->assertEmpty($p->getOutput());
+        self::assertEmpty($p->getOutput());
     }
 
     public function testZeroAsOutput()
@@ -457,64 +457,64 @@ class ProcessTest extends TestCase
         }
 
         $p->run();
-        $this->assertSame('0', $p->getOutput());
+        self::assertSame('0', $p->getOutput());
     }
 
     public function testExitCodeCommandFailed()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX exit code');
+            self::markTestSkipped('Windows does not support POSIX exit code');
         }
 
         // such command run in bash return an exitcode 127
         $process = $this->getProcess('nonexistingcommandIhopeneversomeonewouldnameacommandlikethis');
         $process->run();
 
-        $this->assertGreaterThan(0, $process->getExitCode());
+        self::assertGreaterThan(0, $process->getExitCode());
     }
 
     public function testTTYCommand()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not have /dev/tty support');
+            self::markTestSkipped('Windows does not have /dev/tty support');
         }
 
         if (!Process::isTtySupported()) {
-            $this->markTestSkipped('There is no TTY support');
+            self::markTestSkipped('There is no TTY support');
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null && '.$this->getProcessForCode('usleep(100000);')->getCommandLine());
         $process->setTty(true);
         $process->start();
-        $this->assertTrue($process->isRunning());
+        self::assertTrue($process->isRunning());
         $process->wait();
 
-        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+        self::assertSame(Process::STATUS_TERMINATED, $process->getStatus());
     }
 
     public function testTTYCommandExitCode()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does have /dev/tty support');
+            self::markTestSkipped('Windows does have /dev/tty support');
         }
 
         if (!Process::isTtySupported()) {
-            $this->markTestSkipped('There is no TTY support');
+            self::markTestSkipped('There is no TTY support');
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null');
         $process->setTty(true);
         $process->run();
 
-        $this->assertTrue($process->isSuccessful());
+        self::assertTrue($process->isSuccessful());
     }
 
     public function testTTYInWindowsEnvironment()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('TTY mode is not supported on Windows platform.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('TTY mode is not supported on Windows platform.');
         if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is for Windows platform only');
+            self::markTestSkipped('This test is for Windows platform only');
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null');
@@ -525,40 +525,40 @@ class ProcessTest extends TestCase
     public function testExitCodeTextIsNullWhenExitCodeIsNull()
     {
         $process = $this->getProcess('');
-        $this->assertNull($process->getExitCodeText());
+        self::assertNull($process->getExitCodeText());
     }
 
     public function testPTYCommand()
     {
         if (!Process::isPtySupported()) {
-            $this->markTestSkipped('PTY is not supported on this operating system.');
+            self::markTestSkipped('PTY is not supported on this operating system.');
         }
 
         $process = $this->getProcess('echo "foo"');
         $process->setPty(true);
         $process->run();
 
-        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
-        $this->assertEquals("foo\r\n", $process->getOutput());
+        self::assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+        self::assertEquals("foo\r\n", $process->getOutput());
     }
 
     public function testMustRun()
     {
         $process = $this->getProcess('echo foo');
 
-        $this->assertSame($process, $process->mustRun());
-        $this->assertEquals('foo'.\PHP_EOL, $process->getOutput());
+        self::assertSame($process, $process->mustRun());
+        self::assertEquals('foo'.\PHP_EOL, $process->getOutput());
     }
 
     public function testSuccessfulMustRunHasCorrectExitCode()
     {
         $process = $this->getProcess('echo foo')->mustRun();
-        $this->assertEquals(0, $process->getExitCode());
+        self::assertEquals(0, $process->getExitCode());
     }
 
     public function testMustRunThrowsException()
     {
-        $this->expectException(ProcessFailedException::class);
+        self::expectException(ProcessFailedException::class);
         $process = $this->getProcess('exit 1');
         $process->mustRun();
     }
@@ -571,7 +571,7 @@ class ProcessTest extends TestCase
         $p->setAccessible(true);
 
         $p->setValue($process, 2);
-        $this->assertEquals('Misuse of shell builtins', $process->getExitCodeText());
+        self::assertEquals('Misuse of shell builtins', $process->getExitCodeText());
     }
 
     public function testStartIsNonBlocking()
@@ -580,7 +580,7 @@ class ProcessTest extends TestCase
         $start = microtime(true);
         $process->start();
         $end = microtime(true);
-        $this->assertLessThan(0.4, $end - $start);
+        self::assertLessThan(0.4, $end - $start);
         $process->stop();
     }
 
@@ -588,70 +588,70 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertGreaterThan(0, \strlen($process->getOutput()));
+        self::assertGreaterThan(0, \strlen($process->getOutput()));
     }
 
     public function testGetExitCodeIsNullOnStart()
     {
         $process = $this->getProcessForCode('usleep(100000);');
-        $this->assertNull($process->getExitCode());
+        self::assertNull($process->getExitCode());
         $process->start();
-        $this->assertNull($process->getExitCode());
+        self::assertNull($process->getExitCode());
         $process->wait();
-        $this->assertEquals(0, $process->getExitCode());
+        self::assertEquals(0, $process->getExitCode());
     }
 
     public function testGetExitCodeIsNullOnWhenStartingAgain()
     {
         $process = $this->getProcessForCode('usleep(100000);');
         $process->run();
-        $this->assertEquals(0, $process->getExitCode());
+        self::assertEquals(0, $process->getExitCode());
         $process->start();
-        $this->assertNull($process->getExitCode());
+        self::assertNull($process->getExitCode());
         $process->wait();
-        $this->assertEquals(0, $process->getExitCode());
+        self::assertEquals(0, $process->getExitCode());
     }
 
     public function testGetExitCode()
     {
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertSame(0, $process->getExitCode());
+        self::assertSame(0, $process->getExitCode());
     }
 
     public function testStatus()
     {
         $process = $this->getProcessForCode('usleep(100000);');
-        $this->assertFalse($process->isRunning());
-        $this->assertFalse($process->isStarted());
-        $this->assertFalse($process->isTerminated());
-        $this->assertSame(Process::STATUS_READY, $process->getStatus());
+        self::assertFalse($process->isRunning());
+        self::assertFalse($process->isStarted());
+        self::assertFalse($process->isTerminated());
+        self::assertSame(Process::STATUS_READY, $process->getStatus());
         $process->start();
-        $this->assertTrue($process->isRunning());
-        $this->assertTrue($process->isStarted());
-        $this->assertFalse($process->isTerminated());
-        $this->assertSame(Process::STATUS_STARTED, $process->getStatus());
+        self::assertTrue($process->isRunning());
+        self::assertTrue($process->isStarted());
+        self::assertFalse($process->isTerminated());
+        self::assertSame(Process::STATUS_STARTED, $process->getStatus());
         $process->wait();
-        $this->assertFalse($process->isRunning());
-        $this->assertTrue($process->isStarted());
-        $this->assertTrue($process->isTerminated());
-        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+        self::assertFalse($process->isRunning());
+        self::assertTrue($process->isStarted());
+        self::assertTrue($process->isTerminated());
+        self::assertSame(Process::STATUS_TERMINATED, $process->getStatus());
     }
 
     public function testStop()
     {
         $process = $this->getProcessForCode('sleep(31);');
         $process->start();
-        $this->assertTrue($process->isRunning());
+        self::assertTrue($process->isRunning());
         $process->stop();
-        $this->assertFalse($process->isRunning());
+        self::assertFalse($process->isRunning());
     }
 
     public function testIsSuccessful()
     {
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertTrue($process->isSuccessful());
+        self::assertTrue($process->isSuccessful());
     }
 
     public function testIsSuccessfulOnlyAfterTerminated()
@@ -659,65 +659,65 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('usleep(100000);');
         $process->start();
 
-        $this->assertFalse($process->isSuccessful());
+        self::assertFalse($process->isSuccessful());
 
         $process->wait();
 
-        $this->assertTrue($process->isSuccessful());
+        self::assertTrue($process->isSuccessful());
     }
 
     public function testIsNotSuccessful()
     {
         $process = $this->getProcessForCode('throw new \Exception(\'BOUM\');');
         $process->run();
-        $this->assertFalse($process->isSuccessful());
+        self::assertFalse($process->isSuccessful());
     }
 
     public function testProcessIsNotSignaled()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
+            self::markTestSkipped('Windows does not support POSIX signals');
         }
 
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertFalse($process->hasBeenSignaled());
+        self::assertFalse($process->hasBeenSignaled());
     }
 
     public function testProcessWithoutTermSignal()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
+            self::markTestSkipped('Windows does not support POSIX signals');
         }
 
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertEquals(0, $process->getTermSignal());
+        self::assertEquals(0, $process->getTermSignal());
     }
 
     public function testProcessIsSignaledIfStopped()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
+            self::markTestSkipped('Windows does not support POSIX signals');
         }
 
         $process = $this->getProcessForCode('sleep(32);');
         $process->start();
         $process->stop();
-        $this->assertTrue($process->hasBeenSignaled());
-        $this->assertEquals(15, $process->getTermSignal()); // SIGTERM
+        self::assertTrue($process->hasBeenSignaled());
+        self::assertEquals(15, $process->getTermSignal()); // SIGTERM
     }
 
     public function testProcessThrowsExceptionWhenExternallySignaled()
     {
-        $this->expectException(ProcessSignaledException::class);
-        $this->expectExceptionMessage('The process has been signaled with signal "9".');
+        self::expectException(ProcessSignaledException::class);
+        self::expectExceptionMessage('The process has been signaled with signal "9".');
         if (!\function_exists('posix_kill')) {
-            $this->markTestSkipped('Function posix_kill is required.');
+            self::markTestSkipped('Function posix_kill is required.');
         }
 
         if (self::$sigchild) {
-            $this->markTestSkipped('PHP is compiled with --enable-sigchild.');
+            self::markTestSkipped('PHP is compiled with --enable-sigchild.');
         }
 
         $process = $this->getProcessForCode('sleep(32.1);');
@@ -736,37 +736,37 @@ class ProcessTest extends TestCase
         $process2->wait(); // wait for output
 
         // Ensure that both processed finished and the output is numeric
-        $this->assertFalse($process1->isRunning());
-        $this->assertFalse($process2->isRunning());
-        $this->assertIsNumeric($process1->getOutput());
-        $this->assertIsNumeric($process2->getOutput());
+        self::assertFalse($process1->isRunning());
+        self::assertFalse($process2->isRunning());
+        self::assertIsNumeric($process1->getOutput());
+        self::assertIsNumeric($process2->getOutput());
 
         // Ensure that restart returned a new process by check that the output is different
-        $this->assertNotEquals($process1->getOutput(), $process2->getOutput());
+        self::assertNotEquals($process1->getOutput(), $process2->getOutput());
     }
 
     public function testRunProcessWithTimeout()
     {
-        $this->expectException(ProcessTimedOutException::class);
-        $this->expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
+        self::expectException(ProcessTimedOutException::class);
+        self::expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
         $process = $this->getProcessForCode('sleep(30);');
         $process->setTimeout(0.1);
         $start = microtime(true);
         try {
             $process->run();
-            $this->fail('A RuntimeException should have been raised');
+            self::fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
         }
 
-        $this->assertLessThan(15, microtime(true) - $start);
+        self::assertLessThan(15, microtime(true) - $start);
 
         throw $e;
     }
 
     public function testIterateOverProcessWithTimeout()
     {
-        $this->expectException(ProcessTimedOutException::class);
-        $this->expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
+        self::expectException(ProcessTimedOutException::class);
+        self::expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
         $process = $this->getProcessForCode('sleep(30);');
         $process->setTimeout(0.1);
         $start = microtime(true);
@@ -774,11 +774,11 @@ class ProcessTest extends TestCase
             $process->start();
             foreach ($process as $buffer) {
             }
-            $this->fail('A RuntimeException should have been raised');
+            self::fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
         }
 
-        $this->assertLessThan(15, microtime(true) - $start);
+        self::assertLessThan(15, microtime(true) - $start);
 
         throw $e;
     }
@@ -786,20 +786,20 @@ class ProcessTest extends TestCase
     public function testCheckTimeoutOnNonStartedProcess()
     {
         $process = $this->getProcess('echo foo');
-        $this->assertNull($process->checkTimeout());
+        self::assertNull($process->checkTimeout());
     }
 
     public function testCheckTimeoutOnTerminatedProcess()
     {
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertNull($process->checkTimeout());
+        self::assertNull($process->checkTimeout());
     }
 
     public function testCheckTimeoutOnStartedProcess()
     {
-        $this->expectException(ProcessTimedOutException::class);
-        $this->expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
+        self::expectException(ProcessTimedOutException::class);
+        self::expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
         $process = $this->getProcessForCode('sleep(33);');
         $process->setTimeout(0.1);
 
@@ -811,11 +811,11 @@ class ProcessTest extends TestCase
                 $process->checkTimeout();
                 usleep(100000);
             }
-            $this->fail('A ProcessTimedOutException should have been raised');
+            self::fail('A ProcessTimedOutException should have been raised');
         } catch (ProcessTimedOutException $e) {
         }
 
-        $this->assertLessThan(15, microtime(true) - $start);
+        self::assertLessThan(15, microtime(true) - $start);
 
         throw $e;
     }
@@ -829,11 +829,11 @@ class ProcessTest extends TestCase
         try {
             $process->run();
 
-            $this->fail('A timeout exception was expected.');
+            self::fail('A timeout exception was expected.');
         } catch (ProcessTimedOutException $e) {
-            $this->assertTrue($e->isIdleTimeout());
-            $this->assertFalse($e->isGeneralTimeout());
-            $this->assertEquals(0.1, $e->getExceededTimeout());
+            self::assertTrue($e->isIdleTimeout());
+            self::assertFalse($e->isGeneralTimeout());
+            self::assertEquals(0.1, $e->getExceededTimeout());
         }
     }
 
@@ -851,29 +851,29 @@ class ProcessTest extends TestCase
 
         try {
             $process->wait();
-            $this->fail('A timeout exception was expected.');
+            self::fail('A timeout exception was expected.');
         } catch (ProcessTimedOutException $e) {
-            $this->assertTrue($e->isGeneralTimeout(), 'A general timeout is expected.');
-            $this->assertFalse($e->isIdleTimeout(), 'No idle timeout is expected.');
-            $this->assertEquals(1, $e->getExceededTimeout());
+            self::assertTrue($e->isGeneralTimeout(), 'A general timeout is expected.');
+            self::assertFalse($e->isIdleTimeout(), 'No idle timeout is expected.');
+            self::assertEquals(1, $e->getExceededTimeout());
         }
     }
 
     public function testStartAfterATimeout()
     {
-        $this->expectException(ProcessTimedOutException::class);
-        $this->expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
+        self::expectException(ProcessTimedOutException::class);
+        self::expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
         $process = $this->getProcessForCode('sleep(35);');
         $process->setTimeout(0.1);
 
         try {
             $process->run();
-            $this->fail('A ProcessTimedOutException should have been raised.');
+            self::fail('A ProcessTimedOutException should have been raised.');
         } catch (ProcessTimedOutException $e) {
         }
-        $this->assertFalse($process->isRunning());
+        self::assertFalse($process->isRunning());
         $process->start();
-        $this->assertTrue($process->isRunning());
+        self::assertTrue($process->isRunning());
         $process->stop(0);
 
         throw $e;
@@ -883,21 +883,21 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcessForCode('sleep(36);');
         $process->start();
-        $this->assertGreaterThan(0, $process->getPid());
+        self::assertGreaterThan(0, $process->getPid());
         $process->stop(0);
     }
 
     public function testGetPidIsNullBeforeStart()
     {
         $process = $this->getProcess('foo');
-        $this->assertNull($process->getPid());
+        self::assertNull($process->getPid());
     }
 
     public function testGetPidIsNullAfterRun()
     {
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertNull($process->getPid());
+        self::assertNull($process->getPid());
     }
 
     /**
@@ -914,7 +914,7 @@ class ProcessTest extends TestCase
         $process->signal(\SIGUSR1);
         $process->wait();
 
-        $this->assertEquals('Caught SIGUSR1', $process->getOutput());
+        self::assertEquals('Caught SIGUSR1', $process->getOutput());
     }
 
     /**
@@ -930,16 +930,16 @@ class ProcessTest extends TestCase
             usleep(10000);
         }
 
-        $this->assertFalse($process->isRunning());
-        $this->assertTrue($process->hasBeenSignaled());
-        $this->assertFalse($process->isSuccessful());
-        $this->assertEquals(137, $process->getExitCode());
+        self::assertFalse($process->isRunning());
+        self::assertTrue($process->hasBeenSignaled());
+        self::assertFalse($process->isSuccessful());
+        self::assertEquals(137, $process->getExitCode());
     }
 
     public function testSignalProcessNotRunning()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot send signal on a non running process.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Cannot send signal on a non running process.');
         $process = $this->getProcess('foo');
         $process->signal(1); // SIGHUP
     }
@@ -951,8 +951,8 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('foo');
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('Process must be started before calling "%s()".', $method));
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage(sprintf('Process must be started before calling "%s()".', $method));
 
         $process->{$method}();
     }
@@ -973,14 +973,14 @@ class ProcessTest extends TestCase
      */
     public function testMethodsThatNeedATerminatedProcess($method)
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Process must be terminated before calling');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Process must be terminated before calling');
         $process = $this->getProcessForCode('sleep(37);');
         $process->start();
         try {
             $process->{$method}();
             $process->stop(0);
-            $this->fail('A LogicException must have been thrown');
+            self::fail('A LogicException must have been thrown');
         } catch (\Exception $e) {
         }
         $process->stop(0);
@@ -1001,16 +1001,16 @@ class ProcessTest extends TestCase
     public function testWrongSignal()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('POSIX signals do not work on Windows');
+            self::markTestSkipped('POSIX signals do not work on Windows');
         }
 
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
 
         $process = $this->getProcessForCode('sleep(38);');
         $process->start();
         try {
             $process->signal(-4);
-            $this->fail('A RuntimeException must have been thrown');
+            self::fail('A RuntimeException must have been thrown');
         } finally {
             $process->stop(0);
         }
@@ -1019,17 +1019,17 @@ class ProcessTest extends TestCase
     public function testDisableOutputDisablesTheOutput()
     {
         $p = $this->getProcess('foo');
-        $this->assertFalse($p->isOutputDisabled());
+        self::assertFalse($p->isOutputDisabled());
         $p->disableOutput();
-        $this->assertTrue($p->isOutputDisabled());
+        self::assertTrue($p->isOutputDisabled());
         $p->enableOutput();
-        $this->assertFalse($p->isOutputDisabled());
+        self::assertFalse($p->isOutputDisabled());
     }
 
     public function testDisableOutputWhileRunningThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Disabling output while the process is running is not possible.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Disabling output while the process is running is not possible.');
         $p = $this->getProcessForCode('sleep(39);');
         $p->start();
         $p->disableOutput();
@@ -1037,8 +1037,8 @@ class ProcessTest extends TestCase
 
     public function testEnableOutputWhileRunningThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Enabling output while the process is running is not possible.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Enabling output while the process is running is not possible.');
         $p = $this->getProcessForCode('sleep(40);');
         $p->disableOutput();
         $p->start();
@@ -1052,13 +1052,13 @@ class ProcessTest extends TestCase
         $p->run();
         $p->enableOutput();
         $p->disableOutput();
-        $this->assertTrue($p->isOutputDisabled());
+        self::assertTrue($p->isOutputDisabled());
     }
 
     public function testDisableOutputWhileIdleTimeoutIsSet()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Output cannot be disabled while an idle timeout is set.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Output cannot be disabled while an idle timeout is set.');
         $process = $this->getProcess('foo');
         $process->setIdleTimeout(1);
         $process->disableOutput();
@@ -1066,8 +1066,8 @@ class ProcessTest extends TestCase
 
     public function testSetIdleTimeoutWhileOutputIsDisabled()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('timeout cannot be set while the output is disabled.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('timeout cannot be set while the output is disabled.');
         $process = $this->getProcess('foo');
         $process->disableOutput();
         $process->setIdleTimeout(1);
@@ -1077,7 +1077,7 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('foo');
         $process->disableOutput();
-        $this->assertSame($process, $process->setIdleTimeout(null));
+        self::assertSame($process, $process->setIdleTimeout(null));
     }
 
     /**
@@ -1085,8 +1085,8 @@ class ProcessTest extends TestCase
      */
     public function testGetOutputWhileDisabled($fetchMethod)
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Output has been disabled.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Output has been disabled.');
         $p = $this->getProcessForCode('sleep(41);');
         $p->disableOutput();
         $p->start();
@@ -1109,7 +1109,7 @@ class ProcessTest extends TestCase
         $process->run(function () use ($process) {
             $process->stop();
         });
-        $this->assertTrue(true, 'A call to stop() is not expected to cause wait() to throw a RuntimeException');
+        self::assertTrue(true, 'A call to stop() is not expected to cause wait() to throw a RuntimeException');
     }
 
     public function testKillSignalTerminatesProcessCleanly()
@@ -1118,7 +1118,7 @@ class ProcessTest extends TestCase
         $process->run(function () use ($process) {
             $process->signal(9); // SIGKILL
         });
-        $this->assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
+        self::assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
     }
 
     public function testTermSignalTerminatesProcessCleanly()
@@ -1127,7 +1127,7 @@ class ProcessTest extends TestCase
         $process->run(function () use ($process) {
             $process->signal(15); // SIGTERM
         });
-        $this->assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
+        self::assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
     }
 
     public function responsesCodeProvider()
@@ -1179,7 +1179,7 @@ class ProcessTest extends TestCase
             $result .= $process->$method();
         }
 
-        $this->assertSame($expected, $result);
+        self::assertSame($expected, $result);
         $process->stop();
     }
 
@@ -1200,7 +1200,7 @@ class ProcessTest extends TestCase
 
         $process = $this->getProcessForCode('stream_copy_to_stream(STDIN, STDOUT);', null, null, $input());
         $process->run();
-        $this->assertSame('pingpong', $process->getOutput());
+        self::assertSame('pingpong', $process->getOutput());
     }
 
     public function testSimpleInputStream()
@@ -1220,7 +1220,7 @@ class ProcessTest extends TestCase
         });
 
         $process->wait();
-        $this->assertSame('pingpangpong', $process->getOutput());
+        self::assertSame('pingpangpong', $process->getOutput());
     }
 
     public function testInputStreamWithCallable()
@@ -1250,7 +1250,7 @@ class ProcessTest extends TestCase
         });
 
         $process->wait();
-        $this->assertSame('123', $process->getOutput());
+        self::assertSame('123', $process->getOutput());
     }
 
     public function testInputStreamWithGenerator()
@@ -1266,7 +1266,7 @@ class ProcessTest extends TestCase
         $process->start();
         $input->write('ping');
         $process->wait();
-        $this->assertSame('pingpong', $process->getOutput());
+        self::assertSame('pingpong', $process->getOutput());
     }
 
     public function testInputStreamOnEmpty()
@@ -1284,8 +1284,8 @@ class ProcessTest extends TestCase
         });
         $process->wait();
 
-        $this->assertSame(0, $i, 'InputStream->onEmpty callback should be called only when the input *becomes* empty');
-        $this->assertSame('123456', $process->getOutput());
+        self::assertSame(0, $i, 'InputStream->onEmpty callback should be called only when the input *becomes* empty');
+        self::assertSame('123456', $process->getOutput());
     }
 
     public function testIteratorOutput()
@@ -1304,7 +1304,7 @@ class ProcessTest extends TestCase
         $expectedOutput = [
             [$process::OUT, '123'],
         ];
-        $this->assertSame($expectedOutput, $output);
+        self::assertSame($expectedOutput, $output);
 
         $input->write(345);
 
@@ -1312,8 +1312,8 @@ class ProcessTest extends TestCase
             $output[] = [$type, $data];
         }
 
-        $this->assertSame('', $process->getOutput());
-        $this->assertFalse($process->isRunning());
+        self::assertSame('', $process->getOutput());
+        self::assertFalse($process->isRunning());
 
         $expectedOutput = [
             [$process::OUT, '123'],
@@ -1321,7 +1321,7 @@ class ProcessTest extends TestCase
             [$process::OUT, '345'],
             [$process::ERR, '456'],
         ];
-        $this->assertSame($expectedOutput, $output);
+        self::assertSame($expectedOutput, $output);
     }
 
     public function testNonBlockingNorClearingIteratorOutput()
@@ -1340,7 +1340,7 @@ class ProcessTest extends TestCase
         $expectedOutput = [
             [$process::OUT, ''],
         ];
-        $this->assertSame($expectedOutput, $output);
+        self::assertSame($expectedOutput, $output);
 
         $input->write(123);
 
@@ -1350,14 +1350,14 @@ class ProcessTest extends TestCase
             }
         }
 
-        $this->assertSame('123', $process->getOutput());
-        $this->assertFalse($process->isRunning());
+        self::assertSame('123', $process->getOutput());
+        self::assertFalse($process->isRunning());
 
         $expectedOutput = [
             [$process::OUT, ''],
             [$process::OUT, '123'],
         ];
-        $this->assertSame($expectedOutput, $output);
+        self::assertSame($expectedOutput, $output);
     }
 
     public function testChainedProcesses()
@@ -1369,10 +1369,10 @@ class ProcessTest extends TestCase
         $p1->start();
         $p2->run();
 
-        $this->assertSame('123', $p1->getErrorOutput());
-        $this->assertSame('', $p1->getOutput());
-        $this->assertSame('', $p2->getErrorOutput());
-        $this->assertSame('456', $p2->getOutput());
+        self::assertSame('123', $p1->getErrorOutput());
+        self::assertSame('', $p1->getOutput());
+        self::assertSame('', $p2->getErrorOutput());
+        self::assertSame('456', $p2->getOutput());
     }
 
     public function testSetBadEnv()
@@ -1382,8 +1382,8 @@ class ProcessTest extends TestCase
 
         $process->run();
 
-        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
-        $this->assertSame('', $process->getErrorOutput());
+        self::assertSame('hello'.\PHP_EOL, $process->getOutput());
+        self::assertSame('', $process->getErrorOutput());
     }
 
     public function testEnvBackupDoesNotDeleteExistingVars()
@@ -1395,9 +1395,9 @@ class ProcessTest extends TestCase
 
         $process->run();
 
-        $this->assertSame('foo', $process->getOutput());
-        $this->assertSame('foo', getenv('existing_var'));
-        $this->assertFalse(getenv('new_test_var'));
+        self::assertSame('foo', $process->getOutput());
+        self::assertSame('foo', getenv('existing_var'));
+        self::assertFalse(getenv('new_test_var'));
 
         putenv('existing_var');
         unset($_ENV['existing_var']);
@@ -1415,7 +1415,7 @@ class ProcessTest extends TestCase
         $expected = ['BAR' => 'BAZ', 'EMPTY' => '', 'FOO' => 'BAR'];
         $env = array_intersect_key(unserialize($process->getOutput()), $expected);
 
-        $this->assertEquals($expected, $env);
+        self::assertEquals($expected, $env);
 
         putenv('FOO');
         unset($_ENV['FOO']);
@@ -1426,7 +1426,7 @@ class ProcessTest extends TestCase
         $p = new Process(['/usr/bin/php']);
 
         $expected = '\\' === \DIRECTORY_SEPARATOR ? '"/usr/bin/php"' : "'/usr/bin/php'";
-        $this->assertSame($expected, $p->getCommandLine());
+        self::assertSame($expected, $p->getCommandLine());
     }
 
     /**
@@ -1437,7 +1437,7 @@ class ProcessTest extends TestCase
         $p = new Process([self::$phpBin, '-r', 'echo $argv[1];', $arg]);
         $p->run();
 
-        $this->assertSame((string) $arg, $p->getOutput());
+        self::assertSame((string) $arg, $p->getOutput());
     }
 
     public function testRawCommandLine()
@@ -1446,7 +1446,7 @@ class ProcessTest extends TestCase
         $p->run();
 
         $expected = "Array\n(\n    [0] => -\n    [1] => a\n    [2] => \n    [3] => b\n)\n";
-        $this->assertSame($expected, str_replace('Standard input code', '-', $p->getOutput()));
+        self::assertSame($expected, str_replace('Standard input code', '-', $p->getOutput()));
     }
 
     public function provideEscapeArgument()
@@ -1468,7 +1468,7 @@ class ProcessTest extends TestCase
         $p = Process::fromShellCommandline('echo "${:abc}"DEF');
         $p->run(null, ['abc' => 'ABC']);
 
-        $this->assertSame('ABCDEF', rtrim($p->getOutput()));
+        self::assertSame('ABCDEF', rtrim($p->getOutput()));
     }
 
     public function testPreparedCommandMulti()
@@ -1476,7 +1476,7 @@ class ProcessTest extends TestCase
         $p = Process::fromShellCommandline('echo "${:abc}""${:def}"');
         $p->run(null, ['abc' => 'ABC', 'def' => 'DEF']);
 
-        $this->assertSame('ABCDEF', rtrim($p->getOutput()));
+        self::assertSame('ABCDEF', rtrim($p->getOutput()));
     }
 
     public function testPreparedCommandWithQuoteInIt()
@@ -1484,21 +1484,21 @@ class ProcessTest extends TestCase
         $p = Process::fromShellCommandline('php -r "${:code}" "${:def}"');
         $p->run(null, ['code' => 'echo $argv[1];', 'def' => '"DEF"']);
 
-        $this->assertSame('"DEF"', rtrim($p->getOutput()));
+        self::assertSame('"DEF"', rtrim($p->getOutput()));
     }
 
     public function testPreparedCommandWithMissingValue()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
         $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, ['bcd' => 'BCD']);
     }
 
     public function testPreparedCommandWithNoValues()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}"');
         $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, []);
     }
@@ -1507,14 +1507,14 @@ class ProcessTest extends TestCase
     {
         $cmd = '\\' === \DIRECTORY_SEPARATOR ? 'echo !FOO! !BAR! !BAZ!' : 'echo $FOO $BAR $BAZ';
         $p = Process::fromShellCommandline($cmd);
-        $this->assertSame([], $p->getEnv());
+        self::assertSame([], $p->getEnv());
 
         $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
         $p = Process::fromShellCommandline($cmd, null, $env);
         $p->run(null, ['BAR' => 'baR', 'BAZ' => 'baZ']);
 
-        $this->assertSame('Foo baR baZ', rtrim($p->getOutput()));
-        $this->assertSame($env, $p->getEnv());
+        self::assertSame('Foo baR baZ', rtrim($p->getOutput()));
+        self::assertSame($env, $p->getEnv());
     }
 
     public function testWaitStoppedDeadProcess()
@@ -1523,7 +1523,7 @@ class ProcessTest extends TestCase
         $process->start();
         $process->setTimeout(2);
         $process->wait();
-        $this->assertFalse($process->isRunning());
+        self::assertFalse($process->isRunning());
     }
 
     public function testEnvCaseInsensitiveOnWindows()
@@ -1532,9 +1532,9 @@ class ProcessTest extends TestCase
         $p->run(null, ['Path' => 'foo/bar']);
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->assertSame('Array ( [0] => 1 [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
+            self::assertSame('Array ( [0] => 1 [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
         } else {
-            $this->assertSame('Array ( [0] => bar/baz [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
+            self::assertSame('Array ( [0] => bar/baz [1] => foo/bar )', preg_replace('/\s++/', ' ', trim($p->getOutput())));
         }
     }
 

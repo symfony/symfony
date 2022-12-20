@@ -28,7 +28,7 @@ final class ActionCardTest extends TestCase
         $action = (new ActionCard())
             ->name($value = 'My name');
 
-        $this->assertSame($value, $action->toArray()['name']);
+        self::assertSame($value, $action->toArray()['name']);
     }
 
     /**
@@ -39,8 +39,8 @@ final class ActionCardTest extends TestCase
         $action = (new ActionCard())
             ->input($input);
 
-        $this->assertCount(1, $action->toArray()['inputs']);
-        $this->assertSame($expected, $action->toArray()['inputs']);
+        self::assertCount(1, $action->toArray()['inputs']);
+        self::assertSame($expected, $action->toArray()['inputs']);
     }
 
     public function availableInputs(): \Generator
@@ -58,8 +58,8 @@ final class ActionCardTest extends TestCase
         $section = (new ActionCard())
             ->action($action);
 
-        $this->assertCount(1, $section->toArray()['actions']);
-        $this->assertSame($expected, $section->toArray()['actions']);
+        self::assertCount(1, $section->toArray()['actions']);
+        self::assertSame($expected, $section->toArray()['actions']);
     }
 
     public function compatibleActions(): \Generator
@@ -70,11 +70,8 @@ final class ActionCardTest extends TestCase
 
     public function testToArray()
     {
-        $this->assertSame(
-            [
-                '@type' => 'ActionCard',
-            ],
-            (new ActionCard())->toArray()
-        );
+        self::assertSame([
+            '@type' => 'ActionCard',
+        ], (new ActionCard())->toArray());
     }
 }

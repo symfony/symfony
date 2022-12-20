@@ -39,7 +39,7 @@ class GitRepositoryTest extends TestCase
 
     public function testItThrowsAnExceptionIfInitialisedWithNonGitDirectory()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
 
         @mkdir($this->targetDir, 0777, true);
 
@@ -50,15 +50,15 @@ class GitRepositoryTest extends TestCase
     {
         $git = GitRepository::download(self::REPO_URL, $this->targetDir);
 
-        $this->assertInstanceOf(GitRepository::class, $git);
-        $this->assertDirectoryExists($this->targetDir.'/.git');
-        $this->assertSame($this->targetDir, $git->getPath());
-        $this->assertSame(self::REPO_URL, $git->getUrl());
-        $this->assertMatchesRegularExpression('#^[0-9a-z]{40}$#', $git->getLastCommitHash());
-        $this->assertNotEmpty($git->getLastAuthor());
-        $this->assertInstanceOf(\DateTime::class, $git->getLastAuthoredDate());
-        $this->assertStringMatchesFormat('v%s', $git->getLastTag());
-        $this->assertStringMatchesFormat('v3%s', $git->getLastTag(function ($tag) { return str_starts_with($tag, 'v3'); }));
+        self::assertInstanceOf(GitRepository::class, $git);
+        self::assertDirectoryExists($this->targetDir.'/.git');
+        self::assertSame($this->targetDir, $git->getPath());
+        self::assertSame(self::REPO_URL, $git->getUrl());
+        self::assertMatchesRegularExpression('#^[0-9a-z]{40}$#', $git->getLastCommitHash());
+        self::assertNotEmpty($git->getLastAuthor());
+        self::assertInstanceOf(\DateTime::class, $git->getLastAuthoredDate());
+        self::assertStringMatchesFormat('v%s', $git->getLastTag());
+        self::assertStringMatchesFormat('v3%s', $git->getLastTag(function ($tag) { return str_starts_with($tag, 'v3'); }));
     }
 
     public function testItCheckoutsToTheLastTag()
@@ -69,6 +69,6 @@ class GitRepositoryTest extends TestCase
 
         $git->checkout($lastV3Tag);
 
-        $this->assertNotEquals($lastCommitHash, $git->getLastCommitHash());
+        self::assertNotEquals($lastCommitHash, $git->getLastCommitHash());
     }
 }

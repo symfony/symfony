@@ -40,9 +40,9 @@ class FormFactoryBuilderTest extends TestCase
         $registry = $this->registry->getValue($factory);
         $extensions = $registry->getExtensions();
 
-        $this->assertCount(1, $extensions);
-        $this->assertTrue($extensions[0]->hasType(\get_class($this->type)));
-        $this->assertNull($extensions[0]->getTypeGuesser());
+        self::assertCount(1, $extensions);
+        self::assertTrue($extensions[0]->hasType(\get_class($this->type)));
+        self::assertNull($extensions[0]->getTypeGuesser());
     }
 
     public function testAddTypeGuesser()
@@ -54,7 +54,7 @@ class FormFactoryBuilderTest extends TestCase
         $registry = $this->registry->getValue($factory);
         $extensions = $registry->getExtensions();
 
-        $this->assertCount(1, $extensions);
-        $this->assertNotNull($extensions[0]->getTypeGuesser());
+        self::assertCount(1, $extensions);
+        self::assertNotNull($extensions[0]->getTypeGuesser());
     }
 }

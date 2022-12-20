@@ -25,16 +25,16 @@ class SecurityTest extends TestCase
     public function testGetToken()
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar'), 'provider');
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $tokenStorage->expects($this->once())
+        $tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
         $container = $this->createContainer('security.token_storage', $tokenStorage);
 
         $security = new Security($container);
-        $this->assertSame($token, $security->getToken());
+        self::assertSame($token, $security->getToken());
     }
 
     /**
@@ -43,20 +43,20 @@ class SecurityTest extends TestCase
      */
     public function testGetUser($userInToken, $expectedUser)
     {
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->any())
+        $token = self::createMock(TokenInterface::class);
+        $token->expects(self::any())
             ->method('getUser')
             ->willReturn($userInToken);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $tokenStorage->expects($this->once())
+        $tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
         $container = $this->createContainer('security.token_storage', $tokenStorage);
 
         $security = new Security($container);
-        $this->assertSame($expectedUser, $security->getUser());
+        self::assertSame($expectedUser, $security->getUser());
     }
 
     public function getUserTests()
@@ -79,9 +79,9 @@ class SecurityTest extends TestCase
 
     public function testIsGranted()
     {
-        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker = self::createMock(AuthorizationCheckerInterface::class);
 
-        $authorizationChecker->expects($this->once())
+        $authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('SOME_ATTRIBUTE', 'SOME_SUBJECT')
             ->willReturn(true);
@@ -89,14 +89,14 @@ class SecurityTest extends TestCase
         $container = $this->createContainer('security.authorization_checker', $authorizationChecker);
 
         $security = new Security($container);
-        $this->assertTrue($security->isGranted('SOME_ATTRIBUTE', 'SOME_SUBJECT'));
+        self::assertTrue($security->isGranted('SOME_ATTRIBUTE', 'SOME_SUBJECT'));
     }
 
     private function createContainer($serviceId, $serviceObject)
     {
-        $container = $this->createMock(ContainerInterface::class);
+        $container = self::createMock(ContainerInterface::class);
 
-        $container->expects($this->atLeastOnce())
+        $container->expects(self::atLeastOnce())
             ->method('get')
             ->with($serviceId)
             ->willReturn($serviceObject);

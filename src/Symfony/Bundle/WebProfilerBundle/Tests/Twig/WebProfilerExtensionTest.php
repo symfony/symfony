@@ -52,9 +52,9 @@ class WebProfilerExtensionTest extends TestCase
 
     private function mockTwigEnvironment()
     {
-        $twigEnvironment = $this->createMock(Environment::class);
+        $twigEnvironment = self::createMock(Environment::class);
 
-        $twigEnvironment->expects($this->any())->method('getCharset')->willReturn('UTF-8');
+        $twigEnvironment->expects(self::any())->method('getCharset')->willReturn('UTF-8');
 
         return $twigEnvironment;
     }

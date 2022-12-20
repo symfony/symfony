@@ -29,9 +29,9 @@ class ProblemNormalizerTest extends TestCase
 
     public function testSupportNormalization()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(FlattenException::createFromThrowable(new \Exception())));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \Exception()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertTrue($this->normalizer->supportsNormalization(FlattenException::createFromThrowable(new \Exception())));
+        self::assertFalse($this->normalizer->supportsNormalization(new \Exception()));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     public function testNormalize()
@@ -43,6 +43,6 @@ class ProblemNormalizerTest extends TestCase
             'detail' => 'Internal Server Error',
         ];
 
-        $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable(new \RuntimeException('Error'))));
+        self::assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable(new \RuntimeException('Error'))));
     }
 }

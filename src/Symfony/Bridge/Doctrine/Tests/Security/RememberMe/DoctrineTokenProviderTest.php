@@ -29,14 +29,14 @@ class DoctrineTokenProviderTest extends TestCase
         $token = new PersistentToken('someClass', 'someUser', 'someSeries', 'tokenValue', new \DateTime('2013-01-26T18:23:51'));
         $provider->createNewToken($token);
 
-        $this->assertEquals($provider->loadTokenBySeries('someSeries'), $token);
+        self::assertEquals($provider->loadTokenBySeries('someSeries'), $token);
     }
 
     public function testLoadTokenBySeriesThrowsNotFoundException()
     {
         $provider = $this->bootstrapProvider();
 
-        $this->expectException(TokenNotFoundException::class);
+        self::expectException(TokenNotFoundException::class);
         $provider->loadTokenBySeries('someSeries');
     }
 
@@ -49,8 +49,8 @@ class DoctrineTokenProviderTest extends TestCase
         $provider->updateToken('someSeries', 'newValue', $lastUsed = new \DateTime('2014-06-26T22:03:46'));
         $token = $provider->loadTokenBySeries('someSeries');
 
-        $this->assertEquals('newValue', $token->getTokenValue());
-        $this->assertEquals($token->getLastUsed(), $lastUsed);
+        self::assertEquals('newValue', $token->getTokenValue());
+        self::assertEquals($token->getLastUsed(), $lastUsed);
     }
 
     public function testDeleteToken()
@@ -60,7 +60,7 @@ class DoctrineTokenProviderTest extends TestCase
         $provider->createNewToken($token);
         $provider->deleteTokenBySeries('someSeries');
 
-        $this->expectException(TokenNotFoundException::class);
+        self::expectException(TokenNotFoundException::class);
 
         $provider->loadTokenBySeries('someSeries');
     }
@@ -82,12 +82,12 @@ class DoctrineTokenProviderTest extends TestCase
 
         // parallel request comes in with the old remember-me cookie and session, which also requires reauth
         $token = $provider->loadTokenBySeries($series);
-        $this->assertEquals($newValue, $token->getTokenValue());
+        self::assertEquals($newValue, $token->getTokenValue());
 
         // new token is valid
-        $this->assertTrue($provider->verifyToken($token, $newValue));
+        self::assertTrue($provider->verifyToken($token, $newValue));
         // old token is still valid
-        $this->assertTrue($provider->verifyToken($token, $oldValue));
+        self::assertTrue($provider->verifyToken($token, $oldValue));
     }
 
     public function testVerifyOutdatedTokenAfterParallelRequestFailsAfter60Seconds()
@@ -107,12 +107,12 @@ class DoctrineTokenProviderTest extends TestCase
 
         // parallel request comes in with the old remember-me cookie and session, which also requires reauth
         $token = $provider->loadTokenBySeries($series);
-        $this->assertEquals($newValue, $token->getTokenValue());
+        self::assertEquals($newValue, $token->getTokenValue());
 
         // new token is valid
-        $this->assertTrue($provider->verifyToken($token, $newValue));
+        self::assertTrue($provider->verifyToken($token, $newValue));
         // old token is not valid anymore after 60 seconds
-        $this->assertFalse($provider->verifyToken($token, $oldValue));
+        self::assertFalse($provider->verifyToken($token, $oldValue));
     }
 
     /**

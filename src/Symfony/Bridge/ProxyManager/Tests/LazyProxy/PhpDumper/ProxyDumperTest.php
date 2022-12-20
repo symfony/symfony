@@ -41,7 +41,7 @@ class ProxyDumperTest extends TestCase
      */
     public function testIsProxyCandidate(Definition $definition, bool $expected)
     {
-        $this->assertSame($expected, $this->dumper->isProxyCandidate($definition));
+        self::assertSame($expected, $this->dumper->isProxyCandidate($definition));
     }
 
     public function testGetProxyCode()
@@ -52,11 +52,8 @@ class ProxyDumperTest extends TestCase
 
         $code = $this->dumper->getProxyCode($definition);
 
-        $this->assertStringMatchesFormat(
-            '%Aclass ProxyDumperTest%aextends%w'
-                .'\Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\ProxyDumperTest%a',
-            $code
-        );
+        self::assertStringMatchesFormat('%Aclass ProxyDumperTest%aextends%w'
+            .'\Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\ProxyDumperTest%a', $code);
     }
 
     public function testDeterministicProxyCode()
@@ -64,7 +61,7 @@ class ProxyDumperTest extends TestCase
         $definition = new Definition(__CLASS__);
         $definition->setLazy(true);
 
-        $this->assertSame($this->dumper->getProxyCode($definition), $this->dumper->getProxyCode($definition));
+        self::assertSame($this->dumper->getProxyCode($definition), $this->dumper->getProxyCode($definition));
     }
 
     public function testGetProxyFactoryCode()
@@ -75,10 +72,7 @@ class ProxyDumperTest extends TestCase
 
         $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
 
-        $this->assertStringMatchesFormat(
-            '%A$wrappedInstance = $this->getFoo2Service(false);%w$proxy->setProxyInitializer(null);%A',
-            $code
-        );
+        self::assertStringMatchesFormat('%A$wrappedInstance = $this->getFoo2Service(false);%w$proxy->setProxyInitializer(null);%A', $code);
     }
 
     /**
@@ -90,7 +84,7 @@ class ProxyDumperTest extends TestCase
 
         $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
 
-        $this->assertStringMatchesFormat('%A$this->'.$access.'[\'foo\'] = %A', $code);
+        self::assertStringMatchesFormat('%A$this->'.$access.'[\'foo\'] = %A', $code);
     }
 
     public function getPrivatePublicDefinitions()
@@ -146,22 +140,22 @@ EOPHP;
         $implem = preg_replace('#\n    /\*\*.*?\*/#s', '', $implem);
         $implem = str_replace("array(\n        \n    );", "[\n        \n    ];", $implem);
 
-        $this->assertStringMatchesFormatFile(__DIR__.'/Fixtures/proxy-implem.php', $implem);
-        $this->assertStringEqualsFile(__DIR__.'/Fixtures/proxy-factory.php', $factory);
+        self::assertStringMatchesFormatFile(__DIR__.'/Fixtures/proxy-implem.php', $implem);
+        self::assertStringEqualsFile(__DIR__.'/Fixtures/proxy-factory.php', $factory);
 
         eval(preg_replace('/^<\?php/', '', $implem));
         $factory = require __DIR__.'/Fixtures/proxy-factory.php';
 
         $foo = $factory->getFooService();
 
-        $this->assertInstanceof($factory->proxyClass, $foo);
-        $this->assertInstanceof(DummyInterface::class, $foo);
-        $this->assertInstanceof(SunnyInterface::class, $foo);
-        $this->assertNotInstanceof(DummyClass::class, $foo);
-        $this->assertSame($foo, $foo->dummy());
+        self::assertInstanceof($factory->proxyClass, $foo);
+        self::assertInstanceof(DummyInterface::class, $foo);
+        self::assertInstanceof(SunnyInterface::class, $foo);
+        self::assertNotInstanceof(DummyClass::class, $foo);
+        self::assertSame($foo, $foo->dummy());
 
         $foo->dynamicProp = 123;
-        $this->assertSame(123, @$foo->dynamicProp);
+        self::assertSame(123, @$foo->dynamicProp);
     }
 
     public function getProxyCandidates(): array

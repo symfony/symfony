@@ -34,7 +34,7 @@ class ApplicationTest extends TestCase
 {
     public function testBundleInterfaceImplementation()
     {
-        $bundle = $this->createMock(BundleInterface::class);
+        $bundle = self::createMock(BundleInterface::class);
 
         $kernel = $this->getKernel([$bundle], true);
 
@@ -78,7 +78,7 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
 
-        $this->assertSame($command, $application->get('example'));
+        self::assertSame($command, $application->get('example'));
     }
 
     public function testBundleCommandCanBeFound()
@@ -91,7 +91,7 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
 
-        $this->assertSame($command, $application->find('example'));
+        self::assertSame($command, $application->find('example'));
     }
 
     public function testBundleCommandCanBeFoundByAlias()
@@ -105,7 +105,7 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
 
-        $this->assertSame($command, $application->find('alias'));
+        self::assertSame($command, $application->find('alias'));
     }
 
     public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName()
@@ -120,7 +120,7 @@ class ApplicationTest extends TestCase
         $newCommand = new Command('example');
         $application->add($newCommand);
 
-        $this->assertSame($newCommand, $application->get('example'));
+        self::assertSame($newCommand, $application->get('example'));
     }
 
     public function testRunOnlyWarnsOnUnregistrableCommand()
@@ -130,7 +130,7 @@ class ApplicationTest extends TestCase
         $container->register(ThrowingCommand::class, ThrowingCommand::class);
         $container->setParameter('console.command.ids', [ThrowingCommand::class => ThrowingCommand::class]);
 
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = self::createMock(KernelInterface::class);
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
@@ -148,9 +148,9 @@ class ApplicationTest extends TestCase
         $output = $tester->getDisplay();
 
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('Some commands could not be registered:', $output);
-        $this->assertStringContainsString('throwing', $output);
-        $this->assertStringContainsString('fine', $output);
+        self::assertStringContainsString('Some commands could not be registered:', $output);
+        self::assertStringContainsString('throwing', $output);
+        self::assertStringContainsString('fine', $output);
     }
 
     public function testRegistrationErrorsAreDisplayedOnCommandNotFound()
@@ -158,7 +158,7 @@ class ApplicationTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
 
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = self::createMock(KernelInterface::class);
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
@@ -175,9 +175,9 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'fine']);
         $output = $tester->getDisplay();
 
-        $this->assertSame(1, $tester->getStatusCode());
-        $this->assertStringContainsString('Some commands could not be registered:', $output);
-        $this->assertStringContainsString('Command "fine" is not defined.', $output);
+        self::assertSame(1, $tester->getStatusCode());
+        self::assertStringContainsString('Some commands could not be registered:', $output);
+        self::assertStringContainsString('Command "fine" is not defined.', $output);
     }
 
     public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd()
@@ -187,8 +187,8 @@ class ApplicationTest extends TestCase
         $container->register(ThrowingCommand::class, ThrowingCommand::class);
         $container->setParameter('console.command.ids', [ThrowingCommand::class => ThrowingCommand::class]);
 
-        $kernel = $this->createMock(KernelInterface::class);
-        $kernel->expects($this->once())->method('boot');
+        $kernel = self::createMock(KernelInterface::class);
+        $kernel->expects(self::once())->method('boot');
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
@@ -207,25 +207,25 @@ class ApplicationTest extends TestCase
         $tester->assertCommandIsSuccessful();
         $display = explode('List commands', $tester->getDisplay());
 
-        $this->assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
+        self::assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
     }
 
     public function testSuggestingPackagesWithExactMatch()
     {
         $result = $this->createEventForSuggestingPackages('doctrine:fixtures', []);
-        $this->assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
+        self::assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
     }
 
     public function testSuggestingPackagesWithPartialMatchAndNoAlternatives()
     {
         $result = $this->createEventForSuggestingPackages('server', []);
-        $this->assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
+        self::assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
     }
 
     public function testSuggestingPackagesWithPartialMatchAndAlternatives()
     {
         $result = $this->createEventForSuggestingPackages('server', ['server:run']);
-        $this->assertDoesNotMatchRegularExpression('/You may be looking for a command provided by/', $result);
+        self::assertDoesNotMatchRegularExpression('/You may be looking for a command provided by/', $result);
     }
 
     private function createEventForSuggestingPackages(string $command, array $alternatives = []): string
@@ -240,43 +240,43 @@ class ApplicationTest extends TestCase
 
     private function getKernel(array $bundles, $useDispatcher = false)
     {
-        $container = $this->createMock(ContainerInterface::class);
+        $container = self::createMock(ContainerInterface::class);
 
         if ($useDispatcher) {
-            $dispatcher = $this->createMock(EventDispatcherInterface::class);
+            $dispatcher = self::createMock(EventDispatcherInterface::class);
             $dispatcher
-                ->expects($this->atLeastOnce())
+                ->expects(self::atLeastOnce())
                 ->method('dispatch')
             ;
             $container
-                ->expects($this->atLeastOnce())
+                ->expects(self::atLeastOnce())
                 ->method('get')
-                ->with($this->equalTo('event_dispatcher'))
+                ->with(self::equalTo('event_dispatcher'))
                 ->willReturn($dispatcher);
         }
 
         $container
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('hasParameter')
             ->withConsecutive(['console.command.ids'], ['console.lazy_command.ids'])
             ->willReturnOnConsecutiveCalls(true, true)
         ;
         $container
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('getParameter')
             ->withConsecutive(['console.lazy_command.ids'], ['console.command.ids'])
             ->willReturnOnConsecutiveCalls([], [])
         ;
 
-        $kernel = $this->createMock(KernelInterface::class);
-        $kernel->expects($this->once())->method('boot');
+        $kernel = self::createMock(KernelInterface::class);
+        $kernel->expects(self::once())->method('boot');
         $kernel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getBundles')
             ->willReturn($bundles)
         ;
         $kernel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getContainer')
             ->willReturn($container)
         ;
@@ -286,9 +286,9 @@ class ApplicationTest extends TestCase
 
     private function createBundleMock(array $commands)
     {
-        $bundle = $this->createMock(Bundle::class);
+        $bundle = self::createMock(Bundle::class);
         $bundle
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('registerCommands')
             ->willReturnCallback(function (Application $application) use ($commands) {
                 $application->addCommands($commands);

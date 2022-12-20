@@ -42,15 +42,15 @@ class TokenBucketLimiterTest extends TestCase
     {
         $limiter = $this->createLimiter();
 
-        $this->assertEquals(0, $limiter->reserve(5)->getWaitDuration());
-        $this->assertEquals(0, $limiter->reserve(5)->getWaitDuration());
-        $this->assertEquals(1, $limiter->reserve(5)->getWaitDuration());
+        self::assertEquals(0, $limiter->reserve(5)->getWaitDuration());
+        self::assertEquals(0, $limiter->reserve(5)->getWaitDuration());
+        self::assertEquals(1, $limiter->reserve(5)->getWaitDuration());
     }
 
     public function testReserveMoreTokensThanBucketSize()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot reserve more tokens (15) than the burst size of the rate limiter (10).');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Cannot reserve more tokens (15) than the burst size of the rate limiter (10).');
 
         $limiter = $this->createLimiter();
         $limiter->reserve(15);
@@ -58,14 +58,14 @@ class TokenBucketLimiterTest extends TestCase
 
     public function testReserveMaxWaitingTime()
     {
-        $this->expectException(MaxWaitDurationExceededException::class);
+        self::expectException(MaxWaitDurationExceededException::class);
 
         $limiter = $this->createLimiter(10, Rate::perMinute());
 
         // enough free tokens
-        $this->assertEquals(0, $limiter->reserve(10, 300)->getWaitDuration());
+        self::assertEquals(0, $limiter->reserve(10, 300)->getWaitDuration());
         // waiting time within set maximum
-        $this->assertEquals(300, $limiter->reserve(5, 300)->getWaitDuration());
+        self::assertEquals(300, $limiter->reserve(5, 300)->getWaitDuration());
         // waiting time exceeded maximum time (as 5 tokens are already reserved)
         $limiter->reserve(5, 300);
     }
@@ -77,18 +77,18 @@ class TokenBucketLimiterTest extends TestCase
 
         // enough free tokens
         $rateLimit = $limiter->consume(5);
-        $this->assertTrue($rateLimit->isAccepted());
-        $this->assertEquals(5, $rateLimit->getRemainingTokens());
-        $this->assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 1);
-        $this->assertSame(10, $rateLimit->getLimit());
+        self::assertTrue($rateLimit->isAccepted());
+        self::assertEquals(5, $rateLimit->getRemainingTokens());
+        self::assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 1);
+        self::assertSame(10, $rateLimit->getLimit());
         // there are only 5 available free tokens left now
         $rateLimit = $limiter->consume(10);
-        $this->assertEquals(5, $rateLimit->getRemainingTokens());
+        self::assertEquals(5, $rateLimit->getRemainingTokens());
 
         $rateLimit = $limiter->consume(5);
-        $this->assertEquals(0, $rateLimit->getRemainingTokens());
-        $this->assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 1);
-        $this->assertSame(10, $rateLimit->getLimit());
+        self::assertEquals(0, $rateLimit->getRemainingTokens());
+        self::assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 1);
+        self::assertSame(10, $rateLimit->getLimit());
     }
 
     public function testWaitIntervalOnConsumeOverLimit()
@@ -102,7 +102,7 @@ class TokenBucketLimiterTest extends TestCase
 
         $start = microtime(true);
         $rateLimit->wait(); // wait 1 second
-        $this->assertEqualsWithDelta($start + 1, microtime(true), 1);
+        self::assertEqualsWithDelta($start + 1, microtime(true), 1);
     }
 
     public function testWrongWindowFromCache()
@@ -110,8 +110,8 @@ class TokenBucketLimiterTest extends TestCase
         $this->storage->save(new DummyWindow());
         $limiter = $this->createLimiter();
         $rateLimit = $limiter->consume();
-        $this->assertTrue($rateLimit->isAccepted());
-        $this->assertEquals(9, $rateLimit->getRemainingTokens());
+        self::assertTrue($rateLimit->isAccepted());
+        self::assertEquals(9, $rateLimit->getRemainingTokens());
     }
 
     public function testBucketResilientToTimeShifting()
@@ -120,12 +120,12 @@ class TokenBucketLimiterTest extends TestCase
         $serverTwoClock = microtime(true) + 1;
 
         $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), $serverTwoClock);
-        $this->assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
-        $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
+        self::assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
+        self::assertSame(100, $bucket->getAvailableTokens($serverOneClock));
 
         $bucket = new TokenBucket('id', 100, new Rate(\DateInterval::createFromDateString('5 minutes'), 10), $serverOneClock);
-        $this->assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
-        $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
+        self::assertSame(100, $bucket->getAvailableTokens($serverTwoClock));
+        self::assertSame(100, $bucket->getAvailableTokens($serverOneClock));
     }
 
     private function createLimiter($initialTokens = 10, Rate $rate = null)

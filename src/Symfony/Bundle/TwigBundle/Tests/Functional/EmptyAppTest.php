@@ -26,8 +26,8 @@ class EmptyAppTest extends TestCase
         $kernel = new EmptyAppKernel('test', true);
         $kernel->boot();
 
-        $this->assertTrue($kernel->getContainer()->hasParameter('twig.default_path'));
-        $this->assertNotEmpty($kernel->getContainer()->getParameter('twig.default_path'));
+        self::assertTrue($kernel->getContainer()->hasParameter('twig.default_path'));
+        self::assertNotEmpty($kernel->getContainer()->getParameter('twig.default_path'));
     }
 
     protected function setUp(): void

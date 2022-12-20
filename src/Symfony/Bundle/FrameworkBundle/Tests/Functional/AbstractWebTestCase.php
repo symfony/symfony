@@ -25,17 +25,17 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
 
     public static function setUpBeforeClass(): void
     {
-        static::deleteTmpDir();
+        self::deleteTmpDir();
     }
 
     public static function tearDownAfterClass(): void
     {
-        static::deleteTmpDir();
+        self::deleteTmpDir();
     }
 
     protected static function deleteTmpDir()
     {
-        if (!file_exists($dir = sys_get_temp_dir().'/'.static::getVarDir())) {
+        if (!file_exists($dir = sys_get_temp_dir().'/'.self::getVarDir())) {
             return;
         }
 
@@ -59,10 +59,10 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         }
 
         return new $class(
-            static::getVarDir(),
+            self::getVarDir(),
             $options['test_case'],
             $options['root_config'] ?? 'config.yml',
-            $options['environment'] ?? strtolower(static::getVarDir().$options['test_case']),
+            $options['environment'] ?? strtolower(self::getVarDir().$options['test_case']),
             $options['debug'] ?? false
         );
     }

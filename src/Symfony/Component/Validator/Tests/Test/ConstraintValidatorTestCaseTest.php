@@ -41,7 +41,7 @@ class ConstraintValidatorTestCaseTest extends ConstraintValidatorTestCase
         // Simulate __destruct to assert it throws
         try {
             $contextualValidator->__destruct();
-            $this->fail();
+            self::fail();
         } catch (ExpectationFailedException $e) {
         }
 

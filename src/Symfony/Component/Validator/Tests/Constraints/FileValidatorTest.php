@@ -70,7 +70,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleTypeOrFile()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new File());
     }
 
@@ -229,7 +229,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxSize()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $constraint = new File([
             'maxSize' => '1abc',
         ]);
@@ -311,16 +311,15 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidMimeType()
     {
-        $file = $this
-            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
+        $file = self::getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
             ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
             ->getMock();
         $file
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPathname')
             ->willReturn($this->path);
         $file
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMimeType')
             ->willReturn('image/jpg');
 
@@ -335,16 +334,15 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidWildcardMimeType()
     {
-        $file = $this
-            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
+        $file = self::getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
             ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
             ->getMock();
         $file
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPathname')
             ->willReturn($this->path);
         $file
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMimeType')
             ->willReturn('image/jpg');
 
@@ -362,16 +360,15 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidMimeType(File $constraint)
     {
-        $file = $this
-            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
+        $file = self::getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
             ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
             ->getMock();
         $file
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPathname')
             ->willReturn($this->path);
         $file
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMimeType')
             ->willReturn('application/pdf');
 
@@ -402,16 +399,15 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidWildcardMimeType()
     {
-        $file = $this
-            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
+        $file = self::getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
             ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
             ->getMock();
         $file
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPathname')
             ->willReturn($this->path);
         $file
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMimeType')
             ->willReturn('application/pdf');
 
@@ -528,8 +524,8 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testNegativeMaxSize()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('"-1" is not a valid maximum size.');
+        self::expectException(ConstraintDefinitionException::class);
+        self::expectExceptionMessage('"-1" is not a valid maximum size.');
 
         $file = new File();
         $file->maxSize = -1;

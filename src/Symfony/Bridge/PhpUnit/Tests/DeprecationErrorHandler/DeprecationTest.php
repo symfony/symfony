@@ -49,9 +49,9 @@ class DeprecationTest extends TestCase
     public function testItCanDetermineTheClassWhereTheDeprecationHappened()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
-        $this->assertTrue($deprecation->originatesFromAnObject());
-        $this->assertSame(self::class, $deprecation->originatingClass());
-        $this->assertSame(__FUNCTION__, $deprecation->originatingMethod());
+        self::assertTrue($deprecation->originatesFromAnObject());
+        self::assertSame(self::class, $deprecation->originatingClass());
+        self::assertSame(__FUNCTION__, $deprecation->originatingMethod());
     }
 
     public function testItCanTellWhetherItIsInternal()
@@ -59,30 +59,30 @@ class DeprecationTest extends TestCase
         $r = new \ReflectionClass(Deprecation::class);
 
         if (\dirname($r->getFileName(), 2) !== \dirname(__DIR__, 2)) {
-            $this->markTestSkipped('Test case is not compatible with having the bridge in vendor/');
+            self::markTestSkipped('Test case is not compatible with having the bridge in vendor/');
         }
 
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
-        $this->assertSame(Deprecation::TYPE_SELF, $deprecation->getType());
+        self::assertSame(Deprecation::TYPE_SELF, $deprecation->getType());
     }
 
     public function testLegacyTestMethodIsDetectedAsSuch()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
-        $this->assertTrue($deprecation->isLegacy('whatever'));
+        self::assertTrue($deprecation->isLegacy('whatever'));
     }
 
     public function testItCanBeConvertedToAString()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
-        $this->assertStringContainsString('💩', $deprecation->toString());
-        $this->assertStringContainsString(__FUNCTION__, $deprecation->toString());
+        self::assertStringContainsString('💩', $deprecation->toString());
+        self::assertStringContainsString(__FUNCTION__, $deprecation->toString());
     }
 
     public function testItRulesOutFilesOutsideVendorsAsIndirect()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
-        $this->assertNotSame(Deprecation::TYPE_INDIRECT, $deprecation->getType());
+        self::assertNotSame(Deprecation::TYPE_INDIRECT, $deprecation->getType());
     }
 
     /**
@@ -94,7 +94,7 @@ class DeprecationTest extends TestCase
         array_unshift($trace, ['class' => $callingClass]);
         array_unshift($trace, ['class' => DeprecationErrorHandler::class]);
         $deprecation = new Deprecation($message, $trace, 'should_not_matter.php');
-        $this->assertSame($muted, $deprecation->isMuted());
+        self::assertSame($muted, $deprecation->isMuted());
     }
 
     public function mutedProvider()
@@ -131,7 +131,7 @@ class DeprecationTest extends TestCase
             ],
             'my-procedural-controller.php'
         );
-        $this->assertFalse($deprecation->isMuted());
+        self::assertFalse($deprecation->isMuted());
     }
 
     public function testItTakesMutesDeprecationFromPhpUnitFiles()
@@ -144,7 +144,7 @@ class DeprecationTest extends TestCase
             ],
             'random_path'.\DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'phpunit'.\DIRECTORY_SEPARATOR.'whatever.php'
         );
-        $this->assertTrue($deprecation->isMuted());
+        self::assertTrue($deprecation->isMuted());
     }
 
     public function providerGetTypeDetectsSelf()
@@ -179,7 +179,7 @@ class DeprecationTest extends TestCase
             ['class' => $traceClass, 'function' => 'myMethod'],
         ];
         $deprecation = new Deprecation($message, $trace, $file);
-        $this->assertSame($expectedType, $deprecation->getType());
+        self::assertSame($expectedType, $deprecation->getType());
     }
 
     public function providerGetTypeUsesRightTrace()
@@ -240,7 +240,7 @@ class DeprecationTest extends TestCase
             $trace,
             self::getVendorDir().'/myfakevendor/myfakepackage2/MyFakeFile.php'
         );
-        $this->assertSame($expectedType, $deprecation->getType());
+        self::assertSame($expectedType, $deprecation->getType());
     }
 
     /**

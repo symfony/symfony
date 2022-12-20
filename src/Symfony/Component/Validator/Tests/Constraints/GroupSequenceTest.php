@@ -23,13 +23,13 @@ class GroupSequenceTest extends TestCase
     {
         $sequence = new GroupSequence(['Group 1', 'Group 2']);
 
-        $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);
+        self::assertSame(['Group 1', 'Group 2'], $sequence->groups);
     }
 
     public function testCreateDoctrineStyle()
     {
         $sequence = new GroupSequence(['value' => ['Group 1', 'Group 2']]);
 
-        $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);
+        self::assertSame(['Group 1', 'Group 2'], $sequence->groups);
     }
 }

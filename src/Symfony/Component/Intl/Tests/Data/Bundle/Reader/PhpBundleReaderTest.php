@@ -35,32 +35,32 @@ class PhpBundleReaderTest extends TestCase
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/php', 'en');
 
-        $this->assertIsArray($data);
-        $this->assertSame('Bar', $data['Foo']);
-        $this->assertArrayNotHasKey('ExistsNot', $data);
+        self::assertIsArray($data);
+        self::assertSame('Bar', $data['Foo']);
+        self::assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadFailsIfNonExistingLocale()
     {
-        $this->expectException(ResourceBundleNotFoundException::class);
+        self::expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/php', 'foo');
     }
 
     public function testReadFailsIfNonExistingDirectory()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/foo', 'en');
     }
 
     public function testReadFailsIfNotAFile()
     {
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }
 
     public function testReaderDoesNotBreakOutOfGivenPath()
     {
-        $this->expectException(ResourceBundleNotFoundException::class);
+        self::expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/php', '../invalid_directory/en');
     }
 }

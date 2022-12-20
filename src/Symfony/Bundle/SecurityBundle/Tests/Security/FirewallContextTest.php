@@ -28,24 +28,22 @@ class FirewallContextTest extends TestCase
 
         $context = new FirewallContext($listeners, $exceptionListener, $logoutListener, $config);
 
-        $this->assertEquals($listeners, $context->getListeners());
-        $this->assertEquals($exceptionListener, $context->getExceptionListener());
-        $this->assertEquals($logoutListener, $context->getLogoutListener());
-        $this->assertEquals($config, $context->getConfig());
+        self::assertEquals($listeners, $context->getListeners());
+        self::assertEquals($exceptionListener, $context->getExceptionListener());
+        self::assertEquals($logoutListener, $context->getLogoutListener());
+        self::assertEquals($config, $context->getConfig());
     }
 
     private function getExceptionListenerMock()
     {
-        return $this
-            ->getMockBuilder(ExceptionListener::class)
+        return self::getMockBuilder(ExceptionListener::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
 
     private function getLogoutListenerMock()
     {
-        return $this
-            ->getMockBuilder(LogoutListener::class)
+        return self::getMockBuilder(LogoutListener::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

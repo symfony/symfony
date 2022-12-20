@@ -47,39 +47,39 @@ class JsonSerializableNormalizerTest extends TestCase
 
     private function createNormalizer(array $defaultContext = [])
     {
-        $this->serializer = $this->createMock(JsonSerializerNormalizer::class);
+        $this->serializer = self::createMock(JsonSerializerNormalizer::class);
         $this->normalizer = new JsonSerializableNormalizer(null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
 
     public function testSupportNormalization()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new JsonSerializableDummy()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertTrue($this->normalizer->supportsNormalization(new JsonSerializableDummy()));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     public function testNormalize()
     {
         $this->serializer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('normalize')
             ->willReturnCallback(function ($data) {
-                $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], array_diff_key($data, ['qux' => '']));
+                self::assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], array_diff_key($data, ['qux' => '']));
 
                 return 'string_object';
             })
         ;
 
-        $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
+        self::assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
     }
 
     public function testCircularNormalize()
     {
-        $this->expectException(CircularReferenceException::class);
+        self::expectException(CircularReferenceException::class);
         $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
         $this->serializer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('normalize')
             ->willReturnCallback(function ($data, $format, $context) {
                 $this->normalizer->normalize($data['qux'], $format, $context);
@@ -88,7 +88,7 @@ class JsonSerializableNormalizerTest extends TestCase
             })
         ;
 
-        $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
+        self::assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
     }
 
     protected function getNormalizerForCircularReference(array $defaultContext): JsonSerializableNormalizer
@@ -106,8 +106,8 @@ class JsonSerializableNormalizerTest extends TestCase
 
     public function testInvalidDataThrowException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The object must implement "JsonSerializable".');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The object must implement "JsonSerializable".');
         $this->normalizer->normalize(new \stdClass());
     }
 }

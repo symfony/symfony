@@ -54,7 +54,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTest
             'bootstrap_5_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock());
+        $this->renderer = new FormRenderer($rendererEngine, self::getMockBuilder(CsrfTokenManagerInterface::class)->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
@@ -96,7 +96,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTest
             'bootstrap_5_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock());
+        $this->renderer = new FormRenderer($rendererEngine, self::getMockBuilder(CsrfTokenManagerInterface::class)->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory

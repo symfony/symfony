@@ -81,7 +81,7 @@ class DataCollectorTranslatorTest extends TestCase
             'transChoiceNumber' => null,
         ];
 
-        $this->assertEquals($expectedMessages, $collector->getCollectedMessages());
+        self::assertEquals($expectedMessages, $collector->getCollectedMessages());
     }
 
     private function createCollector()

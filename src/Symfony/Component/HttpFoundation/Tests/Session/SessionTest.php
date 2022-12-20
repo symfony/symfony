@@ -53,24 +53,24 @@ class SessionTest extends TestCase
 
     public function testStart()
     {
-        $this->assertEquals('', $this->session->getId());
-        $this->assertTrue($this->session->start());
-        $this->assertNotEquals('', $this->session->getId());
+        self::assertEquals('', $this->session->getId());
+        self::assertTrue($this->session->start());
+        self::assertNotEquals('', $this->session->getId());
     }
 
     public function testIsStarted()
     {
-        $this->assertFalse($this->session->isStarted());
+        self::assertFalse($this->session->isStarted());
         $this->session->start();
-        $this->assertTrue($this->session->isStarted());
+        self::assertTrue($this->session->isStarted());
     }
 
     public function testSetId()
     {
-        $this->assertEquals('', $this->session->getId());
+        self::assertEquals('', $this->session->getId());
         $this->session->setId('0123456789abcdef');
         $this->session->start();
-        $this->assertEquals('0123456789abcdef', $this->session->getId());
+        self::assertEquals('0123456789abcdef', $this->session->getId());
     }
 
     public function testSetIdAfterStart()
@@ -84,29 +84,29 @@ class SessionTest extends TestCase
         } catch (\Exception $e) {
         }
 
-        $this->assertNull($e);
+        self::assertNull($e);
 
         try {
             $this->session->setId('different');
         } catch (\Exception $e) {
         }
 
-        $this->assertInstanceOf(\LogicException::class, $e);
+        self::assertInstanceOf(\LogicException::class, $e);
     }
 
     public function testSetName()
     {
-        $this->assertEquals('MOCKSESSID', $this->session->getName());
+        self::assertEquals('MOCKSESSID', $this->session->getName());
         $this->session->setName('session.test.com');
         $this->session->start();
-        $this->assertEquals('session.test.com', $this->session->getName());
+        self::assertEquals('session.test.com', $this->session->getName());
     }
 
     public function testGet()
     {
         // tests defaults
-        $this->assertNull($this->session->get('foo'));
-        $this->assertEquals(1, $this->session->get('foo', 1));
+        self::assertNull($this->session->get('foo'));
+        self::assertEquals(1, $this->session->get('foo', 1));
     }
 
     /**
@@ -115,7 +115,7 @@ class SessionTest extends TestCase
     public function testSet($key, $value)
     {
         $this->session->set($key, $value);
-        $this->assertEquals($value, $this->session->get($key));
+        self::assertEquals($value, $this->session->get($key));
     }
 
     /**
@@ -124,16 +124,16 @@ class SessionTest extends TestCase
     public function testHas($key, $value)
     {
         $this->session->set($key, $value);
-        $this->assertTrue($this->session->has($key));
-        $this->assertFalse($this->session->has($key.'non_value'));
+        self::assertTrue($this->session->has($key));
+        self::assertFalse($this->session->has($key.'non_value'));
     }
 
     public function testReplace()
     {
         $this->session->replace(['happiness' => 'be good', 'symfony' => 'awesome']);
-        $this->assertEquals(['happiness' => 'be good', 'symfony' => 'awesome'], $this->session->all());
+        self::assertEquals(['happiness' => 'be good', 'symfony' => 'awesome'], $this->session->all());
         $this->session->replace([]);
-        $this->assertEquals([], $this->session->all());
+        self::assertEquals([], $this->session->all());
     }
 
     /**
@@ -142,7 +142,7 @@ class SessionTest extends TestCase
     public function testAll($key, $value, $result)
     {
         $this->session->set($key, $value);
-        $this->assertEquals($result, $this->session->all());
+        self::assertEquals($result, $this->session->all());
     }
 
     /**
@@ -153,7 +153,7 @@ class SessionTest extends TestCase
         $this->session->set('hi', 'fabien');
         $this->session->set($key, $value);
         $this->session->clear();
-        $this->assertEquals([], $this->session->all());
+        self::assertEquals([], $this->session->all());
     }
 
     public function setProvider()
@@ -173,28 +173,28 @@ class SessionTest extends TestCase
         $this->session->set('hi.world', 'have a nice day');
         $this->session->set($key, $value);
         $this->session->remove($key);
-        $this->assertEquals(['hi.world' => 'have a nice day'], $this->session->all());
+        self::assertEquals(['hi.world' => 'have a nice day'], $this->session->all());
     }
 
     public function testInvalidate()
     {
         $this->session->set('invalidate', 123);
         $this->session->invalidate();
-        $this->assertEquals([], $this->session->all());
+        self::assertEquals([], $this->session->all());
     }
 
     public function testMigrate()
     {
         $this->session->set('migrate', 321);
         $this->session->migrate();
-        $this->assertEquals(321, $this->session->get('migrate'));
+        self::assertEquals(321, $this->session->get('migrate'));
     }
 
     public function testMigrateDestroy()
     {
         $this->session->set('migrate', 333);
         $this->session->migrate(true);
-        $this->assertEquals(333, $this->session->get('migrate'));
+        self::assertEquals(333, $this->session->get('migrate'));
     }
 
     public function testSave()
@@ -202,19 +202,19 @@ class SessionTest extends TestCase
         $this->session->start();
         $this->session->save();
 
-        $this->assertFalse($this->session->isStarted());
+        self::assertFalse($this->session->isStarted());
     }
 
     public function testGetId()
     {
-        $this->assertEquals('', $this->session->getId());
+        self::assertEquals('', $this->session->getId());
         $this->session->start();
-        $this->assertNotEquals('', $this->session->getId());
+        self::assertNotEquals('', $this->session->getId());
     }
 
     public function testGetFlashBag()
     {
-        $this->assertInstanceOf(FlashBagInterface::class, $this->session->getFlashBag());
+        self::assertInstanceOf(FlashBagInterface::class, $this->session->getFlashBag());
     }
 
     public function testGetIterator()
@@ -226,11 +226,11 @@ class SessionTest extends TestCase
 
         $i = 0;
         foreach ($this->session as $key => $val) {
-            $this->assertEquals($attributes[$key], $val);
+            self::assertEquals($attributes[$key], $val);
             ++$i;
         }
 
-        $this->assertEquals(\count($attributes), $i);
+        self::assertEquals(\count($attributes), $i);
     }
 
     public function testGetCount()
@@ -238,30 +238,30 @@ class SessionTest extends TestCase
         $this->session->set('hello', 'world');
         $this->session->set('symfony', 'rocks');
 
-        $this->assertCount(2, $this->session);
+        self::assertCount(2, $this->session);
     }
 
     public function testGetMeta()
     {
-        $this->assertInstanceOf(MetadataBag::class, $this->session->getMetadataBag());
+        self::assertInstanceOf(MetadataBag::class, $this->session->getMetadataBag());
     }
 
     public function testIsEmpty()
     {
-        $this->assertTrue($this->session->isEmpty());
+        self::assertTrue($this->session->isEmpty());
 
         $this->session->set('hello', 'world');
-        $this->assertFalse($this->session->isEmpty());
+        self::assertFalse($this->session->isEmpty());
 
         $this->session->remove('hello');
-        $this->assertTrue($this->session->isEmpty());
+        self::assertTrue($this->session->isEmpty());
 
         $flash = $this->session->getFlashBag();
         $flash->set('hello', 'world');
-        $this->assertFalse($this->session->isEmpty());
+        self::assertFalse($this->session->isEmpty());
 
         $flash->get('hello');
-        $this->assertTrue($this->session->isEmpty());
+        self::assertTrue($this->session->isEmpty());
     }
 
     public function testGetBagWithBagImplementingGetBag()
@@ -272,7 +272,7 @@ class SessionTest extends TestCase
         $storage = new MockArraySessionStorage();
         $storage->registerBag($bag);
 
-        $this->assertSame($bag, (new Session($storage))->getBag('foo'));
+        self::assertSame($bag, (new Session($storage))->getBag('foo'));
     }
 
     public function testGetBagWithBagNotImplementingGetBag()
@@ -285,6 +285,6 @@ class SessionTest extends TestCase
         $storage = new MockArraySessionStorage();
         $storage->registerBag(new SessionBagProxy($bag, $data, $usageIndex, null));
 
-        $this->assertSame($bag, (new Session($storage))->getBag('foo'));
+        self::assertSame($bag, (new Session($storage))->getBag('foo'));
     }
 }

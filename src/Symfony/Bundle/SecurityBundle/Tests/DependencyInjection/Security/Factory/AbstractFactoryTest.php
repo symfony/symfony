@@ -29,13 +29,13 @@ class AbstractFactoryTest extends TestCase
         ], 'user_provider', 'entry_point');
 
         // auth provider
-        $this->assertEquals('auth_provider', $authProviderId);
+        self::assertEquals('auth_provider', $authProviderId);
 
         // listener
-        $this->assertEquals('abstract_listener.foo', $listenerId);
-        $this->assertTrue($container->hasDefinition('abstract_listener.foo'));
+        self::assertEquals('abstract_listener.foo', $listenerId);
+        self::assertTrue($container->hasDefinition('abstract_listener.foo'));
         $definition = $container->getDefinition('abstract_listener.foo');
-        $this->assertEquals([
+        self::assertEquals([
             'index_4' => 'foo',
             'index_5' => new Reference('security.authentication.success_handler.foo.abstract_factory'),
             'index_6' => new Reference('security.authentication.failure_handler.foo.abstract_factory'),
@@ -45,7 +45,7 @@ class AbstractFactoryTest extends TestCase
         ], $definition->getArguments());
 
         // entry point
-        $this->assertEquals('entry_point', $entryPointId, '->create() does not change the default entry point.');
+        self::assertEquals('entry_point', $entryPointId, '->create() does not change the default entry point.');
     }
 
     /**
@@ -66,15 +66,15 @@ class AbstractFactoryTest extends TestCase
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
-        $this->assertEquals(new Reference('security.authentication.failure_handler.foo.abstract_factory'), $arguments['index_6']);
+        self::assertEquals(new Reference('security.authentication.failure_handler.foo.abstract_factory'), $arguments['index_6']);
         $failureHandler = $container->findDefinition((string) $arguments['index_6']);
 
         $methodCalls = $failureHandler->getMethodCalls();
         if ($defaultHandlerInjection) {
-            $this->assertEquals('setOptions', $methodCalls[0][0]);
-            $this->assertEquals(['login_path' => '/bar'], $methodCalls[0][1][0]);
+            self::assertEquals('setOptions', $methodCalls[0][0]);
+            self::assertEquals(['login_path' => '/bar'], $methodCalls[0][1][0]);
         } else {
-            $this->assertCount(0, $methodCalls);
+            self::assertCount(0, $methodCalls);
         }
     }
 
@@ -104,17 +104,17 @@ class AbstractFactoryTest extends TestCase
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
-        $this->assertEquals(new Reference('security.authentication.success_handler.foo.abstract_factory'), $arguments['index_5']);
+        self::assertEquals(new Reference('security.authentication.success_handler.foo.abstract_factory'), $arguments['index_5']);
         $successHandler = $container->findDefinition((string) $arguments['index_5']);
         $methodCalls = $successHandler->getMethodCalls();
 
         if ($defaultHandlerInjection) {
-            $this->assertEquals('setOptions', $methodCalls[0][0]);
-            $this->assertEquals(['default_target_path' => '/bar'], $methodCalls[0][1][0]);
-            $this->assertEquals('setFirewallName', $methodCalls[1][0]);
-            $this->assertEquals(['foo'], $methodCalls[1][1]);
+            self::assertEquals('setOptions', $methodCalls[0][0]);
+            self::assertEquals(['default_target_path' => '/bar'], $methodCalls[0][1][0]);
+            self::assertEquals('setFirewallName', $methodCalls[1][0]);
+            self::assertEquals(['foo'], $methodCalls[1][1]);
         } else {
-            $this->assertCount(0, $methodCalls);
+            self::assertCount(0, $methodCalls);
         }
     }
 
@@ -128,20 +128,20 @@ class AbstractFactoryTest extends TestCase
 
     protected function callFactory($id, $config, $userProviderId, $defaultEntryPointId)
     {
-        $factory = $this->getMockForAbstractClass(AbstractFactory::class);
+        $factory = self::getMockForAbstractClass(AbstractFactory::class);
 
         $factory
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('createAuthProvider')
             ->willReturn('auth_provider')
         ;
         $factory
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getListenerId')
             ->willReturn('abstract_listener')
         ;
         $factory
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getKey')
             ->willReturn('abstract_factory')
         ;

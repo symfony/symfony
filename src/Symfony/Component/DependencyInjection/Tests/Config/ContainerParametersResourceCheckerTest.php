@@ -32,13 +32,13 @@ class ContainerParametersResourceCheckerTest extends TestCase
     protected function setUp(): void
     {
         $this->resource = new ContainerParametersResource(['locales' => ['fr', 'en'], 'default_locale' => 'fr']);
-        $this->container = $this->createMock(ContainerInterface::class);
+        $this->container = self::createMock(ContainerInterface::class);
         $this->resourceChecker = new ContainerParametersResourceChecker($this->container);
     }
 
     public function testSupports()
     {
-        $this->assertTrue($this->resourceChecker->supports($this->resource));
+        self::assertTrue($this->resourceChecker->supports($this->resource));
     }
 
     /**
@@ -48,7 +48,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
     {
         $mockContainer($this->container);
 
-        $this->assertSame($expected, $this->resourceChecker->isFresh($this->resource, time()));
+        self::assertSame($expected, $this->resourceChecker->isFresh($this->resource, time()));
     }
 
     public function isFreshProvider()
@@ -62,11 +62,11 @@ class ContainerParametersResourceCheckerTest extends TestCase
         }, false];
 
         yield 'fresh on every identical parameters' => [function (MockObject $container) {
-            $container->expects($this->exactly(2))->method('hasParameter')->willReturn(true);
-            $container->expects($this->exactly(2))->method('getParameter')
+            $container->expects(self::exactly(2))->method('hasParameter')->willReturn(true);
+            $container->expects(self::exactly(2))->method('getParameter')
                 ->withConsecutive(
-                    [$this->equalTo('locales')],
-                    [$this->equalTo('default_locale')]
+                    [self::equalTo('locales')],
+                    [self::equalTo('default_locale')]
                 )
                 ->willReturnMap([
                     ['locales', ['fr', 'en']],

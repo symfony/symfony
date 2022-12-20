@@ -23,21 +23,21 @@ class NullOutputFormatterStyleTest extends TestCase
     {
         $style = new NullOutputFormatterStyle();
 
-        $this->assertSame('foo', $style->apply('foo'));
+        self::assertSame('foo', $style->apply('foo'));
     }
 
     public function testSetForeground()
     {
         $style = new NullOutputFormatterStyle();
         $style->setForeground('black');
-        $this->assertSame('foo', $style->apply('foo'));
+        self::assertSame('foo', $style->apply('foo'));
     }
 
     public function testSetBackground()
     {
         $style = new NullOutputFormatterStyle();
         $style->setBackground('blue');
-        $this->assertSame('foo', $style->apply('foo'));
+        self::assertSame('foo', $style->apply('foo'));
     }
 
     public function testOptions()
@@ -45,12 +45,12 @@ class NullOutputFormatterStyleTest extends TestCase
         $style = new NullOutputFormatterStyle();
 
         $style->setOptions(['reverse', 'conceal']);
-        $this->assertSame('foo', $style->apply('foo'));
+        self::assertSame('foo', $style->apply('foo'));
 
         $style->setOption('bold');
-        $this->assertSame('foo', $style->apply('foo'));
+        self::assertSame('foo', $style->apply('foo'));
 
         $style->unsetOption('reverse');
-        $this->assertSame('foo', $style->apply('foo'));
+        self::assertSame('foo', $style->apply('foo'));
     }
 }

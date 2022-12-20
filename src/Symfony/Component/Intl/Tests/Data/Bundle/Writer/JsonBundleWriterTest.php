@@ -61,7 +61,7 @@ class JsonBundleWriterTest extends TestCase
             ]),
         ]);
 
-        $this->assertFileEquals(__DIR__.'/Fixtures/en.json', $this->directory.'/en.json');
+        self::assertFileEquals(__DIR__.'/Fixtures/en.json', $this->directory.'/en.json');
     }
 
     /**
@@ -73,6 +73,6 @@ class JsonBundleWriterTest extends TestCase
 
         $this->writer->write($this->directory, 'en', $bundle);
 
-        $this->assertFileEquals(__DIR__.'/Fixtures/rb.json', $this->directory.'/en.json');
+        self::assertFileEquals(__DIR__.'/Fixtures/rb.json', $this->directory.'/en.json');
     }
 }

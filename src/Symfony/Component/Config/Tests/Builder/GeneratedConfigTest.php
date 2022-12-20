@@ -40,7 +40,7 @@ class GeneratedConfigTest extends TestCase
 
     protected function setup(): void
     {
-        parent::setup();
+        self::setup();
 
         $this->tempDir = [];
     }
@@ -50,7 +50,7 @@ class GeneratedConfigTest extends TestCase
         (new Filesystem())->remove($this->tempDir);
         $this->tempDir = [];
 
-        parent::tearDown();
+        self::tearDown();
     }
 
     public function fixtureNames()
@@ -96,13 +96,13 @@ class GeneratedConfigTest extends TestCase
 
         $this->assertDirectorySame($expectedCode, $outputDir);
 
-        $this->assertInstanceOf(ConfigBuilderInterface::class, $configBuilder);
-        $this->assertSame($alias, $configBuilder->getExtensionAlias());
+        self::assertInstanceOf(ConfigBuilderInterface::class, $configBuilder);
+        self::assertSame($alias, $configBuilder->getExtensionAlias());
         $output = $configBuilder->toArray();
         if (class_exists(AbstractConfigurator::class)) {
             $output = AbstractConfigurator::processValue($output);
         }
-        $this->assertSame($expectedOutput, $output);
+        self::assertSame($expectedOutput, $output);
     }
 
     /**
@@ -113,7 +113,7 @@ class GeneratedConfigTest extends TestCase
     {
         $configBuilder = $this->generateConfigBuilder(NodeInitialValues::class);
         $configBuilder->someCleverName(['second' => 'foo']);
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $configBuilder->someCleverName(['first' => 'bar']);
     }
 
@@ -129,12 +129,12 @@ class GeneratedConfigTest extends TestCase
         $messenger = $configBuilder->messenger();
         $foo = $messenger->routing('foo', ['senders' => 'a']);
         $bar = $messenger->routing('bar', ['senders' => 'b']);
-        $this->assertNotEquals($foo, $bar);
+        self::assertNotEquals($foo, $bar);
 
         $foo2 = $messenger->routing('foo');
-        $this->assertEquals($foo, $foo2);
+        self::assertEquals($foo, $foo2);
 
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $messenger->routing('foo', ['senders' => 'c']);
     }
 
@@ -144,7 +144,7 @@ class GeneratedConfigTest extends TestCase
     public function testWrongInitialValues()
     {
         $configBuilder = $this->generateConfigBuilder(NodeInitialValues::class);
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $configBuilder->someCleverName(['not_exists' => 'foo']);
     }
 
@@ -153,8 +153,8 @@ class GeneratedConfigTest extends TestCase
         /** @var AddToListConfig $configBuilder */
         $configBuilder = $this->generateConfigBuilder(AddToList::class);
 
-        $this->assertFalse(method_exists($configBuilder->translator(), 'set'));
-        $this->assertFalse(method_exists($configBuilder->messenger()->receiving(), 'set'));
+        self::assertFalse(method_exists($configBuilder->translator(), 'set'));
+        self::assertFalse(method_exists($configBuilder->messenger()->receiving(), 'set'));
     }
 
     /**
@@ -197,9 +197,9 @@ class GeneratedConfigTest extends TestCase
             $currentFiles[substr($file->getPathname(), \strlen($current))] = $file->getPathname();
         }
 
-        $this->assertSame(array_keys($expectedFiles), array_keys($currentFiles));
+        self::assertSame(array_keys($expectedFiles), array_keys($currentFiles));
         foreach ($expectedFiles as $fileName => $filePath) {
-            $this->assertFileEquals($filePath, $currentFiles[$fileName]);
+            self::assertFileEquals($filePath, $currentFiles[$fileName]);
         }
     }
 }

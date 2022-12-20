@@ -21,9 +21,9 @@ class StackMiddlewareTest extends TestCase
 {
     public function testClone()
     {
-        $middleware1 = $this->createMock(MiddlewareInterface::class);
+        $middleware1 = self::createMock(MiddlewareInterface::class);
         $middleware1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handle')
             ->willReturnCallback(function (Envelope $envelope, StackInterface $stack): Envelope {
                 $fork = clone $stack;
@@ -35,9 +35,9 @@ class StackMiddlewareTest extends TestCase
             })
         ;
 
-        $middleware2 = $this->createMock(MiddlewareInterface::class);
+        $middleware2 = self::createMock(MiddlewareInterface::class);
         $middleware2
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('handle')
             ->willReturnCallback(function (Envelope $envelope, StackInterface $stack): Envelope {
                 return $envelope;

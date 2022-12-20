@@ -39,43 +39,43 @@ class FormLoginAuthenticatorTest extends TestCase
     {
         $failureResponse = $this->authenticator->onAuthenticationFailure($this->requestWithoutSession, new AuthenticationException());
 
-        $this->assertInstanceOf(RedirectResponse::class, $failureResponse);
-        $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
+        self::assertInstanceOf(RedirectResponse::class, $failureResponse);
+        self::assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
     public function testAuthenticationFailureWithSession()
     {
         $this->requestWithSession->getSession()
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('set');
 
         $failureResponse = $this->authenticator->onAuthenticationFailure($this->requestWithSession, new AuthenticationException());
 
-        $this->assertInstanceOf(RedirectResponse::class, $failureResponse);
-        $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
+        self::assertInstanceOf(RedirectResponse::class, $failureResponse);
+        self::assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
     public function testRememberMe()
     {
         $doSupport = $this->authenticator->supportsRememberMe();
 
-        $this->assertTrue($doSupport);
+        self::assertTrue($doSupport);
     }
 
     public function testStartWithoutSession()
     {
         $failureResponse = $this->authenticator->start($this->requestWithoutSession, new AuthenticationException());
 
-        $this->assertInstanceOf(RedirectResponse::class, $failureResponse);
-        $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
+        self::assertInstanceOf(RedirectResponse::class, $failureResponse);
+        self::assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
     public function testStartWithSession()
     {
         $failureResponse = $this->authenticator->start($this->requestWithSession, new AuthenticationException());
 
-        $this->assertInstanceOf(RedirectResponse::class, $failureResponse);
-        $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
+        self::assertInstanceOf(RedirectResponse::class, $failureResponse);
+        self::assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
     protected function setUp(): void
@@ -83,7 +83,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->requestWithoutSession = new Request([], [], [], [], [], []);
         $this->requestWithSession = new Request([], [], [], [], [], []);
 
-        $session = $this->createMock(SessionInterface::class);
+        $session = self::createMock(SessionInterface::class);
         $this->requestWithSession->setSession($session);
 
         $this->authenticator = new TestFormLoginAuthenticator();

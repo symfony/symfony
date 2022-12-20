@@ -80,13 +80,13 @@ class AbstractControllerTest extends TestCase
             'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
         ];
 
-        $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');
+        self::assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');
     }
 
     public function testGetParameter()
     {
         if (!class_exists(ContainerBag::class)) {
-            $this->markTestSkipped('ContainerBag class does not exist');
+            self::markTestSkipped('ContainerBag class does not exist');
         }
 
         $container = new Container(new FrozenParameterBag(['foo' => 'bar']));
@@ -95,13 +95,13 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertSame('bar', $controller->getParameter('foo'));
+        self::assertSame('bar', $controller->getParameter('foo'));
     }
 
     public function testMissingParameterBag()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
+        self::expectException(ServiceNotFoundException::class);
+        self::expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
         $container = new Container();
 
         $controller = $this->createController();
@@ -119,8 +119,8 @@ class AbstractControllerTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
+        $kernel = self::createMock(HttpKernelInterface::class);
+        $kernel->expects(self::once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat().'--'.$request->getLocale());
         });
 
@@ -132,7 +132,7 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->forward('a_controller');
-        $this->assertEquals('xml--fr', $response->getContent());
+        self::assertEquals('xml--fr', $response->getContent());
     }
 
     public function testGetUser()
@@ -143,7 +143,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage($token));
 
-        $this->assertSame($controller->getUser(), $user);
+        self::assertSame($controller->getUser(), $user);
     }
 
     /**
@@ -156,7 +156,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage($token));
 
-        $this->assertNull($controller->getUser());
+        self::assertNull($controller->getUser());
     }
 
     public function testGetUserWithEmptyTokenStorage()
@@ -164,13 +164,13 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage(null));
 
-        $this->assertNull($controller->getUser());
+        self::assertNull($controller->getUser());
     }
 
     public function testGetUserWithEmptyContainer()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('The SecurityBundle is not registered in your application.');
 
         $controller = $this->createController();
         $controller->setContainer(new Container());
@@ -180,9 +180,9 @@ class AbstractControllerTest extends TestCase
 
     private function getContainerWithTokenStorage($token = null): Container
     {
-        $tokenStorage = $this->createMock(TokenStorage::class);
+        $tokenStorage = self::createMock(TokenStorage::class);
         $tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
@@ -198,17 +198,17 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer(new Container());
 
         $response = $controller->json([]);
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals('[]', $response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertEquals('[]', $response->getContent());
     }
 
     public function testJsonWithSerializer()
     {
         $container = new Container();
 
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $serializer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('serialize')
             ->with([], 'json', ['json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS])
             ->willReturn('[]');
@@ -219,17 +219,17 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->json([]);
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals('[]', $response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertEquals('[]', $response->getContent());
     }
 
     public function testJsonWithSerializerContextOverride()
     {
         $container = new Container();
 
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $serializer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('serialize')
             ->with([], 'json', ['json_encode_options' => 0, 'other' => 'context'])
             ->willReturn('[]');
@@ -240,16 +240,16 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $response = $controller->json([], 200, [], ['json_encode_options' => 0, 'other' => 'context']);
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals('[]', $response->getContent());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertEquals('[]', $response->getContent());
         $response->setEncodingOptions(\JSON_FORCE_OBJECT);
-        $this->assertEquals('{}', $response->getContent());
+        self::assertEquals('{}', $response->getContent());
     }
 
     public function testFile()
     {
         $container = new Container();
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $container->set('http_kernel', $kernel);
 
         $controller = $this->createController();
@@ -257,13 +257,13 @@ class AbstractControllerTest extends TestCase
 
         /* @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__));
-        $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(BinaryFileResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
         if ($response->headers->get('content-type')) {
-            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+            self::assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
+        self::assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        self::assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileAsInline()
@@ -273,13 +273,13 @@ class AbstractControllerTest extends TestCase
         /* @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__), null, ResponseHeaderBag::DISPOSITION_INLINE);
 
-        $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(BinaryFileResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
         if ($response->headers->get('content-type')) {
-            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+            self::assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
-        $this->assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
+        self::assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
+        self::assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileWithOwnFileName()
@@ -290,13 +290,13 @@ class AbstractControllerTest extends TestCase
         $fileName = 'test.php';
         $response = $controller->file(new File(__FILE__), $fileName);
 
-        $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(BinaryFileResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
         if ($response->headers->get('content-type')) {
-            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+            self::assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertStringContainsString($fileName, $response->headers->get('content-disposition'));
+        self::assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        self::assertStringContainsString($fileName, $response->headers->get('content-disposition'));
     }
 
     public function testFileWithOwnFileNameAsInline()
@@ -307,13 +307,13 @@ class AbstractControllerTest extends TestCase
         $fileName = 'test.php';
         $response = $controller->file(new File(__FILE__), $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
 
-        $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(BinaryFileResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
         if ($response->headers->get('content-type')) {
-            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+            self::assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
-        $this->assertStringContainsString($fileName, $response->headers->get('content-disposition'));
+        self::assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
+        self::assertStringContainsString($fileName, $response->headers->get('content-disposition'));
     }
 
     public function testFileFromPath()
@@ -323,13 +323,13 @@ class AbstractControllerTest extends TestCase
         /* @var BinaryFileResponse $response */
         $response = $controller->file(__FILE__);
 
-        $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(BinaryFileResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
         if ($response->headers->get('content-type')) {
-            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+            self::assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
+        self::assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        self::assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileFromPathWithCustomizedFileName()
@@ -339,18 +339,18 @@ class AbstractControllerTest extends TestCase
         /* @var BinaryFileResponse $response */
         $response = $controller->file(__FILE__, 'test.php');
 
-        $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(BinaryFileResponse::class, $response);
+        self::assertSame(200, $response->getStatusCode());
         if ($response->headers->get('content-type')) {
-            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+            self::assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertStringContainsString('test.php', $response->headers->get('content-disposition'));
+        self::assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        self::assertStringContainsString('test.php', $response->headers->get('content-disposition'));
     }
 
     public function testFileWhichDoesNotExist()
     {
-        $this->expectException(FileNotFoundException::class);
+        self::expectException(FileNotFoundException::class);
 
         $controller = $this->createController();
 
@@ -359,8 +359,8 @@ class AbstractControllerTest extends TestCase
 
     public function testIsGranted()
     {
-        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(true);
+        $authorizationChecker = self::createMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker->expects(self::once())->method('isGranted')->willReturn(true);
 
         $container = new Container();
         $container->set('security.authorization_checker', $authorizationChecker);
@@ -368,15 +368,15 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertTrue($controller->isGranted('foo'));
+        self::assertTrue($controller->isGranted('foo'));
     }
 
     public function testdenyAccessUnlessGranted()
     {
-        $this->expectException(AccessDeniedException::class);
+        self::expectException(AccessDeniedException::class);
 
-        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
+        $authorizationChecker = self::createMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker->expects(self::once())->method('isGranted')->willReturn(false);
 
         $container = new Container();
         $container->set('security.authorization_checker', $authorizationChecker);
@@ -389,8 +389,8 @@ class AbstractControllerTest extends TestCase
 
     public function testRenderViewTwig()
     {
-        $twig = $this->createMock(Environment::class);
-        $twig->expects($this->once())->method('render')->willReturn('bar');
+        $twig = self::createMock(Environment::class);
+        $twig->expects(self::once())->method('render')->willReturn('bar');
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -398,13 +398,13 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertEquals('bar', $controller->renderView('foo'));
+        self::assertEquals('bar', $controller->renderView('foo'));
     }
 
     public function testRenderTwig()
     {
-        $twig = $this->createMock(Environment::class);
-        $twig->expects($this->once())->method('render')->willReturn('bar');
+        $twig = self::createMock(Environment::class);
+        $twig->expects(self::once())->method('render')->willReturn('bar');
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -412,18 +412,18 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertEquals('bar', $controller->render('foo')->getContent());
+        self::assertEquals('bar', $controller->render('foo')->getContent());
     }
 
     public function testRenderFormNew()
     {
         $formView = new FormView();
 
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
-        $form->expects($this->once())->method('createView')->willReturn($formView);
+        $form = self::getMockBuilder(FormInterface::class)->getMock();
+        $form->expects(self::once())->method('createView')->willReturn($formView);
 
-        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
+        $twig = self::getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects(self::once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -433,21 +433,21 @@ class AbstractControllerTest extends TestCase
 
         $response = $controller->renderForm('foo', ['bar' => $form]);
 
-        $this->assertTrue($response->isSuccessful());
-        $this->assertSame('bar', $response->getContent());
+        self::assertTrue($response->isSuccessful());
+        self::assertSame('bar', $response->getContent());
     }
 
     public function testRenderFormSubmittedAndInvalid()
     {
         $formView = new FormView();
 
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
-        $form->expects($this->once())->method('createView')->willReturn($formView);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(false);
+        $form = self::getMockBuilder(FormInterface::class)->getMock();
+        $form->expects(self::once())->method('createView')->willReturn($formView);
+        $form->expects(self::once())->method('isSubmitted')->willReturn(true);
+        $form->expects(self::once())->method('isValid')->willReturn(false);
 
-        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
+        $twig = self::getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects(self::once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -457,13 +457,13 @@ class AbstractControllerTest extends TestCase
 
         $response = $controller->renderForm('foo', ['bar' => $form]);
 
-        $this->assertSame(422, $response->getStatusCode());
-        $this->assertSame('bar', $response->getContent());
+        self::assertSame(422, $response->getStatusCode());
+        self::assertSame('bar', $response->getContent());
     }
 
     public function testStreamTwig()
     {
-        $twig = $this->createMock(Environment::class);
+        $twig = self::createMock(Environment::class);
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -471,13 +471,13 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertInstanceOf(StreamedResponse::class, $controller->stream('foo'));
+        self::assertInstanceOf(StreamedResponse::class, $controller->stream('foo'));
     }
 
     public function testRedirectToRoute()
     {
-        $router = $this->createMock(RouterInterface::class);
-        $router->expects($this->once())->method('generate')->willReturn('/foo');
+        $router = self::createMock(RouterInterface::class);
+        $router->expects(self::once())->method('generate')->willReturn('/foo');
 
         $container = new Container();
         $container->set('router', $router);
@@ -486,9 +486,9 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
         $response = $controller->redirectToRoute('foo');
 
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame('/foo', $response->getTargetUrl());
-        $this->assertSame(302, $response->getStatusCode());
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame('/foo', $response->getTargetUrl());
+        self::assertSame(302, $response->getStatusCode());
     }
 
     /**
@@ -497,8 +497,8 @@ class AbstractControllerTest extends TestCase
     public function testAddFlash()
     {
         $flashBag = new FlashBag();
-        $session = $this->createMock(Session::class);
-        $session->expects($this->once())->method('getFlashBag')->willReturn($flashBag);
+        $session = self::createMock(Session::class);
+        $session->expects(self::once())->method('getFlashBag')->willReturn($flashBag);
 
         $request = new Request();
         $request->setSession($session);
@@ -513,20 +513,20 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
         $controller->addFlash('foo', 'bar');
 
-        $this->assertSame(['bar'], $flashBag->get('foo'));
+        self::assertSame(['bar'], $flashBag->get('foo'));
     }
 
     public function testCreateAccessDeniedException()
     {
         $controller = $this->createController();
 
-        $this->assertInstanceOf(AccessDeniedException::class, $controller->createAccessDeniedException());
+        self::assertInstanceOf(AccessDeniedException::class, $controller->createAccessDeniedException());
     }
 
     public function testIsCsrfTokenValid()
     {
-        $tokenManager = $this->createMock(CsrfTokenManagerInterface::class);
-        $tokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
+        $tokenManager = self::createMock(CsrfTokenManagerInterface::class);
+        $tokenManager->expects(self::once())->method('isTokenValid')->willReturn(true);
 
         $container = new Container();
         $container->set('security.csrf.token_manager', $tokenManager);
@@ -534,13 +534,13 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertTrue($controller->isCsrfTokenValid('foo', 'bar'));
+        self::assertTrue($controller->isCsrfTokenValid('foo', 'bar'));
     }
 
     public function testGenerateUrl()
     {
-        $router = $this->createMock(RouterInterface::class);
-        $router->expects($this->once())->method('generate')->willReturn('/foo');
+        $router = self::createMock(RouterInterface::class);
+        $router->expects(self::once())->method('generate')->willReturn('/foo');
 
         $container = new Container();
         $container->set('router', $router);
@@ -548,7 +548,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertEquals('/foo', $controller->generateUrl('foo'));
+        self::assertEquals('/foo', $controller->generateUrl('foo'));
     }
 
     public function testRedirect()
@@ -556,28 +556,28 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $response = $controller->redirect('https://dunglas.fr', 301);
 
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame('https://dunglas.fr', $response->getTargetUrl());
-        $this->assertSame(301, $response->getStatusCode());
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame('https://dunglas.fr', $response->getTargetUrl());
+        self::assertSame(301, $response->getStatusCode());
     }
 
     public function testCreateNotFoundException()
     {
         $controller = $this->createController();
 
-        $this->assertInstanceOf(NotFoundHttpException::class, $controller->createNotFoundException());
+        self::assertInstanceOf(NotFoundHttpException::class, $controller->createNotFoundException());
     }
 
     public function testCreateForm()
     {
-        $config = $this->createMock(FormConfigInterface::class);
+        $config = self::createMock(FormConfigInterface::class);
         $config->method('getInheritData')->willReturn(false);
         $config->method('getName')->willReturn('');
 
         $form = new Form($config);
 
-        $formFactory = $this->createMock(FormFactoryInterface::class);
-        $formFactory->expects($this->once())->method('create')->willReturn($form);
+        $formFactory = self::createMock(FormFactoryInterface::class);
+        $formFactory->expects(self::once())->method('create')->willReturn($form);
 
         $container = new Container();
         $container->set('form.factory', $formFactory);
@@ -585,15 +585,15 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertEquals($form, $controller->createForm('foo'));
+        self::assertEquals($form, $controller->createForm('foo'));
     }
 
     public function testCreateFormBuilder()
     {
-        $formBuilder = $this->createMock(FormBuilderInterface::class);
+        $formBuilder = self::createMock(FormBuilderInterface::class);
 
-        $formFactory = $this->createMock(FormFactoryInterface::class);
-        $formFactory->expects($this->once())->method('createBuilder')->willReturn($formBuilder);
+        $formFactory = self::createMock(FormFactoryInterface::class);
+        $formFactory->expects(self::once())->method('createBuilder')->willReturn($formBuilder);
 
         $container = new Container();
         $container->set('form.factory', $formFactory);
@@ -601,7 +601,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
+        self::assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
     /**
@@ -609,7 +609,7 @@ class AbstractControllerTest extends TestCase
      */
     public function testGetDoctrine()
     {
-        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine = self::createMock(ManagerRegistry::class);
 
         $container = new Container();
         $container->set('doctrine', $doctrine);
@@ -617,7 +617,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertEquals($doctrine, $controller->getDoctrine());
+        self::assertEquals($doctrine, $controller->getDoctrine());
     }
 
     public function testAddLink()
@@ -631,7 +631,7 @@ class AbstractControllerTest extends TestCase
         $controller->addLink($request, $link2);
 
         $links = $request->attributes->get('_links')->getLinks();
-        $this->assertContains($link1, $links);
-        $this->assertContains($link2, $links);
+        self::assertContains($link1, $links);
+        self::assertContains($link2, $links);
     }
 }

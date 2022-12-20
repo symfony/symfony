@@ -22,8 +22,8 @@ class ExpiredSignatureStorageTest extends TestCase
         $cache = new ArrayAdapter();
         $storage = new ExpiredSignatureStorage($cache, 600);
 
-        $this->assertSame(0, $storage->countUsages('hash+more'));
+        self::assertSame(0, $storage->countUsages('hash+more'));
         $storage->incrementUsages('hash+more');
-        $this->assertSame(1, $storage->countUsages('hash+more'));
+        self::assertSame(1, $storage->countUsages('hash+more'));
     }
 }

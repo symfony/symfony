@@ -34,7 +34,7 @@ class FormPassTest extends TestCase
 
         $container->compile();
 
-        $this->assertFalse($container->hasDefinition('form.extension'));
+        self::assertFalse($container->hasDefinition('form.extension'));
     }
 
     public function testDoNothingIfDebugCommandNotLoaded()
@@ -43,7 +43,7 @@ class FormPassTest extends TestCase
 
         $container->compile();
 
-        $this->assertFalse($container->hasDefinition('console.command.form_debug'));
+        self::assertFalse($container->hasDefinition('console.command.form_debug'));
     }
 
     public function testAddTaggedTypes()
@@ -59,14 +59,11 @@ class FormPassTest extends TestCase
         $extDefinition = $container->getDefinition('form.extension');
 
         $locator = $extDefinition->getArgument(0);
-        $this->assertTrue(!$locator->isPublic() || $locator->isPrivate());
-        $this->assertEquals(
-            (new Definition(ServiceLocator::class, [[
-                __CLASS__.'_Type1' => new ServiceClosureArgument(new Reference('my.type1')),
-                __CLASS__.'_Type2' => new ServiceClosureArgument(new Reference('my.type2')),
-            ]]))->addTag('container.service_locator')->setPublic(false),
-            $locator->setPublic(false)
-        );
+        self::assertTrue(!$locator->isPublic() || $locator->isPrivate());
+        self::assertEquals((new Definition(ServiceLocator::class, [[
+            __CLASS__.'_Type1' => new ServiceClosureArgument(new Reference('my.type1')),
+            __CLASS__.'_Type2' => new ServiceClosureArgument(new Reference('my.type2')),
+        ]]))->addTag('container.service_locator')->setPublic(false), $locator->setPublic(false));
     }
 
     public function testAddTaggedTypesToDebugCommand()
@@ -86,13 +83,10 @@ class FormPassTest extends TestCase
 
         $cmdDefinition = $container->getDefinition('console.command.form_debug');
 
-        $this->assertEquals(
-            [
-                'Symfony\Component\Form\Extension\Core\Type',
-                __NAMESPACE__,
-            ],
-            $cmdDefinition->getArgument(1)
-        );
+        self::assertEquals([
+            'Symfony\Component\Form\Extension\Core\Type',
+            __NAMESPACE__,
+        ], $cmdDefinition->getArgument(1));
     }
 
     /**
@@ -115,7 +109,7 @@ class FormPassTest extends TestCase
         $container->compile();
 
         $extDefinition = $container->getDefinition('form.extension');
-        $this->assertEquals($expectedRegisteredExtensions, $extDefinition->getArgument(1));
+        self::assertEquals($expectedRegisteredExtensions, $extDefinition->getArgument(1));
     }
 
     public function addTaggedTypeExtensionsDataProvider()
@@ -222,8 +216,8 @@ class FormPassTest extends TestCase
 
     public function testAddTaggedFormTypeExtensionWithoutExtendingAnyType()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The getExtendedTypes() method for service "my.type_extension" does not return any extended types.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The getExtendedTypes() method for service "my.type_extension" does not return any extended types.');
         $container = $this->createContainerBuilder();
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
@@ -251,13 +245,10 @@ class FormPassTest extends TestCase
 
         $extDefinition = $container->getDefinition('form.extension');
 
-        $this->assertEquals(
-            new IteratorArgument([
-                new Reference('my.guesser1'),
-                new Reference('my.guesser2'),
-            ]),
-            $extDefinition->getArgument(2)
-        );
+        self::assertEquals(new IteratorArgument([
+            new Reference('my.guesser1'),
+            new Reference('my.guesser2'),
+        ]), $extDefinition->getArgument(2));
     }
 
     /**
@@ -285,15 +276,15 @@ class FormPassTest extends TestCase
                 function (ContainerBuilder $container) {
                     $formTypes = $container->getDefinition('form.extension')->getArgument(0);
 
-                    $this->assertInstanceOf(Reference::class, $formTypes);
+                    self::assertInstanceOf(Reference::class, $formTypes);
 
                     $locator = $container->getDefinition((string) $formTypes);
                     $expectedLocatorMap = [
                         'stdClass' => new ServiceClosureArgument(new Reference('my.type')),
                     ];
 
-                    $this->assertInstanceOf(Definition::class, $locator);
-                    $this->assertEquals($expectedLocatorMap, $locator->getArgument(0));
+                    self::assertInstanceOf(Definition::class, $locator);
+                    self::assertEquals($expectedLocatorMap, $locator->getArgument(0));
                 },
             ],
             [
@@ -301,15 +292,12 @@ class FormPassTest extends TestCase
                 Type1TypeExtension::class,
                 'form.type_extension',
                 function (ContainerBuilder $container) {
-                    $this->assertEquals(
-                        ['Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument([new Reference('my.type_extension')])],
-                        $container->getDefinition('form.extension')->getArgument(1)
-                    );
+                    self::assertEquals(['Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument([new Reference('my.type_extension')])], $container->getDefinition('form.extension')->getArgument(1));
                 },
                 ['extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType'],
             ],
             ['my.guesser', 'stdClass', 'form.type_guesser', function (ContainerBuilder $container) {
-                $this->assertEquals(new IteratorArgument([new Reference('my.guesser')]), $container->getDefinition('form.extension')->getArgument(2));
+                self::assertEquals(new IteratorArgument([new Reference('my.guesser')]), $container->getDefinition('form.extension')->getArgument(2));
             }],
         ];
     }

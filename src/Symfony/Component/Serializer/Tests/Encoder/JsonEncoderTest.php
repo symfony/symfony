@@ -35,7 +35,7 @@ class JsonEncoderTest extends TestCase
 
         $expected = '{"foo":"foo"}';
 
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'json'));
+        self::assertEquals($expected, $this->encoder->encode($obj, 'json'));
     }
 
     public function testComplexObject()
@@ -44,7 +44,7 @@ class JsonEncoderTest extends TestCase
 
         $expected = $this->getJsonSource();
 
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'json'));
+        self::assertEquals($expected, $this->encoder->encode($obj, 'json'));
     }
 
     public function testOptions()
@@ -56,14 +56,14 @@ class JsonEncoderTest extends TestCase
 
         $expected = '{"foo":3}';
 
-        $this->assertEquals($expected, $this->serializer->serialize($arr, 'json', $context));
+        self::assertEquals($expected, $this->serializer->serialize($arr, 'json', $context));
 
         $arr = [];
         $arr['foo'] = '3';
 
         $expected = '{"foo":"3"}';
 
-        $this->assertEquals($expected, $this->serializer->serialize($arr, 'json'), 'Context should not be persistent');
+        self::assertEquals($expected, $this->serializer->serialize($arr, 'json'), 'Context should not be persistent');
     }
 
     public function testWithDefaultContext()
@@ -78,13 +78,13 @@ class JsonEncoderTest extends TestCase
         $data = new \stdClass();
         $data->msg = '你好';
 
-        $this->assertEquals('{"msg":"你好"}', $json = $encoder->encode($data, 'json'));
-        $this->assertEquals($data, $encoder->decode($json, 'json'));
+        self::assertEquals('{"msg":"你好"}', $json = $encoder->encode($data, 'json'));
+        self::assertEquals($data, $encoder->decode($json, 'json'));
     }
 
     public function testEncodeNotUtf8WithoutPartialOnError()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $arr = [
             'utf8' => 'Hello World!',
             'notUtf8' => "\xb0\xd0\xb5\xd0",
@@ -105,17 +105,17 @@ class JsonEncoderTest extends TestCase
         $result = $this->encoder->encode($arr, 'json', $context);
         $jsonLastError = json_last_error();
 
-        $this->assertSame(\JSON_ERROR_UTF8, $jsonLastError);
-        $this->assertEquals('{"utf8":"Hello World!","notUtf8":null}', $result);
+        self::assertSame(\JSON_ERROR_UTF8, $jsonLastError);
+        self::assertEquals('{"utf8":"Hello World!","notUtf8":null}', $result);
 
-        $this->assertEquals('0', $this->serializer->serialize(\NAN, 'json', $context));
+        self::assertEquals('0', $this->serializer->serialize(\NAN, 'json', $context));
     }
 
     public function testDecodeFalseString()
     {
         $result = $this->encoder->decode('false', 'json');
-        $this->assertSame(\JSON_ERROR_NONE, json_last_error());
-        $this->assertFalse($result);
+        self::assertSame(\JSON_ERROR_NONE, json_last_error());
+        self::assertFalse($result);
     }
 
     protected function getJsonSource()

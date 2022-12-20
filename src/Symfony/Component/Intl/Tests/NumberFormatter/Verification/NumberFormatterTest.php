@@ -29,7 +29,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
 
     public function testCreate()
     {
-        $this->assertInstanceOf(\NumberFormatter::class, \NumberFormatter::create('en', \NumberFormatter::DECIMAL));
+        self::assertInstanceOf(\NumberFormatter::class, \NumberFormatter::create('en', \NumberFormatter::DECIMAL));
     }
 
     public function testGetTextAttribute()

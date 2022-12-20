@@ -26,7 +26,7 @@ class BaseNodeTest extends TestCase
         $constructorArgs[] = $params[0];
 
         if (isset($params[1])) {
-            $parent = $this->createMock(NodeInterface::class);
+            $parent = self::createMock(NodeInterface::class);
             $parent->method('getPath')->willReturn($params[1]);
 
             $constructorArgs[] = $parent;
@@ -36,9 +36,9 @@ class BaseNodeTest extends TestCase
             }
         }
 
-        $node = $this->getMockForAbstractClass(BaseNode::class, $constructorArgs);
+        $node = self::getMockForAbstractClass(BaseNode::class, $constructorArgs);
 
-        $this->assertSame($expected, $node->getPath());
+        self::assertSame($expected, $node->getPath());
     }
 
     public function providePath(): array

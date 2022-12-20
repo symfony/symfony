@@ -26,12 +26,12 @@ class RoutingExtensionTest extends TestCase
      */
     public function testEscaping($template, $mustBeEscaped)
     {
-        $twig = new Environment($this->createMock(LoaderInterface::class), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
-        $twig->addExtension(new RoutingExtension($this->createMock(UrlGeneratorInterface::class)));
+        $twig = new Environment(self::createMock(LoaderInterface::class), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
+        $twig->addExtension(new RoutingExtension(self::createMock(UrlGeneratorInterface::class)));
 
         $nodes = $twig->parse($twig->tokenize(new Source($template, '')));
 
-        $this->assertSame($mustBeEscaped, $nodes->getNode('body')->getNode(0)->getNode('expr') instanceof FilterExpression);
+        self::assertSame($mustBeEscaped, $nodes->getNode('body')->getNode(0)->getNode('expr') instanceof FilterExpression);
     }
 
     public function getEscapingTemplates()

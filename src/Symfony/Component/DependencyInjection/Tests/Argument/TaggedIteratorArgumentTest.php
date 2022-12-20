@@ -20,41 +20,41 @@ class TaggedIteratorArgumentTest extends TestCase
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo');
 
-        $this->assertSame('foo', $taggedIteratorArgument->getTag());
-        $this->assertNull($taggedIteratorArgument->getIndexAttribute());
-        $this->assertNull($taggedIteratorArgument->getDefaultIndexMethod());
-        $this->assertFalse($taggedIteratorArgument->needsIndexes());
-        $this->assertNull($taggedIteratorArgument->getDefaultPriorityMethod());
+        self::assertSame('foo', $taggedIteratorArgument->getTag());
+        self::assertNull($taggedIteratorArgument->getIndexAttribute());
+        self::assertNull($taggedIteratorArgument->getDefaultIndexMethod());
+        self::assertFalse($taggedIteratorArgument->needsIndexes());
+        self::assertNull($taggedIteratorArgument->getDefaultPriorityMethod());
     }
 
     public function testOnlyTagWithNeedsIndexes()
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', null, null, true);
 
-        $this->assertSame('foo', $taggedIteratorArgument->getTag());
-        $this->assertSame('foo', $taggedIteratorArgument->getIndexAttribute());
-        $this->assertSame('getDefaultFooName', $taggedIteratorArgument->getDefaultIndexMethod());
-        $this->assertSame('getDefaultFooPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
+        self::assertSame('foo', $taggedIteratorArgument->getTag());
+        self::assertSame('foo', $taggedIteratorArgument->getIndexAttribute());
+        self::assertSame('getDefaultFooName', $taggedIteratorArgument->getDefaultIndexMethod());
+        self::assertSame('getDefaultFooPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
     }
 
     public function testOnlyTagWithNeedsIndexesAndDotTag()
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo.bar', null, null, true);
 
-        $this->assertSame('foo.bar', $taggedIteratorArgument->getTag());
-        $this->assertSame('bar', $taggedIteratorArgument->getIndexAttribute());
-        $this->assertSame('getDefaultBarName', $taggedIteratorArgument->getDefaultIndexMethod());
-        $this->assertSame('getDefaultBarPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
+        self::assertSame('foo.bar', $taggedIteratorArgument->getTag());
+        self::assertSame('bar', $taggedIteratorArgument->getIndexAttribute());
+        self::assertSame('getDefaultBarName', $taggedIteratorArgument->getDefaultIndexMethod());
+        self::assertSame('getDefaultBarPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
     }
 
     public function testOnlyTagWithNeedsIndexesAndDotsTag()
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo.bar.baz.qux', null, null, true);
 
-        $this->assertSame('foo.bar.baz.qux', $taggedIteratorArgument->getTag());
-        $this->assertSame('qux', $taggedIteratorArgument->getIndexAttribute());
-        $this->assertSame('getDefaultQuxName', $taggedIteratorArgument->getDefaultIndexMethod());
-        $this->assertSame('getDefaultQuxPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
+        self::assertSame('foo.bar.baz.qux', $taggedIteratorArgument->getTag());
+        self::assertSame('qux', $taggedIteratorArgument->getIndexAttribute());
+        self::assertSame('getDefaultQuxName', $taggedIteratorArgument->getDefaultIndexMethod());
+        self::assertSame('getDefaultQuxPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
     }
 
     /**
@@ -64,7 +64,7 @@ class TaggedIteratorArgumentTest extends TestCase
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', $indexAttribute, $defaultIndexMethod);
 
-        $this->assertSame($expectedDefaultIndexMethod, $taggedIteratorArgument->getDefaultIndexMethod());
+        self::assertSame($expectedDefaultIndexMethod, $taggedIteratorArgument->getDefaultIndexMethod());
     }
 
     public function defaultIndexMethodProvider()
@@ -113,7 +113,7 @@ class TaggedIteratorArgumentTest extends TestCase
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', $indexAttribute, null, false, $defaultPriorityMethod);
 
-        $this->assertSame($expectedDefaultPriorityMethod, $taggedIteratorArgument->getDefaultPriorityMethod());
+        self::assertSame($expectedDefaultPriorityMethod, $taggedIteratorArgument->getDefaultPriorityMethod());
     }
 
     public function defaultPriorityMethodProvider()

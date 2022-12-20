@@ -32,25 +32,25 @@ class AbstractTransportTest extends TestCase
 
         $start = time();
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(0, time() - $start, 1);
+        self::assertEqualsWithDelta(0, time() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(5, time() - $start, 1);
+        self::assertEqualsWithDelta(5, time() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(10, time() - $start, 1);
+        self::assertEqualsWithDelta(10, time() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(15, time() - $start, 1);
+        self::assertEqualsWithDelta(15, time() - $start, 1);
 
         $start = time();
         $transport->setMaxPerSecond(-3);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(0, time() - $start, 1);
+        self::assertEqualsWithDelta(0, time() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(0, time() - $start, 1);
+        self::assertEqualsWithDelta(0, time() - $start, 1);
     }
 
     public function testSendingRawMessages()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
 
         $transport = new NullTransport();
         $transport->send(new RawMessage('Some raw email message'));

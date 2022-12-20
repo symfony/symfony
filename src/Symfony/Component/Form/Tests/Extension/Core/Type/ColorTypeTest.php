@@ -30,7 +30,7 @@ final class ColorTypeTest extends BaseTypeTest
 
         $form->submit($submittedValue);
 
-        $this->assertEmpty($form->getErrors());
+        self::assertEmpty($form->getErrors());
     }
 
     public function validationShouldPassProvider()
@@ -68,7 +68,7 @@ final class ColorTypeTest extends BaseTypeTest
         ]);
         $expectedFormError->setOrigin($form);
 
-        $this->assertEquals([$expectedFormError], iterator_to_array($form->getErrors()));
+        self::assertEquals([$expectedFormError], iterator_to_array($form->getErrors()));
     }
 
     public function validationShouldFailProvider()

@@ -22,7 +22,7 @@ class DsnTest extends TestCase
      */
     public function testFromString(string $string, Dsn $dsn)
     {
-        $this->assertEquals($dsn, Dsn::fromString($string));
+        self::assertEquals($dsn, Dsn::fromString($string));
     }
 
     public function testGetOption()
@@ -30,9 +30,9 @@ class DsnTest extends TestCase
         $options = ['with_value' => 'some value', 'nullable' => null];
         $dsn = new Dsn('smtp', 'example.com', null, null, null, $options);
 
-        $this->assertSame('some value', $dsn->getOption('with_value'));
-        $this->assertSame('default', $dsn->getOption('nullable', 'default'));
-        $this->assertSame('default', $dsn->getOption('not_existent_property', 'default'));
+        self::assertSame('some value', $dsn->getOption('with_value'));
+        self::assertSame('default', $dsn->getOption('nullable', 'default'));
+        self::assertSame('default', $dsn->getOption('not_existent_property', 'default'));
     }
 
     /**
@@ -40,8 +40,8 @@ class DsnTest extends TestCase
      */
     public function testInvalidDsn(string $dsn, string $exceptionMessage)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($exceptionMessage);
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage($exceptionMessage);
         Dsn::fromString($dsn);
     }
 

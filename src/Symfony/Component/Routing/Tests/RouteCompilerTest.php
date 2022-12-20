@@ -26,10 +26,10 @@ class RouteCompilerTest extends TestCase
         $route = $r->newInstanceArgs($arguments);
 
         $compiled = $route->compile();
-        $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
-        $this->assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
-        $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
-        $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
+        self::assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
+        self::assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
+        self::assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
+        self::assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
     }
 
     public function provideCompileData()
@@ -188,15 +188,15 @@ class RouteCompilerTest extends TestCase
      */
     public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $r = new \ReflectionClass(Route::class);
         $route = $r->newInstanceArgs($arguments);
 
         $compiled = $route->compile();
-        $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
-        $this->assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
-        $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
-        $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
+        self::assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
+        self::assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
+        self::assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
+        self::assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
     }
 
     public function provideCompileImplicitUtf8Data()
@@ -244,7 +244,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteWithSameVariableTwice()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $route = new Route('/{name}/{name}');
 
         $route->compile();
@@ -252,7 +252,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteCharsetMismatch()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $route = new Route("/\xE9/{bar}", [], ['bar' => '.'], ['utf8' => true]);
 
         $route->compile();
@@ -260,7 +260,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRequirementCharsetMismatch()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $route = new Route('/foo/{bar}', [], ['bar' => "\xE9"], ['utf8' => true]);
 
         $route->compile();
@@ -268,7 +268,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteWithFragmentAsPathParameter()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $route = new Route('/{_fragment}');
 
         $route->compile();
@@ -279,7 +279,7 @@ class RouteCompilerTest extends TestCase
      */
     public function testRouteWithVariableNameStartingWithADigit($name)
     {
-        $this->expectException(\DomainException::class);
+        self::expectException(\DomainException::class);
         $route = new Route('/{'.$name.'}');
         $route->compile();
     }
@@ -302,14 +302,14 @@ class RouteCompilerTest extends TestCase
         $route = $r->newInstanceArgs($arguments);
 
         $compiled = $route->compile();
-        $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
-        $this->assertEquals($regex, str_replace(["\n", ' '], '', $compiled->getRegex()), $name.' (regex)');
-        $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
-        $this->assertEquals($pathVariables, $compiled->getPathVariables(), $name.' (path variables)');
-        $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
-        $this->assertEquals($hostRegex, str_replace(["\n", ' '], '', $compiled->getHostRegex()), $name.' (host regex)');
-        $this->assertEquals($hostVariables, $compiled->getHostVariables(), $name.' (host variables)');
-        $this->assertEquals($hostTokens, $compiled->getHostTokens(), $name.' (host tokens)');
+        self::assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
+        self::assertEquals($regex, str_replace(["\n", ' '], '', $compiled->getRegex()), $name.' (regex)');
+        self::assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
+        self::assertEquals($pathVariables, $compiled->getPathVariables(), $name.' (path variables)');
+        self::assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
+        self::assertEquals($hostRegex, str_replace(["\n", ' '], '', $compiled->getHostRegex()), $name.' (host regex)');
+        self::assertEquals($hostVariables, $compiled->getHostVariables(), $name.' (host variables)');
+        self::assertEquals($hostTokens, $compiled->getHostTokens(), $name.' (host tokens)');
     }
 
     public function provideCompileWithHostData()
@@ -366,7 +366,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteWithTooLongVariableName()
     {
-        $this->expectException(\DomainException::class);
+        self::expectException(\DomainException::class);
         $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
         $route->compile();
     }
@@ -378,7 +378,7 @@ class RouteCompilerTest extends TestCase
     {
         $route = new Route('/{foo}', [], ['foo' => $requirement]);
 
-        $this->assertSame($regex, $route->compile()->getRegex());
+        self::assertSame($regex, $route->compile()->getRegex());
     }
 
     public function provideRemoveCapturingGroup()

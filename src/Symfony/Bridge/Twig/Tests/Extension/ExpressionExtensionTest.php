@@ -25,6 +25,6 @@ class ExpressionExtensionTest extends TestCase
         $twig->addExtension(new ExpressionExtension());
 
         $output = $twig->render('template');
-        $this->assertEquals('1 == 1', $output);
+        self::assertEquals('1 == 1', $output);
     }
 }

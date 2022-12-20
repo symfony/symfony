@@ -51,7 +51,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
             'bootstrap_4_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, self::createMock(CsrfTokenManagerInterface::class));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
@@ -64,7 +64,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get">', $html);
+        self::assertSame('<form name="form" method="get">', $html);
     }
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
@@ -76,7 +76,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get" action="0">', $html);
+        self::assertSame('<form name="form" method="get" action="0">', $html);
     }
 
     public function testMoneyWidgetInIso()
@@ -93,7 +93,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
             'bootstrap_4_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, self::createMock(CsrfTokenManagerInterface::class));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory
@@ -101,12 +101,11 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
             ->createView()
         ;
 
-        $this->assertSame(<<<'HTML'
+        self::assertSame(<<<'HTML'
 <div class="input-group "><div class="input-group-prepend">
                     <span class="input-group-text">&euro; </span>
                 </div><input type="text" id="name" name="name" required="required" class="form-control" /></div>
-HTML
-            , trim($this->renderWidget($view)));
+HTML, trim($this->renderWidget($view)));
     }
 
     protected function renderForm(FormView $view, array $vars = [])

@@ -44,8 +44,8 @@ class SessionListenerTest extends TestCase
      */
     public function testSessionCookieOptions(array $phpSessionOptions, array $sessionOptions, array $expectedSessionOptions)
     {
-        $session = $this->createMock(Session::class);
-        $session->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session = self::createMock(Session::class);
+        $session->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
         $session->method('getId')->willReturn('123456');
         $session->method('getName')->willReturn('PHPSESSID');
         $session->method('save');
@@ -57,7 +57,7 @@ class SessionListenerTest extends TestCase
         session_set_cookie_params(0, $phpSessionOptions['path'] ?? null, $phpSessionOptions['domain'] ?? null, $phpSessionOptions['secure'] ?? null, $phpSessionOptions['httponly'] ?? null);
 
         $listener = new SessionListener(new Container(), false, $sessionOptions);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
@@ -69,16 +69,16 @@ class SessionListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
 
         if ($sessionOptions['use_cookies'] ?? true) {
-            $this->assertCount(1, $cookies);
-            $this->assertSame('PHPSESSID', $cookies[0]->getName());
-            $this->assertSame('123456', $cookies[0]->getValue());
-            $this->assertSame($expectedSessionOptions['cookie_path'], $cookies[0]->getPath());
-            $this->assertSame($expectedSessionOptions['cookie_domain'], $cookies[0]->getDomain());
-            $this->assertSame($expectedSessionOptions['cookie_secure'], $cookies[0]->isSecure());
-            $this->assertSame($expectedSessionOptions['cookie_httponly'], $cookies[0]->isHttpOnly());
-            $this->assertSame($expectedSessionOptions['cookie_samesite'], $cookies[0]->getSameSite());
+            self::assertCount(1, $cookies);
+            self::assertSame('PHPSESSID', $cookies[0]->getName());
+            self::assertSame('123456', $cookies[0]->getValue());
+            self::assertSame($expectedSessionOptions['cookie_path'], $cookies[0]->getPath());
+            self::assertSame($expectedSessionOptions['cookie_domain'], $cookies[0]->getDomain());
+            self::assertSame($expectedSessionOptions['cookie_secure'], $cookies[0]->isSecure());
+            self::assertSame($expectedSessionOptions['cookie_httponly'], $cookies[0]->isHttpOnly());
+            self::assertSame($expectedSessionOptions['cookie_samesite'], $cookies[0]->getSameSite());
         } else {
-            $this->assertCount(0, $cookies);
+            self::assertCount(0, $cookies);
         }
     }
 
@@ -152,12 +152,12 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $listener = $this->createListener($request, new PhpBridgeSessionStorageFactory());
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener->onKernelRequest($event);
 
-        $this->assertTrue($request->hasSession());
-        $this->assertSame($sessionId, $request->getSession()->getId());
+        self::assertTrue($request->hasSession());
+        self::assertSame($sessionId, $request->getSession()->getId());
     }
 
     /**
@@ -168,7 +168,7 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $listener = $this->createListener($request, new NativeSessionStorageFactory());
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
         $session = $request->getSession();
@@ -178,12 +178,12 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(1, $cookies);
+        self::assertCount(1, $cookies);
         $sessionCookie = $cookies[0];
 
-        $this->assertSame('PHPSESSID', $sessionCookie->getName());
-        $this->assertNotEmpty($sessionCookie->getValue());
-        $this->assertFalse($sessionCookie->isCleared());
+        self::assertSame('PHPSESSID', $sessionCookie->getName());
+        self::assertNotEmpty($sessionCookie->getValue());
+        self::assertFalse($sessionCookie->isCleared());
     }
 
     /**
@@ -193,26 +193,26 @@ class SessionListenerTest extends TestCase
     {
         $sessionId = $this->createValidSessionId();
 
-        $this->assertNotEmpty($sessionId);
+        self::assertNotEmpty($sessionId);
 
         $request = new Request();
         $request->cookies->set('PHPSESSID', $sessionId);
 
         $listener = $this->createListener($request, new NativeSessionStorageFactory());
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
         $session = $request->getSession();
-        $this->assertSame($sessionId, $session->getId());
+        self::assertSame($sessionId, $session->getId());
         $session->set('hello', 'world');
 
         $response = new Response();
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
-        $this->assertSame($sessionId, $session->getId());
+        self::assertSame($sessionId, $session->getId());
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(0, $cookies);
+        self::assertCount(0, $cookies);
     }
 
     /**
@@ -222,31 +222,31 @@ class SessionListenerTest extends TestCase
     {
         $newSessionId = $this->createValidSessionId();
 
-        $this->assertNotEmpty($newSessionId);
+        self::assertNotEmpty($newSessionId);
 
         $request = new Request();
         $request->cookies->set('PHPSESSID', 'OLD-SESSION-ID');
 
         $listener = $this->createListener($request, new NativeSessionStorageFactory());
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
         $session = $request->getSession();
-        $this->assertSame($newSessionId, $session->getId());
+        self::assertSame($newSessionId, $session->getId());
         $session->set('hello', 'world');
 
         $response = new Response();
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
-        $this->assertSame($newSessionId, $session->getId());
+        self::assertSame($newSessionId, $session->getId());
 
         $cookies = $response->headers->getCookies();
 
-        $this->assertCount(1, $cookies);
+        self::assertCount(1, $cookies);
         $sessionCookie = $cookies[0];
 
-        $this->assertSame('PHPSESSID', $sessionCookie->getName());
-        $this->assertSame($newSessionId, $sessionCookie->getValue());
+        self::assertSame('PHPSESSID', $sessionCookie->getName());
+        self::assertSame($newSessionId, $sessionCookie->getValue());
     }
 
     /**
@@ -258,14 +258,14 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $request->cookies->set('PHPSESSID', $sessionId);
         $listener = $this->createListener($request, new NativeSessionStorageFactory());
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
         $session = $request->getSession();
         $session->start();
         $sessionId = $session->getId();
-        $this->assertNotEmpty($sessionId);
+        self::assertNotEmpty($sessionId);
         $_SESSION['hello'] = 'world'; // check compatibility to php session bridge
 
         $session->invalidate();
@@ -274,11 +274,11 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(1, $cookies);
+        self::assertCount(1, $cookies);
         $sessionCookie = $cookies[0];
 
-        $this->assertSame('PHPSESSID', $sessionCookie->getName());
-        $this->assertTrue($sessionCookie->isCleared());
+        self::assertSame('PHPSESSID', $sessionCookie->getName());
+        self::assertTrue($sessionCookie->isCleared());
     }
 
     /**
@@ -290,21 +290,21 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $request->cookies->set('PHPSESSID', $sessionId);
         $listener = $this->createListener($request, new NativeSessionStorageFactory());
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
         $session = $request->getSession();
         $session->start();
         $sessionId = $session->getId();
-        $this->assertNotEmpty($sessionId);
+        self::assertNotEmpty($sessionId);
         $_SESSION['hello'] = 'world';
 
         $response = new Response();
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(0, $cookies);
+        self::assertCount(0, $cookies);
     }
 
     /**
@@ -314,34 +314,34 @@ class SessionListenerTest extends TestCase
     {
         $request = new Request();
         $listener = $this->createListener($request, new NativeSessionStorageFactory());
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
         $session = $request->getSession();
         $session->start();
         $sessionId = $session->getId();
-        $this->assertNotEmpty($sessionId);
+        self::assertNotEmpty($sessionId);
         $_SESSION['hello'] = 'world';
 
         $response = new Response();
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(1, $cookies);
+        self::assertCount(1, $cookies);
         $sessionCookie = $cookies[0];
 
-        $this->assertSame('PHPSESSID', $sessionCookie->getName());
-        $this->assertNotEmpty($sessionCookie->getValue());
-        $this->assertFalse($sessionCookie->isCleared());
+        self::assertSame('PHPSESSID', $sessionCookie->getName());
+        self::assertNotEmpty($sessionCookie->getValue());
+        self::assertFalse($sessionCookie->isCleared());
     }
 
     public function testOnlyTriggeredOnMainRequest()
     {
-        $listener = $this->getMockForAbstractClass(AbstractSessionListener::class);
-        $event = $this->createMock(RequestEvent::class);
-        $event->expects($this->once())->method('isMainRequest')->willReturn(false);
-        $event->expects($this->never())->method('getRequest');
+        $listener = self::getMockForAbstractClass(AbstractSessionListener::class);
+        $event = self::createMock(RequestEvent::class);
+        $event->expects(self::once())->method('isMainRequest')->willReturn(false);
+        $event->expects(self::never())->method('getRequest');
 
         // sub request
         $listener->onKernelRequest($event);
@@ -349,14 +349,14 @@ class SessionListenerTest extends TestCase
 
     public function testSessionIsSet()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(1))->method('getName')->willReturn('PHPSESSID');
 
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->once())->method('getMainRequest')->willReturn(null);
+        $requestStack = self::createMock(RequestStack::class);
+        $requestStack->expects(self::once())->method('getMainRequest')->willReturn(null);
 
-        $sessionStorage = $this->createMock(NativeSessionStorage::class);
-        $sessionStorage->expects($this->never())->method('setOptions')->with(['cookie_secure' => true]);
+        $sessionStorage = self::createMock(NativeSessionStorage::class);
+        $sessionStorage->expects(self::never())->method('setOptions')->with(['cookie_secure' => true]);
 
         $container = new Container();
         $container->set('session', $session);
@@ -366,20 +366,20 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $listener = new SessionListener($container);
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener->onKernelRequest($event);
 
-        $this->assertTrue($request->hasSession());
-        $this->assertSame($session, $request->getSession());
+        self::assertTrue($request->hasSession());
+        self::assertSame($session, $request->getSession());
     }
 
     public function testSessionUsesFactory()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
-        $sessionFactory = $this->createMock(SessionFactory::class);
-        $sessionFactory->expects($this->once())->method('createSession')->willReturn($session);
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(1))->method('getName')->willReturn('PHPSESSID');
+        $sessionFactory = self::createMock(SessionFactory::class);
+        $sessionFactory->expects(self::once())->method('createSession')->willReturn($session);
 
         $container = new Container();
         $container->set('session_factory', $sessionFactory);
@@ -387,24 +387,24 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $listener = new SessionListener($container);
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener->onKernelRequest($event);
 
-        $this->assertTrue($request->hasSession());
-        $this->assertSame($session, $request->getSession());
+        self::assertTrue($request->hasSession());
+        self::assertSame($session, $request->getSession());
     }
 
     public function testResponseIsPrivateIfSessionStarted()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(2))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
@@ -412,24 +412,24 @@ class SessionListenerTest extends TestCase
         $response = new Response();
         $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
 
-        $this->assertTrue($response->headers->has('Expires'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
-        $this->assertLessThanOrEqual(new \DateTime('now', new \DateTimeZone('UTC')), new \DateTime($response->headers->get('Expires')));
-        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+        self::assertTrue($response->headers->has('Expires'));
+        self::assertTrue($response->headers->hasCacheControlDirective('private'));
+        self::assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertSame('0', $response->headers->getCacheControlDirective('max-age'));
+        self::assertLessThanOrEqual(new \DateTime('now', new \DateTimeZone('UTC')), new \DateTime($response->headers->get('Expires')));
+        self::assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
     public function testResponseIsStillPublicIfSessionStartedAndHeaderPresent()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(2))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
@@ -439,28 +439,28 @@ class SessionListenerTest extends TestCase
         $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
         $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
 
-        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
-        $this->assertFalse($response->headers->has('Expires'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
-        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+        self::assertTrue($response->headers->hasCacheControlDirective('public'));
+        self::assertFalse($response->headers->has('Expires'));
+        self::assertFalse($response->headers->hasCacheControlDirective('private'));
+        self::assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
+        self::assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
     public function testSessionSaveAndResponseHasSessionCookie()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
-        $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
-        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
-        $session->expects($this->exactly(1))->method('save');
-        $session->expects($this->exactly(1))->method('isStarted')->willReturn(true);
+        $session = self::getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->expects(self::exactly(2))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
+        $session->expects(self::exactly(1))->method('getId')->willReturn('123456');
+        $session->expects(self::exactly(1))->method('getName')->willReturn('PHPSESSID');
+        $session->expects(self::exactly(1))->method('save');
+        $session->expects(self::exactly(1))->method('isStarted')->willReturn(true);
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = self::getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
@@ -469,13 +469,13 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
 
         $cookies = $response->headers->getCookies();
-        $this->assertSame('PHPSESSID', $cookies[0]->getName());
-        $this->assertSame('123456', $cookies[0]->getValue());
+        self::assertSame('PHPSESSID', $cookies[0]->getName());
+        self::assertSame('123456', $cookies[0]->getValue());
     }
 
     public function testUninitializedSessionUsingInitializedSessionService()
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $response = new Response();
         $response->setSharedMaxAge(60);
         $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
@@ -486,17 +486,17 @@ class SessionListenerTest extends TestCase
 
         $listener = new SessionListener($container);
         $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
-        $this->assertFalse($response->headers->has('Expires'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
-        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+        self::assertFalse($response->headers->has('Expires'));
+        self::assertTrue($response->headers->hasCacheControlDirective('public'));
+        self::assertFalse($response->headers->hasCacheControlDirective('private'));
+        self::assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
+        self::assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
     public function testUninitializedSessionUsingSessionFromRequest()
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $response = new Response();
         $response->setSharedMaxAge(60);
         $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
@@ -506,17 +506,17 @@ class SessionListenerTest extends TestCase
 
         $listener = new SessionListener(new Container());
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
-        $this->assertFalse($response->headers->has('Expires'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
-        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+        self::assertFalse($response->headers->has('Expires'));
+        self::assertTrue($response->headers->hasCacheControlDirective('public'));
+        self::assertFalse($response->headers->hasCacheControlDirective('private'));
+        self::assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
+        self::assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
     public function testUninitializedSessionWithoutInitializedSession()
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $response = new Response();
         $response->setSharedMaxAge(60);
         $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
@@ -525,23 +525,23 @@ class SessionListenerTest extends TestCase
 
         $listener = new SessionListener($container);
         $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
-        $this->assertFalse($response->headers->has('Expires'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
+        self::assertFalse($response->headers->has('Expires'));
+        self::assertTrue($response->headers->hasCacheControlDirective('public'));
+        self::assertFalse($response->headers->hasCacheControlDirective('private'));
+        self::assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
     }
 
     public function testResponseHeadersMaxAgeAndExpiresNotBeOverridenIfSessionStarted()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(2))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
@@ -552,26 +552,26 @@ class SessionListenerTest extends TestCase
         $response->setMaxAge(600);
         $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
 
-        $this->assertTrue($response->headers->has('expires'));
-        $this->assertSame($expiresHeader, $response->headers->get('expires'));
-        $this->assertFalse($response->headers->has('max-age'));
-        $this->assertSame('600', $response->headers->getCacheControlDirective('max-age'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+        self::assertTrue($response->headers->has('expires'));
+        self::assertSame($expiresHeader, $response->headers->get('expires'));
+        self::assertFalse($response->headers->has('max-age'));
+        self::assertSame('600', $response->headers->getCacheControlDirective('max-age'));
+        self::assertFalse($response->headers->hasCacheControlDirective('public'));
+        self::assertTrue($response->headers->hasCacheControlDirective('private'));
+        self::assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
     public function testResponseHeadersMaxAgeAndExpiresDefaultValuesIfSessionStarted()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(2))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
@@ -580,64 +580,64 @@ class SessionListenerTest extends TestCase
         $expiresHeader = gmdate('D, d M Y H:i:s', time()).' GMT';
         $listener->onKernelResponse(new ResponseEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $response));
 
-        $this->assertTrue($response->headers->has('expires'));
-        $this->assertSame($expiresHeader, $response->headers->get('expires'));
-        $this->assertFalse($response->headers->has('max-age'));
-        $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+        self::assertTrue($response->headers->has('expires'));
+        self::assertSame($expiresHeader, $response->headers->get('expires'));
+        self::assertFalse($response->headers->has('max-age'));
+        self::assertSame('0', $response->headers->getCacheControlDirective('max-age'));
+        self::assertFalse($response->headers->hasCacheControlDirective('public'));
+        self::assertTrue($response->headers->hasCacheControlDirective('private'));
+        self::assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
     public function testSurrogateMainRequestIsPublic()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
-        $session->expects($this->exactly(4))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1, 1, 1));
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(1))->method('getName')->willReturn('PHPSESSID');
+        $session->expects(self::exactly(4))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1, 1, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
         $container->set('session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $response = new Response();
         $response->setCache(['public' => true, 'max_age' => '30']);
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
-        $this->assertTrue($request->hasSession());
+        self::assertTrue($request->hasSession());
 
         $subRequest = clone $request;
-        $this->assertSame($request->getSession(), $subRequest->getSession());
+        self::assertSame($request->getSession(), $subRequest->getSession());
         $listener->onKernelRequest(new RequestEvent($kernel, $subRequest, HttpKernelInterface::MAIN_REQUEST));
         $listener->onKernelResponse(new ResponseEvent($kernel, $subRequest, HttpKernelInterface::MAIN_REQUEST, $response));
         $listener->onFinishRequest(new FinishRequestEvent($kernel, $subRequest, HttpKernelInterface::MAIN_REQUEST));
 
-        $this->assertFalse($response->headers->has('Expires'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
-        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertSame('30', $response->headers->getCacheControlDirective('max-age'));
+        self::assertFalse($response->headers->has('Expires'));
+        self::assertFalse($response->headers->hasCacheControlDirective('private'));
+        self::assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertSame('30', $response->headers->getCacheControlDirective('max-age'));
 
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
-        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
+        self::assertTrue($response->headers->hasCacheControlDirective('private'));
+        self::assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
+        self::assertSame('0', $response->headers->getCacheControlDirective('max-age'));
 
-        $this->assertTrue($response->headers->has('Expires'));
-        $this->assertLessThanOrEqual(new \DateTime('now', new \DateTimeZone('UTC')), new \DateTime($response->headers->get('Expires')));
+        self::assertTrue($response->headers->has('Expires'));
+        self::assertLessThanOrEqual(new \DateTime('now', new \DateTimeZone('UTC')), new \DateTime($response->headers->get('Expires')));
     }
 
     public function testGetSessionIsCalledOnce()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
-        $sessionStorage = $this->createMock(NativeSessionStorage::class);
-        $kernel = $this->createMock(KernelInterface::class);
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(1))->method('getName')->willReturn('PHPSESSID');
+        $sessionStorage = self::createMock(NativeSessionStorage::class);
+        $kernel = self::createMock(KernelInterface::class);
 
-        $sessionStorage->expects($this->once())
+        $sessionStorage->expects(self::once())
             ->method('setOptions')
             ->with(['cookie_secure' => true]);
 
@@ -669,37 +669,37 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageExceptionIfStatelessAndSessionUsed()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(2))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container, true);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
-        $this->expectException(UnexpectedSessionUsageException::class);
+        self::expectException(UnexpectedSessionUsageException::class);
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new Response()));
     }
 
     public function testSessionUsageLogIfStatelessAndSessionUsed()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(2))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->exactly(1))->method('warning');
+        $logger = self::createMock(LoggerInterface::class);
+        $logger->expects(self::exactly(1))->method('warning');
 
         $container = new Container();
         $container->set('initialized_session', $session);
         $container->set('logger', $logger);
 
         $listener = new SessionListener($container, false);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -710,18 +710,18 @@ class SessionListenerTest extends TestCase
 
     public function testSessionIsSavedWhenUnexpectedSessionExceptionThrown()
     {
-        $session = $this->createMock(Session::class);
-        $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
-        $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
+        $session = self::createMock(Session::class);
+        $session->expects(self::exactly(1))->method('getId')->willReturn('123456');
+        $session->expects(self::exactly(1))->method('getName')->willReturn('PHPSESSID');
         $session->method('isStarted')->willReturn(true);
-        $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
-        $session->expects($this->exactly(1))->method('save');
+        $session->expects(self::exactly(2))->method('getUsageIndex')->will(self::onConsecutiveCalls(0, 1));
+        $session->expects(self::exactly(1))->method('save');
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container, true);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -729,15 +729,15 @@ class SessionListenerTest extends TestCase
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
 
         $response = new Response();
-        $this->expectException(UnexpectedSessionUsageException::class);
+        self::expectException(UnexpectedSessionUsageException::class);
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
     }
 
     public function testSessionUsageCallbackWhenDebugAndStateless()
     {
-        $session = $this->createMock(Session::class);
+        $session = self::createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
-        $session->expects($this->exactly(1))->method('save');
+        $session->expects(self::exactly(1))->method('save');
 
         $requestStack = new RequestStack();
 
@@ -748,23 +748,23 @@ class SessionListenerTest extends TestCase
         $requestStack->push($request);
         $requestStack->push(new Request());
 
-        $collector = $this->createMock(RequestDataCollector::class);
-        $collector->expects($this->once())->method('collectSessionUsage');
+        $collector = self::createMock(RequestDataCollector::class);
+        $collector->expects(self::once())->method('collectSessionUsage');
 
         $container = new Container();
         $container->set('initialized_session', $session);
         $container->set('request_stack', $requestStack);
         $container->set('session_collector', \Closure::fromCallable([$collector, 'collectSessionUsage']));
 
-        $this->expectException(UnexpectedSessionUsageException::class);
+        self::expectException(UnexpectedSessionUsageException::class);
         (new SessionListener($container, true))->onSessionUsage();
     }
 
     public function testSessionUsageCallbackWhenNoDebug()
     {
-        $session = $this->createMock(Session::class);
+        $session = self::createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
-        $session->expects($this->exactly(0))->method('save');
+        $session->expects(self::exactly(0))->method('save');
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -772,8 +772,8 @@ class SessionListenerTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $collector = $this->createMock(RequestDataCollector::class);
-        $collector->expects($this->never())->method('collectSessionUsage');
+        $collector = self::createMock(RequestDataCollector::class);
+        $collector->expects(self::never())->method('collectSessionUsage');
 
         $container = new Container();
         $container->set('initialized_session', $session);
@@ -785,9 +785,9 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageCallbackWhenNoStateless()
     {
-        $session = $this->createMock(Session::class);
+        $session = self::createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
-        $session->expects($this->never())->method('save');
+        $session->expects(self::never())->method('save');
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
@@ -809,16 +809,16 @@ class SessionListenerTest extends TestCase
         $_SESSION['test'] = ['test'];
         session_write_close();
 
-        $this->assertNotEmpty($_SESSION);
-        $this->assertNotEmpty(session_id());
+        self::assertNotEmpty($_SESSION);
+        self::assertNotEmpty(session_id());
 
         $container = new Container();
 
         (new SessionListener($container, true))->reset();
 
-        $this->assertEmpty($_SESSION);
-        $this->assertEmpty(session_id());
-        $this->assertSame(\PHP_SESSION_NONE, session_status());
+        self::assertEmpty($_SESSION);
+        self::assertEmpty(session_id());
+        self::assertSame(\PHP_SESSION_NONE, session_status());
     }
 
     /**
@@ -829,17 +829,17 @@ class SessionListenerTest extends TestCase
         session_start();
         $_SESSION['test'] = ['test'];
 
-        $this->assertNotEmpty($_SESSION);
-        $this->assertNotEmpty(session_id());
-        $this->assertSame(\PHP_SESSION_ACTIVE, session_status());
+        self::assertNotEmpty($_SESSION);
+        self::assertNotEmpty(session_id());
+        self::assertSame(\PHP_SESSION_ACTIVE, session_status());
 
         $container = new Container();
 
         (new SessionListener($container, true))->reset();
 
-        $this->assertEmpty($_SESSION);
-        $this->assertEmpty(session_id());
-        $this->assertSame(\PHP_SESSION_NONE, session_status());
+        self::assertEmpty($_SESSION);
+        self::assertEmpty(session_id());
+        self::assertSame(\PHP_SESSION_NONE, session_status());
     }
 
     private function createListener(Request $request, SessionStorageFactoryInterface $sessionFactory)

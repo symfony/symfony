@@ -26,18 +26,18 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertCount(0, $marking->getPlaces());
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertCount(0, $marking->getPlaces());
 
         $marking->mark('first_place');
 
         $markingStore->setMarking($subject, $marking);
 
-        $this->assertSame(['first_place' => 1], $subject->getMarking());
+        self::assertSame(['first_place' => 1], $subject->getMarking());
 
         $marking2 = $markingStore->getMarking($subject);
 
-        $this->assertEquals($marking, $marking2);
+        self::assertEquals($marking, $marking2);
     }
 
     public function testGetSetMarkingWithSingleState()
@@ -48,18 +48,18 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertCount(0, $marking->getPlaces());
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertCount(0, $marking->getPlaces());
 
         $marking->mark('first_place');
 
         $markingStore->setMarking($subject, $marking);
 
-        $this->assertSame('first_place', $subject->getMarking());
+        self::assertSame('first_place', $subject->getMarking());
 
         $marking2 = $markingStore->getMarking($subject);
 
-        $this->assertEquals($marking, $marking2);
+        self::assertEquals($marking, $marking2);
     }
 
     public function testGetSetMarkingWithSingleStateAndAlmostEmptyPlaceName()
@@ -70,8 +70,8 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertCount(1, $marking->getPlaces());
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertCount(1, $marking->getPlaces());
     }
 
     public function testGetMarkingWithValueObject()
@@ -82,9 +82,9 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertCount(1, $marking->getPlaces());
-        $this->assertSame('first_place', (string) $subject->getMarking());
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertCount(1, $marking->getPlaces());
+        self::assertSame('first_place', (string) $subject->getMarking());
     }
 
     /**
@@ -98,8 +98,8 @@ class MethodMarkingStoreTest extends TestCase
 
         $marking = $markingStore->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
-        $this->assertCount(0, $marking->getPlaces());
+        self::assertInstanceOf(Marking::class, $marking);
+        self::assertCount(0, $marking->getPlaces());
     }
 
     /**
@@ -111,8 +111,8 @@ class MethodMarkingStoreTest extends TestCase
 
         $markingStore = new MethodMarkingStore(true, 'marking2');
 
-        $this->expectException(\Error::class);
-        $this->expectExceptionMessage('Typed property Symfony\Component\Workflow\Tests\MarkingStore\SubjectWithType::$marking must not be accessed before initialization');
+        self::expectException(\Error::class);
+        self::expectExceptionMessage('Typed property Symfony\Component\Workflow\Tests\MarkingStore\SubjectWithType::$marking must not be accessed before initialization');
 
         $markingStore->getMarking($subject);
     }

@@ -19,28 +19,28 @@ class InputArgumentTest extends TestCase
     public function testConstructor()
     {
         $argument = new InputArgument('foo');
-        $this->assertEquals('foo', $argument->getName(), '__construct() takes a name as its first argument');
+        self::assertEquals('foo', $argument->getName(), '__construct() takes a name as its first argument');
     }
 
     public function testModes()
     {
         $argument = new InputArgument('foo');
-        $this->assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
+        self::assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
 
         $argument = new InputArgument('foo', null);
-        $this->assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
+        self::assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
 
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-        $this->assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
+        self::assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
 
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
-        $this->assertTrue($argument->isRequired(), '__construct() can take "InputArgument::REQUIRED" as its mode');
+        self::assertTrue($argument->isRequired(), '__construct() can take "InputArgument::REQUIRED" as its mode');
     }
 
     public function testInvalidModes()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Argument mode "-1" is not valid.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Argument mode "-1" is not valid.');
 
         new InputArgument('foo', '-1');
     }
@@ -48,58 +48,58 @@ class InputArgumentTest extends TestCase
     public function testIsArray()
     {
         $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
-        $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
+        self::assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
         $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
-        $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
+        self::assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-        $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument cannot be an array');
+        self::assertFalse($argument->isArray(), '->isArray() returns false if the argument cannot be an array');
     }
 
     public function testGetDescription()
     {
         $argument = new InputArgument('foo', null, 'Some description');
-        $this->assertEquals('Some description', $argument->getDescription(), '->getDescription() return the message description');
+        self::assertEquals('Some description', $argument->getDescription(), '->getDescription() return the message description');
     }
 
     public function testGetDefault()
     {
         $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', 'default');
-        $this->assertEquals('default', $argument->getDefault(), '->getDefault() return the default value');
+        self::assertEquals('default', $argument->getDefault(), '->getDefault() return the default value');
     }
 
     public function testSetDefault()
     {
         $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', 'default');
         $argument->setDefault(null);
-        $this->assertNull($argument->getDefault(), '->setDefault() can reset the default value by passing null');
+        self::assertNull($argument->getDefault(), '->setDefault() can reset the default value by passing null');
         $argument->setDefault('another');
-        $this->assertEquals('another', $argument->getDefault(), '->setDefault() changes the default value');
+        self::assertEquals('another', $argument->getDefault(), '->setDefault() changes the default value');
 
         $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
         $argument->setDefault([1, 2]);
-        $this->assertEquals([1, 2], $argument->getDefault(), '->setDefault() changes the default value');
+        self::assertEquals([1, 2], $argument->getDefault(), '->setDefault() changes the default value');
     }
 
     public function testSetDefaultWithRequiredArgument()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
         $argument->setDefault('default');
     }
 
     public function testSetDefaultWithRequiredArrayArgument()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
         $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
         $argument->setDefault([]);
     }
 
     public function testSetDefaultWithArrayArgument()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('A default value for an array argument must be an array.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('A default value for an array argument must be an array.');
         $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
         $argument->setDefault('default');
     }

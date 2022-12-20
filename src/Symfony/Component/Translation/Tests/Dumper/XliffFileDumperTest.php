@@ -30,10 +30,7 @@ class XliffFileDumperTest extends TestCase
 
         $dumper = new XliffFileDumper();
 
-        $this->assertStringEqualsFile(
-            __DIR__.'/../fixtures/resources-clean.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR'])
-        );
+        self::assertStringEqualsFile(__DIR__.'/../fixtures/resources-clean.xlf', $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR']));
     }
 
     public function testFormatCatalogueXliff2()
@@ -49,10 +46,7 @@ class XliffFileDumperTest extends TestCase
 
         $dumper = new XliffFileDumper();
 
-        $this->assertStringEqualsFile(
-            __DIR__.'/../fixtures/resources-2.0-clean.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
-        );
+        self::assertStringEqualsFile(__DIR__.'/../fixtures/resources-2.0-clean.xlf', $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0']));
     }
 
     public function testFormatIcuCatalogueXliff2()
@@ -64,10 +58,7 @@ class XliffFileDumperTest extends TestCase
 
         $dumper = new XliffFileDumper();
 
-        $this->assertStringEqualsFile(
-            __DIR__.'/../fixtures/resources-2.0+intl-icu.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages'.MessageCatalogue::INTL_DOMAIN_SUFFIX, ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
-        );
+        self::assertStringEqualsFile(__DIR__.'/../fixtures/resources-2.0+intl-icu.xlf', $dumper->formatCatalogue($catalogue, 'messages'.MessageCatalogue::INTL_DOMAIN_SUFFIX, ['default_locale' => 'fr_FR', 'xliff_version' => '2.0']));
     }
 
     public function testFormatCatalogueWithCustomToolInfo()
@@ -82,10 +73,7 @@ class XliffFileDumperTest extends TestCase
 
         $dumper = new XliffFileDumper();
 
-        $this->assertStringEqualsFile(
-            __DIR__.'/../fixtures/resources-tool-info.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', $options)
-        );
+        self::assertStringEqualsFile(__DIR__.'/../fixtures/resources-tool-info.xlf', $dumper->formatCatalogue($catalogue, 'messages', $options));
     }
 
     public function testFormatCatalogueWithTargetAttributesMetadata()
@@ -98,10 +86,7 @@ class XliffFileDumperTest extends TestCase
 
         $dumper = new XliffFileDumper();
 
-        $this->assertStringEqualsFile(
-            __DIR__.'/../fixtures/resources-target-attributes.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR'])
-        );
+        self::assertStringEqualsFile(__DIR__.'/../fixtures/resources-target-attributes.xlf', $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR']));
     }
 
     public function testFormatCatalogueWithNotesMetadata()
@@ -123,9 +108,6 @@ class XliffFileDumperTest extends TestCase
 
         $dumper = new XliffFileDumper();
 
-        $this->assertStringEqualsFile(
-            __DIR__.'/../fixtures/resources-notes-meta.xlf',
-            $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
-        );
+        self::assertStringEqualsFile(__DIR__.'/../fixtures/resources-notes-meta.xlf', $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0']));
     }
 }

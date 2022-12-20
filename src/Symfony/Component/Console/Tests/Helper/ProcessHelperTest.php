@@ -33,7 +33,7 @@ class ProcessHelperTest extends TestCase
         $helper->setHelperSet(new HelperSet([new DebugFormatterHelper()]));
         $output = $this->getOutputStream($verbosity);
         $helper->run($output, $cmd, $error);
-        $this->assertEquals($expected, $this->getOutput($output));
+        self::assertEquals($expected, $this->getOutput($output));
     }
 
     public function testPassedCallbackIsExecuted()
@@ -46,7 +46,7 @@ class ProcessHelperTest extends TestCase
         $callback = function () use (&$executed) { $executed = true; };
 
         $helper->run($output, ['php', '-r', 'echo 42;'], null, $callback);
-        $this->assertTrue($executed);
+        self::assertTrue($executed);
     }
 
     public function provideCommandsAndOutput()

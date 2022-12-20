@@ -25,18 +25,18 @@ abstract class MiddlewareTestCase extends TestCase
     protected function getStackMock(bool $nextIsCalled = true)
     {
         if (!$nextIsCalled) {
-            $stack = $this->createMock(StackInterface::class);
+            $stack = self::createMock(StackInterface::class);
             $stack
-                ->expects($this->never())
+                ->expects(self::never())
                 ->method('next')
             ;
 
             return $stack;
         }
 
-        $nextMiddleware = $this->createMock(MiddlewareInterface::class);
+        $nextMiddleware = self::createMock(MiddlewareInterface::class);
         $nextMiddleware
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handle')
             ->willReturnCallback(function (Envelope $envelope, StackInterface $stack): Envelope {
                 return $envelope;
@@ -48,9 +48,9 @@ abstract class MiddlewareTestCase extends TestCase
 
     protected function getThrowingStackMock(\Throwable $throwable = null)
     {
-        $nextMiddleware = $this->createMock(MiddlewareInterface::class);
+        $nextMiddleware = self::createMock(MiddlewareInterface::class);
         $nextMiddleware
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handle')
             ->willThrowException($throwable ?? new \RuntimeException('Thrown from next middleware.'))
         ;

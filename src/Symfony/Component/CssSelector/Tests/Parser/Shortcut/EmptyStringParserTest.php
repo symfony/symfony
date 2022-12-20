@@ -24,13 +24,13 @@ class EmptyStringParserTest extends TestCase
     {
         $parser = new EmptyStringParser();
         $selectors = $parser->parse('');
-        $this->assertCount(1, $selectors);
+        self::assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
-        $this->assertEquals('Element[*]', (string) $selector->getTree());
+        self::assertEquals('Element[*]', (string) $selector->getTree());
 
         $selectors = $parser->parse('this will produce an empty array');
-        $this->assertCount(0, $selectors);
+        self::assertCount(0, $selectors);
     }
 }

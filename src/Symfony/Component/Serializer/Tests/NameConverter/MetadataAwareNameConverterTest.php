@@ -28,9 +28,9 @@ final class MetadataAwareNameConverterTest extends TestCase
 {
     public function testInterface()
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
-        $this->assertInstanceOf(NameConverterInterface::class, $nameConverter);
+        self::assertInstanceOf(NameConverterInterface::class, $nameConverter);
     }
 
     /**
@@ -42,7 +42,7 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
-        $this->assertEquals($expected, $nameConverter->normalize($propertyName, SerializedNameDummy::class));
+        self::assertEquals($expected, $nameConverter->normalize($propertyName, SerializedNameDummy::class));
     }
 
     /**
@@ -52,7 +52,7 @@ final class MetadataAwareNameConverterTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        $fallback = $this->createMock(NameConverterInterface::class);
+        $fallback = self::createMock(NameConverterInterface::class);
         $fallback
             ->method('normalize')
             ->willReturnCallback(function ($propertyName) {
@@ -62,7 +62,7 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
 
-        $this->assertEquals($expected, $nameConverter->normalize($propertyName, SerializedNameDummy::class));
+        self::assertEquals($expected, $nameConverter->normalize($propertyName, SerializedNameDummy::class));
     }
 
     /**
@@ -74,7 +74,7 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
-        $this->assertEquals($expected, $nameConverter->denormalize($propertyName, SerializedNameDummy::class));
+        self::assertEquals($expected, $nameConverter->denormalize($propertyName, SerializedNameDummy::class));
     }
 
     /**
@@ -84,7 +84,7 @@ final class MetadataAwareNameConverterTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        $fallback = $this->createMock(NameConverterInterface::class);
+        $fallback = self::createMock(NameConverterInterface::class);
         $fallback
             ->method('denormalize')
             ->willReturnCallback(function ($propertyName) {
@@ -94,7 +94,7 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory, $fallback);
 
-        $this->assertEquals($expected, $nameConverter->denormalize($propertyName, SerializedNameDummy::class));
+        self::assertEquals($expected, $nameConverter->denormalize($propertyName, SerializedNameDummy::class));
     }
 
     public function attributeProvider(): array
@@ -126,7 +126,7 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
-        $this->assertEquals($expected, $nameConverter->normalize($propertyName, OtherSerializedNameDummy::class, null, $context));
+        self::assertEquals($expected, $nameConverter->normalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
     /**
@@ -138,7 +138,7 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
-        $this->assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
+        self::assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
     public function attributeAndContextProvider()
@@ -159,8 +159,8 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
 
-        $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['a']]));
-        $this->assertEquals('buzForExport', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['b']]));
-        $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class));
+        self::assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['a']]));
+        self::assertEquals('buzForExport', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['b']]));
+        self::assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class));
     }
 }

@@ -38,23 +38,20 @@ class SerializerExtractorTest extends TestCase
 
     public function testGetProperties()
     {
-        $this->assertEquals(
-            ['collection'],
-            $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', ['serializer_groups' => ['a']])
-        );
+        self::assertEquals(['collection'], $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', ['serializer_groups' => ['a']]));
     }
 
     public function testGetPropertiesWithIgnoredProperties()
     {
         if (!class_exists(Ignore::class)) {
-            $this->markTestSkipped('Ignore annotation is not implemented in current symfony/serializer version');
+            self::markTestSkipped('Ignore annotation is not implemented in current symfony/serializer version');
         }
 
-        $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['a']]));
+        self::assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['a']]));
     }
 
     public function testGetPropertiesWithAnyGroup()
     {
-        $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class, ['serializer_groups' => null]));
+        self::assertSame(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class, ['serializer_groups' => null]));
     }
 }

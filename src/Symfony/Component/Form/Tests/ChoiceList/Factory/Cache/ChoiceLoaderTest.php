@@ -32,13 +32,13 @@ class ChoiceLoaderTest extends TestCase
         $loader1 = new ChoiceLoader($type, $decorated);
         $loader2 = new ChoiceLoader($type, new ArrayChoiceLoader());
 
-        $this->assertEquals($choiceList, $loader1->loadChoiceList());
-        $this->assertEquals($choiceList, $loader2->loadChoiceList());
+        self::assertEquals($choiceList, $loader1->loadChoiceList());
+        self::assertEquals($choiceList, $loader2->loadChoiceList());
 
-        $this->assertSame($choices, $loader1->loadChoicesForValues($choices));
-        $this->assertSame($choices, $loader2->loadChoicesForValues($choices));
+        self::assertSame($choices, $loader1->loadChoicesForValues($choices));
+        self::assertSame($choices, $loader2->loadChoicesForValues($choices));
 
-        $this->assertSame($choices, $loader1->loadValuesForChoices($choices));
-        $this->assertSame($choices, $loader2->loadValuesForChoices($choices));
+        self::assertSame($choices, $loader1->loadValuesForChoices($choices));
+        self::assertSame($choices, $loader2->loadValuesForChoices($choices));
     }
 }

@@ -20,6 +20,6 @@ class JsonLoginLdapTest extends AbstractWebTestCase
         $kernel = self::createKernel(['test_case' => 'JsonLoginLdap', 'root_config' => 'config.yml']);
         $kernel->boot();
 
-        $this->assertInstanceOf(Kernel::class, $kernel);
+        self::assertInstanceOf(Kernel::class, $kernel);
     }
 }

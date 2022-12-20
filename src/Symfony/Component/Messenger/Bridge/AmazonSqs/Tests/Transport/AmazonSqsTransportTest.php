@@ -52,10 +52,10 @@ class AmazonSqsTransportTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection = self::createMock(Connection::class);
         // Mocking the concrete receiver class because mocking multiple interfaces is deprecated
-        $this->receiver = $this->createMock(AmazonSqsReceiver::class);
-        $this->sender = $this->createMock(SenderInterface::class);
+        $this->receiver = self::createMock(AmazonSqsReceiver::class);
+        $this->sender = self::createMock(SenderInterface::class);
 
         $this->transport = new AmazonSqsTransport($this->connection, null, $this->receiver, $this->sender);
     }
@@ -64,14 +64,14 @@ class AmazonSqsTransportTest extends TestCase
     {
         $transport = $this->getTransport();
 
-        $this->assertInstanceOf(TransportInterface::class, $transport);
+        self::assertInstanceOf(TransportInterface::class, $transport);
     }
 
     public function testReceivesMessages()
     {
         $transport = $this->getTransport(
-            $serializer = $this->createMock(SerializerInterface::class),
-            $connection = $this->createMock(Connection::class)
+            $serializer = self::createMock(SerializerInterface::class),
+            $connection = self::createMock(Connection::class)
         );
 
         $decodedMessage = new DummyMessage('Decoded.');
@@ -86,98 +86,98 @@ class AmazonSqsTransportTest extends TestCase
         $connection->method('get')->willReturn($sqsEnvelope);
 
         $envelopes = iterator_to_array($transport->get());
-        $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+        self::assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
     public function testTransportIsAMessageCountAware()
     {
         $transport = $this->getTransport();
 
-        $this->assertInstanceOf(MessageCountAwareInterface::class, $transport);
+        self::assertInstanceOf(MessageCountAwareInterface::class, $transport);
     }
 
     public function testItCanGetMessagesViaTheReceiver()
     {
         $envelopes = [new Envelope(new \stdClass()), new Envelope(new \stdClass())];
-        $this->receiver->expects($this->once())->method('get')->willReturn($envelopes);
-        $this->assertSame($envelopes, $this->transport->get());
+        $this->receiver->expects(self::once())->method('get')->willReturn($envelopes);
+        self::assertSame($envelopes, $this->transport->get());
     }
 
     public function testItCanAcknowledgeAMessageViaTheReceiver()
     {
         $envelope = new Envelope(new \stdClass());
-        $this->receiver->expects($this->once())->method('ack')->with($envelope);
+        $this->receiver->expects(self::once())->method('ack')->with($envelope);
         $this->transport->ack($envelope);
     }
 
     public function testItCanRejectAMessageViaTheReceiver()
     {
         $envelope = new Envelope(new \stdClass());
-        $this->receiver->expects($this->once())->method('reject')->with($envelope);
+        $this->receiver->expects(self::once())->method('reject')->with($envelope);
         $this->transport->reject($envelope);
     }
 
     public function testItCanGetMessageCountViaTheReceiver()
     {
         $messageCount = 15;
-        $this->receiver->expects($this->once())->method('getMessageCount')->willReturn($messageCount);
-        $this->assertSame($messageCount, $this->transport->getMessageCount());
+        $this->receiver->expects(self::once())->method('getMessageCount')->willReturn($messageCount);
+        self::assertSame($messageCount, $this->transport->getMessageCount());
     }
 
     public function testItCanSendAMessageViaTheSender()
     {
         $envelope = new Envelope(new \stdClass());
-        $this->sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
-        $this->assertSame($envelope, $this->transport->send($envelope));
+        $this->sender->expects(self::once())->method('send')->with($envelope)->willReturn($envelope);
+        self::assertSame($envelope, $this->transport->send($envelope));
     }
 
     public function testItCanSetUpTheConnection()
     {
-        $this->connection->expects($this->once())->method('setup');
+        $this->connection->expects(self::once())->method('setup');
         $this->transport->setup();
     }
 
     public function testItConvertsHttpExceptionDuringSetupIntoTransportException()
     {
         $this->connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setup')
             ->willThrowException($this->createHttpException());
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
 
         $this->transport->setup();
     }
 
     public function testItCanResetTheConnection()
     {
-        $this->connection->expects($this->once())->method('reset');
+        $this->connection->expects(self::once())->method('reset');
         $this->transport->reset();
     }
 
     public function testItConvertsHttpExceptionDuringResetIntoTransportException()
     {
         $this->connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('reset')
             ->willThrowException($this->createHttpException());
 
-        $this->expectException(TransportException::class);
+        self::expectException(TransportException::class);
 
         $this->transport->reset();
     }
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)
     {
-        $serializer = $serializer ?? $this->createMock(SerializerInterface::class);
-        $connection = $connection ?? $this->createMock(Connection::class);
+        $serializer = $serializer ?? self::createMock(SerializerInterface::class);
+        $connection = $connection ?? self::createMock(Connection::class);
 
         return new AmazonSqsTransport($connection, $serializer);
     }
 
     private function createHttpException(): HttpException
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
         $response->method('getInfo')->willReturnCallback(static function (string $type = null) {
             $info = [
                 'http_code' => 500,

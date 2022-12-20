@@ -26,7 +26,7 @@ final class OctopushTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new OctopushTransport('userLogin', 'apiKey', 'from', 'type', $client ?? $this->createMock(HttpClientInterface::class));
+        return new OctopushTransport('userLogin', 'apiKey', 'from', 'type', $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -42,6 +42,6 @@ final class OctopushTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

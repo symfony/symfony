@@ -18,7 +18,7 @@ class RewindableGeneratorTest extends TestCase
 {
     public function testImplementsCountable()
     {
-        $this->assertInstanceOf(\Countable::class, new RewindableGenerator(function () {
+        self::assertInstanceOf(\Countable::class, new RewindableGenerator(function () {
             yield 1;
         }, 1));
     }
@@ -29,7 +29,7 @@ class RewindableGeneratorTest extends TestCase
             yield 1;
         }, 3);
 
-        $this->assertCount(3, $generator);
+        self::assertCount(3, $generator);
     }
 
     public function testCountUsesProvidedValueAsCallback()
@@ -43,11 +43,11 @@ class RewindableGeneratorTest extends TestCase
             return 3;
         });
 
-        $this->assertSame(0, $called, 'Count callback is called lazily');
-        $this->assertCount(3, $generator);
+        self::assertSame(0, $called, 'Count callback is called lazily');
+        self::assertCount(3, $generator);
 
         \count($generator);
 
-        $this->assertSame(1, $called, 'Count callback is called only once');
+        self::assertSame(1, $called, 'Count callback is called only once');
     }
 }

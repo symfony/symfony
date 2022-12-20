@@ -24,7 +24,7 @@ final class SlackContextBlockTest extends TestCase
         $context->image('https://example.com/image.jpg', 'an image');
         $context->id('context_id');
 
-        $this->assertSame([
+        self::assertSame([
             'type' => 'context',
             'elements' => [
                 [
@@ -58,8 +58,8 @@ final class SlackContextBlockTest extends TestCase
             }
         }
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Maximum number of elements should not exceed 10.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Maximum number of elements should not exceed 10.');
 
         $context->text('fail');
     }

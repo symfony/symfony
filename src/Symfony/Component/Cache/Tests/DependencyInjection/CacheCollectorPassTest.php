@@ -55,22 +55,22 @@ class CacheCollectorPassTest extends TestCase
         $collector = $container->register('data_collector.cache', CacheDataCollector::class);
         (new CacheCollectorPass())->process($container);
 
-        $this->assertEquals([
+        self::assertEquals([
             ['addInstance', ['fs', new Reference('fs')]],
             ['addInstance', ['tagged_fs', new Reference('tagged_fs')]],
             ['addInstance', ['php', new Reference('.php.inner')]],
         ], $collector->getMethodCalls());
 
-        $this->assertSame(TraceableAdapter::class, $container->findDefinition('fs')->getClass());
-        $this->assertSame(TraceableTagAwareAdapter::class, $container->getDefinition('tagged_fs')->getClass());
+        self::assertSame(TraceableAdapter::class, $container->findDefinition('fs')->getClass());
+        self::assertSame(TraceableTagAwareAdapter::class, $container->getDefinition('tagged_fs')->getClass());
 
-        $this->assertSame(TraceableAdapter::class, $container->findDefinition('.php.inner')->getClass());
-        $this->assertSame(TagAwareAdapter::class, $container->getDefinition('php')->getClass());
+        self::assertSame(TraceableAdapter::class, $container->findDefinition('.php.inner')->getClass());
+        self::assertSame(TagAwareAdapter::class, $container->getDefinition('php')->getClass());
 
-        $this->assertFalse($collector->isPublic(), 'The "data_collector.cache" should be private after processing');
+        self::assertFalse($collector->isPublic(), 'The "data_collector.cache" should be private after processing');
 
         $innerFs = $container->getDefinition('fs.recorder_inner');
-        $this->assertEquals([new Reference('fs.recorder_inner'), 'setCallbackWrapper'], $innerFs->getMethodCalls()[0][1][0]->getArgument(2)->getFactory());
+        self::assertEquals([new Reference('fs.recorder_inner'), 'setCallbackWrapper'], $innerFs->getMethodCalls()[0][1][0]->getArgument(2)->getFactory());
     }
 
     public function testProcessCacheObjectsAreDecorated()
@@ -94,18 +94,15 @@ class CacheCollectorPassTest extends TestCase
         $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
         $container->compile();
-        $this->assertCount(1, $collector->getMethodCalls());
-        $this->assertEquals(
+        self::assertCount(1, $collector->getMethodCalls());
+        self::assertEquals([
             [
+                'addInstance',
                 [
-                    'addInstance',
-                    [
-                        'cache.object',
-                        new Reference('something_is_decorating_cache_object'),
-                    ],
+                    'cache.object',
+                    new Reference('something_is_decorating_cache_object'),
                 ],
             ],
-            $collector->getMethodCalls()
-        );
+        ], $collector->getMethodCalls());
     }
 }

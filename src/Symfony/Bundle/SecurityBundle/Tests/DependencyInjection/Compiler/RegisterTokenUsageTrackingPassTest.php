@@ -33,8 +33,8 @@ class RegisterTokenUsageTrackingPassTest extends TestCase
         $compilerPass = new RegisterTokenUsageTrackingPass();
         $compilerPass->process($container);
 
-        $this->assertTrue($container->hasAlias('security.token_storage'));
-        $this->assertEquals(new Alias('security.untracked_token_storage', true), $container->getAlias('security.token_storage'));
+        self::assertTrue($container->hasAlias('security.token_storage'));
+        self::assertEquals(new Alias('security.untracked_token_storage', true), $container->getAlias('security.token_storage'));
     }
 
     public function testContextListenerIsNotModifiedIfTokenStorageDoesNotSupportUsageTracking()
@@ -58,7 +58,7 @@ class RegisterTokenUsageTrackingPassTest extends TestCase
         $compilerPass = new RegisterTokenUsageTrackingPass();
         $compilerPass->process($container);
 
-        $this->assertCount(6, $container->getDefinition('security.context_listener')->getArguments());
+        self::assertCount(6, $container->getDefinition('security.context_listener')->getArguments());
     }
 
     public function testContextListenerEnablesUsageTrackingIfSupportedByTokenStorage()
@@ -84,7 +84,7 @@ class RegisterTokenUsageTrackingPassTest extends TestCase
 
         $contextListener = $container->getDefinition('security.context_listener');
 
-        $this->assertCount(7, $container->getDefinition('security.context_listener')->getArguments());
-        $this->assertEquals([new Reference('security.token_storage'), 'enableUsageTracking'], $contextListener->getArgument(6));
+        self::assertCount(7, $container->getDefinition('security.context_listener')->getArguments());
+        self::assertEquals([new Reference('security.token_storage'), 'enableUsageTracking'], $contextListener->getArgument(6));
     }
 }

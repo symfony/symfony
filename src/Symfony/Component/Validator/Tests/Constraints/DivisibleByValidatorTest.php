@@ -96,8 +96,8 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function testThrowsOnNonNumericValues(string $expectedGivenType, $value, $comparedValue)
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage(sprintf('Expected argument of type "numeric", "%s" given', $expectedGivenType));
+        self::expectException(UnexpectedValueException::class);
+        self::expectExceptionMessage(sprintf('Expected argument of type "numeric", "%s" given', $expectedGivenType));
 
         $this->validator->validate($value, $this->createConstraint([
             'value' => $comparedValue,
@@ -114,6 +114,6 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 
     public function provideComparisonsToNullValueAtPropertyPath()
     {
-        $this->markTestSkipped('DivisibleByValidator rejects null values.');
+        self::markTestSkipped('DivisibleByValidator rejects null values.');
     }
 }

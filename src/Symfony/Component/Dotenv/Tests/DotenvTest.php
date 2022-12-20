@@ -27,9 +27,9 @@ class DotenvTest extends TestCase
 
         try {
             $dotenv->parse($data);
-            $this->fail('Should throw a FormatException');
+            self::fail('Should throw a FormatException');
         } catch (FormatException $e) {
-            $this->assertStringMatchesFormat($error, $e->getMessage());
+            self::assertStringMatchesFormat($error, $e->getMessage());
         }
     }
 
@@ -68,7 +68,7 @@ class DotenvTest extends TestCase
     public function testParse($data, $expected)
     {
         $dotenv = new Dotenv();
-        $this->assertSame($expected, $dotenv->parse($data));
+        self::assertSame($expected, $dotenv->parse($data));
     }
 
     public function getEnvData()
@@ -220,8 +220,8 @@ class DotenvTest extends TestCase
         unlink($path2);
         rmdir($tmpdir);
 
-        $this->assertSame('BAR', $foo);
-        $this->assertSame('BAZ', $bar);
+        self::assertSame('BAR', $foo);
+        self::assertSame('BAZ', $bar);
     }
 
     public function testLoadEnv()
@@ -250,17 +250,17 @@ class DotenvTest extends TestCase
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('BAR', getenv('FOO'));
-        $this->assertSame('dev', getenv('TEST_APP_ENV'));
-        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('BAR', getenv('FOO'));
+        self::assertSame('dev', getenv('TEST_APP_ENV'));
+        self::assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
-        $this->assertSame('BAR', getenv('FOO'));
-        $this->assertSame('dev', getenv('TEST_APP_ENV'));
-        $this->assertSame('NEW_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('NEW_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('BAR', getenv('FOO'));
+        self::assertSame('dev', getenv('TEST_APP_ENV'));
+        self::assertSame('NEW_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('NEW_VALUE', $_ENV['EXISTING_KEY']);
 
         // .env.local
         file_put_contents("$path.local", "FOO=localBAR\nEXISTING_KEY=localNEW_VALUE");
@@ -268,61 +268,61 @@ class DotenvTest extends TestCase
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'local';
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('localBAR', getenv('FOO'));
-        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('localBAR', getenv('FOO'));
+        self::assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'local';
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
-        $this->assertSame('localBAR', getenv('FOO'));
-        $this->assertSame('localNEW_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('localNEW_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('localBAR', getenv('FOO'));
+        self::assertSame('localNEW_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('localNEW_VALUE', $_ENV['EXISTING_KEY']);
 
         // special case for test
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'test';
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('BAR', getenv('FOO'));
-        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('BAR', getenv('FOO'));
+        self::assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'test';
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
-        $this->assertSame('BAR', getenv('FOO'));
-        $this->assertSame('NEW_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('NEW_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('BAR', getenv('FOO'));
+        self::assertSame('NEW_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('NEW_VALUE', $_ENV['EXISTING_KEY']);
 
         // .env.dev
         file_put_contents("$path.dev", "FOO=devBAR\nEXISTING_KEY=devNEW_VALUE");
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('devBAR', getenv('FOO'));
-        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('devBAR', getenv('FOO'));
+        self::assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
-        $this->assertSame('devBAR', getenv('FOO'));
-        $this->assertSame('devNEW_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('devNEW_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('devBAR', getenv('FOO'));
+        self::assertSame('devNEW_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('devNEW_VALUE', $_ENV['EXISTING_KEY']);
 
         // .env.dev.local
         file_put_contents("$path.dev.local", "FOO=devlocalBAR\nEXISTING_KEY=devlocalNEW_VALUE");
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('devlocalBAR', getenv('FOO'));
-        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('devlocalBAR', getenv('FOO'));
+        self::assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
-        $this->assertSame('devlocalBAR', getenv('FOO'));
-        $this->assertSame('devlocalNEW_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('devlocalNEW_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('devlocalBAR', getenv('FOO'));
+        self::assertSame('devlocalNEW_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('devlocalNEW_VALUE', $_ENV['EXISTING_KEY']);
         unlink("$path.local");
         unlink("$path.dev");
         unlink("$path.dev.local");
@@ -333,15 +333,15 @@ class DotenvTest extends TestCase
         $resetContext();
         unlink($path);
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
-        $this->assertSame('distBAR', getenv('FOO'));
-        $this->assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('distBAR', getenv('FOO'));
+        self::assertSame('EXISTING_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('EXISTING_VALUE', $_ENV['EXISTING_KEY']);
 
         $resetContext();
         (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV', 'dev', ['test'], true);
-        $this->assertSame('distBAR', getenv('FOO'));
-        $this->assertSame('distNEW_VALUE', getenv('EXISTING_KEY'));
-        $this->assertSame('distNEW_VALUE', $_ENV['EXISTING_KEY']);
+        self::assertSame('distBAR', getenv('FOO'));
+        self::assertSame('distNEW_VALUE', getenv('EXISTING_KEY'));
+        self::assertSame('distNEW_VALUE', $_ENV['EXISTING_KEY']);
         unlink("$path.dist");
 
         $resetContext();
@@ -381,13 +381,13 @@ class DotenvTest extends TestCase
         unlink($path2);
         rmdir($tmpdir);
 
-        $this->assertSame('BAR', $foo);
-        $this->assertSame('BAZ', $bar);
+        self::assertSame('BAR', $foo);
+        self::assertSame('BAZ', $bar);
     }
 
     public function testLoadDirectory()
     {
-        $this->expectException(PathException::class);
+        self::expectException(PathException::class);
         $dotenv = new Dotenv();
         $dotenv->load(__DIR__);
     }
@@ -399,7 +399,7 @@ class DotenvTest extends TestCase
         $dotenv = new Dotenv();
         $dotenv->populate(['argc' => 'new_value']);
 
-        $this->assertSame($originalValue, $_SERVER['argc']);
+        self::assertSame($originalValue, $_SERVER['argc']);
     }
 
     public function testEnvVarIsNotOverridden()
@@ -410,7 +410,7 @@ class DotenvTest extends TestCase
         $dotenv = (new Dotenv())->usePutenv();
         $dotenv->populate(['TEST_ENV_VAR' => 'new_value']);
 
-        $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
+        self::assertSame('original_value', getenv('TEST_ENV_VAR'));
     }
 
     public function testHttpVarIsPartiallyOverridden()
@@ -420,9 +420,9 @@ class DotenvTest extends TestCase
         $dotenv = (new Dotenv())->usePutenv();
         $dotenv->populate(['HTTP_TEST_ENV_VAR' => 'env_value']);
 
-        $this->assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
-        $this->assertSame('env_value', $_ENV['HTTP_TEST_ENV_VAR']);
-        $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
+        self::assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
+        self::assertSame('env_value', $_ENV['HTTP_TEST_ENV_VAR']);
+        self::assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
     }
 
     public function testEnvVarIsOverriden()
@@ -432,9 +432,9 @@ class DotenvTest extends TestCase
         $dotenv = (new Dotenv())->usePutenv();
         $dotenv->populate(['TEST_ENV_VAR_OVERRIDEN' => 'new_value'], true);
 
-        $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
-        $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDEN']);
-        $this->assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDEN']);
+        self::assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
+        self::assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDEN']);
+        self::assertSame('new_value', $_SERVER['TEST_ENV_VAR_OVERRIDEN']);
     }
 
     public function testMemorizingLoadedVarsNamesInSpecialVar()
@@ -454,7 +454,7 @@ class DotenvTest extends TestCase
         $dotenv = (new Dotenv())->usePutenv();
         $dotenv->populate(['APP_DEBUG' => '1', 'DATABASE_URL' => 'mysql://root@localhost/db']);
 
-        $this->assertSame('APP_DEBUG,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
+        self::assertSame('APP_DEBUG,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
 
         // Special variable has a value
         $_ENV['SYMFONY_DOTENV_VARS'] = 'APP_ENV';
@@ -472,7 +472,7 @@ class DotenvTest extends TestCase
         $dotenv->populate(['APP_DEBUG' => '0', 'DATABASE_URL' => 'mysql://root@localhost/db']);
         $dotenv->populate(['DATABASE_URL' => 'sqlite:///somedb.sqlite']);
 
-        $this->assertSame('APP_ENV,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
+        self::assertSame('APP_ENV,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
     }
 
     public function testOverridingEnvVarsWithNamesMemorizedInSpecialVar()
@@ -487,10 +487,10 @@ class DotenvTest extends TestCase
         $dotenv = (new Dotenv())->usePutenv();
         $dotenv->populate(['FOO' => 'foo1', 'BAR' => 'bar1', 'BAZ' => 'baz1', 'DOCUMENT_ROOT' => '/boot']);
 
-        $this->assertSame('foo1', getenv('FOO'));
-        $this->assertSame('bar1', getenv('BAR'));
-        $this->assertSame('baz1', getenv('BAZ'));
-        $this->assertSame('/var/www', getenv('DOCUMENT_ROOT'));
+        self::assertSame('foo1', getenv('FOO'));
+        self::assertSame('bar1', getenv('BAR'));
+        self::assertSame('baz1', getenv('BAZ'));
+        self::assertSame('/var/www', getenv('DOCUMENT_ROOT'));
     }
 
     public function testGetVariablesValueFromEnvFirst()
@@ -500,12 +500,12 @@ class DotenvTest extends TestCase
 
         $test = "APP_ENV=dev\nTEST1=foo1_\${APP_ENV}";
         $values = $dotenv->parse($test);
-        $this->assertSame('foo1_prod', $values['TEST1']);
+        self::assertSame('foo1_prod', $values['TEST1']);
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             $test = "APP_ENV=dev\nTEST2=foo2_\$(php -r 'echo \$_SERVER[\"APP_ENV\"];')";
             $values = $dotenv->parse($test);
-            $this->assertSame('foo2_prod', $values['TEST2']);
+            self::assertSame('foo2_prod', $values['TEST2']);
         }
     }
 
@@ -517,7 +517,7 @@ class DotenvTest extends TestCase
 
         try {
             $values = $dotenv->parse('Foo=${Foo}');
-            $this->assertSame('Bar', $values['Foo']);
+            self::assertSame('Bar', $values['Foo']);
         } finally {
             putenv('Foo');
         }
@@ -526,7 +526,7 @@ class DotenvTest extends TestCase
     public function testNoDeprecationWarning()
     {
         $dotenv = new Dotenv();
-        $this->assertInstanceOf(Dotenv::class, $dotenv);
+        self::assertInstanceOf(Dotenv::class, $dotenv);
     }
 
     public function testDoNotUsePutenv()
@@ -534,9 +534,9 @@ class DotenvTest extends TestCase
         $dotenv = new Dotenv();
         $dotenv->populate(['TEST_USE_PUTENV' => 'no']);
 
-        $this->assertSame('no', $_SERVER['TEST_USE_PUTENV']);
-        $this->assertSame('no', $_ENV['TEST_USE_PUTENV']);
-        $this->assertFalse(getenv('TEST_USE_PUTENV'));
+        self::assertSame('no', $_SERVER['TEST_USE_PUTENV']);
+        self::assertSame('no', $_ENV['TEST_USE_PUTENV']);
+        self::assertFalse(getenv('TEST_USE_PUTENV'));
     }
 
     public function testSERVERVarsDuplicationInENV()
@@ -546,7 +546,7 @@ class DotenvTest extends TestCase
 
         (new Dotenv())->populate(['FOO' => 'BAR']);
 
-        $this->assertSame('CCC', $_ENV['FOO']);
+        self::assertSame('CCC', $_ENV['FOO']);
     }
 
     public function testBootEnv()
@@ -566,34 +566,34 @@ class DotenvTest extends TestCase
         file_put_contents($path, "FOO=BAR\nEXISTING_KEY=NEW_VALUE");
         $resetContext();
         (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path);
-        $this->assertSame('BAR', $_SERVER['FOO']);
-        $this->assertSame('EXISTING_VALUE', $_SERVER['EXISTING_KEY']);
+        self::assertSame('BAR', $_SERVER['FOO']);
+        self::assertSame('EXISTING_VALUE', $_SERVER['EXISTING_KEY']);
 
         $resetContext();
         (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path, 'dev', ['test'], true);
-        $this->assertSame('BAR', $_SERVER['FOO']);
-        $this->assertSame('NEW_VALUE', $_SERVER['EXISTING_KEY']);
+        self::assertSame('BAR', $_SERVER['FOO']);
+        self::assertSame('NEW_VALUE', $_SERVER['EXISTING_KEY']);
         unlink($path);
 
         file_put_contents($path.'.local.php', '<?php return ["TEST_APP_ENV" => "dev", "FOO" => "BAR", "EXISTING_KEY" => "localphpNEW_VALUE"];');
         $resetContext();
         (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path);
-        $this->assertSame('BAR', $_SERVER['FOO']);
-        $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
-        $this->assertSame('EXISTING_VALUE', $_SERVER['EXISTING_KEY']);
+        self::assertSame('BAR', $_SERVER['FOO']);
+        self::assertSame('1', $_SERVER['TEST_APP_DEBUG']);
+        self::assertSame('EXISTING_VALUE', $_SERVER['EXISTING_KEY']);
 
         $resetContext();
         (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path, 'dev', ['test'], true);
-        $this->assertSame('BAR', $_SERVER['FOO']);
-        $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
-        $this->assertSame('localphpNEW_VALUE', $_SERVER['EXISTING_KEY']);
+        self::assertSame('BAR', $_SERVER['FOO']);
+        self::assertSame('1', $_SERVER['TEST_APP_DEBUG']);
+        self::assertSame('localphpNEW_VALUE', $_SERVER['EXISTING_KEY']);
 
         $resetContext();
         $_SERVER['TEST_APP_ENV'] = 'ccc';
         (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG'))->bootEnv($path, 'dev', ['test'], true);
-        $this->assertSame('BAR', $_SERVER['FOO']);
-        $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
-        $this->assertSame('localphpNEW_VALUE', $_SERVER['EXISTING_KEY']);
+        self::assertSame('BAR', $_SERVER['FOO']);
+        self::assertSame('1', $_SERVER['TEST_APP_DEBUG']);
+        self::assertSame('localphpNEW_VALUE', $_SERVER['EXISTING_KEY']);
         unlink($path.'.local.php');
 
         $resetContext();

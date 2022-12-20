@@ -27,18 +27,18 @@ class SwitchUserTokenTest extends TestCase
 
         $unserializedToken = unserialize(serialize($token));
 
-        $this->assertInstanceOf(SwitchUserToken::class, $unserializedToken);
-        $this->assertSame('admin', $unserializedToken->getUserIdentifier());
-        $this->assertSame('provider-key', $unserializedToken->getFirewallName());
-        $this->assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
-        $this->assertSame('https://symfony.com/blog', $unserializedToken->getOriginatedFromUri());
+        self::assertInstanceOf(SwitchUserToken::class, $unserializedToken);
+        self::assertSame('admin', $unserializedToken->getUserIdentifier());
+        self::assertSame('provider-key', $unserializedToken->getFirewallName());
+        self::assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
+        self::assertSame('https://symfony.com/blog', $unserializedToken->getOriginatedFromUri());
 
         $unserializedOriginalToken = $unserializedToken->getOriginalToken();
 
-        $this->assertInstanceOf(UsernamePasswordToken::class, $unserializedOriginalToken);
-        $this->assertSame('user', $unserializedOriginalToken->getUserIdentifier());
-        $this->assertSame('provider-key', $unserializedOriginalToken->getFirewallName());
-        $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
+        self::assertInstanceOf(UsernamePasswordToken::class, $unserializedOriginalToken);
+        self::assertSame('user', $unserializedOriginalToken->getUserIdentifier());
+        self::assertSame('provider-key', $unserializedOriginalToken->getFirewallName());
+        self::assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
     }
 
     /**
@@ -51,20 +51,20 @@ class SwitchUserTokenTest extends TestCase
 
         $unserializedToken = unserialize(serialize($token));
 
-        $this->assertInstanceOf(SwitchUserToken::class, $unserializedToken);
-        $this->assertSame('admin', $unserializedToken->getUserIdentifier());
-        $this->assertSame('bar', $unserializedToken->getCredentials());
-        $this->assertSame('provider-key', $unserializedToken->getFirewallName());
-        $this->assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
-        $this->assertSame('https://symfony.com/blog', $unserializedToken->getOriginatedFromUri());
+        self::assertInstanceOf(SwitchUserToken::class, $unserializedToken);
+        self::assertSame('admin', $unserializedToken->getUserIdentifier());
+        self::assertSame('bar', $unserializedToken->getCredentials());
+        self::assertSame('provider-key', $unserializedToken->getFirewallName());
+        self::assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
+        self::assertSame('https://symfony.com/blog', $unserializedToken->getOriginatedFromUri());
 
         $unserializedOriginalToken = $unserializedToken->getOriginalToken();
 
-        $this->assertInstanceOf(UsernamePasswordToken::class, $unserializedOriginalToken);
-        $this->assertSame('user', $unserializedOriginalToken->getUserIdentifier());
-        $this->assertSame('foo', $unserializedOriginalToken->getCredentials());
-        $this->assertSame('provider-key', $unserializedOriginalToken->getFirewallName());
-        $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
+        self::assertInstanceOf(UsernamePasswordToken::class, $unserializedOriginalToken);
+        self::assertSame('user', $unserializedOriginalToken->getUserIdentifier());
+        self::assertSame('foo', $unserializedOriginalToken->getCredentials());
+        self::assertSame('provider-key', $unserializedOriginalToken->getFirewallName());
+        self::assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
     }
 
     /**
@@ -106,7 +106,7 @@ class SwitchUserTokenTest extends TestCase
         $originalToken = new UsernamePasswordToken(new InMemoryUser('impersonator', '', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']), 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
         $token = new SwitchUserToken($impersonated, 'bar', 'provider-key', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
         $token->setUser($impersonated);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
     }
 
     public function testSerializeNullImpersonateUrl()
@@ -116,7 +116,7 @@ class SwitchUserTokenTest extends TestCase
 
         $unserializedToken = unserialize(serialize($token));
 
-        $this->assertNull($unserializedToken->getOriginatedFromUri());
+        self::assertNull($unserializedToken->getOriginatedFromUri());
     }
 
     /**
@@ -129,7 +129,7 @@ class SwitchUserTokenTest extends TestCase
 
         $unserializedToken = unserialize(serialize($token));
 
-        $this->assertNull($unserializedToken->getOriginatedFromUri());
+        self::assertNull($unserializedToken->getOriginatedFromUri());
     }
 
     /**

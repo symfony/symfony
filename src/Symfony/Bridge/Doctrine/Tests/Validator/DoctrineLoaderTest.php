@@ -41,7 +41,7 @@ class DoctrineLoaderTest extends TestCase
     protected function setUp(): void
     {
         if (!trait_exists(AutoMappingTrait::class)) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.4+');
+            self::markTestSkipped('Auto-mapping requires symfony/validation 4.4+');
         }
     }
 
@@ -57,98 +57,98 @@ class DoctrineLoaderTest extends TestCase
         $classMetadata = $validator->getMetadataFor(new DoctrineLoaderEntity());
 
         $classConstraints = $classMetadata->getConstraints();
-        $this->assertCount(2, $classConstraints);
-        $this->assertInstanceOf(UniqueEntity::class, $classConstraints[0]);
-        $this->assertInstanceOf(UniqueEntity::class, $classConstraints[1]);
-        $this->assertSame(['alreadyMappedUnique'], $classConstraints[0]->fields);
-        $this->assertSame('unique', $classConstraints[1]->fields);
+        self::assertCount(2, $classConstraints);
+        self::assertInstanceOf(UniqueEntity::class, $classConstraints[0]);
+        self::assertInstanceOf(UniqueEntity::class, $classConstraints[1]);
+        self::assertSame(['alreadyMappedUnique'], $classConstraints[0]->fields);
+        self::assertSame('unique', $classConstraints[1]->fields);
 
         $maxLengthMetadata = $classMetadata->getPropertyMetadata('maxLength');
-        $this->assertCount(1, $maxLengthMetadata);
+        self::assertCount(1, $maxLengthMetadata);
         $maxLengthConstraints = $maxLengthMetadata[0]->getConstraints();
-        $this->assertCount(1, $maxLengthConstraints);
-        $this->assertInstanceOf(Length::class, $maxLengthConstraints[0]);
-        $this->assertSame(20, $maxLengthConstraints[0]->max);
+        self::assertCount(1, $maxLengthConstraints);
+        self::assertInstanceOf(Length::class, $maxLengthConstraints[0]);
+        self::assertSame(20, $maxLengthConstraints[0]->max);
 
         $mergedMaxLengthMetadata = $classMetadata->getPropertyMetadata('mergedMaxLength');
-        $this->assertCount(1, $mergedMaxLengthMetadata);
+        self::assertCount(1, $mergedMaxLengthMetadata);
         $mergedMaxLengthConstraints = $mergedMaxLengthMetadata[0]->getConstraints();
-        $this->assertCount(1, $mergedMaxLengthConstraints);
-        $this->assertInstanceOf(Length::class, $mergedMaxLengthConstraints[0]);
-        $this->assertSame(20, $mergedMaxLengthConstraints[0]->max);
-        $this->assertSame(5, $mergedMaxLengthConstraints[0]->min);
+        self::assertCount(1, $mergedMaxLengthConstraints);
+        self::assertInstanceOf(Length::class, $mergedMaxLengthConstraints[0]);
+        self::assertSame(20, $mergedMaxLengthConstraints[0]->max);
+        self::assertSame(5, $mergedMaxLengthConstraints[0]->min);
 
         $alreadyMappedMaxLengthMetadata = $classMetadata->getPropertyMetadata('alreadyMappedMaxLength');
-        $this->assertCount(1, $alreadyMappedMaxLengthMetadata);
+        self::assertCount(1, $alreadyMappedMaxLengthMetadata);
         $alreadyMappedMaxLengthConstraints = $alreadyMappedMaxLengthMetadata[0]->getConstraints();
-        $this->assertCount(1, $alreadyMappedMaxLengthConstraints);
-        $this->assertInstanceOf(Length::class, $alreadyMappedMaxLengthConstraints[0]);
-        $this->assertSame(10, $alreadyMappedMaxLengthConstraints[0]->max);
-        $this->assertSame(1, $alreadyMappedMaxLengthConstraints[0]->min);
+        self::assertCount(1, $alreadyMappedMaxLengthConstraints);
+        self::assertInstanceOf(Length::class, $alreadyMappedMaxLengthConstraints[0]);
+        self::assertSame(10, $alreadyMappedMaxLengthConstraints[0]->max);
+        self::assertSame(1, $alreadyMappedMaxLengthConstraints[0]->min);
 
         $publicParentMaxLengthMetadata = $classMetadata->getPropertyMetadata('publicParentMaxLength');
-        $this->assertCount(1, $publicParentMaxLengthMetadata);
+        self::assertCount(1, $publicParentMaxLengthMetadata);
         $publicParentMaxLengthConstraints = $publicParentMaxLengthMetadata[0]->getConstraints();
-        $this->assertCount(1, $publicParentMaxLengthConstraints);
-        $this->assertInstanceOf(Length::class, $publicParentMaxLengthConstraints[0]);
-        $this->assertSame(35, $publicParentMaxLengthConstraints[0]->max);
+        self::assertCount(1, $publicParentMaxLengthConstraints);
+        self::assertInstanceOf(Length::class, $publicParentMaxLengthConstraints[0]);
+        self::assertSame(35, $publicParentMaxLengthConstraints[0]->max);
 
         $embeddedMetadata = $classMetadata->getPropertyMetadata('embedded');
-        $this->assertCount(1, $embeddedMetadata);
-        $this->assertSame(CascadingStrategy::CASCADE, $embeddedMetadata[0]->getCascadingStrategy());
-        $this->assertSame(TraversalStrategy::IMPLICIT, $embeddedMetadata[0]->getTraversalStrategy());
+        self::assertCount(1, $embeddedMetadata);
+        self::assertSame(CascadingStrategy::CASCADE, $embeddedMetadata[0]->getCascadingStrategy());
+        self::assertSame(TraversalStrategy::IMPLICIT, $embeddedMetadata[0]->getTraversalStrategy());
 
         $parentClassMetadata = $validator->getMetadataFor(new DoctrineLoaderParentEntity());
 
         $publicParentMaxLengthMetadata = $parentClassMetadata->getPropertyMetadata('publicParentMaxLength');
-        $this->assertCount(0, $publicParentMaxLengthMetadata);
+        self::assertCount(0, $publicParentMaxLengthMetadata);
 
         $privateParentMaxLengthMetadata = $parentClassMetadata->getPropertyMetadata('privateParentMaxLength');
-        $this->assertCount(1, $privateParentMaxLengthMetadata);
+        self::assertCount(1, $privateParentMaxLengthMetadata);
         $privateParentMaxLengthConstraints = $privateParentMaxLengthMetadata[0]->getConstraints();
-        $this->assertCount(1, $privateParentMaxLengthConstraints);
-        $this->assertInstanceOf(Length::class, $privateParentMaxLengthConstraints[0]);
-        $this->assertSame(30, $privateParentMaxLengthConstraints[0]->max);
+        self::assertCount(1, $privateParentMaxLengthConstraints);
+        self::assertInstanceOf(Length::class, $privateParentMaxLengthConstraints[0]);
+        self::assertSame(30, $privateParentMaxLengthConstraints[0]->max);
 
         $embeddedClassMetadata = $validator->getMetadataFor(new DoctrineLoaderEmbed());
 
         $embeddedMaxLengthMetadata = $embeddedClassMetadata->getPropertyMetadata('embeddedMaxLength');
-        $this->assertCount(1, $embeddedMaxLengthMetadata);
+        self::assertCount(1, $embeddedMaxLengthMetadata);
         $embeddedMaxLengthConstraints = $embeddedMaxLengthMetadata[0]->getConstraints();
-        $this->assertCount(1, $embeddedMaxLengthConstraints);
-        $this->assertInstanceOf(Length::class, $embeddedMaxLengthConstraints[0]);
-        $this->assertSame(25, $embeddedMaxLengthConstraints[0]->max);
+        self::assertCount(1, $embeddedMaxLengthConstraints);
+        self::assertInstanceOf(Length::class, $embeddedMaxLengthConstraints[0]);
+        self::assertSame(25, $embeddedMaxLengthConstraints[0]->max);
 
         $nestedEmbeddedMetadata = $embeddedClassMetadata->getPropertyMetadata('nestedEmbedded');
-        $this->assertCount(1, $nestedEmbeddedMetadata);
-        $this->assertSame(CascadingStrategy::CASCADE, $nestedEmbeddedMetadata[0]->getCascadingStrategy());
-        $this->assertSame(TraversalStrategy::IMPLICIT, $nestedEmbeddedMetadata[0]->getTraversalStrategy());
+        self::assertCount(1, $nestedEmbeddedMetadata);
+        self::assertSame(CascadingStrategy::CASCADE, $nestedEmbeddedMetadata[0]->getCascadingStrategy());
+        self::assertSame(TraversalStrategy::IMPLICIT, $nestedEmbeddedMetadata[0]->getTraversalStrategy());
 
         $nestedEmbeddedClassMetadata = $validator->getMetadataFor(new DoctrineLoaderNestedEmbed());
 
         $nestedEmbeddedMaxLengthMetadata = $nestedEmbeddedClassMetadata->getPropertyMetadata('nestedEmbeddedMaxLength');
-        $this->assertCount(1, $nestedEmbeddedMaxLengthMetadata);
+        self::assertCount(1, $nestedEmbeddedMaxLengthMetadata);
         $nestedEmbeddedMaxLengthConstraints = $nestedEmbeddedMaxLengthMetadata[0]->getConstraints();
-        $this->assertCount(1, $nestedEmbeddedMaxLengthConstraints);
-        $this->assertInstanceOf(Length::class, $nestedEmbeddedMaxLengthConstraints[0]);
-        $this->assertSame(27, $nestedEmbeddedMaxLengthConstraints[0]->max);
+        self::assertCount(1, $nestedEmbeddedMaxLengthConstraints);
+        self::assertInstanceOf(Length::class, $nestedEmbeddedMaxLengthConstraints[0]);
+        self::assertSame(27, $nestedEmbeddedMaxLengthConstraints[0]->max);
 
-        $this->assertCount(0, $classMetadata->getPropertyMetadata('guidField'));
-        $this->assertCount(0, $classMetadata->getPropertyMetadata('simpleArrayField'));
+        self::assertCount(0, $classMetadata->getPropertyMetadata('guidField'));
+        self::assertCount(0, $classMetadata->getPropertyMetadata('simpleArrayField'));
 
         $textFieldMetadata = $classMetadata->getPropertyMetadata('textField');
-        $this->assertCount(1, $textFieldMetadata);
+        self::assertCount(1, $textFieldMetadata);
         $textFieldConstraints = $textFieldMetadata[0]->getConstraints();
-        $this->assertCount(1, $textFieldConstraints);
-        $this->assertInstanceOf(Length::class, $textFieldConstraints[0]);
-        $this->assertSame(1000, $textFieldConstraints[0]->max);
+        self::assertCount(1, $textFieldConstraints);
+        self::assertInstanceOf(Length::class, $textFieldConstraints[0]);
+        self::assertSame(1000, $textFieldConstraints[0]->max);
 
         /** @var PropertyMetadata[] $noAutoMappingMetadata */
         $noAutoMappingMetadata = $classMetadata->getPropertyMetadata('noAutoMapping');
-        $this->assertCount(1, $noAutoMappingMetadata);
+        self::assertCount(1, $noAutoMappingMetadata);
         $noAutoMappingConstraints = $noAutoMappingMetadata[0]->getConstraints();
-        $this->assertCount(0, $noAutoMappingConstraints);
-        $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
+        self::assertCount(0, $noAutoMappingConstraints);
+        self::assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
     }
 
     /**
@@ -157,7 +157,7 @@ class DoctrineLoaderTest extends TestCase
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {
-            $this->markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
+            self::markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
         }
 
         $validator = Validation::createValidatorBuilder()
@@ -171,10 +171,10 @@ class DoctrineLoaderTest extends TestCase
         $classMetadata = $validator->getMetadataFor(new DoctrineLoaderEnum());
 
         $enumStringMetadata = $classMetadata->getPropertyMetadata('enumString');
-        $this->assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
+        self::assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
 
         $enumStringMetadata = $classMetadata->getPropertyMetadata('enumInt');
-        $this->assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
+        self::assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
     }
 
     public function testFieldMappingsConfiguration()
@@ -195,7 +195,7 @@ class DoctrineLoaderTest extends TestCase
         $classMetadata = $validator->getMetadataFor(new BaseUser(1, 'DemoUser'));
 
         $constraints = $classMetadata->getConstraints();
-        $this->assertCount(0, $constraints);
+        self::assertCount(0, $constraints);
     }
 
     /**
@@ -206,7 +206,7 @@ class DoctrineLoaderTest extends TestCase
         $doctrineLoader = new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), $classValidatorRegexp, false);
 
         $classMetadata = new ClassMetadata(DoctrineLoaderEntity::class);
-        $this->assertSame($expected, $doctrineLoader->loadClassMetadata($classMetadata));
+        self::assertSame($expected, $doctrineLoader->loadClassMetadata($classMetadata));
     }
 
     public function regexpProvider()
@@ -230,15 +230,15 @@ class DoctrineLoaderTest extends TestCase
         $classMetadata = $validator->getMetadataFor(new DoctrineLoaderNoAutoMappingEntity());
 
         $classConstraints = $classMetadata->getConstraints();
-        $this->assertCount(0, $classConstraints);
-        $this->assertSame(AutoMappingStrategy::DISABLED, $classMetadata->getAutoMappingStrategy());
+        self::assertCount(0, $classConstraints);
+        self::assertSame(AutoMappingStrategy::DISABLED, $classMetadata->getAutoMappingStrategy());
 
         $maxLengthMetadata = $classMetadata->getPropertyMetadata('maxLength');
-        $this->assertEmpty($maxLengthMetadata);
+        self::assertEmpty($maxLengthMetadata);
 
         /** @var PropertyMetadata[] $autoMappingExplicitlyEnabledMetadata */
         $autoMappingExplicitlyEnabledMetadata = $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled');
-        $this->assertCount(1, $autoMappingExplicitlyEnabledMetadata[0]->constraints);
-        $this->assertSame(AutoMappingStrategy::ENABLED, $autoMappingExplicitlyEnabledMetadata[0]->getAutoMappingStrategy());
+        self::assertCount(1, $autoMappingExplicitlyEnabledMetadata[0]->constraints);
+        self::assertSame(AutoMappingStrategy::ENABLED, $autoMappingExplicitlyEnabledMetadata[0]->getAutoMappingStrategy());
     }
 }

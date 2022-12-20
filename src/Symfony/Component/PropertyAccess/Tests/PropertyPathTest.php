@@ -22,18 +22,18 @@ class PropertyPathTest extends TestCase
     {
         $path = new PropertyPath('reference.traversable[index].property');
 
-        $this->assertEquals('reference.traversable[index].property', $path->__toString());
+        self::assertEquals('reference.traversable[index].property', $path->__toString());
     }
 
     public function testDotIsRequiredBeforeProperty()
     {
-        $this->expectException(InvalidPropertyPathException::class);
+        self::expectException(InvalidPropertyPathException::class);
         new PropertyPath('[index]property');
     }
 
     public function testDotCannotBePresentAtTheBeginning()
     {
-        $this->expectException(InvalidPropertyPathException::class);
+        self::expectException(InvalidPropertyPathException::class);
         new PropertyPath('.property');
     }
 
@@ -55,25 +55,25 @@ class PropertyPathTest extends TestCase
      */
     public function testUnexpectedCharacters($path)
     {
-        $this->expectException(InvalidPropertyPathException::class);
+        self::expectException(InvalidPropertyPathException::class);
         new PropertyPath($path);
     }
 
     public function testPathCannotBeEmpty()
     {
-        $this->expectException(InvalidPropertyPathException::class);
+        self::expectException(InvalidPropertyPathException::class);
         new PropertyPath('');
     }
 
     public function testPathCannotBeNull()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new PropertyPath(null);
     }
 
     public function testPathCannotBeFalse()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new PropertyPath(false);
     }
 
@@ -81,28 +81,28 @@ class PropertyPathTest extends TestCase
     {
         $propertyPath = new PropertyPath('0');
 
-        $this->assertSame('0', (string) $propertyPath);
+        self::assertSame('0', (string) $propertyPath);
     }
 
     public function testGetParentWithDot()
     {
         $propertyPath = new PropertyPath('grandpa.parent.child');
 
-        $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
+        self::assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
     }
 
     public function testGetParentWithIndex()
     {
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
-        $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
+        self::assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
     }
 
     public function testGetParentWhenThereIsNoParent()
     {
         $propertyPath = new PropertyPath('path');
 
-        $this->assertNull($propertyPath->getParent());
+        self::assertNull($propertyPath->getParent());
     }
 
     public function testCopyConstructor()
@@ -110,19 +110,19 @@ class PropertyPathTest extends TestCase
         $propertyPath = new PropertyPath('grandpa.parent[child]');
         $copy = new PropertyPath($propertyPath);
 
-        $this->assertEquals($propertyPath, $copy);
+        self::assertEquals($propertyPath, $copy);
     }
 
     public function testGetElement()
     {
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
-        $this->assertEquals('child', $propertyPath->getElement(2));
+        self::assertEquals('child', $propertyPath->getElement(2));
     }
 
     public function testGetElementDoesNotAcceptInvalidIndices()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $propertyPath->getElement(3);
@@ -130,7 +130,7 @@ class PropertyPathTest extends TestCase
 
     public function testGetElementDoesNotAcceptNegativeIndices()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $propertyPath->getElement(-1);
@@ -140,13 +140,13 @@ class PropertyPathTest extends TestCase
     {
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
-        $this->assertTrue($propertyPath->isProperty(1));
-        $this->assertFalse($propertyPath->isProperty(2));
+        self::assertTrue($propertyPath->isProperty(1));
+        self::assertFalse($propertyPath->isProperty(2));
     }
 
     public function testIsPropertyDoesNotAcceptInvalidIndices()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $propertyPath->isProperty(3);
@@ -154,7 +154,7 @@ class PropertyPathTest extends TestCase
 
     public function testIsPropertyDoesNotAcceptNegativeIndices()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $propertyPath->isProperty(-1);
@@ -164,13 +164,13 @@ class PropertyPathTest extends TestCase
     {
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
-        $this->assertFalse($propertyPath->isIndex(1));
-        $this->assertTrue($propertyPath->isIndex(2));
+        self::assertFalse($propertyPath->isIndex(1));
+        self::assertTrue($propertyPath->isIndex(2));
     }
 
     public function testIsIndexDoesNotAcceptInvalidIndices()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $propertyPath->isIndex(3);
@@ -178,7 +178,7 @@ class PropertyPathTest extends TestCase
 
     public function testIsIndexDoesNotAcceptNegativeIndices()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $propertyPath->isIndex(-1);

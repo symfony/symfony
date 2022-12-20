@@ -35,9 +35,9 @@ class LoginLinkAuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
-        $this->successHandler = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
+        $this->loginLinkHandler = self::createMock(LoginLinkHandlerInterface::class);
+        $this->successHandler = self::createMock(AuthenticationSuccessHandlerInterface::class);
+        $this->failureHandler = self::createMock(AuthenticationFailureHandlerInterface::class);
     }
 
     /**
@@ -47,7 +47,7 @@ class LoginLinkAuthenticatorTest extends TestCase
     {
         $this->setUpAuthenticator($options);
 
-        $this->assertEquals($supported, $this->authenticator->supports($request));
+        self::assertEquals($supported, $this->authenticator->supports($request));
     }
 
     public function provideSupportData()
@@ -63,27 +63,27 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->setUpAuthenticator();
 
         $request = Request::create('/login/link/check?stuff=1&user=weaverryan');
-        $user = $this->createMock(UserInterface::class);
-        $this->loginLinkHandler->expects($this->once())
+        $user = self::createMock(UserInterface::class);
+        $this->loginLinkHandler->expects(self::once())
             ->method('consumeLoginLink')
             ->with($request)
             ->willReturn($user);
 
         $passport = $this->authenticator->authenticate($request);
-        $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
+        self::assertInstanceOf(SelfValidatingPassport::class, $passport);
         /** @var UserBadge $userBadge */
         $userBadge = $passport->getBadge(UserBadge::class);
-        $this->assertSame($user, $userBadge->getUser());
-        $this->assertSame('weaverryan', $userBadge->getUserIdentifier());
+        self::assertSame($user, $userBadge->getUser());
+        self::assertSame('weaverryan', $userBadge->getUserIdentifier());
     }
 
     public function testUnsuccessfulAuthenticate()
     {
-        $this->expectException(InvalidLoginLinkAuthenticationException::class);
+        self::expectException(InvalidLoginLinkAuthenticationException::class);
         $this->setUpAuthenticator();
 
         $request = Request::create('/login/link/check?stuff=1&user=weaverryan');
-        $this->loginLinkHandler->expects($this->once())
+        $this->loginLinkHandler->expects(self::once())
             ->method('consumeLoginLink')
             ->with($request)
             ->willThrowException(new ExpiredLoginLinkException());
@@ -95,12 +95,12 @@ class LoginLinkAuthenticatorTest extends TestCase
 
     public function testMissingUser()
     {
-        $this->expectException(InvalidLoginLinkAuthenticationException::class);
+        self::expectException(InvalidLoginLinkAuthenticationException::class);
         $this->setUpAuthenticator();
 
         $request = Request::create('/login/link/check?stuff=1');
-        $this->createMock(UserInterface::class);
-        $this->loginLinkHandler->expects($this->never())
+        self::createMock(UserInterface::class);
+        $this->loginLinkHandler->expects(self::never())
             ->method('consumeLoginLink');
 
         $this->authenticator->authenticate($request);
@@ -114,7 +114,7 @@ class LoginLinkAuthenticatorTest extends TestCase
 
         $passport = $this->authenticator->authenticate($request);
 
-        $this->assertTrue($passport->hasBadge(RememberMeBadge::class));
+        self::assertTrue($passport->hasBadge(RememberMeBadge::class));
     }
 
     private function setUpAuthenticator(array $options = [])

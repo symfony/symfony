@@ -35,30 +35,30 @@ class ContainerBagTest extends TestCase
 
     public function testGetAllParameters()
     {
-        $this->assertSame(['foo' => 'value'], $this->containerBag->all());
+        self::assertSame(['foo' => 'value'], $this->containerBag->all());
     }
 
     public function testHasAParameter()
     {
-        $this->assertTrue($this->containerBag->has('foo'));
-        $this->assertFalse($this->containerBag->has('bar'));
+        self::assertTrue($this->containerBag->has('foo'));
+        self::assertFalse($this->containerBag->has('bar'));
     }
 
     public function testGetParameter()
     {
-        $this->assertSame('value', $this->containerBag->get('foo'));
+        self::assertSame('value', $this->containerBag->get('foo'));
     }
 
     public function testGetParameterNotFound()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $this->containerBag->get('bar');
     }
 
     public function testInstanceOf()
     {
-        $this->assertInstanceOf(FrozenParameterBag::class, $this->containerBag);
-        $this->assertInstanceOf(ContainerBagInterface::class, $this->containerBag);
-        $this->assertInstanceOf(ContainerInterface::class, $this->containerBag);
+        self::assertInstanceOf(FrozenParameterBag::class, $this->containerBag);
+        self::assertInstanceOf(ContainerBagInterface::class, $this->containerBag);
+        self::assertInstanceOf(ContainerInterface::class, $this->containerBag);
     }
 }

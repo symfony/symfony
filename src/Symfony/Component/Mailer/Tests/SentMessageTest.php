@@ -23,14 +23,14 @@ class SentMessageTest extends TestCase
     public function test()
     {
         $m = new SentMessage($r = new RawMessage('Email'), $e = new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')]));
-        $this->assertSame($r, $m->getOriginalMessage());
-        $this->assertSame($r, $m->getMessage());
-        $this->assertSame($e, $m->getEnvelope());
-        $this->assertEquals($r->toString(), $m->toString());
-        $this->assertEquals($r->toIterable(), $m->toIterable());
+        self::assertSame($r, $m->getOriginalMessage());
+        self::assertSame($r, $m->getMessage());
+        self::assertSame($e, $m->getEnvelope());
+        self::assertEquals($r->toString(), $m->toString());
+        self::assertEquals($r->toIterable(), $m->toIterable());
 
         $m = new SentMessage($r = (new Email())->from('fabien@example.com')->to('helene@example.com')->text('text'), $e);
-        $this->assertSame($r, $m->getOriginalMessage());
-        $this->assertNotSame($r, $m->getMessage());
+        self::assertSame($r, $m->getOriginalMessage());
+        self::assertNotSame($r, $m->getMessage());
     }
 }

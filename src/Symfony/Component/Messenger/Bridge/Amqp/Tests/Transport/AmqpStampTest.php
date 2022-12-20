@@ -22,22 +22,22 @@ class AmqpStampTest extends TestCase
     public function testRoutingKeyOnly()
     {
         $stamp = new AmqpStamp('routing_key');
-        $this->assertSame('routing_key', $stamp->getRoutingKey());
-        $this->assertSame(\AMQP_NOPARAM, $stamp->getFlags());
-        $this->assertSame([], $stamp->getAttributes());
+        self::assertSame('routing_key', $stamp->getRoutingKey());
+        self::assertSame(\AMQP_NOPARAM, $stamp->getFlags());
+        self::assertSame([], $stamp->getAttributes());
     }
 
     public function testFlagsAndAttributes()
     {
         $stamp = new AmqpStamp(null, \AMQP_DURABLE, ['delivery_mode' => 'unknown']);
-        $this->assertNull($stamp->getRoutingKey());
-        $this->assertSame(\AMQP_DURABLE, $stamp->getFlags());
-        $this->assertSame(['delivery_mode' => 'unknown'], $stamp->getAttributes());
+        self::assertNull($stamp->getRoutingKey());
+        self::assertSame(\AMQP_DURABLE, $stamp->getFlags());
+        self::assertSame(['delivery_mode' => 'unknown'], $stamp->getAttributes());
     }
 
     public function testCreateFromAmqpEnvelope()
     {
-        $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);
+        $amqpEnvelope = self::createMock(\AMQPEnvelope::class);
         $amqpEnvelope->method('getRoutingKey')->willReturn('routingkey');
         $amqpEnvelope->method('getDeliveryMode')->willReturn(2);
         $amqpEnvelope->method('getPriority')->willReturn(5);
@@ -46,17 +46,17 @@ class AmqpStampTest extends TestCase
 
         $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope);
 
-        $this->assertSame($amqpEnvelope->getRoutingKey(), $stamp->getRoutingKey());
-        $this->assertSame($amqpEnvelope->getDeliveryMode(), $stamp->getAttributes()['delivery_mode']);
-        $this->assertSame($amqpEnvelope->getPriority(), $stamp->getAttributes()['priority']);
-        $this->assertSame($amqpEnvelope->getAppId(), $stamp->getAttributes()['app_id']);
-        $this->assertSame($amqpEnvelope->getCorrelationId(), $stamp->getAttributes()['correlation_id']);
-        $this->assertSame(\AMQP_NOPARAM, $stamp->getFlags());
+        self::assertSame($amqpEnvelope->getRoutingKey(), $stamp->getRoutingKey());
+        self::assertSame($amqpEnvelope->getDeliveryMode(), $stamp->getAttributes()['delivery_mode']);
+        self::assertSame($amqpEnvelope->getPriority(), $stamp->getAttributes()['priority']);
+        self::assertSame($amqpEnvelope->getAppId(), $stamp->getAttributes()['app_id']);
+        self::assertSame($amqpEnvelope->getCorrelationId(), $stamp->getAttributes()['correlation_id']);
+        self::assertSame(\AMQP_NOPARAM, $stamp->getFlags());
     }
 
     public function testCreateFromAmqpEnvelopeWithPreviousStamp()
     {
-        $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);
+        $amqpEnvelope = self::createMock(\AMQPEnvelope::class);
         $amqpEnvelope->method('getRoutingKey')->willReturn('routingkey');
         $amqpEnvelope->method('getDeliveryMode')->willReturn(2);
         $amqpEnvelope->method('getPriority')->willReturn(5);
@@ -70,11 +70,11 @@ class AmqpStampTest extends TestCase
 
         $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, $previousStamp);
 
-        $this->assertSame('otherroutingkey', $stamp->getRoutingKey());
-        $this->assertSame($amqpEnvelope->getDeliveryMode(), $stamp->getAttributes()['delivery_mode']);
-        $this->assertSame(8, $stamp->getAttributes()['priority']);
-        $this->assertSame($amqpEnvelope->getAppId(), $stamp->getAttributes()['app_id']);
-        $this->assertSame('bar', $stamp->getAttributes()['correlation_id']);
-        $this->assertSame(\AMQP_MANDATORY, $stamp->getFlags());
+        self::assertSame('otherroutingkey', $stamp->getRoutingKey());
+        self::assertSame($amqpEnvelope->getDeliveryMode(), $stamp->getAttributes()['delivery_mode']);
+        self::assertSame(8, $stamp->getAttributes()['priority']);
+        self::assertSame($amqpEnvelope->getAppId(), $stamp->getAttributes()['app_id']);
+        self::assertSame('bar', $stamp->getAttributes()['correlation_id']);
+        self::assertSame(\AMQP_MANDATORY, $stamp->getFlags());
     }
 }

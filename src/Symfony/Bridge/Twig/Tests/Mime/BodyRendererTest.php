@@ -24,7 +24,7 @@ class BodyRendererTest extends TestCase
     public function testRenderTextOnly()
     {
         $email = $this->prepareEmail('Text', null);
-        $this->assertEquals('Text', $email->getBody()->bodyToString());
+        self::assertEquals('Text', $email->getBody()->bodyToString());
     }
 
     public function testRenderHtmlOnly()
@@ -32,9 +32,9 @@ class BodyRendererTest extends TestCase
         $html = '<head>head</head><b>HTML</b><style type="text/css">css</style>';
         $email = $this->prepareEmail(null, $html);
         $body = $email->getBody();
-        $this->assertInstanceOf(AlternativePart::class, $body);
-        $this->assertEquals('HTML', $body->getParts()[0]->bodyToString());
-        $this->assertEquals(str_replace('=', '=3D', $html), $body->getParts()[1]->bodyToString());
+        self::assertInstanceOf(AlternativePart::class, $body);
+        self::assertEquals('HTML', $body->getParts()[0]->bodyToString());
+        self::assertEquals(str_replace('=', '=3D', $html), $body->getParts()[1]->bodyToString());
     }
 
     public function testRenderMultiLineHtmlOnly()
@@ -49,9 +49,9 @@ css
 HTML;
         $email = $this->prepareEmail(null, $html);
         $body = $email->getBody();
-        $this->assertInstanceOf(AlternativePart::class, $body);
-        $this->assertEquals('HTML', str_replace(["\r", "\n"], '', $body->getParts()[0]->bodyToString()));
-        $this->assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
+        self::assertInstanceOf(AlternativePart::class, $body);
+        self::assertEquals('HTML', str_replace(["\r", "\n"], '', $body->getParts()[0]->bodyToString()));
+        self::assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
     }
 
     public function testRenderHtmlOnlyWithTextSet()
@@ -59,23 +59,23 @@ HTML;
         $email = $this->prepareEmail(null, '<b>HTML</b>');
         $email->text('Text');
         $body = $email->getBody();
-        $this->assertInstanceOf(AlternativePart::class, $body);
-        $this->assertEquals('Text', $body->getParts()[0]->bodyToString());
-        $this->assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
+        self::assertInstanceOf(AlternativePart::class, $body);
+        self::assertEquals('Text', $body->getParts()[0]->bodyToString());
+        self::assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
     }
 
     public function testRenderTextAndHtml()
     {
         $email = $this->prepareEmail('Text', '<b>HTML</b>');
         $body = $email->getBody();
-        $this->assertInstanceOf(AlternativePart::class, $body);
-        $this->assertEquals('Text', $body->getParts()[0]->bodyToString());
-        $this->assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
+        self::assertInstanceOf(AlternativePart::class, $body);
+        self::assertEquals('Text', $body->getParts()[0]->bodyToString());
+        self::assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
     }
 
     public function testRenderWithContextReservedEmailEntry()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $this->prepareEmail('Text', '', ['email' => 'reserved!']);
     }
 
@@ -92,12 +92,12 @@ HTML;
         $email->textTemplate('text');
 
         $renderer->render($email);
-        $this->assertEquals('Text', $email->getTextBody());
+        self::assertEquals('Text', $email->getTextBody());
 
         $email->text('reset');
 
         $renderer->render($email);
-        $this->assertEquals('reset', $email->getTextBody());
+        self::assertEquals('reset', $email->getTextBody());
     }
 
     public function testRenderedOnceUnserializableContext()
@@ -118,7 +118,7 @@ HTML;
         ]);
 
         $renderer->render($email);
-        $this->assertEquals('Text', $email->getTextBody());
+        self::assertEquals('Text', $email->getTextBody());
     }
 
     private function prepareEmail(?string $text, ?string $html, array $context = []): TemplatedEmail

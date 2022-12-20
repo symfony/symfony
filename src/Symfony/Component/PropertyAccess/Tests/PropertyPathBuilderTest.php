@@ -36,12 +36,12 @@ class PropertyPathBuilderTest extends TestCase
     {
         $builder = new PropertyPathBuilder();
 
-        $this->assertNull($builder->getPropertyPath());
+        self::assertNull($builder->getPropertyPath());
     }
 
     public function testCreateCopyPath()
     {
-        $this->assertEquals(new PropertyPath(self::PREFIX), $this->builder->getPropertyPath());
+        self::assertEquals(new PropertyPath(self::PREFIX), $this->builder->getPropertyPath());
     }
 
     public function testAppendIndex()
@@ -50,7 +50,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath(self::PREFIX.'[new1]');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testAppendProperty()
@@ -59,7 +59,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath(self::PREFIX.'.new1');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testAppend()
@@ -68,7 +68,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath(self::PREFIX.'.new1[new2]');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testAppendUsingString()
@@ -77,7 +77,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath(self::PREFIX.'.new1[new2]');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testAppendWithOffset()
@@ -86,7 +86,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath(self::PREFIX.'[new2].new3');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testAppendWithOffsetAndLength()
@@ -95,7 +95,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath(self::PREFIX.'[new2]');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceByIndex()
@@ -104,7 +104,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1[new1].old3[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceByIndexWithoutName()
@@ -113,18 +113,18 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('[old1][old2].old3[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceByIndexDoesNotAllowInvalidOffsets()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $this->builder->replaceByIndex(6, 'new1');
     }
 
     public function testReplaceByIndexDoesNotAllowNegativeOffsets()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $this->builder->replaceByIndex(-1, 'new1');
     }
 
@@ -134,7 +134,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1.new1.old3[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceByPropertyWithoutName()
@@ -143,18 +143,18 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1.old2.old3[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceByPropertyDoesNotAllowInvalidOffsets()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $this->builder->replaceByProperty(6, 'new1');
     }
 
     public function testReplaceByPropertyDoesNotAllowNegativeOffsets()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $this->builder->replaceByProperty(-1, 'new1');
     }
 
@@ -164,7 +164,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1.new1[new2].new3.old3[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceUsingString()
@@ -173,7 +173,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1.new1[new2].new3.old3[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceNegative()
@@ -182,7 +182,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1[old2].old3[old4][old5].new1[new2].new3');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     /**
@@ -190,7 +190,7 @@ class PropertyPathBuilderTest extends TestCase
      */
     public function testReplaceDoesNotAllowInvalidOffsets($offset)
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $this->builder->replace($offset, 1, new PropertyPath('new1[new2].new3'));
     }
 
@@ -208,7 +208,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('new1[new2].new3.old3[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceSubstring()
@@ -217,7 +217,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1[new2].new3.new4.old3[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testReplaceSubstringWithLengthGreaterOne()
@@ -226,7 +226,7 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1[new2].new3.new4[old4][old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     // https://github.com/symfony/symfony/issues/5605
@@ -239,7 +239,7 @@ class PropertyPathBuilderTest extends TestCase
         $builder = new PropertyPathBuilder(new PropertyPath('old1'));
         $builder->replace(0, 1, $path);
 
-        $this->assertEquals($path, $builder->getPropertyPath());
+        self::assertEquals($path, $builder->getPropertyPath());
     }
 
     public function testReplaceWithLongerPathKeepsOrder()
@@ -250,7 +250,7 @@ class PropertyPathBuilderTest extends TestCase
         $builder = new PropertyPathBuilder(new PropertyPath('old1.old2'));
         $builder->replace(0, 1, $path);
 
-        $this->assertEquals($expected, $builder->getPropertyPath());
+        self::assertEquals($expected, $builder->getPropertyPath());
     }
 
     public function testRemove()
@@ -259,18 +259,18 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1[old2].old3[old5].old6');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 
     public function testRemoveDoesNotAllowInvalidOffsets()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $this->builder->remove(6);
     }
 
     public function testRemoveDoesNotAllowNegativeOffsets()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $this->builder->remove(-1);
     }
 
@@ -280,18 +280,18 @@ class PropertyPathBuilderTest extends TestCase
 
         $path = new PropertyPath('old1[old2].old3[old4][old5]');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
 
         $this->builder->appendProperty('old7');
 
         $path = new PropertyPath('old1[old2].old3[old4][old5].old7');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
 
         $this->builder->remove($this->builder->getLength() - 1);
 
         $path = new PropertyPath('old1[old2].old3[old4][old5]');
 
-        $this->assertEquals($path, $this->builder->getPropertyPath());
+        self::assertEquals($path, $this->builder->getPropertyPath());
     }
 }

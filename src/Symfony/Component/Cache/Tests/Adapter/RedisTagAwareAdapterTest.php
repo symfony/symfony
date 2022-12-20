@@ -34,7 +34,7 @@ class RedisTagAwareAdapterTest extends RedisAdapterTest
             self::$redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);
         }
 
-        $this->assertInstanceOf(RedisProxy::class, self::$redis);
+        self::assertInstanceOf(RedisProxy::class, self::$redis);
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 
         return $adapter;

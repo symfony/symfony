@@ -31,9 +31,9 @@ class RouterTest extends TestCase
 {
     public function testConstructThrowsOnNonSymfonyNorPsr11Container()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('You should either pass a "Symfony\Component\DependencyInjection\ContainerInterface" instance or provide the $parameters argument of the "Symfony\Bundle\FrameworkBundle\Routing\Router::__construct" method');
-        new Router($this->createMock(ContainerInterface::class), 'foo');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('You should either pass a "Symfony\Component\DependencyInjection\ContainerInterface" instance or provide the $parameters argument of the "Symfony\Bundle\FrameworkBundle\Routing\Router::__construct" method');
+        new Router(self::createMock(ContainerInterface::class), 'foo');
     }
 
     public function testGenerateWithServiceParam()
@@ -58,9 +58,9 @@ class RouterTest extends TestCase
 
         $router = new Router($sc, 'foo', [], null, $parameters);
 
-        $this->assertSame('/en', $router->generate('foo', ['_locale' => 'en']));
-        $this->assertSame('/', $router->generate('foo', ['_locale' => 'es']));
-        $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
+        self::assertSame('/en', $router->generate('foo', ['_locale' => 'en']));
+        self::assertSame('/', $router->generate('foo', ['_locale' => 'es']));
+        self::assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
     public function testGenerateWithServiceParamWithSfContainer()
@@ -83,9 +83,9 @@ class RouterTest extends TestCase
 
         $router = new Router($sc, 'foo');
 
-        $this->assertSame('/en', $router->generate('foo', ['_locale' => 'en']));
-        $this->assertSame('/', $router->generate('foo', ['_locale' => 'es']));
-        $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
+        self::assertSame('/en', $router->generate('foo', ['_locale' => 'en']));
+        self::assertSame('/', $router->generate('foo', ['_locale' => 'es']));
+        self::assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
     public function testGenerateWithDefaultLocale()
@@ -108,10 +108,10 @@ class RouterTest extends TestCase
 
         $router = new Router($sc, '', [], null, null, null, 'hr');
 
-        $this->assertSame('/test-hr', $router->generate($name));
+        self::assertSame('/test-hr', $router->generate($name));
 
-        $this->assertSame('/test-en', $router->generate($name, ['_locale' => 'en']));
-        $this->assertSame('/test-hr', $router->generate($name, ['_locale' => 'hr']));
+        self::assertSame('/test-en', $router->generate($name, ['_locale' => 'en']));
+        self::assertSame('/test-hr', $router->generate($name, ['_locale' => 'hr']));
     }
 
     public function testDefaultsPlaceholders()
@@ -143,16 +143,13 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            [
-                'foo' => 'before_foo',
-                'bar' => 'bar_after',
-                'baz' => '%escaped%',
-                'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
-                'bee' => ['bee', 'bee'],
-            ],
-            $route->getDefaults()
-        );
+        self::assertEquals([
+            'foo' => 'before_foo',
+            'bar' => 'bar_after',
+            'baz' => '%escaped%',
+            'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
+            'bee' => ['bee', 'bee'],
+        ], $route->getDefaults());
     }
 
     public function testDefaultsPlaceholdersWithSfContainer()
@@ -182,16 +179,13 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            [
-                'foo' => 'before_foo',
-                'bar' => 'bar_after',
-                'baz' => '%escaped%',
-                'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
-                'bee' => ['bee', 'bee'],
-            ],
-            $route->getDefaults()
-        );
+        self::assertEquals([
+            'foo' => 'before_foo',
+            'bar' => 'bar_after',
+            'baz' => '%escaped%',
+            'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
+            'bee' => ['bee', 'bee'],
+        ], $route->getDefaults());
     }
 
     public function testRequirementsPlaceholders()
@@ -219,14 +213,11 @@ class RouterTest extends TestCase
 
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            [
-                'foo' => 'before_foo',
-                'bar' => 'bar_after',
-                'baz' => '%escaped%',
-            ],
-            $route->getRequirements()
-        );
+        self::assertEquals([
+            'foo' => 'before_foo',
+            'bar' => 'bar_after',
+            'baz' => '%escaped%',
+        ], $route->getRequirements());
     }
 
     public function testRequirementsPlaceholdersWithSfContainer()
@@ -251,14 +242,11 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            [
-                'foo' => 'before_foo',
-                'bar' => 'bar_after',
-                'baz' => '%escaped%',
-            ],
-            $route->getRequirements()
-        );
+        self::assertEquals([
+            'foo' => 'before_foo',
+            'bar' => 'bar_after',
+            'baz' => '%escaped%',
+        ], $route->getRequirements());
     }
 
     public function testPatternPlaceholders()
@@ -273,10 +261,7 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            '/before/foo/after/%escaped%',
-            $route->getPath()
-        );
+        self::assertEquals('/before/foo/after/%escaped%', $route->getPath());
     }
 
     public function testPatternPlaceholdersWithSfContainer()
@@ -291,16 +276,13 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            '/before/foo-%escaped%/after/%escaped%',
-            $route->getPath()
-        );
+        self::assertEquals('/before/foo-%escaped%/after/%escaped%', $route->getPath());
     }
 
     public function testEnvPlaceholders()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%env(FOO)%'));
@@ -311,8 +293,8 @@ class RouterTest extends TestCase
 
     public function testEnvPlaceholdersWithSfContainer()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%env(FOO)%'));
@@ -331,8 +313,8 @@ class RouterTest extends TestCase
         $container->setParameter('foo', 'foo-%bar%');
         $container->setParameter('bar', '%env(string:FOO)%');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Using "%env(string:FOO)%" is not allowed in routing configuration.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Using "%env(string:FOO)%" is not allowed in routing configuration.');
 
         $router->getRouteCollection();
     }
@@ -352,10 +334,7 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            '/before/foo/after/%escaped%',
-            $route->getHost()
-        );
+        self::assertEquals('/before/foo/after/%escaped%', $route->getHost());
     }
 
     public function testHostPlaceholdersWithSfContainer()
@@ -373,16 +352,13 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            '/before/foo/after/%escaped%',
-            $route->getHost()
-        );
+        self::assertEquals('/before/foo/after/%escaped%', $route->getHost());
     }
 
     public function testExceptionOnNonExistentParameterWithSfContainer()
     {
-        $this->expectException(ParameterNotFoundException::class);
-        $this->expectExceptionMessage('You have requested a non-existent parameter "nope".');
+        self::expectException(ParameterNotFoundException::class);
+        self::expectExceptionMessage('You have requested a non-existent parameter "nope".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%nope%'));
@@ -395,8 +371,8 @@ class RouterTest extends TestCase
 
     public function testExceptionOnNonStringParameter()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));
@@ -416,17 +392,17 @@ class RouterTest extends TestCase
 
         $sc = $this->getServiceContainer($routes);
 
-        $pc = $this->createMock(ContainerInterface::class);
+        $pc = self::createMock(ContainerInterface::class);
         $pc
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('get')
             ->willReturn(new \stdClass())
         ;
 
         $router = new Router($sc, 'foo', [], null, $pc);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type "stdClass".');
 
         $router->getRouteCollection()->get('foo');
     }
@@ -445,7 +421,7 @@ class RouterTest extends TestCase
 
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertSame($value, $route->getDefault('foo'));
+        self::assertSame($value, $route->getDefault('foo'));
     }
 
     /**
@@ -462,7 +438,7 @@ class RouterTest extends TestCase
 
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertSame($value, $route->getDefault('foo'));
+        self::assertSame($value, $route->getDefault('foo'));
     }
 
     public function testGetRouteCollectionAddsContainerParametersResource()
@@ -490,7 +466,7 @@ class RouterTest extends TestCase
 
         $routeCollection = $router->getRouteCollection();
 
-        $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
+        self::assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
     }
 
     public function testBooleanContainerParametersWithinRouteCondition()
@@ -508,7 +484,7 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertSame('1 or 0', $route->getCondition());
+        self::assertSame('1 or 0', $route->getCondition());
     }
 
     public function getNonStringValues()
@@ -544,7 +520,7 @@ class RouterTest extends TestCase
 
             $cache = new ResourceCheckerConfigCache($cacheDir.\DIRECTORY_SEPARATOR.'url_matching_routes.php', $resourceCheckers);
 
-            $this->assertTrue($cache->isFresh());
+            self::assertTrue($cache->isFresh());
         } finally {
             if (is_dir($cacheDir)) {
                 array_map('unlink', glob($cacheDir.\DIRECTORY_SEPARATOR.'*'));
@@ -569,7 +545,7 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(['http', 'https'], $route->getSchemes());
+        self::assertEquals(['http', 'https'], $route->getSchemes());
     }
 
     public function testResolvingMethods()
@@ -588,7 +564,7 @@ class RouterTest extends TestCase
         $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(['GET', 'POST'], $route->getMethods());
+        self::assertEquals(['GET', 'POST'], $route->getMethods());
     }
 
     public function getContainerParameterForRoute()
@@ -601,18 +577,18 @@ class RouterTest extends TestCase
 
     private function getServiceContainer(RouteCollection $routes): Container
     {
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
 
         $loader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('load')
             ->willReturn($routes)
         ;
 
-        $sc = $this->getMockBuilder(Container::class)->setMethods(['get'])->getMock();
+        $sc = self::getMockBuilder(Container::class)->setMethods(['get'])->getMock();
 
         $sc
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('get')
             ->willReturn($loader)
         ;
@@ -622,18 +598,18 @@ class RouterTest extends TestCase
 
     private function getPsr11ServiceContainer(RouteCollection $routes): ContainerInterface
     {
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
 
         $loader
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('load')
             ->willReturn($routes)
         ;
 
-        $sc = $this->createMock(ContainerInterface::class);
+        $sc = self::createMock(ContainerInterface::class);
 
         $sc
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('get')
             ->willReturn($loader)
         ;
@@ -643,9 +619,9 @@ class RouterTest extends TestCase
 
     private function getParameterBag(array $params = []): ContainerInterface
     {
-        $bag = $this->createMock(ContainerInterface::class);
+        $bag = self::createMock(ContainerInterface::class);
         $bag
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('get')
             ->willReturnCallback(function ($key) use ($params) {
                 return $params[$key] ?? null;

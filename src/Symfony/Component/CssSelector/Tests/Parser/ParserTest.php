@@ -25,7 +25,7 @@ class ParserTest extends TestCase
     {
         $parser = new Parser();
 
-        $this->assertEquals($representation, array_map(function (SelectorNode $node) {
+        self::assertEquals($representation, array_map(function (SelectorNode $node) {
             return (string) $node->getTree();
         }, $parser->parse($source)));
     }
@@ -37,9 +37,9 @@ class ParserTest extends TestCase
 
         try {
             $parser->parse($source);
-            $this->fail('Parser should throw a SyntaxErrorException.');
+            self::fail('Parser should throw a SyntaxErrorException.');
         } catch (SyntaxErrorException $e) {
-            $this->assertEquals($message, $e->getMessage());
+            self::assertEquals($message, $e->getMessage());
         }
     }
 
@@ -48,12 +48,12 @@ class ParserTest extends TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
-        $this->assertCount(1, $selectors);
+        self::assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
-        $this->assertEquals($element, (string) $selector->getTree());
-        $this->assertEquals($pseudo, (string) $selector->getPseudoElement());
+        self::assertEquals($element, (string) $selector->getTree());
+        self::assertEquals($pseudo, (string) $selector->getPseudoElement());
     }
 
     /** @dataProvider getSpecificityTestData */
@@ -61,11 +61,11 @@ class ParserTest extends TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
-        $this->assertCount(1, $selectors);
+        self::assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
-        $this->assertEquals($value, $selector->getSpecificity()->getValue());
+        self::assertEquals($value, $selector->getSpecificity()->getValue());
     }
 
     /** @dataProvider getParseSeriesTestData */
@@ -73,11 +73,11 @@ class ParserTest extends TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
-        $this->assertCount(1, $selectors);
+        self::assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
-        $this->assertEquals([$a, $b], Parser::parseSeries($function->getArguments()));
+        self::assertEquals([$a, $b], Parser::parseSeries($function->getArguments()));
     }
 
     /** @dataProvider getParseSeriesExceptionTestData */
@@ -85,11 +85,11 @@ class ParserTest extends TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
-        $this->assertCount(1, $selectors);
+        self::assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
-        $this->expectException(SyntaxErrorException::class);
+        self::expectException(SyntaxErrorException::class);
         Parser::parseSeries($function->getArguments());
     }
 

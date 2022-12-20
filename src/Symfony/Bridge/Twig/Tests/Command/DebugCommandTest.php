@@ -28,8 +28,8 @@ class DebugCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute([], ['decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('Functions', trim($tester->getDisplay()));
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('Functions', trim($tester->getDisplay()));
     }
 
     public function testFilterAndJsonFormatOptions()
@@ -41,8 +41,8 @@ class DebugCommandTest extends TestCase
             'filters' => ['abs' => []],
         ];
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertEquals($expected, json_decode($tester->getDisplay(true), true));
     }
 
     public function testWarningsWrongBundleOverriding()
@@ -61,14 +61,14 @@ class DebugCommandTest extends TestCase
             'Path "templates/bundles/WebProfileBundle" not matching any bundle found, did you mean "WebProfilerBundle"?',
         ]];
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertEquals($expected, json_decode($tester->getDisplay(true), true));
     }
 
     public function testMalformedTemplateName()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Malformed namespaced template name "@foo" (expecting "@namespace/template_name").');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Malformed namespaced template name "@foo" (expecting "@namespace/template_name").');
         $this->createCommandTester()->execute(['name' => '@foo']);
     }
 
@@ -80,8 +80,8 @@ class DebugCommandTest extends TestCase
         $tester = $this->createCommandTester($paths);
         $ret = $tester->execute($input, ['decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringMatchesFormat($output, $tester->getDisplay(true));
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertStringMatchesFormat($output, $tester->getDisplay(true));
     }
 
     public function getDebugTemplateNameTestData()
@@ -259,8 +259,8 @@ TXT
         $tester = $this->createCommandTester(['templates/' => null], [], null, true);
         $ret = $tester->execute(['name' => 'base.html.twig'], ['decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
     public function testWithGlobals()
@@ -269,7 +269,7 @@ TXT
         $tester = $this->createCommandTester([], [], null, false, ['message' => $message]);
         $tester->execute([], ['decorated' => true]);
         $display = $tester->getDisplay();
-        $this->assertStringContainsString(json_encode($message), $display);
+        self::assertStringContainsString(json_encode($message), $display);
     }
 
     public function testWithGlobalsJson()
@@ -279,7 +279,7 @@ TXT
         $tester->execute(['--format' => 'json'], ['decorated' => true]);
         $display = $tester->getDisplay();
         $display = json_decode($display, true);
-        $this->assertSame($globals, $display['globals']);
+        self::assertSame($globals, $display['globals']);
     }
 
     public function testWithFilter()
@@ -291,7 +291,7 @@ TXT
         $tester->execute(['--filter' => 'date', '--format' => 'json'], ['decorated' => false]);
         $display = $tester->getDisplay();
         $display2 = json_decode($display, true);
-        $this->assertNotSame($display1, $display2);
+        self::assertNotSame($display1, $display2);
     }
 
     /**
@@ -300,7 +300,7 @@ TXT
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
@@ -312,7 +312,7 @@ TXT
 
         $tester = new CommandCompletionTester($application->find('debug:twig'));
         $suggestions = $tester->complete($input, 2);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions(): iterable

@@ -34,7 +34,7 @@ class ProfilerPassTest extends TestCase
      */
     public function testTemplateNoIdThrowsException()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $builder->register('profiler', 'ProfilerClass');
         $builder->register('my_collector_service')
@@ -54,12 +54,12 @@ class ProfilerPassTest extends TestCase
         $profilerPass = new ProfilerPass();
         $profilerPass->process($container);
 
-        $this->assertSame(['my_collector_service' => ['my_collector', 'foo']], $container->getParameter('data_collector.templates'));
+        self::assertSame(['my_collector_service' => ['my_collector', 'foo']], $container->getParameter('data_collector.templates'));
 
         // grab the method calls off of the "profiler" definition
         $methodCalls = $profilerDefinition->getMethodCalls();
-        $this->assertCount(1, $methodCalls);
-        $this->assertEquals('add', $methodCalls[0][0]); // grab the method part of the first call
+        self::assertCount(1, $methodCalls);
+        self::assertEquals('add', $methodCalls[0][0]); // grab the method part of the first call
     }
 
     public function provideValidCollectorWithTemplateUsingAutoconfigure(): \Generator
@@ -111,14 +111,14 @@ class ProfilerPassTest extends TestCase
         (new ProfilerPass())->process($container);
 
         $idForTemplate = \get_class($dataCollector);
-        $this->assertSame(['mydatacollector' => [$idForTemplate, 'foo']], $container->getParameter('data_collector.templates'));
+        self::assertSame(['mydatacollector' => [$idForTemplate, 'foo']], $container->getParameter('data_collector.templates'));
 
         // grab the method calls off of the "profiler" definition
         $methodCalls = $profilerDefinition->getMethodCalls();
-        $this->assertCount(1, $methodCalls);
-        $this->assertEquals('add', $methodCalls[0][0]); // grab the method part of the first call
+        self::assertCount(1, $methodCalls);
+        self::assertEquals('add', $methodCalls[0][0]); // grab the method part of the first call
 
         (new ResolveChildDefinitionsPass())->process($container);
-        $this->assertSame($idForTemplate, $container->get('mydatacollector')->getName());
+        self::assertSame($idForTemplate, $container->get('mydatacollector')->getName());
     }
 }

@@ -47,17 +47,17 @@ class FirewallConfigTest extends TestCase
             $options['switch_user']
         );
 
-        $this->assertSame('foo_firewall', $config->getName());
-        $this->assertSame($options['request_matcher'], $config->getRequestMatcher());
-        $this->assertSame($options['security'], $config->isSecurityEnabled());
-        $this->assertSame($options['stateless'], $config->isStateless());
-        $this->assertSame($options['provider'], $config->getProvider());
-        $this->assertSame($options['context'], $config->getContext());
-        $this->assertSame($options['entry_point'], $config->getEntryPoint());
-        $this->assertSame($options['access_denied_handler'], $config->getAccessDeniedHandler());
-        $this->assertSame($options['access_denied_url'], $config->getAccessDeniedUrl());
-        $this->assertSame($options['user_checker'], $config->getUserChecker());
-        $this->assertSame($authenticators, $config->getAuthenticators());
-        $this->assertSame($options['switch_user'], $config->getSwitchUser());
+        self::assertSame('foo_firewall', $config->getName());
+        self::assertSame($options['request_matcher'], $config->getRequestMatcher());
+        self::assertSame($options['security'], $config->isSecurityEnabled());
+        self::assertSame($options['stateless'], $config->isStateless());
+        self::assertSame($options['provider'], $config->getProvider());
+        self::assertSame($options['context'], $config->getContext());
+        self::assertSame($options['entry_point'], $config->getEntryPoint());
+        self::assertSame($options['access_denied_handler'], $config->getAccessDeniedHandler());
+        self::assertSame($options['access_denied_url'], $config->getAccessDeniedUrl());
+        self::assertSame($options['user_checker'], $config->getUserChecker());
+        self::assertSame($authenticators, $config->getAuthenticators());
+        self::assertSame($options['switch_user'], $config->getSwitchUser());
     }
 }

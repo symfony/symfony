@@ -26,14 +26,11 @@ class SetupTransportsCommandTest extends TestCase
     {
         // mock a service locator
         /** @var MockObject&ServiceLocator $serviceLocator */
-        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator = self::createMock(ServiceLocator::class);
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
-        $serviceLocator->expects($this->exactly(2))
+        $serviceLocator->expects(self::exactly(2))
             ->method('get')
-            ->will($this->onConsecutiveCalls(
-                $this->createMock(SetupableTransportInterface::class),
-                $this->createMock(TransportInterface::class)
-            ));
+            ->will(self::onConsecutiveCalls(self::createMock(SetupableTransportInterface::class), self::createMock(TransportInterface::class)));
         $serviceLocator
             ->method('has')
             ->willReturn(true);
@@ -43,22 +40,20 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute([]);
         $display = $tester->getDisplay();
 
-        $this->assertStringContainsString('The "amqp" transport was set up successfully.', $display);
-        $this->assertStringContainsString('The "other_transport" transport does not support setup.', $display);
+        self::assertStringContainsString('The "amqp" transport was set up successfully.', $display);
+        self::assertStringContainsString('The "other_transport" transport does not support setup.', $display);
     }
 
     public function testReceiverNameArgument()
     {
         // mock a service locator
         /** @var MockObject&ServiceLocator $serviceLocator */
-        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator = self::createMock(ServiceLocator::class);
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
-        $serviceLocator->expects($this->exactly(1))
+        $serviceLocator->expects(self::exactly(1))
             ->method('get')
-            ->will($this->onConsecutiveCalls(
-                $this->createMock(SetupableTransportInterface::class)
-            ));
-        $serviceLocator->expects($this->exactly(1))
+            ->will(self::onConsecutiveCalls(self::createMock(SetupableTransportInterface::class)));
+        $serviceLocator->expects(self::exactly(1))
             ->method('has')
             ->willReturn(true);
 
@@ -67,20 +62,20 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute(['transport' => 'amqp']);
         $display = $tester->getDisplay();
 
-        $this->assertStringContainsString('The "amqp" transport was set up successfully.', $display);
+        self::assertStringContainsString('The "amqp" transport was set up successfully.', $display);
     }
 
     public function testReceiverNameArgumentNotFound()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('The "not_found" transport does not exist.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('The "not_found" transport does not exist.');
         // mock a service locator
         /** @var MockObject&ServiceLocator $serviceLocator */
-        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator = self::createMock(ServiceLocator::class);
         // get method must be call twice and will return consecutively a setup-able transport and a non setup-able transport
-        $serviceLocator->expects($this->exactly(0))
+        $serviceLocator->expects(self::exactly(0))
             ->method('get');
-        $serviceLocator->expects($this->exactly(1))
+        $serviceLocator->expects(self::exactly(1))
             ->method('has')
             ->willReturn(false);
 
@@ -94,11 +89,11 @@ class SetupTransportsCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator = self::createMock(ServiceLocator::class);
         $command = new SetupTransportsCommand($serviceLocator, ['amqp', 'other_transport']);
         $tester = new CommandCompletionTester($command);
         $suggestions = $tester->complete($input);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()

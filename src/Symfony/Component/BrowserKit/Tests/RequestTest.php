@@ -19,37 +19,37 @@ class RequestTest extends TestCase
     public function testGetUri()
     {
         $request = new Request('http://www.example.com/', 'get');
-        $this->assertEquals('http://www.example.com/', $request->getUri(), '->getUri() returns the URI of the request');
+        self::assertEquals('http://www.example.com/', $request->getUri(), '->getUri() returns the URI of the request');
     }
 
     public function testGetMethod()
     {
         $request = new Request('http://www.example.com/', 'get');
-        $this->assertEquals('get', $request->getMethod(), '->getMethod() returns the method of the request');
+        self::assertEquals('get', $request->getMethod(), '->getMethod() returns the method of the request');
     }
 
     public function testGetParameters()
     {
         $request = new Request('http://www.example.com/', 'get', ['foo' => 'bar']);
-        $this->assertEquals(['foo' => 'bar'], $request->getParameters(), '->getParameters() returns the parameters of the request');
+        self::assertEquals(['foo' => 'bar'], $request->getParameters(), '->getParameters() returns the parameters of the request');
     }
 
     public function testGetFiles()
     {
         $request = new Request('http://www.example.com/', 'get', [], ['foo' => 'bar']);
-        $this->assertEquals(['foo' => 'bar'], $request->getFiles(), '->getFiles() returns the uploaded files of the request');
+        self::assertEquals(['foo' => 'bar'], $request->getFiles(), '->getFiles() returns the uploaded files of the request');
     }
 
     public function testGetCookies()
     {
         $request = new Request('http://www.example.com/', 'get', [], [], ['foo' => 'bar']);
-        $this->assertEquals(['foo' => 'bar'], $request->getCookies(), '->getCookies() returns the cookies of the request');
+        self::assertEquals(['foo' => 'bar'], $request->getCookies(), '->getCookies() returns the cookies of the request');
     }
 
     public function testGetServer()
     {
         $request = new Request('http://www.example.com/', 'get', [], [], [], ['foo' => 'bar']);
-        $this->assertEquals(['foo' => 'bar'], $request->getServer(), '->getServer() returns the server parameters of the request');
+        self::assertEquals(['foo' => 'bar'], $request->getServer(), '->getServer() returns the server parameters of the request');
     }
 
     public function testAllParameterValuesAreConvertedToString()
@@ -69,6 +69,6 @@ class RequestTest extends TestCase
         ];
 
         $request = new Request('http://www.example.com/', 'get', $parameters);
-        $this->assertSame($expected, $request->getParameters());
+        self::assertSame($expected, $request->getParameters());
     }
 }

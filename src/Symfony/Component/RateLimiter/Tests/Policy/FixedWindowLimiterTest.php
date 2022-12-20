@@ -46,11 +46,11 @@ class FixedWindowLimiterTest extends TestCase
         }
 
         $rateLimit = $limiter->consume();
-        $this->assertSame(10, $rateLimit->getLimit());
-        $this->assertTrue($rateLimit->isAccepted());
+        self::assertSame(10, $rateLimit->getLimit());
+        self::assertTrue($rateLimit->isAccepted());
         $rateLimit = $limiter->consume();
-        $this->assertFalse($rateLimit->isAccepted());
-        $this->assertSame(10, $rateLimit->getLimit());
+        self::assertFalse($rateLimit->isAccepted());
+        self::assertSame(10, $rateLimit->getLimit());
     }
 
     /**
@@ -68,8 +68,8 @@ class FixedWindowLimiterTest extends TestCase
         // ...try bursting again at the start of the next window, 10 seconds later
         sleep(10);
         $rateLimit = $limiter->consume(10);
-        $this->assertEquals(0, $rateLimit->getRemainingTokens());
-        $this->assertTrue($rateLimit->isAccepted());
+        self::assertEquals(0, $rateLimit->getRemainingTokens());
+        self::assertTrue($rateLimit->isAccepted());
     }
 
     public function testWaitIntervalOnConsumeOverLimit()
@@ -83,7 +83,7 @@ class FixedWindowLimiterTest extends TestCase
 
         $start = microtime(true);
         $rateLimit->wait(); // wait 1 minute
-        $this->assertEqualsWithDelta($start + 60, microtime(true), 1);
+        self::assertEqualsWithDelta($start + 60, microtime(true), 1);
     }
 
     public function testWrongWindowFromCache()
@@ -91,8 +91,8 @@ class FixedWindowLimiterTest extends TestCase
         $this->storage->save(new DummyWindow());
         $limiter = $this->createLimiter();
         $rateLimit = $limiter->consume();
-        $this->assertTrue($rateLimit->isAccepted());
-        $this->assertEquals(9, $rateLimit->getRemainingTokens());
+        self::assertTrue($rateLimit->isAccepted());
+        self::assertEquals(9, $rateLimit->getRemainingTokens());
     }
 
     public function testWindowResilientToTimeShifting()
@@ -100,12 +100,12 @@ class FixedWindowLimiterTest extends TestCase
         $serverOneClock = microtime(true) - 1;
         $serverTwoClock = microtime(true) + 1;
         $window = new Window('id', 300, 100, $serverTwoClock);
-        $this->assertSame(100, $window->getAvailableTokens($serverTwoClock));
-        $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
+        self::assertSame(100, $window->getAvailableTokens($serverTwoClock));
+        self::assertSame(100, $window->getAvailableTokens($serverOneClock));
 
         $window = new Window('id', 300, 100, $serverOneClock);
-        $this->assertSame(100, $window->getAvailableTokens($serverTwoClock));
-        $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
+        self::assertSame(100, $window->getAvailableTokens($serverTwoClock));
+        self::assertSame(100, $window->getAvailableTokens($serverOneClock));
     }
 
     public function provideConsumeOutsideInterval(): \Generator

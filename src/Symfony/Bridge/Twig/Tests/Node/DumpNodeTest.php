@@ -25,7 +25,7 @@ class DumpNodeTest extends TestCase
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(self::createMock(LoaderInterface::class));
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -42,14 +42,14 @@ if ($this->env->isDebug()) {
 
 EOTXT;
 
-        $this->assertSame($expected, $compiler->compile($node)->getSource());
+        self::assertSame($expected, $compiler->compile($node)->getSource());
     }
 
     public function testIndented()
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(self::createMock(LoaderInterface::class));
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -66,7 +66,7 @@ EOTXT;
 
 EOTXT;
 
-        $this->assertSame($expected, $compiler->compile($node, 1)->getSource());
+        self::assertSame($expected, $compiler->compile($node, 1)->getSource());
     }
 
     public function testOneVar()
@@ -76,7 +76,7 @@ EOTXT;
         ]);
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(self::createMock(LoaderInterface::class));
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -89,7 +89,7 @@ EOTXT;
 
         $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
 
-        $this->assertSame($expected, $compiler->compile($node)->getSource());
+        self::assertSame($expected, $compiler->compile($node)->getSource());
     }
 
     public function testMultiVars()
@@ -100,7 +100,7 @@ EOTXT;
         ]);
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(self::createMock(LoaderInterface::class));
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -116,6 +116,6 @@ EOTXT;
 
         $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
 
-        $this->assertSame($expected, $compiler->compile($node)->getSource());
+        self::assertSame($expected, $compiler->compile($node)->getSource());
     }
 }

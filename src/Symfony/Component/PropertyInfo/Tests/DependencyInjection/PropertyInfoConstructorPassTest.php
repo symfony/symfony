@@ -37,7 +37,7 @@ class PropertyInfoConstructorPassTest extends TestCase
             new Reference('n2'),
             new Reference('n3'),
         ]);
-        $this->assertEquals($expected, $definition->getArgument(0));
+        self::assertEquals($expected, $definition->getArgument(0));
     }
 
     public function testReturningEmptyArrayWhenNoService()
@@ -49,6 +49,6 @@ class PropertyInfoConstructorPassTest extends TestCase
         $pass = new PropertyInfoConstructorPass();
         $pass->process($container);
 
-        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(0));
+        self::assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(0));
     }
 }

@@ -41,7 +41,7 @@ class AnnotationLoaderTest extends TestCase
         $loader = new AnnotationLoader($reader);
         $metadata = new ClassMetadata(Entity::class);
 
-        $this->assertTrue($loader->loadClassMetadata($metadata));
+        self::assertTrue($loader->loadClassMetadata($metadata));
     }
 
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
@@ -49,7 +49,7 @@ class AnnotationLoaderTest extends TestCase
         $loader = new AnnotationLoader(new AnnotationReader());
         $metadata = new ClassMetadata('\stdClass');
 
-        $this->assertFalse($loader->loadClassMetadata($metadata));
+        self::assertFalse($loader->loadClassMetadata($metadata));
     }
 
     /**
@@ -102,7 +102,7 @@ class AnnotationLoaderTest extends TestCase
         // load reflection class so that the comparison passes
         $expected->getReflectionClass();
 
-        $this->assertEquals($expected, $metadata);
+        self::assertEquals($expected, $metadata);
     }
 
     /**
@@ -122,7 +122,7 @@ class AnnotationLoaderTest extends TestCase
         $expected_parent->addPropertyConstraint('other', new NotNull());
         $expected_parent->getReflectionClass();
 
-        $this->assertEquals($expected_parent, $parent_metadata);
+        self::assertEquals($expected_parent, $parent_metadata);
     }
 
     /**
@@ -191,7 +191,7 @@ class AnnotationLoaderTest extends TestCase
         // load reflection class so that the comparison passes
         $expected->getReflectionClass();
 
-        $this->assertEquals($expected, $metadata);
+        self::assertEquals($expected, $metadata);
     }
 
     /**
@@ -208,7 +208,7 @@ class AnnotationLoaderTest extends TestCase
         $expected->setGroupSequenceProvider(true);
         $expected->getReflectionClass();
 
-        $this->assertEquals($expected, $metadata);
+        self::assertEquals($expected, $metadata);
     }
 
     public function provideNamespaces(): iterable

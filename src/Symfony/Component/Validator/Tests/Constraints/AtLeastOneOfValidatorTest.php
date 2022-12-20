@@ -53,7 +53,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidCombinations($value, $constraints)
     {
-        $this->assertCount(0, Validation::createValidator()->validate($value, new AtLeastOneOf($constraints)));
+        self::assertCount(0, Validation::createValidator()->validate($value, new AtLeastOneOf($constraints)));
     }
 
     public function getValidCombinations()
@@ -108,8 +108,8 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $violations = $validator->validate($value, $atLeastOneOf);
 
-        $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
-        $this->assertEquals(new ConstraintViolation(implode('', $message), implode('', $message), [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
+        self::assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
+        self::assertEquals(new ConstraintViolation(implode('', $message), implode('', $message), [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
     /**
@@ -121,8 +121,8 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $violations = Validation::createValidator()->validate($value, $atLeastOneOf);
 
-        $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
-        $this->assertEquals(new ConstraintViolation('foo', 'foo', [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
+        self::assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
+        self::assertEquals(new ConstraintViolation('foo', 'foo', [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
     public function getInvalidCombinations()
@@ -179,7 +179,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
             'groups' => 'non_default_group',
         ]), 'non_default_group');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function testContextIsPropagatedToNestedConstraints()
@@ -205,7 +205,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $violations = $validator->validate(new ExpressionConstraintNested(), new Valid());
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testEmbeddedMessageTakenFromFailingConstraint()
@@ -232,9 +232,9 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $violations = $validator->validate(new Data(), new Valid());
 
-        $this->assertCount(2, $violations);
-        $this->assertSame('custom message foo', $violations->get(0)->getMessage());
-        $this->assertSame('This value should satisfy at least one of the following constraints: [1] custom message bar', $violations->get(1)->getMessage());
+        self::assertCount(2, $violations);
+        self::assertSame('custom message foo', $violations->get(0)->getMessage());
+        self::assertSame('This value should satisfy at least one of the following constraints: [1] custom message bar', $violations->get(1)->getMessage());
     }
 
     public function testNestedConstraintsAreNotExecutedWhenGroupDoesNotMatch()
@@ -256,7 +256,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
             'groups' => ['adult', 'senior'],
         ]), 'senior');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 }
 

@@ -38,17 +38,17 @@ class RememberMeListenerTest extends TestCase
         [$listener, $tokenStorage] = $this->getListener();
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
-            ->willReturn($this->createMock(TokenInterface::class))
+            ->willReturn(self::createMock(TokenInterface::class))
         ;
 
         $tokenStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('setToken')
         ;
 
-        $this->assertNull($listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST)));
+        self::assertNull($listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST)));
     }
 
     public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
@@ -56,18 +56,18 @@ class RememberMeListenerTest extends TestCase
         [$listener, $tokenStorage, $service] = $this->getListener();
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('autoLogin')
             ->willReturn(null)
         ;
 
-        $this->assertNull($listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST)));
+        self::assertNull($listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST)));
     }
 
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
@@ -77,63 +77,63 @@ class RememberMeListenerTest extends TestCase
         $exception = new AuthenticationException('Authentication failed.');
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('autoLogin')
-            ->willReturn($this->createMock(TokenInterface::class))
+            ->willReturn(self::createMock(TokenInterface::class))
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loginFail')
             ->with($request, $exception)
         ;
 
         $manager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->willThrowException($exception)
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Authentication failed.');
+        self::expectException(AuthenticationException::class);
+        self::expectExceptionMessage('Authentication failed.');
         [$listener, $tokenStorage, $service, $manager] = $this->getListener(false, false);
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('autoLogin')
-            ->willReturn($this->createMock(TokenInterface::class))
+            ->willReturn(self::createMock(TokenInterface::class))
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loginFail')
         ;
 
         $exception = new AuthenticationException('Authentication failed.');
         $manager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->willThrowException($exception)
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testOnCoreSecurityAuthenticationExceptionDuringAutoLoginTriggersLoginFail()
@@ -141,29 +141,29 @@ class RememberMeListenerTest extends TestCase
         [$listener, $tokenStorage, $service, $manager] = $this->getListener();
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
         $exception = new AuthenticationException('Authentication failed.');
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('autoLogin')
             ->willThrowException($exception)
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loginFail')
         ;
 
         $manager
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('authenticate')
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testOnCoreSecurity()
@@ -171,31 +171,31 @@ class RememberMeListenerTest extends TestCase
         [$listener, $tokenStorage, $service, $manager] = $this->getListener();
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('autoLogin')
             ->willReturn($token)
         ;
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with(self::equalTo($token))
         ;
 
         $manager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->willReturn($token)
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testSessionStrategy()
@@ -203,33 +203,33 @@ class RememberMeListenerTest extends TestCase
         [$listener, $tokenStorage, $service, $manager, , , $sessionStrategy] = $this->getListener(false, true, true);
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('autoLogin')
             ->willReturn($token)
         ;
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with(self::equalTo($token))
         ;
 
         $manager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->willReturn($token)
         ;
 
-        $session = $this->createMock(SessionInterface::class);
+        $session = self::createMock(SessionInterface::class);
         $session
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isStarted')
             ->willReturn(true)
         ;
@@ -238,12 +238,12 @@ class RememberMeListenerTest extends TestCase
         $request->setSession($session);
 
         $sessionStrategy
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('onAuthentication')
             ->willReturn(null)
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testSessionIsMigratedByDefault()
@@ -251,45 +251,45 @@ class RememberMeListenerTest extends TestCase
         [$listener, $tokenStorage, $service, $manager] = $this->getListener(false, true, false);
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('autoLogin')
             ->willReturn($token)
         ;
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with(self::equalTo($token))
         ;
 
         $manager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->willReturn($token)
         ;
 
-        $session = $this->createMock(SessionInterface::class);
+        $session = self::createMock(SessionInterface::class);
         $session
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isStarted')
             ->willReturn(true)
         ;
         $session
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('migrate')
         ;
 
         $request = new Request();
         $request->setSession($session);
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent()
@@ -297,40 +297,40 @@ class RememberMeListenerTest extends TestCase
         [$listener, $tokenStorage, $service, $manager, , $dispatcher] = $this->getListener(true);
 
         $tokenStorage
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getToken')
             ->willReturn(null)
         ;
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('autoLogin')
             ->willReturn($token)
         ;
 
         $tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with(self::equalTo($token))
         ;
 
         $manager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->willReturn($token)
         ;
 
         $dispatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('dispatch')
             ->with(
-                $this->isInstanceOf(InteractiveLoginEvent::class),
+                self::isInstanceOf(InteractiveLoginEvent::class),
                 SecurityEvents::INTERACTIVE_LOGIN
             )
         ;
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
+        $listener(new RequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
     }
 
     protected function getListener($withDispatcher = false, $catchExceptions = true, $withSessionStrategy = false)
@@ -350,31 +350,31 @@ class RememberMeListenerTest extends TestCase
 
     protected function getLogger()
     {
-        return $this->createMock(LoggerInterface::class);
+        return self::createMock(LoggerInterface::class);
     }
 
     protected function getManager()
     {
-        return $this->createMock(AuthenticationManagerInterface::class);
+        return self::createMock(AuthenticationManagerInterface::class);
     }
 
     protected function getService()
     {
-        return $this->createMock(RememberMeServicesInterface::class);
+        return self::createMock(RememberMeServicesInterface::class);
     }
 
     protected function getTokenStorage()
     {
-        return $this->createMock(TokenStorageInterface::class);
+        return self::createMock(TokenStorageInterface::class);
     }
 
     protected function getDispatcher()
     {
-        return $this->createMock(EventDispatcherInterface::class);
+        return self::createMock(EventDispatcherInterface::class);
     }
 
     private function getSessionStrategy()
     {
-        return $this->createMock(SessionAuthenticationStrategyInterface::class);
+        return self::createMock(SessionAuthenticationStrategyInterface::class);
     }
 }

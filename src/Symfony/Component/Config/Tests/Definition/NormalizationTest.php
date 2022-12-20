@@ -48,7 +48,7 @@ class NormalizationTest extends TestCase
             ],
         ];
 
-        $this->assertNormalized($tree, $denormalized, $normalized);
+        self::assertNormalized($tree, $denormalized, $normalized);
     }
 
     public function getEncoderTests(): array
@@ -117,7 +117,7 @@ class NormalizationTest extends TestCase
 
         $normalized = ['logout' => ['handlers' => ['a', 'b', 'c']]];
 
-        $this->assertNormalized($tree, $denormalized, $normalized);
+        self::assertNormalized($tree, $denormalized, $normalized);
     }
 
     public function getAnonymousKeysTests(): array
@@ -148,7 +148,7 @@ class NormalizationTest extends TestCase
             'thing' => [42 => ['foo', 'bar'], 1337 => ['baz', 'qux']],
         ];
 
-        $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, $normalized);
+        self::assertNormalized($this->getNumericKeysTestTree(), $denormalized, $normalized);
     }
 
     public function getNumericKeysTests(): array
@@ -172,15 +172,15 @@ class NormalizationTest extends TestCase
 
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
+        self::expectException(InvalidConfigurationException::class);
+        self::expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
         $denormalized = [
             'thing' => [
                 ['foo', 'bar'], ['baz', 'qux'],
             ],
         ];
 
-        $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, []);
+        self::assertNormalized($this->getNumericKeysTestTree(), $denormalized, []);
     }
 
     public function testAssociativeArrayPreserveKeys()
@@ -199,7 +199,7 @@ class NormalizationTest extends TestCase
 
         $data = ['first' => ['foo' => 'bar']];
 
-        $this->assertNormalized($tree, $data, $data);
+        self::assertNormalized($tree, $data, $data);
     }
 
     public function testFloatLikeValueAsMapKeyAttribute()
@@ -216,7 +216,7 @@ class NormalizationTest extends TestCase
             ->buildTree()
         ;
 
-        $this->assertNormalized($tree, [
+        self::assertNormalized($tree, [
             [
                 'number' => 3.0,
                 'foo' => 'bar',

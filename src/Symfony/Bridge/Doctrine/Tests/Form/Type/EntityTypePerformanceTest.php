@@ -33,13 +33,13 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
     protected function getExtensions()
     {
-        $manager = $this->createMock(ManagerRegistry::class);
+        $manager = self::createMock(ManagerRegistry::class);
 
-        $manager->expects($this->any())
+        $manager->expects(self::any())
             ->method('getManager')
             ->willReturn($this->em);
 
-        $manager->expects($this->any())
+        $manager->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($this->em);
 

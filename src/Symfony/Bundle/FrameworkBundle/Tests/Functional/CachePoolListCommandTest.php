@@ -22,7 +22,7 @@ class CachePoolListCommandTest extends AbstractWebTestCase
 {
     protected function setUp(): void
     {
-        static::bootKernel(['test_case' => 'CachePools', 'root_config' => 'config.yml']);
+        self::bootKernel(['test_case' => 'CachePools', 'root_config' => 'config.yml']);
     }
 
     public function testListPools()
@@ -31,8 +31,8 @@ class CachePoolListCommandTest extends AbstractWebTestCase
         $tester->execute([]);
 
         $tester->assertCommandIsSuccessful('cache:pool:list exits with 0 in case of success');
-        $this->assertStringContainsString('cache.app', $tester->getDisplay());
-        $this->assertStringContainsString('cache.system', $tester->getDisplay());
+        self::assertStringContainsString('cache.app', $tester->getDisplay());
+        self::assertStringContainsString('cache.system', $tester->getDisplay());
     }
 
     public function testEmptyList()

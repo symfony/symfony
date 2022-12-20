@@ -22,10 +22,10 @@ class RememberMeTokenTest extends TestCase
         $user = $this->getUser();
         $token = new RememberMeToken($user, 'fookey', 'foo');
 
-        $this->assertEquals('fookey', $token->getFirewallName());
-        $this->assertEquals('foo', $token->getSecret());
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-        $this->assertSame($user, $token->getUser());
+        self::assertEquals('fookey', $token->getFirewallName());
+        self::assertEquals('foo', $token->getSecret());
+        self::assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        self::assertSame($user, $token->getUser());
     }
 
     /**
@@ -35,12 +35,12 @@ class RememberMeTokenTest extends TestCase
     {
         $user = $this->getUser();
         $token = new RememberMeToken($user, 'fookey', 'foo');
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
     }
 
     public function testConstructorSecretCannotBeEmptyString()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new RememberMeToken(
             $this->getUser(),
             '',
@@ -50,9 +50,9 @@ class RememberMeTokenTest extends TestCase
 
     protected function getUser($roles = ['ROLE_FOO'])
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = self::createMock(UserInterface::class);
         $user
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getRoles')
             ->willReturn($roles)
         ;

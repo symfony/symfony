@@ -22,7 +22,7 @@ class EnumNodeDefinitionTest extends TestCase
         $def->values(['foo']);
 
         $node = $def->getNode();
-        $this->assertEquals(['foo'], $node->getValues());
+        self::assertEquals(['foo'], $node->getValues());
     }
 
     public function testWithOneDistinctValue()
@@ -31,21 +31,21 @@ class EnumNodeDefinitionTest extends TestCase
         $def->values(['foo', 'foo']);
 
         $node = $def->getNode();
-        $this->assertEquals(['foo'], $node->getValues());
+        self::assertEquals(['foo'], $node->getValues());
     }
 
     public function testNoValuesPassed()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('You must call ->values() on enum nodes.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('You must call ->values() on enum nodes.');
         $def = new EnumNodeDefinition('foo');
         $def->getNode();
     }
 
     public function testWithNoValues()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('->values() must be called with at least one value.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('->values() must be called with at least one value.');
         $def = new EnumNodeDefinition('foo');
         $def->values([]);
     }
@@ -56,7 +56,7 @@ class EnumNodeDefinitionTest extends TestCase
         $def->values(['foo', 'bar']);
 
         $node = $def->getNode();
-        $this->assertEquals(['foo', 'bar'], $node->getValues());
+        self::assertEquals(['foo', 'bar'], $node->getValues());
     }
 
     public function testSetDeprecated()
@@ -67,10 +67,10 @@ class EnumNodeDefinitionTest extends TestCase
 
         $node = $def->getNode();
 
-        $this->assertTrue($node->isDeprecated());
+        self::assertTrue($node->isDeprecated());
         $deprecation = $def->getNode()->getDeprecation($node->getName(), $node->getPath());
-        $this->assertSame('The "foo" node is deprecated.', $deprecation['message']);
-        $this->assertSame('vendor/package', $deprecation['package']);
-        $this->assertSame('1.1', $deprecation['version']);
+        self::assertSame('The "foo" node is deprecated.', $deprecation['message']);
+        self::assertSame('vendor/package', $deprecation['package']);
+        self::assertSame('1.1', $deprecation['version']);
     }
 }

@@ -31,7 +31,7 @@ class SendinblueApiTransportTest extends TestCase
      */
     public function testToString(SendinblueApiTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -72,26 +72,26 @@ class SendinblueApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('X-Mailin-Custom', $payload['headers']);
-        $this->assertEquals($json, $payload['headers']['X-Mailin-Custom']);
+        self::assertArrayHasKey('X-Mailin-Custom', $payload['headers']);
+        self::assertEquals($json, $payload['headers']['X-Mailin-Custom']);
 
-        $this->assertArrayHasKey('tags', $payload);
-        $this->assertEquals('TagInHeaders', current($payload['tags']));
-        $this->assertArrayHasKey('templateId', $payload);
-        $this->assertEquals(1, $payload['templateId']);
-        $this->assertArrayHasKey('params', $payload);
-        $this->assertEquals('foo', $payload['params']['param1']);
-        $this->assertEquals('bar', $payload['params']['param2']);
-        $this->assertArrayHasKey('foo', $payload['headers']);
-        $this->assertEquals('bar', $payload['headers']['foo']);
+        self::assertArrayHasKey('tags', $payload);
+        self::assertEquals('TagInHeaders', current($payload['tags']));
+        self::assertArrayHasKey('templateId', $payload);
+        self::assertEquals(1, $payload['templateId']);
+        self::assertArrayHasKey('params', $payload);
+        self::assertEquals('foo', $payload['params']['param1']);
+        self::assertEquals('bar', $payload['params']['param2']);
+        self::assertArrayHasKey('foo', $payload['headers']);
+        self::assertEquals('bar', $payload['headers']['foo']);
     }
 
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
-            $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
+            self::assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new MockResponse(json_encode(['message' => 'i\'m a teapot']), [
                 'http_code' => 418,
@@ -111,17 +111,17 @@ class SendinblueApiTransportTest extends TestCase
             ->text('Hello There!')
         ;
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
     }
 
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
-            $this->assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.sendinblue.com:8984/v3/smtp/email', $url);
+            self::assertStringContainsString('Accept: */*', $options['headers'][2] ?? $options['request_headers'][1]);
 
             return new MockResponse(json_encode(['messageId' => 'foobar']), [
                 'http_code' => 201,
@@ -146,6 +146,6 @@ class SendinblueApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        self::assertSame('foobar', $message->getMessageId());
     }
 }

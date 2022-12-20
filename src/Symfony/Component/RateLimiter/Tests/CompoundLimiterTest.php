@@ -39,22 +39,22 @@ class CompoundLimiterTest extends TestCase
         $limiter3 = $this->createLimiter(12, new \DateInterval('PT30S'));
         $limiter = new CompoundLimiter([$limiter1, $limiter2, $limiter3]);
 
-        $this->assertEquals(0, $limiter->consume(4)->getRemainingTokens(), 'Limiter 1 reached the limit');
+        self::assertEquals(0, $limiter->consume(4)->getRemainingTokens(), 'Limiter 1 reached the limit');
         sleep(1); // reset limiter1's window
-        $this->assertTrue($limiter->consume(3)->isAccepted());
+        self::assertTrue($limiter->consume(3)->isAccepted());
 
-        $this->assertEquals(0, $limiter->consume()->getRemainingTokens(), 'Limiter 2 has no remaining tokens left');
+        self::assertEquals(0, $limiter->consume()->getRemainingTokens(), 'Limiter 2 has no remaining tokens left');
         sleep(10); // reset limiter2's window
-        $this->assertTrue($limiter->consume(3)->isAccepted());
+        self::assertTrue($limiter->consume(3)->isAccepted());
 
-        $this->assertEquals(0, $limiter->consume()->getRemainingTokens(), 'Limiter 3 reached the limit');
+        self::assertEquals(0, $limiter->consume()->getRemainingTokens(), 'Limiter 3 reached the limit');
         sleep(20); // reset limiter3's window
-        $this->assertTrue($limiter->consume()->isAccepted());
+        self::assertTrue($limiter->consume()->isAccepted());
     }
 
     public function testReserve()
     {
-        $this->expectException(ReserveNotSupportedException::class);
+        self::expectException(ReserveNotSupportedException::class);
 
         (new CompoundLimiter([$this->createLimiter(4, new \DateInterval('PT1S'))]))->reserve();
     }

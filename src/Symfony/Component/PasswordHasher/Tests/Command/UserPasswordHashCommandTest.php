@@ -36,7 +36,7 @@ class UserPasswordHashCommandTest extends TestCase
             '--empty-salt' => true,
         ], ['decorated' => false]);
 
-        $this->assertStringContainsString(' Password hash   password', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringContainsString(' Password hash   password', $this->passwordHasherCommandTester->getDisplay());
     }
 
     public function testEncodeNoPasswordNoInteraction()
@@ -44,8 +44,8 @@ class UserPasswordHashCommandTest extends TestCase
         $statusCode = $this->passwordHasherCommandTester->execute([
         ], ['interactive' => false]);
 
-        $this->assertStringContainsString('[ERROR] The password must not be empty.', $this->passwordHasherCommandTester->getDisplay());
-        $this->assertEquals(1, $statusCode);
+        self::assertStringContainsString('[ERROR] The password must not be empty.', $this->passwordHasherCommandTester->getDisplay());
+        self::assertEquals(1, $statusCode);
     }
 
     public function testEncodePasswordBcrypt()
@@ -57,18 +57,18 @@ class UserPasswordHashCommandTest extends TestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordHasherCommandTester->getDisplay();
-        $this->assertStringContainsString('Password hashing succeeded', $output);
+        self::assertStringContainsString('Password hashing succeeded', $output);
 
         $hasher = new NativePasswordHasher(null, null, 17, \PASSWORD_BCRYPT);
         preg_match('# Password hash\s{1,}([\w+\/$.]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
-        $this->assertTrue($hasher->verify($hash, 'password', null));
+        self::assertTrue($hasher->verify($hash, 'password', null));
     }
 
     public function testEncodePasswordArgon2i()
     {
         if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
+            self::markTestSkipped('Argon2i algorithm not available.');
         }
         $this->setupArgon2i();
         $this->passwordHasherCommandTester->execute([
@@ -77,18 +77,18 @@ class UserPasswordHashCommandTest extends TestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordHasherCommandTester->getDisplay();
-        $this->assertStringContainsString('Password hashing succeeded', $output);
+        self::assertStringContainsString('Password hashing succeeded', $output);
 
         $hasher = $sodium ? new SodiumPasswordHasher() : new NativePasswordHasher(null, null, null, \PASSWORD_ARGON2I);
         preg_match('#  Password hash\s+(\$argon2i?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
-        $this->assertTrue($hasher->verify($hash, 'password', null));
+        self::assertTrue($hasher->verify($hash, 'password', null));
     }
 
     public function testEncodePasswordArgon2id()
     {
         if (!($sodium = (SodiumPasswordHasher::isSupported() && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13'))) && !\defined('PASSWORD_ARGON2ID')) {
-            $this->markTestSkipped('Argon2id algorithm not available.');
+            self::markTestSkipped('Argon2id algorithm not available.');
         }
         $this->setupArgon2id();
         $this->passwordHasherCommandTester->execute([
@@ -97,12 +97,12 @@ class UserPasswordHashCommandTest extends TestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordHasherCommandTester->getDisplay();
-        $this->assertStringContainsString('Password hashing succeeded', $output);
+        self::assertStringContainsString('Password hashing succeeded', $output);
 
         $hasher = $sodium ? new SodiumPasswordHasher() : new NativePasswordHasher(null, null, null, \PASSWORD_ARGON2ID);
         preg_match('#  Password hash\s+(\$argon2id?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
-        $this->assertTrue($hasher->verify($hash, 'password', null));
+        self::assertTrue($hasher->verify($hash, 'password', null));
     }
 
     public function testEncodePasswordNative()
@@ -113,18 +113,18 @@ class UserPasswordHashCommandTest extends TestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordHasherCommandTester->getDisplay();
-        $this->assertStringContainsString('Password hashing succeeded', $output);
+        self::assertStringContainsString('Password hashing succeeded', $output);
 
         $hasher = new NativePasswordHasher();
         preg_match('# Password hash\s{1,}([\w+\/$.,=]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
-        $this->assertTrue($hasher->verify($hash, 'password', null));
+        self::assertTrue($hasher->verify($hash, 'password', null));
     }
 
     public function testEncodePasswordSodium()
     {
         if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+            self::markTestSkipped('Libsodium is not available.');
         }
         $this->setupSodium();
         $this->passwordHasherCommandTester->execute([
@@ -133,11 +133,11 @@ class UserPasswordHashCommandTest extends TestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordHasherCommandTester->getDisplay();
-        $this->assertStringContainsString('Password hashing succeeded', $output);
+        self::assertStringContainsString('Password hashing succeeded', $output);
 
         preg_match('#  Password hash\s+(\$?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
-        $this->assertTrue((new SodiumPasswordHasher())->verify($hash, 'password', null));
+        self::assertTrue((new SodiumPasswordHasher())->verify($hash, 'password', null));
     }
 
     public function testEncodePasswordPbkdf2()
@@ -148,14 +148,14 @@ class UserPasswordHashCommandTest extends TestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordHasherCommandTester->getDisplay();
-        $this->assertStringContainsString('Password hashing succeeded', $output);
+        self::assertStringContainsString('Password hashing succeeded', $output);
 
         $hasher = new Pbkdf2PasswordHasher('sha512', true, 1000);
         preg_match('# Password hash\s{1,}([\w+\/]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
         preg_match('# Generated salt\s{1,}([\w+\/]+={0,2})\s+#', $output, $matches);
         $salt = $matches[1];
-        $this->assertTrue($hasher->verify($hash, 'password', $salt));
+        self::assertTrue($hasher->verify($hash, 'password', $salt));
     }
 
     public function testEncodePasswordOutput()
@@ -166,9 +166,9 @@ class UserPasswordHashCommandTest extends TestCase
             ], ['interactive' => false]
         );
 
-        $this->assertStringContainsString('Password hashing succeeded', $this->passwordHasherCommandTester->getDisplay());
-        $this->assertStringContainsString(' Password hash    p@ssw0rd', $this->passwordHasherCommandTester->getDisplay());
-        $this->assertStringContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringContainsString('Password hashing succeeded', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringContainsString(' Password hash    p@ssw0rd', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
     public function testEncodePasswordEmptySaltOutput()
@@ -179,9 +179,9 @@ class UserPasswordHashCommandTest extends TestCase
             '--empty-salt' => true,
         ]);
 
-        $this->assertStringContainsString('Password hashing succeeded', $this->passwordHasherCommandTester->getDisplay());
-        $this->assertStringContainsString(' Password hash   p@ssw0rd', $this->passwordHasherCommandTester->getDisplay());
-        $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringContainsString('Password hashing succeeded', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringContainsString(' Password hash   p@ssw0rd', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
     public function testEncodePasswordNativeOutput()
@@ -191,13 +191,13 @@ class UserPasswordHashCommandTest extends TestCase
             'user-class' => 'Custom\Class\Native\User',
         ], ['interactive' => false]);
 
-        $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
     public function testEncodePasswordArgon2iOutput()
     {
         if (!(SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
+            self::markTestSkipped('Argon2i algorithm not available.');
         }
 
         $this->setupArgon2i();
@@ -206,13 +206,13 @@ class UserPasswordHashCommandTest extends TestCase
             'user-class' => 'Custom\Class\Argon2i\User',
         ], ['interactive' => false]);
 
-        $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
     public function testEncodePasswordArgon2idOutput()
     {
         if (!(SodiumPasswordHasher::isSupported() && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2ID')) {
-            $this->markTestSkipped('Argon2id algorithm not available.');
+            self::markTestSkipped('Argon2id algorithm not available.');
         }
 
         $this->setupArgon2id();
@@ -221,13 +221,13 @@ class UserPasswordHashCommandTest extends TestCase
             'user-class' => 'Custom\Class\Argon2id\User',
         ], ['interactive' => false]);
 
-        $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
     public function testEncodePasswordSodiumOutput()
     {
         if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+            self::markTestSkipped('Libsodium is not available.');
         }
 
         $this->setupSodium();
@@ -236,13 +236,13 @@ class UserPasswordHashCommandTest extends TestCase
             'user-class' => 'Custom\Class\Sodium\User',
         ], ['interactive' => false]);
 
-        $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
     public function testEncodePasswordNoConfigForGivenUserClass()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('No password hasher has been configured for account "Foo\Bar\User".');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('No password hasher has been configured for account "Foo\Bar\User".');
 
         $this->passwordHasherCommandTester->execute([
             'password' => 'password',
@@ -257,14 +257,13 @@ class UserPasswordHashCommandTest extends TestCase
             'password' => 'password',
         ], ['decorated' => false]);
 
-        $this->assertStringContainsString(<<<EOTXT
+        self::assertStringContainsString(<<<EOTXT
  For which user class would you like to hash a password? [Custom\Class\Native\User]:
   [0] Custom\Class\Native\User
   [1] Custom\Class\Pbkdf2\User
   [2] Custom\Class\Test\User
   [3] Symfony\Component\Security\Core\User\InMemoryUser
-EOTXT
-            , $this->passwordHasherCommandTester->getDisplay(true));
+EOTXT, $this->passwordHasherCommandTester->getDisplay(true));
     }
 
     public function testNonInteractiveEncodePasswordUsesFirstUserClass()
@@ -273,15 +272,15 @@ EOTXT
             'password' => 'password',
         ], ['interactive' => false]);
 
-        $this->assertStringContainsString('Hasher used      Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher', $this->passwordHasherCommandTester->getDisplay());
+        self::assertStringContainsString('Hasher used      Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher', $this->passwordHasherCommandTester->getDisplay());
     }
 
     public function testThrowsExceptionOnNoConfiguredHashers()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('There are no configured password hashers for the "security" extension.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('There are no configured password hashers for the "security" extension.');
 
-        $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
+        $tester = new CommandTester(new UserPasswordHashCommand(self::getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
         $tester->execute([
             'password' => 'password',
         ], ['interactive' => false]);
@@ -293,13 +292,13 @@ EOTXT
     public function testCompletionSuggestions(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
-        $command = new UserPasswordHashCommand($this->createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);
+        $command = new UserPasswordHashCommand(self::createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);
         $tester = new CommandCompletionTester($command);
 
-        $this->assertSame($expectedSuggestions, $tester->complete($input));
+        self::assertSame($expectedSuggestions, $tester->complete($input));
     }
 
     public function provideCompletionSuggestions(): iterable

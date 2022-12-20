@@ -19,7 +19,7 @@ class MixedPartTest extends TestCase
     public function testConstructor()
     {
         $a = new MixedPart();
-        $this->assertEquals('multipart', $a->getMediaType());
-        $this->assertEquals('mixed', $a->getMediaSubtype());
+        self::assertEquals('multipart', $a->getMediaType());
+        self::assertEquals('mixed', $a->getMediaSubtype());
     }
 }

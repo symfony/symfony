@@ -25,10 +25,10 @@ class TwigErrorRendererTest extends TestCase
     {
         $exception = new \Exception();
 
-        $twig = $this->createMock(Environment::class);
-        $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
+        $twig = self::createMock(Environment::class);
+        $nativeRenderer = self::createMock(HtmlErrorRenderer::class);
         $nativeRenderer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('render')
             ->with($exception)
         ;
@@ -42,9 +42,9 @@ class TwigErrorRendererTest extends TestCase
 
         $twig = new Environment(new ArrayLoader([]));
 
-        $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
+        $nativeRenderer = self::createMock(HtmlErrorRenderer::class);
         $nativeRenderer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('render')
             ->with($exception)
             ->willReturn(FlattenException::createFromThrowable($exception))
@@ -60,6 +60,6 @@ class TwigErrorRendererTest extends TestCase
         ]));
         $exception = (new TwigErrorRenderer($twig))->render(new NotFoundHttpException());
 
-        $this->assertSame('<h1>Page Not Found</h1>', $exception->getAsString());
+        self::assertSame('<h1>Page Not Found</h1>', $exception->getAsString());
     }
 }

@@ -52,12 +52,12 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $graph = $this->process($container);
 
-        $this->assertCount(4, $edges = $graph->getNode('b')->getInEdges());
+        self::assertCount(4, $edges = $graph->getNode('b')->getInEdges());
 
-        $this->assertSame($ref1, $edges[0]->getValue());
-        $this->assertSame($ref4, $edges[1]->getValue());
-        $this->assertSame($ref5, $edges[2]->getValue());
-        $this->assertSame($ref6, $edges[3]->getValue());
+        self::assertSame($ref1, $edges[0]->getValue());
+        self::assertSame($ref4, $edges[1]->getValue());
+        self::assertSame($ref5, $edges[2]->getValue());
+        self::assertSame($ref6, $edges[3]->getValue());
     }
 
     public function testProcessMarksEdgesLazyWhenReferencedServiceIsLazy()
@@ -77,11 +77,11 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $graph = $this->process($container);
 
-        $this->assertCount(1, $graph->getNode('b')->getInEdges());
-        $this->assertCount(1, $edges = $graph->getNode('a')->getInEdges());
+        self::assertCount(1, $graph->getNode('b')->getInEdges());
+        self::assertCount(1, $edges = $graph->getNode('a')->getInEdges());
 
-        $this->assertSame($ref2, $edges[0]->getValue());
-        $this->assertTrue($edges[0]->isLazy());
+        self::assertSame($ref2, $edges[0]->getValue());
+        self::assertTrue($edges[0]->isLazy());
     }
 
     public function testProcessMarksEdgesLazyWhenReferencedFromIteratorArgument()
@@ -98,14 +98,14 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $graph = $this->process($container);
 
-        $this->assertCount(1, $graph->getNode('a')->getInEdges());
-        $this->assertCount(1, $graph->getNode('b')->getInEdges());
-        $this->assertCount(2, $edges = $graph->getNode('c')->getOutEdges());
+        self::assertCount(1, $graph->getNode('a')->getInEdges());
+        self::assertCount(1, $graph->getNode('b')->getInEdges());
+        self::assertCount(2, $edges = $graph->getNode('c')->getOutEdges());
 
-        $this->assertSame($ref1, $edges[0]->getValue());
-        $this->assertFalse($edges[0]->isLazy());
-        $this->assertSame($ref2, $edges[1]->getValue());
-        $this->assertTrue($edges[1]->isLazy());
+        self::assertSame($ref1, $edges[0]->getValue());
+        self::assertFalse($edges[0]->isLazy());
+        self::assertSame($ref2, $edges[1]->getValue());
+        self::assertTrue($edges[1]->isLazy());
     }
 
     public function testProcessDetectsReferencesFromInlinedDefinitions()
@@ -123,8 +123,8 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $graph = $this->process($container);
 
-        $this->assertCount(1, $refs = $graph->getNode('a')->getInEdges());
-        $this->assertSame($ref, $refs[0]->getValue());
+        self::assertCount(1, $refs = $graph->getNode('a')->getInEdges());
+        self::assertSame($ref, $refs[0]->getValue());
     }
 
     public function testProcessDetectsReferencesFromIteratorArguments()
@@ -142,8 +142,8 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $graph = $this->process($container);
 
-        $this->assertCount(1, $refs = $graph->getNode('a')->getInEdges());
-        $this->assertSame($ref, $refs[0]->getValue());
+        self::assertCount(1, $refs = $graph->getNode('a')->getInEdges());
+        self::assertSame($ref, $refs[0]->getValue());
     }
 
     public function testProcessDetectsReferencesFromInlinedFactoryDefinitions()
@@ -164,8 +164,8 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $graph = $this->process($container);
 
-        $this->assertTrue($graph->hasNode('a'));
-        $this->assertCount(1, $refs = $graph->getNode('a')->getInEdges());
+        self::assertTrue($graph->hasNode('a'));
+        self::assertCount(1, $refs = $graph->getNode('a')->getInEdges());
     }
 
     public function testProcessDoesNotSaveDuplicateReferences()
@@ -183,7 +183,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $graph = $this->process($container);
 
-        $this->assertCount(2, $graph->getNode('a')->getInEdges());
+        self::assertCount(2, $graph->getNode('a')->getInEdges());
     }
 
     public function testProcessDetectsFactoryReferences()
@@ -200,8 +200,8 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $graph = $this->process($container);
 
-        $this->assertTrue($graph->hasNode('foo'));
-        $this->assertCount(1, $graph->getNode('foo')->getInEdges());
+        self::assertTrue($graph->hasNode('foo'));
+        self::assertCount(1, $graph->getNode('foo')->getInEdges());
     }
 
     protected function process(ContainerBuilder $container)

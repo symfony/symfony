@@ -201,7 +201,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             return $a <=> $b;
         });
 
-        $this->assertEquals($expectedListeners, $foundListeners);
+        self::assertEquals($expectedListeners, $foundListeners);
     }
 }
 

@@ -1764,7 +1764,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
     {
-        $this->markTestSkipped('Make tests pass with symfony/form 4.4');
+        self::markTestSkipped('Make tests pass with symfony/form 4.4');
     }
 
     public function testDateChoice()
@@ -2748,7 +2748,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar form-control" data-foo="bar" value="value" />', $html);
+        self::assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar form-control" data-foo="bar" value="value" />', $html);
     }
 
     public function testWidgetAttributeNameRepeatedIfTrue()
@@ -2760,7 +2760,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" class="form-control" value="value" />', $html);
+        self::assertSame('<input type="text" id="text" name="text" required="required" foo="foo" class="form-control" value="value" />', $html);
     }
 
     public function testButtonAttributes()
@@ -2773,7 +2773,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertSame('<button type="button" id="button" name="button" disabled="disabled" class="foobar btn" data-foo="bar">[trans]Button[/trans]</button>', $html);
+        self::assertSame('<button type="button" id="button" name="button" disabled="disabled" class="foobar btn" data-foo="bar">[trans]Button[/trans]</button>', $html);
     }
 
     public function testButtonAttributeNameRepeatedIfTrue()
@@ -2785,7 +2785,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertSame('<button type="button" id="button" name="button" foo="foo" class="btn-default btn">[trans]Button[/trans]</button>', $html);
+        self::assertSame('<button type="button" id="button" name="button" foo="foo" class="btn-default btn">[trans]Button[/trans]</button>', $html);
     }
 
     public function testTel()

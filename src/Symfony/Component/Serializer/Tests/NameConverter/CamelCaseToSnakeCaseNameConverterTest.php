@@ -23,7 +23,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
     public function testInterface()
     {
         $attributeMetadata = new CamelCaseToSnakeCaseNameConverter();
-        $this->assertInstanceOf(NameConverterInterface::class, $attributeMetadata);
+        self::assertInstanceOf(NameConverterInterface::class, $attributeMetadata);
     }
 
     /**
@@ -32,7 +32,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
     public function testNormalize($underscored, $camelCased, $useLowerCamelCase)
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, $useLowerCamelCase);
-        $this->assertEquals($nameConverter->normalize($camelCased), $underscored);
+        self::assertEquals($nameConverter->normalize($camelCased), $underscored);
     }
 
     /**
@@ -41,7 +41,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
     public function testDenormalize($underscored, $camelCased, $useLowerCamelCase)
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, $useLowerCamelCase);
-        $this->assertEquals($nameConverter->denormalize($underscored), $camelCased);
+        self::assertEquals($nameConverter->denormalize($underscored), $camelCased);
     }
 
     public function attributeProvider()

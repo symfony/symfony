@@ -31,9 +31,9 @@ class RemoteUserAuthenticationListenerTest extends TestCase
 
         $request = new Request([], [], [], [], [], $serverVars);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
 
         $listener = new RemoteUserAuthenticationListener(
             $tokenStorage,
@@ -45,17 +45,17 @@ class RemoteUserAuthenticationListenerTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invokeArgs($listener, [$request]);
-        $this->assertSame($result, ['TheUser', null]);
+        self::assertSame($result, ['TheUser', null]);
     }
 
     public function testGetPreAuthenticatedDataNoUser()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $request = new Request([], [], [], [], [], []);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
 
         $listener = new RemoteUserAuthenticationListener(
             $tokenStorage,
@@ -76,9 +76,9 @@ class RemoteUserAuthenticationListenerTest extends TestCase
         $request = new Request([], [], [], [], [], [
             'TheUserKey' => 'TheUser',
         ]);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
 
         $listener = new RemoteUserAuthenticationListener(
             $tokenStorage,
@@ -91,6 +91,6 @@ class RemoteUserAuthenticationListenerTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invokeArgs($listener, [$request]);
-        $this->assertSame($result, $userCredentials);
+        self::assertSame($result, $userCredentials);
     }
 }

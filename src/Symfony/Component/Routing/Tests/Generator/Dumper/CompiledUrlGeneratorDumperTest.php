@@ -48,19 +48,19 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
         $this->routeCollection = new RouteCollection();
         $this->generatorDumper = new CompiledUrlGeneratorDumper($this->routeCollection);
-        $this->testTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.php';
-        $this->largeTestTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.large.php';
+        $this->testTmpFilepath = sys_get_temp_dir().'/php_generator.'.self::getName().'.php';
+        $this->largeTestTmpFilepath = sys_get_temp_dir().'/php_generator.'.self::getName().'.large.php';
         @unlink($this->testTmpFilepath);
         @unlink($this->largeTestTmpFilepath);
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
+        self::tearDown();
 
         @unlink($this->testTmpFilepath);
 
@@ -83,10 +83,10 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $relativeUrlWithParameter = $projectUrlGenerator->generate('Test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_PATH);
         $relativeUrlWithoutParameter = $projectUrlGenerator->generate('Test2', [], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $this->assertEquals('http://localhost/app.php/testing/bar', $absoluteUrlWithParameter);
-        $this->assertEquals('http://localhost/app.php/testing2', $absoluteUrlWithoutParameter);
-        $this->assertEquals('/app.php/testing/bar', $relativeUrlWithParameter);
-        $this->assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
+        self::assertEquals('http://localhost/app.php/testing/bar', $absoluteUrlWithParameter);
+        self::assertEquals('http://localhost/app.php/testing2', $absoluteUrlWithoutParameter);
+        self::assertEquals('/app.php/testing/bar', $relativeUrlWithParameter);
+        self::assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
     }
 
     public function testDumpWithSimpleLocalizedRoutes()
@@ -108,23 +108,23 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $context->setParameter('_locale', 'nl');
         $urlWithDutchContext = $projectUrlGenerator->generate('test');
 
-        $this->assertEquals('/app.php/testing/is/fun', $urlWithDefaultLocale);
-        $this->assertEquals('/app.php/testen/is/leuk', $urlWithSpecifiedLocale);
-        $this->assertEquals('/app.php/testing/is/fun', $urlWithEnglishContext);
-        $this->assertEquals('/app.php/testen/is/leuk', $urlWithDutchContext);
+        self::assertEquals('/app.php/testing/is/fun', $urlWithDefaultLocale);
+        self::assertEquals('/app.php/testen/is/leuk', $urlWithSpecifiedLocale);
+        self::assertEquals('/app.php/testing/is/fun', $urlWithEnglishContext);
+        self::assertEquals('/app.php/testen/is/leuk', $urlWithDutchContext);
 
         // test with full route name
-        $this->assertEquals('/app.php/testing/is/fun', $projectUrlGenerator->generate('test.en'));
+        self::assertEquals('/app.php/testing/is/fun', $projectUrlGenerator->generate('test.en'));
 
         $context->setParameter('_locale', 'de_DE');
         // test that it fall backs to another route when there is no matching localized route
-        $this->assertEquals('/app.php/foo', $projectUrlGenerator->generate('test'));
+        self::assertEquals('/app.php/foo', $projectUrlGenerator->generate('test'));
     }
 
     public function testDumpWithRouteNotFoundLocalizedRoutes()
     {
-        $this->expectException(RouteNotFoundException::class);
-        $this->expectExceptionMessage('Unable to generate a URL for the named route "test" as such route does not exist.');
+        self::expectException(RouteNotFoundException::class);
+        self::expectExceptionMessage('Unable to generate a URL for the named route "test" as such route does not exist.');
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'en'));
 
         $code = $this->generatorDumper->dump();
@@ -148,13 +148,13 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, $context, null, null);
 
         // test with context _locale
-        $this->assertEquals('/app.php/testing/is/fun', $projectUrlGenerator->generate('test'));
+        self::assertEquals('/app.php/testing/is/fun', $projectUrlGenerator->generate('test'));
         // test with parameters _locale
-        $this->assertEquals('/app.php/testen/is/leuk', $projectUrlGenerator->generate('test', ['_locale' => 'nl_BE']));
+        self::assertEquals('/app.php/testen/is/leuk', $projectUrlGenerator->generate('test', ['_locale' => 'nl_BE']));
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'), null, 'fr_CA');
         // test with default locale
-        $this->assertEquals('/app.php/tester/est/amusant', $projectUrlGenerator->generate('test'));
+        self::assertEquals('/app.php/tester/est/amusant', $projectUrlGenerator->generate('test'));
     }
 
     public function testDumpWithTooManyRoutes()
@@ -175,15 +175,15 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $relativeUrlWithParameter = $projectUrlGenerator->generate('Test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_PATH);
         $relativeUrlWithoutParameter = $projectUrlGenerator->generate('Test2', [], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $this->assertEquals('http://localhost/app.php/testing/bar', $absoluteUrlWithParameter);
-        $this->assertEquals('http://localhost/app.php/testing2', $absoluteUrlWithoutParameter);
-        $this->assertEquals('/app.php/testing/bar', $relativeUrlWithParameter);
-        $this->assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
+        self::assertEquals('http://localhost/app.php/testing/bar', $absoluteUrlWithParameter);
+        self::assertEquals('http://localhost/app.php/testing2', $absoluteUrlWithoutParameter);
+        self::assertEquals('/app.php/testing/bar', $relativeUrlWithParameter);
+        self::assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
     }
 
     public function testDumpWithoutRoutes()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'));
@@ -193,7 +193,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testGenerateNonExistingRoute()
     {
-        $this->expectException(RouteNotFoundException::class);
+        self::expectException(RouteNotFoundException::class);
         $this->routeCollection->add('Test', new Route('/test'));
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
@@ -211,7 +211,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
         $url = $projectUrlGenerator->generate('Test', []);
 
-        $this->assertEquals('/testing', $url);
+        self::assertEquals('/testing', $url);
     }
 
     public function testDumpWithSchemeRequirement()
@@ -225,16 +225,16 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $absoluteUrl = $projectUrlGenerator->generate('Test1', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $relativeUrl = $projectUrlGenerator->generate('Test1', [], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $this->assertEquals('ftp://localhost/app.php/testing', $absoluteUrl);
-        $this->assertEquals('ftp://localhost/app.php/testing', $relativeUrl);
+        self::assertEquals('ftp://localhost/app.php/testing', $absoluteUrl);
+        self::assertEquals('ftp://localhost/app.php/testing', $relativeUrl);
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php', 'GET', 'localhost', 'https'));
 
         $absoluteUrl = $projectUrlGenerator->generate('Test1', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $relativeUrl = $projectUrlGenerator->generate('Test1', [], UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        $this->assertEquals('https://localhost/app.php/testing', $absoluteUrl);
-        $this->assertEquals('/app.php/testing', $relativeUrl);
+        self::assertEquals('https://localhost/app.php/testing', $absoluteUrl);
+        self::assertEquals('/app.php/testing', $relativeUrl);
     }
 
     public function testDumpWithLocalizedRoutesPreserveTheGoodLocaleInTheUrl()
@@ -251,15 +251,15 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
         $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, $requestContext, null, null);
 
-        $this->assertSame('/fr/fourchette', $compiledUrlGenerator->generate('foo'));
-        $this->assertSame('/en/fork', $compiledUrlGenerator->generate('foo.en'));
-        $this->assertSame('/en/fork', $compiledUrlGenerator->generate('foo', ['_locale' => 'en']));
-        $this->assertSame('/fr/fourchette', $compiledUrlGenerator->generate('foo.fr', ['_locale' => 'en']));
+        self::assertSame('/fr/fourchette', $compiledUrlGenerator->generate('foo'));
+        self::assertSame('/en/fork', $compiledUrlGenerator->generate('foo.en'));
+        self::assertSame('/en/fork', $compiledUrlGenerator->generate('foo', ['_locale' => 'en']));
+        self::assertSame('/fr/fourchette', $compiledUrlGenerator->generate('foo.fr', ['_locale' => 'en']));
 
-        $this->assertSame('/amusant', $compiledUrlGenerator->generate('fun'));
-        $this->assertSame('/fun', $compiledUrlGenerator->generate('fun.en'));
-        $this->assertSame('/fun', $compiledUrlGenerator->generate('fun', ['_locale' => 'en']));
-        $this->assertSame('/amusant', $compiledUrlGenerator->generate('fun.fr', ['_locale' => 'en']));
+        self::assertSame('/amusant', $compiledUrlGenerator->generate('fun'));
+        self::assertSame('/fun', $compiledUrlGenerator->generate('fun.en'));
+        self::assertSame('/fun', $compiledUrlGenerator->generate('fun', ['_locale' => 'en']));
+        self::assertSame('/amusant', $compiledUrlGenerator->generate('fun.fr', ['_locale' => 'en']));
     }
 
     public function testAliases()
@@ -279,15 +279,15 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
         $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
 
-        $this->assertSame('/foo', $compiledUrlGenerator->generate('b'));
-        $this->assertSame('/foo', $compiledUrlGenerator->generate('c'));
-        $this->assertSame('/sub', $compiledUrlGenerator->generate('sub_b'));
-        $this->assertSame('/sub', $compiledUrlGenerator->generate('sub_c'));
+        self::assertSame('/foo', $compiledUrlGenerator->generate('b'));
+        self::assertSame('/foo', $compiledUrlGenerator->generate('c'));
+        self::assertSame('/sub', $compiledUrlGenerator->generate('sub_b'));
+        self::assertSame('/sub', $compiledUrlGenerator->generate('sub_c'));
     }
 
     public function testTargetAliasNotExisting()
     {
-        $this->expectException(RouteNotFoundException::class);
+        self::expectException(RouteNotFoundException::class);
 
         $this->routeCollection->addAlias('a', 'not-existing');
 
@@ -300,7 +300,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testTargetAliasWithNamePrefixNotExisting()
     {
-        $this->expectException(RouteNotFoundException::class);
+        self::expectException(RouteNotFoundException::class);
 
         $subCollection = new RouteCollection();
         $subCollection->addAlias('a', 'not-existing');
@@ -317,8 +317,8 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> a -> b".');
+        self::expectException(RouteCircularReferenceException::class);
+        self::expectExceptionMessage('Circular reference detected for route "b", path: "b -> a -> b".');
 
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'a');
@@ -328,8 +328,8 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testDeepCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> b".');
+        self::expectException(RouteCircularReferenceException::class);
+        self::expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> b".');
 
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'c');
@@ -340,8 +340,8 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testIndirectCircularReferenceShouldThrowAnException()
     {
-        $this->expectException(RouteCircularReferenceException::class);
-        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> a -> b".');
+        self::expectException(RouteCircularReferenceException::class);
+        self::expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> a -> b".');
 
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'c');

@@ -53,7 +53,7 @@ class SerializerExtensionTest extends TestCase
         $meta = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $runtime = new SerializerRuntime(new Serializer([new ObjectNormalizer($meta)], [new JsonEncoder(), new YamlEncoder()]));
 
-        $mockRuntimeLoader = $this->createMock(RuntimeLoaderInterface::class);
+        $mockRuntimeLoader = self::createMock(RuntimeLoaderInterface::class);
         $mockRuntimeLoader
             ->method('load')
             ->willReturnMap([

@@ -30,7 +30,7 @@ class RoleVoterTest extends TestCase
     {
         $voter = new RoleVoter();
 
-        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
+        self::assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
     public function getVoteTests()
@@ -67,7 +67,7 @@ class RoleVoterTest extends TestCase
     {
         $voter = new RoleVoter($prefix);
 
-        $this->assertSame($expected, $voter->supportsAttribute($attribute));
+        self::assertSame($expected, $voter->supportsAttribute($attribute));
     }
 
     public function provideAttributes()
@@ -84,15 +84,15 @@ class RoleVoterTest extends TestCase
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
-        $this->assertTrue($voter->supportsType(get_debug_type('foo')));
-        $this->assertTrue($voter->supportsType(get_debug_type(null)));
-        $this->assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
+        self::assertTrue($voter->supportsType(get_debug_type('foo')));
+        self::assertTrue($voter->supportsType(get_debug_type(null)));
+        self::assertTrue($voter->supportsType(get_debug_type(new \stdClass())));
     }
 
     protected function getTokenWithRoleNames(array $roles)
     {
-        $token = $this->createMock(AbstractToken::class);
-        $token->expects($this->once())
+        $token = self::createMock(AbstractToken::class);
+        $token->expects(self::once())
               ->method('getRoleNames')
               ->willReturn($roles);
 

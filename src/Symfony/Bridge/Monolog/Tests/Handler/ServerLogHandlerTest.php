@@ -27,25 +27,23 @@ class ServerLogHandlerTest extends TestCase
     public function testFormatter()
     {
         $handler = new ServerLogHandler('tcp://127.0.0.1:9999');
-        $this->assertInstanceOf(VarDumperFormatter::class, $handler->getFormatter());
+        self::assertInstanceOf(VarDumperFormatter::class, $handler->getFormatter());
 
         $formatter = new JsonFormatter();
         $handler->setFormatter($formatter);
-        $this->assertSame($formatter, $handler->getFormatter());
+        self::assertSame($formatter, $handler->getFormatter());
     }
 
     public function testIsHandling()
     {
         $handler = new ServerLogHandler('tcp://127.0.0.1:9999', Logger::INFO);
-        $this->assertFalse($handler->isHandling(['level' => Logger::DEBUG]), '->isHandling returns false when no output is set');
+        self::assertFalse($handler->isHandling(['level' => Logger::DEBUG]), '->isHandling returns false when no output is set');
     }
 
     public function testGetFormatter()
     {
         $handler = new ServerLogHandler('tcp://127.0.0.1:9999');
-        $this->assertInstanceOf(VarDumperFormatter::class, $handler->getFormatter(),
-            '->getFormatter returns VarDumperFormatter by default'
-        );
+        self::assertInstanceOf(VarDumperFormatter::class, $handler->getFormatter(), '->getFormatter returns VarDumperFormatter by default');
     }
 
     public function testWritingAndFormatting()
@@ -65,9 +63,9 @@ class ServerLogHandlerTest extends TestCase
         ];
 
         $socket = stream_socket_server($host, $errno, $errstr);
-        $this->assertIsResource($socket, sprintf('Server start failed on "%s": %s %s.', $host, $errstr, $errno));
+        self::assertIsResource($socket, sprintf('Server start failed on "%s": %s %s.', $host, $errstr, $errno));
 
-        $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
+        self::assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
 
         $sockets = [(int) $socket => $socket];
         $write = [];
@@ -88,23 +86,23 @@ class ServerLogHandlerTest extends TestCase
                     fclose($stream);
 
                     $record = unserialize(base64_decode($message));
-                    $this->assertIsArray($record);
+                    self::assertIsArray($record);
 
-                    $this->assertArrayHasKey('message', $record);
-                    $this->assertEquals('My info message', $record['message']);
+                    self::assertArrayHasKey('message', $record);
+                    self::assertEquals('My info message', $record['message']);
 
-                    $this->assertArrayHasKey('extra', $record);
-                    $this->assertInstanceOf(Data::class, $record['extra']);
+                    self::assertArrayHasKey('extra', $record);
+                    self::assertInstanceOf(Data::class, $record['extra']);
                     $extra = $record['extra']->getValue(true);
-                    $this->assertIsArray($extra);
-                    $this->assertArrayHasKey('process_id', $extra);
-                    $this->assertSame(getmypid(), $extra['process_id']);
+                    self::assertIsArray($extra);
+                    self::assertArrayHasKey('process_id', $extra);
+                    self::assertSame(getmypid(), $extra['process_id']);
 
                     return;
                 }
             }
             usleep(100000);
         }
-        $this->fail('Fail to read message from server');
+        self::fail('Fail to read message from server');
     }
 }

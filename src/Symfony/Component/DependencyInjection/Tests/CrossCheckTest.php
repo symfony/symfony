@@ -52,10 +52,10 @@ class CrossCheckTest extends TestCase
 
         unlink($tmp);
 
-        $this->assertEquals($container2->getAliases(), $container1->getAliases(), 'loading a dump from a previously loaded container returns the same container');
-        $this->assertEquals($container2->getDefinitions(), $container1->getDefinitions(), 'loading a dump from a previously loaded container returns the same container');
-        $this->assertEquals($container2->getParameterBag()->all(), $container1->getParameterBag()->all(), '->getParameterBag() returns the same value for both containers');
-        $this->assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
+        self::assertEquals($container2->getAliases(), $container1->getAliases(), 'loading a dump from a previously loaded container returns the same container');
+        self::assertEquals($container2->getDefinitions(), $container1->getDefinitions(), 'loading a dump from a previously loaded container returns the same container');
+        self::assertEquals($container2->getParameterBag()->all(), $container1->getParameterBag()->all(), '->getParameterBag() returns the same value for both containers');
+        self::assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
 
         $services1 = [];
         foreach ($container1 as $id => $service) {
@@ -68,7 +68,7 @@ class CrossCheckTest extends TestCase
 
         unset($services1['service_container'], $services2['service_container']);
 
-        $this->assertEquals($services2, $services1, 'Iterator on the containers returns the same services');
+        self::assertEquals($services2, $services1, 'Iterator on the containers returns the same services');
     }
 
     public function crossCheckLoadersDumpers()

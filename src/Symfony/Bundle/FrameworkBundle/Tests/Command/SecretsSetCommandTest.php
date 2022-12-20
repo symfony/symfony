@@ -23,13 +23,13 @@ class SecretsSetCommandTest extends TestCase
      */
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        $vault = $this->createMock(AbstractVault::class);
+        $vault = self::createMock(AbstractVault::class);
         $vault->method('list')->willReturn(['SECRET' => null, 'OTHER_SECRET' => null]);
-        $localVault = $this->createMock(AbstractVault::class);
+        $localVault = self::createMock(AbstractVault::class);
         $command = new SecretsSetCommand($vault, $localVault);
         $tester = new CommandCompletionTester($command);
         $suggestions = $tester->complete($input);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()

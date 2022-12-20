@@ -66,23 +66,23 @@ class BundleEntryReaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->readerImpl = $this->createMock(BundleEntryReaderInterface::class);
+        $this->readerImpl = self::createMock(BundleEntryReaderInterface::class);
         $this->reader = new BundleEntryReader($this->readerImpl);
     }
 
     public function testForwardCallToRead()
     {
-        $this->readerImpl->expects($this->once())
+        $this->readerImpl->expects(self::once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
             ->willReturn(self::DATA);
 
-        $this->assertSame(self::DATA, $this->reader->read(self::RES_DIR, 'root'));
+        self::assertSame(self::DATA, $this->reader->read(self::RES_DIR, 'root'));
     }
 
     public function testReadEntireDataFileIfNoIndicesGiven()
     {
-        $this->readerImpl->expects($this->exactly(2))
+        $this->readerImpl->expects(self::exactly(2))
             ->method('read')
             ->withConsecutive(
                 [self::RES_DIR, 'en'],
@@ -90,23 +90,23 @@ class BundleEntryReaderTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(self::DATA, self::FALLBACK_DATA);
 
-        $this->assertSame(self::MERGED_DATA, $this->reader->readEntry(self::RES_DIR, 'en', []));
+        self::assertSame(self::MERGED_DATA, $this->reader->readEntry(self::RES_DIR, 'en', []));
     }
 
     public function testReadExistingEntry()
     {
-        $this->readerImpl->expects($this->once())
+        $this->readerImpl->expects(self::once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
             ->willReturn(self::DATA);
 
-        $this->assertSame('Bar', $this->reader->readEntry(self::RES_DIR, 'root', ['Entries', 'Foo']));
+        self::assertSame('Bar', $this->reader->readEntry(self::RES_DIR, 'root', ['Entries', 'Foo']));
     }
 
     public function testReadNonExistingEntry()
     {
-        $this->expectException(MissingResourceException::class);
-        $this->readerImpl->expects($this->once())
+        self::expectException(MissingResourceException::class);
+        $this->readerImpl->expects(self::once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
             ->willReturn(self::DATA);
@@ -116,7 +116,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testFallbackIfEntryDoesNotExist()
     {
-        $this->readerImpl->expects($this->exactly(2))
+        $this->readerImpl->expects(self::exactly(2))
             ->method('read')
             ->withConsecutive(
                 [self::RES_DIR, 'en_GB'],
@@ -124,13 +124,13 @@ class BundleEntryReaderTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(self::DATA, self::FALLBACK_DATA);
 
-        $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
+        self::assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
     }
 
     public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled()
     {
-        $this->expectException(MissingResourceException::class);
-        $this->readerImpl->expects($this->once())
+        self::expectException(MissingResourceException::class);
+        $this->readerImpl->expects(self::once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
             ->willReturn(self::DATA);
@@ -140,24 +140,24 @@ class BundleEntryReaderTest extends TestCase
 
     public function testFallbackIfLocaleDoesNotExist()
     {
-        $this->readerImpl->expects($this->exactly(2))
+        $this->readerImpl->expects(self::exactly(2))
             ->method('read')
             ->withConsecutive(
                 [self::RES_DIR, 'en_GB'],
                 [self::RES_DIR, 'en']
             )
             ->willReturnOnConsecutiveCalls(
-                $this->throwException(new ResourceBundleNotFoundException()),
+                self::throwException(new ResourceBundleNotFoundException()),
                 self::FALLBACK_DATA
             );
 
-        $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
+        self::assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
     }
 
     public function testDontFallbackIfLocaleDoesNotExistAndFallbackDisabled()
     {
-        $this->expectException(MissingResourceException::class);
-        $this->readerImpl->expects($this->once())
+        self::expectException(MissingResourceException::class);
+        $this->readerImpl->expects(self::once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
             ->willThrowException(new ResourceBundleNotFoundException());
@@ -184,7 +184,7 @@ class BundleEntryReaderTest extends TestCase
     public function testMergeDataWithFallbackData($childData, $parentData, $result)
     {
         if (null === $childData || \is_array($childData)) {
-            $this->readerImpl->expects($this->exactly(2))
+            $this->readerImpl->expects(self::exactly(2))
                 ->method('read')
                 ->withConsecutive(
                     [self::RES_DIR, 'en'],
@@ -192,13 +192,13 @@ class BundleEntryReaderTest extends TestCase
                 )
                 ->willReturnOnConsecutiveCalls($childData, $parentData);
         } else {
-            $this->readerImpl->expects($this->once())
+            $this->readerImpl->expects(self::once())
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
                 ->willReturn($childData);
         }
 
-        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', [], true));
+        self::assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', [], true));
     }
 
     /**
@@ -206,12 +206,12 @@ class BundleEntryReaderTest extends TestCase
      */
     public function testDontMergeDataIfFallbackDisabled($childData, $parentData, $result)
     {
-        $this->readerImpl->expects($this->once())
+        $this->readerImpl->expects(self::once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
             ->willReturn($childData);
 
-        $this->assertSame($childData, $this->reader->readEntry(self::RES_DIR, 'en_GB', [], false));
+        self::assertSame($childData, $this->reader->readEntry(self::RES_DIR, 'en_GB', [], false));
     }
 
     /**
@@ -220,7 +220,7 @@ class BundleEntryReaderTest extends TestCase
     public function testMergeExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
     {
         if (null === $childData || \is_array($childData)) {
-            $this->readerImpl->expects($this->exactly(2))
+            $this->readerImpl->expects(self::exactly(2))
                 ->method('read')
                 ->withConsecutive(
                     [self::RES_DIR, 'en'],
@@ -231,13 +231,13 @@ class BundleEntryReaderTest extends TestCase
                     ['Foo' => ['Bar' => $parentData]]
                 );
         } else {
-            $this->readerImpl->expects($this->once())
+            $this->readerImpl->expects(self::once())
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
                 ->willReturn(['Foo' => ['Bar' => $childData]]);
         }
 
-        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', ['Foo', 'Bar'], true));
+        self::assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', ['Foo', 'Bar'], true));
     }
 
     /**
@@ -253,7 +253,7 @@ class BundleEntryReaderTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(['Foo' => 'Baz'], ['Foo' => ['Bar' => $parentData]]);
 
-        $this->assertSame($parentData, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
+        self::assertSame($parentData, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
     }
 
     /**
@@ -270,18 +270,18 @@ class BundleEntryReaderTest extends TestCase
                 )
                 ->willReturnOnConsecutiveCalls(['Foo' => ['Bar' => $childData]], ['Foo' => 'Bar']);
         } else {
-            $this->readerImpl->expects($this->once())
+            $this->readerImpl->expects(self::once())
                 ->method('read')
                 ->with(self::RES_DIR, 'en_GB')
                 ->willReturn(['Foo' => ['Bar' => $childData]]);
         }
 
-        $this->assertSame($childData, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
+        self::assertSame($childData, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
     }
 
     public function testFailIfEntryFoundNeitherInParentNorChild()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         $this->readerImpl
             ->method('read')
             ->withConsecutive(
@@ -310,13 +310,13 @@ class BundleEntryReaderTest extends TestCase
                 )
                 ->willReturnOnConsecutiveCalls(['Foo' => ['Bar' => $childData]], ['Foo' => ['Bar' => $parentData]]);
         } else {
-            $this->readerImpl->expects($this->once())
+            $this->readerImpl->expects(self::once())
                 ->method('read')
                 ->with(self::RES_DIR, 'en_GB')
                 ->willReturn(['Foo' => ['Bar' => $childData]]);
         }
 
-        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
+        self::assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
     }
 
     /**
@@ -336,12 +336,12 @@ class BundleEntryReaderTest extends TestCase
                 )
                 ->willReturnOnConsecutiveCalls(['Foo' => ['Bar' => $childData]], ['Foo' => ['Bar' => $parentData]]);
         } else {
-            $this->readerImpl->expects($this->once())
+            $this->readerImpl->expects(self::once())
                 ->method('read')
                 ->with(self::RES_DIR, 'ro_MD')
                 ->willReturn(['Foo' => ['Bar' => $childData]]);
         }
 
-        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'mo', ['Foo', 'Bar'], true));
+        self::assertSame($result, $this->reader->readEntry(self::RES_DIR, 'mo', ['Foo', 'Bar'], true));
     }
 }

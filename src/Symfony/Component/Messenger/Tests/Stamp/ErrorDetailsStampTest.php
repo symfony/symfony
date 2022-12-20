@@ -32,9 +32,9 @@ class ErrorDetailsStampTest extends TestCase
 
         $stamp = ErrorDetailsStamp::create($exception);
 
-        $this->assertSame(\Exception::class, $stamp->getExceptionClass());
-        $this->assertSame('exception message', $stamp->getExceptionMessage());
-        $this->assertEquals($flattenException, $stamp->getFlattenException());
+        self::assertSame(\Exception::class, $stamp->getExceptionClass());
+        self::assertSame('exception message', $stamp->getExceptionMessage());
+        self::assertEquals($flattenException, $stamp->getFlattenException());
     }
 
     public function testUnwrappingHandlerFailedException()
@@ -46,10 +46,10 @@ class ErrorDetailsStampTest extends TestCase
 
         $stamp = ErrorDetailsStamp::create($exception);
 
-        $this->assertSame(\Exception::class, $stamp->getExceptionClass());
-        $this->assertSame('I am inside', $stamp->getExceptionMessage());
-        $this->assertSame(123, $stamp->getExceptionCode());
-        $this->assertEquals($flattenException, $stamp->getFlattenException());
+        self::assertSame(\Exception::class, $stamp->getExceptionClass());
+        self::assertSame('I am inside', $stamp->getExceptionMessage());
+        self::assertSame(123, $stamp->getExceptionCode());
+        self::assertEquals($flattenException, $stamp->getFlattenException());
     }
 
     public function testDeserialization()
@@ -67,7 +67,7 @@ class ErrorDetailsStampTest extends TestCase
         $deserializedEnvelope = $serializer->decode($serializer->encode(new Envelope(new \stdClass(), [$stamp])));
 
         $deserializedStamp = $deserializedEnvelope->last(ErrorDetailsStamp::class);
-        $this->assertInstanceOf(ErrorDetailsStamp::class, $deserializedStamp);
-        $this->assertEquals($stamp, $deserializedStamp);
+        self::assertInstanceOf(ErrorDetailsStamp::class, $deserializedStamp);
+        self::assertEquals($stamp, $deserializedStamp);
     }
 }

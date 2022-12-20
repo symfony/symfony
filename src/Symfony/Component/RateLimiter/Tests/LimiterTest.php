@@ -30,7 +30,7 @@ class LimiterTest extends TestCase
         ]);
         $limiter = $factory->create('127.0.0.1');
 
-        $this->assertInstanceOf(TokenBucketLimiter::class, $limiter);
+        self::assertInstanceOf(TokenBucketLimiter::class, $limiter);
     }
 
     public function testFixedWindow()
@@ -43,13 +43,13 @@ class LimiterTest extends TestCase
         ]);
         $limiter = $factory->create();
 
-        $this->assertInstanceOf(FixedWindowLimiter::class, $limiter);
+        self::assertInstanceOf(FixedWindowLimiter::class, $limiter);
     }
 
     public function testWrongInterval()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot parse interval "1 minut", please use a valid unit as described on https://www.php.net/datetime.formats.relative.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Cannot parse interval "1 minut", please use a valid unit as described on https://www.php.net/datetime.formats.relative.');
 
         $this->createFactory([
             'id' => 'test',
@@ -61,6 +61,6 @@ class LimiterTest extends TestCase
 
     private function createFactory(array $options)
     {
-        return new RateLimiterFactory($options, $this->createMock(StorageInterface::class), $this->createMock(LockFactory::class));
+        return new RateLimiterFactory($options, self::createMock(StorageInterface::class), self::createMock(LockFactory::class));
     }
 }

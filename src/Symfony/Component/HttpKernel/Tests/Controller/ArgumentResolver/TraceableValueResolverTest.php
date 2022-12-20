@@ -27,10 +27,10 @@ class TraceableValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('dummy', 'string', false, false, null);
         $request = new Request();
 
-        $this->assertTrue($resolver->supports($request, $argument));
+        self::assertTrue($resolver->supports($request, $argument));
 
         $event = $stopwatch->getEvent(ResolverStub::class.'::supports');
-        $this->assertCount(1, $event->getPeriods());
+        self::assertCount(1, $event->getPeriods());
     }
 
     public function testTimingsInResolve()
@@ -44,20 +44,20 @@ class TraceableValueResolverTest extends TestCase
 
         foreach ($iterable as $index => $resolved) {
             $event = $stopwatch->getEvent(ResolverStub::class.'::resolve');
-            $this->assertTrue($event->isStarted());
-            $this->assertEmpty($event->getPeriods());
+            self::assertTrue($event->isStarted());
+            self::assertEmpty($event->getPeriods());
             switch ($index) {
                 case 0:
-                    $this->assertEquals('first', $resolved);
+                    self::assertEquals('first', $resolved);
                     break;
                 case 1:
-                    $this->assertEquals('second', $resolved);
+                    self::assertEquals('second', $resolved);
                     break;
             }
         }
 
         $event = $stopwatch->getEvent(ResolverStub::class.'::resolve');
-        $this->assertCount(1, $event->getPeriods());
+        self::assertCount(1, $event->getPeriods());
     }
 }
 

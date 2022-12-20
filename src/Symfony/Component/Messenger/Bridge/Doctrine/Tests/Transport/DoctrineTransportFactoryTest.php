@@ -32,73 +32,67 @@ class DoctrineTransportFactoryTest extends TestCase
     public function testSupports()
     {
         $factory = new DoctrineTransportFactory(
-            $this->createMock(ConnectionRegistry::class)
+            self::createMock(ConnectionRegistry::class)
         );
 
-        $this->assertTrue($factory->supports('doctrine://default', []));
-        $this->assertFalse($factory->supports('amqp://localhost', []));
+        self::assertTrue($factory->supports('doctrine://default', []));
+        self::assertFalse($factory->supports('amqp://localhost', []));
     }
 
     public function testCreateTransport()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
-        $schemaConfig = $this->createMock(SchemaConfig::class);
-        $platform = $this->createMock(AbstractPlatform::class);
+        $driverConnection = self::createMock(\Doctrine\DBAL\Connection::class);
+        $schemaManager = self::createMock(AbstractSchemaManager::class);
+        $schemaConfig = self::createMock(SchemaConfig::class);
+        $platform = self::createMock(AbstractPlatform::class);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
         $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
-        $registry = $this->createMock(ConnectionRegistry::class);
+        $registry = self::createMock(ConnectionRegistry::class);
 
-        $registry->expects($this->once())
+        $registry->expects(self::once())
             ->method('getConnection')
             ->willReturn($driverConnection);
 
         $factory = new DoctrineTransportFactory($registry);
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
 
-        $this->assertEquals(
-            new DoctrineTransport(new Connection(PostgreSqlConnection::buildConfiguration('doctrine://default'), $driverConnection), $serializer),
-            $factory->createTransport('doctrine://default', [], $serializer)
-        );
+        self::assertEquals(new DoctrineTransport(new Connection(PostgreSqlConnection::buildConfiguration('doctrine://default'), $driverConnection), $serializer), $factory->createTransport('doctrine://default', [], $serializer));
     }
 
     public function testCreateTransportNotifyWithPostgreSQLPlatform()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
-        $schemaConfig = $this->createMock(SchemaConfig::class);
-        $platform = $this->createMock(PostgreSQLPlatform::class);
+        $driverConnection = self::createMock(\Doctrine\DBAL\Connection::class);
+        $schemaManager = self::createMock(AbstractSchemaManager::class);
+        $schemaConfig = self::createMock(SchemaConfig::class);
+        $platform = self::createMock(PostgreSQLPlatform::class);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
         $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
-        $registry = $this->createMock(ConnectionRegistry::class);
+        $registry = self::createMock(ConnectionRegistry::class);
 
-        $registry->expects($this->once())
+        $registry->expects(self::once())
             ->method('getConnection')
             ->willReturn($driverConnection);
 
         $factory = new DoctrineTransportFactory($registry);
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
 
-        $this->assertEquals(
-            new DoctrineTransport(new PostgreSqlConnection(PostgreSqlConnection::buildConfiguration('doctrine://default'), $driverConnection), $serializer),
-            $factory->createTransport('doctrine://default', [], $serializer)
-        );
+        self::assertEquals(new DoctrineTransport(new PostgreSqlConnection(PostgreSqlConnection::buildConfiguration('doctrine://default'), $driverConnection), $serializer), $factory->createTransport('doctrine://default', [], $serializer));
     }
 
     public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
     {
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN "doctrine://default".');
-        $registry = $this->createMock(ConnectionRegistry::class);
-        $registry->expects($this->once())
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage('Could not find Doctrine connection from Messenger DSN "doctrine://default".');
+        $registry = self::createMock(ConnectionRegistry::class);
+        $registry->expects(self::once())
             ->method('getConnection')
             ->willReturnCallback(function () {
                 throw new \InvalidArgumentException();
             });
 
         $factory = new DoctrineTransportFactory($registry);
-        $factory->createTransport('doctrine://default', [], $this->createMock(SerializerInterface::class));
+        $factory->createTransport('doctrine://default', [], self::createMock(SerializerInterface::class));
     }
 }

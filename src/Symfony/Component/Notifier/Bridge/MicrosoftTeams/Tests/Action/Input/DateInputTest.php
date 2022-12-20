@@ -30,7 +30,7 @@ final class DateInputTest extends AbstractInputTestCase
         $input = $this->createInput()
             ->includeTime(true);
 
-        $this->assertTrue($input->toArray()['includeTime']);
+        self::assertTrue($input->toArray()['includeTime']);
     }
 
     public function testIncludeTimeWithFalse()
@@ -38,16 +38,13 @@ final class DateInputTest extends AbstractInputTestCase
         $input = $this->createInput()
             ->includeTime(false);
 
-        $this->assertFalse($input->toArray()['includeTime']);
+        self::assertFalse($input->toArray()['includeTime']);
     }
 
     public function testToArray()
     {
-        $this->assertSame(
-            [
-                '@type' => 'DateInput',
-            ],
-            $this->createInput()->toArray()
-        );
+        self::assertSame([
+            '@type' => 'DateInput',
+        ], $this->createInput()->toArray());
     }
 }

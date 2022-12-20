@@ -23,20 +23,20 @@ class CollatorTest extends AbstractCollatorTest
 {
     public function testConstructorWithUnsupportedLocale()
     {
-        $this->expectException(MethodArgumentValueNotImplementedException::class);
+        self::expectException(MethodArgumentValueNotImplementedException::class);
         $this->getCollator('pt_BR');
     }
 
     public function testCompare()
     {
-        $this->expectException(MethodNotImplementedException::class);
+        self::expectException(MethodNotImplementedException::class);
         $collator = $this->getCollator('en');
         $collator->compare('a', 'b');
     }
 
     public function testGetAttribute()
     {
-        $this->expectException(MethodNotImplementedException::class);
+        self::expectException(MethodNotImplementedException::class);
         $collator = $this->getCollator('en');
         $collator->getAttribute(Collator::NUMERIC_COLLATION);
     }
@@ -44,51 +44,51 @@ class CollatorTest extends AbstractCollatorTest
     public function testGetErrorCode()
     {
         $collator = $this->getCollator('en');
-        $this->assertEquals(IntlGlobals::U_ZERO_ERROR, $collator->getErrorCode());
+        self::assertEquals(IntlGlobals::U_ZERO_ERROR, $collator->getErrorCode());
     }
 
     public function testGetErrorMessage()
     {
         $collator = $this->getCollator('en');
-        $this->assertEquals('U_ZERO_ERROR', $collator->getErrorMessage());
+        self::assertEquals('U_ZERO_ERROR', $collator->getErrorMessage());
     }
 
     public function testGetLocale()
     {
         $collator = $this->getCollator('en');
-        $this->assertEquals('en', $collator->getLocale());
+        self::assertEquals('en', $collator->getLocale());
     }
 
     public function testConstructWithoutLocale()
     {
         $collator = $this->getCollator(null);
-        $this->assertInstanceOf(Collator::class, $collator);
+        self::assertInstanceOf(Collator::class, $collator);
     }
 
     public function testGetSortKey()
     {
-        $this->expectException(MethodNotImplementedException::class);
+        self::expectException(MethodNotImplementedException::class);
         $collator = $this->getCollator('en');
         $collator->getSortKey('Hello');
     }
 
     public function testGetStrength()
     {
-        $this->expectException(MethodNotImplementedException::class);
+        self::expectException(MethodNotImplementedException::class);
         $collator = $this->getCollator('en');
         $collator->getStrength();
     }
 
     public function testSetAttribute()
     {
-        $this->expectException(MethodNotImplementedException::class);
+        self::expectException(MethodNotImplementedException::class);
         $collator = $this->getCollator('en');
         $collator->setAttribute(Collator::NUMERIC_COLLATION, Collator::ON);
     }
 
     public function testSetStrength()
     {
-        $this->expectException(MethodNotImplementedException::class);
+        self::expectException(MethodNotImplementedException::class);
         $collator = $this->getCollator('en');
         $collator->setStrength(Collator::PRIMARY);
     }
@@ -97,7 +97,7 @@ class CollatorTest extends AbstractCollatorTest
     {
         $collator = $this->getCollator('en');
         $collator = $collator::create('en');
-        $this->assertInstanceOf(Collator::class, $collator);
+        self::assertInstanceOf(Collator::class, $collator);
     }
 
     protected function getCollator(?string $locale): Collator

@@ -20,7 +20,7 @@ class QuestionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
         $this->question = new Question('Test question');
     }
 
@@ -65,10 +65,8 @@ class QuestionTest extends TestCase
             function (string $input): array { return []; }
         );
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'A hidden question cannot use the autocompleter.'
-        );
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('A hidden question cannot use the autocompleter.');
 
         $this->question->setHidden(true);
     }
@@ -87,7 +85,7 @@ class QuestionTest extends TestCase
             // Do nothing
         }
 
-        $this->assertNull($exception);
+        self::assertNull($exception);
     }
 
     /**
@@ -157,17 +155,17 @@ class QuestionTest extends TestCase
     public function testSetAutocompleterValuesWithTraversable()
     {
         $question1 = new Question('Test question 1');
-        $iterator1 = $this->getMockForAbstractClass(\IteratorAggregate::class);
+        $iterator1 = self::getMockForAbstractClass(\IteratorAggregate::class);
         $iterator1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getIterator')
             ->willReturn(new \ArrayIterator(['Potato']));
         $question1->setAutocompleterValues($iterator1);
 
         $question2 = new Question('Test question 2');
-        $iterator2 = $this->getMockForAbstractClass(\IteratorAggregate::class);
+        $iterator2 = self::getMockForAbstractClass(\IteratorAggregate::class);
         $iterator2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getIterator')
             ->willReturn(new \ArrayIterator(['Carrot']));
         $question2->setAutocompleterValues($iterator2);
@@ -202,10 +200,8 @@ class QuestionTest extends TestCase
     {
         $this->question->setHidden(true);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'A hidden question cannot use the autocompleter.'
-        );
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('A hidden question cannot use the autocompleter.');
 
         $this->question->setAutocompleterCallback(
             function (string $input): array { return []; }
@@ -226,7 +222,7 @@ class QuestionTest extends TestCase
             // Do nothing
         }
 
-        $this->assertNull($exception);
+        self::assertNull($exception);
     }
 
     public function providerGetSetValidator()

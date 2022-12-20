@@ -31,14 +31,14 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
         $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.uniqid('CompiledUrlMatcher').'.php';
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
+        self::tearDown();
 
         @unlink($this->dumpPath);
     }
@@ -49,7 +49,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
         $collection->add('foo', new Route('/foo:bar/'));
 
         $matcher = $this->generateDumpedMatcher($collection);
-        $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/', 'foo')->willReturn([]);
+        $matcher->expects(self::once())->method('redirect')->with('/foo%3Abar/', 'foo')->willReturn([]);
 
         $matcher->match('/foo%3Abar');
     }
@@ -62,7 +62,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
         $basePath = __DIR__.'/../../Fixtures/dumper/';
 
         $dumper = new CompiledUrlMatcherDumper($collection);
-        $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump());
+        self::assertStringEqualsFile($basePath.$fixture, $dumper->dump());
     }
 
     public function getRouteCollections()
@@ -484,7 +484,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
         file_put_contents($this->dumpPath, $code);
         $compiledRoutes = require $this->dumpPath;
 
-        return $this->getMockBuilder(TestCompiledUrlMatcher::class)
+        return self::getMockBuilder(TestCompiledUrlMatcher::class)
             ->setConstructorArgs([$compiledRoutes, new RequestContext()])
             ->setMethods(['redirect'])
             ->getMock();
@@ -492,8 +492,8 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
     public function testGenerateDumperMatcherWithObject()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
         $routeCollection = new RouteCollection();
         $routeCollection->add('_', new Route('/', [new \stdClass()]));
         $dumper = new CompiledUrlMatcherDumper($routeCollection);

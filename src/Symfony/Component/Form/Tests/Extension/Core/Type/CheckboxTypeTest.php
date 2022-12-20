@@ -22,9 +22,9 @@ class CheckboxTypeTest extends BaseTypeTest
     {
         $form = $this->factory->create(static::TESTED_TYPE);
 
-        $this->assertFalse($form->getData());
-        $this->assertFalse($form->getNormData());
-        $this->assertNull($form->getViewData());
+        self::assertFalse($form->getData());
+        self::assertFalse($form->getNormData());
+        self::assertNull($form->getViewData());
     }
 
     public function testPassValueToView()
@@ -32,7 +32,7 @@ class CheckboxTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE, null, ['value' => 'foobar'])
             ->createView();
 
-        $this->assertEquals('foobar', $view->vars['value']);
+        self::assertEquals('foobar', $view->vars['value']);
     }
 
     public function testCheckedIfDataTrue()
@@ -41,7 +41,7 @@ class CheckboxTypeTest extends BaseTypeTest
             ->setData(true)
             ->createView();
 
-        $this->assertTrue($view->vars['checked']);
+        self::assertTrue($view->vars['checked']);
     }
 
     public function testCheckedIfDataTrueWithEmptyValue()
@@ -50,7 +50,7 @@ class CheckboxTypeTest extends BaseTypeTest
             ->setData(true)
             ->createView();
 
-        $this->assertTrue($view->vars['checked']);
+        self::assertTrue($view->vars['checked']);
     }
 
     public function testNotCheckedIfDataFalse()
@@ -59,7 +59,7 @@ class CheckboxTypeTest extends BaseTypeTest
             ->setData(false)
             ->createView();
 
-        $this->assertFalse($view->vars['checked']);
+        self::assertFalse($view->vars['checked']);
     }
 
     public function testSubmitWithValueChecked()
@@ -69,8 +69,8 @@ class CheckboxTypeTest extends BaseTypeTest
         ]);
         $form->submit('foobar');
 
-        $this->assertTrue($form->getData());
-        $this->assertEquals('foobar', $form->getViewData());
+        self::assertTrue($form->getData());
+        self::assertEquals('foobar', $form->getViewData());
     }
 
     public function testSubmitWithRandomValueChecked()
@@ -80,8 +80,8 @@ class CheckboxTypeTest extends BaseTypeTest
         ]);
         $form->submit('krixikraxi');
 
-        $this->assertTrue($form->getData());
-        $this->assertEquals('foobar', $form->getViewData());
+        self::assertTrue($form->getData());
+        self::assertEquals('foobar', $form->getViewData());
     }
 
     public function testSubmitWithValueUnchecked()
@@ -91,8 +91,8 @@ class CheckboxTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertFalse($form->getData());
-        $this->assertNull($form->getViewData());
+        self::assertFalse($form->getData());
+        self::assertNull($form->getViewData());
     }
 
     public function testSubmitWithEmptyValueChecked()
@@ -102,8 +102,8 @@ class CheckboxTypeTest extends BaseTypeTest
         ]);
         $form->submit('');
 
-        $this->assertTrue($form->getData());
-        $this->assertSame('', $form->getViewData());
+        self::assertTrue($form->getData());
+        self::assertSame('', $form->getViewData());
     }
 
     public function testSubmitWithEmptyValueUnchecked()
@@ -113,8 +113,8 @@ class CheckboxTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertFalse($form->getData());
-        $this->assertNull($form->getViewData());
+        self::assertFalse($form->getData());
+        self::assertNull($form->getViewData());
     }
 
     public function testSubmitWithEmptyValueAndFalseUnchecked()
@@ -124,8 +124,8 @@ class CheckboxTypeTest extends BaseTypeTest
         ]);
         $form->submit(false);
 
-        $this->assertFalse($form->getData());
-        $this->assertNull($form->getViewData());
+        self::assertFalse($form->getData());
+        self::assertNull($form->getViewData());
     }
 
     public function testSubmitWithEmptyValueAndTrueChecked()
@@ -135,8 +135,8 @@ class CheckboxTypeTest extends BaseTypeTest
         ]);
         $form->submit(true);
 
-        $this->assertTrue($form->getData());
-        $this->assertSame('', $form->getViewData());
+        self::assertTrue($form->getData());
+        self::assertSame('', $form->getViewData());
     }
 
     /**
@@ -161,9 +161,9 @@ class CheckboxTypeTest extends BaseTypeTest
         $form->setData($data);
         $view = $form->createView();
 
-        $this->assertSame($data, $form->getData());
-        $this->assertSame($checked, $form->getNormData());
-        $this->assertEquals($checked, $view->vars['checked']);
+        self::assertSame($data, $form->getData());
+        self::assertSame($checked, $form->getNormData());
+        self::assertEquals($checked, $view->vars['checked']);
     }
 
     public function provideCustomModelTransformerData()
@@ -183,7 +183,7 @@ class CheckboxTypeTest extends BaseTypeTest
             'false_values' => [$falseValue],
         ]);
         $form->submit($falseValue);
-        $this->assertFalse($form->getData());
+        self::assertFalse($form->getData());
     }
 
     public function provideCustomFalseValues()
@@ -197,8 +197,8 @@ class CheckboxTypeTest extends BaseTypeTest
 
     public function testDontAllowNonArrayFalseValues()
     {
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessageMatches('/"false_values" with value "invalid" is expected to be of type "array"/');
+        self::expectException(InvalidOptionsException::class);
+        self::expectExceptionMessageMatches('/"false_values" with value "invalid" is expected to be of type "array"/');
         $this->factory->create(static::TESTED_TYPE, null, [
             'false_values' => 'invalid',
         ]);
@@ -217,9 +217,9 @@ class CheckboxTypeTest extends BaseTypeTest
         $form->submit(null);
 
         // view data is transformed to the string true value
-        $this->assertSame('1', $form->getViewData());
-        $this->assertSame($expectedData, $form->getNormData());
-        $this->assertSame($expectedData, $form->getData());
+        self::assertSame('1', $form->getViewData());
+        self::assertSame($expectedData, $form->getNormData());
+        self::assertSame($expectedData, $form->getData());
     }
 
     public function testSubmitNullIsEmpty()
@@ -228,6 +228,6 @@ class CheckboxTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertTrue($form->isEmpty());
+        self::assertTrue($form->isEmpty());
     }
 }

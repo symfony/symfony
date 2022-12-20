@@ -31,60 +31,60 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
     {
         $provider = $this->getProvider();
 
-        $this->assertTrue($provider->supports($this->getSupportedToken()));
-        $this->assertFalse($provider->supports($this->createMock(TokenInterface::class)));
+        self::assertTrue($provider->supports($this->getSupportedToken()));
+        self::assertFalse($provider->supports(self::createMock(TokenInterface::class)));
 
-        $token = $this->createMock(PreAuthenticatedToken::class);
+        $token = self::createMock(PreAuthenticatedToken::class);
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getFirewallName')
             ->willReturn('foo')
         ;
-        $this->assertFalse($provider->supports($token));
+        self::assertFalse($provider->supports($token));
     }
 
     public function testAuthenticateWhenTokenIsNotSupported()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('The token is not supported by this authentication provider.');
+        self::expectException(AuthenticationException::class);
+        self::expectExceptionMessage('The token is not supported by this authentication provider.');
         $provider = $this->getProvider();
 
-        $provider->authenticate($this->createMock(TokenInterface::class));
+        $provider->authenticate(self::createMock(TokenInterface::class));
     }
 
     public function testAuthenticateWhenNoUserIsSet()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $provider = $this->getProvider();
         $provider->authenticate($this->getSupportedToken(''));
     }
 
     public function testAuthenticate()
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = self::createMock(UserInterface::class);
         $user
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getRoles')
             ->willReturn([])
         ;
         $provider = $this->getProvider($user);
 
         $token = $provider->authenticate($this->getSupportedToken('fabien', 'pass'));
-        $this->assertInstanceOf(PreAuthenticatedToken::class, $token);
-        $this->assertEquals('pass', $token->getCredentials());
-        $this->assertEquals('key', $token->getFirewallName());
-        $this->assertEquals([], $token->getRoleNames());
-        $this->assertEquals(['foo' => 'bar'], $token->getAttributes(), '->authenticate() copies token attributes');
-        $this->assertSame($user, $token->getUser());
+        self::assertInstanceOf(PreAuthenticatedToken::class, $token);
+        self::assertEquals('pass', $token->getCredentials());
+        self::assertEquals('key', $token->getFirewallName());
+        self::assertEquals([], $token->getRoleNames());
+        self::assertEquals(['foo' => 'bar'], $token->getAttributes(), '->authenticate() copies token attributes');
+        self::assertSame($user, $token->getUser());
     }
 
     public function testAuthenticateWhenUserCheckerThrowsException()
     {
-        $this->expectException(LockedException::class);
-        $user = $this->createMock(UserInterface::class);
+        self::expectException(LockedException::class);
+        $user = self::createMock(UserInterface::class);
 
-        $userChecker = $this->createMock(UserCheckerInterface::class);
-        $userChecker->expects($this->once())
+        $userChecker = self::createMock(UserCheckerInterface::class);
+        $userChecker->expects(self::once())
                     ->method('checkPostAuth')
                     ->willThrowException(new LockedException())
         ;
@@ -96,22 +96,22 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken($user = false, $credentials = false)
     {
-        $token = $this->getMockBuilder(PreAuthenticatedToken::class)->setMethods(['getUser', 'getCredentials', 'getFirewallName'])->disableOriginalConstructor()->getMock();
+        $token = self::getMockBuilder(PreAuthenticatedToken::class)->setMethods(['getUser', 'getCredentials', 'getFirewallName'])->disableOriginalConstructor()->getMock();
         if (false !== $user) {
-            $token->expects($this->once())
+            $token->expects(self::once())
                   ->method('getUser')
                   ->willReturn($user)
             ;
         }
         if (false !== $credentials) {
-            $token->expects($this->once())
+            $token->expects(self::once())
                   ->method('getCredentials')
                   ->willReturn($credentials)
             ;
         }
 
         $token
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getFirewallName')
             ->willReturn('key')
         ;
@@ -123,16 +123,16 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     protected function getProvider($user = null, $userChecker = null)
     {
-        $userProvider = $this->createMock(InMemoryUserProvider::class);
+        $userProvider = self::createMock(InMemoryUserProvider::class);
         if (null !== $user) {
-            $userProvider->expects($this->once())
+            $userProvider->expects(self::once())
                          ->method('loadUserByIdentifier')
                          ->willReturn($user)
             ;
         }
 
         if (null === $userChecker) {
-            $userChecker = $this->createMock(UserCheckerInterface::class);
+            $userChecker = self::createMock(UserCheckerInterface::class);
         }
 
         return new PreAuthenticatedAuthenticationProvider($userProvider, $userChecker, 'key');

@@ -36,19 +36,19 @@ class AddConstraintValidatorsPassTest extends TestCase
         $addConstraintValidatorsPass->process($container);
 
         $locator = $container->getDefinition((string) $validatorFactory->getArgument(0));
-        $this->assertTrue(!$locator->isPublic() || $locator->isPrivate());
+        self::assertTrue(!$locator->isPublic() || $locator->isPrivate());
         $expected = (new Definition(ServiceLocator::class, [[
             Validator1::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
             'my_constraint_validator_alias1' => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
             Validator2::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service2')),
         ]]))->addTag('container.service_locator')->setPublic(false);
-        $this->assertEquals($expected, $locator->setPublic(false));
+        self::assertEquals($expected, $locator->setPublic(false));
     }
 
     public function testAbstractConstraintValidator()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.');
         $container = new ContainerBuilder();
         $container->register('validator.validator_factory')
             ->addArgument([]);
@@ -72,7 +72,7 @@ class AddConstraintValidatorsPassTest extends TestCase
         $addConstraintValidatorsPass->process($container);
 
         // the container is untouched (i.e. no new definitions or aliases)
-        $this->assertCount($definitionsBefore, $container->getDefinitions());
-        $this->assertCount($aliasesBefore, $container->getAliases());
+        self::assertCount($definitionsBefore, $container->getDefinitions());
+        self::assertCount($aliasesBefore, $container->getAliases());
     }
 }

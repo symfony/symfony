@@ -38,7 +38,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsCountableType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Count(5));
     }
 
@@ -285,17 +285,17 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Count(5);
 
-        $this->assertEquals(5, $constraint->min);
-        $this->assertEquals(5, $constraint->max);
+        self::assertEquals(5, $constraint->min);
+        self::assertEquals(5, $constraint->max);
     }
 
     public function testConstraintAnnotationDefaultOption()
     {
         $constraint = new Count(['value' => 5, 'exactMessage' => 'message']);
 
-        $this->assertEquals(5, $constraint->min);
-        $this->assertEquals(5, $constraint->max);
-        $this->assertEquals('message', $constraint->exactMessage);
+        self::assertEquals(5, $constraint->min);
+        self::assertEquals(5, $constraint->max);
+        self::assertEquals('message', $constraint->exactMessage);
     }
 
     // Since the contextual validator is mocked, this test only asserts that it

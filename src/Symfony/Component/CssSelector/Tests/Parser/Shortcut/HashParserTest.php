@@ -25,11 +25,11 @@ class HashParserTest extends TestCase
     {
         $parser = new HashParser();
         $selectors = $parser->parse($source);
-        $this->assertCount(1, $selectors);
+        self::assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
-        $this->assertEquals($representation, (string) $selector->getTree());
+        self::assertEquals($representation, (string) $selector->getTree());
     }
 
     public function getParseTestData()

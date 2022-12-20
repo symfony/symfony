@@ -22,7 +22,7 @@ class MessageConverterTest extends TestCase
     {
         $file = file_get_contents(__DIR__.'/Fixtures/mimetypes/test.gif');
         $email = (new Email())->from('fabien@symfony.com')->to('you@example.com');
-        $this->assertSame($email, MessageConverter::toEmail($email));
+        self::assertSame($email, MessageConverter::toEmail($email));
 
         $this->assertConversion((clone $email)->text('text content'));
         $this->assertConversion((clone $email)->html('HTML content <img src="cid:test.jpg" />'));
@@ -72,7 +72,7 @@ class MessageConverterTest extends TestCase
         $message = new Message($expected->getHeaders(), $r->invoke($expected));
         $converted = MessageConverter::toEmail($message);
         if ($expected->getHtmlBody()) {
-            $this->assertStringMatchesFormat(str_replace('cid:test.jpg', 'cid:%s', $expected->getHtmlBody()), $converted->getHtmlBody());
+            self::assertStringMatchesFormat(str_replace('cid:test.jpg', 'cid:%s', $expected->getHtmlBody()), $converted->getHtmlBody());
             $expected->html('HTML content');
             $converted->html('HTML content');
         }
@@ -82,6 +82,6 @@ class MessageConverterTest extends TestCase
         $r->setValue($expected, null);
         $r->setValue($converted, null);
 
-        $this->assertEquals($expected, $converted);
+        self::assertEquals($expected, $converted);
     }
 }

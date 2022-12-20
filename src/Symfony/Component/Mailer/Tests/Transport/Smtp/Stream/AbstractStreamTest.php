@@ -26,7 +26,7 @@ class AbstractStreamTest extends TestCase
             $result .= $chunk;
         }
 
-        $this->assertSame($expected, $result);
+        self::assertSame($expected, $result);
     }
 
     public function provideReplace()

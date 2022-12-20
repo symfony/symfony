@@ -26,20 +26,20 @@ class UuidTest extends TestCase
     {
         $uuid = new Uuid(['normalizer' => 'trim']);
 
-        $this->assertEquals('trim', $uuid->normalizer);
+        self::assertEquals('trim', $uuid->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Uuid(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Uuid(['normalizer' => new \stdClass()]);
     }
 

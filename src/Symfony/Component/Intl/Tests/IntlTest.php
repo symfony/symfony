@@ -20,14 +20,14 @@ class IntlTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
         $this->defaultLocale = \Locale::getDefault();
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
+        self::tearDown();
 
         \Locale::setDefault($this->defaultLocale);
     }
@@ -37,26 +37,26 @@ class IntlTest extends TestCase
      */
     public function testIsExtensionLoadedChecksIfIntlExtensionIsLoaded()
     {
-        $this->assertTrue(Intl::isExtensionLoaded());
+        self::assertTrue(Intl::isExtensionLoaded());
     }
 
     public function testGetIcuVersionReadsTheVersionOfInstalledIcuLibrary()
     {
-        $this->assertStringMatchesFormat('%d.%d', Intl::getIcuVersion());
+        self::assertStringMatchesFormat('%d.%d', Intl::getIcuVersion());
     }
 
     public function testGetIcuDataVersionReadsTheVersionOfInstalledIcuData()
     {
-        $this->assertStringMatchesFormat('%d.%d', Intl::getIcuDataVersion());
+        self::assertStringMatchesFormat('%d.%d', Intl::getIcuDataVersion());
     }
 
     public function testGetIcuStubVersionReadsTheVersionOfBundledStubs()
     {
-        $this->assertStringMatchesFormat('%d.%d', Intl::getIcuStubVersion());
+        self::assertStringMatchesFormat('%d.%d', Intl::getIcuStubVersion());
     }
 
     public function testGetDataDirectoryReturnsThePathToIcuData()
     {
-        $this->assertDirectoryExists(Intl::getDataDirectory());
+        self::assertDirectoryExists(Intl::getDataDirectory());
     }
 }

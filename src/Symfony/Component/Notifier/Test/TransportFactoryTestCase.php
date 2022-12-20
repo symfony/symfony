@@ -68,7 +68,7 @@ abstract class TransportFactoryTestCase extends TestCase
     {
         $factory = $this->createFactory();
 
-        $this->assertSame($expected, $factory->supports(new Dsn($dsn)));
+        self::assertSame($expected, $factory->supports(new Dsn($dsn)));
     }
 
     /**
@@ -79,7 +79,7 @@ abstract class TransportFactoryTestCase extends TestCase
         $factory = $this->createFactory();
         $transport = $factory->create(new Dsn($dsn));
 
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     /**
@@ -91,9 +91,9 @@ abstract class TransportFactoryTestCase extends TestCase
 
         $dsn = new Dsn($dsn);
 
-        $this->expectException(UnsupportedSchemeException::class);
+        self::expectException(UnsupportedSchemeException::class);
         if (null !== $message) {
-            $this->expectExceptionMessage($message);
+            self::expectExceptionMessage($message);
         }
 
         $factory->create($dsn);
@@ -108,9 +108,9 @@ abstract class TransportFactoryTestCase extends TestCase
 
         $dsn = new Dsn($dsn);
 
-        $this->expectException(IncompleteDsnException::class);
+        self::expectException(IncompleteDsnException::class);
         if (null !== $message) {
-            $this->expectExceptionMessage($message);
+            self::expectExceptionMessage($message);
         }
 
         $factory->create($dsn);
@@ -125,9 +125,9 @@ abstract class TransportFactoryTestCase extends TestCase
 
         $dsn = new Dsn($dsn);
 
-        $this->expectException(MissingRequiredOptionException::class);
+        self::expectException(MissingRequiredOptionException::class);
         if (null !== $message) {
-            $this->expectExceptionMessage($message);
+            self::expectExceptionMessage($message);
         }
 
         $factory->create($dsn);

@@ -25,7 +25,7 @@ class DataCollectorTest extends TestCase
         $c->collect(new Request(), new Response());
         $cloner = new VarCloner();
 
-        $this->assertEquals($cloner->cloneVar('scheme://foo'), $c->getData());
+        self::assertEquals($cloner->cloneVar('scheme://foo'), $c->getData());
     }
 
     public function testCloneVarExistingFilePath()
@@ -33,6 +33,6 @@ class DataCollectorTest extends TestCase
         $c = new CloneVarDataCollector([$filePath = tempnam(sys_get_temp_dir(), 'clone_var_data_collector_')]);
         $c->collect(new Request(), new Response());
 
-        $this->assertSame($filePath, $c->getData()[0]);
+        self::assertSame($filePath, $c->getData()[0]);
     }
 }

@@ -24,7 +24,7 @@ class DefinitionBuilderTest extends TestCase
         $builder->setInitialPlaces('b');
         $definition = $builder->build();
 
-        $this->assertEquals(['b'], $definition->getInitialPlaces());
+        self::assertEquals(['b'], $definition->getInitialPlaces());
     }
 
     public function testAddTransition()
@@ -38,9 +38,9 @@ class DefinitionBuilderTest extends TestCase
 
         $definition = $builder->build();
 
-        $this->assertCount(2, $definition->getTransitions());
-        $this->assertSame($transition0, $definition->getTransitions()[0]);
-        $this->assertSame($transition1, $definition->getTransitions()[1]);
+        self::assertCount(2, $definition->getTransitions());
+        self::assertSame($transition0, $definition->getTransitions()[0]);
+        self::assertSame($transition1, $definition->getTransitions()[1]);
     }
 
     public function testAddPlace()
@@ -50,9 +50,9 @@ class DefinitionBuilderTest extends TestCase
 
         $definition = $builder->build();
 
-        $this->assertCount(2, $definition->getPlaces());
-        $this->assertEquals('a', $definition->getPlaces()['a']);
-        $this->assertEquals('b', $definition->getPlaces()['b']);
+        self::assertCount(2, $definition->getPlaces());
+        self::assertEquals('a', $definition->getPlaces()['a']);
+        self::assertEquals('b', $definition->getPlaces()['b']);
     }
 
     public function testSetMetadataStore()
@@ -62,6 +62,6 @@ class DefinitionBuilderTest extends TestCase
         $builder->setMetadataStore($metadataStore);
         $definition = $builder->build();
 
-        $this->assertSame($metadataStore, $definition->getMetadataStore());
+        self::assertSame($metadataStore, $definition->getMetadataStore());
     }
 }

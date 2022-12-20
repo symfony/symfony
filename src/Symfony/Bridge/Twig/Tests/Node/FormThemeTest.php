@@ -38,9 +38,9 @@ class FormThemeTest extends TestCase
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $this->assertEquals($form, $node->getNode('form'));
-        $this->assertEquals($resources, $node->getNode('resources'));
-        $this->assertFalse($node->getAttribute('only'));
+        self::assertEquals($form, $node->getNode('form'));
+        self::assertEquals($resources, $node->getNode('resources'));
+        self::assertFalse($node->getAttribute('only'));
     }
 
     public function testCompile()
@@ -55,50 +55,38 @@ class FormThemeTest extends TestCase
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $environment = new Environment($this->createMock(LoaderInterface::class));
-        $formRenderer = new FormRenderer($this->createMock(FormRendererEngineInterface::class));
+        $environment = new Environment(self::createMock(LoaderInterface::class));
+        $formRenderer = new FormRenderer(self::createMock(FormRendererEngineInterface::class));
         $this->registerTwigRuntimeLoader($environment, $formRenderer);
         $compiler = new Compiler($environment);
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], true);',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], true);',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
 
         $node = new FormThemeNode($form, $resources, 0, null, true);
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], false);',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], false);',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
 
         $resources = new ConstantExpression('tpl1', 0);
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", true);',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", true);',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
 
         $node = new FormThemeNode($form, $resources, 0, null, true);
 
-        $this->assertEquals(
-            sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", false);',
-                $this->getVariableGetter('form')
-            ),
-            trim($compiler->compile($node)->getSource())
-        );
+        self::assertEquals(sprintf(
+            '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", false);',
+            $this->getVariableGetter('form')
+        ), trim($compiler->compile($node)->getSource()));
     }
 
     protected function getVariableGetter($name)

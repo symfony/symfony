@@ -20,12 +20,12 @@ class CodeExtensionTest extends TestCase
     public function testFormatFile()
     {
         $expected = sprintf('<a href="proto://foobar%s#&amp;line=25" title="Click to open this file" class="file_link">%s at line 25</a>', substr(__FILE__, 5), __FILE__);
-        $this->assertEquals($expected, $this->getExtension()->formatFile(__FILE__, 25));
+        self::assertEquals($expected, $this->getExtension()->formatFile(__FILE__, 25));
     }
 
     public function testFileRelative()
     {
-        $this->assertEquals('file.txt', $this->getExtension()->getFileRelative(\DIRECTORY_SEPARATOR.'project'.\DIRECTORY_SEPARATOR.'file.txt'));
+        self::assertEquals('file.txt', $this->getExtension()->getFileRelative(\DIRECTORY_SEPARATOR.'project'.\DIRECTORY_SEPARATOR.'file.txt'));
     }
 
     /**
@@ -33,7 +33,7 @@ class CodeExtensionTest extends TestCase
      */
     public function testGettingClassAbbreviation($class, $abbr)
     {
-        $this->assertEquals($this->getExtension()->abbrClass($class), $abbr);
+        self::assertEquals($this->getExtension()->abbrClass($class), $abbr);
     }
 
     /**
@@ -41,7 +41,7 @@ class CodeExtensionTest extends TestCase
      */
     public function testGettingMethodAbbreviation($method, $abbr)
     {
-        $this->assertEquals($this->getExtension()->abbrMethod($method), $abbr);
+        self::assertEquals($this->getExtension()->abbrMethod($method), $abbr);
     }
 
     public function getClassNameProvider(): array

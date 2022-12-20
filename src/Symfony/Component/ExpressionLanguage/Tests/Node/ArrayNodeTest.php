@@ -24,8 +24,8 @@ class ArrayNodeTest extends AbstractNodeTest
         $serializedNode = serialize($node);
         $unserializedNode = unserialize($serializedNode);
 
-        $this->assertEquals($node, $unserializedNode);
-        $this->assertNotEquals($this->createArrayNode(), $unserializedNode);
+        self::assertEquals($node, $unserializedNode);
+        self::assertNotEquals($this->createArrayNode(), $unserializedNode);
     }
 
     public function getEvaluateData()

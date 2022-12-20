@@ -41,13 +41,13 @@ class CompleteCommandTest extends TestCase
 
     public function testRequiredShellOption()
     {
-        $this->expectExceptionMessage('The "--shell" option must be set.');
+        self::expectExceptionMessage('The "--shell" option must be set.');
         $this->execute([]);
     }
 
     public function testUnsupportedShellOption()
     {
-        $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash").');
+        self::expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash").');
         $this->execute(['--shell' => 'unsupported']);
     }
 
@@ -62,7 +62,7 @@ class CompleteCommandTest extends TestCase
         // verify that the default set of shells is still supported
         $this->execute(['--shell' => 'bash', '--current' => '1', '--input' => ['bin/console']]);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -71,7 +71,7 @@ class CompleteCommandTest extends TestCase
     public function testInputAndCurrentOptionValidation(array $input, ?string $exceptionMessage)
     {
         if ($exceptionMessage) {
-            $this->expectExceptionMessage($exceptionMessage);
+            self::expectExceptionMessage($exceptionMessage);
         }
 
         $this->execute($input + ['--shell' => 'bash']);
@@ -97,7 +97,7 @@ class CompleteCommandTest extends TestCase
     public function testCompleteCommandName(array $input, array $suggestions)
     {
         $this->execute(['--current' => '1', '--input' => $input]);
-        $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
+        self::assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
     }
 
     public function provideCompleteCommandNameInputs()
@@ -114,7 +114,7 @@ class CompleteCommandTest extends TestCase
     public function testCompleteCommandInputDefinition(array $input, array $suggestions)
     {
         $this->execute(['--current' => '2', '--input' => $input]);
-        $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
+        self::assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
     }
 
     public function provideCompleteCommandInputDefinitionInputs()

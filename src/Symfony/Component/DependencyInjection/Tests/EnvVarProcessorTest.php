@@ -37,10 +37,10 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor($container);
 
         $result = $processor->getEnv('string', 'foo', function () {
-            $this->fail('Should not be called');
+            self::fail('Should not be called');
         });
 
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     public function validStrings()
@@ -65,12 +65,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('bool', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
 
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     /**
@@ -81,12 +81,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('not', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
 
-        $this->assertSame(!$processed, $result);
+        self::assertSame(!$processed, $result);
     }
 
     public function validBools()
@@ -110,12 +110,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('int', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
 
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     public function validInts()
@@ -132,12 +132,12 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvIntInvalid($value)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Non-numeric env var');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Non-numeric env var');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('int', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
@@ -160,12 +160,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('float', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
 
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     public function validFloats()
@@ -182,12 +182,12 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvFloatInvalid($value)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Non-numeric env var');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Non-numeric env var');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('float', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
@@ -210,12 +210,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('const', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
 
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     public function validConsts()
@@ -231,12 +231,12 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvConstInvalid($value)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('undefined constant');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('undefined constant');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('const', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
@@ -255,18 +255,18 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('base64', 'foo', function ($name) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return base64_encode('hello');
         });
 
-        $this->assertSame('hello', $result);
+        self::assertSame('hello', $result);
 
         $result = $processor->getEnv('base64', 'foo', function ($name) { return '/+0='; });
-        $this->assertSame("\xFF\xED", $result);
+        self::assertSame("\xFF\xED", $result);
 
         $result = $processor->getEnv('base64', 'foo', function ($name) { return '_-0='; });
-        $this->assertSame("\xFF\xED", $result);
+        self::assertSame("\xFF\xED", $result);
     }
 
     public function testGetEnvTrim()
@@ -274,12 +274,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('trim', 'foo', function ($name) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return " hello\n";
         });
 
-        $this->assertSame('hello', $result);
+        self::assertSame('hello', $result);
     }
 
     /**
@@ -290,12 +290,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('json', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
 
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     public function validJson()
@@ -309,12 +309,12 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvInvalidJson()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Syntax error');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Syntax error');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('json', 'foo', function ($name) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return 'invalid_json';
         });
@@ -325,12 +325,12 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvJsonOther($value)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid JSON env var');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Invalid JSON env var');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('json', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return json_encode($value);
         });
@@ -349,12 +349,12 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvUnknown()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported env var prefix');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Unsupported env var prefix');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('unknown', 'foo', function ($name) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return 'foo';
         });
@@ -362,12 +362,12 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvKeyInvalidKey()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid env "key:foo": a key specifier should be provided.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Invalid env "key:foo": a key specifier should be provided.');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'foo', function ($name) {
-            $this->fail('Should not get here');
+            self::fail('Should not get here');
         });
     }
 
@@ -376,12 +376,12 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyNoArrayResult($value)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Resolved value of "foo" did not result in an array value.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Resolved value of "foo" did not result in an array value.');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
@@ -402,12 +402,12 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyArrayKeyNotFound($value)
     {
-        $this->expectException(EnvNotFoundException::class);
-        $this->expectExceptionMessage('Key "index" not found in');
+        self::expectException(EnvNotFoundException::class);
+        self::expectExceptionMessage('Key "index" not found in');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
@@ -429,8 +429,8 @@ class EnvVarProcessorTest extends TestCase
     {
         $processor = new EnvVarProcessor(new Container());
 
-        $this->assertSame($value['index'], $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+        self::assertSame($value['index'], $processor->getEnv('key', 'index:foo', function ($name) use ($value) {
+            self::assertSame('foo', $name);
 
             return $value;
         }));
@@ -455,8 +455,8 @@ class EnvVarProcessorTest extends TestCase
     {
         $processor = new EnvVarProcessor(new Container());
 
-        $this->assertSame('password', $processor->getEnv('key', 'index:file:foo', function ($name) {
-            $this->assertSame('file:foo', $name);
+        self::assertSame('password', $processor->getEnv('key', 'index:file:foo', function ($name) {
+            self::assertSame('file:foo', $name);
 
             return [
                 'index' => 'password',
@@ -471,11 +471,11 @@ class EnvVarProcessorTest extends TestCase
     {
         $processor = new EnvVarProcessor(new Container());
         $result = $processor->getEnv('default', ':foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     public function validNullables()
@@ -491,8 +491,8 @@ class EnvVarProcessorTest extends TestCase
 
     public function testRequireMissingFile()
     {
-        $this->expectException(EnvNotFoundException::class);
-        $this->expectExceptionMessage('missing-file');
+        self::expectException(EnvNotFoundException::class);
+        self::expectExceptionMessage('missing-file');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('require', '/missing-file', function ($name) {
@@ -507,12 +507,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('require', $path, function ($name) use ($path) {
-            $this->assertSame($path, $name);
+            self::assertSame($path, $name);
 
             return $path;
         });
 
-        $this->assertEquals('foo', $result);
+        self::assertEquals('foo', $result);
     }
 
     /**
@@ -530,7 +530,7 @@ class EnvVarProcessorTest extends TestCase
             return '%bar%';
         });
 
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     public function validResolve()
@@ -552,7 +552,7 @@ class EnvVarProcessorTest extends TestCase
             return '%%';
         });
 
-        $this->assertSame('%', $result);
+        self::assertSame('%', $result);
     }
 
     /**
@@ -560,8 +560,8 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvResolveNotScalar($value)
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Parameter "bar" found when resolving env var "foo" must be scalar');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Parameter "bar" found when resolving env var "foo" must be scalar');
 
         $container = new ContainerBuilder();
         $container->setParameter('bar', $value);
@@ -595,7 +595,7 @@ class EnvVarProcessorTest extends TestCase
             return 'foo' === $name ? '%env(BAR)%' : $getEnv('string', $name, function () {});
         });
 
-        $this->assertSame('BAR in container', $result);
+        self::assertSame('BAR in container', $result);
     }
 
     public function testGetEnvResolveNestedRealEnv()
@@ -613,7 +613,7 @@ class EnvVarProcessorTest extends TestCase
             return 'foo' === $name ? '%env(BAR)%' : $getEnv('string', $name, function () {});
         });
 
-        $this->assertSame('BAR in environment', $result);
+        self::assertSame('BAR in environment', $result);
 
         unset($_ENV['BAR']);
     }
@@ -626,12 +626,12 @@ class EnvVarProcessorTest extends TestCase
         $processor = new EnvVarProcessor(new Container());
 
         $result = $processor->getEnv('csv', 'foo', function ($name) use ($value) {
-            $this->assertSame('foo', $name);
+            self::assertSame('foo', $name);
 
             return $value;
         });
 
-        $this->assertSame($processed, $result);
+        self::assertSame($processed, $result);
     }
 
     public function validCsv()
@@ -677,13 +677,13 @@ CSV;
         $processor = new EnvVarProcessor(new Container(), $loaders());
 
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
-        $this->assertSame('123', $result);
+        self::assertSame('123', $result);
 
         $result = $processor->getEnv('string', 'BAR_ENV_LOADER', function () {});
-        $this->assertSame('456', $result);
+        self::assertSame('456', $result);
 
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
-        $this->assertSame('123', $result); // check twice
+        self::assertSame('123', $result); // check twice
     }
 
     public function testCircularEnvLoader()
@@ -711,29 +711,29 @@ CSV;
         $processor = new EnvVarProcessor($container, new RewindableGenerator($loaders, 1));
 
         $result = $processor->getEnv('string', 'FOO_CONTAINER', function () {});
-        $this->assertSame('foo', $result);
+        self::assertSame('foo', $result);
 
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
-        $this->assertSame('123', $result);
+        self::assertSame('123', $result);
 
         $result = $processor->getEnv('default', ':BAR_CONTAINER', function ($name) use ($processor) {
-            $this->assertSame('BAR_CONTAINER', $name);
+            self::assertSame('BAR_CONTAINER', $name);
 
             return $processor->getEnv('string', $name, function () {});
         });
-        $this->assertNull($result);
+        self::assertNull($result);
 
-        $this->assertSame(2, $index);
+        self::assertSame(2, $index);
     }
 
     public function testGetEnvInvalidPrefixWithDefault()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported env var prefix');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Unsupported env var prefix');
         $processor = new EnvVarProcessor(new Container());
 
         $processor->getEnv('unknown', 'default::FAKE', function ($name) {
-            $this->assertSame('default::FAKE', $name);
+            self::assertSame('default::FAKE', $name);
 
             return null;
         });
@@ -744,7 +744,7 @@ CSV;
      */
     public function testGetEnvUrlPath(?string $expected, string $url)
     {
-        $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('url', 'foo', static function () use ($url): string {
+        self::assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('url', 'foo', static function () use ($url): string {
             return $url;
         })['path']);
     }

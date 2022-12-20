@@ -59,10 +59,10 @@ class PdoDbalAdapterTest extends AdapterTestCase
         $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
         if (!interface_exists(Middleware::class)) {
-            $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
+            self::markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
         }
 
-        $middleware = $this->createMock(Middleware::class);
+        $middleware = self::createMock(Middleware::class);
         $middleware
             ->method('wrap')
             ->willReturn(new DriverWrapper($connection->getDriver()));
@@ -77,7 +77,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
         $item = $adapter->getItem('key');
         $item->set('value');
-        $this->assertTrue($adapter->save($item));
+        self::assertTrue($adapter->save($item));
     }
 
     public function testConfigureSchema()
@@ -88,7 +88,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
         $adapter = new PdoAdapter($connection);
         $adapter->configureSchema($schema, $connection);
-        $this->assertTrue($schema->hasTable('cache_items'));
+        self::assertTrue($schema->hasTable('cache_items'));
     }
 
     public function testConfigureSchemaDifferentDbalConnection()
@@ -98,7 +98,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
         $adapter = $this->createCachePool();
         $adapter->configureSchema($schema, $otherConnection);
-        $this->assertFalse($schema->hasTable('cache_items'));
+        self::assertFalse($schema->hasTable('cache_items'));
     }
 
     public function testConfigureSchemaTableExists()
@@ -111,7 +111,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
         $adapter = new PdoAdapter($connection);
         $adapter->configureSchema($schema, $connection);
         $table = $schema->getTable('cache_items');
-        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
+        self::assertEmpty($table->getColumns(), 'The table was not overwritten');
     }
 
     /**
@@ -126,7 +126,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
             $item = $pool->getItem('key');
             $item->set('value');
-            $this->assertTrue($pool->save($item));
+            self::assertTrue($pool->save($item));
         } finally {
             if (null !== $file) {
                 @unlink($file);
@@ -160,9 +160,9 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
     private function createConnectionMock()
     {
-        $connection = $this->createMock(Connection::class);
-        $driver = $this->createMock(AbstractMySQLDriver::class);
-        $connection->expects($this->any())
+        $connection = self::createMock(Connection::class);
+        $driver = self::createMock(AbstractMySQLDriver::class);
+        $connection->expects(self::any())
             ->method('getDriver')
             ->willReturn($driver);
 

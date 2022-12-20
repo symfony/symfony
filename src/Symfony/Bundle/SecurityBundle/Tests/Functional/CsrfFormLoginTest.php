@@ -18,28 +18,28 @@ class CsrfFormLoginTest extends AbstractWebTestCase
      */
     public function testFormLoginAndLogoutWithCsrfTokens($options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
         $form['user_login[password]'] = 'test';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/profile');
+        self::assertRedirect($client->getResponse(), '/profile');
 
         $crawler = $client->followRedirect();
 
         $text = $crawler->text(null, true);
-        $this->assertStringContainsString('Hello johannes!', $text);
-        $this->assertStringContainsString('You\'re browsing to path "/profile".', $text);
+        self::assertStringContainsString('Hello johannes!', $text);
+        self::assertStringContainsString('You\'re browsing to path "/profile".', $text);
 
         $logoutLinks = $crawler->selectLink('Log out')->links();
-        $this->assertCount(2, $logoutLinks);
-        $this->assertStringContainsString('_csrf_token=', $logoutLinks[0]->getUri());
+        self::assertCount(2, $logoutLinks);
+        self::assertStringContainsString('_csrf_token=', $logoutLinks[0]->getUri());
 
         $client->click($logoutLinks[0]);
 
-        $this->assertRedirect($client->getResponse(), '/');
+        self::assertRedirect($client->getResponse(), '/');
     }
 
     /**
@@ -47,16 +47,16 @@ class CsrfFormLoginTest extends AbstractWebTestCase
      */
     public function testFormLoginWithInvalidCsrfToken($options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[_token]'] = '';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/login');
+        self::assertRedirect($client->getResponse(), '/login');
 
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Invalid CSRF token.', $text);
+        self::assertStringContainsString('Invalid CSRF token.', $text);
     }
 
     /**
@@ -64,7 +64,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
      */
     public function testFormLoginWithCustomTargetPath($options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
@@ -72,11 +72,11 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $form['user_login[_target_path]'] = '/foo';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/foo');
+        self::assertRedirect($client->getResponse(), '/foo');
 
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Hello johannes!', $text);
-        $this->assertStringContainsString('You\'re browsing to path "/foo".', $text);
+        self::assertStringContainsString('Hello johannes!', $text);
+        self::assertStringContainsString('You\'re browsing to path "/foo".', $text);
     }
 
     /**
@@ -84,20 +84,20 @@ class CsrfFormLoginTest extends AbstractWebTestCase
      */
     public function testFormLoginRedirectsToProtectedResourceAfterLogin($options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $client->request('GET', '/protected-resource');
-        $this->assertRedirect($client->getResponse(), '/login');
+        self::assertRedirect($client->getResponse(), '/login');
 
         $form = $client->followRedirect()->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
         $form['user_login[password]'] = 'test';
         $client->submit($form);
-        $this->assertRedirect($client->getResponse(), '/protected-resource');
+        self::assertRedirect($client->getResponse(), '/protected-resource');
 
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Hello johannes!', $text);
-        $this->assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
+        self::assertStringContainsString('Hello johannes!', $text);
+        self::assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
     }
 
     /**
@@ -106,28 +106,28 @@ class CsrfFormLoginTest extends AbstractWebTestCase
      */
     public function testLegacyFormLoginAndLogoutWithCsrfTokens($options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
         $form['user_login[password]'] = 'test';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/profile');
+        self::assertRedirect($client->getResponse(), '/profile');
 
         $crawler = $client->followRedirect();
 
         $text = $crawler->text(null, true);
-        $this->assertStringContainsString('Hello johannes!', $text);
-        $this->assertStringContainsString('You\'re browsing to path "/profile".', $text);
+        self::assertStringContainsString('Hello johannes!', $text);
+        self::assertStringContainsString('You\'re browsing to path "/profile".', $text);
 
         $logoutLinks = $crawler->selectLink('Log out')->links();
-        $this->assertCount(2, $logoutLinks);
-        $this->assertStringContainsString('_csrf_token=', $logoutLinks[0]->getUri());
+        self::assertCount(2, $logoutLinks);
+        self::assertStringContainsString('_csrf_token=', $logoutLinks[0]->getUri());
 
         $client->click($logoutLinks[0]);
 
-        $this->assertRedirect($client->getResponse(), '/');
+        self::assertRedirect($client->getResponse(), '/');
     }
 
     /**
@@ -136,16 +136,16 @@ class CsrfFormLoginTest extends AbstractWebTestCase
      */
     public function testLegacyFormLoginWithInvalidCsrfToken($options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[_token]'] = '';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/login');
+        self::assertRedirect($client->getResponse(), '/login');
 
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Invalid CSRF token.', $text);
+        self::assertStringContainsString('Invalid CSRF token.', $text);
     }
 
     /**
@@ -154,7 +154,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
      */
     public function testFormLegacyLoginWithCustomTargetPath($options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
@@ -162,11 +162,11 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $form['user_login[_target_path]'] = '/foo';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/foo');
+        self::assertRedirect($client->getResponse(), '/foo');
 
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Hello johannes!', $text);
-        $this->assertStringContainsString('You\'re browsing to path "/foo".', $text);
+        self::assertStringContainsString('Hello johannes!', $text);
+        self::assertStringContainsString('You\'re browsing to path "/foo".', $text);
     }
 
     /**
@@ -175,20 +175,20 @@ class CsrfFormLoginTest extends AbstractWebTestCase
      */
     public function testLegacyFormLoginRedirectsToProtectedResourceAfterLogin($options)
     {
-        $client = $this->createClient($options);
+        $client = self::createClient($options);
 
         $client->request('GET', '/protected-resource');
-        $this->assertRedirect($client->getResponse(), '/login');
+        self::assertRedirect($client->getResponse(), '/login');
 
         $form = $client->followRedirect()->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
         $form['user_login[password]'] = 'test';
         $client->submit($form);
-        $this->assertRedirect($client->getResponse(), '/protected-resource');
+        self::assertRedirect($client->getResponse(), '/protected-resource');
 
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Hello johannes!', $text);
-        $this->assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
+        self::assertStringContainsString('Hello johannes!', $text);
+        self::assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
     }
 
     public function provideClientOptions()

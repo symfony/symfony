@@ -42,6 +42,6 @@ class AsciiSluggerTest extends TestCase
     {
         $slugger = new AsciiSlugger();
 
-        $this->assertSame($expected, (string) $slugger->slug($string, $separator, $locale));
+        self::assertSame($expected, (string) $slugger->slug($string, $separator, $locale));
     }
 }

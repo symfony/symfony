@@ -27,7 +27,7 @@ final class MobytOptionsTest extends TestCase
 
         $options = MobytOptions::fromNotification($notification)->toArray();
 
-        $this->assertSame($expectedMessageType, $options['message_type']);
+        self::assertSame($expectedMessageType, $options['message_type']);
     }
 
     /**
@@ -47,7 +47,7 @@ final class MobytOptionsTest extends TestCase
 
         $options = MobytOptions::fromNotification($notification)->toArray();
 
-        $this->assertSame(MobytOptions::MESSAGE_TYPE_QUALITY_HIGH, $options['message_type']);
+        self::assertSame(MobytOptions::MESSAGE_TYPE_QUALITY_HIGH, $options['message_type']);
     }
 
     public function testGetRecipientIdWhenSet()
@@ -56,12 +56,12 @@ final class MobytOptionsTest extends TestCase
             'recipient' => 'foo',
         ]);
 
-        $this->assertSame('foo', $mobytOptions->getRecipientId());
+        self::assertSame('foo', $mobytOptions->getRecipientId());
     }
 
     public function testGetRecipientIdWhenNotSet()
     {
-        $this->assertNull((new MobytOptions())->getRecipientId());
+        self::assertNull((new MobytOptions())->getRecipientId());
     }
 
     public function testToArray()
@@ -71,7 +71,7 @@ final class MobytOptionsTest extends TestCase
             'recipient' => 'bar',
         ]);
 
-        $this->assertEmpty($mobytOptions->toArray());
+        self::assertEmpty($mobytOptions->toArray());
     }
 
     /**
@@ -82,7 +82,7 @@ final class MobytOptionsTest extends TestCase
         $mobytOptions = new MobytOptions();
         $mobytOptions->messageType($type);
 
-        $this->assertSame(['message_type' => $type], $mobytOptions->toArray());
+        self::assertSame(['message_type' => $type], $mobytOptions->toArray());
     }
 
     public function validMessageTypes(): iterable
@@ -96,18 +96,16 @@ final class MobytOptionsTest extends TestCase
     {
         $mobytOptions = new MobytOptions();
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The message type "foo-bar" is not supported; supported message types are: "N", "L", "LL"');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The message type "foo-bar" is not supported; supported message types are: "N", "L", "LL"');
 
         $mobytOptions->messageType('foo-bar');
     }
 
     public function testSettingMessageTypeViaConstructorWithUnknownTypeThrowsInvalidArgumentException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'The message type "foo-bar" is not supported; supported message types are: "N", "L", "LL"'
-        );
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The message type "foo-bar" is not supported; supported message types are: "N", "L", "LL"');
 
         new MobytOptions([
             'message_type' => 'foo-bar',

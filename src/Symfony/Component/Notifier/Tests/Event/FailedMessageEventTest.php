@@ -31,7 +31,7 @@ class FailedMessageEventTest extends TestCase
      */
     public function testConstruct(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
     {
-        $this->assertEquals($event, new FailedMessageEvent($message, $error));
+        self::assertEquals($event, new FailedMessageEvent($message, $error));
     }
 
     /**
@@ -39,7 +39,7 @@ class FailedMessageEventTest extends TestCase
      */
     public function testGetMessage(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
     {
-        $this->assertSame($message, $event->getMessage());
+        self::assertSame($message, $event->getMessage());
     }
 
     /**
@@ -47,13 +47,13 @@ class FailedMessageEventTest extends TestCase
      */
     public function testGetError(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
     {
-        $this->assertSame($error, $event->getError());
+        self::assertSame($error, $event->getError());
     }
 
     public function testFailedMessageEventIsDisptachIfError()
     {
-        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
-        $clientMock = $this->createMock(HttpClientInterface::class);
+        $eventDispatcherMock = self::createMock(EventDispatcherInterface::class);
+        $clientMock = self::createMock(HttpClientInterface::class);
 
         $transport = new class($clientMock, $eventDispatcherMock) extends AbstractTransport {
             public $exception;
@@ -82,7 +82,7 @@ class FailedMessageEventTest extends TestCase
 
         $message = new DummyMessage();
 
-        $eventDispatcherMock->expects($this->exactly(2))
+        $eventDispatcherMock->expects(self::exactly(2))
             ->method('dispatch')
             ->withConsecutive(
                 [new MessageEvent($message)],

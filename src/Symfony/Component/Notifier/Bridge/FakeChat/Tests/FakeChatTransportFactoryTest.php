@@ -24,7 +24,7 @@ final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
      */
     public function createFactory(): TransportFactoryInterface
     {
-        return new FakeChatTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
+        return new FakeChatTransportFactory(self::createMock(MailerInterface::class), self::createMock(LoggerInterface::class));
     }
 
     public function createProvider(): iterable

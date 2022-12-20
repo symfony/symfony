@@ -42,7 +42,7 @@ class JsonLoginAuthenticatorTest extends TestCase
     {
         $this->setUpAuthenticator();
 
-        $this->assertTrue($this->authenticator->supports($request));
+        self::assertTrue($this->authenticator->supports($request));
     }
 
     public function provideSupportData()
@@ -61,7 +61,7 @@ class JsonLoginAuthenticatorTest extends TestCase
     {
         $this->setUpAuthenticator(['check_path' => '/api/login']);
 
-        $this->assertSame($result, $this->authenticator->supports($request));
+        self::assertSame($result, $this->authenticator->supports($request));
     }
 
     public function provideSupportsWithCheckPathData()
@@ -76,7 +76,7 @@ class JsonLoginAuthenticatorTest extends TestCase
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
         $passport = $this->authenticator->authenticate($request);
-        $this->assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
+        self::assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
     }
 
     public function testAuthenticateWithCustomPath()
@@ -88,7 +88,7 @@ class JsonLoginAuthenticatorTest extends TestCase
 
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"authentication": {"username": "dunglas", "password": "foo"}}');
         $passport = $this->authenticator->authenticate($request);
-        $this->assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
+        self::assertEquals('foo', $passport->getBadge(PasswordCredentials::class)->getPassword());
     }
 
     /**
@@ -96,8 +96,8 @@ class JsonLoginAuthenticatorTest extends TestCase
      */
     public function testAuthenticateInvalid($request, $errorMessage, $exceptionType = BadRequestHttpException::class)
     {
-        $this->expectException($exceptionType);
-        $this->expectExceptionMessage($errorMessage);
+        self::expectException($exceptionType);
+        self::expectExceptionMessage($errorMessage);
 
         $this->setUpAuthenticator();
 
@@ -131,7 +131,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->setUpAuthenticator();
 
         $response = $this->authenticator->onAuthenticationFailure(new Request(), new AuthenticationException());
-        $this->assertSame(['error' => 'An authentication exception occurred.'], json_decode($response->getContent(), true));
+        self::assertSame(['error' => 'An authentication exception occurred.'], json_decode($response->getContent(), true));
     }
 
     public function testAuthenticationFailureWithTranslator()
@@ -144,7 +144,7 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->authenticator->setTranslator($translator);
 
         $response = $this->authenticator->onAuthenticationFailure(new Request(), new AuthenticationException());
-        $this->assertSame(['error' => 'foo'], json_decode($response->getContent(), true));
+        self::assertSame(['error' => 'foo'], json_decode($response->getContent(), true));
     }
 
     public function testOnFailureReplacesMessageDataWithoutTranslator()
@@ -163,7 +163,7 @@ class JsonLoginAuthenticatorTest extends TestCase
             }
         });
 
-        $this->assertSame(['error' => 'Session locked after 3 failed attempts.'], json_decode($response->getContent(), true));
+        self::assertSame(['error' => 'Session locked after 3 failed attempts.'], json_decode($response->getContent(), true));
     }
 
     private function setUpAuthenticator(array $options = [])

@@ -36,8 +36,8 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->process($container);
 
         $arguments = $def->getArguments();
-        $this->assertSame([null, null], $arguments);
-        $this->assertCount(0, $def->getMethodCalls());
+        self::assertSame([null, null], $arguments);
+        self::assertCount(0, $def->getMethodCalls());
     }
 
     public function testProcessIgnoreInvalidArgumentInCollectionArgument()
@@ -58,7 +58,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->process($container);
 
         $arguments = $def->getArguments();
-        $this->assertSame([$baz, null], $arguments[0]);
+        self::assertSame([$baz, null], $arguments[0]);
     }
 
     public function testProcessKeepMethodCallOnInvalidArgumentInCollectionArgument()
@@ -79,8 +79,8 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->process($container);
 
         $calls = $def->getMethodCalls();
-        $this->assertCount(1, $def->getMethodCalls());
-        $this->assertSame([$baz, null], $calls[0][1][0]);
+        self::assertCount(1, $def->getMethodCalls());
+        self::assertSame([$baz, null], $calls[0][1][0]);
     }
 
     public function testProcessIgnoreNonExistentServices()
@@ -94,7 +94,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->process($container);
 
         $arguments = $def->getArguments();
-        $this->assertEquals('bar', (string) $arguments[0]);
+        self::assertEquals('bar', (string) $arguments[0]);
     }
 
     public function testProcessRemovesPropertiesOnInvalid()
@@ -107,7 +107,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals([], $def->getProperties());
+        self::assertEquals([], $def->getProperties());
     }
 
     public function testProcessRemovesArgumentsOnInvalid()
@@ -125,7 +125,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertSame([[[]]], $def->getArguments());
+        self::assertSame([[[]]], $def->getArguments());
     }
 
     public function testProcessSetDecoratedAsNullOnInvalid()
@@ -142,7 +142,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         (new DecoratorServicePass())->process($container);
         (new ResolveInvalidReferencesPass())->process($container);
 
-        $this->assertSame([null], $decoratorDefinition->getArguments());
+        self::assertSame([null], $decoratorDefinition->getArguments());
     }
 
     public function testProcessSetOnlyDecoratedAsNullOnInvalid()
@@ -161,8 +161,8 @@ class ResolveInvalidReferencesPassTest extends TestCase
         (new DecoratorServicePass())->process($container);
         (new ResolveInvalidReferencesPass())->process($container);
 
-        $this->assertNull($decoratorDefinition->getArguments()[0]);
-        $this->assertEquals($unknownArgument, $decoratorDefinition->getArguments()[1]);
+        self::assertNull($decoratorDefinition->getArguments()[0]);
+        self::assertEquals($unknownArgument, $decoratorDefinition->getArguments()[1]);
     }
 
     protected function process(ContainerBuilder $container)

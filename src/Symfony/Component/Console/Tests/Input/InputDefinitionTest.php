@@ -36,10 +36,10 @@ class InputDefinitionTest extends TestCase
         $this->initializeArguments();
 
         $definition = new InputDefinition();
-        $this->assertEquals([], $definition->getArguments(), '__construct() creates a new InputDefinition object');
+        self::assertEquals([], $definition->getArguments(), '__construct() creates a new InputDefinition object');
 
         $definition = new InputDefinition([$this->foo, $this->bar]);
-        $this->assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getArguments(), '__construct() takes an array of InputArgument objects as its first argument');
+        self::assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getArguments(), '__construct() takes an array of InputArgument objects as its first argument');
     }
 
     public function testConstructorOptions()
@@ -47,10 +47,10 @@ class InputDefinitionTest extends TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition();
-        $this->assertEquals([], $definition->getOptions(), '__construct() creates a new InputDefinition object');
+        self::assertEquals([], $definition->getOptions(), '__construct() creates a new InputDefinition object');
 
         $definition = new InputDefinition([$this->foo, $this->bar]);
-        $this->assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getOptions(), '__construct() takes an array of InputOption objects as its first argument');
+        self::assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getOptions(), '__construct() takes an array of InputOption objects as its first argument');
     }
 
     public function testSetArguments()
@@ -59,10 +59,10 @@ class InputDefinitionTest extends TestCase
 
         $definition = new InputDefinition();
         $definition->setArguments([$this->foo]);
-        $this->assertEquals(['foo' => $this->foo], $definition->getArguments(), '->setArguments() sets the array of InputArgument objects');
+        self::assertEquals(['foo' => $this->foo], $definition->getArguments(), '->setArguments() sets the array of InputArgument objects');
         $definition->setArguments([$this->bar]);
 
-        $this->assertEquals(['bar' => $this->bar], $definition->getArguments(), '->setArguments() clears all InputArgument objects');
+        self::assertEquals(['bar' => $this->bar], $definition->getArguments(), '->setArguments() clears all InputArgument objects');
     }
 
     public function testAddArguments()
@@ -71,9 +71,9 @@ class InputDefinitionTest extends TestCase
 
         $definition = new InputDefinition();
         $definition->addArguments([$this->foo]);
-        $this->assertEquals(['foo' => $this->foo], $definition->getArguments(), '->addArguments() adds an array of InputArgument objects');
+        self::assertEquals(['foo' => $this->foo], $definition->getArguments(), '->addArguments() adds an array of InputArgument objects');
         $definition->addArguments([$this->bar]);
-        $this->assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getArguments(), '->addArguments() does not clear existing InputArgument objects');
+        self::assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getArguments(), '->addArguments() does not clear existing InputArgument objects');
     }
 
     public function testAddArgument()
@@ -82,15 +82,15 @@ class InputDefinitionTest extends TestCase
 
         $definition = new InputDefinition();
         $definition->addArgument($this->foo);
-        $this->assertEquals(['foo' => $this->foo], $definition->getArguments(), '->addArgument() adds a InputArgument object');
+        self::assertEquals(['foo' => $this->foo], $definition->getArguments(), '->addArgument() adds a InputArgument object');
         $definition->addArgument($this->bar);
-        $this->assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getArguments(), '->addArgument() adds a InputArgument object');
+        self::assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getArguments(), '->addArgument() adds a InputArgument object');
     }
 
     public function testArgumentsMustHaveDifferentNames()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('An argument with name "foo" already exists.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('An argument with name "foo" already exists.');
         $this->initializeArguments();
 
         $definition = new InputDefinition();
@@ -100,8 +100,8 @@ class InputDefinitionTest extends TestCase
 
     public function testArrayArgumentHasToBeLast()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot add a required argument "anotherbar" after an array argument "fooarray".');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Cannot add a required argument "anotherbar" after an array argument "fooarray".');
         $this->initializeArguments();
 
         $definition = new InputDefinition();
@@ -112,8 +112,8 @@ class InputDefinitionTest extends TestCase
     public function testRequiredArgumentCannotFollowAnOptionalOne()
     {
         $this->initializeArguments();
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(sprintf('Cannot add a required argument "%s" after an optional one "%s".', $this->foo2->getName(), $this->foo->getName()));
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage(sprintf('Cannot add a required argument "%s" after an optional one "%s".', $this->foo2->getName(), $this->foo->getName()));
 
         $definition = new InputDefinition();
         $definition->addArgument($this->foo);
@@ -126,13 +126,13 @@ class InputDefinitionTest extends TestCase
 
         $definition = new InputDefinition();
         $definition->addArguments([$this->foo]);
-        $this->assertEquals($this->foo, $definition->getArgument('foo'), '->getArgument() returns a InputArgument by its name');
+        self::assertEquals($this->foo, $definition->getArgument('foo'), '->getArgument() returns a InputArgument by its name');
     }
 
     public function testGetInvalidArgument()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "bar" argument does not exist.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The "bar" argument does not exist.');
         $this->initializeArguments();
 
         $definition = new InputDefinition();
@@ -147,8 +147,8 @@ class InputDefinitionTest extends TestCase
         $definition = new InputDefinition();
         $definition->addArguments([$this->foo]);
 
-        $this->assertTrue($definition->hasArgument('foo'), '->hasArgument() returns true if a InputArgument exists for the given name');
-        $this->assertFalse($definition->hasArgument('bar'), '->hasArgument() returns false if a InputArgument exists for the given name');
+        self::assertTrue($definition->hasArgument('foo'), '->hasArgument() returns true if a InputArgument exists for the given name');
+        self::assertFalse($definition->hasArgument('bar'), '->hasArgument() returns false if a InputArgument exists for the given name');
     }
 
     public function testGetArgumentRequiredCount()
@@ -157,9 +157,9 @@ class InputDefinitionTest extends TestCase
 
         $definition = new InputDefinition();
         $definition->addArgument($this->foo2);
-        $this->assertEquals(1, $definition->getArgumentRequiredCount(), '->getArgumentRequiredCount() returns the number of required arguments');
+        self::assertEquals(1, $definition->getArgumentRequiredCount(), '->getArgumentRequiredCount() returns the number of required arguments');
         $definition->addArgument($this->foo);
-        $this->assertEquals(1, $definition->getArgumentRequiredCount(), '->getArgumentRequiredCount() returns the number of required arguments');
+        self::assertEquals(1, $definition->getArgumentRequiredCount(), '->getArgumentRequiredCount() returns the number of required arguments');
     }
 
     public function testGetArgumentCount()
@@ -168,9 +168,9 @@ class InputDefinitionTest extends TestCase
 
         $definition = new InputDefinition();
         $definition->addArgument($this->foo2);
-        $this->assertEquals(1, $definition->getArgumentCount(), '->getArgumentCount() returns the number of arguments');
+        self::assertEquals(1, $definition->getArgumentCount(), '->getArgumentCount() returns the number of arguments');
         $definition->addArgument($this->foo);
-        $this->assertEquals(2, $definition->getArgumentCount(), '->getArgumentCount() returns the number of arguments');
+        self::assertEquals(2, $definition->getArgumentCount(), '->getArgumentCount() returns the number of arguments');
     }
 
     public function testGetArgumentDefaults()
@@ -181,12 +181,12 @@ class InputDefinitionTest extends TestCase
             new InputArgument('foo3', InputArgument::OPTIONAL | InputArgument::IS_ARRAY),
         //  new InputArgument('foo4', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '', [1, 2]),
         ]);
-        $this->assertEquals(['foo1' => null, 'foo2' => 'default', 'foo3' => []], $definition->getArgumentDefaults(), '->getArgumentDefaults() return the default values for each argument');
+        self::assertEquals(['foo1' => null, 'foo2' => 'default', 'foo3' => []], $definition->getArgumentDefaults(), '->getArgumentDefaults() return the default values for each argument');
 
         $definition = new InputDefinition([
             new InputArgument('foo4', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '', [1, 2]),
         ]);
-        $this->assertEquals(['foo4' => [1, 2]], $definition->getArgumentDefaults(), '->getArgumentDefaults() return the default values for each argument');
+        self::assertEquals(['foo4' => [1, 2]], $definition->getArgumentDefaults(), '->getArgumentDefaults() return the default values for each argument');
     }
 
     public function testSetOptions()
@@ -194,15 +194,15 @@ class InputDefinitionTest extends TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
-        $this->assertEquals(['foo' => $this->foo], $definition->getOptions(), '->setOptions() sets the array of InputOption objects');
+        self::assertEquals(['foo' => $this->foo], $definition->getOptions(), '->setOptions() sets the array of InputOption objects');
         $definition->setOptions([$this->bar]);
-        $this->assertEquals(['bar' => $this->bar], $definition->getOptions(), '->setOptions() clears all InputOption objects');
+        self::assertEquals(['bar' => $this->bar], $definition->getOptions(), '->setOptions() clears all InputOption objects');
     }
 
     public function testSetOptionsClearsOptions()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "-f" option does not exist.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The "-f" option does not exist.');
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
@@ -215,9 +215,9 @@ class InputDefinitionTest extends TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
-        $this->assertEquals(['foo' => $this->foo], $definition->getOptions(), '->addOptions() adds an array of InputOption objects');
+        self::assertEquals(['foo' => $this->foo], $definition->getOptions(), '->addOptions() adds an array of InputOption objects');
         $definition->addOptions([$this->bar]);
-        $this->assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getOptions(), '->addOptions() does not clear existing InputOption objects');
+        self::assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getOptions(), '->addOptions() does not clear existing InputOption objects');
     }
 
     public function testAddOption()
@@ -226,15 +226,15 @@ class InputDefinitionTest extends TestCase
 
         $definition = new InputDefinition();
         $definition->addOption($this->foo);
-        $this->assertEquals(['foo' => $this->foo], $definition->getOptions(), '->addOption() adds a InputOption object');
+        self::assertEquals(['foo' => $this->foo], $definition->getOptions(), '->addOption() adds a InputOption object');
         $definition->addOption($this->bar);
-        $this->assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getOptions(), '->addOption() adds a InputOption object');
+        self::assertEquals(['foo' => $this->foo, 'bar' => $this->bar], $definition->getOptions(), '->addOption() adds a InputOption object');
     }
 
     public function testAddDuplicateOption()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('An option named "foo" already exists.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('An option named "foo" already exists.');
         $this->initializeOptions();
 
         $definition = new InputDefinition();
@@ -244,8 +244,8 @@ class InputDefinitionTest extends TestCase
 
     public function testAddDuplicateNegatedOption()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('An option named "no-foo" already exists.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('An option named "no-foo" already exists.');
 
         $definition = new InputDefinition();
         $definition->addOption(new InputOption('no-foo'));
@@ -254,8 +254,8 @@ class InputDefinitionTest extends TestCase
 
     public function testAddDuplicateNegatedReverseOption()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('An option named "no-foo" already exists.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('An option named "no-foo" already exists.');
 
         $definition = new InputDefinition();
         $definition->addOption(new InputOption('foo', null, InputOption::VALUE_NEGATABLE));
@@ -264,8 +264,8 @@ class InputDefinitionTest extends TestCase
 
     public function testAddDuplicateShortcutOption()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('An option with shortcut "f" already exists.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('An option with shortcut "f" already exists.');
         $this->initializeOptions();
 
         $definition = new InputDefinition();
@@ -278,13 +278,13 @@ class InputDefinitionTest extends TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
-        $this->assertEquals($this->foo, $definition->getOption('foo'), '->getOption() returns a InputOption by its name');
+        self::assertEquals($this->foo, $definition->getOption('foo'), '->getOption() returns a InputOption by its name');
     }
 
     public function testGetInvalidOption()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "--bar" option does not exist.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The "--bar" option does not exist.');
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
@@ -296,8 +296,8 @@ class InputDefinitionTest extends TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
-        $this->assertTrue($definition->hasOption('foo'), '->hasOption() returns true if a InputOption exists for the given name');
-        $this->assertFalse($definition->hasOption('bar'), '->hasOption() returns false if a InputOption exists for the given name');
+        self::assertTrue($definition->hasOption('foo'), '->hasOption() returns true if a InputOption exists for the given name');
+        self::assertFalse($definition->hasOption('bar'), '->hasOption() returns false if a InputOption exists for the given name');
     }
 
     public function testHasShortcut()
@@ -305,8 +305,8 @@ class InputDefinitionTest extends TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
-        $this->assertTrue($definition->hasShortcut('f'), '->hasShortcut() returns true if a InputOption exists for the given shortcut');
-        $this->assertFalse($definition->hasShortcut('b'), '->hasShortcut() returns false if a InputOption exists for the given shortcut');
+        self::assertTrue($definition->hasShortcut('f'), '->hasShortcut() returns true if a InputOption exists for the given shortcut');
+        self::assertFalse($definition->hasShortcut('b'), '->hasShortcut() returns false if a InputOption exists for the given shortcut');
     }
 
     public function testGetOptionForShortcut()
@@ -314,7 +314,7 @@ class InputDefinitionTest extends TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
-        $this->assertEquals($this->foo, $definition->getOptionForShortcut('f'), '->getOptionForShortcut() returns a InputOption by its shortcut');
+        self::assertEquals($this->foo, $definition->getOptionForShortcut('f'), '->getOptionForShortcut() returns a InputOption by its shortcut');
     }
 
     public function testGetOptionForMultiShortcut()
@@ -322,14 +322,14 @@ class InputDefinitionTest extends TestCase
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->multi]);
-        $this->assertEquals($this->multi, $definition->getOptionForShortcut('m'), '->getOptionForShortcut() returns a InputOption by its shortcut');
-        $this->assertEquals($this->multi, $definition->getOptionForShortcut('mmm'), '->getOptionForShortcut() returns a InputOption by its shortcut');
+        self::assertEquals($this->multi, $definition->getOptionForShortcut('m'), '->getOptionForShortcut() returns a InputOption by its shortcut');
+        self::assertEquals($this->multi, $definition->getOptionForShortcut('mmm'), '->getOptionForShortcut() returns a InputOption by its shortcut');
     }
 
     public function testGetOptionForInvalidShortcut()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "-l" option does not exist.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The "-l" option does not exist.');
         $this->initializeOptions();
 
         $definition = new InputDefinition([$this->foo]);
@@ -356,7 +356,7 @@ class InputDefinitionTest extends TestCase
             'foo6' => [],
             'foo7' => [1, 2],
         ];
-        $this->assertSame($defaults, $definition->getOptionDefaults(), '->getOptionDefaults() returns the default values for all options');
+        self::assertSame($defaults, $definition->getOptionDefaults(), '->getOptionDefaults() returns the default values for all options');
     }
 
     /**
@@ -364,7 +364,7 @@ class InputDefinitionTest extends TestCase
      */
     public function testGetSynopsis(InputDefinition $definition, $expectedSynopsis, $message = null)
     {
-        $this->assertEquals($expectedSynopsis, $definition->getSynopsis(), $message ? '->getSynopsis() '.$message : '');
+        self::assertEquals($expectedSynopsis, $definition->getSynopsis(), $message ? '->getSynopsis() '.$message : '');
     }
 
     public function getGetSynopsisData()
@@ -388,7 +388,7 @@ class InputDefinitionTest extends TestCase
     public function testGetShortSynopsis()
     {
         $definition = new InputDefinition([new InputOption('foo'), new InputOption('bar'), new InputArgument('cat')]);
-        $this->assertEquals('[options] [--] [<cat>]', $definition->getSynopsis(true), '->getSynopsis(true) groups options in [options]');
+        self::assertEquals('[options] [--] [<cat>]', $definition->getSynopsis(true), '->getSynopsis(true) groups options in [options]');
     }
 
     protected function initializeArguments()

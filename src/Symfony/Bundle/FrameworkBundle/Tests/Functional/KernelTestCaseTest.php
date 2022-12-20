@@ -22,23 +22,23 @@ class KernelTestCaseTest extends AbstractWebTestCase
 {
     public function testThatPrivateServicesAreUnavailableIfTestConfigIsDisabled()
     {
-        static::bootKernel(['test_case' => 'TestServiceContainer', 'root_config' => 'test_disabled.yml', 'environment' => 'test_disabled']);
+        self::bootKernel(['test_case' => 'TestServiceContainer', 'root_config' => 'test_disabled.yml', 'environment' => 'test_disabled']);
 
-        $this->expectException(\LogicException::class);
-        static::getContainer();
+        self::expectException(\LogicException::class);
+        self::getContainer();
     }
 
     public function testThatPrivateServicesAreAvailableIfTestConfigIsEnabled()
     {
-        static::bootKernel(['test_case' => 'TestServiceContainer']);
+        self::bootKernel(['test_case' => 'TestServiceContainer']);
 
-        $container = static::getContainer();
-        $this->assertInstanceOf(ContainerInterface::class, $container);
-        $this->assertInstanceOf(TestContainer::class, $container);
-        $this->assertTrue($container->has(PublicService::class));
-        $this->assertTrue($container->has(NonPublicService::class));
-        $this->assertTrue($container->has(PrivateService::class));
-        $this->assertTrue($container->has('private_service'));
-        $this->assertFalse($container->has(UnusedPrivateService::class));
+        $container = self::getContainer();
+        self::assertInstanceOf(ContainerInterface::class, $container);
+        self::assertInstanceOf(TestContainer::class, $container);
+        self::assertTrue($container->has(PublicService::class));
+        self::assertTrue($container->has(NonPublicService::class));
+        self::assertTrue($container->has(PrivateService::class));
+        self::assertTrue($container->has('private_service'));
+        self::assertFalse($container->has(UnusedPrivateService::class));
     }
 }

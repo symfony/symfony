@@ -22,14 +22,14 @@ class ValidatorDataCollectorTest extends TestCase
 {
     public function testCollectsValidatorCalls()
     {
-        $originalValidator = $this->createMock(ValidatorInterface::class);
+        $originalValidator = self::createMock(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);
 
         $collector = new ValidatorDataCollector($validator);
 
         $violations = new ConstraintViolationList([
-            $this->createMock(ConstraintViolation::class),
-            $this->createMock(ConstraintViolation::class),
+            self::createMock(ConstraintViolation::class),
+            self::createMock(ConstraintViolation::class),
         ]);
         $originalValidator->method('validate')->willReturn($violations);
 
@@ -39,27 +39,27 @@ class ValidatorDataCollectorTest extends TestCase
 
         $calls = $collector->getCalls();
 
-        $this->assertCount(1, $calls);
-        $this->assertSame(2, $collector->getViolationsCount());
+        self::assertCount(1, $calls);
+        self::assertSame(2, $collector->getViolationsCount());
 
         $call = $calls[0];
 
-        $this->assertArrayHasKey('caller', $call);
-        $this->assertArrayHasKey('context', $call);
-        $this->assertArrayHasKey('violations', $call);
-        $this->assertCount(2, $call['violations']);
+        self::assertArrayHasKey('caller', $call);
+        self::assertArrayHasKey('context', $call);
+        self::assertArrayHasKey('violations', $call);
+        self::assertCount(2, $call['violations']);
     }
 
     public function testReset()
     {
-        $originalValidator = $this->createMock(ValidatorInterface::class);
+        $originalValidator = self::createMock(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);
 
         $collector = new ValidatorDataCollector($validator);
 
         $violations = new ConstraintViolationList([
-            $this->createMock(ConstraintViolation::class),
-            $this->createMock(ConstraintViolation::class),
+            self::createMock(ConstraintViolation::class),
+            self::createMock(ConstraintViolation::class),
         ]);
         $originalValidator->method('validate')->willReturn($violations);
 
@@ -68,7 +68,7 @@ class ValidatorDataCollectorTest extends TestCase
         $collector->lateCollect();
         $collector->reset();
 
-        $this->assertCount(0, $collector->getCalls());
-        $this->assertSame(0, $collector->getViolationsCount());
+        self::assertCount(0, $collector->getCalls());
+        self::assertSame(0, $collector->getViolationsCount());
     }
 }

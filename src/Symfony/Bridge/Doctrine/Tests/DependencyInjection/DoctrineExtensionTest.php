@@ -30,10 +30,9 @@ class DoctrineExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        self::setUp();
 
-        $this->extension = $this
-            ->getMockBuilder(AbstractDoctrineExtension::class)
+        $this->extension = self::getMockBuilder(AbstractDoctrineExtension::class)
             ->setMethods([
                 'getMappingResourceConfigDirectory',
                 'getObjectManagerElementName',
@@ -45,7 +44,7 @@ class DoctrineExtensionTest extends TestCase
             ->getMock()
         ;
 
-        $this->extension->expects($this->any())
+        $this->extension->expects(self::any())
             ->method('getObjectManagerElementName')
             ->willReturnCallback(function ($name) {
                 return 'doctrine.orm.'.$name;
@@ -62,7 +61,7 @@ class DoctrineExtensionTest extends TestCase
 
     public function testFixManagersAutoMappingsWithTwoAutomappings()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $emConfigs = [
             'em1' => [
                 'auto_mapping' => true,
@@ -172,10 +171,10 @@ class DoctrineExtensionTest extends TestCase
 
         $newEmConfigs = $method->invoke($this->extension, $emConfigs, $bundles);
 
-        $this->assertEquals($newEmConfigs['em1'], array_merge([
+        self::assertEquals($newEmConfigs['em1'], array_merge([
             'auto_mapping' => false,
         ], $expectedEm1));
-        $this->assertEquals($newEmConfigs['em2'], array_merge([
+        self::assertEquals($newEmConfigs['em2'], array_merge([
             'auto_mapping' => false,
         ], $expectedEm2));
     }
@@ -190,11 +189,11 @@ class DoctrineExtensionTest extends TestCase
 
         // The ordinary fixtures contain annotation
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures', $container);
-        $this->assertSame($mappingType, 'annotation');
+        self::assertSame($mappingType, 'annotation');
 
         // In the attribute folder, attributes are used
         $mappingType = $method->invoke($this->extension, __DIR__.'/../Fixtures/Attribute', $container);
-        $this->assertSame($mappingType, \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute');
+        self::assertSame($mappingType, \PHP_VERSION_ID < 80000 ? 'annotation' : 'attribute');
     }
 
     public function providerBasicDrivers()
@@ -225,18 +224,18 @@ class DoctrineExtensionTest extends TestCase
 
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
 
-        $this->assertTrue($container->hasDefinition('doctrine.orm.default_metadata_cache'));
+        self::assertTrue($container->hasDefinition('doctrine.orm.default_metadata_cache'));
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
         $defCalls = $definition->getMethodCalls();
         $expectedCalls[] = 'setNamespace';
         $actualCalls = array_column($defCalls, 0);
 
-        $this->assertFalse($definition->isPublic());
-        $this->assertEquals("%$class%", $definition->getClass());
+        self::assertFalse($definition->isPublic());
+        self::assertEquals("%$class%", $definition->getClass());
 
         foreach (array_unique($expectedCalls) as $call) {
-            $this->assertContains($call, $actualCalls);
+            self::assertContains($call, $actualCalls);
         }
     }
 
@@ -257,13 +256,13 @@ class DoctrineExtensionTest extends TestCase
 
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
 
-        $this->assertTrue($container->hasAlias('doctrine.orm.default_metadata_cache'));
+        self::assertTrue($container->hasAlias('doctrine.orm.default_metadata_cache'));
     }
 
     public function testUnrecognizedCacheDriverException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('"unrecognized_type" is an unrecognized Doctrine cache driver.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('"unrecognized_type" is an unrecognized Doctrine cache driver.');
         $cacheName = 'metadata_cache';
         $container = $this->createContainer();
         $objectManager = [
@@ -335,16 +334,13 @@ class DoctrineExtensionTest extends TestCase
         $method = $reflection->getMethod('getMappingDriverBundleConfigDefaults');
         $method->setAccessible(true);
 
-        $this->assertSame(
-            [
-                'dir' => $bundleClass->getPath().$dirSuffix,
-                'type' => $expectedType,
-                'prefix' => $bundleClass->getNamespace().'\\Entity',
-                'mapping' => true,
-                'is_bundle' => true,
-            ],
-            $method->invoke($this->extension, $mappingConfig, new \ReflectionClass($bundleClass), $container, $bundleClass->getPath())
-        );
+        self::assertSame([
+            'dir' => $bundleClass->getPath().$dirSuffix,
+            'type' => $expectedType,
+            'prefix' => $bundleClass->getNamespace().'\\Entity',
+            'mapping' => true,
+            'is_bundle' => true,
+        ], $method->invoke($this->extension, $mappingConfig, new \ReflectionClass($bundleClass), $container, $bundleClass->getPath()));
     }
 
     protected function invokeLoadCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)

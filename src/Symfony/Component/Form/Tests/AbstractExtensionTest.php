@@ -21,14 +21,14 @@ class AbstractExtensionTest extends TestCase
     public function testHasType()
     {
         $loader = new ConcreteExtension();
-        $this->assertTrue($loader->hasType('Symfony\Component\Form\Tests\Fixtures\FooType'));
-        $this->assertFalse($loader->hasType('foo'));
+        self::assertTrue($loader->hasType('Symfony\Component\Form\Tests\Fixtures\FooType'));
+        self::assertFalse($loader->hasType('foo'));
     }
 
     public function testGetType()
     {
         $loader = new ConcreteExtension();
-        $this->assertInstanceOf(FooType::class, $loader->getType('Symfony\Component\Form\Tests\Fixtures\FooType'));
+        self::assertInstanceOf(FooType::class, $loader->getType('Symfony\Component\Form\Tests\Fixtures\FooType'));
     }
 }
 

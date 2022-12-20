@@ -28,11 +28,11 @@ class DoctrineOrmTypeGuesserTest extends TestCase
      */
     public function testTypeGuesser(string $type, $expected)
     {
-        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata = self::createMock(ClassMetadata::class);
         $classMetadata->fieldMappings['field'] = true;
-        $classMetadata->expects($this->once())->method('getTypeOfField')->with('field')->willReturn($type);
+        $classMetadata->expects(self::once())->method('getTypeOfField')->with('field')->willReturn($type);
 
-        $this->assertEquals($expected, $this->getGuesser($classMetadata)->guessType('TestEntity', 'field'));
+        self::assertEquals($expected, $this->getGuesser($classMetadata)->guessType('TestEntity', 'field'));
     }
 
     public function requiredType()
@@ -54,7 +54,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
      */
     public function testRequiredGuesser($classMetadata, $expected)
     {
-        $this->assertEquals($expected, $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
+        self::assertEquals($expected, $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }
 
     public function requiredProvider()
@@ -62,49 +62,49 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         $return = [];
 
         // Simple field, not nullable
-        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata = self::createMock(ClassMetadata::class);
         $classMetadata->fieldMappings['field'] = true;
-        $classMetadata->expects($this->once())->method('isNullable')->with('field')->willReturn(false);
+        $classMetadata->expects(self::once())->method('isNullable')->with('field')->willReturn(false);
 
         $return[] = [$classMetadata, new ValueGuess(true, Guess::HIGH_CONFIDENCE)];
 
         // Simple field, nullable
-        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata = self::createMock(ClassMetadata::class);
         $classMetadata->fieldMappings['field'] = true;
-        $classMetadata->expects($this->once())->method('isNullable')->with('field')->willReturn(true);
+        $classMetadata->expects(self::once())->method('isNullable')->with('field')->willReturn(true);
 
         $return[] = [$classMetadata, new ValueGuess(false, Guess::MEDIUM_CONFIDENCE)];
 
         // One-to-one, nullable (by default)
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata->expects($this->once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(true);
+        $classMetadata = self::createMock(ClassMetadata::class);
+        $classMetadata->expects(self::once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(true);
 
         $mapping = ['joinColumns' => [[]]];
-        $classMetadata->expects($this->once())->method('getAssociationMapping')->with('field')->willReturn($mapping);
+        $classMetadata->expects(self::once())->method('getAssociationMapping')->with('field')->willReturn($mapping);
 
         $return[] = [$classMetadata, new ValueGuess(false, Guess::HIGH_CONFIDENCE)];
 
         // One-to-one, nullable (explicit)
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata->expects($this->once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(true);
+        $classMetadata = self::createMock(ClassMetadata::class);
+        $classMetadata->expects(self::once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(true);
 
         $mapping = ['joinColumns' => [['nullable' => true]]];
-        $classMetadata->expects($this->once())->method('getAssociationMapping')->with('field')->willReturn($mapping);
+        $classMetadata->expects(self::once())->method('getAssociationMapping')->with('field')->willReturn($mapping);
 
         $return[] = [$classMetadata, new ValueGuess(false, Guess::HIGH_CONFIDENCE)];
 
         // One-to-one, not nullable
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata->expects($this->once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(true);
+        $classMetadata = self::createMock(ClassMetadata::class);
+        $classMetadata->expects(self::once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(true);
 
         $mapping = ['joinColumns' => [['nullable' => false]]];
-        $classMetadata->expects($this->once())->method('getAssociationMapping')->with('field')->willReturn($mapping);
+        $classMetadata->expects(self::once())->method('getAssociationMapping')->with('field')->willReturn($mapping);
 
         $return[] = [$classMetadata, new ValueGuess(true, Guess::HIGH_CONFIDENCE)];
 
         // One-to-many, no clue
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata->expects($this->once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(false);
+        $classMetadata = self::createMock(ClassMetadata::class);
+        $classMetadata->expects(self::once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(false);
 
         $return[] = [$classMetadata, null];
 
@@ -113,11 +113,11 @@ class DoctrineOrmTypeGuesserTest extends TestCase
 
     private function getGuesser(ClassMetadata $classMetadata)
     {
-        $em = $this->createMock(ObjectManager::class);
-        $em->expects($this->once())->method('getClassMetaData')->with('TestEntity')->willReturn($classMetadata);
+        $em = self::createMock(ObjectManager::class);
+        $em->expects(self::once())->method('getClassMetaData')->with('TestEntity')->willReturn($classMetadata);
 
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry->expects($this->once())->method('getManagers')->willReturn([$em]);
+        $registry = self::createMock(ManagerRegistry::class);
+        $registry->expects(self::once())->method('getManagers')->willReturn([$em]);
 
         return new DoctrineOrmTypeGuesser($registry);
     }

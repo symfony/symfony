@@ -24,7 +24,7 @@ class DataTransformerChainTest extends TestCase
             new FixedDataTransformer(['bar' => 'baz']),
         ]);
 
-        $this->assertEquals('baz', $chain->transform('foo'));
+        self::assertEquals('baz', $chain->transform('foo'));
     }
 
     public function testReverseTransform()
@@ -34,6 +34,6 @@ class DataTransformerChainTest extends TestCase
             new FixedDataTransformer(['bar' => 'foo']),
         ]);
 
-        $this->assertEquals('baz', $chain->reverseTransform('foo'));
+        self::assertEquals('baz', $chain->reverseTransform('foo'));
     }
 }

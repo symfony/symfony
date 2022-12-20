@@ -23,7 +23,7 @@ class MultiplierRetryStrategyTest extends TestCase
         $strategy = new MultiplierRetryStrategy(3);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
 
-        $this->assertTrue($strategy->isRetryable($envelope));
+        self::assertTrue($strategy->isRetryable($envelope));
     }
 
     public function testIsNotRetryable()
@@ -31,14 +31,14 @@ class MultiplierRetryStrategyTest extends TestCase
         $strategy = new MultiplierRetryStrategy(3);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(3)]);
 
-        $this->assertFalse($strategy->isRetryable($envelope));
+        self::assertFalse($strategy->isRetryable($envelope));
     }
 
     public function testIsNotRetryableWithZeroMax()
     {
         $strategy = new MultiplierRetryStrategy(0);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
-        $this->assertFalse($strategy->isRetryable($envelope));
+        self::assertFalse($strategy->isRetryable($envelope));
     }
 
     public function testIsRetryableWithNoStamp()
@@ -46,7 +46,7 @@ class MultiplierRetryStrategyTest extends TestCase
         $strategy = new MultiplierRetryStrategy(3);
         $envelope = new Envelope(new \stdClass());
 
-        $this->assertTrue($strategy->isRetryable($envelope));
+        self::assertTrue($strategy->isRetryable($envelope));
     }
 
     /**
@@ -57,7 +57,7 @@ class MultiplierRetryStrategyTest extends TestCase
         $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries)]);
 
-        $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
+        self::assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
     }
 
     public function getWaitTimeTests(): iterable

@@ -20,8 +20,8 @@ class PreAuthenticatedTokenTest extends TestCase
     public function testConstructor()
     {
         $token = new PreAuthenticatedToken(new InMemoryUser('foo', 'bar', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-        $this->assertEquals('key', $token->getFirewallName());
+        self::assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        self::assertEquals('key', $token->getFirewallName());
     }
 
     /**
@@ -30,8 +30,8 @@ class PreAuthenticatedTokenTest extends TestCase
     public function testLegacyConstructor()
     {
         $token = new PreAuthenticatedToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-        $this->assertEquals('key', $token->getFirewallName());
+        self::assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        self::assertEquals('key', $token->getFirewallName());
     }
 
     /**
@@ -40,13 +40,13 @@ class PreAuthenticatedTokenTest extends TestCase
     public function testGetCredentials()
     {
         $token = new PreAuthenticatedToken('foo', 'bar', 'key');
-        $this->assertEquals('bar', $token->getCredentials());
+        self::assertEquals('bar', $token->getCredentials());
     }
 
     public function testGetUser()
     {
         $token = new PreAuthenticatedToken($user = new InMemoryUser('foo', 'bar'), 'key');
-        $this->assertEquals($user, $token->getUser());
+        self::assertEquals($user, $token->getUser());
     }
 
     /**
@@ -56,7 +56,7 @@ class PreAuthenticatedTokenTest extends TestCase
     {
         $token = new PreAuthenticatedToken('foo', 'bar', 'key');
         $token->eraseCredentials();
-        $this->assertNull($token->getCredentials());
+        self::assertNull($token->getCredentials());
     }
 
     /**
@@ -65,6 +65,6 @@ class PreAuthenticatedTokenTest extends TestCase
     public function testIsAuthenticated()
     {
         $token = new PreAuthenticatedToken('foo', 'bar', 'key');
-        $this->assertFalse($token->isAuthenticated());
+        self::assertFalse($token->isAuthenticated());
     }
 }

@@ -24,16 +24,16 @@ class DoctrineDbalCacheAdapterSchemaSubscriberTest extends TestCase
     public function testPostGenerateSchema()
     {
         $schema = new Schema();
-        $dbalConnection = $this->createMock(Connection::class);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->once())
+        $dbalConnection = self::createMock(Connection::class);
+        $entityManager = self::createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
             ->method('getConnection')
             ->willReturn($dbalConnection);
 
         $event = new GenerateSchemaEventArgs($entityManager, $schema);
 
-        $dbalAdapter = $this->createMock(DoctrineDbalAdapter::class);
-        $dbalAdapter->expects($this->once())
+        $dbalAdapter = self::createMock(DoctrineDbalAdapter::class);
+        $dbalAdapter->expects(self::once())
             ->method('configureSchema')
             ->with($schema, $dbalConnection);
 

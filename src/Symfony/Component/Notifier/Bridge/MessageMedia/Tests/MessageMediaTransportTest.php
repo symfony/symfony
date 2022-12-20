@@ -30,7 +30,7 @@ final class MessageMediaTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null, string $from = null): TransportInterface
     {
-        return new MessageMediaTransport('apiKey', 'apiSecret', $from, $client ?? $this->createMock(HttpClientInterface::class));
+        return new MessageMediaTransport('apiKey', 'apiSecret', $from, $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -47,7 +47,7 @@ final class MessageMediaTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     /**
@@ -57,7 +57,7 @@ final class MessageMediaTransportTest extends TransportTestCase
      */
     public function testExceptionIsThrownWhenHttpSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
         $response->method('getStatusCode')
             ->willReturn($statusCode);
         $response->method('getContent')
@@ -66,8 +66,8 @@ final class MessageMediaTransportTest extends TransportTestCase
         $client = new MockHttpClient($response);
 
         $transport = new MessageMediaTransport('apiKey', 'apiSecret', null, $client);
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage($expectedExceptionMessage);
 
         $transport->send(new SmsMessage('+61491570156', 'Hello!'));
     }

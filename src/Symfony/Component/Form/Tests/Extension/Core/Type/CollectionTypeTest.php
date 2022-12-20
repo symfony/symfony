@@ -28,7 +28,7 @@ class CollectionTypeTest extends BaseTypeTest
             'entry_type' => TextTypeTest::TESTED_TYPE,
         ]);
 
-        $this->assertCount(0, $form);
+        self::assertCount(0, $form);
     }
 
     public function testSetDataAdjustsSize()
@@ -41,23 +41,23 @@ class CollectionTypeTest extends BaseTypeTest
         ]);
         $form->setData(['foo@foo.com', 'foo@bar.com']);
 
-        $this->assertInstanceOf(Form::class, $form[0]);
-        $this->assertInstanceOf(Form::class, $form[1]);
-        $this->assertCount(2, $form);
-        $this->assertEquals('foo@foo.com', $form[0]->getData());
-        $this->assertEquals('foo@bar.com', $form[1]->getData());
+        self::assertInstanceOf(Form::class, $form[0]);
+        self::assertInstanceOf(Form::class, $form[1]);
+        self::assertCount(2, $form);
+        self::assertEquals('foo@foo.com', $form[0]->getData());
+        self::assertEquals('foo@bar.com', $form[1]->getData());
         $formAttrs0 = $form[0]->getConfig()->getOption('attr');
         $formAttrs1 = $form[1]->getConfig()->getOption('attr');
-        $this->assertEquals(20, $formAttrs0['maxlength']);
-        $this->assertEquals(20, $formAttrs1['maxlength']);
+        self::assertEquals(20, $formAttrs0['maxlength']);
+        self::assertEquals(20, $formAttrs1['maxlength']);
 
         $form->setData(['foo@baz.com']);
-        $this->assertInstanceOf(Form::class, $form[0]);
-        $this->assertArrayNotHasKey(1, $form);
-        $this->assertCount(1, $form);
-        $this->assertEquals('foo@baz.com', $form[0]->getData());
+        self::assertInstanceOf(Form::class, $form[0]);
+        self::assertArrayNotHasKey(1, $form);
+        self::assertCount(1, $form);
+        self::assertEquals('foo@baz.com', $form[0]->getData());
         $formAttrs0 = $form[0]->getConfig()->getOption('attr');
-        $this->assertEquals(20, $formAttrs0['maxlength']);
+        self::assertEquals(20, $formAttrs0['maxlength']);
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
@@ -65,7 +65,7 @@ class CollectionTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
         ]);
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $form->setData(new \stdClass());
     }
 
@@ -77,10 +77,10 @@ class CollectionTypeTest extends BaseTypeTest
         $form->setData(['foo@foo.com', 'bar@bar.com']);
         $form->submit(['foo@bar.com']);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertTrue($form->has('1'));
-        $this->assertEquals('foo@bar.com', $form[0]->getData());
-        $this->assertEquals('', $form[1]->getData());
+        self::assertTrue($form->has('0'));
+        self::assertTrue($form->has('1'));
+        self::assertEquals('foo@bar.com', $form[0]->getData());
+        self::assertEquals('', $form[1]->getData());
     }
 
     public function testResizedDownIfSubmittedWithMissingDataAndAllowDelete()
@@ -92,10 +92,10 @@ class CollectionTypeTest extends BaseTypeTest
         $form->setData(['foo@foo.com', 'bar@bar.com']);
         $form->submit(['foo@foo.com']);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertFalse($form->has('1'));
-        $this->assertEquals('foo@foo.com', $form[0]->getData());
-        $this->assertEquals(['foo@foo.com'], $form->getData());
+        self::assertTrue($form->has('0'));
+        self::assertFalse($form->has('1'));
+        self::assertEquals('foo@foo.com', $form[0]->getData());
+        self::assertEquals(['foo@foo.com'], $form->getData());
     }
 
     public function testResizedDownIfSubmittedWithEmptyDataAndDeleteEmpty()
@@ -109,10 +109,10 @@ class CollectionTypeTest extends BaseTypeTest
         $form->setData(['foo@foo.com', 'bar@bar.com']);
         $form->submit(['foo@foo.com', '']);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertFalse($form->has('1'));
-        $this->assertEquals('foo@foo.com', $form[0]->getData());
-        $this->assertEquals(['foo@foo.com'], $form->getData());
+        self::assertTrue($form->has('0'));
+        self::assertFalse($form->has('1'));
+        self::assertEquals('foo@foo.com', $form[0]->getData());
+        self::assertEquals(['foo@foo.com'], $form->getData());
     }
 
     public function testResizedDownWithDeleteEmptyCallable()
@@ -128,10 +128,10 @@ class CollectionTypeTest extends BaseTypeTest
         $form->setData([new Author('Bob'), new Author('Alice')]);
         $form->submit([['firstName' => 'Bob'], ['firstName' => '']]);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertFalse($form->has('1'));
-        $this->assertEquals(new Author('Bob'), $form[0]->getData());
-        $this->assertEquals([new Author('Bob')], $form->getData());
+        self::assertTrue($form->has('0'));
+        self::assertFalse($form->has('1'));
+        self::assertEquals(new Author('Bob'), $form[0]->getData());
+        self::assertEquals([new Author('Bob')], $form->getData());
     }
 
     public function testResizedDownIfSubmittedWithCompoundEmptyDataDeleteEmptyAndNoDataClass()
@@ -152,10 +152,10 @@ class CollectionTypeTest extends BaseTypeTest
             ['firstName' => 's_first', 'lastName' => 's_last'],
             ['firstName' => '', 'lastName' => ''],
         ]);
-        $this->assertTrue($form->has('0'));
-        $this->assertFalse($form->has('1'));
-        $this->assertEquals(['firstName' => 's_first', 'lastName' => 's_last'], $form[0]->getData());
-        $this->assertEquals([['firstName' => 's_first', 'lastName' => 's_last']], $form->getData());
+        self::assertTrue($form->has('0'));
+        self::assertFalse($form->has('1'));
+        self::assertEquals(['firstName' => 's_first', 'lastName' => 's_last'], $form[0]->getData());
+        self::assertEquals([['firstName' => 's_first', 'lastName' => 's_last']], $form->getData());
     }
 
     public function testDontAddEmptyDataIfDeleteEmpty()
@@ -169,10 +169,10 @@ class CollectionTypeTest extends BaseTypeTest
         $form->setData(['foo@foo.com']);
         $form->submit(['foo@foo.com', '']);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertFalse($form->has('1'));
-        $this->assertEquals('foo@foo.com', $form[0]->getData());
-        $this->assertEquals(['foo@foo.com'], $form->getData());
+        self::assertTrue($form->has('0'));
+        self::assertFalse($form->has('1'));
+        self::assertEquals('foo@foo.com', $form[0]->getData());
+        self::assertEquals(['foo@foo.com'], $form->getData());
     }
 
     public function testNoDeleteEmptyIfDeleteNotAllowed()
@@ -186,8 +186,8 @@ class CollectionTypeTest extends BaseTypeTest
         $form->setData(['foo@foo.com']);
         $form->submit(['']);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertEquals('', $form[0]->getData());
+        self::assertTrue($form->has('0'));
+        self::assertEquals('', $form[0]->getData());
     }
 
     public function testResizedDownIfSubmittedWithCompoundEmptyDataAndDeleteEmpty()
@@ -207,10 +207,10 @@ class CollectionTypeTest extends BaseTypeTest
             ['firstName' => '', 'lastName' => ''],
         ]);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertFalse($form->has('1'));
-        $this->assertEquals(new Author('s_first', 's_last'), $form[0]->getData());
-        $this->assertEquals([new Author('s_first', 's_last')], $form->getData());
+        self::assertTrue($form->has('0'));
+        self::assertFalse($form->has('1'));
+        self::assertEquals(new Author('s_first', 's_last'), $form[0]->getData());
+        self::assertEquals([new Author('s_first', 's_last')], $form->getData());
     }
 
     public function testNotDeleteEmptyIfInvalid()
@@ -227,12 +227,12 @@ class CollectionTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'x', '']);
 
-        $this->assertSame(['a'], $form->getData());
-        $this->assertCount(2, $form);
-        $this->assertTrue($form->has('1'));
-        $this->assertFalse($form[1]->isValid());
-        $this->assertNull($form[1]->getData());
-        $this->assertSame('x', $form[1]->getViewData());
+        self::assertSame(['a'], $form->getData());
+        self::assertCount(2, $form);
+        self::assertTrue($form->has('1'));
+        self::assertFalse($form[1]->isValid());
+        self::assertNull($form[1]->getData());
+        self::assertSame('x', $form[1]->getViewData());
     }
 
     public function testNotResizedIfSubmittedWithExtraData()
@@ -243,9 +243,9 @@ class CollectionTypeTest extends BaseTypeTest
         $form->setData(['foo@bar.com']);
         $form->submit(['foo@foo.com', 'bar@bar.com']);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertFalse($form->has('1'));
-        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        self::assertTrue($form->has('0'));
+        self::assertFalse($form->has('1'));
+        self::assertEquals('foo@foo.com', $form[0]->getData());
     }
 
     public function testResizedUpIfSubmittedWithExtraDataAndAllowAdd()
@@ -257,11 +257,11 @@ class CollectionTypeTest extends BaseTypeTest
         $form->setData(['foo@bar.com']);
         $form->submit(['foo@bar.com', 'bar@bar.com']);
 
-        $this->assertTrue($form->has('0'));
-        $this->assertTrue($form->has('1'));
-        $this->assertEquals('foo@bar.com', $form[0]->getData());
-        $this->assertEquals('bar@bar.com', $form[1]->getData());
-        $this->assertEquals(['foo@bar.com', 'bar@bar.com'], $form->getData());
+        self::assertTrue($form->has('0'));
+        self::assertTrue($form->has('1'));
+        self::assertEquals('foo@bar.com', $form[0]->getData());
+        self::assertEquals('bar@bar.com', $form[1]->getData());
+        self::assertEquals(['foo@bar.com', 'bar@bar.com'], $form->getData());
     }
 
     public function testAllowAddButNoPrototype()
@@ -272,7 +272,7 @@ class CollectionTypeTest extends BaseTypeTest
             'prototype' => false,
         ]);
 
-        $this->assertFalse($form->has('__name__'));
+        self::assertFalse($form->has('__name__'));
     }
 
     public function testPrototypeMultipartPropagation()
@@ -285,7 +285,7 @@ class CollectionTypeTest extends BaseTypeTest
             ])
         ;
 
-        $this->assertTrue($form->createView()->vars['multipart']);
+        self::assertTrue($form->createView()->vars['multipart']);
     }
 
     public function testGetDataDoesNotContainsPrototypeNameBeforeDataAreSet()
@@ -297,7 +297,7 @@ class CollectionTypeTest extends BaseTypeTest
         ]);
 
         $data = $form->getData();
-        $this->assertArrayNotHasKey('__name__', $data);
+        self::assertArrayNotHasKey('__name__', $data);
     }
 
     public function testGetDataDoesNotContainsPrototypeNameAfterDataAreSet()
@@ -310,7 +310,7 @@ class CollectionTypeTest extends BaseTypeTest
 
         $form->setData(['foobar.png']);
         $data = $form->getData();
-        $this->assertArrayNotHasKey('__name__', $data);
+        self::assertArrayNotHasKey('__name__', $data);
     }
 
     public function testPrototypeNameOption()
@@ -321,7 +321,7 @@ class CollectionTypeTest extends BaseTypeTest
             'allow_add' => true,
         ]);
 
-        $this->assertSame('__name__', $form->getConfig()->getAttribute('prototype')->getName(), '__name__ is the default');
+        self::assertSame('__name__', $form->getConfig()->getAttribute('prototype')->getName(), '__name__ is the default');
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => FormTypeTest::TESTED_TYPE,
@@ -330,7 +330,7 @@ class CollectionTypeTest extends BaseTypeTest
             'prototype_name' => '__test__',
         ]);
 
-        $this->assertSame('__test__', $form->getConfig()->getAttribute('prototype')->getName());
+        self::assertSame('__test__', $form->getConfig()->getAttribute('prototype')->getName());
     }
 
     public function testPrototypeDefaultLabel()
@@ -342,7 +342,7 @@ class CollectionTypeTest extends BaseTypeTest
             'prototype_name' => '__test__',
         ]);
 
-        $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
+        self::assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
 
     public function testPrototypeData()
@@ -358,8 +358,8 @@ class CollectionTypeTest extends BaseTypeTest
             ],
         ]);
 
-        $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
-        $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
+        self::assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
+        self::assertFalse($form->createView()->vars['prototype']->vars['label']);
     }
 
     public function testPrototypeDefaultRequired()
@@ -371,7 +371,7 @@ class CollectionTypeTest extends BaseTypeTest
             'prototype_name' => '__test__',
         ]);
 
-        $this->assertTrue($form->createView()->vars['prototype']->vars['required']);
+        self::assertTrue($form->createView()->vars['prototype']->vars['required']);
     }
 
     public function testPrototypeSetNotRequired()
@@ -384,8 +384,8 @@ class CollectionTypeTest extends BaseTypeTest
             'required' => false,
         ]);
 
-        $this->assertFalse($form->createView()->vars['required'], 'collection is not required');
-        $this->assertFalse($form->createView()->vars['prototype']->vars['required'], '"prototype" should not be required');
+        self::assertFalse($form->createView()->vars['required'], 'collection is not required');
+        self::assertFalse($form->createView()->vars['prototype']->vars['required'], '"prototype" should not be required');
     }
 
     public function testPrototypeSetNotRequiredIfParentNotRequired()
@@ -402,9 +402,9 @@ class CollectionTypeTest extends BaseTypeTest
         ]);
 
         $child->setParent($parent);
-        $this->assertFalse($parent->createView()->vars['required'], 'Parent is not required');
-        $this->assertFalse($child->createView()->vars['required'], 'Child is not required');
-        $this->assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
+        self::assertFalse($parent->createView()->vars['required'], 'Parent is not required');
+        self::assertFalse($child->createView()->vars['required'], 'Child is not required');
+        self::assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
     }
 
     public function testPrototypeNotOverrideRequiredByEntryOptionsInFavorOfParent()
@@ -425,9 +425,9 @@ class CollectionTypeTest extends BaseTypeTest
 
         $child->setParent($parent);
 
-        $this->assertFalse($parent->createView()->vars['required'], 'Parent is not required');
-        $this->assertFalse($child->createView()->vars['required'], 'Child is not required');
-        $this->assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
+        self::assertFalse($parent->createView()->vars['required'], 'Parent is not required');
+        self::assertFalse($child->createView()->vars['required'], 'Child is not required');
+        self::assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
     }
 
     public function testEntriesBlockPrefixes()
@@ -445,9 +445,9 @@ class CollectionTypeTest extends BaseTypeTest
             '_fields_entry',
         ];
 
-        $this->assertCount(1, $collectionView);
-        $this->assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
-        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+        self::assertCount(1, $collectionView);
+        self::assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
+        self::assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
     }
 
     public function testEntriesBlockPrefixesWithCustomBlockPrefix()
@@ -467,9 +467,9 @@ class CollectionTypeTest extends BaseTypeTest
             '_fields_entry',
         ];
 
-        $this->assertCount(1, $collectionView);
-        $this->assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
-        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+        self::assertCount(1, $collectionView);
+        self::assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
+        self::assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
     }
 
     public function testEntriesBlockPrefixesWithCustomBlockPrefixedType()
@@ -489,9 +489,9 @@ class CollectionTypeTest extends BaseTypeTest
             '_fields_entry',
         ];
 
-        $this->assertCount(1, $collectionView);
-        $this->assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
-        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+        self::assertCount(1, $collectionView);
+        self::assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
+        self::assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
     }
 
     public function testPrototypeBlockPrefixesWithCustomBlockPrefix()
@@ -511,8 +511,8 @@ class CollectionTypeTest extends BaseTypeTest
             '_fields_entry',
         ];
 
-        $this->assertCount(0, $collectionView);
-        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+        self::assertCount(0, $collectionView);
+        self::assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

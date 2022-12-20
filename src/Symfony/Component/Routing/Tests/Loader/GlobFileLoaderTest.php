@@ -23,8 +23,8 @@ class GlobFileLoaderTest extends TestCase
     {
         $loader = new GlobFileLoader(new FileLocator());
 
-        $this->assertTrue($loader->supports('any-path', 'glob'), '->supports() returns true if the resource has the glob type');
-        $this->assertFalse($loader->supports('any-path'), '->supports() returns false if the resource is not of glob type');
+        self::assertTrue($loader->supports('any-path', 'glob'), '->supports() returns true if the resource has the glob type');
+        self::assertFalse($loader->supports('any-path'), '->supports() returns false if the resource is not of glob type');
     }
 
     public function testLoadAddsTheGlobResourceToTheContainer()
@@ -32,7 +32,7 @@ class GlobFileLoaderTest extends TestCase
         $loader = new GlobFileLoaderWithoutImport(new FileLocator());
         $collection = $loader->load(__DIR__.'/../Fixtures/directory/*.yml');
 
-        $this->assertEquals(new GlobResource(__DIR__.'/../Fixtures/directory', '/*.yml', false), $collection->getResources()[0]);
+        self::assertEquals(new GlobResource(__DIR__.'/../Fixtures/directory', '/*.yml', false), $collection->getResources()[0]);
     }
 }
 

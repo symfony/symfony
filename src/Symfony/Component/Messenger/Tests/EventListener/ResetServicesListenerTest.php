@@ -31,10 +31,10 @@ class ResetServicesListenerTest extends TestCase
      */
     public function testResetServices(bool $shouldReset)
     {
-        $servicesResetter = $this->createMock(ServicesResetter::class);
-        $servicesResetter->expects($shouldReset ? $this->once() : $this->never())->method('reset');
+        $servicesResetter = self::createMock(ServicesResetter::class);
+        $servicesResetter->expects($shouldReset ? self::once() : self::never())->method('reset');
 
-        $event = new WorkerRunningEvent($this->createMock(Worker::class), !$shouldReset);
+        $event = new WorkerRunningEvent(self::createMock(Worker::class), !$shouldReset);
 
         $resetListener = new ResetServicesListener($servicesResetter);
         $resetListener->resetServices($event);
@@ -42,10 +42,10 @@ class ResetServicesListenerTest extends TestCase
 
     public function testResetServicesAtStop()
     {
-        $servicesResetter = $this->createMock(ServicesResetter::class);
-        $servicesResetter->expects($this->once())->method('reset');
+        $servicesResetter = self::createMock(ServicesResetter::class);
+        $servicesResetter->expects(self::once())->method('reset');
 
-        $event = new WorkerStoppedEvent($this->createMock(Worker::class));
+        $event = new WorkerStoppedEvent(self::createMock(Worker::class));
 
         $resetListener = new ResetServicesListener($servicesResetter);
         $resetListener->resetServicesAtStop($event);

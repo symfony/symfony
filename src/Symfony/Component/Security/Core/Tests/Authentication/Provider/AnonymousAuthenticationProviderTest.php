@@ -27,22 +27,22 @@ class AnonymousAuthenticationProviderTest extends TestCase
     {
         $provider = $this->getProvider('foo');
 
-        $this->assertTrue($provider->supports($this->getSupportedToken('foo')));
-        $this->assertFalse($provider->supports($this->createMock(TokenInterface::class)));
+        self::assertTrue($provider->supports($this->getSupportedToken('foo')));
+        self::assertFalse($provider->supports(self::createMock(TokenInterface::class)));
     }
 
     public function testAuthenticateWhenTokenIsNotSupported()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('The token is not supported by this authentication provider.');
+        self::expectException(AuthenticationException::class);
+        self::expectExceptionMessage('The token is not supported by this authentication provider.');
         $provider = $this->getProvider('foo');
 
-        $provider->authenticate($this->createMock(TokenInterface::class));
+        $provider->authenticate(self::createMock(TokenInterface::class));
     }
 
     public function testAuthenticateWhenSecretIsNotValid()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $provider = $this->getProvider('foo');
 
         $provider->authenticate($this->getSupportedToken('bar'));
@@ -53,13 +53,13 @@ class AnonymousAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider('foo');
         $token = $this->getSupportedToken('foo');
 
-        $this->assertSame($token, $provider->authenticate($token));
+        self::assertSame($token, $provider->authenticate($token));
     }
 
     protected function getSupportedToken($secret)
     {
-        $token = $this->getMockBuilder(AnonymousToken::class)->setMethods(['getSecret'])->disableOriginalConstructor()->getMock();
-        $token->expects($this->any())
+        $token = self::getMockBuilder(AnonymousToken::class)->setMethods(['getSecret'])->disableOriginalConstructor()->getMock();
+        $token->expects(self::any())
               ->method('getSecret')
               ->willReturn($secret)
         ;

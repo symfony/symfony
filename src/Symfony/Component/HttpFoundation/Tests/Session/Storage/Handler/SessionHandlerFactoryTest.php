@@ -33,8 +33,8 @@ class SessionHandlerFactoryTest extends TestCase
     {
         $handler = SessionHandlerFactory::createHandler($connectionDSN);
 
-        $this->assertInstanceOf($expectedHandlerType, $handler);
-        $this->assertEquals($expectedPath, \ini_get('session.save_path'));
+        self::assertInstanceOf($expectedHandlerType, $handler);
+        self::assertEquals($expectedPath, \ini_get('session.save_path'));
     }
 
     public function provideConnectionDSN(): array
@@ -52,8 +52,8 @@ class SessionHandlerFactoryTest extends TestCase
      */
     public function testCreateRedisHandlerFromConnectionObject()
     {
-        $handler = SessionHandlerFactory::createHandler($this->createMock(\Redis::class));
-        $this->assertInstanceOf(RedisSessionHandler::class, $handler);
+        $handler = SessionHandlerFactory::createHandler(self::createMock(\Redis::class));
+        self::assertInstanceOf(RedisSessionHandler::class, $handler);
     }
 
     /**
@@ -62,16 +62,16 @@ class SessionHandlerFactoryTest extends TestCase
     public function testCreateRedisHandlerFromDsn()
     {
         $handler = SessionHandlerFactory::createHandler('redis://localhost?prefix=foo&ttl=3600&ignored=bar');
-        $this->assertInstanceOf(RedisSessionHandler::class, $handler);
+        self::assertInstanceOf(RedisSessionHandler::class, $handler);
 
         $reflection = new \ReflectionObject($handler);
 
         $prefixProperty = $reflection->getProperty('prefix');
         $prefixProperty->setAccessible(true);
-        $this->assertSame('foo', $prefixProperty->getValue($handler));
+        self::assertSame('foo', $prefixProperty->getValue($handler));
 
         $ttlProperty = $reflection->getProperty('ttl');
         $ttlProperty->setAccessible(true);
-        $this->assertSame('3600', $ttlProperty->getValue($handler));
+        self::assertSame('3600', $ttlProperty->getValue($handler));
     }
 }

@@ -32,7 +32,7 @@ class MermaidDumperTest extends TestCase
 
         $dump = $dumper->dump($definition);
 
-        $this->assertEquals($expected, $dump);
+        self::assertEquals($expected, $dump);
     }
 
     /**
@@ -44,7 +44,7 @@ class MermaidDumperTest extends TestCase
 
         $dump = $dumper->dump($definition);
 
-        $this->assertEquals($expected, $dump);
+        self::assertEquals($expected, $dump);
     }
 
     /**
@@ -56,7 +56,7 @@ class MermaidDumperTest extends TestCase
 
         $dump = $dumper->dump($definition);
 
-        $this->assertEquals($expected, $dump);
+        self::assertEquals($expected, $dump);
     }
 
     /**
@@ -68,7 +68,7 @@ class MermaidDumperTest extends TestCase
 
         $dump = $dumper->dump($definition, $marking);
 
-        $this->assertEquals($expected, $dump);
+        self::assertEquals($expected, $dump);
     }
 
     public function provideWorkflowDefinitionWithoutMarking(): array

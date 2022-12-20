@@ -30,13 +30,13 @@ class CsrfProtectionListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $this->csrfTokenManager = self::createMock(CsrfTokenManagerInterface::class);
         $this->listener = new CsrfProtectionListener($this->csrfTokenManager);
     }
 
     public function testNoCsrfTokenBadge()
     {
-        $this->csrfTokenManager->expects($this->never())->method('isTokenValid');
+        $this->csrfTokenManager->expects(self::never())->method('isTokenValid');
 
         $event = $this->createEvent($this->createPassport(null));
         $this->listener->checkPassport($event);
@@ -44,7 +44,7 @@ class CsrfProtectionListenerTest extends TestCase
 
     public function testValidCsrfToken()
     {
-        $this->csrfTokenManager->expects($this->any())
+        $this->csrfTokenManager->expects(self::any())
             ->method('isTokenValid')
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(true);
@@ -52,15 +52,15 @@ class CsrfProtectionListenerTest extends TestCase
         $event = $this->createEvent($this->createPassport(new CsrfTokenBadge('authenticator_token_id', 'abc123')));
         $this->listener->checkPassport($event);
 
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
     }
 
     public function testInvalidCsrfToken()
     {
-        $this->expectException(InvalidCsrfTokenException::class);
-        $this->expectExceptionMessage('Invalid CSRF token.');
+        self::expectException(InvalidCsrfTokenException::class);
+        self::expectExceptionMessage('Invalid CSRF token.');
 
-        $this->csrfTokenManager->expects($this->any())
+        $this->csrfTokenManager->expects(self::any())
             ->method('isTokenValid')
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(false);
@@ -71,7 +71,7 @@ class CsrfProtectionListenerTest extends TestCase
 
     private function createEvent($passport)
     {
-        return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
+        return new CheckPassportEvent(self::createMock(AuthenticatorInterface::class), $passport);
     }
 
     private function createPassport(?CsrfTokenBadge $badge)

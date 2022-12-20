@@ -22,7 +22,7 @@ final class OpenUriActionTest extends TestCase
         $action = (new OpenUriAction())
             ->name($value = 'My name');
 
-        $this->assertSame($value, $action->toArray()['name']);
+        self::assertSame($value, $action->toArray()['name']);
     }
 
     public function testTargetWithDefaultValue()
@@ -30,12 +30,9 @@ final class OpenUriActionTest extends TestCase
         $action = (new OpenUriAction())
             ->target($uri = 'URI');
 
-        $this->assertSame(
-            [
-                ['os' => 'default', 'uri' => $uri],
-            ],
-            $action->toArray()['targets']
-        );
+        self::assertSame([
+            ['os' => 'default', 'uri' => $uri],
+        ], $action->toArray()['targets']);
     }
 
     /**
@@ -46,12 +43,9 @@ final class OpenUriActionTest extends TestCase
         $action = (new OpenUriAction())
             ->target($uri = 'URI', $os);
 
-        $this->assertSame(
-            [
-                ['os' => $os, 'uri' => $uri],
-            ],
-            $action->toArray()['targets']
-        );
+        self::assertSame([
+            ['os' => $os, 'uri' => $uri],
+        ], $action->toArray()['targets']);
     }
 
     /**
@@ -67,18 +61,15 @@ final class OpenUriActionTest extends TestCase
 
     public function testTargetThrowsWithUnknownOperatingSystem()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
         (new OpenUriAction())->target('URI', 'FOO');
     }
 
     public function testToArray()
     {
-        $this->assertSame(
-            [
-                '@type' => 'OpenUri',
-            ],
-            (new OpenUriAction())->toArray()
-        );
+        self::assertSame([
+            '@type' => 'OpenUri',
+        ], (new OpenUriAction())->toArray());
     }
 }

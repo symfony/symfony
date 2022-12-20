@@ -24,11 +24,11 @@ class PersistentTokenTest extends TestCase
         $lastUsed = new \DateTime();
         $token = new PersistentToken('fooclass', 'fooname', 'fooseries', 'footokenvalue', $lastUsed);
 
-        $this->assertEquals('fooclass', $token->getClass());
-        $this->assertEquals('fooname', $token->getUserIdentifier());
-        $this->assertEquals('fooseries', $token->getSeries());
-        $this->assertEquals('footokenvalue', $token->getTokenValue());
-        $this->assertSame($lastUsed, $token->getLastUsed());
+        self::assertEquals('fooclass', $token->getClass());
+        self::assertEquals('fooname', $token->getUserIdentifier());
+        self::assertEquals('fooseries', $token->getSeries());
+        self::assertEquals('footokenvalue', $token->getTokenValue());
+        self::assertSame($lastUsed, $token->getLastUsed());
     }
 
     /**
@@ -39,6 +39,6 @@ class PersistentTokenTest extends TestCase
         $token = new PersistentToken('fooclass', 'fooname', 'fooseries', 'footokenvalue', new \DateTime());
 
         $this->expectDeprecation('Since symfony/security-core 5.3: Method "Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken::getUsername()" is deprecated, use getUserIdentifier() instead.');
-        $this->assertEquals('fooname', $token->getUsername());
+        self::assertEquals('fooname', $token->getUsername());
     }
 }

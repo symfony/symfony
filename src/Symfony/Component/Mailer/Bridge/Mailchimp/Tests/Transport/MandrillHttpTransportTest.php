@@ -29,7 +29,7 @@ class MandrillHttpTransportTest extends TestCase
      */
     public function testToString(MandrillHttpTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -53,20 +53,20 @@ class MandrillHttpTransportTest extends TestCase
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://mandrillapp.com/api/1.0/messages/send-raw.json', $url);
+            self::assertSame('POST', $method);
+            self::assertSame('https://mandrillapp.com/api/1.0/messages/send-raw.json', $url);
 
             $body = json_decode($options['body'], true);
             $message = $body['raw_message'];
-            $this->assertSame('KEY', $body['key']);
-            $this->assertSame('Fabien', $body['from_name']);
-            $this->assertSame('fabpot@symfony.com', $body['from_email']);
-            $this->assertSame('saif.gmati@symfony.com', $body['to'][0]);
+            self::assertSame('KEY', $body['key']);
+            self::assertSame('Fabien', $body['from_name']);
+            self::assertSame('fabpot@symfony.com', $body['from_email']);
+            self::assertSame('saif.gmati@symfony.com', $body['to'][0]);
 
-            $this->assertStringContainsString('Subject: Hello!', $message);
-            $this->assertStringContainsString('To: Saif Eddin <saif.gmati@symfony.com>', $message);
-            $this->assertStringContainsString('From: Fabien <fabpot@symfony.com>', $message);
-            $this->assertStringContainsString('Hello There!', $message);
+            self::assertStringContainsString('Subject: Hello!', $message);
+            self::assertStringContainsString('To: Saif Eddin <saif.gmati@symfony.com>', $message);
+            self::assertStringContainsString('From: Fabien <fabpot@symfony.com>', $message);
+            self::assertStringContainsString('Hello There!', $message);
 
             return new MockResponse(json_encode([['_id' => 'foobar']]), [
                 'http_code' => 200,
@@ -83,7 +83,7 @@ class MandrillHttpTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        self::assertSame('foobar', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()
@@ -102,8 +102,8 @@ class MandrillHttpTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
     }
 
@@ -121,9 +121,9 @@ class MandrillHttpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(3, $email->getHeaders()->toArray());
-        $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
-        $this->assertSame('X-MC-Tags: password-reset,user,another', $email->getHeaders()->get('X-MC-Tags')->toString());
-        $this->assertSame('X-MC-Metadata: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-MC-Metadata')->toString());
+        self::assertCount(3, $email->getHeaders()->toArray());
+        self::assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
+        self::assertSame('X-MC-Tags: password-reset,user,another', $email->getHeaders()->get('X-MC-Tags')->toString());
+        self::assertSame('X-MC-Metadata: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-MC-Metadata')->toString());
     }
 }

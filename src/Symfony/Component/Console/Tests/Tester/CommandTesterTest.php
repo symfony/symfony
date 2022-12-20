@@ -46,33 +46,33 @@ class CommandTesterTest extends TestCase
 
     public function testExecute()
     {
-        $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
-        $this->assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
-        $this->assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
+        self::assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
+        self::assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
+        self::assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
     }
 
     public function testGetInput()
     {
-        $this->assertEquals('bar', $this->tester->getInput()->getArgument('foo'), '->getInput() returns the current input instance');
+        self::assertEquals('bar', $this->tester->getInput()->getArgument('foo'), '->getInput() returns the current input instance');
     }
 
     public function testGetOutput()
     {
         rewind($this->tester->getOutput()->getStream());
-        $this->assertEquals('foo'.\PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
+        self::assertEquals('foo'.\PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
     }
 
     public function testGetDisplay()
     {
-        $this->assertEquals('foo'.\PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
+        self::assertEquals('foo'.\PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
     }
 
     public function testGetDisplayWithoutCallingExecuteBefore()
     {
         $tester = new CommandTester(new Command());
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Output not initialized');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Output not initialized');
 
         $tester->getDisplay();
     }
@@ -86,8 +86,8 @@ class CommandTesterTest extends TestCase
     {
         $tester = new CommandTester(new Command());
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Status code not initialized');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Status code not initialized');
 
         $tester->getStatusCode();
     }
@@ -105,7 +105,7 @@ class CommandTesterTest extends TestCase
         $tester = new CommandTester($application->find('foo'));
 
         // check that there is no need to pass the command name here
-        $this->assertEquals(0, $tester->execute([]));
+        self::assertEquals(0, $tester->execute([]));
     }
 
     public function testCommandWithInputs()
@@ -130,7 +130,7 @@ class CommandTesterTest extends TestCase
         $tester->execute([]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertEquals(implode('', $questions), $tester->getDisplay(true));
+        self::assertEquals(implode('', $questions), $tester->getDisplay(true));
     }
 
     public function testCommandWithDefaultInputs()
@@ -155,13 +155,13 @@ class CommandTesterTest extends TestCase
         $tester->execute([]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertEquals(implode('', $questions), $tester->getDisplay(true));
+        self::assertEquals(implode('', $questions), $tester->getDisplay(true));
     }
 
     public function testCommandWithWrongInputsNumber()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Aborted.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Aborted.');
         $questions = [
             'What\'s your name?',
             'How are you?',
@@ -185,8 +185,8 @@ class CommandTesterTest extends TestCase
 
     public function testCommandWithQuestionsButNoInputs()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Aborted.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Aborted.');
         $questions = [
             'What\'s your name?',
             'How are you?',
@@ -245,6 +245,6 @@ class CommandTesterTest extends TestCase
             ['capture_stderr_separately' => true]
         );
 
-        $this->assertSame('foo', $tester->getErrorOutput());
+        self::assertSame('foo', $tester->getErrorOutput());
     }
 }

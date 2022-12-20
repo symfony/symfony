@@ -65,7 +65,7 @@ class RegisterEntryPointsPassTest extends TestCase
 
         (new RegisterEntryPointPass())->process($container);
 
-        $this->assertSame('security.authenticator.custom_authenticator.main', $config->getArgument(7));
+        self::assertSame('security.authenticator.custom_authenticator.main', $config->getArgument(7));
     }
 }
 

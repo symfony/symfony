@@ -33,7 +33,7 @@ class RegisterReverseContainerPassTest extends TestCase
         $container->addCompilerPass(new RegisterReverseContainerPass(true));
         $container->compile();
 
-        $this->assertFalse($container->has('foo'));
+        self::assertFalse($container->has('foo'));
     }
 
     public function testPublicServices()
@@ -51,8 +51,8 @@ class RegisterReverseContainerPassTest extends TestCase
 
         $foo = $container->get('foo');
 
-        $this->assertSame('foo', $container->get('reverse_container')->getId($foo));
-        $this->assertSame($foo, $container->get('reverse_container')->getService('foo'));
+        self::assertSame('foo', $container->get('reverse_container')->getId($foo));
+        self::assertSame($foo, $container->get('reverse_container')->getService('foo'));
     }
 
     public function testReversibleServices()
@@ -71,7 +71,7 @@ class RegisterReverseContainerPassTest extends TestCase
 
         $foo = $container->get('bar')->foo;
 
-        $this->assertSame('foo', $container->get('reverse_container')->getId($foo));
-        $this->assertSame($foo, $container->get('reverse_container')->getService('foo'));
+        self::assertSame('foo', $container->get('reverse_container')->getId($foo));
+        self::assertSame($foo, $container->get('reverse_container')->getService('foo'));
     }
 }

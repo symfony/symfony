@@ -71,8 +71,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $url = sprintf('http://%s/', 0 < substr_count($ipAddr, ':') ? sprintf('[%s]', $ipAddr) : $ipAddr);
 
         if ($mustThrow) {
-            $this->expectException(TransportException::class);
-            $this->expectExceptionMessage(sprintf('IP "%s" is blocked for "%s".', $ipAddr, $url));
+            self::expectException(TransportException::class);
+            self::expectExceptionMessage(sprintf('IP "%s" is blocked for "%s".', $ipAddr, $url));
         }
 
         $previousHttpClient = $this->getHttpClientMock($url, $ipAddr, $content);
@@ -80,8 +80,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $response = $client->request('GET', $url);
 
         if (!$mustThrow) {
-            $this->assertEquals($content, $response->getContent());
-            $this->assertEquals(200, $response->getStatusCode());
+            self::assertEquals($content, $response->getContent());
+            self::assertEquals(200, $response->getStatusCode());
         }
     }
 
@@ -100,9 +100,9 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $client = new NoPrivateNetworkHttpClient($previousHttpClient);
         $response = $client->request('GET', $url, ['on_progress' => $customCallback]);
 
-        $this->assertEquals(1, $executionCount);
-        $this->assertEquals($content, $response->getContent());
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertEquals(1, $executionCount);
+        self::assertEquals($content, $response->getContent());
+        self::assertEquals(200, $response->getStatusCode());
     }
 
     public function testNonCallableOnProgressCallback()
@@ -112,8 +112,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $content = 'bar';
         $customCallback = sprintf('cb_%s', microtime(true));
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Option "on_progress" must be callable, "string" given.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Option "on_progress" must be callable, "string" given.');
 
         $client = new NoPrivateNetworkHttpClient(new MockHttpClient());
         $client->request('GET', $url, ['on_progress' => $customCallback]);
@@ -121,28 +121,27 @@ class NoPrivateNetworkHttpClientTest extends TestCase
 
     public function testConstructor()
     {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 passed to "Symfony\Component\HttpClient\NoPrivateNetworkHttpClient::__construct()" must be of the type array, string or null. "int" given.');
+        self::expectException(\TypeError::class);
+        self::expectExceptionMessage('Argument 2 passed to "Symfony\Component\HttpClient\NoPrivateNetworkHttpClient::__construct()" must be of the type array, string or null. "int" given.');
 
         new NoPrivateNetworkHttpClient(new MockHttpClient(), 3);
     }
 
     private function getHttpClientMock(string $url, string $ipAddr, string $content)
     {
-        $previousHttpClient = $this
-            ->getMockBuilder(HttpClientInterface::class)
+        $previousHttpClient = self::getMockBuilder(HttpClientInterface::class)
             ->getMock();
 
         $previousHttpClient
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('request')
             ->with(
                 'GET',
                 $url,
-                $this->callback(function ($options) {
-                    $this->assertArrayHasKey('on_progress', $options);
+                self::callback(function ($options) {
+                    self::assertArrayHasKey('on_progress', $options);
                     $onProgress = $options['on_progress'];
-                    $this->assertIsCallable($onProgress);
+                    self::assertIsCallable($onProgress);
 
                     return true;
                 })

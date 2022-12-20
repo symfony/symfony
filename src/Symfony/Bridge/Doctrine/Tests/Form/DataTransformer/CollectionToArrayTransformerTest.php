@@ -38,7 +38,7 @@ class CollectionToArrayTransformerTest extends TestCase
             3 => 'bar',
         ];
 
-        $this->assertSame($array, $this->transformer->transform(new ArrayCollection($array)));
+        self::assertSame($array, $this->transformer->transform(new ArrayCollection($array)));
     }
 
     /**
@@ -55,17 +55,17 @@ class CollectionToArrayTransformerTest extends TestCase
             3 => 'bar',
         ];
 
-        $this->assertSame($array, $this->transformer->transform($array));
+        self::assertSame($array, $this->transformer->transform($array));
     }
 
     public function testTransformNull()
     {
-        $this->assertSame([], $this->transformer->transform(null));
+        self::assertSame([], $this->transformer->transform(null));
     }
 
     public function testTransformExpectsArrayOrCollection()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $this->transformer->transform('Foo');
     }
 
@@ -76,16 +76,16 @@ class CollectionToArrayTransformerTest extends TestCase
             3 => 'bar',
         ];
 
-        $this->assertEquals(new ArrayCollection($array), $this->transformer->reverseTransform($array));
+        self::assertEquals(new ArrayCollection($array), $this->transformer->reverseTransform($array));
     }
 
     public function testReverseTransformEmpty()
     {
-        $this->assertEquals(new ArrayCollection(), $this->transformer->reverseTransform(''));
+        self::assertEquals(new ArrayCollection(), $this->transformer->reverseTransform(''));
     }
 
     public function testReverseTransformNull()
     {
-        $this->assertEquals(new ArrayCollection(), $this->transformer->reverseTransform(null));
+        self::assertEquals(new ArrayCollection(), $this->transformer->reverseTransform(null));
     }
 }

@@ -20,16 +20,16 @@ class UserNotFoundExceptionTest extends TestCase
     public function testGetMessageData()
     {
         $exception = new UserNotFoundException('Username could not be found.');
-        $this->assertEquals(['{{ username }}' => null, '{{ user_identifier }}' => null], $exception->getMessageData());
+        self::assertEquals(['{{ username }}' => null, '{{ user_identifier }}' => null], $exception->getMessageData());
         $exception->setUserIdentifier('username');
-        $this->assertEquals(['{{ username }}' => 'username', '{{ user_identifier }}' => 'username'], $exception->getMessageData());
+        self::assertEquals(['{{ username }}' => 'username', '{{ user_identifier }}' => 'username'], $exception->getMessageData());
     }
 
     public function testUserIdentifierIsNotSetByDefault()
     {
         $exception = new UserNotFoundException();
 
-        $this->assertNull($exception->getUserIdentifier());
+        self::assertNull($exception->getUserIdentifier());
     }
 
     /**
@@ -39,7 +39,7 @@ class UserNotFoundExceptionTest extends TestCase
     {
         $exception = new UserNotFoundException();
 
-        $this->assertNull($exception->getUsername());
+        self::assertNull($exception->getUsername());
     }
 
     /**
@@ -48,9 +48,9 @@ class UserNotFoundExceptionTest extends TestCase
     public function testUsernameNotFoundException()
     {
         $exception = new UsernameNotFoundException();
-        $this->assertInstanceOf(UserNotFoundException::class, $exception);
+        self::assertInstanceOf(UserNotFoundException::class, $exception);
 
         $exception->setUsername('username');
-        $this->assertEquals('username', $exception->getUserIdentifier());
+        self::assertEquals('username', $exception->getUserIdentifier());
     }
 }

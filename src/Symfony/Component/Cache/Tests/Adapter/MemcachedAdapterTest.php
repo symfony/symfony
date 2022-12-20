@@ -61,11 +61,11 @@ class MemcachedAdapterTest extends AdapterTestCase
             'hash' => 'md5',
         ]);
 
-        $this->assertSame(\Memcached::SERIALIZER_PHP, $client->getOption(\Memcached::OPT_SERIALIZER));
-        $this->assertSame(\Memcached::HASH_MD5, $client->getOption(\Memcached::OPT_HASH));
-        $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
-        $this->assertSame(0, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
-        $this->assertSame(\Memcached::DISTRIBUTION_MODULA, $client->getOption(\Memcached::OPT_DISTRIBUTION));
+        self::assertSame(\Memcached::SERIALIZER_PHP, $client->getOption(\Memcached::OPT_SERIALIZER));
+        self::assertSame(\Memcached::HASH_MD5, $client->getOption(\Memcached::OPT_HASH));
+        self::assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
+        self::assertSame(0, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
+        self::assertSame(\Memcached::DISTRIBUTION_MODULA, $client->getOption(\Memcached::OPT_DISTRIBUTION));
     }
 
     /**
@@ -74,11 +74,11 @@ class MemcachedAdapterTest extends AdapterTestCase
     public function testBadOptions($name, $value)
     {
         if (\PHP_VERSION_ID < 80000) {
-            $this->expectException(\ErrorException::class);
-            $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
+            self::expectException(\ErrorException::class);
+            self::expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
         } else {
-            $this->expectException(\Error::class);
-            $this->expectExceptionMessage('Undefined constant Memcached::');
+            self::expectException(\Error::class);
+            self::expectExceptionMessage('Undefined constant Memcached::');
         }
 
         MemcachedAdapter::createConnection([], [$name => $value]);
@@ -95,22 +95,22 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function testDefaultOptions()
     {
-        $this->assertTrue(MemcachedAdapter::isSupported());
+        self::assertTrue(MemcachedAdapter::isSupported());
 
         $client = MemcachedAdapter::createConnection([]);
 
-        $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
-        $this->assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
-        $this->assertSame(1, $client->getOption(\Memcached::OPT_TCP_NODELAY));
-        $this->assertSame(1, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
+        self::assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
+        self::assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
+        self::assertSame(1, $client->getOption(\Memcached::OPT_TCP_NODELAY));
+        self::assertSame(1, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
     }
 
     public function testOptionSerializer()
     {
-        $this->expectException(CacheException::class);
-        $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
+        self::expectException(CacheException::class);
+        self::expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
         if (!\Memcached::HAVE_JSON) {
-            $this->markTestSkipped('Memcached::HAVE_JSON required');
+            self::markTestSkipped('Memcached::HAVE_JSON required');
         }
 
         new MemcachedAdapter(MemcachedAdapter::createConnection([], ['serializer' => 'json']));
@@ -130,9 +130,9 @@ class MemcachedAdapterTest extends AdapterTestCase
         ];
 
         $f = function ($s) { return ['host' => $s['host'], 'port' => $s['port']]; };
-        $this->assertSame([$expect], array_map($f, $client1->getServerList()));
-        $this->assertSame([$expect], array_map($f, $client2->getServerList()));
-        $this->assertSame([$expect], array_map($f, $client3->getServerList()));
+        self::assertSame([$expect], array_map($f, $client1->getServerList()));
+        self::assertSame([$expect], array_map($f, $client2->getServerList()));
+        self::assertSame([$expect], array_map($f, $client3->getServerList()));
     }
 
     public function provideServersSetting(): iterable
@@ -181,7 +181,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         $client = MemcachedAdapter::createConnection($dsn, $options);
 
         foreach ($expectedOptions as $option => $expect) {
-            $this->assertSame($expect, $client->getOption($option));
+            self::assertSame($expect, $client->getOption($option));
         }
     }
 
@@ -205,7 +205,7 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function testClear()
     {
-        $this->assertTrue($this->createCachePool()->clear());
+        self::assertTrue($this->createCachePool()->clear());
     }
 
     public function testMultiServerDsn()
@@ -230,7 +230,7 @@ class MemcachedAdapterTest extends AdapterTestCase
                 'type' => 'SOCKET',
             ],
         ];
-        $this->assertSame($expected, $client->getServerList());
+        self::assertSame($expected, $client->getServerList());
 
         $dsn = 'memcached://localhost?host[foo.bar]=3';
         $client = MemcachedAdapter::createConnection($dsn);
@@ -247,7 +247,7 @@ class MemcachedAdapterTest extends AdapterTestCase
                 'type' => 'TCP',
             ],
         ];
-        $this->assertSame($expected, $client->getServerList());
+        self::assertSame($expected, $client->getServerList());
     }
 
     public function testKeyEncoding()

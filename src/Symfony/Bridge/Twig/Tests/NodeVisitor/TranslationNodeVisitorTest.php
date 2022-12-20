@@ -26,12 +26,12 @@ class TranslationNodeVisitorTest extends TestCase
     /** @dataProvider getMessagesExtractionTestData */
     public function testMessagesExtraction(Node $node, array $expectedMessages)
     {
-        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment(self::createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $visitor = new TranslationNodeVisitor();
         $visitor->enable();
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
-        $this->assertEquals($expectedMessages, $visitor->getMessages());
+        self::assertEquals($expectedMessages, $visitor->getMessages());
     }
 
     public function testMessageExtractionWithInvalidDomainNode()

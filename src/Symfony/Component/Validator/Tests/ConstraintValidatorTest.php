@@ -24,7 +24,7 @@ class ConstraintValidatorTest extends TestCase
     {
         \Locale::setDefault('en');
 
-        $this->assertSame($expected, (new TestFormatValueConstraintValidator())->formatValueProxy($value, $format));
+        self::assertSame($expected, (new TestFormatValueConstraintValidator())->formatValueProxy($value, $format));
     }
 
     public function formatValueProvider()

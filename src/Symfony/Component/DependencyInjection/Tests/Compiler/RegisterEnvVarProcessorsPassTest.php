@@ -26,8 +26,8 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
 
         (new RegisterEnvVarProcessorsPass())->process($container);
 
-        $this->assertTrue($container->has('container.env_var_processors_locator'));
-        $this->assertInstanceOf(SimpleProcessor::class, $container->get('container.env_var_processors_locator')->get('foo'));
+        self::assertTrue($container->has('container.env_var_processors_locator'));
+        self::assertInstanceOf(SimpleProcessor::class, $container->get('container.env_var_processors_locator')->get('foo'));
 
         $expected = [
             'foo' => ['string'],
@@ -50,7 +50,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'require' => ['bool', 'int', 'float', 'string', 'array'],
         ];
 
-        $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());
+        self::assertSame($expected, $container->getParameterBag()->getProvidedTypes());
     }
 
     public function testNoProcessor()
@@ -59,13 +59,13 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
 
         (new RegisterEnvVarProcessorsPass())->process($container);
 
-        $this->assertFalse($container->has('container.env_var_processors_locator'));
+        self::assertFalse($container->has('container.env_var_processors_locator'));
     }
 
     public function testBadProcessor()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid type "foo" returned by "Symfony\Component\DependencyInjection\Tests\Compiler\BadProcessor::getProvidedTypes()", expected one of "array", "bool", "float", "int", "string".');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid type "foo" returned by "Symfony\Component\DependencyInjection\Tests\Compiler\BadProcessor::getProvidedTypes()", expected one of "array", "bool", "float", "int", "string".');
         $container = new ContainerBuilder();
         $container->register('foo', BadProcessor::class)->addTag('container.env_var_processor');
 

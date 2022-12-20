@@ -24,7 +24,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
 
     protected function setUp(): void
     {
-        $kernel = static::createKernel(['test_case' => 'RouterDebug', 'root_config' => 'config.yml']);
+        $kernel = self::createKernel(['test_case' => 'RouterDebug', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);
     }
 
@@ -34,10 +34,10 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $ret = $tester->execute([]);
         $display = $tester->getDisplay();
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('routerdebug_test', $display);
-        $this->assertStringContainsString('/test', $display);
-        $this->assertStringContainsString('/session', $display);
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('routerdebug_test', $display);
+        self::assertStringContainsString('/test', $display);
+        self::assertStringContainsString('/session', $display);
     }
 
     public function testDumpOneRoute()
@@ -45,9 +45,9 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'routerdebug_session_welcome']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('routerdebug_session_welcome', $tester->getDisplay());
-        $this->assertStringContainsString('/session', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('routerdebug_session_welcome', $tester->getDisplay());
+        self::assertStringContainsString('/session', $tester->getDisplay());
     }
 
     public function testSearchMultipleRoutes()
@@ -56,10 +56,10 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $tester->setInputs([3]);
         $ret = $tester->execute(['name' => 'routerdebug'], ['interactive' => true]);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('Select one of the matching routes:', $tester->getDisplay());
-        $this->assertStringContainsString('routerdebug_test', $tester->getDisplay());
-        $this->assertStringContainsString('/test', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('Select one of the matching routes:', $tester->getDisplay());
+        self::assertStringContainsString('routerdebug_test', $tester->getDisplay());
+        self::assertStringContainsString('/test', $tester->getDisplay());
     }
 
     public function testSearchMultipleRoutesWithoutInteraction()
@@ -67,22 +67,22 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'routerdebug'], ['interactive' => false]);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringNotContainsString('Select one of the matching routes:', $tester->getDisplay());
-        $this->assertStringContainsString('routerdebug_session_welcome', $tester->getDisplay());
-        $this->assertStringContainsString('/session', $tester->getDisplay());
-        $this->assertStringContainsString('routerdebug_session_welcome_name', $tester->getDisplay());
-        $this->assertStringContainsString('/session/{name} ', $tester->getDisplay());
-        $this->assertStringContainsString('routerdebug_session_logout', $tester->getDisplay());
-        $this->assertStringContainsString('/session_logout', $tester->getDisplay());
-        $this->assertStringContainsString('routerdebug_test', $tester->getDisplay());
-        $this->assertStringContainsString('/test', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringNotContainsString('Select one of the matching routes:', $tester->getDisplay());
+        self::assertStringContainsString('routerdebug_session_welcome', $tester->getDisplay());
+        self::assertStringContainsString('/session', $tester->getDisplay());
+        self::assertStringContainsString('routerdebug_session_welcome_name', $tester->getDisplay());
+        self::assertStringContainsString('/session/{name} ', $tester->getDisplay());
+        self::assertStringContainsString('routerdebug_session_logout', $tester->getDisplay());
+        self::assertStringContainsString('/session_logout', $tester->getDisplay());
+        self::assertStringContainsString('routerdebug_test', $tester->getDisplay());
+        self::assertStringContainsString('/test', $tester->getDisplay());
     }
 
     public function testSearchWithThrow()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The route "gerard" does not exist.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The route "gerard" does not exist.');
         $tester = $this->createCommandTester();
         $tester->execute(['name' => 'gerard'], ['interactive' => true]);
     }
@@ -93,11 +93,11 @@ class RouterDebugCommandTest extends AbstractWebTestCase
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $tester = new CommandCompletionTester($this->application->get('debug:router'));
-        $this->assertSame($expectedSuggestions, $tester->complete($input));
+        self::assertSame($expectedSuggestions, $tester->complete($input));
     }
 
     public function provideCompletionSuggestions()

@@ -29,7 +29,7 @@ class HttpFoundationExtensionTest extends TestCase
         $stack->push(Request::create($pathinfo));
         $extension = new HttpFoundationExtension(new UrlHelper($stack));
 
-        $this->assertEquals($expected, $extension->generateAbsoluteUrl($path));
+        self::assertEquals($expected, $extension->generateAbsoluteUrl($path));
     }
 
     public function getGenerateAbsoluteUrlData()
@@ -61,13 +61,13 @@ class HttpFoundationExtensionTest extends TestCase
     public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
     {
         if (!class_exists(RequestContext::class)) {
-            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+            self::markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
         }
 
         $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
         $extension = new HttpFoundationExtension(new UrlHelper(new RequestStack(), $requestContext));
 
-        $this->assertEquals($expected, $extension->generateAbsoluteUrl($path));
+        self::assertEquals($expected, $extension->generateAbsoluteUrl($path));
     }
 
     /**
@@ -76,12 +76,12 @@ class HttpFoundationExtensionTest extends TestCase
     public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path)
     {
         if (!class_exists(RequestContext::class)) {
-            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+            self::markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
         }
 
         $extension = new HttpFoundationExtension(new UrlHelper(new RequestStack()));
 
-        $this->assertEquals($path, $extension->generateAbsoluteUrl($path));
+        self::assertEquals($path, $extension->generateAbsoluteUrl($path));
     }
 
     public function getGenerateAbsoluteUrlRequestContextData()
@@ -107,10 +107,7 @@ class HttpFoundationExtensionTest extends TestCase
         $stack->push($request);
         $extension = new HttpFoundationExtension(new UrlHelper($stack));
 
-        $this->assertEquals(
-            'http://localhost/app/web/bundles/framework/css/structure.css',
-            $extension->generateAbsoluteUrl('/app/web/bundles/framework/css/structure.css')
-        );
+        self::assertEquals('http://localhost/app/web/bundles/framework/css/structure.css', $extension->generateAbsoluteUrl('/app/web/bundles/framework/css/structure.css'));
     }
 
     /**
@@ -119,14 +116,14 @@ class HttpFoundationExtensionTest extends TestCase
     public function testGenerateRelativePath($expected, $path, $pathinfo)
     {
         if (!method_exists(Request::class, 'getRelativeUriForPath')) {
-            $this->markTestSkipped('Your version of Symfony HttpFoundation is too old.');
+            self::markTestSkipped('Your version of Symfony HttpFoundation is too old.');
         }
 
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
         $extension = new HttpFoundationExtension(new UrlHelper($stack));
 
-        $this->assertEquals($expected, $extension->generateRelativePath($path));
+        self::assertEquals($expected, $extension->generateRelativePath($path));
     }
 
     public function getGenerateRelativePathData()

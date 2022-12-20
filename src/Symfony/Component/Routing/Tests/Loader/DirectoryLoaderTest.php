@@ -54,11 +54,11 @@ class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
     {
         $routes = $collection->all();
 
-        $this->assertCount(3, $routes, 'Three routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        self::assertCount(3, $routes, 'Three routes are loaded');
+        self::assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         for ($i = 1; $i <= 3; ++$i) {
-            $this->assertSame('/route/'.$i, $routes['route'.$i]->getPath());
+            self::assertSame('/route/'.$i, $routes['route'.$i]->getPath());
         }
     }
 
@@ -66,9 +66,9 @@ class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
     {
         $fixturesDir = __DIR__.'/../Fixtures';
 
-        $this->assertFalse($this->loader->supports($fixturesDir), '->supports(*) returns false');
+        self::assertFalse($this->loader->supports($fixturesDir), '->supports(*) returns false');
 
-        $this->assertTrue($this->loader->supports($fixturesDir, 'directory'), '->supports(*, "directory") returns true');
-        $this->assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports(*, "foo") returns false');
+        self::assertTrue($this->loader->supports($fixturesDir, 'directory'), '->supports(*, "directory") returns true');
+        self::assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports(*, "foo") returns false');
     }
 }

@@ -63,8 +63,8 @@ class LokaliseProviderTest extends ProviderTestCase
     public function testCompleteWriteProcess()
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
             return new MockResponse(json_encode(['languages' => []]));
         };
@@ -77,9 +77,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse();
         };
@@ -92,9 +92,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 'page' => 1,
             ];
 
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
-            $this->assertSame($expectedQuery, $options['query']);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
+            self::assertSame($expectedQuery, $options['query']);
 
             return new MockResponse(json_encode(['keys' => []]));
         };
@@ -107,9 +107,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 'page' => 1,
             ];
 
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
-            $this->assertSame($expectedQuery, $options['query']);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
+            self::assertSame($expectedQuery, $options['query']);
 
             return new MockResponse(json_encode(['keys' => []]));
         };
@@ -130,8 +130,8 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode(['keys' => [
                 [
@@ -157,8 +157,8 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode(['keys' => [
                 [
@@ -215,8 +215,8 @@ class LokaliseProviderTest extends ProviderTestCase
             ]);
 
             $updateProcessed = true;
-            $this->assertSame('PUT', $method);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('PUT', $method);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse();
         };
@@ -245,14 +245,14 @@ class LokaliseProviderTest extends ProviderTestCase
         ]));
 
         $provider->write($translatorBag);
-        $this->assertTrue($updateProcessed, 'Translations update was not called.');
+        self::assertTrue($updateProcessed, 'Translations update was not called.');
     }
 
     public function testWriteGetLanguageServerError()
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
             return new MockResponse('', ['http_code' => 500]);
         };
@@ -269,8 +269,8 @@ class LokaliseProviderTest extends ProviderTestCase
             'messages' => ['young_dog' => 'puppy'],
         ]));
 
-        $this->expectException(ProviderException::class);
-        $this->expectExceptionMessage('Unable to get languages from Lokalise.');
+        self::expectException(ProviderException::class);
+        self::expectExceptionMessage('Unable to get languages from Lokalise.');
 
         $provider->write($translatorBag);
     }
@@ -278,8 +278,8 @@ class LokaliseProviderTest extends ProviderTestCase
     public function testWriteCreateLanguageServerError()
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
             return new MockResponse(json_encode(['languages' => []]));
         };
@@ -291,9 +291,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse('', ['http_code' => 500]);
         };
@@ -311,8 +311,8 @@ class LokaliseProviderTest extends ProviderTestCase
             'messages' => ['young_dog' => 'puppy'],
         ]));
 
-        $this->expectException(ProviderException::class);
-        $this->expectExceptionMessage('Unable to create languages on Lokalise.');
+        self::expectException(ProviderException::class);
+        self::expectExceptionMessage('Unable to create languages on Lokalise.');
 
         $provider->write($translatorBag);
     }
@@ -320,8 +320,8 @@ class LokaliseProviderTest extends ProviderTestCase
     public function testWriteGetKeysIdsServerError()
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
             return new MockResponse(json_encode(['languages' => []]));
         };
@@ -333,9 +333,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode(['keys' => []]));
         };
@@ -348,9 +348,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 'page' => 1,
             ];
 
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
-            $this->assertSame($expectedQuery, $options['query']);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
+            self::assertSame($expectedQuery, $options['query']);
 
             return new MockResponse('', ['http_code' => 500]);
         };
@@ -369,8 +369,8 @@ class LokaliseProviderTest extends ProviderTestCase
             'messages' => ['young_dog' => 'puppy'],
         ]));
 
-        $this->expectException(ProviderException::class);
-        $this->expectExceptionMessage('Unable to get keys ids from Lokalise.');
+        self::expectException(ProviderException::class);
+        self::expectExceptionMessage('Unable to get keys ids from Lokalise.');
 
         $provider->write($translatorBag);
     }
@@ -378,8 +378,8 @@ class LokaliseProviderTest extends ProviderTestCase
     public function testWriteCreateKeysServerError()
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
             return new MockResponse(json_encode(['languages' => []]));
         };
@@ -391,9 +391,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode(['keys' => []]));
         };
@@ -406,9 +406,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 'page' => 1,
             ];
 
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
-            $this->assertSame($expectedQuery, $options['query']);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
+            self::assertSame($expectedQuery, $options['query']);
 
             return new MockResponse(json_encode(['keys' => []]));
         };
@@ -429,8 +429,8 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse('', ['http_code' => 500]);
         };
@@ -450,8 +450,8 @@ class LokaliseProviderTest extends ProviderTestCase
             'messages' => ['young_dog' => 'puppy'],
         ]));
 
-        $this->expectException(ProviderException::class);
-        $this->expectExceptionMessage('Unable to create keys to Lokalise.');
+        self::expectException(ProviderException::class);
+        self::expectExceptionMessage('Unable to create keys to Lokalise.');
 
         $provider->write($translatorBag);
     }
@@ -459,8 +459,8 @@ class LokaliseProviderTest extends ProviderTestCase
     public function testWriteUploadTranslationsServerError()
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
 
             return new MockResponse(json_encode(['languages' => []]));
         };
@@ -472,9 +472,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode(['keys' => []]));
         };
@@ -487,9 +487,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 'page' => 1,
             ];
 
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
-            $this->assertSame($expectedQuery, $options['query']);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
+            self::assertSame($expectedQuery, $options['query']);
 
             return new MockResponse(json_encode(['keys' => []]));
         };
@@ -510,8 +510,8 @@ class LokaliseProviderTest extends ProviderTestCase
                 ],
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode(['keys' => [
                 [
@@ -522,7 +522,7 @@ class LokaliseProviderTest extends ProviderTestCase
         };
 
         $updateTranslationsResponse = function (string $method, string $url, array $options = []) use (&$updateProcessed): ResponseInterface {
-            $this->assertSame('PUT', $method);
+            self::assertSame('PUT', $method);
 
             return new MockResponse('', ['http_code' => 500]);
         };
@@ -543,8 +543,8 @@ class LokaliseProviderTest extends ProviderTestCase
             'messages' => ['young_dog' => 'puppy'],
         ]));
 
-        $this->expectException(ProviderException::class);
-        $this->expectExceptionMessage('Unable to create/update translations to Lokalise.');
+        self::expectException(ProviderException::class);
+        self::expectExceptionMessage('Unable to create/update translations to Lokalise.');
 
         $provider->write($translatorBag);
     }
@@ -565,9 +565,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 'replace_breaks' => false,
             ]);
 
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/files/export', $url);
-            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/files/export', $url);
+            self::assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
             return new MockResponse(json_encode([
                 'files' => [
@@ -581,7 +581,7 @@ class LokaliseProviderTest extends ProviderTestCase
         };
 
         $loader = $this->getLoader();
-        $loader->expects($this->once())
+        $loader->expects(self::once())
             ->method('load')
             ->willReturn((new XliffFileLoader())->load($responseContent, $locale, $domain));
 
@@ -596,7 +596,7 @@ class LokaliseProviderTest extends ProviderTestCase
             $catalogue->deleteMetadata('', '');
         }
 
-        $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
+        self::assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
 
     /**
@@ -624,7 +624,7 @@ class LokaliseProviderTest extends ProviderTestCase
         ]));
 
         $loader = $this->getLoader();
-        $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
+        $loader->expects(self::exactly(\count($consecutiveLoadArguments)))
             ->method('load')
             ->withConsecutive(...$consecutiveLoadArguments)
             ->willReturnOnConsecutiveCalls(...$consecutiveLoadReturns);
@@ -642,7 +642,7 @@ class LokaliseProviderTest extends ProviderTestCase
 
         foreach ($locales as $locale) {
             foreach ($domains as $domain) {
-                $this->assertEquals($expectedTranslatorBag->getCatalogue($locale)->all($domain), $translatorBag->getCatalogue($locale)->all($domain));
+                self::assertEquals($expectedTranslatorBag->getCatalogue($locale)->all($domain), $translatorBag->getCatalogue($locale)->all($domain));
             }
         }
     }
@@ -657,9 +657,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 'page' => 1,
             ];
 
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
-            $this->assertSame($expectedQuery, $options['query']);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
+            self::assertSame($expectedQuery, $options['query']);
 
             return new MockResponse(json_encode(['keys' => [
                 [
@@ -677,9 +677,9 @@ class LokaliseProviderTest extends ProviderTestCase
                 'page' => 1,
             ];
 
-            $this->assertSame('GET', $method);
-            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
-            $this->assertSame($expectedQuery, $options['query']);
+            self::assertSame('GET', $method);
+            self::assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/keys?'.http_build_query($expectedQuery), $url);
+            self::assertSame($expectedQuery, $options['query']);
 
             return new MockResponse(json_encode(['keys' => [
                 [
@@ -690,8 +690,8 @@ class LokaliseProviderTest extends ProviderTestCase
         };
 
         $deleteResponse = function (string $method, string $url, array $options = []): MockResponse {
-            $this->assertSame('DELETE', $method);
-            $this->assertSame(json_encode(['keys' => [29, 92]]), $options['body']);
+            self::assertSame('DELETE', $method);
+            self::assertSame(json_encode(['keys' => [29, 92]]), $options['body']);
 
             return new MockResponse();
         };

@@ -20,7 +20,7 @@ class MergeTest extends TestCase
 {
     public function testForbiddenOverwrite()
     {
-        $this->expectException(ForbiddenOverwriteException::class);
+        self::expectException(ForbiddenOverwriteException::class);
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
             ->getRootNode()
@@ -84,7 +84,7 @@ class MergeTest extends TestCase
             'unsetted' => ['a', 'b'],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'foo' => 'moo',
             'bar' => 'b',
             'unsettable' => false,
@@ -94,7 +94,7 @@ class MergeTest extends TestCase
 
     public function testDoesNotAllowNewKeysInSubsequentConfigs()
     {
-        $this->expectException(InvalidConfigurationException::class);
+        self::expectException(InvalidConfigurationException::class);
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
             ->getRootNode()
@@ -159,7 +159,7 @@ class MergeTest extends TestCase
             ],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'no_deep_merging' => [
                 'c' => 'd',
             ],
@@ -189,6 +189,6 @@ class MergeTest extends TestCase
             'append_elements' => ['c', 'd'],
         ];
 
-        $this->assertEquals(['append_elements' => ['a', 'b', 'c', 'd']], $tree->merge($a, $b));
+        self::assertEquals(['append_elements' => ['a', 'b', 'c', 'd']], $tree->merge($a, $b));
     }
 }

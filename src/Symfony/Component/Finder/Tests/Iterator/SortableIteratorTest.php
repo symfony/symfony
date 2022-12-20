@@ -19,9 +19,9 @@ class SortableIteratorTest extends RealIteratorTestCase
     {
         try {
             new SortableIterator(new Iterator([]), -255);
-            $this->fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+            self::fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+            self::assertInstanceOf(\InvalidArgumentException::class, $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
         }
     }
 
@@ -60,7 +60,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             || SortableIterator::SORT_BY_MODIFIED_TIME === $mode
         ) {
             if ('\\' === \DIRECTORY_SEPARATOR && SortableIterator::SORT_BY_MODIFIED_TIME !== $mode) {
-                $this->markTestSkipped('Sorting by atime or ctime is not supported on Windows');
+                self::markTestSkipped('Sorting by atime or ctime is not supported on Windows');
             }
             $this->assertOrderedIteratorForGroups($expected, $iterator);
         } else {
@@ -247,13 +247,13 @@ class SortableIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [SortableIterator::SORT_BY_NAME, $this->toAbsolute($sortByName)],
-            [SortableIterator::SORT_BY_TYPE, $this->toAbsolute($sortByType)],
-            [SortableIterator::SORT_BY_ACCESSED_TIME, $this->toAbsolute($sortByAccessedTime)],
-            [SortableIterator::SORT_BY_CHANGED_TIME, $this->toAbsolute($sortByChangedTime)],
-            [SortableIterator::SORT_BY_MODIFIED_TIME, $this->toAbsolute($sortByModifiedTime)],
-            [SortableIterator::SORT_BY_NAME_NATURAL, $this->toAbsolute($sortByNameNatural)],
-            [function (\SplFileInfo $a, \SplFileInfo $b) { return strcmp($a->getRealPath(), $b->getRealPath()); }, $this->toAbsolute($customComparison)],
+            [SortableIterator::SORT_BY_NAME, self::toAbsolute($sortByName)],
+            [SortableIterator::SORT_BY_TYPE, self::toAbsolute($sortByType)],
+            [SortableIterator::SORT_BY_ACCESSED_TIME, self::toAbsolute($sortByAccessedTime)],
+            [SortableIterator::SORT_BY_CHANGED_TIME, self::toAbsolute($sortByChangedTime)],
+            [SortableIterator::SORT_BY_MODIFIED_TIME, self::toAbsolute($sortByModifiedTime)],
+            [SortableIterator::SORT_BY_NAME_NATURAL, self::toAbsolute($sortByNameNatural)],
+            [function (\SplFileInfo $a, \SplFileInfo $b) { return strcmp($a->getRealPath(), $b->getRealPath()); }, self::toAbsolute($customComparison)],
         ];
     }
 }

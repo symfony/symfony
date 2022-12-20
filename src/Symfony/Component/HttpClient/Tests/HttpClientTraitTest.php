@@ -34,7 +34,7 @@ class HttpClientTraitTest extends TestCase
         [, $defaults] = self::prepareRequest(null, null, $defaults);
 
         [$url] = self::prepareRequest(null, $url, ['query' => $query], $defaults);
-        $this->assertSame($expected, implode('', $url));
+        self::assertSame($expected, implode('', $url));
     }
 
     public function providePrepareRequestUrl(): iterable
@@ -54,7 +54,7 @@ class HttpClientTraitTest extends TestCase
      */
     public function testResolveUrl(string $base, string $url, string $expected)
     {
-        $this->assertSame($expected, implode('', self::resolveUrl(self::parseUrl($url), self::parseUrl($base))));
+        self::assertSame($expected, implode('', self::resolveUrl(self::parseUrl($url), self::parseUrl($base))));
     }
 
     /**
@@ -126,15 +126,15 @@ class HttpClientTraitTest extends TestCase
 
     public function testResolveUrlWithoutScheme()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8080". Did you forget to add "http(s)://"?');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8080". Did you forget to add "http(s)://"?');
         self::resolveUrl(self::parseUrl('localhost:8080'), null);
     }
 
     public function testResolveBaseUrlWitoutScheme()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8081". Did you forget to add "http(s)://"?');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8081". Did you forget to add "http(s)://"?');
         self::resolveUrl(self::parseUrl('/foo'), self::parseUrl('localhost:8081'));
     }
 
@@ -145,7 +145,7 @@ class HttpClientTraitTest extends TestCase
     {
         $expected = array_combine(['scheme', 'authority', 'path', 'query', 'fragment'], $expected);
 
-        $this->assertSame($expected, self::parseUrl($url, $query));
+        self::assertSame($expected, self::parseUrl($url, $query));
     }
 
     public function provideParseUrl(): iterable
@@ -172,7 +172,7 @@ class HttpClientTraitTest extends TestCase
      */
     public function testRemoveDotSegments($expected, $url)
     {
-        $this->assertSame($expected, self::removeDotSegments($url));
+        self::assertSame($expected, self::removeDotSegments($url));
     }
 
     public function provideRemoveDotSegments()
@@ -192,35 +192,35 @@ class HttpClientTraitTest extends TestCase
     public function testAuthBearerOption()
     {
         [, $options] = self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foobar'], HttpClientInterface::OPTIONS_DEFAULTS);
-        $this->assertSame(['Accept: */*', 'Authorization: Bearer foobar'], $options['headers']);
-        $this->assertSame(['Authorization: Bearer foobar'], $options['normalized_headers']['authorization']);
+        self::assertSame(['Accept: */*', 'Authorization: Bearer foobar'], $options['headers']);
+        self::assertSame(['Authorization: Bearer foobar'], $options['normalized_headers']['authorization']);
     }
 
     public function testInvalidAuthBearerOption()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Option "auth_bearer" must be a string, "stdClass" given.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Option "auth_bearer" must be a string, "stdClass" given.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
     public function testInvalidAuthBearerValue()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid character found in option "auth_bearer": "a\nb".');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid character found in option "auth_bearer": "a\nb".');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => "a\nb"], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
     public function testSetAuthBasicAndBearerOptions()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
     public function testSetJSONAndBodyOptions()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Define either the "json" or the "body" option, setting both is not supported');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Define either the "json" or the "body" option, setting both is not supported');
         self::prepareRequest('POST', 'http://example.com', ['json' => ['foo' => 'bar'], 'body' => '<html/>'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
@@ -237,8 +237,8 @@ class HttpClientTraitTest extends TestCase
      */
     public function testPrepareAuthBasic($arg, $result)
     {
-        [, $options] = $this->prepareRequest('POST', 'http://example.com', ['auth_basic' => $arg], HttpClientInterface::OPTIONS_DEFAULTS);
-        $this->assertSame('Authorization: Basic '.$result, $options['normalized_headers']['authorization'][0]);
+        [, $options] = self::prepareRequest('POST', 'http://example.com', ['auth_basic' => $arg], HttpClientInterface::OPTIONS_DEFAULTS);
+        self::assertSame('Authorization: Basic '.$result, $options['normalized_headers']['authorization'][0]);
     }
 
     public function provideFingerprints()
@@ -256,22 +256,22 @@ class HttpClientTraitTest extends TestCase
      */
     public function testNormalizePeerFingerprint($fingerprint, $expected)
     {
-        self::assertSame($expected, $this->normalizePeerFingerprint($fingerprint));
+        self::assertSame($expected, self::normalizePeerFingerprint($fingerprint));
     }
 
     public function testNormalizePeerFingerprintException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot auto-detect fingerprint algorithm for "foo".');
-        $this->normalizePeerFingerprint('foo');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Cannot auto-detect fingerprint algorithm for "foo".');
+        self::normalizePeerFingerprint('foo');
     }
 
     public function testNormalizePeerFingerprintTypeException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, "stdClass" given.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Option "peer_fingerprint" must be string or array, "stdClass" given.');
         $fingerprint = new \stdClass();
 
-        $this->normalizePeerFingerprint($fingerprint);
+        self::normalizePeerFingerprint($fingerprint);
     }
 }

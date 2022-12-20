@@ -26,23 +26,23 @@ class UserTest extends TestCase
 
     public function testConstructorException()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new User('', 'superpass');
     }
 
     public function testGetRoles()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertEquals([], $user->getRoles());
+        self::assertEquals([], $user->getRoles());
 
         $user = new User('fabien', 'superpass', ['ROLE_ADMIN']);
-        $this->assertEquals(['ROLE_ADMIN'], $user->getRoles());
+        self::assertEquals(['ROLE_ADMIN'], $user->getRoles());
     }
 
     public function testGetPassword()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertEquals('superpass', $user->getPassword());
+        self::assertEquals('superpass', $user->getPassword());
     }
 
     /**
@@ -53,68 +53,68 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
 
         $this->expectDeprecation('Since symfony/security-core 5.3: Method "Symfony\Component\Security\Core\User\User::getUsername()" is deprecated, use getUserIdentifier() instead.');
-        $this->assertEquals('fabien', $user->getUsername());
+        self::assertEquals('fabien', $user->getUsername());
     }
 
     public function testGetUserIdentifier()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertEquals('fabien', $user->getUserIdentifier());
+        self::assertEquals('fabien', $user->getUserIdentifier());
     }
 
     public function testGetSalt()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertEquals('', $user->getSalt());
+        self::assertEquals('', $user->getSalt());
     }
 
     public function testIsAccountNonExpired()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertTrue($user->isAccountNonExpired());
+        self::assertTrue($user->isAccountNonExpired());
 
         $user = new User('fabien', 'superpass', [], true, false);
-        $this->assertFalse($user->isAccountNonExpired());
+        self::assertFalse($user->isAccountNonExpired());
     }
 
     public function testIsCredentialsNonExpired()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertTrue($user->isCredentialsNonExpired());
+        self::assertTrue($user->isCredentialsNonExpired());
 
         $user = new User('fabien', 'superpass', [], true, true, false);
-        $this->assertFalse($user->isCredentialsNonExpired());
+        self::assertFalse($user->isCredentialsNonExpired());
     }
 
     public function testIsAccountNonLocked()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertTrue($user->isAccountNonLocked());
+        self::assertTrue($user->isAccountNonLocked());
 
         $user = new User('fabien', 'superpass', [], true, true, true, false);
-        $this->assertFalse($user->isAccountNonLocked());
+        self::assertFalse($user->isAccountNonLocked());
     }
 
     public function testIsEnabled()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertTrue($user->isEnabled());
+        self::assertTrue($user->isEnabled());
 
         $user = new User('fabien', 'superpass', [], false);
-        $this->assertFalse($user->isEnabled());
+        self::assertFalse($user->isEnabled());
     }
 
     public function testEraseCredentials()
     {
         $user = new User('fabien', 'superpass');
         $user->eraseCredentials();
-        $this->assertEquals('superpass', $user->getPassword());
+        self::assertEquals('superpass', $user->getPassword());
     }
 
     public function testToString()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertEquals('fabien', (string) $user);
+        self::assertEquals('fabien', (string) $user);
     }
 
     /**
@@ -126,8 +126,8 @@ class UserTest extends TestCase
      */
     public function testIsEqualTo($expectation, $a, $b)
     {
-        $this->assertSame($expectation, $a->isEqualTo($b));
-        $this->assertSame($expectation, $b->isEqualTo($a));
+        self::assertSame($expectation, $a->isEqualTo($b));
+        self::assertSame($expectation, $b->isEqualTo($a));
     }
 
     public static function isEqualToData()
@@ -147,6 +147,6 @@ class UserTest extends TestCase
     public function testIsEqualToWithDifferentUser()
     {
         $user = new User('username', 'password');
-        $this->assertFalse($user->isEqualTo($this->createMock(UserInterface::class)));
+        self::assertFalse($user->isEqualTo(self::createMock(UserInterface::class)));
     }
 }

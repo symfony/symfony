@@ -29,7 +29,7 @@ final class MattermostTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new MattermostTransport('testAccessToken', 'testChannel', null, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MattermostTransport('testAccessToken', 'testChannel', null, $client ?? self::createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
@@ -45,6 +45,6 @@ final class MattermostTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

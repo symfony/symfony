@@ -28,8 +28,8 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
      */
     public function testWorkerStopsWhenMaximumCountReached(int $max, bool $shouldStop)
     {
-        $worker = $this->createMock(Worker::class);
-        $worker->expects($shouldStop ? $this->atLeastOnce() : $this->never())->method('stop');
+        $worker = self::createMock(Worker::class);
+        $worker->expects($shouldStop ? self::atLeastOnce() : self::never())->method('stop');
 
         $failedEvent = $this->createFailedEvent();
         $runningEvent = new WorkerRunningEvent($worker, false);
@@ -55,14 +55,14 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
 
     public function testWorkerLogsMaximumCountReachedWhenLoggerIsGiven()
     {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('info')
+        $logger = self::createMock(LoggerInterface::class);
+        $logger->expects(self::once())->method('info')
             ->with(
-                $this->equalTo('Worker stopped due to limit of {count} failed message(s) is reached'),
-                $this->equalTo(['count' => 1])
+                self::equalTo('Worker stopped due to limit of {count} failed message(s) is reached'),
+                self::equalTo(['count' => 1])
             );
 
-        $worker = $this->createMock(Worker::class);
+        $worker = self::createMock(Worker::class);
         $event = new WorkerRunningEvent($worker, false);
 
         $failureLimitListener = new StopWorkerOnFailureLimitListener(1, $logger);
@@ -74,6 +74,6 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
     {
         $envelope = new Envelope(new DummyMessage('hello'));
 
-        return new WorkerMessageFailedEvent($envelope, 'default', $this->createMock(Throwable::class));
+        return new WorkerMessageFailedEvent($envelope, 'default', self::createMock(Throwable::class));
     }
 }

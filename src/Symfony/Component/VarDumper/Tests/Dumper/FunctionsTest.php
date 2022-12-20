@@ -28,7 +28,7 @@ class FunctionsTest extends TestCase
         $return = dump($var1);
         ob_end_clean();
 
-        $this->assertEquals($var1, $return);
+        self::assertEquals($var1, $return);
     }
 
     public function testDumpReturnsAllArgsInArray()
@@ -43,7 +43,7 @@ class FunctionsTest extends TestCase
         $return = dump($var1, $var2, $var3);
         ob_end_clean();
 
-        $this->assertEquals([$var1, $var2, $var3], $return);
+        self::assertEquals([$var1, $var2, $var3], $return);
     }
 
     protected function setupVarDumper()

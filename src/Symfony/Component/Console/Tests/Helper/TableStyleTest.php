@@ -18,8 +18,8 @@ class TableStyleTest extends TestCase
 {
     public function testSetPadTypeWithInvalidType()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid padding type. Expected one of (STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH).');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid padding type. Expected one of (STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH).');
         $style = new TableStyle();
         $style->setPadType(31);
     }

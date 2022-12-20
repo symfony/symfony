@@ -27,37 +27,37 @@ class AuthenticationTrustResolverTest extends TestCase
     public function testIsAnonymous()
     {
         $resolver = new AuthenticationTrustResolver();
-        $this->assertFalse($resolver->isAnonymous(null));
-        $this->assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
-        $this->assertFalse($resolver->isAnonymous(new FakeCustomToken()));
+        self::assertFalse($resolver->isAnonymous(null));
+        self::assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
+        self::assertFalse($resolver->isAnonymous(new FakeCustomToken()));
     }
 
     public function testIsRememberMe()
     {
         $resolver = new AuthenticationTrustResolver();
 
-        $this->assertFalse($resolver->isRememberMe(null));
-        $this->assertFalse($resolver->isRememberMe(new FakeCustomToken()));
-        $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
-        $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
+        self::assertFalse($resolver->isRememberMe(null));
+        self::assertFalse($resolver->isRememberMe(new FakeCustomToken()));
+        self::assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
+        self::assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
     }
 
     public function testisFullFledged()
     {
         $resolver = new AuthenticationTrustResolver();
 
-        $this->assertFalse($resolver->isFullFledged(null));
-        $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
-        $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
-        $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
+        self::assertFalse($resolver->isFullFledged(null));
+        self::assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
+        self::assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
+        self::assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
     public function testIsAuthenticated()
     {
         $resolver = new AuthenticationTrustResolver();
-        $this->assertFalse($resolver->isAuthenticated(null));
-        $this->assertTrue($resolver->isAuthenticated($this->getRememberMeToken()));
-        $this->assertTrue($resolver->isAuthenticated(new FakeCustomToken()));
+        self::assertFalse($resolver->isAuthenticated(null));
+        self::assertTrue($resolver->isAuthenticated($this->getRememberMeToken()));
+        self::assertTrue($resolver->isAuthenticated(new FakeCustomToken()));
     }
 
     /**
@@ -67,29 +67,29 @@ class AuthenticationTrustResolverTest extends TestCase
     {
         $resolver = $this->getResolver();
 
-        $this->assertFalse($resolver->isAnonymous(null));
-        $this->assertFalse($resolver->isAnonymous(new FakeCustomToken()));
-        $this->assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
+        self::assertFalse($resolver->isAnonymous(null));
+        self::assertFalse($resolver->isAnonymous(new FakeCustomToken()));
+        self::assertFalse($resolver->isAnonymous($this->getRememberMeToken()));
     }
 
     public function testIsRememberMeWithClassAsConstructorButStillExtending()
     {
         $resolver = $this->getResolver();
 
-        $this->assertFalse($resolver->isRememberMe(null));
-        $this->assertFalse($resolver->isRememberMe(new FakeCustomToken()));
-        $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
-        $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
+        self::assertFalse($resolver->isRememberMe(null));
+        self::assertFalse($resolver->isRememberMe(new FakeCustomToken()));
+        self::assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
+        self::assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
     }
 
     public function testisFullFledgedWithClassAsConstructorButStillExtending()
     {
         $resolver = $this->getResolver();
 
-        $this->assertFalse($resolver->isFullFledged(null));
-        $this->assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
-        $this->assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
-        $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
+        self::assertFalse($resolver->isFullFledged(null));
+        self::assertFalse($resolver->isFullFledged($this->getRememberMeToken()));
+        self::assertFalse($resolver->isFullFledged(new RealCustomRememberMeToken()));
+        self::assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
     /**
@@ -99,13 +99,13 @@ class AuthenticationTrustResolverTest extends TestCase
     {
         $resolver = $this->getResolver();
 
-        $this->assertTrue($resolver->isAnonymous($this->getAnonymousToken()));
-        $this->assertTrue($resolver->isAnonymous($this->getRealCustomAnonymousToken()));
+        self::assertTrue($resolver->isAnonymous($this->getAnonymousToken()));
+        self::assertTrue($resolver->isAnonymous($this->getRealCustomAnonymousToken()));
 
-        $this->assertFalse($resolver->isRememberMe($this->getAnonymousToken()));
+        self::assertFalse($resolver->isRememberMe($this->getAnonymousToken()));
 
-        $this->assertFalse($resolver->isFullFledged($this->getAnonymousToken()));
-        $this->assertFalse($resolver->isFullFledged($this->getRealCustomAnonymousToken()));
+        self::assertFalse($resolver->isFullFledged($this->getAnonymousToken()));
+        self::assertFalse($resolver->isFullFledged($this->getRealCustomAnonymousToken()));
     }
 
     protected function getAnonymousToken()

@@ -28,8 +28,8 @@ final class OhMySmtpSmtpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(1, $email->getHeaders()->toArray());
-        $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
+        self::assertCount(1, $email->getHeaders()->toArray());
+        self::assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
     }
 
     public function testTagAndMetadataHeaders()
@@ -44,8 +44,8 @@ final class OhMySmtpSmtpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(2, $email->getHeaders()->toArray());
-        $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
-        $this->assertSame('X-OMS-Tags: password-reset, 2nd-tag', $email->getHeaders()->get('X-OMS-Tags')->toString());
+        self::assertCount(2, $email->getHeaders()->toArray());
+        self::assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
+        self::assertSame('X-OMS-Tags: password-reset, 2nd-tag', $email->getHeaders()->get('X-OMS-Tags')->toString());
     }
 }

@@ -40,9 +40,9 @@ class AboutCommandTest extends TestCase
         $tester = $this->createCommandTester($kernel);
         $ret = $tester->execute([]);
 
-        $this->assertSame(0, $ret);
-        $this->assertStringContainsString('Cache directory', $tester->getDisplay());
-        $this->assertStringContainsString('Log directory', $tester->getDisplay());
+        self::assertSame(0, $ret);
+        self::assertStringContainsString('Cache directory', $tester->getDisplay());
+        self::assertStringContainsString('Log directory', $tester->getDisplay());
 
         $this->fs->chmod($kernel->getCacheDir().'/readable_file', 0777);
 
@@ -59,7 +59,7 @@ class AboutCommandTest extends TestCase
 
         // skip test on Windows; PHP can't easily set file as unreadable on Windows
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test cannot run on Windows.');
+            self::markTestSkipped('This test cannot run on Windows.');
         }
 
         $this->fs->dumpFile($kernel->getCacheDir().'/unreadable_file', 'The file content.');
@@ -68,9 +68,9 @@ class AboutCommandTest extends TestCase
         $tester = $this->createCommandTester($kernel);
         $ret = $tester->execute([]);
 
-        $this->assertSame(0, $ret);
-        $this->assertStringContainsString('Cache directory', $tester->getDisplay());
-        $this->assertStringContainsString('Log directory', $tester->getDisplay());
+        self::assertSame(0, $ret);
+        self::assertStringContainsString('Cache directory', $tester->getDisplay());
+        self::assertStringContainsString('Log directory', $tester->getDisplay());
 
         $this->fs->chmod($kernel->getCacheDir().'/unreadable_file', 0777);
 

@@ -28,7 +28,7 @@ class StringInputTest extends TestCase
         $r = new \ReflectionClass(ArgvInput::class);
         $p = $r->getProperty('tokens');
         $p->setAccessible(true);
-        $this->assertEquals($tokens, $p->getValue($input), $message);
+        self::assertEquals($tokens, $p->getValue($input), $message);
     }
 
     public function testInputOptionWithGivenString()
@@ -40,7 +40,7 @@ class StringInputTest extends TestCase
         // call to bind
         $input = new StringInput('--foo=bar');
         $input->bind($definition);
-        $this->assertEquals('bar', $input->getOption('foo'));
+        self::assertEquals('bar', $input->getOption('foo'));
     }
 
     public function getTokenizeData()
@@ -78,12 +78,12 @@ class StringInputTest extends TestCase
     public function testToString()
     {
         $input = new StringInput('-f foo');
-        $this->assertEquals('-f foo', (string) $input);
+        self::assertEquals('-f foo', (string) $input);
 
         $input = new StringInput('-f --bar=foo "a b c d"');
-        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d'), (string) $input);
+        self::assertEquals('-f --bar=foo '.escapeshellarg('a b c d'), (string) $input);
 
         $input = new StringInput('-f --bar=foo \'a b c d\' '."'A\nB\\'C'");
-        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
+        self::assertEquals('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
     }
 }

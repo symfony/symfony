@@ -57,14 +57,14 @@ class CacheClearCommandTest extends TestCase
         $finder = new Finder();
         $metaFiles = $finder->files()->in($this->kernel->getCacheDir())->name('*.php.meta');
         // check that cache is warmed up
-        $this->assertNotEmpty($metaFiles);
+        self::assertNotEmpty($metaFiles);
         $configCacheFactory = new ConfigCacheFactory(true);
 
         foreach ($metaFiles as $file) {
             $configCacheFactory->cache(
                 substr($file, 0, -5),
                 function () use ($file) {
-                    $this->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
+                    self::fail(sprintf('Meta file "%s" is not fresh', (string) $file));
                 }
             );
         }
@@ -85,7 +85,7 @@ class CacheClearCommandTest extends TestCase
                 break;
             }
         }
-        $this->assertTrue($found, 'Kernel file should present as resource');
+        self::assertTrue($found, 'Kernel file should present as resource');
 
         $containerRef = new \ReflectionClass(require $containerFile);
         $containerFile = str_replace(
@@ -93,11 +93,7 @@ class CacheClearCommandTest extends TestCase
             'test'.\DIRECTORY_SEPARATOR,
             $containerRef->getFileName()
         );
-        $this->assertMatchesRegularExpression(
-            sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass),
-            file_get_contents($containerFile),
-            'kernel.container_class is properly set on the dumped container'
-        );
+        self::assertMatchesRegularExpression(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
     }
 
     public function testCacheIsWarmedWhenCalledTwice()
@@ -112,7 +108,7 @@ class CacheClearCommandTest extends TestCase
         $application->setCatchExceptions(false);
         $application->doRun($input, new NullOutput());
 
-        $this->assertTrue(is_file($this->kernel->getCacheDir().'/annotations.php'));
+        self::assertTrue(is_file($this->kernel->getCacheDir().'/annotations.php'));
     }
 
     public function testCacheIsWarmedWithOldContainer()
@@ -133,6 +129,6 @@ class CacheClearCommandTest extends TestCase
         $application->setCatchExceptions(false);
         $application->doRun($input, new NullOutput());
 
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
     }
 }

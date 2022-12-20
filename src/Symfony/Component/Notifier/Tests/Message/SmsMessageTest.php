@@ -23,14 +23,14 @@ class SmsMessageTest extends TestCase
     {
         $message = new SmsMessage('+3312345678', 'subject');
 
-        $this->assertSame('subject', $message->getSubject());
-        $this->assertSame('+3312345678', $message->getPhone());
+        self::assertSame('subject', $message->getSubject());
+        self::assertSame('+3312345678', $message->getPhone());
     }
 
     public function testEnsureNonEmptyPhoneOnConstruction()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('"Symfony\Component\Notifier\Message\SmsMessage" needs a phone number, it cannot be empty.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('"Symfony\Component\Notifier\Message\SmsMessage" needs a phone number, it cannot be empty.');
 
         new SmsMessage('', 'subject');
     }
@@ -39,21 +39,21 @@ class SmsMessageTest extends TestCase
     {
         $message = new SmsMessage('+3312345678', 'subject');
 
-        $this->assertSame('+3312345678', $message->getPhone());
+        self::assertSame('+3312345678', $message->getPhone());
 
         $message->phone('+4912345678');
 
-        $this->assertSame('+4912345678', $message->getPhone());
+        self::assertSame('+4912345678', $message->getPhone());
     }
 
     public function testEnsureNonEmptyPhoneOnSet()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('"Symfony\Component\Notifier\Message\SmsMessage" needs a phone number, it cannot be empty.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('"Symfony\Component\Notifier\Message\SmsMessage" needs a phone number, it cannot be empty.');
 
         $message = new SmsMessage('+3312345678', 'subject');
 
-        $this->assertSame('+3312345678', $message->getPhone());
+        self::assertSame('+3312345678', $message->getPhone());
 
         $message->phone('');
     }

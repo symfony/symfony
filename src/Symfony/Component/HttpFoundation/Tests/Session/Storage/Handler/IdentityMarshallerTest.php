@@ -25,7 +25,7 @@ class IdentityMarshallerTest extends Testcase
         $values = ['data' => 'string_data'];
         $failed = [];
 
-        $this->assertSame($values, $marshaller->marshall($values, $failed));
+        self::assertSame($values, $marshaller->marshall($values, $failed));
     }
 
     /**
@@ -36,8 +36,8 @@ class IdentityMarshallerTest extends Testcase
         $marshaller = new IdentityMarshaller();
         $failed = [];
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller::marshall accepts only string as data');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller::marshall accepts only string as data');
 
         $marshaller->marshall($values, $failed);
     }
@@ -46,7 +46,7 @@ class IdentityMarshallerTest extends Testcase
     {
         $marshaller = new IdentityMarshaller();
 
-        $this->assertEquals('data', $marshaller->unmarshall('data'));
+        self::assertEquals('data', $marshaller->unmarshall('data'));
     }
 
     public function invalidMarshallDataProvider(): iterable

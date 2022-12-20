@@ -36,8 +36,8 @@ EOF
             , 'UTF-8');
 
         $errors = libxml_get_errors();
-        $this->assertCount(1, $errors);
-        $this->assertEquals("Tag nav invalid\n", $errors[0]->message);
+        self::assertCount(1, $errors);
+        self::assertEquals("Tag nav invalid\n", $errors[0]->message);
 
         libxml_clear_errors();
         libxml_use_internal_errors($internalErrors);
@@ -60,7 +60,7 @@ EOF
 EOF
             , 'UTF-8');
 
-        $this->assertGreaterThan(1, libxml_get_errors());
+        self::assertGreaterThan(1, libxml_get_errors());
 
         libxml_clear_errors();
         libxml_use_internal_errors($internalErrors);

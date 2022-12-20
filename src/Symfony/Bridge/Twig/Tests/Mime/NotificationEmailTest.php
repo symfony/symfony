@@ -26,7 +26,7 @@ class NotificationEmailTest extends TestCase
             ->context(['a' => 'b'])
         ;
 
-        $this->assertEquals([
+        self::assertEquals([
             'importance' => NotificationEmail::IMPORTANCE_HIGH,
             'content' => 'Foo',
             'exception' => true,
@@ -49,7 +49,7 @@ class NotificationEmailTest extends TestCase
             ->context(['a' => 'b'])
             ->theme('example')
         ));
-        $this->assertEquals([
+        self::assertEquals([
             'importance' => NotificationEmail::IMPORTANCE_HIGH,
             'content' => 'Foo',
             'exception' => true,
@@ -61,21 +61,21 @@ class NotificationEmailTest extends TestCase
             'footer_text' => 'Notification e-mail sent by Symfony',
         ], $email->getContext());
 
-        $this->assertSame('@email/example/notification/body.html.twig', $email->getHtmlTemplate());
+        self::assertSame('@email/example/notification/body.html.twig', $email->getHtmlTemplate());
     }
 
     public function testTheme()
     {
         $email = (new NotificationEmail())->theme('mine');
-        $this->assertSame('@email/mine/notification/body.html.twig', $email->getHtmlTemplate());
-        $this->assertSame('@email/mine/notification/body.txt.twig', $email->getTextTemplate());
+        self::assertSame('@email/mine/notification/body.html.twig', $email->getHtmlTemplate());
+        self::assertSame('@email/mine/notification/body.txt.twig', $email->getTextTemplate());
     }
 
     public function testSubject()
     {
         $email = (new NotificationEmail())->from('me@example.com')->subject('Foo');
         $headers = $email->getPreparedHeaders();
-        $this->assertSame('[LOW] Foo', $headers->get('Subject')->getValue());
+        self::assertSame('[LOW] Foo', $headers->get('Subject')->getValue());
     }
 
     public function testPublicMail()
@@ -86,7 +86,7 @@ class NotificationEmailTest extends TestCase
             ->context(['a' => 'b'])
         ;
 
-        $this->assertEquals([
+        self::assertEquals([
             'importance' => null,
             'content' => 'Foo',
             'exception' => false,
@@ -105,7 +105,7 @@ class NotificationEmailTest extends TestCase
             ->context(['a' => 'b'])
         ;
 
-        $this->assertEquals([
+        self::assertEquals([
             'importance' => null,
             'content' => 'Foo',
             'exception' => false,
@@ -122,10 +122,10 @@ class NotificationEmailTest extends TestCase
     {
         $email = NotificationEmail::asPublicEmail()->from('me@example.com')->subject('Foo');
         $headers = $email->getPreparedHeaders();
-        $this->assertSame('Foo', $headers->get('Subject')->getValue());
+        self::assertSame('Foo', $headers->get('Subject')->getValue());
 
         $email = (new NotificationEmail())->markAsPublic()->from('me@example.com')->subject('Foo');
         $headers = $email->getPreparedHeaders();
-        $this->assertSame('Foo', $headers->get('Subject')->getValue());
+        self::assertSame('Foo', $headers->get('Subject')->getValue());
     }
 }

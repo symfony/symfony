@@ -21,8 +21,8 @@ class DefinitionErrorExceptionPassTest extends TestCase
 {
     public function testThrowsException()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Things went wrong!');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Things went wrong!');
         $container = new ContainerBuilder();
         $def = new Definition();
         $def->addError('Things went wrong!');
@@ -47,6 +47,6 @@ class DefinitionErrorExceptionPassTest extends TestCase
 
         $pass = new DefinitionErrorExceptionPass();
         $pass->process($container);
-        $this->assertSame($def, $container->getDefinition('foo_service_id')->getArgument(0));
+        self::assertSame($def, $container->getDefinition('foo_service_id')->getArgument(0));
     }
 }

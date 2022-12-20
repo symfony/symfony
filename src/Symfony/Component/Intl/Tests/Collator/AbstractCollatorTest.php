@@ -28,7 +28,7 @@ abstract class AbstractCollatorTest extends TestCase
     {
         $collator = $this->getCollator('en');
         $collator->asort($array, $sortFlag);
-        $this->assertSame($expected, $array);
+        self::assertSame($expected, $array);
     }
 
     public function asortProvider()

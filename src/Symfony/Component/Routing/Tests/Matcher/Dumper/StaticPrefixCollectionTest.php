@@ -31,7 +31,7 @@ class StaticPrefixCollectionTest extends TestCase
         }
 
         $dumped = $this->dumpCollection($collection);
-        $this->assertEquals($expected, $dumped);
+        self::assertEquals($expected, $dumped);
     }
 
     public function routeProvider()

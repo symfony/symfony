@@ -30,7 +30,7 @@ final class DiscordTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new DiscordTransport('testToken', 'testWebhookId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new DiscordTransport('testToken', 'testWebhookId', $client ?? self::createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
@@ -46,26 +46,26 @@ final class DiscordTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSendChatMessageWithMoreThan2000CharsThrowsLogicException()
     {
         $transport = $this->createTransport();
 
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('The subject length of a Discord message must not exceed 2000 characters.');
+        self::expectException(LengthException::class);
+        self::expectExceptionMessage('The subject length of a Discord message must not exceed 2000 characters.');
 
         $transport->send(new ChatMessage(str_repeat('囍', 2001)));
     }
 
     public function testSendWithErrorResponseThrows()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(400);
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn(json_encode(['message' => 'testDescription', 'code' => 'testErrorCode']));
 
@@ -75,8 +75,8 @@ final class DiscordTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client);
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessageMatches('/testDescription.+testErrorCode/');
 
         $transport->send(new ChatMessage('testMessage'));
     }

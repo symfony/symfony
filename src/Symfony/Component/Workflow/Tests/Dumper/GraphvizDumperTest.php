@@ -34,7 +34,7 @@ class GraphvizDumperTest extends TestCase
     {
         $dump = $this->dumper->dump($definition);
 
-        $this->assertEquals($expected, $dump);
+        self::assertEquals($expected, $dump);
     }
 
     /**
@@ -44,7 +44,7 @@ class GraphvizDumperTest extends TestCase
     {
         $dump = $this->dumper->dump($definition, $marking);
 
-        $this->assertEquals($expected, $dump);
+        self::assertEquals($expected, $dump);
     }
 
     public function provideWorkflowDefinitionWithMarking()

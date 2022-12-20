@@ -31,12 +31,12 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
 
-        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+        self::assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
     public function testResolveNoUser()
     {
-        $mock = $this->createMock(UserInterface::class);
+        $mock = self::createMock(UserInterface::class);
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password'), 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -44,7 +44,7 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', \get_class($mock), false, false, null);
 
-        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+        self::assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
     public function testResolveWrongType()
@@ -53,7 +53,7 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', null, false, false, null);
 
-        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+        self::assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
     public function testResolve()
@@ -66,8 +66,8 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
-        $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+        self::assertTrue($resolver->supports(Request::create('/'), $metadata));
+        self::assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
     }
 
     public function testResolveWithAttribute()
@@ -78,11 +78,11 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = $this->createMock(ArgumentMetadata::class);
+        $metadata = self::createMock(ArgumentMetadata::class);
         $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
 
-        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
-        $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+        self::assertTrue($resolver->supports(Request::create('/'), $metadata));
+        self::assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
     }
 
     public function testResolveWithAttributeAndNoUser()
@@ -92,7 +92,7 @@ class UserValueResolverTest extends TestCase
         $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
 
-        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+        self::assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
     public function testIntegration()
@@ -103,7 +103,7 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $argumentResolver = new ArgumentResolver(null, [new UserValueResolver($tokenStorage)]);
-        $this->assertSame([$user], $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user) {}));
+        self::assertSame([$user], $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user) {}));
     }
 
     public function testIntegrationNoUser()
@@ -111,6 +111,6 @@ class UserValueResolverTest extends TestCase
         $tokenStorage = new TokenStorage();
 
         $argumentResolver = new ArgumentResolver(null, [new UserValueResolver($tokenStorage), new DefaultValueResolver()]);
-        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user = null) {}));
+        self::assertSame([null], $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user = null) {}));
     }
 }

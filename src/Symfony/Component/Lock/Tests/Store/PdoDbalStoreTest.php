@@ -65,17 +65,17 @@ class PdoDbalStoreTest extends AbstractStoreTest
 
     public function testAbortAfterExpiration()
     {
-        $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
+        self::markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
     public function testConfigureSchema()
     {
         $this->expectDeprecation('Since symfony/lock 5.4: Usage of a DBAL Connection with "Symfony\Component\Lock\Store\PdoStore" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Lock\Store\DoctrineDbalStore" instead.');
 
-        $store = new PdoStore($this->createMock(Connection::class), ['db_table' => 'lock_table']);
+        $store = new PdoStore(self::createMock(Connection::class), ['db_table' => 'lock_table']);
         $schema = new Schema();
         $store->configureSchema($schema);
-        $this->assertTrue($schema->hasTable('lock_table'));
+        self::assertTrue($schema->hasTable('lock_table'));
     }
 
     /**
@@ -91,7 +91,7 @@ class PdoDbalStoreTest extends AbstractStoreTest
             $store->createTable();
 
             $store->save($key);
-            $this->assertTrue($store->exists($key));
+            self::assertTrue($store->exists($key));
         } finally {
             if (null !== $file) {
                 @unlink($file);

@@ -23,7 +23,7 @@ class CallbackTransformerTest extends TestCase
             function ($value) { return $value.' has reversely been transformed'; }
         );
 
-        $this->assertEquals('foo has been transformed', $transformer->transform('foo'));
-        $this->assertEquals('bar has reversely been transformed', $transformer->reverseTransform('bar'));
+        self::assertEquals('foo has been transformed', $transformer->transform('foo'));
+        self::assertEquals('bar has reversely been transformed', $transformer->reverseTransform('bar'));
     }
 }

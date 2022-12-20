@@ -72,15 +72,15 @@ class GetSetMethodNormalizerTest extends TestCase
 
     private function createNormalizer(array $defaultContext = [])
     {
-        $this->serializer = $this->createMock(SerializerNormalizer::class);
+        $this->serializer = self::createMock(SerializerNormalizer::class);
         $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
 
     public function testInterface()
     {
-        $this->assertInstanceOf(NormalizerInterface::class, $this->normalizer);
-        $this->assertInstanceOf(DenormalizerInterface::class, $this->normalizer);
+        self::assertInstanceOf(NormalizerInterface::class, $this->normalizer);
+        self::assertInstanceOf(DenormalizerInterface::class, $this->normalizer);
     }
 
     public function testNormalize()
@@ -94,23 +94,20 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj->setObject($object);
 
         $this->serializer
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('normalize')
             ->with($object, 'any')
             ->willReturn('string_object')
         ;
 
-        $this->assertEquals(
-            [
-                'foo' => 'foo',
-                'bar' => 'bar',
-                'baz' => true,
-                'fooBar' => 'foobar',
-                'camelCase' => 'camelcase',
-                'object' => 'string_object',
-            ],
-            $this->normalizer->normalize($obj, 'any')
-        );
+        self::assertEquals([
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'baz' => true,
+            'fooBar' => 'foobar',
+            'camelCase' => 'camelcase',
+            'object' => 'string_object',
+        ], $this->normalizer->normalize($obj, 'any'));
     }
 
     public function testDenormalize()
@@ -120,9 +117,9 @@ class GetSetMethodNormalizerTest extends TestCase
             GetSetDummy::class,
             'any'
         );
-        $this->assertEquals('foo', $obj->getFoo());
-        $this->assertEquals('bar', $obj->getBar());
-        $this->assertTrue($obj->isBaz());
+        self::assertEquals('foo', $obj->getFoo());
+        self::assertEquals('bar', $obj->getBar());
+        self::assertTrue($obj->isBaz());
     }
 
     public function testIgnoredAttributesInContext()
@@ -132,13 +129,10 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj->setFoo('foo');
         $obj->setBar('bar');
         $obj->setCamelCase(true);
-        $this->assertEquals(
-            [
-                'fooBar' => 'foobar',
-                'camelCase' => true,
-            ],
-            $this->normalizer->normalize($obj, 'any', [AbstractNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes])
-        );
+        self::assertEquals([
+            'fooBar' => 'foobar',
+            'camelCase' => true,
+        ], $this->normalizer->normalize($obj, 'any', [AbstractNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes]));
     }
 
     public function testDenormalizeWithObject()
@@ -148,13 +142,13 @@ class GetSetMethodNormalizerTest extends TestCase
         $data->bar = 'bar';
         $data->fooBar = 'foobar';
         $obj = $this->normalizer->denormalize($data, GetSetDummy::class, 'any');
-        $this->assertEquals('foo', $obj->getFoo());
-        $this->assertEquals('bar', $obj->getBar());
+        self::assertEquals('foo', $obj->getFoo());
+        self::assertEquals('bar', $obj->getBar());
     }
 
     public function testDenormalizeNull()
     {
-        $this->assertEquals(new GetSetDummy(), $this->normalizer->denormalize(null, GetSetDummy::class));
+        self::assertEquals(new GetSetDummy(), $this->normalizer->denormalize(null, GetSetDummy::class));
     }
 
     public function testConstructorDenormalize()
@@ -162,9 +156,9 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'],
             GetConstructorDummy::class, 'any');
-        $this->assertEquals('foo', $obj->getFoo());
-        $this->assertEquals('bar', $obj->getBar());
-        $this->assertTrue($obj->isBaz());
+        self::assertEquals('foo', $obj->getFoo());
+        self::assertEquals('bar', $obj->getBar());
+        self::assertTrue($obj->isBaz());
     }
 
     public function testConstructorDenormalizeWithNullArgument()
@@ -172,9 +166,9 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => null, 'baz' => true],
             GetConstructorDummy::class, 'any');
-        $this->assertEquals('foo', $obj->getFoo());
-        $this->assertNull($obj->getBar());
-        $this->assertTrue($obj->isBaz());
+        self::assertEquals('foo', $obj->getFoo());
+        self::assertNull($obj->getBar());
+        self::assertTrue($obj->isBaz());
     }
 
     public function testConstructorDenormalizeWithMissingOptionalArgument()
@@ -182,9 +176,9 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => 'test', 'baz' => [1, 2, 3]],
             GetConstructorOptionalArgsDummy::class, 'any');
-        $this->assertEquals('test', $obj->getFoo());
-        $this->assertEquals([], $obj->getBar());
-        $this->assertEquals([1, 2, 3], $obj->getBaz());
+        self::assertEquals('test', $obj->getFoo());
+        self::assertEquals([], $obj->getBar());
+        self::assertEquals([1, 2, 3], $obj->getBaz());
     }
 
     public function testConstructorDenormalizeWithOptionalDefaultArgument()
@@ -192,8 +186,8 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['bar' => 'test'],
             GetConstructorArgsWithDefaultValueDummy::class, 'any');
-        $this->assertEquals([], $obj->getFoo());
-        $this->assertEquals('test', $obj->getBar());
+        self::assertEquals([], $obj->getFoo());
+        self::assertEquals('test', $obj->getBar());
     }
 
     public function testConstructorDenormalizeWithVariadicArgument()
@@ -201,7 +195,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             ['foo' => [1, 2, 3]],
             'Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorArgsDummy', 'any');
-        $this->assertEquals([1, 2, 3], $obj->getFoo());
+        self::assertEquals([1, 2, 3], $obj->getFoo());
     }
 
     public function testConstructorDenormalizeWithMissingVariadicArgument()
@@ -209,7 +203,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj = $this->normalizer->denormalize(
             [],
             'Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorArgsDummy', 'any');
-        $this->assertEquals([], $obj->getFoo());
+        self::assertEquals([], $obj->getFoo());
     }
 
     public function testConstructorWithObjectDenormalize()
@@ -220,14 +214,14 @@ class GetSetMethodNormalizerTest extends TestCase
         $data->baz = true;
         $data->fooBar = 'foobar';
         $obj = $this->normalizer->denormalize($data, GetConstructorDummy::class, 'any');
-        $this->assertEquals('foo', $obj->getFoo());
-        $this->assertEquals('bar', $obj->getBar());
+        self::assertEquals('foo', $obj->getFoo());
+        self::assertEquals('bar', $obj->getBar());
     }
 
     public function testConstructorWArgWithPrivateMutator()
     {
         $obj = $this->normalizer->denormalize(['foo' => 'bar'], ObjectConstructorArgsWithPrivateMutatorDummy::class, 'any');
-        $this->assertEquals('bar', $obj->getFoo());
+        self::assertEquals('bar', $obj->getFoo());
     }
 
     protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): GetSetMethodNormalizer
@@ -292,14 +286,11 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj->setSymfony('@coopTilleuls');
         $obj->setCoopTilleuls('les-tilleuls.coop');
 
-        $this->assertEquals(
-            [
-                'bar' => null,
-                'foo_bar' => '@dunglas',
-                'symfony' => '@coopTilleuls',
-            ],
-            $this->normalizer->normalize($obj, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
-        );
+        self::assertEquals([
+            'bar' => null,
+            'foo_bar' => '@dunglas',
+            'symfony' => '@coopTilleuls',
+        ], $this->normalizer->normalize($obj, null, [GetSetMethodNormalizer::GROUPS => ['name_converter']]));
     }
 
     public function testGroupsDenormalizeWithNameConverter()
@@ -312,15 +303,12 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj->setFooBar('@dunglas');
         $obj->setSymfony('@coopTilleuls');
 
-        $this->assertEquals(
-            $obj,
-            $this->normalizer->denormalize([
-                'bar' => null,
-                'foo_bar' => '@dunglas',
-                'symfony' => '@coopTilleuls',
-                'coop_tilleuls' => 'les-tilleuls.coop',
-            ], 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy', null, [GetSetMethodNormalizer::GROUPS => ['name_converter']])
-        );
+        self::assertEquals($obj, $this->normalizer->denormalize([
+            'bar' => null,
+            'foo_bar' => '@dunglas',
+            'symfony' => '@coopTilleuls',
+            'coop_tilleuls' => 'les-tilleuls.coop',
+        ], 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\GroupDummy', null, [GetSetMethodNormalizer::GROUPS => ['name_converter']]));
     }
 
     protected function getNormalizerForMaxDepth(): NormalizerInterface
@@ -354,7 +342,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testRejectInvalidKey()
     {
-        $this->markTestSkipped('This test makes no sense with the GetSetMethodNormalizer');
+        self::markTestSkipped('This test makes no sense with the GetSetMethodNormalizer');
     }
 
     protected function getNormalizerForIgnoredAttributes(): GetSetMethodNormalizer
@@ -377,9 +365,9 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
-        $serializer = $this->createMock(SerializerInterface::class);
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
+        $serializer = self::createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
 
         $obj = new GetSetDummy();
@@ -401,45 +389,42 @@ class GetSetMethodNormalizerTest extends TestCase
             'sibling1' => ['coopTilleuls' => 'Les-Tilleuls.coop'],
             'sibling2' => ['coopTilleuls' => 'Les-Tilleuls.coop'],
         ];
-        $this->assertEquals($expected, $this->normalizer->normalize($siblingHolder));
+        self::assertEquals($expected, $this->normalizer->normalize($siblingHolder));
     }
 
     public function testDenormalizeNonExistingAttribute()
     {
-        $this->assertEquals(
-            new GetSetDummy(),
-            $this->normalizer->denormalize(['non_existing' => true], GetSetDummy::class)
-        );
+        self::assertEquals(new GetSetDummy(), $this->normalizer->denormalize(['non_existing' => true], GetSetDummy::class));
     }
 
     public function testDenormalizeShouldNotSetStaticAttribute()
     {
         $obj = $this->normalizer->denormalize(['staticObject' => true], GetSetDummy::class);
 
-        $this->assertEquals(new GetSetDummy(), $obj);
-        $this->assertNull(GetSetDummy::getStaticObject());
+        self::assertEquals(new GetSetDummy(), $obj);
+        self::assertNull(GetSetDummy::getStaticObject());
     }
 
     public function testNoTraversableSupport()
     {
-        $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
+        self::assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
     }
 
     public function testNoStaticGetSetSupport()
     {
-        $this->assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
+        self::assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
     }
 
     public function testPrivateSetter()
     {
         $obj = $this->normalizer->denormalize(['foo' => 'foobar'], ObjectWithPrivateSetterDummy::class);
-        $this->assertEquals('bar', $obj->getFoo());
+        self::assertEquals('bar', $obj->getFoo());
     }
 
     public function testHasGetterDenormalize()
     {
         $obj = $this->normalizer->denormalize(['foo' => true], ObjectWithHasGetterDummy::class);
-        $this->assertTrue($obj->hasFoo());
+        self::assertTrue($obj->hasFoo());
     }
 
     public function testHasGetterNormalize()
@@ -447,26 +432,20 @@ class GetSetMethodNormalizerTest extends TestCase
         $obj = new ObjectWithHasGetterDummy();
         $obj->setFoo(true);
 
-        $this->assertEquals(
-            ['foo' => true],
-            $this->normalizer->normalize($obj, 'any')
-        );
+        self::assertEquals(['foo' => true], $this->normalizer->normalize($obj, 'any'));
     }
 
     public function testCallMagicMethodDenormalize()
     {
         $obj = $this->normalizer->denormalize(['active' => true], ObjectWithMagicMethod::class);
-        $this->assertTrue($obj->isActive());
+        self::assertTrue($obj->isActive());
     }
 
     public function testCallMagicMethodNormalize()
     {
         $obj = new ObjectWithMagicMethod();
 
-        $this->assertSame(
-            ['active' => true],
-            $this->normalizer->normalize($obj, 'any')
-        );
+        self::assertSame(['active' => true], $this->normalizer->normalize($obj, 'any'));
     }
 
     protected function getObjectCollectionWithExpectedArray(): array

@@ -30,19 +30,19 @@ class GraphvizDumperTest extends TestCase
     {
         $dumper = new GraphvizDumper($container = new ContainerBuilder());
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services1.dot', $dumper->dump(), '->dump() dumps an empty container as an empty dot file');
+        self::assertStringEqualsFile(self::$fixturesPath.'/graphviz/services1.dot', $dumper->dump(), '->dump() dumps an empty container as an empty dot file');
 
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services9.dot', $dumper->dump(), '->dump() dumps services');
+        self::assertStringEqualsFile(self::$fixturesPath.'/graphviz/services9.dot', $dumper->dump(), '->dump() dumps services');
 
         $container = include self::$fixturesPath.'/containers/container10.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services10.dot', $dumper->dump(), '->dump() dumps services');
+        self::assertStringEqualsFile(self::$fixturesPath.'/graphviz/services10.dot', $dumper->dump(), '->dump() dumps services');
 
         $container = include self::$fixturesPath.'/containers/container10.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertEquals($dumper->dump([
+        self::assertEquals($dumper->dump([
             'graph' => ['ratio' => 'normal'],
             'node' => ['fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'],
             'edge' => ['fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1],
@@ -56,14 +56,14 @@ class GraphvizDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container13.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services13.dot', $dumper->dump(), '->dump() dumps services');
+        self::assertStringEqualsFile(self::$fixturesPath.'/graphviz/services13.dot', $dumper->dump(), '->dump() dumps services');
     }
 
     public function testDumpWithFrozenCustomClassContainer()
     {
         $container = include self::$fixturesPath.'/containers/container14.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services14.dot', $dumper->dump(), '->dump() dumps services');
+        self::assertStringEqualsFile(self::$fixturesPath.'/graphviz/services14.dot', $dumper->dump(), '->dump() dumps services');
     }
 
     public function testDumpWithUnresolvedParameter()
@@ -71,7 +71,7 @@ class GraphvizDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container17.php';
         $dumper = new GraphvizDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services17.dot', $dumper->dump(), '->dump() dumps services');
+        self::assertStringEqualsFile(self::$fixturesPath.'/graphviz/services17.dot', $dumper->dump(), '->dump() dumps services');
     }
 
     public function testDumpWithInlineDefinition()
@@ -83,6 +83,6 @@ class GraphvizDumperTest extends TestCase
         $container->register('bar', 'stdClass');
         $dumper = new GraphvizDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services_inline.dot', $dumper->dump(), '->dump() dumps nested references');
+        self::assertStringEqualsFile(self::$fixturesPath.'/graphviz/services_inline.dot', $dumper->dump(), '->dump() dumps nested references');
     }
 }

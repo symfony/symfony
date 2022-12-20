@@ -56,8 +56,8 @@ EODUMP;
             },
         ], CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
 
-        $this->assertSame(CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR, $this->varDumperConfig['flags']);
-        $this->assertSame($casters, $this->varDumperConfig['casters']);
+        self::assertSame(CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR, $this->varDumperConfig['flags']);
+        self::assertSame($casters, $this->varDumperConfig['casters']);
 
         $this->assertDumpEquals(<<<DUMP
 [
@@ -72,7 +72,7 @@ DUMP
 
         $this->tearDownVarDumper();
 
-        $this->assertNull($this->varDumperConfig['flags']);
-        $this->assertSame([], $this->varDumperConfig['casters']);
+        self::assertNull($this->varDumperConfig['flags']);
+        self::assertSame([], $this->varDumperConfig['casters']);
     }
 }

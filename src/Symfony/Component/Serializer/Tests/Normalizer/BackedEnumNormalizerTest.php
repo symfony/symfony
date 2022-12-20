@@ -39,10 +39,10 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testSupportsNormalization()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(StringBackedEnumDummy::GET));
-        $this->assertTrue($this->normalizer->supportsNormalization(IntegerBackedEnumDummy::SUCCESS));
-        $this->assertFalse($this->normalizer->supportsNormalization(UnitEnumDummy::GET));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertTrue($this->normalizer->supportsNormalization(StringBackedEnumDummy::GET));
+        self::assertTrue($this->normalizer->supportsNormalization(IntegerBackedEnumDummy::SUCCESS));
+        self::assertFalse($this->normalizer->supportsNormalization(UnitEnumDummy::GET));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     /**
@@ -50,8 +50,8 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testNormalize()
     {
-        $this->assertSame('GET', $this->normalizer->normalize(StringBackedEnumDummy::GET));
-        $this->assertSame(200, $this->normalizer->normalize(IntegerBackedEnumDummy::SUCCESS));
+        self::assertSame('GET', $this->normalizer->normalize(StringBackedEnumDummy::GET));
+        self::assertSame(200, $this->normalizer->normalize(IntegerBackedEnumDummy::SUCCESS));
     }
 
     /**
@@ -59,7 +59,7 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testNormalizeBadObjectTypeThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $this->normalizer->normalize(new \stdClass());
     }
 
@@ -68,10 +68,10 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testSupportsDenormalization()
     {
-        $this->assertTrue($this->normalizer->supportsDenormalization(null, StringBackedEnumDummy::class));
-        $this->assertTrue($this->normalizer->supportsDenormalization(null, IntegerBackedEnumDummy::class));
-        $this->assertFalse($this->normalizer->supportsDenormalization(null, UnitEnumDummy::class));
-        $this->assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
+        self::assertTrue($this->normalizer->supportsDenormalization(null, StringBackedEnumDummy::class));
+        self::assertTrue($this->normalizer->supportsDenormalization(null, IntegerBackedEnumDummy::class));
+        self::assertFalse($this->normalizer->supportsDenormalization(null, UnitEnumDummy::class));
+        self::assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
     }
 
     /**
@@ -79,8 +79,8 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testDenormalize()
     {
-        $this->assertSame(StringBackedEnumDummy::GET, $this->normalizer->denormalize('GET', StringBackedEnumDummy::class));
-        $this->assertSame(IntegerBackedEnumDummy::SUCCESS, $this->normalizer->denormalize(200, IntegerBackedEnumDummy::class));
+        self::assertSame(StringBackedEnumDummy::GET, $this->normalizer->denormalize('GET', StringBackedEnumDummy::class));
+        self::assertSame(IntegerBackedEnumDummy::SUCCESS, $this->normalizer->denormalize(200, IntegerBackedEnumDummy::class));
     }
 
     /**
@@ -88,7 +88,7 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testDenormalizeNullValueThrowsException()
     {
-        $this->expectException(NotNormalizableValueException::class);
+        self::expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize(null, StringBackedEnumDummy::class);
     }
 
@@ -97,7 +97,7 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testDenormalizeBooleanValueThrowsException()
     {
-        $this->expectException(NotNormalizableValueException::class);
+        self::expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize(true, StringBackedEnumDummy::class);
     }
 
@@ -106,7 +106,7 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testDenormalizeObjectThrowsException()
     {
-        $this->expectException(NotNormalizableValueException::class);
+        self::expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize(new \stdClass(), StringBackedEnumDummy::class);
     }
 
@@ -115,30 +115,30 @@ class BackedEnumNormalizerTest extends TestCase
      */
     public function testDenormalizeBadBackingValueThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The data must belong to a backed enumeration of type '.StringBackedEnumDummy::class);
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The data must belong to a backed enumeration of type '.StringBackedEnumDummy::class);
 
         $this->normalizer->denormalize('POST', StringBackedEnumDummy::class);
     }
 
     public function testNormalizeShouldThrowExceptionForNonEnumObjects()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The data must belong to a backed enumeration.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The data must belong to a backed enumeration.');
 
         $this->normalizer->normalize(\stdClass::class);
     }
 
     public function testDenormalizeShouldThrowExceptionForNonEnumObjects()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The data must belong to a backed enumeration.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The data must belong to a backed enumeration.');
 
         $this->normalizer->denormalize('GET', \stdClass::class);
     }
 
     public function testSupportsNormalizationShouldFailOnAnyPHPVersionForNonEnumObjects()
     {
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 }

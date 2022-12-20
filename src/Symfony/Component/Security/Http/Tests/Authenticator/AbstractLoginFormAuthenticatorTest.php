@@ -27,7 +27,7 @@ class AbstractLoginFormAuthenticatorTest extends TestCase
     public function testSupports(string $loginUrl, Request $request, bool $expected)
     {
         $authenticator = new ConcreteFormAuthenticator($loginUrl);
-        $this->assertSame($expected, $authenticator->supports($request));
+        self::assertSame($expected, $authenticator->supports($request));
     }
 
     public function provideSupportsData(): iterable

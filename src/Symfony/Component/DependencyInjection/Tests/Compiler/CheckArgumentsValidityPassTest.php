@@ -34,8 +34,8 @@ class CheckArgumentsValidityPassTest extends TestCase
         $pass = new CheckArgumentsValidityPass();
         $pass->process($container);
 
-        $this->assertEquals([null, 1, 'a'], $container->getDefinition('foo')->getArguments());
-        $this->assertEquals([
+        self::assertEquals([null, 1, 'a'], $container->getDefinition('foo')->getArguments());
+        self::assertEquals([
             ['bar', ['a', 'b']],
             ['baz', ['c', 'd']],
         ], $container->getDefinition('foo')->getMethodCalls());
@@ -52,7 +52,7 @@ class CheckArgumentsValidityPassTest extends TestCase
         $definition->setMethodCalls($methodCalls);
 
         $pass = new CheckArgumentsValidityPass();
-        $this->expectException(RuntimeException::class);
+        self::expectException(RuntimeException::class);
         $pass->process($container);
     }
 
@@ -74,6 +74,6 @@ class CheckArgumentsValidityPassTest extends TestCase
 
         $pass = new CheckArgumentsValidityPass(false);
         $pass->process($container);
-        $this->assertCount(1, $definition->getErrors());
+        self::assertCount(1, $definition->getErrors());
     }
 }

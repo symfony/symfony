@@ -31,10 +31,10 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
      */
     final public function testDecide(AccessDecisionStrategyInterface $strategy, array $voters, bool $expected)
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $manager = new AccessDecisionManager($voters, $strategy);
 
-        $this->assertSame($expected, $manager->decide($token, ['ROLE_FOO']));
+        self::assertSame($expected, $manager->decide($token, ['ROLE_FOO']));
     }
 
     /**
@@ -63,7 +63,7 @@ abstract class AccessDecisionStrategyTestCase extends TestCase
 
     final protected function getVoter(int $vote): VoterInterface
     {
-        $voter = $this->createMock(VoterInterface::class);
+        $voter = self::createMock(VoterInterface::class);
         $voter->method('vote')->willReturn($vote);
 
         return $voter;

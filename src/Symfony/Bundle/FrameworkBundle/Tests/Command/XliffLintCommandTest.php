@@ -40,7 +40,7 @@ Or find all files in a bundle:
   <info>php %command.full_name% @AcmeDemoBundle</info>
 EOF;
 
-        $this->assertStringContainsString($expected, $command->getHelp());
+        self::assertStringContainsString($expected, $command->getHelp());
     }
 
     public function testLintFilesFromBundleDirectory()
@@ -52,7 +52,7 @@ EOF;
         );
 
         $tester->assertCommandIsSuccessful('Returns 0 in case of success');
-        $this->assertStringContainsString('[OK] All 0 XLIFF files contain valid syntax', trim($tester->getDisplay()));
+        self::assertStringContainsString('[OK] All 0 XLIFF files contain valid syntax', trim($tester->getDisplay()));
     }
 
     private function createCommandTester($application = null): CommandTester
@@ -73,31 +73,31 @@ EOF;
 
     private function getKernelAwareApplicationMock()
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = self::createMock(KernelInterface::class);
         $kernel
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('locateResource')
             ->with('@AppBundle/Resources')
             ->willReturn(sys_get_temp_dir().'/xliff-lint-test');
 
-        $application = $this->createMock(Application::class);
+        $application = self::createMock(Application::class);
         $application
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getKernel')
             ->willReturn($kernel);
 
         $application
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getHelperSet')
             ->willReturn(new HelperSet());
 
         $application
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getDefinition')
             ->willReturn(new InputDefinition());
 
         $application
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with('lint:xliff')
             ->willReturn(new XliffLintCommand());

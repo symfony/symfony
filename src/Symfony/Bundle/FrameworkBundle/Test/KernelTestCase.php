@@ -44,7 +44,7 @@ abstract class KernelTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        static::ensureKernelShutdown();
+        self::ensureKernelShutdown();
         static::$class = null;
         static::$kernel = null;
         static::$booted = false;
@@ -76,9 +76,9 @@ abstract class KernelTestCase extends TestCase
      */
     protected static function bootKernel(array $options = [])
     {
-        static::ensureKernelShutdown();
+        self::ensureKernelShutdown();
 
-        $kernel = static::createKernel($options);
+        $kernel = self::createKernel($options);
         $kernel->boot();
         static::$kernel = $kernel;
         static::$booted = true;
@@ -100,7 +100,7 @@ abstract class KernelTestCase extends TestCase
     protected static function getContainer(): ContainerInterface
     {
         if (!static::$booted) {
-            static::bootKernel();
+            self::bootKernel();
         }
 
         try {
@@ -123,7 +123,7 @@ abstract class KernelTestCase extends TestCase
     protected static function createKernel(array $options = [])
     {
         if (null === static::$class) {
-            static::$class = static::getKernelClass();
+            static::$class = self::getKernelClass();
         }
 
         if (isset($options['environment'])) {

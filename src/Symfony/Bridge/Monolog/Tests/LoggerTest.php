@@ -26,7 +26,7 @@ class LoggerTest extends TestCase
         $logger = new Logger(__METHOD__, [$handler]);
 
         $logger->error('error message');
-        $this->assertSame([], $logger->getLogs());
+        self::assertSame([], $logger->getLogs());
     }
 
     public function testCountErrorsWithoutDebugProcessor()
@@ -35,7 +35,7 @@ class LoggerTest extends TestCase
         $logger = new Logger(__METHOD__, [$handler]);
 
         $logger->error('error message');
-        $this->assertSame(0, $logger->countErrors());
+        self::assertSame(0, $logger->countErrors());
     }
 
     public function testGetLogsWithDebugProcessor()
@@ -45,7 +45,7 @@ class LoggerTest extends TestCase
         $logger = new Logger(__METHOD__, [$handler], [$processor]);
 
         $logger->error('error message');
-        $this->assertCount(1, $logger->getLogs());
+        self::assertCount(1, $logger->getLogs());
     }
 
     public function testCountErrorsWithDebugProcessor()
@@ -64,7 +64,7 @@ class LoggerTest extends TestCase
         $logger->alert('test message');
         $logger->emergency('test message');
 
-        $this->assertSame(4, $logger->countErrors());
+        self::assertSame(4, $logger->countErrors());
     }
 
     public function testGetLogsWithDebugProcessor2()
@@ -74,19 +74,19 @@ class LoggerTest extends TestCase
         $logger->pushProcessor(new DebugProcessor());
 
         $logger->info('test');
-        $this->assertCount(1, $logger->getLogs());
+        self::assertCount(1, $logger->getLogs());
         [$record] = $logger->getLogs();
 
-        $this->assertEquals('test', $record['message']);
-        $this->assertEquals(Logger::INFO, $record['priority']);
+        self::assertEquals('test', $record['message']);
+        self::assertEquals(Logger::INFO, $record['priority']);
     }
 
     public function testGetLogsWithDebugProcessor3()
     {
         $request = new Request();
-        $processor = $this->createMock(DebugProcessor::class);
-        $processor->expects($this->once())->method('getLogs')->with($request);
-        $processor->expects($this->once())->method('countErrors')->with($request);
+        $processor = self::createMock(DebugProcessor::class);
+        $processor->expects(self::once())->method('getLogs')->with($request);
+        $processor->expects(self::once())->method('countErrors')->with($request);
 
         $handler = new TestHandler();
         $logger = new Logger('test', [$handler]);
@@ -105,8 +105,8 @@ class LoggerTest extends TestCase
         $logger->info('test');
         $logger->clear();
 
-        $this->assertEmpty($logger->getLogs());
-        $this->assertSame(0, $logger->countErrors());
+        self::assertEmpty($logger->getLogs());
+        self::assertSame(0, $logger->countErrors());
     }
 
     public function testReset()
@@ -118,22 +118,22 @@ class LoggerTest extends TestCase
         $logger->info('test');
         $logger->reset();
 
-        $this->assertEmpty($logger->getLogs());
-        $this->assertSame(0, $logger->countErrors());
+        self::assertEmpty($logger->getLogs());
+        self::assertSame(0, $logger->countErrors());
         if (class_exists(ResettableInterface::class)) {
-            $this->assertEmpty($handler->getRecords());
+            self::assertEmpty($handler->getRecords());
         }
     }
 
     public function testInheritedClassCallGetLogsWithoutArgument()
     {
         $loggerChild = new ClassThatInheritLogger('test');
-        $this->assertSame([], $loggerChild->getLogs());
+        self::assertSame([], $loggerChild->getLogs());
     }
 
     public function testInheritedClassCallCountErrorsWithoutArgument()
     {
         $loggerChild = new ClassThatInheritLogger('test');
-        $this->assertEquals(0, $loggerChild->countErrors());
+        self::assertEquals(0, $loggerChild->countErrors());
     }
 }

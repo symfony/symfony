@@ -33,8 +33,8 @@ class ConstraintViolationListNormalizerTest extends TestCase
 
     public function testSupportsNormalization()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new ConstraintViolationList()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertTrue($this->normalizer->supportsNormalization(new ConstraintViolationList()));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     public function testNormalize()
@@ -67,7 +67,7 @@ class ConstraintViolationListNormalizerTest extends TestCase
                 ],
         ];
 
-        $this->assertEquals($expected, $this->normalizer->normalize($list));
+        self::assertEquals($expected, $this->normalizer->normalize($list));
     }
 
     public function testNormalizeWithNameConverter()
@@ -105,7 +105,7 @@ error',
             ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($list));
+        self::assertEquals($expected, $normalizer->normalize($list));
     }
 
     /**
@@ -121,11 +121,11 @@ error',
 
         $violation = $this->normalizer->normalize($list, null, [ConstraintViolationListNormalizer::PAYLOAD_FIELDS => $fields])['violations'][0];
         if ([] === $fields) {
-            $this->assertArrayNotHasKey('payload', $violation);
+            self::assertArrayNotHasKey('payload', $violation);
 
             return;
         }
-        $this->assertSame($expected, $violation['payload']);
+        self::assertSame($expected, $violation['payload']);
     }
 
     public function payloadFieldsProvider(): iterable

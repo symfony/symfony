@@ -28,9 +28,6 @@ class RoutingResolverPassTest extends TestCase
 
         (new RoutingResolverPass())->process($container);
 
-        $this->assertEquals(
-            [['addLoader', [new Reference('loader1')]], ['addLoader', [new Reference('loader2')]]],
-            $container->getDefinition('routing.resolver')->getMethodCalls()
-        );
+        self::assertEquals([['addLoader', [new Reference('loader1')]], ['addLoader', [new Reference('loader2')]]], $container->getDefinition('routing.resolver')->getMethodCalls());
     }
 }

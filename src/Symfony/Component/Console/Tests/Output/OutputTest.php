@@ -20,72 +20,72 @@ class OutputTest extends TestCase
     public function testConstructor()
     {
         $output = new TestOutput(Output::VERBOSITY_QUIET, true);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
-        $this->assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
+        self::assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        self::assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
     }
 
     public function testSetIsDecorated()
     {
         $output = new TestOutput();
         $output->setDecorated(true);
-        $this->assertTrue($output->isDecorated(), 'setDecorated() sets the decorated flag');
+        self::assertTrue($output->isDecorated(), 'setDecorated() sets the decorated flag');
     }
 
     public function testSetGetVerbosity()
     {
         $output = new TestOutput();
         $output->setVerbosity(Output::VERBOSITY_QUIET);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
+        self::assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
 
-        $this->assertTrue($output->isQuiet());
-        $this->assertFalse($output->isVerbose());
-        $this->assertFalse($output->isVeryVerbose());
-        $this->assertFalse($output->isDebug());
+        self::assertTrue($output->isQuiet());
+        self::assertFalse($output->isVerbose());
+        self::assertFalse($output->isVeryVerbose());
+        self::assertFalse($output->isDebug());
 
         $output->setVerbosity(Output::VERBOSITY_NORMAL);
-        $this->assertFalse($output->isQuiet());
-        $this->assertFalse($output->isVerbose());
-        $this->assertFalse($output->isVeryVerbose());
-        $this->assertFalse($output->isDebug());
+        self::assertFalse($output->isQuiet());
+        self::assertFalse($output->isVerbose());
+        self::assertFalse($output->isVeryVerbose());
+        self::assertFalse($output->isDebug());
 
         $output->setVerbosity(Output::VERBOSITY_VERBOSE);
-        $this->assertFalse($output->isQuiet());
-        $this->assertTrue($output->isVerbose());
-        $this->assertFalse($output->isVeryVerbose());
-        $this->assertFalse($output->isDebug());
+        self::assertFalse($output->isQuiet());
+        self::assertTrue($output->isVerbose());
+        self::assertFalse($output->isVeryVerbose());
+        self::assertFalse($output->isDebug());
 
         $output->setVerbosity(Output::VERBOSITY_VERY_VERBOSE);
-        $this->assertFalse($output->isQuiet());
-        $this->assertTrue($output->isVerbose());
-        $this->assertTrue($output->isVeryVerbose());
-        $this->assertFalse($output->isDebug());
+        self::assertFalse($output->isQuiet());
+        self::assertTrue($output->isVerbose());
+        self::assertTrue($output->isVeryVerbose());
+        self::assertFalse($output->isDebug());
 
         $output->setVerbosity(Output::VERBOSITY_DEBUG);
-        $this->assertFalse($output->isQuiet());
-        $this->assertTrue($output->isVerbose());
-        $this->assertTrue($output->isVeryVerbose());
-        $this->assertTrue($output->isDebug());
+        self::assertFalse($output->isQuiet());
+        self::assertTrue($output->isVerbose());
+        self::assertTrue($output->isVeryVerbose());
+        self::assertTrue($output->isDebug());
     }
 
     public function testWriteWithVerbosityQuiet()
     {
         $output = new TestOutput(Output::VERBOSITY_QUIET);
         $output->writeln('foo');
-        $this->assertEquals('', $output->output, '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
+        self::assertEquals('', $output->output, '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
     }
 
     public function testWriteAnArrayOfMessages()
     {
         $output = new TestOutput();
         $output->writeln(['foo', 'bar']);
-        $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
+        self::assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
     }
 
     public function testWriteAnIterableOfMessages()
     {
         $output = new TestOutput();
         $output->writeln($this->generateMessages());
-        $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an iterable of messages to output');
+        self::assertEquals("foo\nbar\n", $output->output, '->writeln() can take an iterable of messages to output');
     }
 
     private function generateMessages(): iterable
@@ -101,7 +101,7 @@ class OutputTest extends TestCase
     {
         $output = new TestOutput();
         $output->writeln($message, $type);
-        $this->assertEquals($expectedOutput, $output->output);
+        self::assertEquals($expectedOutput, $output->output);
     }
 
     public function provideWriteArguments()
@@ -117,7 +117,7 @@ class OutputTest extends TestCase
         $output = new TestOutput();
         $output->setDecorated(false);
         $output->writeln('<info>foo</info>');
-        $this->assertEquals("foo\n", $output->output, '->writeln() strips decoration tags if decoration is set to false');
+        self::assertEquals("foo\n", $output->output, '->writeln() strips decoration tags if decoration is set to false');
     }
 
     public function testWriteDecoratedMessage()
@@ -127,7 +127,7 @@ class OutputTest extends TestCase
         $output->getFormatter()->setStyle('FOO', $fooStyle);
         $output->setDecorated(true);
         $output->writeln('<foo>foo</foo>');
-        $this->assertEquals("\033[33;41;5mfoo\033[39;49;25m\n", $output->output, '->writeln() decorates the output');
+        self::assertEquals("\033[33;41;5mfoo\033[39;49;25m\n", $output->output, '->writeln() decorates the output');
     }
 
     public function testWriteWithInvalidStyle()
@@ -136,11 +136,11 @@ class OutputTest extends TestCase
 
         $output->clear();
         $output->write('<bar>foo</bar>');
-        $this->assertEquals('<bar>foo</bar>', $output->output, '->write() do nothing when a style does not exist');
+        self::assertEquals('<bar>foo</bar>', $output->output, '->write() do nothing when a style does not exist');
 
         $output->clear();
         $output->writeln('<bar>foo</bar>');
-        $this->assertEquals("<bar>foo</bar>\n", $output->output, '->writeln() do nothing when a style does not exist');
+        self::assertEquals("<bar>foo</bar>\n", $output->output, '->writeln() do nothing when a style does not exist');
     }
 
     /**
@@ -158,7 +158,7 @@ class OutputTest extends TestCase
         $output->write('4', false, Output::VERBOSITY_VERBOSE);
         $output->write('5', false, Output::VERBOSITY_VERY_VERBOSE);
         $output->write('6', false, Output::VERBOSITY_DEBUG);
-        $this->assertEquals($expected, $output->output, $msg);
+        self::assertEquals($expected, $output->output, $msg);
     }
 
     public function verbosityProvider()

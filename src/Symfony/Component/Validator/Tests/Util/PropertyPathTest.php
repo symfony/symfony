@@ -21,7 +21,7 @@ class PropertyPathTest extends TestCase
      */
     public function testAppend($basePath, $subPath, $expectedPath, $message)
     {
-        $this->assertSame($expectedPath, PropertyPath::append($basePath, $subPath), $message);
+        self::assertSame($expectedPath, PropertyPath::append($basePath, $subPath), $message);
     }
 
     public function provideAppendPaths()

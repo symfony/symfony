@@ -51,7 +51,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
     public function testRequestShouldBeNull()
     {
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'), 'request');
     }
 
@@ -67,8 +67,8 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertSame('DATA', $form->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertSame('DATA', $form->getData());
     }
 
     public function testConvertEmptyUploadedFilesToNull()
@@ -85,8 +85,8 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertNull($form->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertNull($form->getData());
     }
 
     public function testFixBuggyFilesArray()
@@ -115,8 +115,8 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertEquals([
+        self::assertTrue($form->isSubmitted());
+        self::assertEquals([
             'name' => 'upload.txt',
             'type' => 'text/plain',
             'tmp_name' => 'owfdskjasdfsa',
@@ -153,8 +153,8 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($subfieldForm->isSubmitted());
-        $this->assertEquals([
+        self::assertTrue($subfieldForm->isSubmitted());
+        self::assertEquals([
             'name' => 'upload.txt',
             'type' => 'text/plain',
             'tmp_name' => 'owfdskjasdfsa',
@@ -175,7 +175,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertFalse($form->isSubmitted());
+        self::assertFalse($form->isSubmitted());
     }
 
     public function testFormIgnoresMethodFieldIfRequestMethodIsMatched()
@@ -192,7 +192,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertSame([], $form->getExtraData());
+        self::assertSame([], $form->getExtraData());
     }
 
     public function testFormDoesNotIgnoreMethodFieldIfRequestMethodIsNotMatched()
@@ -209,7 +209,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertSame(['_method' => 'DELETE'], $form->getExtraData());
+        self::assertSame(['_method' => 'DELETE'], $form->getExtraData());
     }
 
     public function testMethodSubFormIsSubmitted()
@@ -227,8 +227,8 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->get('_method')->isSubmitted());
-        $this->assertSame('PUT', $form->get('_method')->getData());
+        self::assertTrue($form->get('_method')->isSubmitted());
+        self::assertSame('PUT', $form->get('_method')->getData());
     }
 
     protected function setRequestData($method, $data, $files = [])

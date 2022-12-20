@@ -32,8 +32,8 @@ class FragmentListenerTest extends TestCase
 
         $listener->onKernelRequest($event);
 
-        $this->assertEquals($expected, $request->attributes->all());
-        $this->assertTrue($request->query->has('_path'));
+        self::assertEquals($expected, $request->attributes->all());
+        self::assertTrue($request->query->has('_path'));
     }
 
     public function testOnlyTriggeredIfControllerWasNotDefinedYet()
@@ -48,12 +48,12 @@ class FragmentListenerTest extends TestCase
 
         $listener->onKernelRequest($event);
 
-        $this->assertEquals($expected, $request->attributes->all());
+        self::assertEquals($expected, $request->attributes->all());
     }
 
     public function testAccessDeniedWithNonSafeMethods()
     {
-        $this->expectException(AccessDeniedHttpException::class);
+        self::expectException(AccessDeniedHttpException::class);
         $request = Request::create('http://example.com/_fragment', 'POST');
 
         $listener = new FragmentListener(new UriSigner('foo'));
@@ -64,7 +64,7 @@ class FragmentListenerTest extends TestCase
 
     public function testAccessDeniedWithWrongSignature()
     {
-        $this->expectException(AccessDeniedHttpException::class);
+        self::expectException(AccessDeniedHttpException::class);
         $request = Request::create('http://example.com/_fragment', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
 
         $listener = new FragmentListener(new UriSigner('foo'));
@@ -83,8 +83,8 @@ class FragmentListenerTest extends TestCase
 
         $listener->onKernelRequest($event);
 
-        $this->assertEquals(['foo' => 'bar', '_controller' => 'foo'], $request->attributes->get('_route_params'));
-        $this->assertFalse($request->query->has('_path'));
+        self::assertEquals(['foo' => 'bar', '_controller' => 'foo'], $request->attributes->get('_route_params'));
+        self::assertFalse($request->query->has('_path'));
     }
 
     public function testRemovesPathWithControllerDefined()
@@ -96,7 +96,7 @@ class FragmentListenerTest extends TestCase
 
         $listener->onKernelRequest($event);
 
-        $this->assertFalse($request->query->has('_path'));
+        self::assertFalse($request->query->has('_path'));
     }
 
     public function testRemovesPathWithControllerNotDefined()
@@ -109,11 +109,11 @@ class FragmentListenerTest extends TestCase
 
         $listener->onKernelRequest($event);
 
-        $this->assertFalse($request->query->has('_path'));
+        self::assertFalse($request->query->has('_path'));
     }
 
     private function createRequestEvent(Request $request, int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
-        return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, $requestType);
+        return new RequestEvent(self::createMock(HttpKernelInterface::class), $request, $requestType);
     }
 }

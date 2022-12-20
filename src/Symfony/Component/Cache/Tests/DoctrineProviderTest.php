@@ -26,23 +26,23 @@ class DoctrineProviderTest extends TestCase
         $pool = new ArrayAdapter();
         $cache = new DoctrineProvider($pool);
 
-        $this->assertInstanceOf(CacheProvider::class, $cache);
+        self::assertInstanceOf(CacheProvider::class, $cache);
 
         $key = '{}()/\@:';
 
-        $this->assertTrue($cache->delete($key));
-        $this->assertFalse($cache->contains($key));
+        self::assertTrue($cache->delete($key));
+        self::assertFalse($cache->contains($key));
 
-        $this->assertTrue($cache->save($key, 'bar'));
-        $this->assertTrue($cache->contains($key));
-        $this->assertSame('bar', $cache->fetch($key));
+        self::assertTrue($cache->save($key, 'bar'));
+        self::assertTrue($cache->contains($key));
+        self::assertSame('bar', $cache->fetch($key));
 
-        $this->assertTrue($cache->delete($key));
-        $this->assertFalse($cache->fetch($key));
-        $this->assertTrue($cache->save($key, 'bar'));
+        self::assertTrue($cache->delete($key));
+        self::assertFalse($cache->fetch($key));
+        self::assertTrue($cache->save($key, 'bar'));
 
         $cache->flushAll();
-        $this->assertFalse($cache->fetch($key));
-        $this->assertFalse($cache->contains($key));
+        self::assertFalse($cache->fetch($key));
+        self::assertFalse($cache->contains($key));
     }
 }

@@ -21,18 +21,18 @@ class HistoryTest extends TestCase
     {
         $history = new History();
         $history->add(new Request('http://www.example1.com/', 'get'));
-        $this->assertSame('http://www.example1.com/', $history->current()->getUri(), '->add() adds a request to the history');
+        self::assertSame('http://www.example1.com/', $history->current()->getUri(), '->add() adds a request to the history');
 
         $history->add(new Request('http://www.example2.com/', 'get'));
-        $this->assertSame('http://www.example2.com/', $history->current()->getUri(), '->add() adds a request to the history');
+        self::assertSame('http://www.example2.com/', $history->current()->getUri(), '->add() adds a request to the history');
 
         $history->add(new Request('http://www.example3.com/', 'get'));
         $history->back();
         $history->add(new Request('http://www.example4.com/', 'get'));
-        $this->assertSame('http://www.example4.com/', $history->current()->getUri(), '->add() adds a request to the history');
+        self::assertSame('http://www.example4.com/', $history->current()->getUri(), '->add() adds a request to the history');
 
         $history->back();
-        $this->assertSame('http://www.example2.com/', $history->current()->getUri(), '->add() adds a request to the history');
+        self::assertSame('http://www.example2.com/', $history->current()->getUri(), '->add() adds a request to the history');
     }
 
     public function testClearIsEmpty()
@@ -40,11 +40,11 @@ class HistoryTest extends TestCase
         $history = new History();
         $history->add(new Request('http://www.example.com/', 'get'));
 
-        $this->assertFalse($history->isEmpty(), '->isEmpty() returns false if the history is not empty');
+        self::assertFalse($history->isEmpty(), '->isEmpty() returns false if the history is not empty');
 
         $history->clear();
 
-        $this->assertTrue($history->isEmpty(), '->isEmpty() true if the history is empty');
+        self::assertTrue($history->isEmpty(), '->isEmpty() true if the history is empty');
     }
 
     public function testCurrent()
@@ -53,14 +53,14 @@ class HistoryTest extends TestCase
 
         try {
             $history->current();
-            $this->fail('->current() throws a \LogicException if the history is empty');
+            self::fail('->current() throws a \LogicException if the history is empty');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\LogicException::class, $e, '->current() throws a \LogicException if the history is empty');
+            self::assertInstanceOf(\LogicException::class, $e, '->current() throws a \LogicException if the history is empty');
         }
 
         $history->add(new Request('http://www.example.com/', 'get'));
 
-        $this->assertSame('http://www.example.com/', $history->current()->getUri(), '->current() returns the current request in the history');
+        self::assertSame('http://www.example.com/', $history->current()->getUri(), '->current() returns the current request in the history');
     }
 
     public function testBack()
@@ -70,15 +70,15 @@ class HistoryTest extends TestCase
 
         try {
             $history->back();
-            $this->fail('->back() throws a \LogicException if the history is already on the first page');
+            self::fail('->back() throws a \LogicException if the history is already on the first page');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\LogicException::class, $e, '->current() throws a \LogicException if the history is already on the first page');
+            self::assertInstanceOf(\LogicException::class, $e, '->current() throws a \LogicException if the history is already on the first page');
         }
 
         $history->add(new Request('http://www.example1.com/', 'get'));
         $history->back();
 
-        $this->assertSame('http://www.example.com/', $history->current()->getUri(), '->back() returns the previous request in the history');
+        self::assertSame('http://www.example.com/', $history->current()->getUri(), '->back() returns the previous request in the history');
     }
 
     public function testForward()
@@ -89,14 +89,14 @@ class HistoryTest extends TestCase
 
         try {
             $history->forward();
-            $this->fail('->forward() throws a \LogicException if the history is already on the last page');
+            self::fail('->forward() throws a \LogicException if the history is already on the last page');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\LogicException::class, $e, '->forward() throws a \LogicException if the history is already on the last page');
+            self::assertInstanceOf(\LogicException::class, $e, '->forward() throws a \LogicException if the history is already on the last page');
         }
 
         $history->back();
         $history->forward();
 
-        $this->assertSame('http://www.example1.com/', $history->current()->getUri(), '->forward() returns the next request in the history');
+        self::assertSame('http://www.example1.com/', $history->current()->getUri(), '->forward() returns the next request in the history');
     }
 }

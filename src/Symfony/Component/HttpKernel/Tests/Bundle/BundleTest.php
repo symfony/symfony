@@ -22,16 +22,13 @@ class BundleTest extends TestCase
     {
         $bundle = new ExtensionPresentBundle();
 
-        $this->assertInstanceOf(
-            'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\DependencyInjection\ExtensionPresentExtension',
-            $bundle->getContainerExtension()
-        );
+        self::assertInstanceOf('Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\DependencyInjection\ExtensionPresentExtension', $bundle->getContainerExtension());
     }
 
     public function testGetContainerExtensionWithInvalidClass()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface');
         $bundle = new ExtensionNotValidBundle();
         $bundle->getContainerExtension();
     }
@@ -40,17 +37,17 @@ class BundleTest extends TestCase
     {
         $bundle = new GuessedNameBundle();
 
-        $this->assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
-        $this->assertSame('GuessedNameBundle', $bundle->getName());
+        self::assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
+        self::assertSame('GuessedNameBundle', $bundle->getName());
     }
 
     public function testBundleNameCanBeExplicitlyProvided()
     {
         $bundle = new NamedBundle();
 
-        $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
-        $this->assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
-        $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
+        self::assertSame('ExplicitlyNamedBundle', $bundle->getName());
+        self::assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
+        self::assertSame('ExplicitlyNamedBundle', $bundle->getName());
     }
 }
 

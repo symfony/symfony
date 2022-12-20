@@ -27,8 +27,8 @@ class KeyTest extends TestCase
         $key->setState('foo', 'bar');
 
         $copy = unserialize(serialize($key));
-        $this->assertSame($key->getState('foo'), $copy->getState('foo'));
-        $this->assertEqualsWithDelta($key->getRemainingLifetime(), $copy->getRemainingLifetime(), 0.001);
+        self::assertSame($key->getState('foo'), $copy->getState('foo'));
+        self::assertEqualsWithDelta($key->getRemainingLifetime(), $copy->getRemainingLifetime(), 0.001);
     }
 
     public function testUnserialize()
@@ -36,7 +36,7 @@ class KeyTest extends TestCase
         $key = new Key(__METHOD__);
         $key->markUnserializable();
 
-        $this->expectException(UnserializableKeyException::class);
+        self::expectException(UnserializableKeyException::class);
         serialize($key);
     }
 }

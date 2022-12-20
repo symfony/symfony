@@ -19,19 +19,19 @@ class FileLocatorTest extends TestCase
 {
     public function testLocate()
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = self::createMock(KernelInterface::class);
         $kernel
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('locateResource')
             ->with('@BundleName/some/path')
             ->willReturn('/bundle-name/some/path');
         $locator = new FileLocator($kernel);
-        $this->assertEquals('/bundle-name/some/path', $locator->locate('@BundleName/some/path'));
+        self::assertEquals('/bundle-name/some/path', $locator->locate('@BundleName/some/path'));
 
         $kernel
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('locateResource');
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $locator->locate('/some/path');
     }
 }

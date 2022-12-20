@@ -19,7 +19,7 @@ final class MercureOptionsTest extends TestCase
 {
     public function testConstructWithDefaults()
     {
-        $this->assertSame((new MercureOptions())->toArray(), [
+        self::assertSame((new MercureOptions())->toArray(), [
             'topics' => null,
             'private' => false,
             'id' => null,
@@ -32,7 +32,7 @@ final class MercureOptionsTest extends TestCase
     {
         $options = (new MercureOptions('/topic/1', true, 'id', 'type', 1));
 
-        $this->assertSame($options->toArray(), [
+        self::assertSame($options->toArray(), [
             'topics' => ['/topic/1'],
             'private' => true,
             'id' => 'id',
@@ -43,7 +43,7 @@ final class MercureOptionsTest extends TestCase
 
     public function testConstructWithWrongTopicsThrows()
     {
-        $this->expectException(TypeError::class);
+        self::expectException(TypeError::class);
         new MercureOptions(new \stdClass());
     }
 }

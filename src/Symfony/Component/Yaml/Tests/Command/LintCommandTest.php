@@ -36,8 +36,8 @@ class LintCommandTest extends TestCase
 
         $ret = $tester->execute(['filename' => $filename], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertMatchesRegularExpression('/^\/\/ OK in /', trim($tester->getDisplay()));
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertMatchesRegularExpression('/^\/\/ OK in /', trim($tester->getDisplay()));
     }
 
     public function testLintCorrectFiles()
@@ -48,8 +48,8 @@ class LintCommandTest extends TestCase
 
         $ret = $tester->execute(['filename' => [$filename1, $filename2]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertMatchesRegularExpression('/^\/\/ OK in /', trim($tester->getDisplay()));
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertMatchesRegularExpression('/^\/\/ OK in /', trim($tester->getDisplay()));
     }
 
     public function testLintIncorrectFile()
@@ -62,15 +62,15 @@ bar';
 
         $ret = $tester->execute(['filename' => $filename], ['decorated' => false]);
 
-        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertStringContainsString('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
+        self::assertEquals(1, $ret, 'Returns 1 in case of error');
+        self::assertStringContainsString('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
     }
 
     public function testLintIncorrectFileWithGithubFormat()
     {
         if (!class_exists(GithubActionReporter::class)) {
-            $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('The "github" format is only available since "symfony/console" >= 5.3.');
+            self::expectException(\InvalidArgumentException::class);
+            self::expectExceptionMessage('The "github" format is only available since "symfony/console" >= 5.3.');
         }
 
         $incorrectContent = <<<YAML
@@ -93,7 +93,7 @@ YAML;
     public function testLintAutodetectsGithubActionEnvironment()
     {
         if (!class_exists(GithubActionReporter::class)) {
-            $this->markTestSkipped('The "github" format is only available since "symfony/console" >= 5.3.');
+            self::markTestSkipped('The "github" format is only available since "symfony/console" >= 5.3.');
         }
 
         $prev = getenv('GITHUB_ACTIONS');
@@ -123,7 +123,7 @@ YAML;
 !php/const 'Symfony\Component\Yaml\Tests\Command\Foo::TEST': bar
 YAML;
         $ret = $this->createCommandTester()->execute(['filename' => $this->createFile($yaml)], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
-        $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
+        self::assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
     }
 
     public function testCustomTags()
@@ -132,7 +132,7 @@ YAML;
 foo: !my_tag {foo: bar}
 YAML;
         $ret = $this->createCommandTester()->execute(['filename' => $this->createFile($yaml), '--parse-tags' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
-        $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
+        self::assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
     }
 
     public function testCustomTagsError()
@@ -141,7 +141,7 @@ YAML;
 foo: !my_tag {foo: bar}
 YAML;
         $ret = $this->createCommandTester()->execute(['filename' => $this->createFile($yaml)], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
-        $this->assertSame(1, $ret, 'lint:yaml exits with code 1 in case of error');
+        self::assertSame(1, $ret, 'lint:yaml exits with code 1 in case of error');
     }
 
     public function testLintWithExclude()
@@ -151,13 +151,13 @@ YAML;
         $filename2 = $this->createFile('bar: baz');
 
         $ret = $tester->execute(['filename' => [$filename1, $filename2], '--exclude' => [$filename1]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
-        $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
-        $this->assertStringContainsString('All 1 YAML files contain valid syntax.', trim($tester->getDisplay()));
+        self::assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
+        self::assertStringContainsString('All 1 YAML files contain valid syntax.', trim($tester->getDisplay()));
     }
 
     public function testLintFileNotReadable()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
         unlink($filename);
@@ -171,12 +171,12 @@ YAML;
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $tester = new CommandCompletionTester($this->createCommand());
 
-        $this->assertSame($expectedSuggestions, $tester->complete($input));
+        self::assertSame($expectedSuggestions, $tester->complete($input));
     }
 
     public function provideCompletionSuggestions()

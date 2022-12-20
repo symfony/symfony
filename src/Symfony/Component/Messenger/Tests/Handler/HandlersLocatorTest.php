@@ -22,7 +22,7 @@ class HandlersLocatorTest extends TestCase
 {
     public function testItYieldsHandlerDescriptors()
     {
-        $handler = $this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
+        $handler = self::createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
         $locator = new HandlersLocator([
             DummyMessage::class => [$handler],
         ]);
@@ -30,18 +30,18 @@ class HandlersLocatorTest extends TestCase
         $descriptor = new HandlerDescriptor($handler);
         $descriptor->getName();
 
-        $this->assertEquals([$descriptor], iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('a')))));
+        self::assertEquals([$descriptor], iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('a')))));
     }
 
     public function testItReturnsOnlyHandlersMatchingTransport()
     {
-        $firstHandler = $this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
-        $secondHandler = $this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
+        $firstHandler = self::createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
+        $secondHandler = self::createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']);
 
         $locator = new HandlersLocator([
             DummyMessage::class => [
                 $first = new HandlerDescriptor($firstHandler, ['alias' => 'one']),
-                new HandlerDescriptor($this->createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']), ['from_transport' => 'ignored', 'alias' => 'two']),
+                new HandlerDescriptor(self::createPartialMock(HandlersLocatorTestCallable::class, ['__invoke']), ['from_transport' => 'ignored', 'alias' => 'two']),
                 $second = new HandlerDescriptor($secondHandler, ['from_transport' => 'transportName', 'alias' => 'three']),
             ],
         ]);
@@ -49,7 +49,7 @@ class HandlersLocatorTest extends TestCase
         $first->getName();
         $second->getName();
 
-        $this->assertEquals([
+        self::assertEquals([
             $first,
             $second,
         ], iterator_to_array($locator->getHandlers(

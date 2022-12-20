@@ -29,10 +29,10 @@ class NativeFileSessionHandlerTest extends TestCase
     {
         new NativeSessionStorage(['name' => 'TESTING'], new NativeFileSessionHandler(sys_get_temp_dir()));
 
-        $this->assertEquals('user', \ini_get('session.save_handler'));
+        self::assertEquals('user', \ini_get('session.save_handler'));
 
-        $this->assertEquals(sys_get_temp_dir(), \ini_get('session.save_path'));
-        $this->assertEquals('TESTING', \ini_get('session.name'));
+        self::assertEquals(sys_get_temp_dir(), \ini_get('session.save_path'));
+        self::assertEquals('TESTING', \ini_get('session.name'));
     }
 
     /**
@@ -41,8 +41,8 @@ class NativeFileSessionHandlerTest extends TestCase
     public function testConstructSavePath($savePath, $expectedSavePath, $path)
     {
         new NativeFileSessionHandler($savePath);
-        $this->assertEquals($expectedSavePath, \ini_get('session.save_path'));
-        $this->assertDirectoryExists(realpath($path));
+        self::assertEquals($expectedSavePath, \ini_get('session.save_path'));
+        self::assertDirectoryExists(realpath($path));
 
         rmdir($path);
     }
@@ -60,7 +60,7 @@ class NativeFileSessionHandlerTest extends TestCase
 
     public function testConstructException()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new NativeFileSessionHandler('something;invalid;with;too-many-args');
     }
 
@@ -69,6 +69,6 @@ class NativeFileSessionHandlerTest extends TestCase
         $path = \ini_get('session.save_path');
         new NativeSessionStorage(['name' => 'TESTING'], new NativeFileSessionHandler());
 
-        $this->assertEquals($path, \ini_get('session.save_path'));
+        self::assertEquals($path, \ini_get('session.save_path'));
     }
 }

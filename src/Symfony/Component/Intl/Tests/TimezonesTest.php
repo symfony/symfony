@@ -470,7 +470,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetIds()
     {
-        $this->assertEquals(self::ZONES, Timezones::getIds());
+        self::assertEquals(self::ZONES, Timezones::getIds());
     }
 
     /**
@@ -482,15 +482,15 @@ class TimezonesTest extends ResourceBundleTestCase
 
         sort($zones);
 
-        $this->assertNotEmpty($zones);
-        $this->assertEmpty(array_diff($zones, self::ZONES));
+        self::assertNotEmpty($zones);
+        self::assertEmpty(array_diff($zones, self::ZONES));
     }
 
     public function testGetNamesDefaultLocale()
     {
         \Locale::setDefault('de_AT');
 
-        $this->assertSame(Timezones::getNames('de_AT'), Timezones::getNames());
+        self::assertSame(Timezones::getNames('de_AT'), Timezones::getNames());
     }
 
     /**
@@ -501,7 +501,7 @@ class TimezonesTest extends ResourceBundleTestCase
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(Timezones::getNames($ofLocale), Timezones::getNames($alias));
+        self::assertEquals(Timezones::getNames($ofLocale), Timezones::getNames($alias));
     }
 
     /**
@@ -512,7 +512,7 @@ class TimezonesTest extends ResourceBundleTestCase
         $names = Timezones::getNames($displayLocale);
 
         foreach ($names as $language => $name) {
-            $this->assertSame($name, Timezones::getName($language, $displayLocale));
+            self::assertSame($name, Timezones::getName($language, $displayLocale));
         }
     }
 
@@ -523,35 +523,35 @@ class TimezonesTest extends ResourceBundleTestCase
         $names = Timezones::getNames('de_AT');
 
         foreach ($names as $language => $name) {
-            $this->assertSame($name, Timezones::getName($language));
+            self::assertSame($name, Timezones::getName($language));
         }
     }
 
     public function testGetNameWithInvalidTimezone()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Timezones::getName('foo');
     }
 
     public function testGetNameWithAliasTimezone()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Timezones::getName('US/Pacific'); // alias in icu (not compiled), name unavailable in php
     }
 
     public function testExists()
     {
-        $this->assertTrue(Timezones::exists('Europe/Amsterdam'));
-        $this->assertTrue(Timezones::exists('US/Pacific')); // alias in icu (not compiled), identifier available in php
-        $this->assertFalse(Timezones::exists('Etc/Unknown'));
+        self::assertTrue(Timezones::exists('Europe/Amsterdam'));
+        self::assertTrue(Timezones::exists('US/Pacific')); // alias in icu (not compiled), identifier available in php
+        self::assertFalse(Timezones::exists('Etc/Unknown'));
     }
 
     public function testGetRawOffset()
     {
         // timezones free from DST changes to avoid time-based variance
-        $this->assertSame(0, Timezones::getRawOffset('Etc/UTC'));
-        $this->assertSame(-10800, Timezones::getRawOffset('America/Buenos_Aires'));
-        $this->assertSame(20700, Timezones::getRawOffset('Asia/Katmandu'));
+        self::assertSame(0, Timezones::getRawOffset('Etc/UTC'));
+        self::assertSame(-10800, Timezones::getRawOffset('America/Buenos_Aires'));
+        self::assertSame(20700, Timezones::getRawOffset('Asia/Katmandu'));
 
         // ensure we support identifiers available in php (not compiled from icu)
         Timezones::getRawOffset('US/Pacific');
@@ -559,52 +559,52 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetRawOffsetWithUnknownTimezone()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Unknown or bad timezone (foobar)');
+        self::expectException(\Exception::class);
+        self::expectExceptionMessage('Unknown or bad timezone (foobar)');
         Timezones::getRawOffset('foobar');
     }
 
     public function testGetGmtOffset()
     {
         // timezones free from DST changes to avoid time-based variance
-        $this->assertSame('GMT+00:00', Timezones::getGmtOffset('Etc/UTC'));
-        $this->assertSame('UTC+00:00', Timezones::getGmtOffset('Etc/UTC', null, 'fr'));
-        $this->assertSame('GMT +00:00', Timezones::getGmtOffset('Etc/GMT', null, 'ur'));
-        $this->assertSame('GMT+00:00', Timezones::getGmtOffset('Etc/GMT', null, 'ur_IN'));
-        $this->assertSame('GMT-03:00', Timezones::getGmtOffset('America/Buenos_Aires'));
-        $this->assertSame('ཇི་ཨེམ་ཏི་-03:00', Timezones::getGmtOffset('America/Buenos_Aires', null, 'dz'));
-        $this->assertSame('GMT+05:45', Timezones::getGmtOffset('Asia/Katmandu'));
-        $this->assertSame('GMT+5:45', Timezones::getGmtOffset('Asia/Katmandu', null, 'cs'));
+        self::assertSame('GMT+00:00', Timezones::getGmtOffset('Etc/UTC'));
+        self::assertSame('UTC+00:00', Timezones::getGmtOffset('Etc/UTC', null, 'fr'));
+        self::assertSame('GMT +00:00', Timezones::getGmtOffset('Etc/GMT', null, 'ur'));
+        self::assertSame('GMT+00:00', Timezones::getGmtOffset('Etc/GMT', null, 'ur_IN'));
+        self::assertSame('GMT-03:00', Timezones::getGmtOffset('America/Buenos_Aires'));
+        self::assertSame('ཇི་ཨེམ་ཏི་-03:00', Timezones::getGmtOffset('America/Buenos_Aires', null, 'dz'));
+        self::assertSame('GMT+05:45', Timezones::getGmtOffset('Asia/Katmandu'));
+        self::assertSame('GMT+5:45', Timezones::getGmtOffset('Asia/Katmandu', null, 'cs'));
     }
 
     public function testGetCountryCode()
     {
-        $this->assertSame('NL', Timezones::getCountryCode('Europe/Amsterdam'));
-        $this->assertSame('US', Timezones::getCountryCode('America/New_York'));
+        self::assertSame('NL', Timezones::getCountryCode('Europe/Amsterdam'));
+        self::assertSame('US', Timezones::getCountryCode('America/New_York'));
     }
 
     public function testForCountryCode()
     {
-        $this->assertSame(['Europe/Amsterdam'], Timezones::forCountryCode('NL'));
-        $this->assertSame(['Europe/Berlin', 'Europe/Busingen'], Timezones::forCountryCode('DE'));
+        self::assertSame(['Europe/Amsterdam'], Timezones::forCountryCode('NL'));
+        self::assertSame(['Europe/Berlin', 'Europe/Busingen'], Timezones::forCountryCode('DE'));
     }
 
     public function testForCountryCodeWithUnknownCountry()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Timezones::forCountryCode('foobar');
     }
 
     public function testForCountryCodeWithWrongCountryCode()
     {
-        $this->expectException(MissingResourceException::class);
-        $this->expectExceptionMessage('Country codes must be in uppercase, but "nl" was passed. Try with "NL" country code instead.');
+        self::expectException(MissingResourceException::class);
+        self::expectExceptionMessage('Country codes must be in uppercase, but "nl" was passed. Try with "NL" country code instead.');
         Timezones::forCountryCode('nl');
     }
 
     public function testGetCountryCodeWithUnknownTimezone()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Timezones::getCountryCode('foobar');
     }
 
@@ -617,7 +617,7 @@ class TimezonesTest extends ResourceBundleTestCase
         Timezones::getRawOffset($timezone);
         Timezones::getGmtOffset($timezone);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     /**
@@ -629,12 +629,12 @@ class TimezonesTest extends ResourceBundleTestCase
             // ensure each timezone identifier has a corresponding country code
             Timezones::getCountryCode($timezone);
 
-            $this->addToAssertionCount(1);
+            self::addToAssertionCount(1);
         } catch (MissingResourceException $e) {
             if (\in_array($timezone, self::ZONES_NO_COUNTRY, true)) {
-                $this->markTestSkipped();
+                self::markTestSkipped();
             } else {
-                $this->fail();
+                self::fail();
             }
         }
     }
@@ -654,7 +654,7 @@ class TimezonesTest extends ResourceBundleTestCase
         // ensure each country code has a list of timezone identifiers (possibly empty)
         Timezones::forCountryCode($country);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function provideCountries(): iterable
@@ -666,7 +666,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetRawOffsetChangeTimeCountry()
     {
-        $this->assertSame(7200, Timezones::getRawOffset('Europe/Paris', (new \DateTime('2022-07-16 00:00:00+00:00'))->getTimestamp()));
-        $this->assertSame(3600, Timezones::getRawOffset('Europe/Paris', (new \DateTime('2022-02-16 00:00:00+00:00'))->getTimestamp()));
+        self::assertSame(7200, Timezones::getRawOffset('Europe/Paris', (new \DateTime('2022-07-16 00:00:00+00:00'))->getTimestamp()));
+        self::assertSame(3600, Timezones::getRawOffset('Europe/Paris', (new \DateTime('2022-02-16 00:00:00+00:00'))->getTimestamp()));
     }
 }

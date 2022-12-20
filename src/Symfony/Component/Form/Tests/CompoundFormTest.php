@@ -69,7 +69,7 @@ class CompoundFormTest extends TestCase
             'lastName' => 'Schussek',
         ]);
 
-        $this->assertTrue($this->form->isValid());
+        self::assertTrue($this->form->isValid());
     }
 
     public function testInvalidIfChildIsInvalid()
@@ -84,7 +84,7 @@ class CompoundFormTest extends TestCase
 
         $this->form->get('lastName')->addError(new FormError('Invalid'));
 
-        $this->assertFalse($this->form->isValid());
+        self::assertFalse($this->form->isValid());
     }
 
     public function testDisabledFormsValidEvenIfChildrenInvalid()
@@ -100,7 +100,7 @@ class CompoundFormTest extends TestCase
 
         $form->get('name')->addError(new FormError('Invalid'));
 
-        $this->assertTrue($form->isValid());
+        self::assertTrue($form->isValid());
     }
 
     public function testSubmitForwardsNullIfNotClearMissingButValueIsExplicitlyNull()
@@ -111,7 +111,7 @@ class CompoundFormTest extends TestCase
 
         $this->form->submit(['firstName' => null], false);
 
-        $this->assertNull($this->form->get('firstName')->getData());
+        self::assertNull($this->form->get('firstName')->getData());
     }
 
     public function testSubmitForwardsNullIfValueIsMissing()
@@ -122,7 +122,7 @@ class CompoundFormTest extends TestCase
 
         $this->form->submit([]);
 
-        $this->assertNull($this->form->get('firstName')->getData());
+        self::assertNull($this->form->get('firstName')->getData());
     }
 
     public function testSubmitDoesNotForwardNullIfNotClearMissing()
@@ -133,7 +133,7 @@ class CompoundFormTest extends TestCase
 
         $this->form->submit([], false);
 
-        $this->assertFalse($child->isSubmitted());
+        self::assertFalse($child->isSubmitted());
     }
 
     public function testSubmitDoesNotAddExtraFieldForNullValues()
@@ -146,7 +146,7 @@ class CompoundFormTest extends TestCase
         $this->form->add($child);
         $this->form->submit(['file' => null], false);
 
-        $this->assertCount(0, $this->form->getExtraData());
+        self::assertCount(0, $this->form->getExtraData());
     }
 
     public function testClearMissingFlagIsForwarded()
@@ -165,10 +165,10 @@ class CompoundFormTest extends TestCase
 
         $this->form->submit(['person' => ['firstName' => 'foo']], false);
 
-        $this->assertTrue($firstNameForm->isSubmitted());
-        $this->assertSame('foo', $firstNameForm->getData());
-        $this->assertFalse($lastNameForm->isSubmitted());
-        $this->assertSame('last name', $lastNameForm->getData());
+        self::assertTrue($firstNameForm->isSubmitted());
+        self::assertSame('foo', $firstNameForm->getData());
+        self::assertFalse($lastNameForm->isSubmitted());
+        self::assertSame('last name', $lastNameForm->getData());
     }
 
     public function testCloneChildren()
@@ -178,9 +178,9 @@ class CompoundFormTest extends TestCase
 
         $clone = clone $this->form;
 
-        $this->assertNotSame($this->form, $clone);
-        $this->assertNotSame($child, $clone['child']);
-        $this->assertNotSame($this->form['child'], $clone['child']);
+        self::assertNotSame($this->form, $clone);
+        self::assertNotSame($child, $clone['child']);
+        self::assertNotSame($this->form['child'], $clone['child']);
     }
 
     public function testNotEmptyIfChildNotEmpty()
@@ -191,7 +191,7 @@ class CompoundFormTest extends TestCase
         $this->form->add($child);
         $child->setData('foo');
 
-        $this->assertFalse($this->form->isEmpty());
+        self::assertFalse($this->form->isEmpty());
     }
 
     public function testAdd()
@@ -199,21 +199,21 @@ class CompoundFormTest extends TestCase
         $child = $this->getBuilder('foo')->getForm();
         $this->form->add($child);
 
-        $this->assertTrue($this->form->has('foo'));
-        $this->assertSame($this->form, $child->getParent());
-        $this->assertSame(['foo' => $child], $this->form->all());
+        self::assertTrue($this->form->has('foo'));
+        self::assertSame($this->form, $child->getParent());
+        self::assertSame(['foo' => $child], $this->form->all());
     }
 
     public function testAddUsingNameAndType()
     {
         $this->form->add('foo', TextType::class);
 
-        $this->assertTrue($this->form->has('foo'));
+        self::assertTrue($this->form->has('foo'));
 
         $child = $this->form->get('foo');
 
-        $this->assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
-        $this->assertSame(['foo' => $child], $this->form->all());
+        self::assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
+        self::assertSame(['foo' => $child], $this->form->all());
     }
 
     public function testAddUsingIntegerNameAndType()
@@ -221,24 +221,24 @@ class CompoundFormTest extends TestCase
         // in order to make casting unnecessary
         $this->form->add(0, TextType::class);
 
-        $this->assertTrue($this->form->has(0));
+        self::assertTrue($this->form->has(0));
 
         $child = $this->form->get(0);
 
-        $this->assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
-        $this->assertSame([0 => $child], $this->form->all());
+        self::assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
+        self::assertSame([0 => $child], $this->form->all());
     }
 
     public function testAddWithoutType()
     {
         $this->form->add('foo');
 
-        $this->assertTrue($this->form->has('foo'));
+        self::assertTrue($this->form->has('foo'));
 
         $child = $this->form->get('foo');
 
-        $this->assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
-        $this->assertSame(['foo' => $child], $this->form->all());
+        self::assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
+        self::assertSame(['foo' => $child], $this->form->all());
     }
 
     public function testAddUsingNameButNoType()
@@ -250,12 +250,12 @@ class CompoundFormTest extends TestCase
 
         $this->form->add('foo');
 
-        $this->assertTrue($this->form->has('foo'));
+        self::assertTrue($this->form->has('foo'));
 
         $child = $this->form->get('foo');
 
-        $this->assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
-        $this->assertSame(['foo' => $child], $this->form->all());
+        self::assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
+        self::assertSame(['foo' => $child], $this->form->all());
     }
 
     public function testAddUsingNameButNoTypeAndOptions()
@@ -267,17 +267,17 @@ class CompoundFormTest extends TestCase
 
         $this->form->add('foo');
 
-        $this->assertTrue($this->form->has('foo'));
+        self::assertTrue($this->form->has('foo'));
 
         $child = $this->form->get('foo');
 
-        $this->assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
-        $this->assertSame(['foo' => $child], $this->form->all());
+        self::assertInstanceOf(TextType::class, $child->getConfig()->getType()->getInnerType());
+        self::assertSame(['foo' => $child], $this->form->all());
     }
 
     public function testAddThrowsExceptionIfAlreadySubmitted()
     {
-        $this->expectException(AlreadySubmittedException::class);
+        self::expectException(AlreadySubmittedException::class);
         $this->form->submit([]);
         $this->form->add($this->getBuilder('foo')->getForm());
     }
@@ -288,13 +288,13 @@ class CompoundFormTest extends TestCase
         $this->form->add($child);
         $this->form->remove('foo');
 
-        $this->assertNull($child->getParent());
-        $this->assertCount(0, $this->form);
+        self::assertNull($child->getParent());
+        self::assertCount(0, $this->form);
     }
 
     public function testRemoveThrowsExceptionIfAlreadySubmitted()
     {
-        $this->expectException(AlreadySubmittedException::class);
+        self::expectException(AlreadySubmittedException::class);
         $this->form->add($this->getBuilder('foo')->setCompound(false)->getForm());
         $this->form->submit(['foo' => 'bar']);
         $this->form->remove('foo');
@@ -304,7 +304,7 @@ class CompoundFormTest extends TestCase
     {
         $this->form->remove('notexisting');
 
-        $this->assertCount(0, $this->form);
+        self::assertCount(0, $this->form);
     }
 
     public function testArrayAccess()
@@ -313,12 +313,12 @@ class CompoundFormTest extends TestCase
 
         $this->form[] = $child;
 
-        $this->assertArrayHasKey('foo', $this->form);
-        $this->assertSame($child, $this->form['foo']);
+        self::assertArrayHasKey('foo', $this->form);
+        self::assertSame($child, $this->form['foo']);
 
         unset($this->form['foo']);
 
-        $this->assertArrayNotHasKey('foo', $this->form);
+        self::assertArrayNotHasKey('foo', $this->form);
     }
 
     public function testCountable()
@@ -326,7 +326,7 @@ class CompoundFormTest extends TestCase
         $this->form->add($this->getBuilder('foo')->getForm());
         $this->form->add($this->getBuilder('bar')->getForm());
 
-        $this->assertCount(2, $this->form);
+        self::assertCount(2, $this->form);
     }
 
     public function testIterator()
@@ -334,7 +334,7 @@ class CompoundFormTest extends TestCase
         $this->form->add($this->getBuilder('foo')->getForm());
         $this->form->add($this->getBuilder('bar')->getForm());
 
-        $this->assertSame($this->form->all(), iterator_to_array($this->form));
+        self::assertSame($this->form->all(), iterator_to_array($this->form));
     }
 
     public function testAddMapsViewDataToFormIfInitialized()
@@ -347,12 +347,12 @@ class CompoundFormTest extends TestCase
 
         $child = $this->getBuilder('child')->getForm();
 
-        $this->assertNull($child->getData());
+        self::assertNull($child->getData());
 
         $form->initialize();
         $form->add($child);
 
-        $this->assertSame('foo', $child->getData());
+        self::assertSame('foo', $child->getData());
     }
 
     public function testAddDoesNotMapViewDataToFormIfNotInitialized()
@@ -366,9 +366,9 @@ class CompoundFormTest extends TestCase
 
         $form->add($child);
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertNull($form->getViewData());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertNull($form->getViewData());
     }
 
     public function testAddDoesNotMapViewDataToFormIfInheritData()
@@ -385,9 +385,9 @@ class CompoundFormTest extends TestCase
         $form->initialize();
         $form->add($child);
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertNull($form->getViewData());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertNull($form->getViewData());
     }
 
     public function testSetDataSupportsDynamicAdditionAndRemovalOfChildren()
@@ -417,8 +417,8 @@ class CompoundFormTest extends TestCase
         // pass NULL to all children
         $form->setData([]);
 
-        $this->assertFalse($form->has('removed'));
-        $this->assertTrue($form->has('added'));
+        self::assertFalse($form->has('removed'));
+        self::assertTrue($form->has('added'));
     }
 
     public function testSetDataMapsViewDataToChildren()
@@ -431,16 +431,16 @@ class CompoundFormTest extends TestCase
         $form->add($child1 = $this->getBuilder('firstName')->getForm());
         $form->add($child2 = $this->getBuilder('lastName')->getForm());
 
-        $this->assertNull($child1->getData());
-        $this->assertNull($child2->getData());
+        self::assertNull($child1->getData());
+        self::assertNull($child2->getData());
 
         $form->setData([
             'firstName' => 'foo',
             'lastName' => 'bar',
         ]);
 
-        $this->assertSame('foo', $child1->getData());
-        $this->assertSame('bar', $child2->getData());
+        self::assertSame('foo', $child1->getData());
+        self::assertSame('bar', $child2->getData());
     }
 
     public function testSetDataDoesNotMapViewDataToChildrenWithLockedSetData()
@@ -464,8 +464,8 @@ class CompoundFormTest extends TestCase
 
         $form->setData('foo');
 
-        $this->assertSame('Fabien', $form->get('firstName')->getData());
-        $this->assertSame('Potencier', $form->get('lastName')->getData());
+        self::assertSame('Fabien', $form->get('firstName')->getData());
+        self::assertSame('Potencier', $form->get('lastName')->getData());
     }
 
     public function testSubmitSupportsDynamicAdditionAndRemovalOfChildren()
@@ -487,8 +487,8 @@ class CompoundFormTest extends TestCase
         // pass NULL to all children
         $this->form->submit([]);
 
-        $this->assertFalse($childToBeRemoved->isSubmitted());
-        $this->assertTrue($childToBeAdded->isSubmitted());
+        self::assertFalse($childToBeRemoved->isSubmitted());
+        self::assertTrue($childToBeAdded->isSubmitted());
     }
 
     public function testSubmitMapsSubmittedChildrenOntoExistingViewData()
@@ -505,14 +505,14 @@ class CompoundFormTest extends TestCase
         $form->add($child1 = $this->getBuilder('firstName')->setCompound(false)->getForm());
         $form->add($child2 = $this->getBuilder('lastName')->setCompound(false)->getForm());
 
-        $this->assertSame(['firstName' => null, 'lastName' => null], $form->getData());
+        self::assertSame(['firstName' => null, 'lastName' => null], $form->getData());
 
         $form->submit([
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ]);
 
-        $this->assertSame(['firstName' => 'Bernhard', 'lastName' => 'Schussek'], $form->getData());
+        self::assertSame(['firstName' => 'Bernhard', 'lastName' => 'Schussek'], $form->getData());
     }
 
     public function testMapFormsToDataIsNotInvokedIfInheritData()
@@ -530,12 +530,12 @@ class CompoundFormTest extends TestCase
             'lastName' => 'Schussek',
         ]);
 
-        $this->assertNull($child1->getData());
-        $this->assertNull($child1->getNormData());
-        $this->assertNull($child1->getViewData());
-        $this->assertNull($child2->getData());
-        $this->assertNull($child2->getNormData());
-        $this->assertNull($child2->getViewData());
+        self::assertNull($child1->getData());
+        self::assertNull($child1->getNormData());
+        self::assertNull($child1->getViewData());
+        self::assertNull($child2->getData());
+        self::assertNull($child2->getNormData());
+        self::assertNull($child2->getViewData());
     }
 
     /*
@@ -552,7 +552,7 @@ class CompoundFormTest extends TestCase
 
         $form->submit([]);
 
-        $this->assertSame($object, $form->getData());
+        self::assertSame($object, $form->getData());
     }
 
     public function testSubmitMapsSubmittedChildrenOntoEmptyData()
@@ -571,7 +571,7 @@ class CompoundFormTest extends TestCase
             'name' => 'Bernhard',
         ]);
 
-        $this->assertSame('Bernhard', $object['name']);
+        self::assertSame('Bernhard', $object['name']);
     }
 
     public function requestMethodProvider()
@@ -626,8 +626,8 @@ class CompoundFormTest extends TestCase
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', \UPLOAD_ERR_OK);
 
-        $this->assertEquals('Bernhard', $form['name']->getData());
-        $this->assertEquals($file, $form['image']->getData());
+        self::assertEquals('Bernhard', $form['name']->getData());
+        self::assertEquals($file, $form['image']->getData());
 
         unlink($path);
     }
@@ -673,9 +673,9 @@ class CompoundFormTest extends TestCase
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', \UPLOAD_ERR_OK);
 
-        $this->assertEquals('Bernhard', $form['name']->getData());
-        $this->assertEquals($file, $form['image']->getData());
-        $this->assertEquals(['extra' => 'data'], $form->getExtraData());
+        self::assertEquals('Bernhard', $form['name']->getData());
+        self::assertEquals($file, $form['image']->getData());
+        self::assertEquals(['extra' => 'data'], $form->getExtraData());
 
         unlink($path);
     }
@@ -712,7 +712,7 @@ class CompoundFormTest extends TestCase
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', \UPLOAD_ERR_OK);
 
-        $this->assertEquals($file, $form->getData());
+        self::assertEquals($file, $form->getData());
 
         unlink($path);
     }
@@ -741,7 +741,7 @@ class CompoundFormTest extends TestCase
 
         $form->handleRequest($request);
 
-        $this->assertEquals('Bernhard', $form->getData());
+        self::assertEquals('Bernhard', $form->getData());
 
         unlink($path);
     }
@@ -770,8 +770,8 @@ class CompoundFormTest extends TestCase
 
         $form->handleRequest($request);
 
-        $this->assertEquals('Bernhard', $form['firstName']->getData());
-        $this->assertEquals('Schussek', $form['lastName']->getData());
+        self::assertEquals('Bernhard', $form['firstName']->getData());
+        self::assertEquals('Schussek', $form['lastName']->getData());
     }
 
     public function testSubmitGetRequestWithEmptyRootFormName()
@@ -797,9 +797,9 @@ class CompoundFormTest extends TestCase
 
         $form->handleRequest($request);
 
-        $this->assertEquals('Bernhard', $form['firstName']->getData());
-        $this->assertEquals('Schussek', $form['lastName']->getData());
-        $this->assertEquals(['extra' => 'data'], $form->getExtraData());
+        self::assertEquals('Bernhard', $form['firstName']->getData());
+        self::assertEquals('Schussek', $form['lastName']->getData());
+        self::assertEquals(['extra' => 'data'], $form->getExtraData());
     }
 
     public function testGetErrors()
@@ -809,13 +809,10 @@ class CompoundFormTest extends TestCase
 
         $errors = $this->form->getErrors();
 
-        $this->assertSame(
-            "ERROR: Error 1\n".
-            "ERROR: Error 2\n",
-            (string) $errors
-        );
+        self::assertSame("ERROR: Error 1\n".
+        "ERROR: Error 2\n", (string) $errors);
 
-        $this->assertSame([$error1, $error2], iterator_to_array($errors));
+        self::assertSame([$error1, $error2], iterator_to_array($errors));
     }
 
     public function testGetErrorsDeep()
@@ -829,17 +826,11 @@ class CompoundFormTest extends TestCase
 
         $errors = $this->form->getErrors(true);
 
-        $this->assertSame(
-            "ERROR: Error 1\n".
-            "ERROR: Error 2\n".
-            "ERROR: Nested Error\n",
-            (string) $errors
-        );
+        self::assertSame("ERROR: Error 1\n".
+        "ERROR: Error 2\n".
+        "ERROR: Nested Error\n", (string) $errors);
 
-        $this->assertSame(
-            [$error1, $error2, $nestedError],
-            iterator_to_array($errors)
-        );
+        self::assertSame([$error1, $error2, $nestedError], iterator_to_array($errors));
     }
 
     public function testGetErrorsDeepRecursive()
@@ -853,24 +844,21 @@ class CompoundFormTest extends TestCase
 
         $errors = $this->form->getErrors(true, false);
 
-        $this->assertSame(
-            "ERROR: Error 1\n".
-            "ERROR: Error 2\n".
-            "Child:\n".
-            "    ERROR: Nested Error\n",
-            (string) $errors
-        );
+        self::assertSame("ERROR: Error 1\n".
+        "ERROR: Error 2\n".
+        "Child:\n".
+        "    ERROR: Nested Error\n", (string) $errors);
 
         $errorsAsArray = iterator_to_array($errors);
 
-        $this->assertSame($error1, $errorsAsArray[0]);
-        $this->assertSame($error2, $errorsAsArray[1]);
-        $this->assertInstanceOf(FormErrorIterator::class, $errorsAsArray[2]);
+        self::assertSame($error1, $errorsAsArray[0]);
+        self::assertSame($error2, $errorsAsArray[1]);
+        self::assertInstanceOf(FormErrorIterator::class, $errorsAsArray[2]);
 
         $nestedErrorsAsArray = iterator_to_array($errorsAsArray[2]);
 
-        $this->assertCount(1, $nestedErrorsAsArray);
-        $this->assertSame($nestedError, $nestedErrorsAsArray[0]);
+        self::assertCount(1, $nestedErrorsAsArray);
+        self::assertSame($nestedError, $nestedErrorsAsArray[0]);
     }
 
     public function testClearErrors()
@@ -878,11 +866,11 @@ class CompoundFormTest extends TestCase
         $this->form->addError(new FormError('Error 1'));
         $this->form->addError(new FormError('Error 2'));
 
-        $this->assertCount(2, $this->form->getErrors());
+        self::assertCount(2, $this->form->getErrors());
 
         $this->form->clearErrors();
 
-        $this->assertCount(0, $this->form->getErrors());
+        self::assertCount(0, $this->form->getErrors());
     }
 
     public function testClearErrorsShallow()
@@ -896,8 +884,8 @@ class CompoundFormTest extends TestCase
 
         $this->form->clearErrors(false);
 
-        $this->assertCount(0, $this->form->getErrors(false));
-        $this->assertCount(1, $this->form->getErrors(true));
+        self::assertCount(0, $this->form->getErrors(false));
+        self::assertCount(1, $this->form->getErrors(true));
     }
 
     public function testClearErrorsDeep()
@@ -911,16 +899,16 @@ class CompoundFormTest extends TestCase
 
         $this->form->clearErrors(true);
 
-        $this->assertCount(0, $this->form->getErrors(false));
-        $this->assertCount(0, $this->form->getErrors(true));
+        self::assertCount(0, $this->form->getErrors(false));
+        self::assertCount(0, $this->form->getErrors(true));
     }
 
     // Basic cases are covered in SimpleFormTest
     public function testCreateViewWithChildren()
     {
-        $type = $this->createMock(ResolvedFormTypeInterface::class);
-        $type1 = $this->createMock(ResolvedFormTypeInterface::class);
-        $type2 = $this->createMock(ResolvedFormTypeInterface::class);
+        $type = self::createMock(ResolvedFormTypeInterface::class);
+        $type1 = self::createMock(ResolvedFormTypeInterface::class);
+        $type2 = self::createMock(ResolvedFormTypeInterface::class);
         $options = ['a' => 'Foo', 'b' => 'Bar'];
         $field1 = $this->getBuilder('foo')
             ->setType($type1)
@@ -948,28 +936,28 @@ class CompoundFormTest extends TestCase
 
         $assertChildViewsEqual = function (array $childViews) {
             return function (FormView $view) use ($childViews) {
-                $this->assertSame($childViews, $view->children);
+                self::assertSame($childViews, $view->children);
             };
         };
 
         // First create the view
-        $type->expects($this->once())
+        $type->expects(self::once())
             ->method('createView')
             ->willReturn($view);
 
         // Then build it for the form itself
-        $type->expects($this->once())
+        $type->expects(self::once())
             ->method('buildView')
             ->with($view, $this->form, $options)
             ->willReturnCallback($assertChildViewsEqual([]));
 
-        $this->assertSame($view, $this->form->createView());
-        $this->assertSame(['foo' => $field1View, 'bar' => $field2View], $view->children);
+        self::assertSame($view, $this->form->createView());
+        self::assertSame(['foo' => $field1View, 'bar' => $field2View], $view->children);
     }
 
     public function testNoClickedButtonBeforeSubmission()
     {
-        $this->assertNull($this->form->getClickedButton());
+        self::assertNull($this->form->getClickedButton());
     }
 
     public function testNoClickedButton()
@@ -982,7 +970,7 @@ class CompoundFormTest extends TestCase
         $this->form->add($nestedForm);
         $this->form->submit([]);
 
-        $this->assertNull($this->form->getClickedButton());
+        self::assertNull($this->form->getClickedButton());
     }
 
     public function testClickedButton()
@@ -992,7 +980,7 @@ class CompoundFormTest extends TestCase
         $this->form->add($button);
         $this->form->submit(['submit' => '']);
 
-        $this->assertSame($button, $this->form->getClickedButton());
+        self::assertSame($button, $this->form->getClickedButton());
     }
 
     public function testClickedButtonFromNestedForm()
@@ -1009,7 +997,7 @@ class CompoundFormTest extends TestCase
             ],
         ]);
 
-        $this->assertSame($button, $this->form->getClickedButton());
+        self::assertSame($button, $this->form->getClickedButton());
     }
 
     public function testClickedButtonFromParentForm()
@@ -1023,7 +1011,7 @@ class CompoundFormTest extends TestCase
             'submit' => '',
         ]);
 
-        $this->assertSame($button, $this->form->getClickedButton());
+        self::assertSame($button, $this->form->getClickedButton());
     }
 
     public function testDisabledButtonIsNotSubmitted()
@@ -1043,9 +1031,9 @@ class CompoundFormTest extends TestCase
             'submit' => '',
         ]);
 
-        $this->assertTrue($submit->isDisabled());
-        $this->assertFalse($submit->isClicked());
-        $this->assertFalse($submit->isSubmitted());
+        self::assertTrue($submit->isDisabled());
+        self::assertFalse($submit->isClicked());
+        self::assertFalse($submit->isSubmitted());
     }
 
     public function testArrayTransformationFailureOnSubmit()
@@ -1058,11 +1046,11 @@ class CompoundFormTest extends TestCase
             'bar' => ['bar'],
         ]);
 
-        $this->assertNull($this->form->get('foo')->getData());
-        $this->assertSame('Submitted data was expected to be text or number, array given.', $this->form->get('foo')->getTransformationFailure()->getMessage());
+        self::assertNull($this->form->get('foo')->getData());
+        self::assertSame('Submitted data was expected to be text or number, array given.', $this->form->get('foo')->getTransformationFailure()->getMessage());
 
-        $this->assertNull($this->form->get('bar')->getData());
-        $this->assertSame('Submitted data was expected to be text or number, array given.', $this->form->get('bar')->getTransformationFailure()->getMessage());
+        self::assertNull($this->form->get('bar')->getData());
+        self::assertSame('Submitted data was expected to be text or number, array given.', $this->form->get('bar')->getTransformationFailure()->getMessage());
     }
 
     public function testFileUpload()
@@ -1076,8 +1064,8 @@ class CompoundFormTest extends TestCase
             'bar' => new UploadedFile(__FILE__, 'upload.png', 'image/png', \UPLOAD_ERR_OK),
         ]);
 
-        $this->assertSame('Submitted data was expected to be text or number, file upload given.', $this->form->get('bar')->getTransformationFailure()->getMessage());
-        $this->assertNull($this->form->get('bar')->getData());
+        self::assertSame('Submitted data was expected to be text or number, file upload given.', $this->form->get('bar')->getTransformationFailure()->getMessage());
+        self::assertNull($this->form->get('bar')->getData());
     }
 
     /**
@@ -1104,7 +1092,7 @@ class CompoundFormTest extends TestCase
             'date' => '04/08/2022',
         ]);
 
-        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
+        self::assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 
     public function testMapDateTimeObjectsWithEmptyArrayDataUsingDataMapper()
@@ -1128,7 +1116,7 @@ class CompoundFormTest extends TestCase
             'date' => '04/08/2022',
         ]);
 
-        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
+        self::assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 
     private function createForm(string $name = 'name', bool $compound = true): FormInterface

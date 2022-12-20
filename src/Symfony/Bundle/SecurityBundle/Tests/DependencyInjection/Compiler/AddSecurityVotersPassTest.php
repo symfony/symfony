@@ -24,8 +24,8 @@ class AddSecurityVotersPassTest extends TestCase
 {
     public function testNoVoters()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
@@ -66,9 +66,9 @@ class AddSecurityVotersPassTest extends TestCase
 
         $argument = $container->getDefinition('security.access.decision_manager')->getArgument(0);
         $refs = $argument->getValues();
-        $this->assertEquals(new Reference('highest_prio_service'), $refs[0]);
-        $this->assertEquals(new Reference('lowest_prio_service'), $refs[1]);
-        $this->assertCount(4, $refs);
+        self::assertEquals(new Reference('highest_prio_service'), $refs[0]);
+        self::assertEquals(new Reference('lowest_prio_service'), $refs[1]);
+        self::assertCount(4, $refs);
     }
 
     public function testThatVotersAreTraceableInDebugMode()
@@ -92,15 +92,15 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass->process($container);
 
         $def1 = $container->getDefinition('debug.security.voter.voter1');
-        $this->assertNull($def1->getDecoratedService(), 'voter1: should not be decorated');
-        $this->assertEquals(new Reference('voter1'), $def1->getArgument(0), 'voter1: wrong argument');
+        self::assertNull($def1->getDecoratedService(), 'voter1: should not be decorated');
+        self::assertEquals(new Reference('voter1'), $def1->getArgument(0), 'voter1: wrong argument');
 
         $def2 = $container->getDefinition('debug.security.voter.voter2');
-        $this->assertNull($def2->getDecoratedService(), 'voter2: should not be decorated');
-        $this->assertEquals(new Reference('voter2'), $def2->getArgument(0), 'voter2: wrong argument');
+        self::assertNull($def2->getDecoratedService(), 'voter2: should not be decorated');
+        self::assertEquals(new Reference('voter2'), $def2->getArgument(0), 'voter2: wrong argument');
 
         $voters = $container->findTaggedServiceIds('security.voter');
-        $this->assertCount(2, $voters, 'Incorrect count of voters');
+        self::assertCount(2, $voters, 'Incorrect count of voters');
     }
 
     public function testThatVotersAreNotTraceableWithoutDebugMode()
@@ -123,8 +123,8 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
 
-        $this->assertFalse($container->has('debug.security.voter.voter1'), 'voter1 should not be traced');
-        $this->assertFalse($container->has('debug.security.voter.voter2'), 'voter2 should not be traced');
+        self::assertFalse($container->has('debug.security.voter.voter1'), 'voter1 should not be traced');
+        self::assertFalse($container->has('debug.security.voter.voter2'), 'voter2 should not be traced');
     }
 
     public function testVoterMissingInterface()
@@ -132,8 +132,8 @@ class AddSecurityVotersPassTest extends TestCase
         $exception = LogicException::class;
         $message = '"stdClass" must implement the "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" when used as a voter.';
 
-        $this->expectException($exception);
-        $this->expectExceptionMessage($message);
+        self::expectException($exception);
+        self::expectExceptionMessage($message);
 
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

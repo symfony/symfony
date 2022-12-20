@@ -95,8 +95,8 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertSame('DATA', $form->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertSame('DATA', $form->getData());
     }
 
     /**
@@ -114,7 +114,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertFalse($form->isSubmitted());
+        self::assertFalse($form->isSubmitted());
     }
 
     /**
@@ -130,7 +130,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertFalse($form->isSubmitted());
+        self::assertFalse($form->isSubmitted());
     }
 
     /**
@@ -146,7 +146,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertFalse($form->isSubmitted());
+        self::assertFalse($form->isSubmitted());
     }
 
     public function testDoNotSubmitIfNameNotInRequestAndGetRequest()
@@ -159,7 +159,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertFalse($form->isSubmitted());
+        self::assertFalse($form->isSubmitted());
     }
 
     /**
@@ -178,17 +178,17 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->get('param1')->isSubmitted());
-        $this->assertSame('submitted value', $form->get('param1')->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->get('param1')->isSubmitted());
+        self::assertSame('submitted value', $form->get('param1')->getData());
 
         if ('PATCH' === $method) {
-            $this->assertFalse($form->get('param2')->isSubmitted());
+            self::assertFalse($form->get('param2')->isSubmitted());
         } else {
-            $this->assertTrue($form->get('param2')->isSubmitted());
+            self::assertTrue($form->get('param2')->isSubmitted());
         }
 
-        $this->assertNull($form->get('param2')->getData());
+        self::assertNull($form->get('param2')->getData());
     }
 
     /**
@@ -206,7 +206,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertFalse($form->isSubmitted());
+        self::assertFalse($form->isSubmitted());
     }
 
     /**
@@ -231,9 +231,9 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertSame('DATA', $form->get('field1')->getData());
-        $this->assertSame($file, $form->get('field2')->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertSame('DATA', $form->get('field1')->getData());
+        self::assertSame($file, $form->get('field2')->getData());
     }
 
     /**
@@ -252,8 +252,8 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertSame('DATA', $form->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertSame('DATA', $form->getData());
     }
 
     /**
@@ -274,8 +274,8 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertSame($file, $form->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertSame($file, $form->getData());
     }
 
     /**
@@ -298,8 +298,8 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertSame($file, $form->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertSame($file, $form->getData());
     }
 
     /**
@@ -318,8 +318,8 @@ abstract class AbstractRequestHandlerTest extends TestCase
         ]);
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertSame($file, $fileForm->getData());
+        self::assertTrue($form->isSubmitted());
+        self::assertSame($file, $fileForm->getData());
     }
 
     /**
@@ -340,11 +340,11 @@ abstract class AbstractRequestHandlerTest extends TestCase
             $error = new FormError($options['post_max_size_message'], null, $errorParams);
             $error->setOrigin($form);
 
-            $this->assertEquals([$error], iterator_to_array($form->getErrors()));
-            $this->assertTrue($form->isSubmitted());
+            self::assertEquals([$error], iterator_to_array($form->getErrors()));
+            self::assertTrue($form->isSubmitted());
         } else {
-            $this->assertCount(0, $form->getErrors());
-            $this->assertFalse($form->isSubmitted());
+            self::assertCount(0, $form->getErrors());
+            self::assertFalse($form->isSubmitted());
         }
     }
 
@@ -365,12 +365,12 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     public function testUploadedFilesAreAccepted()
     {
-        $this->assertTrue($this->requestHandler->isFileUpload($this->getUploadedFile()));
+        self::assertTrue($this->requestHandler->isFileUpload($this->getUploadedFile()));
     }
 
     public function testInvalidFilesAreRejected()
     {
-        $this->assertFalse($this->requestHandler->isFileUpload($this->getInvalidFile()));
+        self::assertFalse($this->requestHandler->isFileUpload($this->getInvalidFile()));
     }
 
     /**
@@ -378,7 +378,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
      */
     public function testFailedFileUploadIsTurnedIntoFormError($errorCode, $expectedErrorCode)
     {
-        $this->assertSame($expectedErrorCode, $this->requestHandler->getUploadFileError($this->getFailedUploadedFile($errorCode)));
+        self::assertSame($expectedErrorCode, $this->requestHandler->getUploadFileError($this->getFailedUploadedFile($errorCode)));
     }
 
     public function uploadFileErrorCodes()

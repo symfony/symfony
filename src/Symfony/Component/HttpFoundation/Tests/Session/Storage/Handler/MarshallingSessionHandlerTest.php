@@ -34,15 +34,15 @@ class MarshallingSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->marshaller = $this->createMock(MarshallerInterface::class);
-        $this->handler = $this->createMock(AbstractSessionHandler::class);
+        $this->marshaller = self::createMock(MarshallerInterface::class);
+        $this->handler = self::createMock(AbstractSessionHandler::class);
     }
 
     public function testOpen()
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
-        $this->handler->expects($this->once())->method('open')
+        $this->handler->expects(self::once())->method('open')
             ->with('path', 'name')->willReturn(true);
 
         $marshallingSessionHandler->open('path', 'name');
@@ -52,16 +52,16 @@ class MarshallingSessionHandlerTest extends TestCase
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
-        $this->handler->expects($this->once())->method('close')->willReturn(true);
+        $this->handler->expects(self::once())->method('close')->willReturn(true);
 
-        $this->assertTrue($marshallingSessionHandler->close());
+        self::assertTrue($marshallingSessionHandler->close());
     }
 
     public function testDestroy()
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
-        $this->handler->expects($this->once())->method('destroy')
+        $this->handler->expects(self::once())->method('destroy')
             ->with('session_id')->willReturn(true);
 
         $marshallingSessionHandler->destroy('session_id');
@@ -71,7 +71,7 @@ class MarshallingSessionHandlerTest extends TestCase
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
-        $this->handler->expects($this->once())->method('gc')
+        $this->handler->expects(self::once())->method('gc')
             ->with(4711)->willReturn(1);
 
         $marshallingSessionHandler->gc(4711);
@@ -81,25 +81,25 @@ class MarshallingSessionHandlerTest extends TestCase
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
-        $this->handler->expects($this->once())->method('read')->with('session_id')
+        $this->handler->expects(self::once())->method('read')->with('session_id')
             ->willReturn('data');
-        $this->marshaller->expects($this->once())->method('unmarshall')->with('data')
+        $this->marshaller->expects(self::once())->method('unmarshall')->with('data')
             ->willReturn('unmarshalled_data')
         ;
 
         $result = $marshallingSessionHandler->read('session_id');
-        $this->assertEquals('unmarshalled_data', $result);
+        self::assertEquals('unmarshalled_data', $result);
     }
 
     public function testWrite()
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
-        $this->marshaller->expects($this->once())->method('marshall')
+        $this->marshaller->expects(self::once())->method('marshall')
             ->with(['data' => 'data'], [])
             ->willReturn(['data' => 'marshalled_data']);
 
-        $this->handler->expects($this->once())->method('write')
+        $this->handler->expects(self::once())->method('write')
             ->with('session_id', 'marshalled_data')
         ;
 
@@ -110,7 +110,7 @@ class MarshallingSessionHandlerTest extends TestCase
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
-        $this->handler->expects($this->once())->method('validateId')
+        $this->handler->expects(self::once())->method('validateId')
             ->with('session_id')->willReturn(true);
 
         $marshallingSessionHandler->validateId('session_id');
@@ -120,7 +120,7 @@ class MarshallingSessionHandlerTest extends TestCase
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
-        $this->handler->expects($this->once())->method('updateTimestamp')
+        $this->handler->expects(self::once())->method('updateTimestamp')
             ->with('session_id', 'data')->willReturn(true);
 
         $marshallingSessionHandler->updateTimestamp('session_id', 'data');

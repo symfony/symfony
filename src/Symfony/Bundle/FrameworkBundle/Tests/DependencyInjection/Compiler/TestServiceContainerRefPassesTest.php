@@ -60,7 +60,7 @@ class TestServiceContainerRefPassesTest extends TestCase
         $privateServices = $container->getDefinition('test.private_services_locator')->getArgument(0);
         unset($privateServices['Symfony\Component\DependencyInjection\ContainerInterface'], $privateServices['Psr\Container\ContainerInterface']);
 
-        $this->assertEquals($expected, $privateServices);
-        $this->assertFalse($container->getDefinition('Test\private_used_non_shared_service')->isShared());
+        self::assertEquals($expected, $privateServices);
+        self::assertFalse($container->getDefinition('Test\private_used_non_shared_service')->isShared());
     }
 }

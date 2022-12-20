@@ -21,8 +21,8 @@ class StreamedResponseTest extends TestCase
     {
         $response = new StreamedResponse(function () { echo 'foo'; }, 404, ['Content-Type' => 'text/plain']);
 
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertEquals('text/plain', $response->headers->get('Content-Type'));
+        self::assertEquals(404, $response->getStatusCode());
+        self::assertEquals('text/plain', $response->headers->get('Content-Type'));
     }
 
     public function testPrepareWith11Protocol()
@@ -33,8 +33,8 @@ class StreamedResponseTest extends TestCase
 
         $response->prepare($request);
 
-        $this->assertEquals('1.1', $response->getProtocolVersion());
-        $this->assertNotEquals('chunked', $response->headers->get('Transfer-Encoding'), 'Apache assumes responses with a Transfer-Encoding header set to chunked to already be encoded.');
+        self::assertEquals('1.1', $response->getProtocolVersion());
+        self::assertNotEquals('chunked', $response->headers->get('Transfer-Encoding'), 'Apache assumes responses with a Transfer-Encoding header set to chunked to already be encoded.');
     }
 
     public function testPrepareWith10Protocol()
@@ -45,8 +45,8 @@ class StreamedResponseTest extends TestCase
 
         $response->prepare($request);
 
-        $this->assertEquals('1.0', $response->getProtocolVersion());
-        $this->assertNull($response->headers->get('Transfer-Encoding'));
+        self::assertEquals('1.0', $response->getProtocolVersion());
+        self::assertNull($response->headers->get('Transfer-Encoding'));
     }
 
     public function testPrepareWithHeadRequest()
@@ -56,7 +56,7 @@ class StreamedResponseTest extends TestCase
 
         $response->prepare($request);
 
-        $this->assertSame('123', $response->headers->get('Content-Length'));
+        self::assertSame('123', $response->headers->get('Content-Length'));
     }
 
     public function testPrepareWithCacheHeaders()
@@ -65,7 +65,7 @@ class StreamedResponseTest extends TestCase
         $request = Request::create('/', 'GET');
 
         $response->prepare($request);
-        $this->assertEquals('max-age=600, public', $response->headers->get('Cache-Control'));
+        self::assertEquals('max-age=600, public', $response->headers->get('Cache-Control'));
     }
 
     public function testSendContent()
@@ -75,22 +75,22 @@ class StreamedResponseTest extends TestCase
         $response = new StreamedResponse(function () use (&$called) { ++$called; });
 
         $response->sendContent();
-        $this->assertEquals(1, $called);
+        self::assertEquals(1, $called);
 
         $response->sendContent();
-        $this->assertEquals(1, $called);
+        self::assertEquals(1, $called);
     }
 
     public function testSendContentWithNonCallable()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $response = new StreamedResponse(null);
         $response->sendContent();
     }
 
     public function testSetContent()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $response = new StreamedResponse(function () { echo 'foo'; });
         $response->setContent('foo');
     }
@@ -98,7 +98,7 @@ class StreamedResponseTest extends TestCase
     public function testGetContent()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
-        $this->assertFalse($response->getContent());
+        self::assertFalse($response->getContent());
     }
 
     /**
@@ -108,36 +108,36 @@ class StreamedResponseTest extends TestCase
     {
         $response = StreamedResponse::create(function () {}, 204);
 
-        $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertEquals(204, $response->getStatusCode());
+        self::assertInstanceOf(StreamedResponse::class, $response);
+        self::assertEquals(204, $response->getStatusCode());
     }
 
     public function testReturnThis()
     {
         $response = new StreamedResponse(function () {});
-        $this->assertInstanceOf(StreamedResponse::class, $response->sendContent());
-        $this->assertInstanceOf(StreamedResponse::class, $response->sendContent());
+        self::assertInstanceOf(StreamedResponse::class, $response->sendContent());
+        self::assertInstanceOf(StreamedResponse::class, $response->sendContent());
 
         $response = new StreamedResponse(function () {});
-        $this->assertInstanceOf(StreamedResponse::class, $response->sendHeaders());
-        $this->assertInstanceOf(StreamedResponse::class, $response->sendHeaders());
+        self::assertInstanceOf(StreamedResponse::class, $response->sendHeaders());
+        self::assertInstanceOf(StreamedResponse::class, $response->sendHeaders());
     }
 
     public function testSetNotModified()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
         $modified = $response->setNotModified();
-        $this->assertObjectHasAttribute('headers', $modified);
-        $this->assertObjectHasAttribute('content', $modified);
-        $this->assertObjectHasAttribute('version', $modified);
-        $this->assertObjectHasAttribute('statusCode', $modified);
-        $this->assertObjectHasAttribute('statusText', $modified);
-        $this->assertObjectHasAttribute('charset', $modified);
-        $this->assertEquals(304, $modified->getStatusCode());
+        self::assertObjectHasAttribute('headers', $modified);
+        self::assertObjectHasAttribute('content', $modified);
+        self::assertObjectHasAttribute('version', $modified);
+        self::assertObjectHasAttribute('statusCode', $modified);
+        self::assertObjectHasAttribute('statusText', $modified);
+        self::assertObjectHasAttribute('charset', $modified);
+        self::assertEquals(304, $modified->getStatusCode());
 
         ob_start();
         $modified->sendContent();
         $string = ob_get_clean();
-        $this->assertEmpty($string);
+        self::assertEmpty($string);
     }
 }

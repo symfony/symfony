@@ -49,7 +49,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('z3X945Jbf5', $cachePool->getArgument(0));
+        self::assertSame('z3X945Jbf5', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsSeededWithAdapterClassName()
@@ -70,7 +70,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
+        self::assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsSeededWithAdapterClassNameWithoutAffectingOtherCachePools()
@@ -97,7 +97,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
+        self::assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsNotReplacedIfArrayAdapterIsUsed()
@@ -114,7 +114,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
+        self::assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
     }
 
     public function testNamespaceArgumentIsNotReplacedIfNullAdapterIsUsed()
@@ -131,7 +131,7 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
+        self::assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
     }
 
     public function testArgsAreReplaced()
@@ -151,10 +151,10 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertInstanceOf(Reference::class, $cachePool->getArgument(0));
-        $this->assertSame('foobar', (string) $cachePool->getArgument(0));
-        $this->assertSame('6Ridbw4aMn', $cachePool->getArgument(1));
-        $this->assertSame(3, $cachePool->getArgument(2));
+        self::assertInstanceOf(Reference::class, $cachePool->getArgument(0));
+        self::assertSame('foobar', (string) $cachePool->getArgument(0));
+        self::assertSame('6Ridbw4aMn', $cachePool->getArgument(1));
+        self::assertSame(3, $cachePool->getArgument(2));
     }
 
     public function testWithNameAttribute()
@@ -174,13 +174,13 @@ class CachePoolPassTest extends TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('PeXBWSl6ca', $cachePool->getArgument(1));
+        self::assertSame('PeXBWSl6ca', $cachePool->getArgument(1));
     }
 
     public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are');
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.project_dir', 'foo');
@@ -217,19 +217,19 @@ class CachePoolPassTest extends TestCase
         $this->cachePoolPass->process($container);
 
         $appCachePool = $container->getDefinition('cache.app');
-        $this->assertInstanceOf(ChildDefinition::class, $appCachePool);
-        $this->assertSame('cache.chain', $appCachePool->getParent());
+        self::assertInstanceOf(ChildDefinition::class, $appCachePool);
+        self::assertSame('cache.chain', $appCachePool->getParent());
 
         $chainCachePool = $container->getDefinition('cache.chain');
-        $this->assertNotInstanceOf(ChildDefinition::class, $chainCachePool);
-        $this->assertCount(2, $chainCachePool->getArgument(0));
-        $this->assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[0]);
-        $this->assertSame('cache.adapter.array', $chainCachePool->getArgument(0)[0]->getParent());
-        $this->assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[1]);
-        $this->assertSame('cache.adapter.apcu', $chainCachePool->getArgument(0)[1]->getParent());
+        self::assertNotInstanceOf(ChildDefinition::class, $chainCachePool);
+        self::assertCount(2, $chainCachePool->getArgument(0));
+        self::assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[0]);
+        self::assertSame('cache.adapter.array', $chainCachePool->getArgument(0)[0]->getParent());
+        self::assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[1]);
+        self::assertSame('cache.adapter.apcu', $chainCachePool->getArgument(0)[1]->getParent());
 
         $doctrineCachePool = $container->getDefinition('doctrine.result_cache_pool');
-        $this->assertInstanceOf(ChildDefinition::class, $doctrineCachePool);
-        $this->assertSame('cache.app', $doctrineCachePool->getParent());
+        self::assertInstanceOf(ChildDefinition::class, $doctrineCachePool);
+        self::assertSame('cache.app', $doctrineCachePool->getParent());
     }
 }

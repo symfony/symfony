@@ -30,7 +30,7 @@ class ResolveClassPassTest extends TestCase
 
         (new ResolveClassPass())->process($container);
 
-        $this->assertSame($serviceId, $def->getClass());
+        self::assertSame($serviceId, $def->getClass());
     }
 
     public function provideValidClassId()
@@ -49,7 +49,7 @@ class ResolveClassPassTest extends TestCase
 
         (new ResolveClassPass())->process($container);
 
-        $this->assertNull($def->getClass());
+        self::assertNull($def->getClass());
     }
 
     public function provideInvalidClassId()
@@ -67,8 +67,8 @@ class ResolveClassPassTest extends TestCase
 
         (new ResolveClassPass())->process($container);
 
-        $this->assertSame('App\Foo', $parent->getClass());
-        $this->assertNull($child->getClass());
+        self::assertSame('App\Foo', $parent->getClass());
+        self::assertNull($child->getClass());
     }
 
     public function testClassFoundChildDefinition()
@@ -79,14 +79,14 @@ class ResolveClassPassTest extends TestCase
 
         (new ResolveClassPass())->process($container);
 
-        $this->assertSame('App\Foo', $parent->getClass());
-        $this->assertSame(self::class, $child->getClass());
+        self::assertSame('App\Foo', $parent->getClass());
+        self::assertSame(self::class, $child->getClass());
     }
 
     public function testAmbiguousChildDefinition()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service definition "App\Foo\Child" has a parent but no class, and its name looks like an FQCN. Either the class is missing or you want to inherit it from the parent service. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Service definition "App\Foo\Child" has a parent but no class, and its name looks like an FQCN. Either the class is missing or you want to inherit it from the parent service. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class.');
         $container = new ContainerBuilder();
         $container->register('App\Foo', null);
         $container->setDefinition('App\Foo\Child', new ChildDefinition('App\Foo'));

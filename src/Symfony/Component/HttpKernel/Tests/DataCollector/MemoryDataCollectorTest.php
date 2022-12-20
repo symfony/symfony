@@ -23,9 +23,9 @@ class MemoryDataCollectorTest extends TestCase
         $collector = new MemoryDataCollector();
         $collector->collect(new Request(), new Response());
 
-        $this->assertIsInt($collector->getMemory());
-        $this->assertIsInt($collector->getMemoryLimit());
-        $this->assertSame('memory', $collector->getName());
+        self::assertIsInt($collector->getMemory());
+        self::assertIsInt($collector->getMemoryLimit());
+        self::assertSame('memory', $collector->getName());
     }
 
     /** @dataProvider getBytesConversionTestData */
@@ -34,7 +34,7 @@ class MemoryDataCollectorTest extends TestCase
         $collector = new MemoryDataCollector();
         $method = new \ReflectionMethod($collector, 'convertToBytes');
         $method->setAccessible(true);
-        $this->assertEquals($bytes, $method->invoke($collector, $limit));
+        self::assertEquals($bytes, $method->invoke($collector, $limit));
     }
 
     public function getBytesConversionTestData()

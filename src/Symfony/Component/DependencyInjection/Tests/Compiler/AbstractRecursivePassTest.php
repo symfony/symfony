@@ -49,8 +49,8 @@ class AbstractRecursivePassTest extends TestCase
         };
         $pass->process($container);
 
-        $this->assertInstanceOf(\ReflectionMethod::class, $pass->actual);
-        $this->assertSame(FactoryDummy::class, $pass->actual->class);
+        self::assertInstanceOf(\ReflectionMethod::class, $pass->actual);
+        self::assertSame(FactoryDummy::class, $pass->actual->class);
     }
 
     public function testGetConstructorResolvesChildDefinitionsClass()
@@ -75,8 +75,8 @@ class AbstractRecursivePassTest extends TestCase
         };
         $pass->process($container);
 
-        $this->assertInstanceOf(\ReflectionMethod::class, $pass->actual);
-        $this->assertSame(Bar::class, $pass->actual->class);
+        self::assertInstanceOf(\ReflectionMethod::class, $pass->actual);
+        self::assertSame(Bar::class, $pass->actual->class);
     }
 
     public function testGetReflectionMethodResolvesChildDefinitionsClass()
@@ -101,14 +101,14 @@ class AbstractRecursivePassTest extends TestCase
         };
         $pass->process($container);
 
-        $this->assertInstanceOf(\ReflectionMethod::class, $pass->actual);
-        $this->assertSame(Bar::class, $pass->actual->class);
+        self::assertInstanceOf(\ReflectionMethod::class, $pass->actual);
+        self::assertSame(Bar::class, $pass->actual->class);
     }
 
     public function testGetConstructorDefinitionNoClass()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid service "foo": the class is not set.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Invalid service "foo": the class is not set.');
 
         $container = new ContainerBuilder();
         $container->register('foo');

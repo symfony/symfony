@@ -23,20 +23,20 @@ class ClassExistenceResourceTest extends TestCase
     public function testToString()
     {
         $res = new ClassExistenceResource('BarClass');
-        $this->assertSame('BarClass', (string) $res);
+        self::assertSame('BarClass', (string) $res);
     }
 
     public function testGetResource()
     {
         $res = new ClassExistenceResource('BarClass');
-        $this->assertSame('BarClass', $res->getResource());
+        self::assertSame('BarClass', $res->getResource());
     }
 
     public function testIsFreshWhenClassDoesNotExist()
     {
         $res = new ClassExistenceResource('Symfony\Component\Config\Tests\Fixtures\BarClass');
 
-        $this->assertTrue($res->isFresh(time()));
+        self::assertTrue($res->isFresh(time()));
 
         eval(<<<EOF
 namespace Symfony\Component\Config\Tests\Fixtures;
@@ -47,14 +47,14 @@ class BarClass
 EOF
         );
 
-        $this->assertFalse($res->isFresh(time()));
+        self::assertFalse($res->isFresh(time()));
     }
 
     public function testIsFreshWhenClassExists()
     {
         $res = new ClassExistenceResource('Symfony\Component\Config\Tests\Resource\ClassExistenceResourceTest');
 
-        $this->assertTrue($res->isFresh(time()));
+        self::assertTrue($res->isFresh(time()));
     }
 
     public function testExistsKo()
@@ -63,15 +63,15 @@ EOF
 
         try {
             $res = new ClassExistenceResource('MissingFooClass');
-            $this->assertTrue($res->isFresh(0));
+            self::assertTrue($res->isFresh(0));
 
-            $this->assertSame('MissingFooClass', $loadedClass);
+            self::assertSame('MissingFooClass', $loadedClass);
 
             $loadedClass = 123;
 
             new ClassExistenceResource('MissingFooClass', false);
 
-            $this->assertSame(123, $loadedClass);
+            self::assertSame(123, $loadedClass);
         } finally {
             spl_autoload_unregister($autoloader);
         }
@@ -80,13 +80,13 @@ EOF
     public function testBadParentWithTimestamp()
     {
         $res = new ClassExistenceResource(BadParent::class, false);
-        $this->assertTrue($res->isFresh(time()));
+        self::assertTrue($res->isFresh(time()));
     }
 
     public function testBadParentWithNoTimestamp()
     {
-        $this->expectException(\ReflectionException::class);
-        $this->expectExceptionMessage('Class "Symfony\Component\Config\Tests\Fixtures\MissingParent" not found while loading "Symfony\Component\Config\Tests\Fixtures\BadParent".');
+        self::expectException(\ReflectionException::class);
+        self::expectExceptionMessage('Class "Symfony\Component\Config\Tests\Fixtures\MissingParent" not found while loading "Symfony\Component\Config\Tests\Fixtures\BadParent".');
 
         $res = new ClassExistenceResource(BadParent::class, false);
         $res->isFresh(0);
@@ -94,8 +94,8 @@ EOF
 
     public function testBadFileName()
     {
-        $this->expectException(\ReflectionException::class);
-        $this->expectExceptionMessage('Mismatch between file name and class name.');
+        self::expectException(\ReflectionException::class);
+        self::expectExceptionMessage('Mismatch between file name and class name.');
 
         $res = new ClassExistenceResource(BadFileName::class, false);
         $res->isFresh(0);
@@ -103,8 +103,8 @@ EOF
 
     public function testBadFileNameBis()
     {
-        $this->expectException(\ReflectionException::class);
-        $this->expectExceptionMessage('Mismatch between file name and class name.');
+        self::expectException(\ReflectionException::class);
+        self::expectExceptionMessage('Mismatch between file name and class name.');
 
         $res = new ClassExistenceResource(BadFileName::class, false);
         $res->isFresh(0);
@@ -114,12 +114,12 @@ EOF
     {
         $res = new ClassExistenceResource(ConditionalClass::class, false);
 
-        $this->assertFalse($res->isFresh(0));
+        self::assertFalse($res->isFresh(0));
     }
 
     public function testParseError()
     {
-        $this->expectException(\ParseError::class);
+        self::expectException(\ParseError::class);
 
         $res = new ClassExistenceResource(ParseError::class, false);
         $res->isFresh(0);

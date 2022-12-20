@@ -193,7 +193,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
+        self::assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
     }
 
     public function testStartTagWithOverriddenVars()
@@ -208,7 +208,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
             'action' => 'http://foo.com/directory',
         ]);
 
-        $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
+        self::assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
     }
 
     public function testStartTagForMultipartForm()
@@ -222,7 +222,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
+        self::assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
     }
 
     public function testStartTagWithExtraAttributes()
@@ -236,7 +236,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
             'attr' => ['class' => 'foobar'],
         ]);
 
-        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
+        self::assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
     }
 
     public function testCheckboxRow()

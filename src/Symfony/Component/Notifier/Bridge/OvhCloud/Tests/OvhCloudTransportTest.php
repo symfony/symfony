@@ -28,7 +28,7 @@ final class OvhCloudTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null, string $sender = null): TransportInterface
     {
-        return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?? $this->createMock(HttpClientInterface::class)))->setSender($sender);
+        return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?? self::createMock(HttpClientInterface::class)))->setSender($sender);
     }
 
     public function toStringProvider(): iterable
@@ -45,7 +45,7 @@ final class OvhCloudTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function validMessagesProvider(): iterable
@@ -90,6 +90,6 @@ final class OvhCloudTransportTest extends TransportTestCase
 
         $endpoint = 'https://eu.api.ovh.com/1.0/sms/serviceName/jobs';
         $toSign = 'applicationSecret+consumerKey+POST+'.$endpoint.'+'.$body.'+'.$time;
-        $this->assertSame('$1$'.sha1($toSign), $signature);
+        self::assertSame('$1$'.sha1($toSign), $signature);
     }
 }

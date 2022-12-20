@@ -58,7 +58,7 @@ class FinalizationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'level1' => [
                 'level1_scalar' => 'foo',
             ],

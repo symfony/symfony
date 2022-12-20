@@ -29,20 +29,20 @@ class LengthTest extends TestCase
     {
         $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => 'trim']);
 
-        $this->assertEquals('trim', $length->normalizer);
+        self::assertEquals('trim', $length->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Length(['min' => 0, 'max' => 10, 'normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass()]);
     }
 

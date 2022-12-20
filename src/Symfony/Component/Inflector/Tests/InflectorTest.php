@@ -308,12 +308,12 @@ class InflectorTest extends TestCase
     {
         $singular = Inflector::singularize($plural);
         if (\is_string($expectedSingular) && \is_array($singular)) {
-            $this->fail("--- Expected\n`string`: ".$expectedSingular."\n+++ Actual\n`array`: ".implode(', ', $singular));
+            self::fail("--- Expected\n`string`: ".$expectedSingular."\n+++ Actual\n`array`: ".implode(', ', $singular));
         } elseif (\is_array($expectedSingular) && \is_string($singular)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedSingular)."\n+++ Actual\n`string`: ".$singular);
+            self::fail("--- Expected\n`array`: ".implode(', ', $expectedSingular)."\n+++ Actual\n`string`: ".$singular);
         }
 
-        $this->assertEquals($expectedSingular, $singular);
+        self::assertEquals($expectedSingular, $singular);
     }
 
     /**
@@ -323,23 +323,23 @@ class InflectorTest extends TestCase
     {
         $plural = Inflector::pluralize($singular);
         if (\is_string($expectedPlural) && \is_array($plural)) {
-            $this->fail("--- Expected\n`string`: ".$expectedPlural."\n+++ Actual\n`array`: ".implode(', ', $plural));
+            self::fail("--- Expected\n`string`: ".$expectedPlural."\n+++ Actual\n`array`: ".implode(', ', $plural));
         } elseif (\is_array($expectedPlural) && \is_string($plural)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedPlural)."\n+++ Actual\n`string`: ".$plural);
+            self::fail("--- Expected\n`array`: ".implode(', ', $expectedPlural)."\n+++ Actual\n`string`: ".$plural);
         }
 
-        $this->assertEquals($expectedPlural, $plural);
+        self::assertEquals($expectedPlural, $plural);
     }
 
     public function testPluralizeEmptyString()
     {
         $plural = Inflector::pluralize('');
-        $this->assertSame('', $plural);
+        self::assertSame('', $plural);
     }
 
     public function testSingularizeEmptyString()
     {
         $singular = Inflector::singularize('');
-        $this->assertSame('', $singular);
+        self::assertSame('', $singular);
     }
 }

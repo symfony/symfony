@@ -22,27 +22,27 @@ final class CompiledClassMetadataCacheWarmerTest extends TestCase
 {
     public function testItImplementsCacheWarmerInterface()
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
-        $filesystem = $this->createMock(Filesystem::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
+        $filesystem = self::createMock(Filesystem::class);
 
         $compiledClassMetadataCacheWarmer = new CompiledClassMetadataCacheWarmer([], $classMetadataFactory, new ClassMetadataFactoryCompiler(), $filesystem);
 
-        $this->assertInstanceOf(CacheWarmerInterface::class, $compiledClassMetadataCacheWarmer);
+        self::assertInstanceOf(CacheWarmerInterface::class, $compiledClassMetadataCacheWarmer);
     }
 
     public function testItIsAnOptionalCacheWarmer()
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
-        $filesystem = $this->createMock(Filesystem::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
+        $filesystem = self::createMock(Filesystem::class);
 
         $compiledClassMetadataCacheWarmer = new CompiledClassMetadataCacheWarmer([], $classMetadataFactory, new ClassMetadataFactoryCompiler(), $filesystem);
 
-        $this->assertTrue($compiledClassMetadataCacheWarmer->isOptional());
+        self::assertTrue($compiledClassMetadataCacheWarmer->isOptional());
     }
 
     public function testItDumpCompiledClassMetadatas()
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
 
         $code = <<<EOF
 <?php
@@ -53,9 +53,9 @@ return [
 ];
 EOF;
 
-        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem = self::createMock(Filesystem::class);
         $filesystem
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('dumpFile')
             ->with('/var/cache/prod/serializer.class.metadata.php', $code)
         ;

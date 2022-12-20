@@ -35,7 +35,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         }
 
         $adapter = parent::createCachePool($defaultLifetime, $testMethod);
-        $this->assertInstanceOf(RedisProxy::class, self::$redis);
+        self::assertInstanceOf(RedisProxy::class, self::$redis);
 
         return $adapter;
     }
@@ -43,8 +43,8 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public function testCreateHostConnection()
     {
         $redis = RedisAdapter::createConnection('redis:?host[h1]&host[h2]&host[/foo:]');
-        $this->assertInstanceOf(\RedisArray::class, $redis);
-        $this->assertSame(['h1:6379', 'h2:6379', '/foo'], $redis->_hosts());
+        self::assertInstanceOf(\RedisArray::class, $redis);
+        self::assertSame(['h1:6379', 'h2:6379', '/foo'], $redis->_hosts());
         @$redis = null; // some versions of phpredis connect on destruct, let's silence the warning
 
         $this->doTestCreateConnection(getenv('REDIS_HOST'));
@@ -53,7 +53,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public function testCreateSocketConnection()
     {
         if (!getenv('REDIS_SOCKET') || !file_exists(getenv('REDIS_SOCKET'))) {
-            $this->markTestSkipped('Redis socket not found');
+            self::markTestSkipped('Redis socket not found');
         }
 
         $this->doTestCreateConnection(getenv('REDIS_SOCKET'));
@@ -62,34 +62,34 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     private function doTestCreateConnection(string $uri)
     {
         $redis = RedisAdapter::createConnection('redis://'.$uri);
-        $this->assertInstanceOf(\Redis::class, $redis);
-        $this->assertTrue($redis->isConnected());
-        $this->assertSame(0, $redis->getDbNum());
+        self::assertInstanceOf(\Redis::class, $redis);
+        self::assertTrue($redis->isConnected());
+        self::assertSame(0, $redis->getDbNum());
 
         $redis = RedisAdapter::createConnection('redis://'.$uri.'/2');
-        $this->assertSame(2, $redis->getDbNum());
+        self::assertSame(2, $redis->getDbNum());
 
         $redis = RedisAdapter::createConnection('redis://'.$uri, ['timeout' => 3]);
-        $this->assertEquals(3, $redis->getTimeout());
+        self::assertEquals(3, $redis->getTimeout());
 
         $redis = RedisAdapter::createConnection('redis://'.$uri.'?timeout=4');
-        $this->assertEquals(4, $redis->getTimeout());
+        self::assertEquals(4, $redis->getTimeout());
 
         $redis = RedisAdapter::createConnection('redis://'.$uri, ['read_timeout' => 5]);
-        $this->assertEquals(5, $redis->getReadTimeout());
+        self::assertEquals(5, $redis->getReadTimeout());
     }
 
     public function testCreateTlsConnection()
     {
         $redis = RedisAdapter::createConnection('rediss:?host[h1]&host[h2]&host[/foo:]');
-        $this->assertInstanceOf(\RedisArray::class, $redis);
-        $this->assertSame(['tls://h1:6379', 'tls://h2:6379', '/foo'], $redis->_hosts());
+        self::assertInstanceOf(\RedisArray::class, $redis);
+        self::assertSame(['tls://h1:6379', 'tls://h2:6379', '/foo'], $redis->_hosts());
         @$redis = null; // some versions of phpredis connect on destruct, let's silence the warning
 
         $redisHost = getenv('REDIS_HOST');
 
         $redis = RedisAdapter::createConnection('rediss://'.$redisHost.'?lazy=1');
-        $this->assertInstanceOf(RedisProxy::class, $redis);
+        self::assertInstanceOf(RedisProxy::class, $redis);
     }
 
     /**
@@ -97,8 +97,8 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
      */
     public function testFailedCreateConnection(string $dsn)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis connection ');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Redis connection ');
         RedisAdapter::createConnection($dsn);
     }
 
@@ -117,8 +117,8 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
      */
     public function testInvalidCreateConnection(string $dsn)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid Redis DSN');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid Redis DSN');
         RedisAdapter::createConnection($dsn);
     }
 

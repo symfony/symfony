@@ -30,7 +30,7 @@ final class MobytTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): TransportInterface
     {
-        return (new MobytTransport('accountSid', 'authToken', 'from', $messageType, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MobytTransport('accountSid', 'authToken', 'from', $messageType, $client ?? self::createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
@@ -47,6 +47,6 @@ final class MobytTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

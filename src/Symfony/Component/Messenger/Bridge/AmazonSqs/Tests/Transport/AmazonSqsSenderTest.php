@@ -27,10 +27,10 @@ class AmazonSqsSenderTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers']);
+        $connection = self::createMock(Connection::class);
+        $connection->expects(self::once())->method('send')->with($encoded['body'], $encoded['headers']);
 
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new AmazonSqsSender($connection, $serializer);
@@ -44,11 +44,11 @@ class AmazonSqsSenderTest extends TestCase
 
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')
+        $connection = self::createMock(Connection::class);
+        $connection->expects(self::once())->method('send')
             ->with($encoded['body'], $encoded['headers'], 0, $stamp->getMessageGroupId(), $stamp->getMessageDeduplicationId());
 
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new AmazonSqsSender($connection, $serializer);
@@ -62,11 +62,11 @@ class AmazonSqsSenderTest extends TestCase
 
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')
+        $connection = self::createMock(Connection::class);
+        $connection->expects(self::once())->method('send')
             ->with($encoded['body'], $encoded['headers'], 0, null, null, $stamp->getTraceId());
 
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new AmazonSqsSender($connection, $serializer);

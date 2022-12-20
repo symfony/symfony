@@ -21,7 +21,7 @@ class EmptyVersionStrategyTest extends TestCase
         $emptyVersionStrategy = new EmptyVersionStrategy();
         $path = 'test-path';
 
-        $this->assertEmpty($emptyVersionStrategy->getVersion($path));
+        self::assertEmpty($emptyVersionStrategy->getVersion($path));
     }
 
     public function testApplyVersion()
@@ -29,6 +29,6 @@ class EmptyVersionStrategyTest extends TestCase
         $emptyVersionStrategy = new EmptyVersionStrategy();
         $path = 'test-path';
 
-        $this->assertSame($path, $emptyVersionStrategy->applyVersion($path));
+        self::assertSame($path, $emptyVersionStrategy->applyVersion($path));
     }
 }

@@ -28,13 +28,13 @@ class ComparatorTest extends TestCase
 
         $this->expectDeprecation('Since symfony/finder 5.4: "Symfony\Component\Finder\Comparator\Comparator::setOperator" is deprecated. Set the operator via the constructor instead.');
         $comparator->setOperator('>');
-        $this->assertEquals('>', $comparator->getOperator(), '->getOperator() returns the current operator');
+        self::assertEquals('>', $comparator->getOperator(), '->getOperator() returns the current operator');
     }
 
     public function testInvalidOperator()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid operator "foo".');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid operator "foo".');
 
         new Comparator('some target', 'foo');
     }
@@ -49,7 +49,7 @@ class ComparatorTest extends TestCase
 
         $this->expectDeprecation('Since symfony/finder 5.4: "Symfony\Component\Finder\Comparator\Comparator::setTarget" is deprecated. Set the target via the constructor instead.');
         $comparator->setTarget(8);
-        $this->assertEquals(8, $comparator->getTarget(), '->getTarget() returns the target');
+        self::assertEquals(8, $comparator->getTarget(), '->getTarget() returns the target');
     }
 
     /**
@@ -59,10 +59,10 @@ class ComparatorTest extends TestCase
     {
         $c = new Comparator($target, $operator);
 
-        $this->assertSame($target, $c->getTarget());
-        $this->assertSame($operator, $c->getOperator());
+        self::assertSame($target, $c->getTarget());
+        self::assertSame($operator, $c->getOperator());
 
-        $this->assertTrue($c->test($testedValue));
+        self::assertTrue($c->test($testedValue));
     }
 
     public function provideMatches(): array
@@ -88,7 +88,7 @@ class ComparatorTest extends TestCase
     {
         $c = new Comparator($target, $operator);
 
-        $this->assertFalse($c->test($testedValue));
+        self::assertFalse($c->test($testedValue));
     }
 
     public function provideNonMatches(): array

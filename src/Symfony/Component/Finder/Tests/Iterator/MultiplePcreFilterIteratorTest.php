@@ -22,7 +22,7 @@ class MultiplePcreFilterIteratorTest extends TestCase
     public function testIsRegex($string, $isRegex, $message)
     {
         $testIterator = new TestMultiplePcreFilterIterator();
-        $this->assertEquals($isRegex, $testIterator->isRegex($string), $message);
+        self::assertEquals($isRegex, $testIterator->isRegex($string), $message);
     }
 
     public function getIsRegexFixtures()

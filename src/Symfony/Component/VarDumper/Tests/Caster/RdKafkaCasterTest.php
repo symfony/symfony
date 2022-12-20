@@ -69,7 +69,7 @@ EODUMP;
     public function testDumpProducer()
     {
         if (!$this->hasBroker) {
-            $this->markTestSkipped('Test requires an active broker');
+            self::markTestSkipped('Test requires an active broker');
         }
 
         $producer = new Producer(new Conf());
@@ -132,7 +132,7 @@ EODUMP;
     public function testDumpKafkaConsumer()
     {
         if (!$this->hasBroker) {
-            $this->markTestSkipped('Test requires an active broker');
+            self::markTestSkipped('Test requires an active broker');
         }
 
         $conf = new Conf();

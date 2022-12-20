@@ -20,7 +20,7 @@ class HttpClientTest extends TestCase
 {
     public function testCreateClient()
     {
-        $this->assertInstanceOf(HttpClientInterface::class, HttpClient::create());
-        $this->assertNotInstanceOf(NativeHttpClient::class, HttpClient::create());
+        self::assertInstanceOf(HttpClientInterface::class, HttpClient::create());
+        self::assertNotInstanceOf(NativeHttpClient::class, HttpClient::create());
     }
 }

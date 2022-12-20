@@ -59,9 +59,9 @@ abstract class AbstractRedisStoreTest extends AbstractStoreTest
         $newStore = $this->getStore();
 
         $oldStore->save($key1);
-        $this->assertTrue($oldStore->exists($key1));
+        self::assertTrue($oldStore->exists($key1));
 
-        $this->expectException(LockConflictedException::class);
+        self::expectException(LockConflictedException::class);
         $newStore->save($key2);
     }
 }

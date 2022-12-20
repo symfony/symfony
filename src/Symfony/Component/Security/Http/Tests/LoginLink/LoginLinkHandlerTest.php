@@ -44,7 +44,7 @@ class LoginLinkHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->router = $this->createMock(UrlGeneratorInterface::class);
+        $this->router = self::createMock(UrlGeneratorInterface::class);
         $this->userProvider = new TestLoginLinkHandlerUserProvider();
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->expiredLinkCache = new ArrayAdapter();
@@ -57,11 +57,11 @@ class LoginLinkHandlerTest extends TestCase
      */
     public function testCreateLoginLink($user, array $extraProperties, Request $request = null)
     {
-        $this->router->expects($this->once())
+        $this->router->expects(self::once())
             ->method('generate')
             ->with(
                 'app_check_login_link_route',
-                $this->callback(function ($parameters) use ($extraProperties) {
+                self::callback(function ($parameters) use ($extraProperties) {
                     return 'weaverryan' == $parameters['user']
                         && isset($parameters['expires'])
                         && isset($parameters['hash'])
@@ -75,17 +75,17 @@ class LoginLinkHandlerTest extends TestCase
             ->willReturn('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000');
 
         if ($request) {
-            $this->router->expects($this->once())
+            $this->router->expects(self::once())
                 ->method('getContext')
                 ->willReturn($currentRequestContext = new RequestContext());
 
-            $this->router->expects($this->exactly(2))
+            $this->router->expects(self::exactly(2))
                 ->method('setContext')
-                ->withConsecutive([$this->equalTo((new RequestContext())->fromRequest($request)->setParameter('_locale', $request->getLocale()))], [$currentRequestContext]);
+                ->withConsecutive([self::equalTo((new RequestContext())->fromRequest($request)->setParameter('_locale', $request->getLocale()))], [$currentRequestContext]);
         }
 
         $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $request);
-        $this->assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000', $loginLink->getUrl());
+        self::assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000', $loginLink->getUrl());
     }
 
     public function provideCreateLoginLinkData()
@@ -123,15 +123,15 @@ class LoginLinkHandlerTest extends TestCase
 
         $linker = $this->createLinker(['max_uses' => 3]);
         $actualUser = $linker->consumeLoginLink($request);
-        $this->assertEquals($user, $actualUser);
+        self::assertEquals($user, $actualUser);
 
         $item = $this->expiredLinkCache->getItem(rawurlencode($signature));
-        $this->assertSame(1, $item->get());
+        self::assertSame(1, $item->get());
     }
 
     public function testConsumeLoginLinkWithExpired()
     {
-        $this->expectException(ExpiredLoginLinkException::class);
+        self::expectException(ExpiredLoginLinkException::class);
         $expires = time() - 500;
         $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
         $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
@@ -145,7 +145,7 @@ class LoginLinkHandlerTest extends TestCase
 
     public function testConsumeLoginLinkWithUserNotFound()
     {
-        $this->expectException(InvalidLoginLinkException::class);
+        self::expectException(InvalidLoginLinkException::class);
         $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires=10000');
 
         $linker = $this->createLinker();
@@ -154,7 +154,7 @@ class LoginLinkHandlerTest extends TestCase
 
     public function testConsumeLoginLinkWithDifferentSignature()
     {
-        $this->expectException(InvalidLoginLinkException::class);
+        self::expectException(InvalidLoginLinkException::class);
         $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=fake_hash&expires=%d', time() + 500));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
@@ -166,7 +166,7 @@ class LoginLinkHandlerTest extends TestCase
 
     public function testConsumeLoginLinkExceedsMaxUsage()
     {
-        $this->expectException(ExpiredLoginLinkException::class);
+        self::expectException(ExpiredLoginLinkException::class);
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
         $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
@@ -187,7 +187,7 @@ class LoginLinkHandlerTest extends TestCase
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);
 
-        $this->expectException(InvalidLoginLinkException::class);
+        self::expectException(InvalidLoginLinkException::class);
         $request = Request::create('/login/verify?user=weaverryan&expires=10000');
 
         $linker = $this->createLinker();
@@ -199,7 +199,7 @@ class LoginLinkHandlerTest extends TestCase
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);
 
-        $this->expectException(InvalidLoginLinkException::class);
+        self::expectException(InvalidLoginLinkException::class);
         $request = Request::create('/login/verify?user=weaverryan&hash=thehash');
 
         $linker = $this->createLinker();

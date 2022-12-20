@@ -33,14 +33,14 @@ class UserCheckerListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userChecker = $this->createMock(UserCheckerInterface::class);
+        $this->userChecker = self::createMock(UserCheckerInterface::class);
         $this->listener = new UserCheckerListener($this->userChecker);
         $this->user = new InMemoryUser('test', null);
     }
 
     public function testPreAuth()
     {
-        $this->userChecker->expects($this->once())->method('checkPreAuth')->with($this->user);
+        $this->userChecker->expects(self::once())->method('checkPreAuth')->with($this->user);
 
         $this->listener->preCheckCredentials($this->createCheckPassportEvent());
     }
@@ -50,21 +50,21 @@ class UserCheckerListenerTest extends TestCase
      */
     public function testPreAuthNoUser()
     {
-        $this->userChecker->expects($this->never())->method('checkPreAuth');
+        $this->userChecker->expects(self::never())->method('checkPreAuth');
 
-        $this->listener->preCheckCredentials($this->createCheckPassportEvent($this->createMock(PassportInterface::class)));
+        $this->listener->preCheckCredentials($this->createCheckPassportEvent(self::createMock(PassportInterface::class)));
     }
 
     public function testPreAuthenticatedBadge()
     {
-        $this->userChecker->expects($this->never())->method('checkPreAuth');
+        $this->userChecker->expects(self::never())->method('checkPreAuth');
 
         $this->listener->preCheckCredentials($this->createCheckPassportEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PreAuthenticatedUserBadge()])));
     }
 
     public function testPostAuthValidCredentials()
     {
-        $this->userChecker->expects($this->once())->method('checkPostAuth')->with($this->user);
+        $this->userChecker->expects(self::once())->method('checkPostAuth')->with($this->user);
 
         $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PostAuthenticationToken($this->user, 'main', [])));
     }
@@ -74,7 +74,7 @@ class UserCheckerListenerTest extends TestCase
      */
     public function testPostAuthNoUser()
     {
-        $this->userChecker->expects($this->never())->method('checkPostAuth');
+        $this->userChecker->expects(self::never())->method('checkPostAuth');
 
         $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PreAuthenticatedToken('nobody', 'main')));
     }
@@ -85,7 +85,7 @@ class UserCheckerListenerTest extends TestCase
             $passport = new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }));
         }
 
-        return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
+        return new CheckPassportEvent(self::createMock(AuthenticatorInterface::class), $passport);
     }
 
     private function createAuthenticationSuccessEvent()

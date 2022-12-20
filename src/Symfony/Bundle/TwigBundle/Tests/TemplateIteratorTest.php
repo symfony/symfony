@@ -19,26 +19,23 @@ class TemplateIteratorTest extends TestCase
 {
     public function testGetIterator()
     {
-        $bundle = $this->createMock(BundleInterface::class);
-        $bundle->expects($this->any())->method('getName')->willReturn('BarBundle');
-        $bundle->expects($this->any())->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
+        $bundle = self::createMock(BundleInterface::class);
+        $bundle->expects(self::any())->method('getName')->willReturn('BarBundle');
+        $bundle->expects(self::any())->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
 
-        $kernel = $this->createMock(Kernel::class);
-        $kernel->expects($this->any())->method('getBundles')->willReturn([
+        $kernel = self::createMock(Kernel::class);
+        $kernel->expects(self::any())->method('getBundles')->willReturn([
             $bundle,
         ]);
         $iterator = new TemplateIterator($kernel, [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
 
         $sorted = iterator_to_array($iterator);
         sort($sorted);
-        $this->assertEquals(
-            [
-                '@Bar/index.html.twig',
-                '@Bar/layout.html.twig',
-                '@Foo/index.html.twig',
-                'layout.html.twig',
-            ],
-            $sorted
-        );
+        self::assertEquals([
+            '@Bar/index.html.twig',
+            '@Bar/layout.html.twig',
+            '@Foo/index.html.twig',
+            'layout.html.twig',
+        ], $sorted);
     }
 }

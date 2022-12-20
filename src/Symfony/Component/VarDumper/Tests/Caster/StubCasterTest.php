@@ -105,7 +105,7 @@ EODUMP;
 </bar>
 EODUMP;
 
-        $this->assertStringMatchesFormat($expectedDump, $dump);
+        self::assertStringMatchesFormat($expectedDump, $dump);
     }
 
     public function testLinkStubWithNoFileLink()
@@ -126,7 +126,7 @@ EODUMP;
 </bar>
 EODUMP;
 
-        $this->assertStringMatchesFormat($expectedDump, $dump);
+        self::assertStringMatchesFormat($expectedDump, $dump);
     }
 
     public function testClassStub()
@@ -146,7 +146,7 @@ EODUMP;
 </bar>
 EODUMP;
 
-        $this->assertStringMatchesFormat($expectedDump, $dump);
+        self::assertStringMatchesFormat($expectedDump, $dump);
     }
 
     public function testClassStubWithNotExistingClass()
@@ -167,7 +167,7 @@ EODUMP;
 </bar>
 EODUMP;
 
-        $this->assertStringMatchesFormat($expectedDump, $dump);
+        self::assertStringMatchesFormat($expectedDump, $dump);
     }
 
     public function testClassStubWithNotExistingMethod()
@@ -187,7 +187,7 @@ EODUMP;
 </bar>
 EODUMP;
 
-        $this->assertStringMatchesFormat($expectedDump, $dump);
+        self::assertStringMatchesFormat($expectedDump, $dump);
     }
 
     public function testClassStubWithAnonymousClass()
@@ -208,6 +208,6 @@ EODUMP;
 </bar>
 EODUMP;
 
-        $this->assertStringMatchesFormat($expectedDump, $dump);
+        self::assertStringMatchesFormat($expectedDump, $dump);
     }
 }

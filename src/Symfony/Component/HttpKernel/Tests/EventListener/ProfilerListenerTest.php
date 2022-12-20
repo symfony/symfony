@@ -34,15 +34,15 @@ class ProfilerListenerTest extends TestCase
     {
         $profile = new Profile('token');
 
-        $profiler = $this->createMock(Profiler::class);
-        $profiler->expects($this->once())
+        $profiler = self::createMock(Profiler::class);
+        $profiler->expects(self::once())
             ->method('collect')
             ->willReturn($profile);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
-        $mainRequest = $this->createMock(Request::class);
-        $subRequest = $this->createMock(Request::class);
-        $response = $this->createMock(Response::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
+        $mainRequest = self::createMock(Request::class);
+        $subRequest = self::createMock(Request::class);
+        $response = self::createMock(Response::class);
 
         $requestStack = new RequestStack();
         $requestStack->push($mainRequest);
@@ -67,16 +67,16 @@ class ProfilerListenerTest extends TestCase
     {
         $profile = new Profile('token');
 
-        $profiler = $this->createMock(Profiler::class);
-        $profiler->expects($this->once())
+        $profiler = self::createMock(Profiler::class);
+        $profiler->expects(self::once())
             ->method('collect')
             ->willReturn($profile);
 
         $profiler
-            ->expects(null === $enable ? $this->never() : $this->once())
+            ->expects(null === $enable ? self::never() : self::once())
             ->method($enable ? 'enable' : 'disable');
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $response = new Response();
 
         $requestStack = new RequestStack();

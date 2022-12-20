@@ -24,7 +24,7 @@ class AmazonSqsIntegrationTest extends TestCase
     public function testConnectionSendToFifoQueueAndGet()
     {
         if (!getenv('MESSENGER_SQS_FIFO_QUEUE_DSN')) {
-            $this->markTestSkipped('The "MESSENGER_SQS_FIFO_QUEUE_DSN" environment variable is required.');
+            self::markTestSkipped('The "MESSENGER_SQS_FIFO_QUEUE_DSN" environment variable is required.');
         }
 
         $this->execute(getenv('MESSENGER_SQS_FIFO_QUEUE_DSN'));
@@ -33,7 +33,7 @@ class AmazonSqsIntegrationTest extends TestCase
     public function testConnectionSendAndGet()
     {
         if (!getenv('MESSENGER_SQS_DSN')) {
-            $this->markTestSkipped('The "MESSENGER_SQS_DSN" environment variable is required.');
+            self::markTestSkipped('The "MESSENGER_SQS_DSN" environment variable is required.');
         }
 
         $this->execute(getenv('MESSENGER_SQS_DSN'));
@@ -46,15 +46,15 @@ class AmazonSqsIntegrationTest extends TestCase
         $this->clearSqs($dsn);
 
         $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class, DummyMessage::class => 'special']);
-        $this->assertSame(1, $connection->getMessageCount());
+        self::assertSame(1, $connection->getMessageCount());
 
         $wait = 0;
         while ((null === $encoded = $connection->get()) && $wait++ < 200) {
             usleep(5000);
         }
 
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class, DummyMessage::class => 'special'], $encoded['headers']);
+        self::assertEquals('{"message": "Hi"}', $encoded['body']);
+        self::assertEquals(['type' => DummyMessage::class, DummyMessage::class => 'special'], $encoded['headers']);
     }
 
     private function clearSqs(string $dsn): void

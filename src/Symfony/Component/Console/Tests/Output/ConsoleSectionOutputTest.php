@@ -43,7 +43,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output->clear();
 
         rewind($output->getStream());
-        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
+        self::assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
     }
 
     public function testClearNumberOfLines()
@@ -55,7 +55,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output->clear(2);
 
         rewind($output->getStream());
-        $this->assertEquals("Foo\nBar\nBaz\nFooBar".\PHP_EOL.sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
+        self::assertEquals("Foo\nBar\nBaz\nFooBar".\PHP_EOL.sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
     }
 
     public function testClearNumberOfLinesWithMultipleSections()
@@ -72,7 +72,7 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
 
-        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0J\e[1A\e[0J".'Baz'.\PHP_EOL.'Foo'.\PHP_EOL, stream_get_contents($output->getStream()));
+        self::assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0J\e[1A\e[0J".'Baz'.\PHP_EOL.'Foo'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testClearPreservingEmptyLines()
@@ -88,7 +88,7 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
 
-        $this->assertEquals(\PHP_EOL.'foo'.\PHP_EOL."\x1b[1A\x1b[0J\x1b[1A\x1b[0J".'bar'.\PHP_EOL.\PHP_EOL, stream_get_contents($output->getStream()));
+        self::assertEquals(\PHP_EOL.'foo'.\PHP_EOL."\x1b[1A\x1b[0J\x1b[1A\x1b[0J".'bar'.\PHP_EOL.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testOverwrite()
@@ -100,7 +100,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output->overwrite('Bar');
 
         rewind($output->getStream());
-        $this->assertEquals('Foo'.\PHP_EOL."\x1b[1A\x1b[0JBar".\PHP_EOL, stream_get_contents($output->getStream()));
+        self::assertEquals('Foo'.\PHP_EOL."\x1b[1A\x1b[0JBar".\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testOverwriteMultipleLines()
@@ -112,7 +112,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output->overwrite('Bar');
 
         rewind($output->getStream());
-        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.'Baz'.\PHP_EOL.sprintf("\x1b[%dA", 3)."\x1b[0J".'Bar'.\PHP_EOL, stream_get_contents($output->getStream()));
+        self::assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.'Baz'.\PHP_EOL.sprintf("\x1b[%dA", 3)."\x1b[0J".'Bar'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testAddingMultipleSections()
@@ -121,7 +121,7 @@ class ConsoleSectionOutputTest extends TestCase
         new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
         new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
 
-        $this->assertCount(2, $sections);
+        self::assertCount(2, $sections);
     }
 
     public function testMultipleSectionsOutput()
@@ -138,7 +138,7 @@ class ConsoleSectionOutputTest extends TestCase
         $output2->overwrite('Foobar');
 
         rewind($output->getStream());
-        $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[2A\x1b[0JBar".\PHP_EOL."\x1b[1A\x1b[0JBaz".\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0JFoobar".\PHP_EOL, stream_get_contents($output->getStream()));
+        self::assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[2A\x1b[0JBar".\PHP_EOL."\x1b[1A\x1b[0JBaz".\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0JFoobar".\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testClearSectionContainingQuestion()
@@ -147,9 +147,9 @@ class ConsoleSectionOutputTest extends TestCase
         fwrite($inputStream, "Batman & Robin\n");
         rewind($inputStream);
 
-        $input = $this->createMock(StreamableInputInterface::class);
-        $input->expects($this->once())->method('isInteractive')->willReturn(true);
-        $input->expects($this->once())->method('getStream')->willReturn($inputStream);
+        $input = self::createMock(StreamableInputInterface::class);
+        $input->expects(self::once())->method('isInteractive')->willReturn(true);
+        $input->expects(self::once())->method('getStream')->willReturn($inputStream);
 
         $sections = [];
         $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
@@ -158,6 +158,6 @@ class ConsoleSectionOutputTest extends TestCase
         $output->clear();
 
         rewind($output->getStream());
-        $this->assertSame('What\'s your favorite super hero?'.\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
+        self::assertSame('What\'s your favorite super hero?'.\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
     }
 }

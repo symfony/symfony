@@ -33,7 +33,7 @@ class FormErrorNormalizerTest extends TestCase
     {
         $this->normalizer = new FormErrorNormalizer();
 
-        $this->form = $this->createMock(FormInterface::class);
+        $this->form = self::createMock(FormInterface::class);
         $this->form->method('isSubmitted')->willReturn(true);
         $this->form->method('all')->willReturn([]);
 
@@ -47,18 +47,18 @@ class FormErrorNormalizerTest extends TestCase
 
     public function testSupportsNormalizationWithWrongClass()
     {
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     public function testSupportsNormalizationWithNotSubmittedForm()
     {
-        $form = $this->createMock(FormInterface::class);
-        $this->assertFalse($this->normalizer->supportsNormalization($form));
+        $form = self::createMock(FormInterface::class);
+        self::assertFalse($this->normalizer->supportsNormalization($form));
     }
 
     public function testSupportsNormalizationWithValidForm()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization($this->form));
+        self::assertTrue($this->normalizer->supportsNormalization($this->form));
     }
 
     public function testNormalize()
@@ -79,7 +79,7 @@ class FormErrorNormalizerTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $this->normalizer->normalize($this->form));
+        self::assertEquals($expected, $this->normalizer->normalize($this->form));
     }
 
     public function testNormalizeWithChildren()
@@ -124,7 +124,7 @@ class FormErrorNormalizerTest extends TestCase
             ],
         ];
 
-        $form = clone $form1 = clone $form2 = clone $form3 = $this->createMock(FormInterface::class);
+        $form = clone $form1 = clone $form2 = clone $form3 = self::createMock(FormInterface::class);
 
         $form1->method('getErrors')
             ->willReturn(new FormErrorIterator($form1, [
@@ -149,7 +149,7 @@ class FormErrorNormalizerTest extends TestCase
 
         $form2->method('all')->willReturn([$form3]);
 
-        $form = $this->createMock(FormInterface::class);
+        $form = self::createMock(FormInterface::class);
         $form->method('isSubmitted')->willReturn(true);
         $form->method('all')->willReturn([$form1, $form2]);
         $form->method('getErrors')
@@ -158,6 +158,6 @@ class FormErrorNormalizerTest extends TestCase
             ])
             );
 
-        $this->assertEquals($exptected, $this->normalizer->normalize($form));
+        self::assertEquals($exptected, $this->normalizer->normalize($form));
     }
 }

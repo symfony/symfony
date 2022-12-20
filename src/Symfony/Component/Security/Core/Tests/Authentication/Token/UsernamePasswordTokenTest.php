@@ -20,8 +20,8 @@ class UsernamePasswordTokenTest extends TestCase
     public function testConstructor()
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-        $this->assertEquals('key', $token->getFirewallName());
+        self::assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        self::assertEquals('key', $token->getFirewallName());
     }
 
     /**
@@ -30,9 +30,9 @@ class UsernamePasswordTokenTest extends TestCase
     public function testLegacyConstructor()
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-        $this->assertEquals('bar', $token->getCredentials());
-        $this->assertEquals('key', $token->getFirewallName());
+        self::assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        self::assertEquals('bar', $token->getCredentials());
+        self::assertEquals('key', $token->getFirewallName());
     }
 
     /**
@@ -41,10 +41,10 @@ class UsernamePasswordTokenTest extends TestCase
     public function testIsAuthenticated()
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
-        $this->assertFalse($token->isAuthenticated());
+        self::assertFalse($token->isAuthenticated());
 
         $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
     }
 
     /**
@@ -52,7 +52,7 @@ class UsernamePasswordTokenTest extends TestCase
      */
     public function testSetAuthenticatedToTrue()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->setAuthenticated(true);
     }
@@ -64,7 +64,7 @@ class UsernamePasswordTokenTest extends TestCase
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->setAuthenticated(false);
-        $this->assertFalse($token->isAuthenticated());
+        self::assertFalse($token->isAuthenticated());
     }
 
     /**
@@ -74,12 +74,12 @@ class UsernamePasswordTokenTest extends TestCase
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->eraseCredentials();
-        $this->assertEquals('', $token->getCredentials());
+        self::assertEquals('', $token->getCredentials());
     }
 
     public function testToString()
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', '', ['A', 'B']), 'foo', ['A', 'B']);
-        $this->assertEquals('UsernamePasswordToken(user="foo", authenticated=true, roles="A, B")', (string) $token);
+        self::assertEquals('UsernamePasswordToken(user="foo", authenticated=true, roles="A, B")', (string) $token);
     }
 }

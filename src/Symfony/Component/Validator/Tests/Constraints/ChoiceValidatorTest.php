@@ -41,7 +41,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectArrayIfMultipleIsTrue()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $constraint = new Choice([
             'choices' => ['foo', 'bar'],
             'multiple' => true,
@@ -64,13 +64,13 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testChoicesOrCallbackExpected()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $this->validator->validate('foobar', new Choice());
     }
 
     public function testValidCallbackExpected()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         $this->validator->validate('foobar', new Choice(['callback' => 'abcd']));
     }
 

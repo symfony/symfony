@@ -76,11 +76,11 @@ abstract class MergeCollectionListenerTest extends TestCase
 
         // The original object was modified
         if (\is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
+            self::assertSame($originalData, $event->getData());
         }
 
         // The original object matches the new object
-        $this->assertEquals($newData, $event->getData());
+        self::assertEquals($newData, $event->getData());
     }
 
     /**
@@ -100,11 +100,11 @@ abstract class MergeCollectionListenerTest extends TestCase
 
         // The original object was modified
         if (\is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
+            self::assertSame($originalData, $event->getData());
         }
 
         // The original object matches the new object
-        $this->assertEquals($this->getData([1 => 'first', 2 => 'second']), $event->getData());
+        self::assertEquals($this->getData([1 => 'first', 2 => 'second']), $event->getData());
     }
 
     /**
@@ -125,11 +125,11 @@ abstract class MergeCollectionListenerTest extends TestCase
 
         // We still have the original object
         if (\is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
+            self::assertSame($originalData, $event->getData());
         }
 
         // Nothing was removed
-        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+        self::assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
     /**
@@ -149,11 +149,11 @@ abstract class MergeCollectionListenerTest extends TestCase
 
         // The original object was modified
         if (\is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
+            self::assertSame($originalData, $event->getData());
         }
 
         // The original object matches the new object
-        $this->assertEquals($newData, $event->getData());
+        self::assertEquals($newData, $event->getData());
     }
 
     /**
@@ -174,11 +174,11 @@ abstract class MergeCollectionListenerTest extends TestCase
 
         // We still have the original object
         if (\is_object($originalData)) {
-            $this->assertSame($originalData, $event->getData());
+            self::assertSame($originalData, $event->getData());
         }
 
         // Nothing was removed
-        $this->assertEquals($this->getData($originalDataArray), $event->getData());
+        self::assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
     /**
@@ -186,7 +186,7 @@ abstract class MergeCollectionListenerTest extends TestCase
      */
     public function testRequireArrayOrTraversable($allowAdd, $allowDelete)
     {
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
         $newData = 'no array or traversable';
         $event = new FormEvent($this->form, $newData);
         $listener = new MergeCollectionListener($allowAdd, $allowDelete);
@@ -205,7 +205,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $event = new FormEvent($this->form, $newData);
         $listener->onSubmit($event);
 
-        $this->assertSame($originalData, $event->getData());
+        self::assertSame($originalData, $event->getData());
     }
 
     /**
@@ -223,7 +223,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $event = new FormEvent($this->form, $newData);
         $listener->onSubmit($event);
 
-        $this->assertSame($newData, $event->getData());
+        self::assertSame($newData, $event->getData());
     }
 
     /**
@@ -241,6 +241,6 @@ abstract class MergeCollectionListenerTest extends TestCase
         $event = new FormEvent($this->form, $newData);
         $listener->onSubmit($event);
 
-        $this->assertNull($event->getData());
+        self::assertNull($event->getData());
     }
 }

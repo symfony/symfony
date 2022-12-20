@@ -35,24 +35,24 @@ class UserAuthenticationProviderTest extends TestCase
     {
         $provider = $this->getProvider();
 
-        $this->assertTrue($provider->supports($this->getSupportedToken()));
-        $this->assertFalse($provider->supports($this->createMock(TokenInterface::class)));
+        self::assertTrue($provider->supports($this->getSupportedToken()));
+        self::assertFalse($provider->supports(self::createMock(TokenInterface::class)));
     }
 
     public function testAuthenticateWhenTokenIsNotSupported()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('The token is not supported by this authentication provider.');
+        self::expectException(AuthenticationException::class);
+        self::expectExceptionMessage('The token is not supported by this authentication provider.');
         $provider = $this->getProvider();
 
-        $provider->authenticate($this->createMock(TokenInterface::class));
+        $provider->authenticate(self::createMock(TokenInterface::class));
     }
 
     public function testAuthenticateWhenUsernameIsNotFound()
     {
-        $this->expectException(UserNotFoundException::class);
+        self::expectException(UserNotFoundException::class);
         $provider = $this->getProvider(false, false);
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
                  ->willThrowException(new UserNotFoundException())
         ;
@@ -62,9 +62,9 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenUsernameIsNotFoundAndHideIsTrue()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $provider = $this->getProvider(false, true);
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
                  ->willThrowException(new UserNotFoundException())
         ;
@@ -75,26 +75,26 @@ class UserAuthenticationProviderTest extends TestCase
     public function testAuthenticateWhenCredentialsAreInvalidAndHideIsTrue()
     {
         $provider = $this->getProvider();
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('retrieveUser')
-            ->willReturn($this->createMock(UserInterface::class))
+            ->willReturn(self::createMock(UserInterface::class))
         ;
-        $provider->expects($this->once())
+        $provider->expects(self::once())
             ->method('checkAuthentication')
             ->willThrowException(new BadCredentialsException())
         ;
 
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Bad credentials.');
+        self::expectException(BadCredentialsException::class);
+        self::expectExceptionMessage('Bad credentials.');
 
         $provider->authenticate($this->getSupportedToken());
     }
 
     public function testAuthenticateWhenProviderDoesNotReturnAnUserInterface()
     {
-        $this->expectException(AuthenticationServiceException::class);
+        self::expectException(AuthenticationServiceException::class);
         $provider = $this->getProvider(false, true);
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
                  ->willReturn(null)
         ;
@@ -104,17 +104,17 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenPreChecksFails()
     {
-        $this->expectException(BadCredentialsException::class);
-        $userChecker = $this->createMock(UserCheckerInterface::class);
-        $userChecker->expects($this->once())
+        self::expectException(BadCredentialsException::class);
+        $userChecker = self::createMock(UserCheckerInterface::class);
+        $userChecker->expects(self::once())
                     ->method('checkPreAuth')
                     ->willThrowException(new CredentialsExpiredException())
         ;
 
         $provider = $this->getProvider($userChecker);
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
-                 ->willReturn($this->createMock(UserInterface::class))
+                 ->willReturn(self::createMock(UserInterface::class))
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -122,17 +122,17 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenPostChecksFails()
     {
-        $this->expectException(BadCredentialsException::class);
-        $userChecker = $this->createMock(UserCheckerInterface::class);
-        $userChecker->expects($this->once())
+        self::expectException(BadCredentialsException::class);
+        $userChecker = self::createMock(UserCheckerInterface::class);
+        $userChecker->expects(self::once())
                     ->method('checkPostAuth')
                     ->willThrowException(new AccountExpiredException())
         ;
 
         $provider = $this->getProvider($userChecker);
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
-                 ->willReturn($this->createMock(UserInterface::class))
+                 ->willReturn(self::createMock(UserInterface::class))
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -140,14 +140,14 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenPostCheckAuthenticationFails()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Bad credentials');
+        self::expectException(BadCredentialsException::class);
+        self::expectExceptionMessage('Bad credentials');
         $provider = $this->getProvider();
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
-                 ->willReturn($this->createMock(UserInterface::class))
+                 ->willReturn(self::createMock(UserInterface::class))
         ;
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('checkAuthentication')
                  ->willThrowException(new CredentialsExpiredException())
         ;
@@ -157,14 +157,14 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenPostCheckAuthenticationFailsWithHideFalse()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('Foo');
+        self::expectException(BadCredentialsException::class);
+        self::expectExceptionMessage('Foo');
         $provider = $this->getProvider(false, false);
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
-                 ->willReturn($this->createMock(UserInterface::class))
+                 ->willReturn(self::createMock(UserInterface::class))
         ;
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('checkAuthentication')
                  ->willThrowException(new BadCredentialsException('Foo'))
         ;
@@ -174,67 +174,67 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticate()
     {
-        $user = $this->createMock(UserInterface::class);
-        $user->expects($this->once())
+        $user = self::createMock(UserInterface::class);
+        $user->expects(self::once())
              ->method('getRoles')
              ->willReturn(['ROLE_FOO'])
         ;
 
         $provider = $this->getProvider();
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
                  ->willReturn($user)
         ;
 
         $token = $this->getSupportedToken();
-        $token->expects($this->once())
+        $token->expects(self::once())
               ->method('getCredentials')
               ->willReturn('foo')
         ;
 
         $authToken = $provider->authenticate($token);
 
-        $this->assertInstanceOf(UsernamePasswordToken::class, $authToken);
-        $this->assertSame($user, $authToken->getUser());
-        $this->assertEquals(['ROLE_FOO'], $authToken->getRoleNames());
-        $this->assertEquals('foo', $authToken->getCredentials());
-        $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
+        self::assertInstanceOf(UsernamePasswordToken::class, $authToken);
+        self::assertSame($user, $authToken->getUser());
+        self::assertEquals(['ROLE_FOO'], $authToken->getRoleNames());
+        self::assertEquals('foo', $authToken->getCredentials());
+        self::assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
     }
 
     public function testAuthenticatePreservesOriginalToken()
     {
-        $user = $this->createMock(UserInterface::class);
-        $user->expects($this->once())
+        $user = self::createMock(UserInterface::class);
+        $user->expects(self::once())
              ->method('getRoles')
              ->willReturn(['ROLE_FOO'])
         ;
 
         $provider = $this->getProvider();
-        $provider->expects($this->once())
+        $provider->expects(self::once())
                  ->method('retrieveUser')
                  ->willReturn($user)
         ;
 
-        $originalToken = $this->createMock(TokenInterface::class);
+        $originalToken = self::createMock(TokenInterface::class);
         $token = new SwitchUserToken(new InMemoryUser('wouter', null), 'foo', 'key', [], $originalToken);
         $token->setAttributes(['foo' => 'bar']);
 
         $authToken = $provider->authenticate($token);
 
-        $this->assertInstanceOf(SwitchUserToken::class, $authToken);
-        $this->assertSame($originalToken, $authToken->getOriginalToken());
-        $this->assertSame($user, $authToken->getUser());
-        $this->assertContains('ROLE_FOO', $authToken->getRoleNames());
-        $this->assertContains('ROLE_PREVIOUS_ADMIN', $authToken->getRoleNames());
-        $this->assertEquals('foo', $authToken->getCredentials());
-        $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
+        self::assertInstanceOf(SwitchUserToken::class, $authToken);
+        self::assertSame($originalToken, $authToken->getOriginalToken());
+        self::assertSame($user, $authToken->getUser());
+        self::assertContains('ROLE_FOO', $authToken->getRoleNames());
+        self::assertContains('ROLE_PREVIOUS_ADMIN', $authToken->getRoleNames());
+        self::assertEquals('foo', $authToken->getCredentials());
+        self::assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
     }
 
     protected function getSupportedToken()
     {
-        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->setMethods(['getCredentials', 'getFirewallName', 'getRoles'])->disableOriginalConstructor()->getMock();
+        $mock = self::getMockBuilder(UsernamePasswordToken::class)->setMethods(['getCredentials', 'getFirewallName', 'getRoles'])->disableOriginalConstructor()->getMock();
         $mock
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getFirewallName')
             ->willReturn('key')
         ;
@@ -247,9 +247,9 @@ class UserAuthenticationProviderTest extends TestCase
     protected function getProvider($userChecker = false, $hide = true)
     {
         if (false === $userChecker) {
-            $userChecker = $this->createMock(UserCheckerInterface::class);
+            $userChecker = self::createMock(UserCheckerInterface::class);
         }
 
-        return $this->getMockForAbstractClass(UserAuthenticationProvider::class, [$userChecker, 'key', $hide]);
+        return self::getMockForAbstractClass(UserAuthenticationProvider::class, [$userChecker, 'key', $hide]);
     }
 }

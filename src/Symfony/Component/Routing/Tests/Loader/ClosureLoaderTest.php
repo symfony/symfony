@@ -24,11 +24,11 @@ class ClosureLoaderTest extends TestCase
 
         $closure = function () {};
 
-        $this->assertTrue($loader->supports($closure), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        self::assertTrue($loader->supports($closure), '->supports() returns true if the resource is loadable');
+        self::assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
-        $this->assertTrue($loader->supports($closure, 'closure'), '->supports() checks the resource type if specified');
-        $this->assertFalse($loader->supports($closure, 'foo'), '->supports() checks the resource type if specified');
+        self::assertTrue($loader->supports($closure, 'closure'), '->supports() checks the resource type if specified');
+        self::assertFalse($loader->supports($closure, 'foo'), '->supports() checks the resource type if specified');
     }
 
     public function testLoad()
@@ -37,7 +37,7 @@ class ClosureLoaderTest extends TestCase
 
         $route = new Route('/');
         $routes = $loader->load(function (string $env = null) use ($route) {
-            $this->assertSame('some-env', $env);
+            self::assertSame('some-env', $env);
 
             $routes = new RouteCollection();
 
@@ -46,6 +46,6 @@ class ClosureLoaderTest extends TestCase
             return $routes;
         });
 
-        $this->assertEquals($route, $routes->get('foo'), '->load() loads a \Closure resource');
+        self::assertEquals($route, $routes->get('foo'), '->load() loads a \Closure resource');
     }
 }

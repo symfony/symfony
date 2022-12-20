@@ -69,7 +69,7 @@ class LoginThrottlingListenerTest extends TestCase
             $this->listener->checkPassport($this->createCheckPassportEvent($passport));
         }
 
-        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        self::expectException(TooManyLoginAttemptsAuthenticationException::class);
         $this->listener->checkPassport($this->createCheckPassportEvent($passport));
     }
 
@@ -84,7 +84,7 @@ class LoginThrottlingListenerTest extends TestCase
             $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
         }
 
-        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        self::expectException(TooManyLoginAttemptsAuthenticationException::class);
         $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
@@ -99,7 +99,7 @@ class LoginThrottlingListenerTest extends TestCase
             $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 2]));
         }
 
-        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        self::expectException(TooManyLoginAttemptsAuthenticationException::class);
         $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
@@ -110,12 +110,12 @@ class LoginThrottlingListenerTest extends TestCase
 
     private function createLoginSuccessfulEvent($passport)
     {
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), $this->requestStack->getCurrentRequest(), null, 'main');
+        return new LoginSuccessEvent(self::createMock(AuthenticatorInterface::class), $passport, self::createMock(TokenInterface::class), $this->requestStack->getCurrentRequest(), null, 'main');
     }
 
     private function createCheckPassportEvent($passport)
     {
-        return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
+        return new CheckPassportEvent(self::createMock(AuthenticatorInterface::class), $passport);
     }
 
     private function createRequest($ip = '192.168.1.0')

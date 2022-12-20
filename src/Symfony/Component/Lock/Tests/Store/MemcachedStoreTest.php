@@ -64,12 +64,12 @@ class MemcachedStoreTest extends AbstractStoreTest
 
     public function testAbortAfterExpiration()
     {
-        $this->markTestSkipped('Memcached expects a TTL greater than 1 sec. Simulating a slow network is too hard');
+        self::markTestSkipped('Memcached expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
     public function testInvalidTtl()
     {
-        $this->expectException(InvalidTtlException::class);
+        self::expectException(InvalidTtlException::class);
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }

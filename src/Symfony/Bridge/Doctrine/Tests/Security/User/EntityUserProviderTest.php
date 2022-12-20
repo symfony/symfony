@@ -45,7 +45,7 @@ class EntityUserProviderTest extends TestCase
         // try to change the user identity
         $user1->name = 'user2';
 
-        $this->assertSame($user1, $provider->refreshUser($user1));
+        self::assertSame($user1, $provider->refreshUser($user1));
     }
 
     public function testLoadUserByUsername()
@@ -60,35 +60,35 @@ class EntityUserProviderTest extends TestCase
 
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
-        $this->assertSame($user, $provider->loadUserByIdentifier('user1'));
+        self::assertSame($user, $provider->loadUserByIdentifier('user1'));
     }
 
     public function testLoadUserByUsernameWithUserLoaderRepositoryAndWithoutProperty()
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->createMock(UserLoaderRepository::class);
+        $repository = self::createMock(UserLoaderRepository::class);
         $repository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('loadUserByIdentifier')
             ->with('user1')
             ->willReturn($user);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = self::createMock(EntityManager::class);
         $em
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getRepository')
             ->with('Symfony\Bridge\Doctrine\Tests\Fixtures\User')
             ->willReturn($repository);
 
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User');
-        $this->assertSame($user, $provider->loadUserByIdentifier('user1'));
+        self::assertSame($user, $provider->loadUserByIdentifier('user1'));
     }
 
     public function testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('You must either make the "Symfony\Bridge\Doctrine\Tests\Fixtures\User" entity Doctrine Repository ("Doctrine\ORM\EntityRepository") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('You must either make the "Symfony\Bridge\Doctrine\Tests\Fixtures\User" entity Doctrine Repository ("Doctrine\ORM\EntityRepository") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.');
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
 
@@ -108,8 +108,8 @@ class EntityUserProviderTest extends TestCase
         $user1 = new User(null, null, 'user1');
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('You cannot refresh a user from the EntityUserProvider that does not contain an identifier. The user object has to be serialized with its own identifier mapped by Doctrine');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('You cannot refresh a user from the EntityUserProvider that does not contain an identifier. The user object has to be serialized with its own identifier mapped by Doctrine');
         $provider->refreshUser($user1);
     }
 
@@ -126,8 +126,8 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $user2 = new User(1, 2, 'user2');
-        $this->expectException(UserNotFoundException::class);
-        $this->expectExceptionMessage('User with id {"id1":1,"id2":2} not found');
+        self::expectException(UserNotFoundException::class);
+        self::expectExceptionMessage('User with id {"id1":1,"id2":2} not found');
 
         $provider->refreshUser($user2);
     }
@@ -146,17 +146,17 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $user2 = $em->getReference('Symfony\Bridge\Doctrine\Tests\Fixtures\User', ['id1' => 1, 'id2' => 1]);
-        $this->assertTrue($provider->supportsClass(\get_class($user2)));
+        self::assertTrue($provider->supportsClass(\get_class($user2)));
     }
 
     public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()
     {
-        $repository = $this->createMock(UserLoaderRepository::class);
-        $repository->expects($this->once())
+        $repository = self::createMock(UserLoaderRepository::class);
+        $repository->expects(self::once())
             ->method('loadUserByIdentifier')
             ->with('name')
             ->willReturn(
-                $this->createMock(UserInterface::class)
+                self::createMock(UserInterface::class)
             );
 
         $provider = new EntityUserProvider(
@@ -169,8 +169,8 @@ class EntityUserProviderTest extends TestCase
 
     public function testLoadUserByUserNameShouldDeclineInvalidInterface()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $repository = $this->createMock(ObjectRepository::class);
+        self::expectException(\InvalidArgumentException::class);
+        $repository = self::createMock(ObjectRepository::class);
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
@@ -184,8 +184,8 @@ class EntityUserProviderTest extends TestCase
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->createMock(PasswordUpgraderRepository::class);
-        $repository->expects($this->once())
+        $repository = self::createMock(PasswordUpgraderRepository::class);
+        $repository->expects(self::once())
             ->method('upgradePassword')
             ->with($user, 'foobar');
 
@@ -199,10 +199,10 @@ class EntityUserProviderTest extends TestCase
 
     private function getManager($em, $name = null)
     {
-        $manager = $this->createMock(ManagerRegistry::class);
-        $manager->expects($this->any())
+        $manager = self::createMock(ManagerRegistry::class);
+        $manager->expects(self::any())
             ->method('getManager')
-            ->with($this->equalTo($name))
+            ->with(self::equalTo($name))
             ->willReturn($em);
 
         return $manager;
@@ -210,10 +210,10 @@ class EntityUserProviderTest extends TestCase
 
     private function getObjectManager($repository)
     {
-        $em = $this->getMockBuilder(ObjectManager::class)
+        $em = self::getMockBuilder(ObjectManager::class)
             ->setMethods(['getClassMetadata', 'getRepository'])
             ->getMockForAbstractClass();
-        $em->expects($this->any())
+        $em->expects(self::any())
             ->method('getRepository')
             ->willReturn($repository);
 

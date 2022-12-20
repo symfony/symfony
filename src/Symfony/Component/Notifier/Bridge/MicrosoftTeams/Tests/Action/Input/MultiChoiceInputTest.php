@@ -31,12 +31,9 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         $input = $this->createInput()
             ->choice($display = 'DISPLAY', $value = 'VALUE');
 
-        $this->assertSame(
-            [
-                ['display' => $display, 'value' => $value],
-            ],
-            $input->toArray()['choices']
-        );
+        self::assertSame([
+            ['display' => $display, 'value' => $value],
+        ], $input->toArray()['choices']);
     }
 
     public function testIsMultiSelectWithTrue()
@@ -44,7 +41,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         $input = $this->createInput()
             ->isMultiSelect(true);
 
-        $this->assertTrue($input->toArray()['isMultiSelect']);
+        self::assertTrue($input->toArray()['isMultiSelect']);
     }
 
     public function testIsMultiSelectWithFalse()
@@ -52,7 +49,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         $input = $this->createInput()
             ->isMultiSelect(false);
 
-        $this->assertFalse($input->toArray()['isMultiSelect']);
+        self::assertFalse($input->toArray()['isMultiSelect']);
     }
 
     /**
@@ -63,7 +60,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         $input = $this->createInput()
             ->style($value);
 
-        $this->assertSame($value, $input->toArray()['style']);
+        self::assertSame($value, $input->toArray()['style']);
     }
 
     /**
@@ -80,18 +77,15 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
      */
     public function testStyleThrowsWithUnknownStyle()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
         $this->createInput()->style('red');
     }
 
     public function testToArray()
     {
-        $this->assertSame(
-            [
-                '@type' => 'MultichoiceInput',
-            ],
-            $this->createInput()->toArray()
-        );
+        self::assertSame([
+            '@type' => 'MultichoiceInput',
+        ], $this->createInput()->toArray());
     }
 }

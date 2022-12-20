@@ -26,7 +26,7 @@ class TranslationExtensionTest extends TestCase
     {
         $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(['value' => 12, 'msg' => 'approx.']);
 
-        $this->assertEquals('Percent: 12% (approx.)', $output);
+        self::assertEquals('Percent: 12% (approx.)', $output);
     }
 
     /**
@@ -41,23 +41,23 @@ class TranslationExtensionTest extends TestCase
             $twig->addExtension(new TranslationExtension(new Translator('en')));
 
             echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSourceContext('index'))))."\n\n";
-            $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
+            self::assertEquals($expected, $this->getTemplate($template)->render($variables));
         }
 
-        $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
+        self::assertEquals($expected, $this->getTemplate($template)->render($variables));
     }
 
     public function testTransUnknownKeyword()
     {
-        $this->expectException(\Twig\Error\SyntaxError::class);
-        $this->expectExceptionMessage('Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.');
+        self::expectException(\Twig\Error\SyntaxError::class);
+        self::expectExceptionMessage('Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.');
         $this->getTemplate("{% trans \n\nfoo %}{% endtrans %}")->render();
     }
 
     public function testTransComplexBody()
     {
-        $this->expectException(\Twig\Error\SyntaxError::class);
-        $this->expectExceptionMessage('A message inside a trans tag must be a simple text in "index" at line 2.');
+        self::expectException(\Twig\Error\SyntaxError::class);
+        self::expectExceptionMessage('A message inside a trans tag must be a simple text in "index" at line 2.');
         $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
     }
 
@@ -168,7 +168,7 @@ class TranslationExtensionTest extends TestCase
 
         $template = $this->getTemplate($templates, $translator);
 
-        $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render([])));
+        self::assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render([])));
     }
 
     public function testDefaultTranslationDomainWithNamedArguments()
@@ -202,7 +202,7 @@ class TranslationExtensionTest extends TestCase
 
         $template = $this->getTemplate($templates, $translator);
 
-        $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render([])));
+        self::assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render([])));
     }
 
     private function getTemplate($template, TranslatorInterface $translator = null): TemplateWrapper

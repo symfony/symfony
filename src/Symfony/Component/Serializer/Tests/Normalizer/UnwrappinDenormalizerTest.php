@@ -27,16 +27,16 @@ class UnwrappinDenormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serializer = $this->createMock(Serializer::class);
+        $this->serializer = self::createMock(Serializer::class);
         $this->denormalizer = new UnwrappingDenormalizer();
         $this->denormalizer->setSerializer($this->serializer);
     }
 
     public function testSupportsNormalization()
     {
-        $this->assertTrue($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]']));
-        $this->assertFalse($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]', 'unwrapped' => true]));
-        $this->assertFalse($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', []));
+        self::assertTrue($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]']));
+        self::assertFalse($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]', 'unwrapped' => true]));
+        self::assertFalse($this->denormalizer->supportsDenormalization([], 'stdClass', 'any', []));
     }
 
     public function testDenormalize()
@@ -46,7 +46,7 @@ class UnwrappinDenormalizerTest extends TestCase
         $expected->bar = 'bar';
         $expected->setFoo('foo');
 
-        $this->serializer->expects($this->exactly(1))
+        $this->serializer->expects(self::exactly(1))
             ->method('denormalize')
             ->with(['foo' => 'foo', 'bar' => 'bar', 'baz' => true])
             ->willReturn($expected);
@@ -58,14 +58,14 @@ class UnwrappinDenormalizerTest extends TestCase
             [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']
         );
 
-        $this->assertEquals('foo', $result->getFoo());
-        $this->assertEquals('bar', $result->bar);
-        $this->assertTrue($result->isBaz());
+        self::assertEquals('foo', $result->getFoo());
+        self::assertEquals('bar', $result->bar);
+        self::assertTrue($result->isBaz());
     }
 
     public function testDenormalizeInvalidPath()
     {
-        $this->serializer->expects($this->exactly(1))
+        $this->serializer->expects(self::exactly(1))
             ->method('denormalize')
             ->with(null)
             ->willReturn(new ObjectDummy());
@@ -77,8 +77,8 @@ class UnwrappinDenormalizerTest extends TestCase
             [UnwrappingDenormalizer::UNWRAP_PATH => '[invalid]']
         );
 
-        $this->assertNull($obj->getFoo());
-        $this->assertNull($obj->bar);
-        $this->assertNull($obj->isBaz());
+        self::assertNull($obj->getFoo());
+        self::assertNull($obj->bar);
+        self::assertNull($obj->isBaz());
     }
 }

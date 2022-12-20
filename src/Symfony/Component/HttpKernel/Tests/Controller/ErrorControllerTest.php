@@ -27,12 +27,12 @@ class ErrorControllerTest extends TestCase
      */
     public function testInvokeController(Request $request, \Exception $exception, int $statusCode, string $content)
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $errorRenderer = new HtmlErrorRenderer();
         $controller = new ErrorController($kernel, null, $errorRenderer);
         $response = $controller($exception);
 
-        $this->assertSame($statusCode, $response->getStatusCode());
+        self::assertSame($statusCode, $response->getStatusCode());
         self::assertStringContainsString($content, strtr($response->getContent(), ["\n" => '', '    ' => '']));
     }
 
@@ -67,27 +67,27 @@ class ErrorControllerTest extends TestCase
         $_controller = 'error_controller';
         $code = 404;
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $kernel
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handle')
             ->with(
-                $this->callback(function (Request $request) use ($_controller, $code) {
+                self::callback(function (Request $request) use ($_controller, $code) {
                     $exception = $request->attributes->get('exception');
 
-                    $this->assertSame($_controller, $request->attributes->get('_controller'));
-                    $this->assertInstanceOf(\Throwable::class, $exception);
-                    $this->assertSame($code, $exception->getStatusCode());
-                    $this->assertFalse($request->attributes->get('showException'));
+                    self::assertSame($_controller, $request->attributes->get('_controller'));
+                    self::assertInstanceOf(\Throwable::class, $exception);
+                    self::assertSame($code, $exception->getStatusCode());
+                    self::assertFalse($request->attributes->get('showException'));
 
                     return true;
                 }),
-                $this->equalTo(HttpKernelInterface::SUB_REQUEST)
+                self::equalTo(HttpKernelInterface::SUB_REQUEST)
             )
             ->willReturn($response = new Response());
 
         $controller = new ErrorController($kernel, $_controller, new HtmlErrorRenderer());
 
-        $this->assertSame($response, $controller->preview(new Request(), $code));
+        self::assertSame($response, $controller->preview(new Request(), $code));
     }
 }

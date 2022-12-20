@@ -34,7 +34,7 @@ class RememberMeListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
+        $this->rememberMeHandler = self::createMock(RememberMeHandlerInterface::class);
         $this->listener = new RememberMeListener($this->rememberMeHandler);
         $this->request = Request::create('/login');
         $this->request->request->set('_remember_me', true);
@@ -43,7 +43,7 @@ class RememberMeListenerTest extends TestCase
 
     public function testSuccessfulLoginWithoutSupportingAuthenticator()
     {
-        $this->rememberMeHandler->expects($this->never())->method('createRememberMeCookie');
+        $this->rememberMeHandler->expects(self::never())->method('createRememberMeCookie');
 
         $event = $this->createLoginSuccessfulEvent($this->createPassport([]));
         $this->listener->onSuccessfulLogin($event);
@@ -51,7 +51,7 @@ class RememberMeListenerTest extends TestCase
 
     public function testSuccessfulLoginWithRememberMeDisabled()
     {
-        $this->rememberMeHandler->expects($this->never())->method('createRememberMeCookie');
+        $this->rememberMeHandler->expects(self::never())->method('createRememberMeCookie');
 
         $event = $this->createLoginSuccessfulEvent($this->createPassport([new RememberMeBadge()]));
         $this->listener->onSuccessfulLogin($event);
@@ -59,7 +59,7 @@ class RememberMeListenerTest extends TestCase
 
     public function testCredentialsInvalid()
     {
-        $this->rememberMeHandler->expects($this->once())->method('clearRememberMeCookie');
+        $this->rememberMeHandler->expects(self::once())->method('clearRememberMeCookie');
 
         $this->listener->clearCookie();
     }
@@ -70,7 +70,7 @@ class RememberMeListenerTest extends TestCase
             $passport = $this->createPassport();
         }
 
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), $this->request, $this->response, 'main_firewall');
+        return new LoginSuccessEvent(self::createMock(AuthenticatorInterface::class), $passport, self::createMock(TokenInterface::class), $this->request, $this->response, 'main_firewall');
     }
 
     private function createPassport(array $badges = null)

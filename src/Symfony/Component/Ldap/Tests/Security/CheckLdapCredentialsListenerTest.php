@@ -42,10 +42,10 @@ class CheckLdapCredentialsListenerTest extends TestCase
     protected function setUp(): void
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
+            self::markTestSkipped('This test requires symfony/security-http:^5.1');
         }
 
-        $this->ldap = $this->createMock(LdapInterface::class);
+        $this->ldap = self::createMock(LdapInterface::class);
     }
 
     /**
@@ -53,7 +53,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
      */
     public function testShouldNotCheckPassport($authenticator, $passport)
     {
-        $this->ldap->expects($this->never())->method('bind');
+        $this->ldap->expects(self::never())->method('bind');
 
         $listener = $this->createListener();
         $listener->onCheckPassport(new CheckPassportEvent($authenticator, $passport));
@@ -62,7 +62,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     public function provideShouldNotCheckPassport()
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
+            self::markTestSkipped('This test requires symfony/security-http:^5.1');
         }
 
         // no LdapBadge
@@ -76,8 +76,8 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function testPasswordCredentialsAlreadyResolvedThrowsException()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('LDAP authentication password verification cannot be completed because something else has already resolved the PasswordCredentials.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('LDAP authentication password verification cannot be completed because something else has already resolved the PasswordCredentials.');
 
         $badge = new PasswordCredentials('s3cret');
         $badge->markResolved();
@@ -89,8 +89,8 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function testInvalidLdapServiceId()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot check credentials using the "not_existing_ldap_service" ldap service, as such service is not found. Did you maybe forget to add the "ldap" service tag to this service?');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Cannot check credentials using the "not_existing_ldap_service" ldap service, as such service is not found. Did you maybe forget to add the "ldap" service tag to this service?');
 
         $listener = $this->createListener();
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('not_existing_ldap_service')));
@@ -101,8 +101,8 @@ class CheckLdapCredentialsListenerTest extends TestCase
      */
     public function testWrongPassport($passport)
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('LDAP authentication requires a passport containing a user and password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('LDAP authentication requires a passport containing a user and password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
 
         $listener = $this->createListener();
         $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
@@ -111,7 +111,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     public function provideWrongPassportData()
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
+            self::markTestSkipped('This test requires symfony/security-http:^5.1');
         }
 
         // no password credentials
@@ -123,13 +123,13 @@ class CheckLdapCredentialsListenerTest extends TestCase
      */
     public function testLegacyWrongPassport()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('LDAP authentication requires a passport containing a user and password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('LDAP authentication requires a passport containing a user and password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
 
         // no user passport
-        $passport = $this->createMock(PassportInterface::class);
-        $passport->expects($this->any())->method('hasBadge')->with(LdapBadge::class)->willReturn(true);
-        $passport->expects($this->any())->method('getBadge')->with(LdapBadge::class)->willReturn(new LdapBadge('app.ldap'));
+        $passport = self::createMock(PassportInterface::class);
+        $passport->expects(self::any())->method('hasBadge')->with(LdapBadge::class)->willReturn(true);
+        $passport->expects(self::any())->method('getBadge')->with(LdapBadge::class)->willReturn(new LdapBadge('app.ldap'));
 
         $listener = $this->createListener();
         $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
@@ -137,8 +137,8 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function testEmptyPasswordShouldThrowAnException()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('The presented password cannot be empty.');
+        self::expectException(BadCredentialsException::class);
+        self::expectExceptionMessage('The presented password cannot be empty.');
 
         $listener = $this->createListener();
         $listener->onCheckPassport($this->createEvent(''));
@@ -146,11 +146,11 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function testBindFailureShouldThrowAnException()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('The presented password is invalid.');
+        self::expectException(BadCredentialsException::class);
+        self::expectExceptionMessage('The presented password is invalid.');
 
         $this->ldap->method('escape')->willReturnArgument(0);
-        $this->ldap->expects($this->any())->method('bind')->willThrowException(new ConnectionException());
+        $this->ldap->expects(self::any())->method('bind')->willThrowException(new ConnectionException());
 
         $listener = $this->createListener();
         $listener->onCheckPassport($this->createEvent());
@@ -165,16 +165,16 @@ class CheckLdapCredentialsListenerTest extends TestCase
             }
         };
 
-        $query = $this->createMock(QueryInterface::class);
-        $query->expects($this->once())->method('execute')->willReturn($collection);
+        $query = self::createMock(QueryInterface::class);
+        $query->expects(self::once())->method('execute')->willReturn($collection);
 
         $this->ldap
             ->method('bind')
             ->withConsecutive(
                 ['elsa', 'test1234A$']
             );
-        $this->ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
-        $this->ldap->expects($this->once())->method('query')->with('{username}', 'wouter_test')->willReturn($query);
+        $this->ldap->expects(self::any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
+        $this->ldap->expects(self::once())->method('query')->with('{username}', 'wouter_test')->willReturn($query);
 
         $listener = $this->createListener();
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{username}', 'elsa', 'test1234A$', '{username}_test')));
@@ -182,13 +182,13 @@ class CheckLdapCredentialsListenerTest extends TestCase
 
     public function testEmptyQueryResultShouldThrowAnException()
     {
-        $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage('The presented username is invalid.');
+        self::expectException(BadCredentialsException::class);
+        self::expectExceptionMessage('The presented username is invalid.');
 
-        $collection = $this->createMock(CollectionInterface::class);
+        $collection = self::createMock(CollectionInterface::class);
 
-        $query = $this->createMock(QueryInterface::class);
-        $query->expects($this->once())->method('execute')->willReturn($collection);
+        $query = self::createMock(QueryInterface::class);
+        $query->expects(self::once())->method('execute')->willReturn($collection);
 
         $this->ldap
             ->method('bind')
@@ -196,7 +196,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
                 ['elsa', 'test1234A$']
             );
         $this->ldap->method('escape')->willReturnArgument(0);
-        $this->ldap->expects($this->once())->method('query')->willReturn($query);
+        $this->ldap->expects(self::once())->method('query')->willReturn($query);
 
         $listener = $this->createListener();
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{username}', 'elsa', 'test1234A$', '{username}_test')));

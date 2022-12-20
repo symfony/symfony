@@ -31,11 +31,8 @@ class ConsoleCommandProcessorTest extends TestCase
 
         $record = $processor(['extra' => []]);
 
-        $this->assertArrayHasKey('command', $record['extra']);
-        $this->assertEquals(
-            ['name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS],
-            $record['extra']['command']
-        );
+        self::assertArrayHasKey('command', $record['extra']);
+        self::assertEquals(['name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS], $record['extra']['command']);
     }
 
     public function testProcessorWithOptions()
@@ -45,11 +42,8 @@ class ConsoleCommandProcessorTest extends TestCase
 
         $record = $processor(['extra' => []]);
 
-        $this->assertArrayHasKey('command', $record['extra']);
-        $this->assertEquals(
-            ['name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS, 'options' => self::TEST_OPTIONS],
-            $record['extra']['command']
-        );
+        self::assertArrayHasKey('command', $record['extra']);
+        self::assertEquals(['name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS, 'options' => self::TEST_OPTIONS], $record['extra']['command']);
     }
 
     public function testProcessorDoesNothingWhenNotInConsole()
@@ -57,17 +51,17 @@ class ConsoleCommandProcessorTest extends TestCase
         $processor = new ConsoleCommandProcessor(true, true);
 
         $record = $processor(['extra' => []]);
-        $this->assertEquals(['extra' => []], $record);
+        self::assertEquals(['extra' => []], $record);
     }
 
     private function getConsoleEvent(): ConsoleEvent
     {
-        $input = $this->createMock(InputInterface::class);
+        $input = self::createMock(InputInterface::class);
         $input->method('getArguments')->willReturn(self::TEST_ARGUMENTS);
         $input->method('getOptions')->willReturn(self::TEST_OPTIONS);
-        $command = $this->createMock(Command::class);
+        $command = self::createMock(Command::class);
         $command->method('getName')->willReturn(self::TEST_NAME);
 
-        return new ConsoleEvent($command, $input, $this->createMock(OutputInterface::class));
+        return new ConsoleEvent($command, $input, self::createMock(OutputInterface::class));
     }
 }

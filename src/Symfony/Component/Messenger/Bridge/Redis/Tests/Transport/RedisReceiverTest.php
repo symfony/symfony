@@ -32,13 +32,13 @@ class RedisReceiverTest extends TestCase
      */
     public function testItReturnsTheDecodedMessageToTheHandler(array $redisEnvelope, $expectedMessage, SerializerInterface $serializer)
     {
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $connection->method('get')->willReturn($redisEnvelope);
 
         $receiver = new RedisReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->get();
-        $this->assertCount(1, $actualEnvelopes);
-        $this->assertEquals($expectedMessage, $actualEnvelopes[0]->getMessage());
+        self::assertCount(1, $actualEnvelopes);
+        self::assertEquals($expectedMessage, $actualEnvelopes[0]->getMessage());
     }
 
     /**
@@ -46,14 +46,14 @@ class RedisReceiverTest extends TestCase
      */
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException(array $redisEnvelope)
     {
-        $this->expectException(MessageDecodingFailedException::class);
+        self::expectException(MessageDecodingFailedException::class);
 
-        $serializer = $this->createMock(PhpSerializer::class);
+        $serializer = self::createMock(PhpSerializer::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $connection->method('get')->willReturn($redisEnvelope);
-        $connection->expects($this->once())->method('reject');
+        $connection->expects(self::once())->method('reject');
 
         $receiver = new RedisReceiver($connection, $serializer);
         $receiver->get();

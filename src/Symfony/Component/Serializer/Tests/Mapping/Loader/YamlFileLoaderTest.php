@@ -49,23 +49,23 @@ class YamlFileLoaderTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf(LoaderInterface::class, $this->loader);
+        self::assertInstanceOf(LoaderInterface::class, $this->loader);
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
-        $this->assertTrue($this->loader->loadClassMetadata($this->metadata));
+        self::assertTrue($this->loader->loadClassMetadata($this->metadata));
     }
 
     public function testLoadClassMetadataReturnsFalseWhenEmpty()
     {
         $loader = new YamlFileLoader(__DIR__.'/../../Fixtures/empty-mapping.yml');
-        $this->assertFalse($loader->loadClassMetadata($this->metadata));
+        self::assertFalse($loader->loadClassMetadata($this->metadata));
     }
 
     public function testLoadClassMetadataReturnsThrowsInvalidMapping()
     {
-        $this->expectException(MappingException::class);
+        self::expectException(MappingException::class);
         $loader = new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-mapping.yml');
         $loader->loadClassMetadata($this->metadata);
     }
@@ -74,7 +74,7 @@ class YamlFileLoaderTest extends TestCase
     {
         $this->loader->loadClassMetadata($this->metadata);
 
-        $this->assertEquals(TestClassMetadataFactory::createXmlCLassMetadata(), $this->metadata);
+        self::assertEquals(TestClassMetadataFactory::createXmlCLassMetadata(), $this->metadata);
     }
 
     public function testMaxDepth()
@@ -83,8 +83,8 @@ class YamlFileLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertEquals(2, $attributesMetadata['foo']->getMaxDepth());
-        $this->assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
+        self::assertEquals(2, $attributesMetadata['foo']->getMaxDepth());
+        self::assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
     }
 
     public function testSerializedName()
@@ -93,8 +93,8 @@ class YamlFileLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
-        $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+        self::assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
+        self::assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
     }
 
     public function testLoadDiscriminatorMap()
@@ -109,7 +109,7 @@ class YamlFileLoaderTest extends TestCase
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
 
-        $this->assertEquals($expected, $classMetadata);
+        self::assertEquals($expected, $classMetadata);
     }
 
     public function testLoadIgnore()
@@ -118,14 +118,14 @@ class YamlFileLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
-        $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
+        self::assertTrue($attributesMetadata['ignored1']->isIgnored());
+        self::assertTrue($attributesMetadata['ignored2']->isIgnored());
     }
 
     public function testLoadInvalidIgnore()
     {
-        $this->expectException(MappingException::class);
-        $this->expectExceptionMessage('The "ignore" value must be a boolean');
+        self::expectException(MappingException::class);
+        self::expectExceptionMessage('The "ignore" value must be a boolean');
 
         (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-ignore.yml'))->loadClassMetadata(new ClassMetadata(IgnoreDummy::class));
     }

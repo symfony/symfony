@@ -21,7 +21,7 @@ final class InvokeAddInCommandActionTest extends TestCase
         $action = (new InvokeAddInCommandAction())
             ->name($value = 'My name');
 
-        $this->assertSame($value, $action->toArray()['name']);
+        self::assertSame($value, $action->toArray()['name']);
     }
 
     public function testAddInId()
@@ -29,7 +29,7 @@ final class InvokeAddInCommandActionTest extends TestCase
         $action = (new InvokeAddInCommandAction())
             ->addInId($value = '1234');
 
-        $this->assertSame($value, $action->toArray()['addInId']);
+        self::assertSame($value, $action->toArray()['addInId']);
     }
 
     public function testDesktopCommandId()
@@ -37,7 +37,7 @@ final class InvokeAddInCommandActionTest extends TestCase
         $action = (new InvokeAddInCommandAction())
             ->desktopCommandId($value = '324');
 
-        $this->assertSame($value, $action->toArray()['desktopCommandId']);
+        self::assertSame($value, $action->toArray()['desktopCommandId']);
     }
 
     public function testInitializationContext()
@@ -49,16 +49,13 @@ final class InvokeAddInCommandActionTest extends TestCase
         $action = (new InvokeAddInCommandAction())
             ->initializationContext($value);
 
-        $this->assertSame($value, $action->toArray()['initializationContext']);
+        self::assertSame($value, $action->toArray()['initializationContext']);
     }
 
     public function testToArray()
     {
-        $this->assertSame(
-            [
-                '@type' => 'InvokeAddInCommand',
-            ],
-            (new InvokeAddInCommandAction())->toArray()
-        );
+        self::assertSame([
+            '@type' => 'InvokeAddInCommand',
+        ], (new InvokeAddInCommandAction())->toArray());
     }
 }

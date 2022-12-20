@@ -26,8 +26,8 @@ class UlidGeneratorTest extends TestCase
         $generator = new UlidGenerator();
         $ulid = $generator->generate($em, new Entity());
 
-        $this->assertInstanceOf(Ulid::class, $ulid);
-        $this->assertTrue(Ulid::isValid($ulid));
+        self::assertInstanceOf(Ulid::class, $ulid);
+        self::assertTrue(Ulid::isValid($ulid));
     }
 
     /**
@@ -37,12 +37,12 @@ class UlidGeneratorTest extends TestCase
     {
         $ulid = new Ulid('00000000000000000000000000');
         $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
-        $factory = $this->createMock(UlidFactory::class);
-        $factory->expects($this->any())
+        $factory = self::createMock(UlidFactory::class);
+        $factory->expects(self::any())
             ->method('create')
             ->willReturn($ulid);
         $generator = new UlidGenerator($factory);
 
-        $this->assertSame($ulid, $generator->generate($em, new Entity()));
+        self::assertSame($ulid, $generator->generate($em, new Entity()));
     }
 }

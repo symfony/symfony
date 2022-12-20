@@ -41,16 +41,16 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
             }
         };
 
-        $stopwatch = $this->createMock(Stopwatch::class);
-        $stopwatch->expects($this->exactly(2))->method('isStarted')->willReturn(true);
-        $stopwatch->expects($this->exactly(2))
+        $stopwatch = self::createMock(Stopwatch::class);
+        $stopwatch->expects(self::exactly(2))->method('isStarted')->willReturn(true);
+        $stopwatch->expects(self::exactly(2))
             ->method('start')
             ->withConsecutive(
-                [$this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
+                [self::matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
                 ['Tail on "command_bus"', 'messenger.middleware']
             )
         ;
-        $stopwatch->expects($this->exactly(2))
+        $stopwatch->expects(self::exactly(2))
             ->method('stop')
             ->withConsecutive(
                 ['"Symfony\Component\Messenger\Middleware\MiddlewareInterface@anonymous" on "command_bus"'],
@@ -61,31 +61,31 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $traced = new TraceableMiddleware($stopwatch, $busId);
 
         $traced->handle($envelope, new StackMiddleware(new \ArrayIterator([null, $middleware])));
-        $this->assertSame(1, $middleware->calls);
+        self::assertSame(1, $middleware->calls);
     }
 
     public function testHandleWithException()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Thrown from next middleware.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Thrown from next middleware.');
         $busId = 'command_bus';
 
-        $middleware = $this->createMock(MiddlewareInterface::class);
-        $middleware->expects($this->once())
+        $middleware = self::createMock(MiddlewareInterface::class);
+        $middleware->expects(self::once())
             ->method('handle')
             ->willThrowException(new \RuntimeException('Thrown from next middleware.'))
         ;
 
-        $stopwatch = $this->createMock(Stopwatch::class);
-        $stopwatch->expects($this->once())->method('isStarted')->willReturn(true);
+        $stopwatch = self::createMock(Stopwatch::class);
+        $stopwatch->expects(self::once())->method('isStarted')->willReturn(true);
         // Start/stop are expected to be called once, as an exception is thrown by the next callable
-        $stopwatch->expects($this->once())
+        $stopwatch->expects(self::once())
             ->method('start')
-            ->with($this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware')
+            ->with(self::matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware')
         ;
-        $stopwatch->expects($this->once())
+        $stopwatch->expects(self::once())
             ->method('stop')
-            ->with($this->matches('"%sMiddlewareInterface%s" on "command_bus"'))
+            ->with(self::matches('"%sMiddlewareInterface%s" on "command_bus"'))
         ;
 
         $traced = new TraceableMiddleware($stopwatch, $busId);
@@ -121,6 +121,6 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $traced = new TraceableMiddleware($stopwatch, $busId);
 
         $traced->handle($envelope, new StackMiddleware(new \ArrayIterator([null, $middleware])));
-        $this->assertSame(1, $middleware->calls);
+        self::assertSame(1, $middleware->calls);
     }
 }

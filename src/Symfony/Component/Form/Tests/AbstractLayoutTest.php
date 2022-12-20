@@ -32,13 +32,13 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     protected function setUp(): void
     {
         if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('Extension intl is required.');
+            self::markTestSkipped('Extension intl is required.');
         }
 
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
 
-        $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $this->csrfTokenManager = self::createMock(CsrfTokenManagerInterface::class);
 
         parent::setUp();
     }
@@ -62,8 +62,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $xpath = new \DOMXPath($element->ownerDocument);
         $nodeList = $xpath->evaluate($expression);
-        $this->assertEquals(1, $nodeList->length);
-        $this->assertEquals($nodeValue, $nodeList->item(0)->nodeValue);
+        self::assertEquals(1, $nodeList->length);
+        self::assertEquals($nodeValue, $nodeList->item(0)->nodeValue);
     }
 
     protected function assertMatchesXpath($html, $expression, $count = 1)
@@ -74,7 +74,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             // the top level
             $dom->loadXML('<root>'.$html.'</root>');
         } catch (\Exception $e) {
-            $this->fail(sprintf(
+            self::fail(sprintf(
                 "Failed loading HTML:\n\n%s\n\nError: %s",
                 $html,
                 $e->getMessage()
@@ -85,7 +85,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         if ($nodeList->length != $count) {
             $dom->formatOutput = true;
-            $this->fail(sprintf(
+            self::fail(sprintf(
                 "Failed asserting that \n\n%s\n\nmatches exactly %s. Matches %s in \n\n%s",
                 $expression,
                 1 == $count ? 'once' : $count.' times',
@@ -94,7 +94,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
                 substr($dom->saveHTML(), 6, -8)
             ));
         } else {
-            $this->addToAssertionCount(1);
+            self::addToAssertionCount(1);
         }
     }
 
@@ -125,7 +125,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function renderHelp(FormView $view)
     {
-        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', static::class));
+        self::markTestSkipped(sprintf('%s::renderHelp() is not implemented.', static::class));
     }
 
     abstract protected function renderErrors(FormView $view);
@@ -1657,8 +1657,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $form->get('date')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
-        $this->assertEmpty($this->renderErrors($view));
-        $this->assertNotEmpty($this->renderErrors($view['date']));
+        self::assertEmpty($this->renderErrors($view));
+        self::assertNotEmpty($this->renderErrors($view['date']));
     }
 
     public function testBirthDay()
@@ -2260,8 +2260,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $form->get('time')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
-        $this->assertEmpty($this->renderErrors($view));
-        $this->assertNotEmpty($this->renderErrors($view['time']));
+        self::assertEmpty($this->renderErrors($view));
+        self::assertNotEmpty($this->renderErrors($view['time']));
     }
 
     public function testTimezone()
@@ -2363,7 +2363,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType');
 
-        $this->assertSame('', $this->renderLabel($form->createView()));
+        self::assertSame('', $this->renderLabel($form->createView()));
     }
 
     public function testButtonlabelWithoutTranslation()
@@ -2404,7 +2404,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
+        self::assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
     }
 
     public function testStartTagForPutRequest()
@@ -2436,7 +2436,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'action' => 'http://foo.com/directory',
         ]);
 
-        $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
+        self::assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
     }
 
     public function testStartTagForMultipartForm()
@@ -2450,7 +2450,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
+        self::assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
     }
 
     public function testStartTagWithExtraAttributes()
@@ -2464,7 +2464,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'attr' => ['class' => 'foobar'],
         ]);
 
-        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
+        self::assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
     }
 
     public function testWidgetAttributes()
@@ -2478,7 +2478,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
+        self::assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
     }
 
     public function testWidgetAttributeNameRepeatedIfTrue()
@@ -2490,7 +2490,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value" />', $html);
+        self::assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value" />', $html);
     }
 
     public function testWidgetAttributeHiddenIfFalse()
@@ -2501,7 +2501,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderWidget($form->createView());
 
-        $this->assertStringNotContainsString('foo="', $html);
+        self::assertStringNotContainsString('foo="', $html);
     }
 
     public function testButtonAttributes()
@@ -2514,7 +2514,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertSame('<button type="button" id="button" name="button" disabled="disabled" class="foobar" data-foo="bar">[trans]Button[/trans]</button>', $html);
+        self::assertSame('<button type="button" id="button" name="button" disabled="disabled" class="foobar" data-foo="bar">[trans]Button[/trans]</button>', $html);
     }
 
     public function testButtonAttributeNameRepeatedIfTrue()
@@ -2526,7 +2526,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertSame('<button type="button" id="button" name="button" foo="foo">[trans]Button[/trans]</button>', $html);
+        self::assertSame('<button type="button" id="button" name="button" foo="foo">[trans]Button[/trans]</button>', $html);
     }
 
     public function testButtonAttributeHiddenIfFalse()
@@ -2537,7 +2537,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderWidget($form->createView());
 
-        $this->assertStringNotContainsString('foo="', $html);
+        self::assertStringNotContainsString('foo="', $html);
     }
 
     public function testTextareaWithWhitespaceOnlyContentRetainsValue()
@@ -2546,7 +2546,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderWidget($form->createView());
 
-        $this->assertStringContainsString('>  </textarea>', $html);
+        self::assertStringContainsString('>  </textarea>', $html);
     }
 
     public function testTextareaWithWhitespaceOnlyContentRetainsValueWhenRenderingForm()
@@ -2557,7 +2557,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderForm($form->createView());
 
-        $this->assertStringContainsString('>  </textarea>', $html);
+        self::assertStringContainsString('>  </textarea>', $html);
     }
 
     public function testWidgetContainerAttributeHiddenIfFalse()
@@ -2569,7 +2569,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $html = $this->renderWidget($form->createView());
 
         // no foo
-        $this->assertStringNotContainsString('foo="', $html);
+        self::assertStringNotContainsString('foo="', $html);
     }
 
     public function testTranslatedAttributes()

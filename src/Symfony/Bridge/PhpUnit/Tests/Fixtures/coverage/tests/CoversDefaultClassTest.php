@@ -18,6 +18,6 @@ class CoversDefaultClassTest extends TestCase
 {
     public function test()
     {
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

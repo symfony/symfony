@@ -21,27 +21,27 @@ class PlaintextPasswordHasherTest extends TestCase
     {
         $hasher = new PlaintextPasswordHasher();
 
-        $this->assertTrue($hasher->verify('foo', 'foo', ''));
-        $this->assertFalse($hasher->verify('bar', 'foo', ''));
-        $this->assertFalse($hasher->verify('FOO', 'foo', ''));
+        self::assertTrue($hasher->verify('foo', 'foo', ''));
+        self::assertFalse($hasher->verify('bar', 'foo', ''));
+        self::assertFalse($hasher->verify('FOO', 'foo', ''));
 
         $hasher = new PlaintextPasswordHasher(true);
 
-        $this->assertTrue($hasher->verify('foo', 'foo', ''));
-        $this->assertFalse($hasher->verify('bar', 'foo', ''));
-        $this->assertTrue($hasher->verify('FOO', 'foo', ''));
+        self::assertTrue($hasher->verify('foo', 'foo', ''));
+        self::assertFalse($hasher->verify('bar', 'foo', ''));
+        self::assertTrue($hasher->verify('FOO', 'foo', ''));
     }
 
     public function testHash()
     {
         $hasher = new PlaintextPasswordHasher();
 
-        $this->assertSame('foo', $hasher->hash('foo', ''));
+        self::assertSame('foo', $hasher->hash('foo', ''));
     }
 
     public function testHashLength()
     {
-        $this->expectException(InvalidPasswordException::class);
+        self::expectException(InvalidPasswordException::class);
         $hasher = new PlaintextPasswordHasher();
 
         $hasher->hash(str_repeat('a', 5000), 'salt');
@@ -51,6 +51,6 @@ class PlaintextPasswordHasherTest extends TestCase
     {
         $hasher = new PlaintextPasswordHasher();
 
-        $this->assertFalse($hasher->verify('encoded', str_repeat('a', 5000), 'salt'));
+        self::assertFalse($hasher->verify('encoded', str_repeat('a', 5000), 'salt'));
     }
 }

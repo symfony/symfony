@@ -25,9 +25,9 @@ class YamlFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/resources.yml';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        self::assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadDoesNothingIfEmpty()
@@ -36,14 +36,14 @@ class YamlFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/empty.yml';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals([], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        self::assertEquals([], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(NotFoundResourceException::class);
+        self::expectException(NotFoundResourceException::class);
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.yml';
         $loader->load($resource, 'en', 'domain1');
@@ -51,7 +51,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
-        $this->expectException(InvalidResourceException::class);
+        self::expectException(InvalidResourceException::class);
         $loader = new YamlFileLoader();
         $resource = 'http://example.com/resources.yml';
         $loader->load($resource, 'en', 'domain1');
@@ -59,7 +59,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadThrowsAnExceptionIfNotAnArray()
     {
-        $this->expectException(InvalidResourceException::class);
+        self::expectException(InvalidResourceException::class);
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../fixtures/non-valid.yml';
         $loader->load($resource, 'en', 'domain1');

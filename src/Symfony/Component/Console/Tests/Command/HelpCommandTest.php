@@ -26,9 +26,9 @@ class HelpCommandTest extends TestCase
         $command->setApplication(new Application());
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command_name' => 'li'], ['decorated' => false]);
-        $this->assertStringContainsString('list [options] [--] [<namespace>]', $commandTester->getDisplay(), '->execute() returns a text help for the given command alias');
-        $this->assertStringContainsString('format=FORMAT', $commandTester->getDisplay(), '->execute() returns a text help for the given command alias');
-        $this->assertStringContainsString('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command alias');
+        self::assertStringContainsString('list [options] [--] [<namespace>]', $commandTester->getDisplay(), '->execute() returns a text help for the given command alias');
+        self::assertStringContainsString('format=FORMAT', $commandTester->getDisplay(), '->execute() returns a text help for the given command alias');
+        self::assertStringContainsString('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command alias');
     }
 
     public function testExecuteForCommand()
@@ -37,9 +37,9 @@ class HelpCommandTest extends TestCase
         $commandTester = new CommandTester($command);
         $command->setCommand(new ListCommand());
         $commandTester->execute([], ['decorated' => false]);
-        $this->assertStringContainsString('list [options] [--] [<namespace>]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
-        $this->assertStringContainsString('format=FORMAT', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
-        $this->assertStringContainsString('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        self::assertStringContainsString('list [options] [--] [<namespace>]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        self::assertStringContainsString('format=FORMAT', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        self::assertStringContainsString('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
     }
 
     public function testExecuteForCommandWithXmlOption()
@@ -48,7 +48,7 @@ class HelpCommandTest extends TestCase
         $commandTester = new CommandTester($command);
         $command->setCommand(new ListCommand());
         $commandTester->execute(['--format' => 'xml']);
-        $this->assertStringContainsString('<command', $commandTester->getDisplay(), '->execute() returns an XML help text if --xml is passed');
+        self::assertStringContainsString('<command', $commandTester->getDisplay(), '->execute() returns an XML help text if --xml is passed');
     }
 
     public function testExecuteForApplicationCommand()
@@ -56,9 +56,9 @@ class HelpCommandTest extends TestCase
         $application = new Application();
         $commandTester = new CommandTester($application->get('help'));
         $commandTester->execute(['command_name' => 'list']);
-        $this->assertStringContainsString('list [options] [--] [<namespace>]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
-        $this->assertStringContainsString('format=FORMAT', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
-        $this->assertStringContainsString('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        self::assertStringContainsString('list [options] [--] [<namespace>]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        self::assertStringContainsString('format=FORMAT', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        self::assertStringContainsString('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
     }
 
     public function testExecuteForApplicationCommandWithXmlOption()
@@ -66,8 +66,8 @@ class HelpCommandTest extends TestCase
         $application = new Application();
         $commandTester = new CommandTester($application->get('help'));
         $commandTester->execute(['command_name' => 'list', '--format' => 'xml']);
-        $this->assertStringContainsString('list [--raw] [--format FORMAT] [--short] [--] [&lt;namespace&gt;]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
-        $this->assertStringContainsString('<command', $commandTester->getDisplay(), '->execute() returns an XML help text if --format=xml is passed');
+        self::assertStringContainsString('list [--raw] [--format FORMAT] [--short] [--] [&lt;namespace&gt;]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        self::assertStringContainsString('<command', $commandTester->getDisplay(), '->execute() returns an XML help text if --format=xml is passed');
     }
 
     /**
@@ -80,7 +80,7 @@ class HelpCommandTest extends TestCase
         $application->add(new \FooCommand());
         $tester = new CommandCompletionTester($application->get('help'));
         $suggestions = $tester->complete($input, 2);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()

@@ -28,9 +28,9 @@ class RouterContextMiddlewareTest extends MiddlewareTestCase
     {
         $context = new RequestContext('/', 'GET', 'symfony.com');
 
-        $router = $this->createMock(RequestContextAwareInterface::class);
+        $router = self::createMock(RequestContextAwareInterface::class);
         $router
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getContext')
             ->willReturn($context);
 
@@ -39,17 +39,17 @@ class RouterContextMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope(new \stdClass());
         $envelope = $middleware->handle($envelope, $this->getStackMock());
 
-        $this->assertNotNull($stamp = $envelope->last(RouterContextStamp::class));
-        $this->assertSame('symfony.com', $stamp->getHost());
+        self::assertNotNull($stamp = $envelope->last(RouterContextStamp::class));
+        self::assertSame('symfony.com', $stamp->getHost());
     }
 
     public function testMiddlewareRestoreContext()
     {
-        $router = $this->createMock(RequestContextAwareInterface::class);
+        $router = self::createMock(RequestContextAwareInterface::class);
         $context = new RequestContext('', 'POST', 'github.com');
 
         $router
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getContext')
             ->willReturn($context);
 
@@ -59,12 +59,12 @@ class RouterContextMiddlewareTest extends MiddlewareTestCase
             new RouterContextStamp('', 'GET', 'symfony.com', 'https', 80, 443, '/', ''),
         ]);
 
-        $nextMiddleware = $this->createMock(MiddlewareInterface::class);
+        $nextMiddleware = self::createMock(MiddlewareInterface::class);
         $nextMiddleware
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handle')
             ->willReturnCallback(function (Envelope $envelope, StackInterface $stack) use ($context): Envelope {
-                $this->assertSame('symfony.com', $context->getHost());
+                self::assertSame('symfony.com', $context->getHost());
 
                 return $envelope;
             })
@@ -72,6 +72,6 @@ class RouterContextMiddlewareTest extends MiddlewareTestCase
 
         $middleware->handle($envelope, new StackMiddleware($nextMiddleware));
 
-        $this->assertSame('github.com', $context->getHost());
+        self::assertSame('github.com', $context->getHost());
     }
 }

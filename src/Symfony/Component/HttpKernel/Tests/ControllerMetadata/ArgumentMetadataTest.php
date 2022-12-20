@@ -25,25 +25,25 @@ class ArgumentMetadataTest extends TestCase
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value');
 
-        $this->assertFalse($argument->isNullable());
+        self::assertFalse($argument->isNullable());
     }
 
     public function testDefaultValueAvailable()
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true);
 
-        $this->assertTrue($argument->isNullable());
-        $this->assertTrue($argument->hasDefaultValue());
-        $this->assertSame('default value', $argument->getDefaultValue());
+        self::assertTrue($argument->isNullable());
+        self::assertTrue($argument->hasDefaultValue());
+        self::assertSame('default value', $argument->getDefaultValue());
     }
 
     public function testDefaultValueUnavailable()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $argument = new ArgumentMetadata('foo', 'string', false, false, null, false);
 
-        $this->assertFalse($argument->isNullable());
-        $this->assertFalse($argument->hasDefaultValue());
+        self::assertFalse($argument->isNullable());
+        self::assertFalse($argument->hasDefaultValue());
         $argument->getDefaultValue();
     }
 
@@ -52,13 +52,13 @@ class ArgumentMetadataTest extends TestCase
      */
     public function testLegacyAttribute()
     {
-        $attribute = $this->createMock(ArgumentInterface::class);
+        $attribute = self::createMock(ArgumentInterface::class);
 
         $this->expectDeprecation('Since symfony/http-kernel 5.3: The "Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata" constructor expects an array of PHP attributes as last argument, %s given.');
         $this->expectDeprecation('Since symfony/http-kernel 5.3: Method "Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata::getAttribute()" is deprecated, use "getAttributes()" instead.');
 
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true, $attribute);
-        $this->assertSame($attribute, $argument->getAttribute());
+        self::assertSame($attribute, $argument->getAttribute());
     }
 
     /**
@@ -67,6 +67,6 @@ class ArgumentMetadataTest extends TestCase
     public function testGetAttributes()
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true, [new Foo('bar')]);
-        $this->assertEquals([new Foo('bar')], $argument->getAttributes());
+        self::assertEquals([new Foo('bar')], $argument->getAttributes());
     }
 }

@@ -61,19 +61,19 @@ class NamespacedAttributeBagTest extends TestCase
     {
         $bag = new NamespacedAttributeBag();
         $bag->initialize($this->array);
-        $this->assertEquals($this->array, $this->bag->all());
+        self::assertEquals($this->array, $this->bag->all());
         $array = ['should' => 'not stick'];
         $bag->initialize($array);
 
         // should have remained the same
-        $this->assertEquals($this->array, $this->bag->all());
+        self::assertEquals($this->array, $this->bag->all());
     }
 
     public function testGetStorageKey()
     {
-        $this->assertEquals('_sf2', $this->bag->getStorageKey());
+        self::assertEquals('_sf2', $this->bag->getStorageKey());
         $attributeBag = new NamespacedAttributeBag('test');
-        $this->assertEquals('test', $attributeBag->getStorageKey());
+        self::assertEquals('test', $attributeBag->getStorageKey());
     }
 
     /**
@@ -81,7 +81,7 @@ class NamespacedAttributeBagTest extends TestCase
      */
     public function testHas($key, $value, $exists)
     {
-        $this->assertEquals($exists, $this->bag->has($key));
+        self::assertEquals($exists, $this->bag->has($key));
     }
 
     /**
@@ -92,7 +92,7 @@ class NamespacedAttributeBagTest extends TestCase
         $expected = json_encode($this->bag->all());
         $this->bag->has($key);
 
-        $this->assertEquals($expected, json_encode($this->bag->all()));
+        self::assertEquals($expected, json_encode($this->bag->all()));
     }
 
     /**
@@ -100,13 +100,13 @@ class NamespacedAttributeBagTest extends TestCase
      */
     public function testGet($key, $value, $expected)
     {
-        $this->assertEquals($value, $this->bag->get($key));
+        self::assertEquals($value, $this->bag->get($key));
     }
 
     public function testGetDefaults()
     {
-        $this->assertNull($this->bag->get('user2.login'));
-        $this->assertEquals('default', $this->bag->get('user2.login', 'default'));
+        self::assertNull($this->bag->get('user2.login'));
+        self::assertEquals('default', $this->bag->get('user2.login', 'default'));
     }
 
     /**
@@ -117,7 +117,7 @@ class NamespacedAttributeBagTest extends TestCase
         $expected = json_encode($this->bag->all());
         $this->bag->get($key);
 
-        $this->assertEquals($expected, json_encode($this->bag->all()));
+        self::assertEquals($expected, json_encode($this->bag->all()));
     }
 
     /**
@@ -126,17 +126,17 @@ class NamespacedAttributeBagTest extends TestCase
     public function testSet($key, $value, $expected)
     {
         $this->bag->set($key, $value);
-        $this->assertEquals($value, $this->bag->get($key));
+        self::assertEquals($value, $this->bag->get($key));
     }
 
     public function testAll()
     {
-        $this->assertEquals($this->array, $this->bag->all());
+        self::assertEquals($this->array, $this->bag->all());
 
         $this->bag->set('hello', 'fabien');
         $array = $this->array;
         $array['hello'] = 'fabien';
-        $this->assertEquals($array, $this->bag->all());
+        self::assertEquals($array, $this->bag->all());
     }
 
     public function testReplace()
@@ -145,41 +145,41 @@ class NamespacedAttributeBagTest extends TestCase
         $array['name'] = 'jack';
         $array['foo.bar'] = 'beep';
         $this->bag->replace($array);
-        $this->assertEquals($array, $this->bag->all());
-        $this->assertNull($this->bag->get('hello'));
-        $this->assertNull($this->bag->get('always'));
-        $this->assertNull($this->bag->get('user.login'));
+        self::assertEquals($array, $this->bag->all());
+        self::assertNull($this->bag->get('hello'));
+        self::assertNull($this->bag->get('always'));
+        self::assertNull($this->bag->get('user.login'));
     }
 
     public function testRemove()
     {
-        $this->assertEquals('world', $this->bag->get('hello'));
+        self::assertEquals('world', $this->bag->get('hello'));
         $this->bag->remove('hello');
-        $this->assertNull($this->bag->get('hello'));
+        self::assertNull($this->bag->get('hello'));
 
-        $this->assertEquals('be happy', $this->bag->get('always'));
+        self::assertEquals('be happy', $this->bag->get('always'));
         $this->bag->remove('always');
-        $this->assertNull($this->bag->get('always'));
+        self::assertNull($this->bag->get('always'));
 
-        $this->assertEquals('drak', $this->bag->get('user.login'));
+        self::assertEquals('drak', $this->bag->get('user.login'));
         $this->bag->remove('user.login');
-        $this->assertNull($this->bag->get('user.login'));
+        self::assertNull($this->bag->get('user.login'));
     }
 
     public function testRemoveExistingNamespacedAttribute()
     {
-        $this->assertSame('cod', $this->bag->remove('category/fishing/first'));
+        self::assertSame('cod', $this->bag->remove('category/fishing/first'));
     }
 
     public function testRemoveNonexistingNamespacedAttribute()
     {
-        $this->assertNull($this->bag->remove('foo/bar/baz'));
+        self::assertNull($this->bag->remove('foo/bar/baz'));
     }
 
     public function testClear()
     {
         $this->bag->clear();
-        $this->assertEquals([], $this->bag->all());
+        self::assertEquals([], $this->bag->all());
     }
 
     public function attributesProvider()

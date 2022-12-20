@@ -30,20 +30,20 @@ class AbstractRememberMeServicesTest extends TestCase
     {
         $service = $this->getService(null, ['remember_me_parameter' => 'foo']);
 
-        $this->assertEquals('foo', $service->getRememberMeParameter());
+        self::assertEquals('foo', $service->getRememberMeParameter());
     }
 
     public function testGetSecret()
     {
         $service = $this->getService();
-        $this->assertEquals('foosecret', $service->getSecret());
+        self::assertEquals('foosecret', $service->getSecret());
     }
 
     public function testAutoLoginReturnsNullWhenNoCookie()
     {
         $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
 
-        $this->assertNull($service->autoLogin(new Request()));
+        self::assertNull($service->autoLogin(new Request()));
     }
 
     public function testAutoLoginReturnsNullAfterLoginFail()
@@ -54,18 +54,18 @@ class AbstractRememberMeServicesTest extends TestCase
         $request->cookies->set('foo', 'foo');
 
         $service->loginFail($request);
-        $this->assertNull($service->autoLogin($request));
+        self::assertNull($service->autoLogin($request));
     }
 
     public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
         $request->cookies->set('foo', 'foo');
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('processAutoLoginCookie')
             ->willReturn(null)
         ;
@@ -79,24 +79,24 @@ class AbstractRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', 'foo');
 
-        $user = $this->createMock(UserInterface::class);
+        $user = self::createMock(UserInterface::class);
         $user
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getRoles')
             ->willReturn([])
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('processAutoLoginCookie')
             ->willReturn($user)
         ;
 
         $returnedToken = $service->autoLogin($request);
 
-        $this->assertSame($user, $returnedToken->getUser());
-        $this->assertSame('foosecret', $returnedToken->getSecret());
-        $this->assertSame('fookey', $returnedToken->getFirewallName());
+        self::assertSame($user, $returnedToken->getUser());
+        self::assertSame('foosecret', $returnedToken->getSecret());
+        self::assertSame('fookey', $returnedToken->getFirewallName());
     }
 
     /**
@@ -107,16 +107,16 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService(null, $options);
         $request = new Request();
         $response = new Response();
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $service->logout($request, $response, $token);
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
-        $this->assertInstanceOf(Cookie::class, $cookie);
-        $this->assertTrue($cookie->isCleared());
-        $this->assertSame($options['name'], $cookie->getName());
-        $this->assertSame($options['path'], $cookie->getPath());
-        $this->assertSame($options['domain'], $cookie->getDomain());
-        $this->assertSame($options['secure'], $cookie->isSecure());
-        $this->assertSame($options['httponly'], $cookie->isHttpOnly());
+        self::assertInstanceOf(Cookie::class, $cookie);
+        self::assertTrue($cookie->isCleared());
+        self::assertSame($options['name'], $cookie->getName());
+        self::assertSame($options['path'], $cookie->getPath());
+        self::assertSame($options['domain'], $cookie->getDomain());
+        self::assertSame($options['secure'], $cookie->isSecure());
+        self::assertSame($options['httponly'], $cookie->isHttpOnly());
     }
 
     public function provideOptionsForLogout()
@@ -134,7 +134,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
         $service->loginFail($request);
 
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainUserInterfaceImplementation()
@@ -142,19 +142,19 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getUser')
             ->willReturn('foo')
         ;
 
         $service
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('onLoginSuccess')
         ;
 
-        $this->assertFalse($request->request->has('foo'));
+        self::assertFalse($request->request->has('foo'));
 
         $service->loginSuccess($request, $response, $token);
     }
@@ -164,21 +164,21 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
-        $account = $this->createMock(UserInterface::class);
-        $token = $this->createMock(TokenInterface::class);
+        $account = self::createMock(UserInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getUser')
             ->willReturn($account)
         ;
 
         $service
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('onLoginSuccess')
             ->willReturn(null)
         ;
 
-        $this->assertFalse($request->request->has('foo'));
+        self::assertFalse($request->request->has('foo'));
 
         $service->loginSuccess($request, $response, $token);
     }
@@ -188,16 +188,16 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
-        $account = $this->createMock(UserInterface::class);
-        $token = $this->createMock(TokenInterface::class);
+        $account = self::createMock(UserInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getUser')
             ->willReturn($account)
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('onLoginSuccess')
             ->willReturn(null)
         ;
@@ -215,16 +215,16 @@ class AbstractRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->request->set('foo', ['bar' => $value]);
         $response = new Response();
-        $account = $this->createMock(UserInterface::class);
-        $token = $this->createMock(TokenInterface::class);
+        $account = self::createMock(UserInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getUser')
             ->willReturn($account)
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('onLoginSuccess')
             ->willReturn(true)
         ;
@@ -242,16 +242,16 @@ class AbstractRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->request->set('foo', $value);
         $response = new Response();
-        $account = $this->createMock(UserInterface::class);
-        $token = $this->createMock(TokenInterface::class);
+        $account = self::createMock(UserInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getUser')
             ->willReturn($account)
         ;
 
         $service
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('onLoginSuccess')
             ->willReturn(true)
         ;
@@ -276,16 +276,16 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService();
 
         $encoded = $this->callProtected($service, 'encodeCookie', [$cookieParts]);
-        $this->assertIsString($encoded);
+        self::assertIsString($encoded);
 
         $decoded = $this->callProtected($service, 'decodeCookie', [$encoded]);
-        $this->assertSame($cookieParts, $decoded);
+        self::assertSame($cookieParts, $decoded);
     }
 
     public function testThereShouldBeNoCookieDelimiterInCookieParts()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('cookie delimiter');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('cookie delimiter');
         $cookieParts = ['aa', 'b'.AbstractRememberMeServices::COOKIE_DELIMITER.'b', 'cc'];
         $service = $this->getService();
 
@@ -298,16 +298,16 @@ class AbstractRememberMeServicesTest extends TestCase
             $userProvider = $this->getProvider();
         }
 
-        return $this->getMockForAbstractClass(AbstractRememberMeServices::class, [
+        return self::getMockForAbstractClass(AbstractRememberMeServices::class, [
             [$userProvider], 'foosecret', 'fookey', $options, $logger,
         ]);
     }
 
     protected function getProvider()
     {
-        $provider = $this->createMock(UserProviderInterface::class);
+        $provider = self::createMock(UserProviderInterface::class);
         $provider
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('supportsClass')
             ->willReturn(true)
         ;

@@ -41,8 +41,8 @@ class ArrayAdapterTest extends AdapterTestCase
         $cache->save($item);
 
         $fooItem = $cache->getItem('foo');
-        $this->assertTrue($fooItem->isHit());
-        $this->assertEquals('::4711', $fooItem->get());
+        self::assertTrue($fooItem->isHit());
+        self::assertEquals('::4711', $fooItem->get());
 
         // Miss (should be present as NULL in $values)
         $cache->getItem('bar');
@@ -53,11 +53,11 @@ class ArrayAdapterTest extends AdapterTestCase
 
         $values = $cache->getValues();
 
-        $this->assertCount(2, $values);
-        $this->assertArrayHasKey('foo', $values);
-        $this->assertSame(serialize('::4711'), $values['foo']);
-        $this->assertArrayHasKey('bar', $values);
-        $this->assertNull($values['bar']);
+        self::assertCount(2, $values);
+        self::assertArrayHasKey('foo', $values);
+        self::assertSame(serialize('::4711'), $values['foo']);
+        self::assertArrayHasKey('bar', $values);
+        self::assertNull($values['bar']);
     }
 
     public function testMaxLifetime()
@@ -68,9 +68,9 @@ class ArrayAdapterTest extends AdapterTestCase
         $item->expiresAfter(2);
         $cache->save($item->set(123));
 
-        $this->assertTrue($cache->hasItem('foo'));
+        self::assertTrue($cache->hasItem('foo'));
         sleep(1);
-        $this->assertFalse($cache->hasItem('foo'));
+        self::assertFalse($cache->hasItem('foo'));
     }
 
     public function testMaxItems()
@@ -81,14 +81,14 @@ class ArrayAdapterTest extends AdapterTestCase
         $cache->save($cache->getItem('bar'));
         $cache->save($cache->getItem('buz'));
 
-        $this->assertFalse($cache->hasItem('foo'));
-        $this->assertTrue($cache->hasItem('bar'));
-        $this->assertTrue($cache->hasItem('buz'));
+        self::assertFalse($cache->hasItem('foo'));
+        self::assertTrue($cache->hasItem('bar'));
+        self::assertTrue($cache->hasItem('buz'));
 
         $cache->save($cache->getItem('foo'));
 
-        $this->assertFalse($cache->hasItem('bar'));
-        $this->assertTrue($cache->hasItem('buz'));
-        $this->assertTrue($cache->hasItem('foo'));
+        self::assertFalse($cache->hasItem('bar'));
+        self::assertTrue($cache->hasItem('buz'));
+        self::assertTrue($cache->hasItem('foo'));
     }
 }

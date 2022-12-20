@@ -29,23 +29,20 @@ class LocaleListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack = self::createMock(RequestStack::class);
     }
 
     public function testIsAnEventSubscriber()
     {
-        $this->assertInstanceOf(EventSubscriberInterface::class, new LocaleListener($this->requestStack));
+        self::assertInstanceOf(EventSubscriberInterface::class, new LocaleListener($this->requestStack));
     }
 
     public function testRegisteredEvent()
     {
-        $this->assertEquals(
-            [
-                KernelEvents::REQUEST => [['setDefaultLocale', 100], ['onKernelRequest', 16]],
-                KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
-            ],
-            LocaleListener::getSubscribedEvents()
-        );
+        self::assertEquals([
+            KernelEvents::REQUEST => [['setDefaultLocale', 100], ['onKernelRequest', 16]],
+            KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
+        ], LocaleListener::getSubscribedEvents());
     }
 
     public function testDefaultLocale()
@@ -54,7 +51,7 @@ class LocaleListenerTest extends TestCase
         $event = $this->getEvent($request = Request::create('/'));
 
         $listener->setDefaultLocale($event);
-        $this->assertEquals('fr', $request->getLocale());
+        self::assertEquals('fr', $request->getLocale());
     }
 
     public function testLocaleFromRequestAttribute()
@@ -67,17 +64,17 @@ class LocaleListenerTest extends TestCase
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
-        $this->assertEquals('es', $request->getLocale());
+        self::assertEquals('es', $request->getLocale());
     }
 
     public function testLocaleSetForRoutingContext()
     {
         // the request context is updated
-        $context = $this->createMock(RequestContext::class);
-        $context->expects($this->once())->method('setParameter')->with('_locale', 'es');
+        $context = self::createMock(RequestContext::class);
+        $context->expects(self::once())->method('setParameter')->with('_locale', 'es');
 
-        $router = $this->getMockBuilder(Router::class)->setMethods(['getContext'])->disableOriginalConstructor()->getMock();
-        $router->expects($this->once())->method('getContext')->willReturn($context);
+        $router = self::getMockBuilder(Router::class)->setMethods(['getContext'])->disableOriginalConstructor()->getMock();
+        $router->expects(self::once())->method('getContext')->willReturn($context);
 
         $request = Request::create('/');
 
@@ -89,18 +86,18 @@ class LocaleListenerTest extends TestCase
     public function testRouterResetWithParentRequestOnKernelFinishRequest()
     {
         // the request context is updated
-        $context = $this->createMock(RequestContext::class);
-        $context->expects($this->once())->method('setParameter')->with('_locale', 'es');
+        $context = self::createMock(RequestContext::class);
+        $context->expects(self::once())->method('setParameter')->with('_locale', 'es');
 
-        $router = $this->getMockBuilder(Router::class)->setMethods(['getContext'])->disableOriginalConstructor()->getMock();
-        $router->expects($this->once())->method('getContext')->willReturn($context);
+        $router = self::getMockBuilder(Router::class)->setMethods(['getContext'])->disableOriginalConstructor()->getMock();
+        $router->expects(self::once())->method('getContext')->willReturn($context);
 
         $parentRequest = Request::create('/');
         $parentRequest->setLocale('es');
 
-        $this->requestStack->expects($this->once())->method('getParentRequest')->willReturn($parentRequest);
+        $this->requestStack->expects(self::once())->method('getParentRequest')->willReturn($parentRequest);
 
-        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST);
+        $event = new FinishRequestEvent(self::createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new LocaleListener($this->requestStack, 'fr', $router);
         $listener->onKernelFinishRequest($event);
@@ -114,7 +111,7 @@ class LocaleListenerTest extends TestCase
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
-        $this->assertEquals('de', $request->getLocale());
+        self::assertEquals('de', $request->getLocale());
     }
 
     public function testRequestPreferredLocaleFromAcceptLanguageHeader()
@@ -127,7 +124,7 @@ class LocaleListenerTest extends TestCase
 
         $listener->setDefaultLocale($event);
         $listener->onKernelRequest($event);
-        $this->assertEquals('fr', $request->getLocale());
+        self::assertEquals('fr', $request->getLocale());
     }
 
     public function testRequestSecondPreferredLocaleFromAcceptLanguageHeader()
@@ -140,7 +137,7 @@ class LocaleListenerTest extends TestCase
 
         $listener->setDefaultLocale($event);
         $listener->onKernelRequest($event);
-        $this->assertEquals('en', $request->getLocale());
+        self::assertEquals('en', $request->getLocale());
     }
 
     public function testDontUseAcceptLanguageHeaderIfNotEnabled()
@@ -153,7 +150,7 @@ class LocaleListenerTest extends TestCase
 
         $listener->setDefaultLocale($event);
         $listener->onKernelRequest($event);
-        $this->assertEquals('de', $request->getLocale());
+        self::assertEquals('de', $request->getLocale());
     }
 
     public function testRequestUnavailablePreferredLocaleFromAcceptLanguageHeader()
@@ -166,7 +163,7 @@ class LocaleListenerTest extends TestCase
 
         $listener->setDefaultLocale($event);
         $listener->onKernelRequest($event);
-        $this->assertEquals('de', $request->getLocale());
+        self::assertEquals('de', $request->getLocale());
     }
 
     public function testRequestNoLocaleFromAcceptLanguageHeader()
@@ -179,7 +176,7 @@ class LocaleListenerTest extends TestCase
 
         $listener->setDefaultLocale($event);
         $listener->onKernelRequest($event);
-        $this->assertEquals('de', $request->getLocale());
+        self::assertEquals('de', $request->getLocale());
     }
 
     public function testRequestAttributeLocaleNotOverridenFromAcceptLanguageHeader()
@@ -193,11 +190,11 @@ class LocaleListenerTest extends TestCase
 
         $listener->setDefaultLocale($event);
         $listener->onKernelRequest($event);
-        $this->assertEquals('it', $request->getLocale());
+        self::assertEquals('it', $request->getLocale());
     }
 
     private function getEvent(Request $request): RequestEvent
     {
-        return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        return new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
     }
 }

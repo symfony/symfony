@@ -52,7 +52,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, self::createMock(CsrfTokenManagerInterface::class));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
@@ -123,7 +123,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     {
         $choice = new ChoiceView($choice, $choice, $choice.' label');
 
-        $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_selected_choice($choice, $value));
+        self::assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_selected_choice($choice, $value));
     }
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
@@ -135,7 +135,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get">', $html);
+        self::assertSame('<form name="form" method="get">', $html);
     }
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
@@ -147,7 +147,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form name="form" method="get" action="0">', $html);
+        self::assertSame('<form name="form" method="get" action="0">', $html);
     }
 
     public function isRootFormProvider()
@@ -163,7 +163,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      */
     public function testIsRootForm($expected, FormView $formView)
     {
-        $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_root_form($formView));
+        self::assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_root_form($formView));
     }
 
     public function testMoneyWidgetInIso()
@@ -180,7 +180,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, self::createMock(CsrfTokenManagerInterface::class));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory
@@ -188,7 +188,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             ->createView()
         ;
 
-        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
+        self::assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
     }
 
     public function testHelpAttr()

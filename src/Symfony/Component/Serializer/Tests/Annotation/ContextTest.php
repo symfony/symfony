@@ -33,8 +33,8 @@ class ContextTest extends TestCase
 
     public function testThrowsOnEmptyContext()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('At least one of the "context", "normalizationContext", or "denormalizationContext" options of annotation "Symfony\Component\Serializer\Annotation\Context" must be provided as a non-empty array.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('At least one of the "context", "normalizationContext", or "denormalizationContext" options of annotation "Symfony\Component\Serializer\Annotation\Context" must be provided as a non-empty array.');
 
         new Context();
     }
@@ -45,8 +45,8 @@ class ContextTest extends TestCase
      */
     public function testThrowsOnEmptyContextLegacy(callable $factory)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('At least one of the "context", "normalizationContext", or "denormalizationContext" options of annotation "Symfony\Component\Serializer\Annotation\Context" must be provided as a non-empty array.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('At least one of the "context", "normalizationContext", or "denormalizationContext" options of annotation "Symfony\Component\Serializer\Annotation\Context" must be provided as a non-empty array.');
 
         $factory();
     }
@@ -64,8 +64,8 @@ class ContextTest extends TestCase
      */
     public function testThrowsOnNonArrayContext(array $options)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Option "%s" of annotation "%s" must be an array.', key($options), Context::class));
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('Option "%s" of annotation "%s" must be an array.', key($options), Context::class));
 
         new Context($options);
     }
@@ -82,8 +82,8 @@ class ContextTest extends TestCase
      */
     public function testInvalidGroupOption()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
 
         new Context(...['context' => ['foo' => 'bar'], 'groups' => ['fine', new \stdClass()]]);
     }
@@ -93,16 +93,16 @@ class ContextTest extends TestCase
      */
     public function testInvalidGroupOptionLegacy()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
 
         new Context(['context' => ['foo' => 'bar'], 'groups' => ['fine', new \stdClass()]]);
     }
 
     public function testInvalidGroupArgument()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('Parameter "groups" of annotation "%s" must be a string or an array of strings. Got "stdClass"', Context::class));
 
         new Context([], ['foo' => 'bar'], [], [], ['fine', new \stdClass()]);
     }

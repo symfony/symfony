@@ -31,11 +31,11 @@ class CountryTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('DE', 'DE', 'Germany'), $choices);
-        $this->assertContainsEquals(new ChoiceView('GB', 'GB', 'United Kingdom'), $choices);
-        $this->assertContainsEquals(new ChoiceView('US', 'US', 'United States'), $choices);
-        $this->assertContainsEquals(new ChoiceView('FR', 'FR', 'France'), $choices);
-        $this->assertContainsEquals(new ChoiceView('MY', 'MY', 'Malaysia'), $choices);
+        self::assertContainsEquals(new ChoiceView('DE', 'DE', 'Germany'), $choices);
+        self::assertContainsEquals(new ChoiceView('GB', 'GB', 'United Kingdom'), $choices);
+        self::assertContainsEquals(new ChoiceView('US', 'US', 'United States'), $choices);
+        self::assertContainsEquals(new ChoiceView('FR', 'FR', 'France'), $choices);
+        self::assertContainsEquals(new ChoiceView('MY', 'MY', 'Malaysia'), $choices);
     }
 
     /**
@@ -50,11 +50,11 @@ class CountryTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('DE', 'DE', 'Німеччина'), $choices);
-        $this->assertContainsEquals(new ChoiceView('GB', 'GB', 'Велика Британія'), $choices);
-        $this->assertContainsEquals(new ChoiceView('US', 'US', 'Сполучені Штати'), $choices);
-        $this->assertContainsEquals(new ChoiceView('FR', 'FR', 'Франція'), $choices);
-        $this->assertContainsEquals(new ChoiceView('MY', 'MY', 'Малайзія'), $choices);
+        self::assertContainsEquals(new ChoiceView('DE', 'DE', 'Німеччина'), $choices);
+        self::assertContainsEquals(new ChoiceView('GB', 'GB', 'Велика Британія'), $choices);
+        self::assertContainsEquals(new ChoiceView('US', 'US', 'Сполучені Штати'), $choices);
+        self::assertContainsEquals(new ChoiceView('FR', 'FR', 'Франція'), $choices);
+        self::assertContainsEquals(new ChoiceView('MY', 'MY', 'Малайзія'), $choices);
     }
 
     public function testAlpha3Option()
@@ -66,11 +66,11 @@ class CountryTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('DEU', 'DEU', 'Germany'), $choices);
-        $this->assertContainsEquals(new ChoiceView('GBR', 'GBR', 'United Kingdom'), $choices);
-        $this->assertContainsEquals(new ChoiceView('USA', 'USA', 'United States'), $choices);
-        $this->assertContainsEquals(new ChoiceView('FRA', 'FRA', 'France'), $choices);
-        $this->assertContainsEquals(new ChoiceView('MYS', 'MYS', 'Malaysia'), $choices);
+        self::assertContainsEquals(new ChoiceView('DEU', 'DEU', 'Germany'), $choices);
+        self::assertContainsEquals(new ChoiceView('GBR', 'GBR', 'United Kingdom'), $choices);
+        self::assertContainsEquals(new ChoiceView('USA', 'USA', 'United States'), $choices);
+        self::assertContainsEquals(new ChoiceView('FRA', 'FRA', 'France'), $choices);
+        self::assertContainsEquals(new ChoiceView('MYS', 'MYS', 'Malaysia'), $choices);
     }
 
     /**
@@ -86,11 +86,11 @@ class CountryTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('DEU', 'DEU', 'Німеччина'), $choices);
-        $this->assertContainsEquals(new ChoiceView('GBR', 'GBR', 'Велика Британія'), $choices);
-        $this->assertContainsEquals(new ChoiceView('USA', 'USA', 'Сполучені Штати'), $choices);
-        $this->assertContainsEquals(new ChoiceView('FRA', 'FRA', 'Франція'), $choices);
-        $this->assertContainsEquals(new ChoiceView('MYS', 'MYS', 'Малайзія'), $choices);
+        self::assertContainsEquals(new ChoiceView('DEU', 'DEU', 'Німеччина'), $choices);
+        self::assertContainsEquals(new ChoiceView('GBR', 'GBR', 'Велика Британія'), $choices);
+        self::assertContainsEquals(new ChoiceView('USA', 'USA', 'Сполучені Штати'), $choices);
+        self::assertContainsEquals(new ChoiceView('FRA', 'FRA', 'Франція'), $choices);
+        self::assertContainsEquals(new ChoiceView('MYS', 'MYS', 'Малайзія'), $choices);
     }
 
     public function testUnknownCountryIsNotIncluded()
@@ -104,7 +104,7 @@ class CountryTypeTest extends BaseTypeTest
             $countryCodes[] = $choice->value;
         }
 
-        $this->assertNotContains('ZZ', $countryCodes);
+        self::assertNotContains('ZZ', $countryCodes);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

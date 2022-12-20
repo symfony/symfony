@@ -32,27 +32,27 @@ class TimeDataCollectorTest extends TestCase
 
         $c->collect($request, new Response());
 
-        $this->assertEquals(0, $c->getStartTime());
+        self::assertEquals(0, $c->getStartTime());
 
         $request->server->set('REQUEST_TIME_FLOAT', 2);
 
         $c->collect($request, new Response());
 
-        $this->assertEquals(2000, $c->getStartTime());
+        self::assertEquals(2000, $c->getStartTime());
 
         $request = new Request();
         $c->collect($request, new Response());
-        $this->assertEquals(0, $c->getStartTime());
+        self::assertEquals(0, $c->getStartTime());
 
-        $kernel = $this->createMock(KernelInterface::class);
-        $kernel->expects($this->once())->method('getStartTime')->willReturn(123456.0);
+        $kernel = self::createMock(KernelInterface::class);
+        $kernel->expects(self::once())->method('getStartTime')->willReturn(123456.0);
 
         $c = new TimeDataCollector($kernel);
         $request = new Request();
         $request->server->set('REQUEST_TIME', 1);
 
         $c->collect($request, new Response());
-        $this->assertEquals(123456000, $c->getStartTime());
-        $this->assertSame(class_exists(Stopwatch::class, false), $c->isStopwatchInstalled());
+        self::assertEquals(123456000, $c->getStartTime());
+        self::assertSame(class_exists(Stopwatch::class, false), $c->isStopwatchInstalled());
     }
 }

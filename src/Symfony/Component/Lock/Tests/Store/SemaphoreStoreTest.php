@@ -40,10 +40,10 @@ class SemaphoreStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
         $store->waitAndSave($key);
 
-        $this->assertGreaterThan($initialCount, $this->getOpenedSemaphores(), 'Semaphores should have been created');
+        self::assertGreaterThan($initialCount, $this->getOpenedSemaphores(), 'Semaphores should have been created');
 
         $store->delete($key);
-        $this->assertEquals($initialCount, $this->getOpenedSemaphores(), 'All semaphores should be removed');
+        self::assertEquals($initialCount, $this->getOpenedSemaphores(), 'All semaphores should be removed');
     }
 
     private function getOpenedSemaphores()

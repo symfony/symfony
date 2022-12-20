@@ -28,17 +28,17 @@ class CachePoolDeleteCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $this->cachePool = self::createMock(CacheItemPoolInterface::class);
     }
 
     public function testCommandWithValidKey()
     {
-        $this->cachePool->expects($this->once())
+        $this->cachePool->expects(self::once())
             ->method('hasItem')
             ->with('bar')
             ->willReturn(true);
 
-        $this->cachePool->expects($this->once())
+        $this->cachePool->expects(self::once())
             ->method('deleteItem')
             ->with('bar')
             ->willReturn(true);
@@ -46,39 +46,39 @@ class CachePoolDeleteCommandTest extends TestCase
         $tester = $this->getCommandTester($this->getKernel());
         $tester->execute(['pool' => 'foo', 'key' => 'bar']);
 
-        $this->assertStringContainsString('[OK] Cache item "bar" was successfully deleted.', $tester->getDisplay());
+        self::assertStringContainsString('[OK] Cache item "bar" was successfully deleted.', $tester->getDisplay());
     }
 
     public function testCommandWithInValidKey()
     {
-        $this->cachePool->expects($this->once())
+        $this->cachePool->expects(self::once())
             ->method('hasItem')
             ->with('bar')
             ->willReturn(false);
 
-        $this->cachePool->expects($this->never())
+        $this->cachePool->expects(self::never())
             ->method('deleteItem')
             ->with('bar');
 
         $tester = $this->getCommandTester($this->getKernel());
         $tester->execute(['pool' => 'foo', 'key' => 'bar']);
 
-        $this->assertStringContainsString('[NOTE] Cache item "bar" does not exist in cache pool "foo".', $tester->getDisplay());
+        self::assertStringContainsString('[NOTE] Cache item "bar" does not exist in cache pool "foo".', $tester->getDisplay());
     }
 
     public function testCommandDeleteFailed()
     {
-        $this->cachePool->expects($this->once())
+        $this->cachePool->expects(self::once())
             ->method('hasItem')
             ->with('bar')
             ->willReturn(true);
 
-        $this->cachePool->expects($this->once())
+        $this->cachePool->expects(self::once())
             ->method('deleteItem')
             ->with('bar')
             ->willReturn(false);
 
-        $this->expectExceptionMessage('Cache item "bar" could not be deleted.');
+        self::expectExceptionMessage('Cache item "bar" could not be deleted.');
 
         $tester = $this->getCommandTester($this->getKernel());
         $tester->execute(['pool' => 'foo', 'key' => 'bar']);
@@ -95,7 +95,7 @@ class CachePoolDeleteCommandTest extends TestCase
 
         $suggestions = $tester->complete($input);
 
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions()
@@ -111,16 +111,16 @@ class CachePoolDeleteCommandTest extends TestCase
      */
     private function getKernel(): KernelInterface
     {
-        $container = $this->createMock(ContainerInterface::class);
+        $container = self::createMock(ContainerInterface::class);
 
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = self::createMock(KernelInterface::class);
         $kernel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getContainer')
             ->willReturn($container);
 
         $kernel
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getBundles')
             ->willReturn([]);
 

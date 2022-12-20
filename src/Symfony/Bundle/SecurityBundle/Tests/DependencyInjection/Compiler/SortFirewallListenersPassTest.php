@@ -55,7 +55,7 @@ class SortFirewallListenersPassTest extends TestCase
             new Reference('listener_interface_not_implemented'),
             new Reference('listener_priority_minus1'),
         ];
-        $this->assertEquals($expectedSortedlisteners, $sortedListeners->getValues());
+        self::assertEquals($expectedSortedlisteners, $sortedListeners->getValues());
     }
 }
 

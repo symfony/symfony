@@ -25,14 +25,14 @@ class ValidTest extends TestCase
     {
         $constraint = new Valid(['groups' => 'foo']);
 
-        $this->assertSame(['foo'], $constraint->groups);
+        self::assertSame(['foo'], $constraint->groups);
     }
 
     public function testGroupsAreNullByDefault()
     {
         $constraint = new Valid();
 
-        $this->assertNull($constraint->groups);
+        self::assertNull($constraint->groups);
     }
 
     /**

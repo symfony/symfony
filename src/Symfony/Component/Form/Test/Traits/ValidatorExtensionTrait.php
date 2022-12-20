@@ -34,10 +34,10 @@ trait ValidatorExtensionTrait
             throw new \Exception(sprintf('The trait "ValidatorExtensionTrait" can only be added to a class that extends "%s".', TypeTestCase::class));
         }
 
-        $this->validator = $this->createMock(ValidatorInterface::class);
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->setConstructorArgs([''])->setMethods(['addPropertyConstraint'])->getMock();
-        $this->validator->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
-        $this->validator->expects($this->any())->method('validate')->will($this->returnValue(new ConstraintViolationList()));
+        $this->validator = self::createMock(ValidatorInterface::class);
+        $metadata = self::getMockBuilder(ClassMetadata::class)->setConstructorArgs([''])->setMethods(['addPropertyConstraint'])->getMock();
+        $this->validator->expects(self::any())->method('getMetadataFor')->will(self::returnValue($metadata));
+        $this->validator->expects(self::any())->method('validate')->will(self::returnValue(new ConstraintViolationList()));
 
         return new ValidatorExtension($this->validator, false);
     }

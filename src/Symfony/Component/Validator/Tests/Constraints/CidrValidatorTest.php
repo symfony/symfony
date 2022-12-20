@@ -42,14 +42,14 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidConstraint()
     {
-        $this->expectException(UnexpectedTypeException::class);
+        self::expectException(UnexpectedTypeException::class);
 
         $this->validator->validate('neko', new NotNull());
     }
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
 
         $this->validator->validate(123456, new Cidr());
     }

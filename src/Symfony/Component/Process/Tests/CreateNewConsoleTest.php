@@ -21,14 +21,14 @@ class CreateNewConsoleTest extends TestCase
 {
     public function testOptionCreateNewConsole()
     {
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
         try {
             $process = new Process(['php', __DIR__.'/ThreeSecondProcess.php']);
             $process->setOptions(['create_new_console' => true]);
             $process->disableOutput();
             $process->start();
         } catch (\Exception $e) {
-            $this->fail($e);
+            self::fail($e);
         }
     }
 
@@ -40,6 +40,6 @@ class CreateNewConsoleTest extends TestCase
         $process->setOptions(['create_new_console' => true]);
         $process->disableOutput();
         $process->start();
-        $this->assertLessThan(3000, $startTime - microtime(true));
+        self::assertLessThan(3000, $startTime - microtime(true));
     }
 }

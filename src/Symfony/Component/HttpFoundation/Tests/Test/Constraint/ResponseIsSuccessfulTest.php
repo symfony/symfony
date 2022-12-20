@@ -23,17 +23,17 @@ class ResponseIsSuccessfulTest extends TestCase
     {
         $constraint = new ResponseIsSuccessful();
 
-        $this->assertTrue($constraint->evaluate(new Response(), '', true));
-        $this->assertFalse($constraint->evaluate(new Response('', 404), '', true));
+        self::assertTrue($constraint->evaluate(new Response(), '', true));
+        self::assertFalse($constraint->evaluate(new Response('', 404), '', true));
 
         try {
             $constraint->evaluate(new Response('', 404));
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("Failed asserting that the Response is successful.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
+            self::assertStringContainsString("Failed asserting that the Response is successful.\nHTTP/1.0 404 Not Found", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 }

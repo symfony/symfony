@@ -44,12 +44,12 @@ class ResponseFunctionalTest extends TestCase
     public function testCookie($fixture)
     {
         if (\PHP_VERSION_ID >= 80000 && 'cookie_max_age' === $fixture) {
-            $this->markTestSkipped('This fixture produces a fatal error on PHP 8.');
+            self::markTestSkipped('This fixture produces a fatal error on PHP 8.');
         }
 
         $result = file_get_contents(sprintf('http://localhost:8054/%s.php', $fixture));
         $result = preg_replace_callback('/expires=[^;]++/', function ($m) { return str_replace('-', ' ', $m[0]); }, $result);
-        $this->assertStringMatchesFormatFile(__DIR__.sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
+        self::assertStringMatchesFormatFile(__DIR__.sprintf('/Fixtures/response-functional/%s.expected', $fixture), $result);
     }
 
     public function provideCookie()

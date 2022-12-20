@@ -16,8 +16,8 @@ final class DeprecationGroupTest extends TestCase
             'get5klocMethod'
         );
         $group->addNoticeFromProceduralCode('Calling sfContext::getInstance() is deprecated');
-        $this->assertCount(1, $group->notices());
-        $this->assertSame(2, $group->count());
+        self::assertCount(1, $group->notices());
+        self::assertSame(2, $group->count());
     }
 
     public function testItAllowsAddingANoticeWithoutClutteringTheMemory()
@@ -25,6 +25,6 @@ final class DeprecationGroupTest extends TestCase
         // this is useful for notices in the legacy group
         $group = new DeprecationGroup();
         $group->addNotice();
-        $this->assertSame(1, $group->count());
+        self::assertSame(1, $group->count());
     }
 }

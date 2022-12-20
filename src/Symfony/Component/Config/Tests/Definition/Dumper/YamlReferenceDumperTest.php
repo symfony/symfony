@@ -23,7 +23,7 @@ class YamlReferenceDumperTest extends TestCase
 
         $dumper = new YamlReferenceDumper();
 
-        $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
+        self::assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 
     public function provideDumpAtPath(): array
@@ -78,7 +78,7 @@ EOL
 
         $dumper = new YamlReferenceDumper();
 
-        $this->assertSame(trim($expected), trim($dumper->dumpAtPath($configuration, $path)));
+        self::assertSame(trim($expected), trim($dumper->dumpAtPath($configuration, $path)));
     }
 
     private function getConfigurationAsString(): string

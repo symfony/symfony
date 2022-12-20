@@ -34,8 +34,8 @@ class DotenvVaultTest extends TestCase
     {
         $vault = new DotenvVault($this->envFile);
 
-        $this->assertFalse($vault->generateKeys());
-        $this->assertSame('The dotenv vault doesn\'t encrypt secrets thus doesn\'t need keys.', $vault->getLastMessage());
+        self::assertFalse($vault->generateKeys());
+        self::assertSame('The dotenv vault doesn\'t encrypt secrets thus doesn\'t need keys.', $vault->getLastMessage());
     }
 
     public function testEncryptAndDecrypt()
@@ -50,17 +50,17 @@ class DotenvVaultTest extends TestCase
         (new Dotenv())->load($this->envFile);
 
         $decrypted = $vault->reveal('foo');
-        $this->assertSame($plain, $decrypted);
+        self::assertSame($plain, $decrypted);
 
-        $this->assertSame(['foo' => null], array_intersect_key($vault->list(), ['foo' => 123]));
-        $this->assertSame(['foo' => $plain], array_intersect_key($vault->list(true), ['foo' => 123]));
+        self::assertSame(['foo' => null], array_intersect_key($vault->list(), ['foo' => 123]));
+        self::assertSame(['foo' => $plain], array_intersect_key($vault->list(true), ['foo' => 123]));
 
-        $this->assertTrue($vault->remove('foo'));
-        $this->assertFalse($vault->remove('foo'));
+        self::assertTrue($vault->remove('foo'));
+        self::assertFalse($vault->remove('foo'));
 
         unset($_SERVER['foo'], $_ENV['foo']);
         (new Dotenv())->load($this->envFile);
 
-        $this->assertArrayNotHasKey('foo', $vault->list());
+        self::assertArrayNotHasKey('foo', $vault->list());
     }
 }

@@ -25,29 +25,29 @@ class BrowserCookieValueSameTest extends TestCase
     {
         $browser = $this->getBrowser();
         $constraint = new BrowserCookieValueSame('foo', 'bar', false, '/path');
-        $this->assertTrue($constraint->evaluate($browser, '', true));
+        self::assertTrue($constraint->evaluate($browser, '', true));
         $constraint = new BrowserCookieValueSame('foo', 'bar', true, '/path');
-        $this->assertTrue($constraint->evaluate($browser, '', true));
+        self::assertTrue($constraint->evaluate($browser, '', true));
         $constraint = new BrowserCookieValueSame('foo', 'babar', false, '/path');
-        $this->assertFalse($constraint->evaluate($browser, '', true));
+        self::assertFalse($constraint->evaluate($browser, '', true));
 
         try {
             $constraint->evaluate($browser);
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Browser has cookie \"foo\" with path \"/path\" with value \"babar\".\n", TestFailure::exceptionToString($e));
+            self::assertEquals("Failed asserting that the Browser has cookie \"foo\" with path \"/path\" with value \"babar\".\n", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 
     private function getBrowser(): AbstractBrowser
     {
-        $browser = $this->createMock(AbstractBrowser::class);
+        $browser = self::createMock(AbstractBrowser::class);
         $jar = new CookieJar();
         $jar->set(new Cookie('foo', 'bar', null, '/path', 'example.com'));
-        $browser->expects($this->any())->method('getCookieJar')->willReturn($jar);
+        $browser->expects(self::any())->method('getCookieJar')->willReturn($jar);
 
         return $browser;
     }

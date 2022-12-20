@@ -24,6 +24,6 @@ class ParsedExpressionTest extends TestCase
         $serializedExpression = serialize($expression);
         $unserializedExpression = unserialize($serializedExpression);
 
-        $this->assertEquals($expression, $unserializedExpression);
+        self::assertEquals($expression, $unserializedExpression);
     }
 }

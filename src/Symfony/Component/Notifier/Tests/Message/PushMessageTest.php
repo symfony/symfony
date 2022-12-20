@@ -24,8 +24,8 @@ class PushMessageTest extends TestCase
     {
         $message = new PushMessage('Hello', 'World');
 
-        $this->assertSame('Hello', $message->getSubject());
-        $this->assertSame('World', $message->getContent());
+        self::assertSame('Hello', $message->getSubject());
+        self::assertSame('World', $message->getContent());
     }
 
     public function testSetSubject()
@@ -33,7 +33,7 @@ class PushMessageTest extends TestCase
         $message = new PushMessage('Hello', 'World');
         $message->subject('dlrow olleH');
 
-        $this->assertSame('dlrow olleH', $message->getSubject());
+        self::assertSame('dlrow olleH', $message->getSubject());
     }
 
     public function testSetContent()
@@ -41,7 +41,7 @@ class PushMessageTest extends TestCase
         $message = new PushMessage('Hello', 'World');
         $message->content('dlrow olleH');
 
-        $this->assertSame('dlrow olleH', $message->getContent());
+        self::assertSame('dlrow olleH', $message->getContent());
     }
 
     public function testSetTransport()
@@ -49,7 +49,7 @@ class PushMessageTest extends TestCase
         $message = new PushMessage('Hello', 'World');
         $message->transport('next_one');
 
-        $this->assertSame('next_one', $message->getTransport());
+        self::assertSame('next_one', $message->getTransport());
     }
 
     public function testCreateFromNotification()
@@ -59,8 +59,8 @@ class PushMessageTest extends TestCase
 
         $message = PushMessage::fromNotification($notification);
 
-        $this->assertSame('Hello', $message->getSubject());
-        $this->assertSame('World', $message->getContent());
-        $this->assertSame($notification, $message->getNotification());
+        self::assertSame('Hello', $message->getSubject());
+        self::assertSame('World', $message->getContent());
+        self::assertSame($notification, $message->getNotification());
     }
 }

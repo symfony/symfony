@@ -31,7 +31,7 @@ final class TurboSmsTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new TurboSmsTransport('authToken', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
+        return new TurboSmsTransport('authToken', 'sender', $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -47,12 +47,12 @@ final class TurboSmsTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSuccessfulSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
         $response
             ->expects(self::exactly(2))
             ->method('getStatusCode')
@@ -90,7 +90,7 @@ final class TurboSmsTransportTest extends TransportTestCase
 
     public function testFailedSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = self::createMock(ResponseInterface::class);
         $response
             ->expects(self::exactly(2))
             ->method('getStatusCode')
@@ -114,19 +114,19 @@ final class TurboSmsTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client);
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Unable to send SMS with TurboSMS: Error code 103 with message "REQUIRED_TOKEN".');
+        self::expectException(TransportException::class);
+        self::expectExceptionMessage('Unable to send SMS with TurboSMS: Error code 103 with message "REQUIRED_TOKEN".');
 
         $transport->send($message);
     }
 
     public function testInvalidFrom()
     {
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
+        self::expectException(LengthException::class);
+        self::expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
 
         $message = new SmsMessage('380931234567', 'Hello!');
-        $transport = new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', $this->createMock(HttpClientInterface::class));
+        $transport = new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', self::createMock(HttpClientInterface::class));
 
         $transport->send($message);
     }
@@ -134,10 +134,10 @@ final class TurboSmsTransportTest extends TransportTestCase
     public function testInvalidSubjectWithLatinSymbols()
     {
         $message = new SmsMessage('380931234567', str_repeat('z', 1522));
-        $transport = new TurboSmsTransport('authToken', 'sender', $this->createMock(HttpClientInterface::class));
+        $transport = new TurboSmsTransport('authToken', 'sender', self::createMock(HttpClientInterface::class));
 
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('The subject length for "latin" symbols of a TurboSMS message must not exceed 1521 characters.');
+        self::expectException(LengthException::class);
+        self::expectExceptionMessage('The subject length for "latin" symbols of a TurboSMS message must not exceed 1521 characters.');
 
         $transport->send($message);
     }
@@ -145,10 +145,10 @@ final class TurboSmsTransportTest extends TransportTestCase
     public function testInvalidSubjectWithCyrillicSymbols()
     {
         $message = new SmsMessage('380931234567', str_repeat('z', 661).'Й');
-        $transport = new TurboSmsTransport('authToken', 'sender', $this->createMock(HttpClientInterface::class));
+        $transport = new TurboSmsTransport('authToken', 'sender', self::createMock(HttpClientInterface::class));
 
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('The subject length for "cyrillic" symbols of a TurboSMS message must not exceed 661 characters.');
+        self::expectException(LengthException::class);
+        self::expectExceptionMessage('The subject length for "cyrillic" symbols of a TurboSMS message must not exceed 661 characters.');
 
         $transport->send($message);
     }

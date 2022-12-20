@@ -30,37 +30,37 @@ class ErrorListenerTest extends TestCase
     {
         $error = new \TypeError('An error occurred');
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('critical')
             ->with('Error thrown while running command "{command}". Message: "{message}"', ['exception' => $error, 'command' => 'test:run --foo=baz buzz', 'message' => 'An error occurred'])
         ;
 
         $listener = new ErrorListener($logger);
-        $listener->onConsoleError(new ConsoleErrorEvent(new ArgvInput(['console.php', 'test:run', '--foo=baz', 'buzz']), $this->createMock(OutputInterface::class), $error, new Command('test:run')));
+        $listener->onConsoleError(new ConsoleErrorEvent(new ArgvInput(['console.php', 'test:run', '--foo=baz', 'buzz']), self::createMock(OutputInterface::class), $error, new Command('test:run')));
     }
 
     public function testOnConsoleErrorWithNoCommandAndNoInputString()
     {
         $error = new \RuntimeException('An error occurred');
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('critical')
             ->with('An error occurred while using the console. Message: "{message}"', ['exception' => $error, 'message' => 'An error occurred'])
         ;
 
         $listener = new ErrorListener($logger);
-        $listener->onConsoleError(new ConsoleErrorEvent(new NonStringInput(), $this->createMock(OutputInterface::class), $error));
+        $listener->onConsoleError(new ConsoleErrorEvent(new NonStringInput(), self::createMock(OutputInterface::class), $error));
     }
 
     public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('debug')
             ->with('Command "{command}" exited with code "{code}"', ['command' => 'test:run', 'code' => 255])
         ;
@@ -71,9 +71,9 @@ class ErrorListenerTest extends TestCase
 
     public function testOnConsoleTerminateForZeroExitCodeDoesNotWriteToLog()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $logger
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('debug')
         ;
 
@@ -83,20 +83,17 @@ class ErrorListenerTest extends TestCase
 
     public function testGetSubscribedEvents()
     {
-        $this->assertSame(
-            [
-                'console.error' => ['onConsoleError', -128],
-                'console.terminate' => ['onConsoleTerminate', -128],
-            ],
-            ErrorListener::getSubscribedEvents()
-        );
+        self::assertSame([
+            'console.error' => ['onConsoleError', -128],
+            'console.terminate' => ['onConsoleTerminate', -128],
+        ], ErrorListener::getSubscribedEvents());
     }
 
     public function testAllKindsOfInputCanBeLogged()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $logger
-            ->expects($this->exactly(3))
+            ->expects(self::exactly(3))
             ->method('debug')
             ->with('Command "{command}" exited with code "{code}"', ['command' => 'test:run --foo=bar', 'code' => 255])
         ;
@@ -109,20 +106,20 @@ class ErrorListenerTest extends TestCase
 
     public function testCommandNameIsDisplayedForNonStringableInput()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('debug')
             ->with('Command "{command}" exited with code "{code}"', ['command' => 'test:run', 'code' => 255])
         ;
 
         $listener = new ErrorListener($logger);
-        $listener->onConsoleTerminate($this->getConsoleTerminateEvent($this->createMock(InputInterface::class), 255));
+        $listener->onConsoleTerminate($this->getConsoleTerminateEvent(self::createMock(InputInterface::class), 255));
     }
 
     private function getConsoleTerminateEvent(InputInterface $input, $exitCode)
     {
-        return new ConsoleTerminateEvent(new Command('test:run'), $input, $this->createMock(OutputInterface::class), $exitCode);
+        return new ConsoleTerminateEvent(new Command('test:run'), $input, self::createMock(OutputInterface::class), $exitCode);
     }
 }
 

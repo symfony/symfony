@@ -39,7 +39,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testInvalidWidgetOption()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'fake_widget',
         ]);
@@ -47,7 +47,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testInvalidInputOption()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'input' => 'fake_input',
         ]);
@@ -64,8 +64,8 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2010-06-02');
 
-        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
-        $this->assertEquals('2010-06-02', $form->getViewData());
+        self::assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        self::assertEquals('2010-06-02', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextDateTimeWithCustomFormat()
@@ -81,8 +81,8 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2010');
 
-        $this->assertEquals(new \DateTime('2010-01-01 UTC'), $form->getData());
-        $this->assertEquals('2010', $form->getViewData());
+        self::assertEquals(new \DateTime('2010-01-01 UTC'), $form->getData());
+        self::assertEquals('2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextDateTime()
@@ -103,8 +103,8 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2.6.2010');
 
-        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
-        $this->assertEquals('02.06.2010', $form->getViewData());
+        self::assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        self::assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextDateTimeImmutable()
@@ -125,9 +125,9 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2.6.2010');
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
-        $this->assertEquals(new \DateTimeImmutable('2010-06-02 UTC'), $form->getData());
-        $this->assertEquals('02.06.2010', $form->getViewData());
+        self::assertInstanceOf(\DateTimeImmutable::class, $form->getData());
+        self::assertEquals(new \DateTimeImmutable('2010-06-02 UTC'), $form->getData());
+        self::assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextString()
@@ -148,8 +148,8 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2.6.2010');
 
-        $this->assertEquals('2010-06-02', $form->getData());
-        $this->assertEquals('02.06.2010', $form->getViewData());
+        self::assertEquals('2010-06-02', $form->getData());
+        self::assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextTimestamp()
@@ -172,8 +172,8 @@ class DateTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $form->getData());
-        $this->assertEquals('02.06.2010', $form->getViewData());
+        self::assertEquals($dateTime->format('U'), $form->getData());
+        self::assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextRaw()
@@ -200,8 +200,8 @@ class DateTypeTest extends BaseTypeTest
             'year' => '2010',
         ];
 
-        $this->assertEquals($output, $form->getData());
-        $this->assertEquals('02.06.2010', $form->getViewData());
+        self::assertEquals($output, $form->getData());
+        self::assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testArrayDateWithReferenceDoesUseReferenceTimeOnZero()
@@ -226,8 +226,8 @@ class DateTypeTest extends BaseTypeTest
             'widget' => 'single_text',
         ]);
 
-        $this->assertSame($input, $form->getData());
-        $this->assertEquals('01.01.1970', $form->getViewData());
+        self::assertSame($input, $form->getData());
+        self::assertEquals('01.01.1970', $form->getViewData());
     }
 
     public function testSubmitFromText()
@@ -248,8 +248,8 @@ class DateTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertEquals($dateTime, $form->getData());
-        $this->assertEquals($text, $form->getViewData());
+        self::assertEquals($dateTime, $form->getData());
+        self::assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromChoice()
@@ -271,8 +271,8 @@ class DateTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertEquals($dateTime, $form->getData());
-        $this->assertEquals($text, $form->getViewData());
+        self::assertEquals($dateTime, $form->getData());
+        self::assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromChoiceEmpty()
@@ -292,8 +292,8 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit($text);
 
-        $this->assertNull($form->getData());
-        $this->assertEquals($text, $form->getViewData());
+        self::assertNull($form->getData());
+        self::assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromInputDateTimeDifferentPattern()
@@ -309,8 +309,8 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('06*2010*02');
 
-        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
-        $this->assertEquals('06*2010*02', $form->getViewData());
+        self::assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        self::assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputStringDifferentPattern()
@@ -326,8 +326,8 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('06*2010*02');
 
-        $this->assertEquals('2010-06-02', $form->getData());
-        $this->assertEquals('06*2010*02', $form->getViewData());
+        self::assertEquals('2010-06-02', $form->getData());
+        self::assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputTimestampDifferentPattern()
@@ -345,8 +345,8 @@ class DateTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $form->getData());
-        $this->assertEquals('06*2010*02', $form->getViewData());
+        self::assertEquals($dateTime->format('U'), $form->getData());
+        self::assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputRawDifferentPattern()
@@ -368,8 +368,8 @@ class DateTypeTest extends BaseTypeTest
             'year' => '2010',
         ];
 
-        $this->assertEquals($output, $form->getData());
-        $this->assertEquals('06*2010*02', $form->getViewData());
+        self::assertEquals($output, $form->getData());
+        self::assertEquals('06*2010*02', $form->getViewData());
     }
 
     /**
@@ -382,7 +382,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals($pattern, $view->vars['date_pattern']);
+        self::assertEquals($pattern, $view->vars['date_pattern']);
     }
 
     public function provideDateFormats()
@@ -400,7 +400,7 @@ class DateTypeTest extends BaseTypeTest
      */
     public function testThrowExceptionIfFormatIsNoPattern()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => '0',
             'html5' => false,
@@ -411,8 +411,8 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfFormatDoesNotContainYearMonthAndDay()
     {
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The "format" option should contain the letters "y", "M" and "d". Its current value is "yy".');
+        self::expectException(InvalidOptionsException::class);
+        self::expectExceptionMessage('The "format" option should contain the letters "y", "M" and "d". Its current value is "yy".');
         $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [6, 7],
             'format' => 'yy',
@@ -421,8 +421,8 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfFormatMissesYearMonthAndDayWithSingleTextWidget()
     {
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The "format" option should contain the letters "y", "M" or "d". Its current value is "wrong".');
+        self::expectException(InvalidOptionsException::class);
+        self::expectExceptionMessage('The "format" option should contain the letters "y", "M" or "d". Its current value is "wrong".');
         $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
             'format' => 'wrong',
@@ -432,7 +432,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfFormatIsNoConstant()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => 105,
         ]);
@@ -440,7 +440,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfFormatIsInvalid()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => [],
         ]);
@@ -448,7 +448,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfYearsIsInvalid()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'years' => 'bad value',
         ]);
@@ -456,7 +456,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfMonthsIsInvalid()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'months' => 'bad value',
         ]);
@@ -464,7 +464,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfDaysIsInvalid()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'days' => 'bad value',
         ]);
@@ -490,7 +490,7 @@ class DateTypeTest extends BaseTypeTest
 
         // 2010-06-02 00:00:00 UTC
         // 2010-06-01 20:00:00 UTC-4
-        $this->assertEquals('01.06.2010', $form->getViewData());
+        self::assertEquals('01.06.2010', $form->getViewData());
     }
 
     public function testSetDataWithNegativeTimezoneOffsetDateTimeInput()
@@ -515,8 +515,8 @@ class DateTypeTest extends BaseTypeTest
 
         // 2010-06-02 00:00:00 UTC
         // 2010-06-01 20:00:00 UTC-4
-        $this->assertEquals($dateTime, $form->getData());
-        $this->assertEquals('01.06.2010', $form->getViewData());
+        self::assertEquals($dateTime, $form->getData());
+        self::assertEquals('01.06.2010', $form->getViewData());
     }
 
     public function testYearsOption()
@@ -527,7 +527,7 @@ class DateTypeTest extends BaseTypeTest
 
         $view = $form->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView('2010', '2010', '2010'),
             new ChoiceView('2011', '2011', '2011'),
         ], $view['year']->vars['choices']);
@@ -543,7 +543,7 @@ class DateTypeTest extends BaseTypeTest
 
         $view = $form->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView(6, '6', '6'),
             new ChoiceView(7, '7', '7'),
         ], $view['month']->vars['choices']);
@@ -563,7 +563,7 @@ class DateTypeTest extends BaseTypeTest
 
         $view = $form->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView(1, '1', 'Jän.'),
             new ChoiceView(4, '4', 'Apr.'),
         ], $view['month']->vars['choices']);
@@ -582,7 +582,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView(1, '1', 'Jänner'),
             new ChoiceView(4, '4', 'April'),
         ], $view['month']->vars['choices']);
@@ -601,7 +601,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView(1, '1', 'Jänner'),
             new ChoiceView(4, '4', 'April'),
         ], $view['month']->vars['choices']);
@@ -615,7 +615,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals([
+        self::assertEquals([
             new ChoiceView(6, '6', '6'),
             new ChoiceView(7, '7', '7'),
         ], $view['day']->vars['choices']);
@@ -635,7 +635,7 @@ class DateTypeTest extends BaseTypeTest
             'year' => '',
         ]);
 
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testIsSynchronizedReturnsTrueIfChoiceAndCompletelyFilled()
@@ -652,7 +652,7 @@ class DateTypeTest extends BaseTypeTest
             'year' => '2010',
         ]);
 
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testIsSynchronizedReturnsFalseIfChoiceAndDayEmpty()
@@ -669,7 +669,7 @@ class DateTypeTest extends BaseTypeTest
             'year' => '2010',
         ]);
 
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testPassDatePatternToView()
@@ -682,7 +682,7 @@ class DateTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE)
             ->createView();
 
-        $this->assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
+        self::assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentFormat()
@@ -697,7 +697,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
+        self::assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentPattern()
@@ -707,7 +707,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('{{ month }}{{ year }}{{ day }}', $view->vars['date_pattern']);
+        self::assertSame('{{ month }}{{ year }}{{ day }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentPatternWithSeparators()
@@ -717,7 +717,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->vars['date_pattern']);
+        self::assertSame('{{ month }}*{{ year }}*{{ day }}', $view->vars['date_pattern']);
     }
 
     public function testDontPassDatePatternIfText()
@@ -727,7 +727,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertArrayNotHasKey('date_pattern', $view->vars);
+        self::assertArrayNotHasKey('date_pattern', $view->vars);
     }
 
     public function testDatePatternFormatWithQuotedStrings()
@@ -743,7 +743,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
+        self::assertEquals('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassWidgetToView()
@@ -753,14 +753,14 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('single_text', $view->vars['widget']);
+        self::assertSame('single_text', $view->vars['widget']);
     }
 
     public function testInitializeWithDateTime()
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
+        self::assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
@@ -770,7 +770,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertEquals('date', $view->vars['type']);
+        self::assertEquals('date', $view->vars['type']);
     }
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()
@@ -780,9 +780,9 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('', $view['year']->vars['placeholder']);
-        $this->assertSame('', $view['month']->vars['placeholder']);
-        $this->assertSame('', $view['day']->vars['placeholder']);
+        self::assertSame('', $view['year']->vars['placeholder']);
+        self::assertSame('', $view['month']->vars['placeholder']);
+        self::assertSame('', $view['day']->vars['placeholder']);
     }
 
     public function testPassNoPlaceholderToViewIfRequired()
@@ -792,9 +792,9 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertNull($view['year']->vars['placeholder']);
-        $this->assertNull($view['month']->vars['placeholder']);
-        $this->assertNull($view['day']->vars['placeholder']);
+        self::assertNull($view['year']->vars['placeholder']);
+        self::assertNull($view['month']->vars['placeholder']);
+        self::assertNull($view['day']->vars['placeholder']);
     }
 
     public function testPassPlaceholderAsString()
@@ -804,9 +804,9 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('Empty', $view['year']->vars['placeholder']);
-        $this->assertSame('Empty', $view['month']->vars['placeholder']);
-        $this->assertSame('Empty', $view['day']->vars['placeholder']);
+        self::assertSame('Empty', $view['year']->vars['placeholder']);
+        self::assertSame('Empty', $view['month']->vars['placeholder']);
+        self::assertSame('Empty', $view['day']->vars['placeholder']);
     }
 
     public function testPassPlaceholderAsArray()
@@ -820,9 +820,9 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('Empty year', $view['year']->vars['placeholder']);
-        $this->assertSame('Empty month', $view['month']->vars['placeholder']);
-        $this->assertSame('Empty day', $view['day']->vars['placeholder']);
+        self::assertSame('Empty year', $view['year']->vars['placeholder']);
+        self::assertSame('Empty month', $view['month']->vars['placeholder']);
+        self::assertSame('Empty day', $view['day']->vars['placeholder']);
     }
 
     public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
@@ -836,9 +836,9 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('Empty year', $view['year']->vars['placeholder']);
-        $this->assertSame('', $view['month']->vars['placeholder']);
-        $this->assertSame('Empty day', $view['day']->vars['placeholder']);
+        self::assertSame('Empty year', $view['year']->vars['placeholder']);
+        self::assertSame('', $view['month']->vars['placeholder']);
+        self::assertSame('Empty day', $view['day']->vars['placeholder']);
     }
 
     public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
@@ -852,9 +852,9 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('Empty year', $view['year']->vars['placeholder']);
-        $this->assertNull($view['month']->vars['placeholder']);
-        $this->assertSame('Empty day', $view['day']->vars['placeholder']);
+        self::assertSame('Empty year', $view['year']->vars['placeholder']);
+        self::assertNull($view['month']->vars['placeholder']);
+        self::assertSame('Empty day', $view['day']->vars['placeholder']);
     }
 
     public function testPassHtml5TypeIfSingleTextAndHtml5Format()
@@ -864,7 +864,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertSame('date', $view->vars['type']);
+        self::assertSame('date', $view->vars['type']);
     }
 
     public function testDontPassHtml5TypeIfHtml5NotAllowed()
@@ -875,7 +875,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertArrayNotHasKey('type', $view->vars);
+        self::assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotHtml5Format()
@@ -887,7 +887,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertArrayNotHasKey('type', $view->vars);
+        self::assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotSingleText()
@@ -897,7 +897,7 @@ class DateTypeTest extends BaseTypeTest
         ])
             ->createView();
 
-        $this->assertArrayNotHasKey('type', $view->vars);
+        self::assertArrayNotHasKey('type', $view->vars);
     }
 
     public function provideCompoundWidgets()
@@ -919,8 +919,8 @@ class DateTypeTest extends BaseTypeTest
         ]);
         $form['year']->addError($error);
 
-        $this->assertSame([], iterator_to_array($form['year']->getErrors()));
-        $this->assertSame([$error], iterator_to_array($form->getErrors()));
+        self::assertSame([], iterator_to_array($form['year']->getErrors()));
+        self::assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
     /**
@@ -934,8 +934,8 @@ class DateTypeTest extends BaseTypeTest
         ]);
         $form['month']->addError($error);
 
-        $this->assertSame([], iterator_to_array($form['month']->getErrors()));
-        $this->assertSame([$error], iterator_to_array($form->getErrors()));
+        self::assertSame([], iterator_to_array($form['month']->getErrors()));
+        self::assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
     /**
@@ -949,8 +949,8 @@ class DateTypeTest extends BaseTypeTest
         ]);
         $form['day']->addError($error);
 
-        $this->assertSame([], iterator_to_array($form['day']->getErrors()));
-        $this->assertSame([$error], iterator_to_array($form->getErrors()));
+        self::assertSame([], iterator_to_array($form['day']->getErrors()));
+        self::assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
     public function testYears()
@@ -965,7 +965,7 @@ class DateTypeTest extends BaseTypeTest
             $listChoices[] = new ChoiceView($y, $y, $y);
         }
 
-        $this->assertEquals($listChoices, $view['year']->vars['choices']);
+        self::assertEquals($listChoices, $view['year']->vars['choices']);
     }
 
     public function testPassDefaultChoiceTranslationDomain()
@@ -973,9 +973,9 @@ class DateTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE);
 
         $view = $form->createView();
-        $this->assertFalse($view['year']->vars['choice_translation_domain']);
-        $this->assertFalse($view['month']->vars['choice_translation_domain']);
-        $this->assertFalse($view['day']->vars['choice_translation_domain']);
+        self::assertFalse($view['year']->vars['choice_translation_domain']);
+        self::assertFalse($view['month']->vars['choice_translation_domain']);
+        self::assertFalse($view['day']->vars['choice_translation_domain']);
     }
 
     public function testPassChoiceTranslationDomainAsString()
@@ -985,9 +985,9 @@ class DateTypeTest extends BaseTypeTest
         ]);
 
         $view = $form->createView();
-        $this->assertSame('messages', $view['year']->vars['choice_translation_domain']);
-        $this->assertSame('messages', $view['month']->vars['choice_translation_domain']);
-        $this->assertSame('messages', $view['day']->vars['choice_translation_domain']);
+        self::assertSame('messages', $view['year']->vars['choice_translation_domain']);
+        self::assertSame('messages', $view['month']->vars['choice_translation_domain']);
+        self::assertSame('messages', $view['day']->vars['choice_translation_domain']);
     }
 
     public function testPassChoiceTranslationDomainAsArray()
@@ -1000,9 +1000,9 @@ class DateTypeTest extends BaseTypeTest
         ]);
 
         $view = $form->createView();
-        $this->assertSame('foo', $view['year']->vars['choice_translation_domain']);
-        $this->assertFalse($view['month']->vars['choice_translation_domain']);
-        $this->assertSame('test', $view['day']->vars['choice_translation_domain']);
+        self::assertSame('foo', $view['year']->vars['choice_translation_domain']);
+        self::assertFalse($view['month']->vars['choice_translation_domain']);
+        self::assertSame('test', $view['day']->vars['choice_translation_domain']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -1017,9 +1017,9 @@ class DateTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getViewData());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertSame('', $form->getViewData());
     }
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = [], $expectedData = null)
@@ -1030,9 +1030,9 @@ class DateTypeTest extends BaseTypeTest
         $form->submit(null);
 
         // view transformer writes back empty strings in the view data
-        $this->assertSame(['year' => '', 'month' => '', 'day' => ''], $form->getViewData());
-        $this->assertSame($expectedData, $form->getNormData());
-        $this->assertSame($expectedData, $form->getData());
+        self::assertSame(['year' => '', 'month' => '', 'day' => ''], $form->getViewData());
+        self::assertSame($expectedData, $form->getNormData());
+        self::assertSame($expectedData, $form->getData());
     }
 
     /**
@@ -1049,9 +1049,9 @@ class DateTypeTest extends BaseTypeTest
         if ($emptyData instanceof \Closure) {
             $emptyData = $emptyData($form);
         }
-        $this->assertSame($emptyData, $form->getViewData());
-        $this->assertEquals($expectedData, $form->getNormData());
-        $this->assertEquals($expectedData, $form->getData());
+        self::assertSame($emptyData, $form->getViewData());
+        self::assertEquals($expectedData, $form->getNormData());
+        self::assertEquals($expectedData, $form->getData());
     }
 
     public function provideEmptyData()
@@ -1083,6 +1083,6 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2018-01-14');
 
-        $this->assertSame('14/01/2018', $form->getData());
+        self::assertSame('14/01/2018', $form->getData());
     }
 }

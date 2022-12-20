@@ -37,16 +37,16 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $request->initialize(['foo' => 'bar']);
-        $this->assertEquals('bar', $request->query->get('foo'), '->initialize() takes an array of query parameters as its first argument');
+        self::assertEquals('bar', $request->query->get('foo'), '->initialize() takes an array of query parameters as its first argument');
 
         $request->initialize([], ['foo' => 'bar']);
-        $this->assertEquals('bar', $request->request->get('foo'), '->initialize() takes an array of request parameters as its second argument');
+        self::assertEquals('bar', $request->request->get('foo'), '->initialize() takes an array of request parameters as its second argument');
 
         $request->initialize([], [], ['foo' => 'bar']);
-        $this->assertEquals('bar', $request->attributes->get('foo'), '->initialize() takes an array of attributes as its third argument');
+        self::assertEquals('bar', $request->attributes->get('foo'), '->initialize() takes an array of attributes as its third argument');
 
         $request->initialize([], [], [], [], [], ['HTTP_FOO' => 'bar']);
-        $this->assertEquals('bar', $request->headers->get('FOO'), '->initialize() takes an array of HTTP headers as its sixth argument');
+        self::assertEquals('bar', $request->headers->get('FOO'), '->initialize() takes an array of HTTP headers as its sixth argument');
     }
 
     public function testGetLocale()
@@ -54,7 +54,7 @@ class RequestTest extends TestCase
         $request = new Request();
         $request->setLocale('pl');
         $locale = $request->getLocale();
-        $this->assertEquals('pl', $locale);
+        self::assertEquals('pl', $locale);
     }
 
     public function testGetUser()
@@ -62,7 +62,7 @@ class RequestTest extends TestCase
         $request = Request::create('http://user:password@test.com');
         $user = $request->getUser();
 
-        $this->assertEquals('user', $user);
+        self::assertEquals('user', $user);
     }
 
     public function testGetPassword()
@@ -70,7 +70,7 @@ class RequestTest extends TestCase
         $request = Request::create('http://user:password@test.com');
         $password = $request->getPassword();
 
-        $this->assertEquals('password', $password);
+        self::assertEquals('password', $password);
     }
 
     public function testIsNoCache()
@@ -78,7 +78,7 @@ class RequestTest extends TestCase
         $request = new Request();
         $isNoCache = $request->isNoCache();
 
-        $this->assertFalse($isNoCache);
+        self::assertFalse($isNoCache);
     }
 
     public function testGetContentType()
@@ -86,7 +86,7 @@ class RequestTest extends TestCase
         $request = new Request();
         $contentType = $request->getContentType();
 
-        $this->assertNull($contentType);
+        self::assertNull($contentType);
     }
 
     public function testSetDefaultLocale()
@@ -95,136 +95,136 @@ class RequestTest extends TestCase
         $request->setDefaultLocale('pl');
         $locale = $request->getLocale();
 
-        $this->assertEquals('pl', $locale);
+        self::assertEquals('pl', $locale);
     }
 
     public function testCreate()
     {
         $request = Request::create('http://test.com/foo?bar=baz');
-        $this->assertEquals('http://test.com/foo?bar=baz', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('bar=baz', $request->getQueryString());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/foo?bar=baz', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('bar=baz', $request->getQueryString());
+        self::assertEquals(80, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com/foo', 'GET', ['bar' => 'baz']);
-        $this->assertEquals('http://test.com/foo?bar=baz', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('bar=baz', $request->getQueryString());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/foo?bar=baz', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('bar=baz', $request->getQueryString());
+        self::assertEquals(80, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com/foo?bar=foo', 'GET', ['bar' => 'baz']);
-        $this->assertEquals('http://test.com/foo?bar=baz', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('bar=baz', $request->getQueryString());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/foo?bar=baz', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('bar=baz', $request->getQueryString());
+        self::assertEquals(80, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('https://test.com/foo?foo.bar=baz');
-        $this->assertEquals('https://test.com/foo?foo.bar=baz', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('foo.bar=baz', $request->getQueryString());
-        $this->assertEquals(443, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertTrue($request->isSecure());
-        $this->assertSame(['foo_bar' => 'baz'], $request->query->all());
+        self::assertEquals('https://test.com/foo?foo.bar=baz', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('foo.bar=baz', $request->getQueryString());
+        self::assertEquals(443, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertTrue($request->isSecure());
+        self::assertSame(['foo_bar' => 'baz'], $request->query->all());
 
         $request = Request::create('test.com:90/foo');
-        $this->assertEquals('http://test.com:90/foo', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('test.com', $request->getHost());
-        $this->assertEquals('test.com:90', $request->getHttpHost());
-        $this->assertEquals(90, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com:90/foo', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('test.com', $request->getHost());
+        self::assertEquals('test.com:90', $request->getHttpHost());
+        self::assertEquals(90, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('https://test.com:90/foo');
-        $this->assertEquals('https://test.com:90/foo', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('test.com', $request->getHost());
-        $this->assertEquals('test.com:90', $request->getHttpHost());
-        $this->assertEquals(90, $request->getPort());
-        $this->assertTrue($request->isSecure());
+        self::assertEquals('https://test.com:90/foo', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('test.com', $request->getHost());
+        self::assertEquals('test.com:90', $request->getHttpHost());
+        self::assertEquals(90, $request->getPort());
+        self::assertTrue($request->isSecure());
 
         $request = Request::create('https://127.0.0.1:90/foo');
-        $this->assertEquals('https://127.0.0.1:90/foo', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('127.0.0.1', $request->getHost());
-        $this->assertEquals('127.0.0.1:90', $request->getHttpHost());
-        $this->assertEquals(90, $request->getPort());
-        $this->assertTrue($request->isSecure());
+        self::assertEquals('https://127.0.0.1:90/foo', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('127.0.0.1', $request->getHost());
+        self::assertEquals('127.0.0.1:90', $request->getHttpHost());
+        self::assertEquals(90, $request->getPort());
+        self::assertTrue($request->isSecure());
 
         $request = Request::create('https://[::1]:90/foo');
-        $this->assertEquals('https://[::1]:90/foo', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('[::1]', $request->getHost());
-        $this->assertEquals('[::1]:90', $request->getHttpHost());
-        $this->assertEquals(90, $request->getPort());
-        $this->assertTrue($request->isSecure());
+        self::assertEquals('https://[::1]:90/foo', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('[::1]', $request->getHost());
+        self::assertEquals('[::1]:90', $request->getHttpHost());
+        self::assertEquals(90, $request->getPort());
+        self::assertTrue($request->isSecure());
 
         $request = Request::create('https://[::1]/foo');
-        $this->assertEquals('https://[::1]/foo', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('[::1]', $request->getHost());
-        $this->assertEquals('[::1]', $request->getHttpHost());
-        $this->assertEquals(443, $request->getPort());
-        $this->assertTrue($request->isSecure());
+        self::assertEquals('https://[::1]/foo', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('[::1]', $request->getHost());
+        self::assertEquals('[::1]', $request->getHttpHost());
+        self::assertEquals(443, $request->getPort());
+        self::assertTrue($request->isSecure());
 
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
         $request = Request::create('http://example.com/jsonrpc', 'POST', [], [], [], [], $json);
-        $this->assertEquals($json, $request->getContent());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals($json, $request->getContent());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com');
-        $this->assertEquals('http://test.com/', $request->getUri());
-        $this->assertEquals('/', $request->getPathInfo());
-        $this->assertEquals('', $request->getQueryString());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/', $request->getUri());
+        self::assertEquals('/', $request->getPathInfo());
+        self::assertEquals('', $request->getQueryString());
+        self::assertEquals(80, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com?test=1');
-        $this->assertEquals('http://test.com/?test=1', $request->getUri());
-        $this->assertEquals('/', $request->getPathInfo());
-        $this->assertEquals('test=1', $request->getQueryString());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/?test=1', $request->getUri());
+        self::assertEquals('/', $request->getPathInfo());
+        self::assertEquals('test=1', $request->getQueryString());
+        self::assertEquals(80, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com:90/?test=1');
-        $this->assertEquals('http://test.com:90/?test=1', $request->getUri());
-        $this->assertEquals('/', $request->getPathInfo());
-        $this->assertEquals('test=1', $request->getQueryString());
-        $this->assertEquals(90, $request->getPort());
-        $this->assertEquals('test.com:90', $request->getHttpHost());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com:90/?test=1', $request->getUri());
+        self::assertEquals('/', $request->getPathInfo());
+        self::assertEquals('test=1', $request->getQueryString());
+        self::assertEquals(90, $request->getPort());
+        self::assertEquals('test.com:90', $request->getHttpHost());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://username:password@test.com');
-        $this->assertEquals('http://test.com/', $request->getUri());
-        $this->assertEquals('/', $request->getPathInfo());
-        $this->assertEquals('', $request->getQueryString());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertEquals('username', $request->getUser());
-        $this->assertEquals('password', $request->getPassword());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/', $request->getUri());
+        self::assertEquals('/', $request->getPathInfo());
+        self::assertEquals('', $request->getQueryString());
+        self::assertEquals(80, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertEquals('username', $request->getUser());
+        self::assertEquals('password', $request->getPassword());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://username@test.com');
-        $this->assertEquals('http://test.com/', $request->getUri());
-        $this->assertEquals('/', $request->getPathInfo());
-        $this->assertEquals('', $request->getQueryString());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertEquals('username', $request->getUser());
-        $this->assertSame('', $request->getPassword());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/', $request->getUri());
+        self::assertEquals('/', $request->getPathInfo());
+        self::assertEquals('', $request->getQueryString());
+        self::assertEquals(80, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertEquals('username', $request->getUser());
+        self::assertSame('', $request->getPassword());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com/?foo');
-        $this->assertEquals('/?foo', $request->getRequestUri());
-        $this->assertEquals(['foo' => ''], $request->query->all());
+        self::assertEquals('/?foo', $request->getRequestUri());
+        self::assertEquals(['foo' => ''], $request->query->all());
 
         // assume rewrite rule: (.*) --> app/app.php; app/ is a symlink to a symfony web/ directory
         $request = Request::create('http://test.com/apparthotel-1234', 'GET', [], [], [],
@@ -234,61 +234,61 @@ class RequestTest extends TestCase
                 'SCRIPT_NAME' => '/app/app.php',
                 'PHP_SELF' => '/app/app.php/apparthotel-1234',
             ]);
-        $this->assertEquals('http://test.com/apparthotel-1234', $request->getUri());
-        $this->assertEquals('/apparthotel-1234', $request->getPathInfo());
-        $this->assertEquals('', $request->getQueryString());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/apparthotel-1234', $request->getUri());
+        self::assertEquals('/apparthotel-1234', $request->getPathInfo());
+        self::assertEquals('', $request->getQueryString());
+        self::assertEquals(80, $request->getPort());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertFalse($request->isSecure());
 
         // Fragment should not be included in the URI
         $request = Request::create('http://test.com/foo#bar');
-        $this->assertEquals('http://test.com/foo', $request->getUri());
+        self::assertEquals('http://test.com/foo', $request->getUri());
     }
 
     public function testCreateWithRequestUri()
     {
         $request = Request::create('http://test.com:80/foo');
         $request->server->set('REQUEST_URI', 'http://test.com:80/foo');
-        $this->assertEquals('http://test.com/foo', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('test.com', $request->getHost());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/foo', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('test.com', $request->getHost());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com:8080/foo');
         $request->server->set('REQUEST_URI', 'http://test.com:8080/foo');
-        $this->assertEquals('http://test.com:8080/foo', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('test.com', $request->getHost());
-        $this->assertEquals('test.com:8080', $request->getHttpHost());
-        $this->assertEquals(8080, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com:8080/foo', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('test.com', $request->getHost());
+        self::assertEquals('test.com:8080', $request->getHttpHost());
+        self::assertEquals(8080, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com/foo?bar=foo', 'GET', ['bar' => 'baz']);
         $request->server->set('REQUEST_URI', 'http://test.com/foo?bar=foo');
-        $this->assertEquals('http://test.com/foo?bar=baz', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('bar=baz', $request->getQueryString());
-        $this->assertEquals('test.com', $request->getHost());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('http://test.com/foo?bar=baz', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('bar=baz', $request->getQueryString());
+        self::assertEquals('test.com', $request->getHost());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         $request = Request::create('https://test.com:443/foo');
         $request->server->set('REQUEST_URI', 'https://test.com:443/foo');
-        $this->assertEquals('https://test.com/foo', $request->getUri());
-        $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('test.com', $request->getHost());
-        $this->assertEquals('test.com', $request->getHttpHost());
-        $this->assertEquals(443, $request->getPort());
-        $this->assertTrue($request->isSecure());
+        self::assertEquals('https://test.com/foo', $request->getUri());
+        self::assertEquals('/foo', $request->getPathInfo());
+        self::assertEquals('test.com', $request->getHost());
+        self::assertEquals('test.com', $request->getHttpHost());
+        self::assertEquals(443, $request->getPort());
+        self::assertTrue($request->isSecure());
 
         // Fragment should not be included in the URI
         $request = Request::create('http://test.com/foo#bar');
         $request->server->set('REQUEST_URI', 'http://test.com/foo#bar');
-        $this->assertEquals('http://test.com/foo', $request->getUri());
+        self::assertEquals('http://test.com/foo', $request->getUri());
     }
 
     /**
@@ -305,8 +305,8 @@ class RequestTest extends TestCase
             'SERVER_PORT' => 80,
         ]);
 
-        $this->assertSame($expected, $request->getRequestUri(), $message);
-        $this->assertSame($expected, $request->server->get('REQUEST_URI'), 'Normalize the request URI.');
+        self::assertSame($expected, $request->getRequestUri(), $message);
+        self::assertSame($expected, $request->server->get('REQUEST_URI'), 'Normalize the request URI.');
     }
 
     public function getRequestUriData()
@@ -336,8 +336,8 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $message = 'Fallback to empty URI when headers are missing.';
-        $this->assertSame($expected, $request->getRequestUri(), $message);
-        $this->assertSame($expected, $request->server->get('REQUEST_URI'), 'Normalize the request URI.');
+        self::assertSame($expected, $request->getRequestUri(), $message);
+        self::assertSame($expected, $request->server->get('REQUEST_URI'), 'Normalize the request URI.');
     }
 
     public function testCreateCheckPrecedence()
@@ -352,13 +352,13 @@ class RequestTest extends TestCase
             'QUERY_STRING' => 'foo=bar',
             'CONTENT_TYPE' => 'application/json',
         ]);
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(443, $request->getPort());
-        $this->assertTrue($request->isSecure());
-        $this->assertEquals('fabien', $request->getUser());
-        $this->assertEquals('pa$$', $request->getPassword());
-        $this->assertEquals('', $request->getQueryString());
-        $this->assertEquals('application/json', $request->headers->get('CONTENT_TYPE'));
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(443, $request->getPort());
+        self::assertTrue($request->isSecure());
+        self::assertEquals('fabien', $request->getUser());
+        self::assertEquals('pa$$', $request->getPassword());
+        self::assertEquals('', $request->getQueryString());
+        self::assertEquals('application/json', $request->headers->get('CONTENT_TYPE'));
 
         // URI has precedence over server
         $request = Request::create('http://thomas:pokemon@example.net:8080/?foo=bar', 'GET', [], [], [], [
@@ -366,12 +366,12 @@ class RequestTest extends TestCase
             'HTTPS' => 'on',
             'SERVER_PORT' => 443,
         ]);
-        $this->assertEquals('example.net', $request->getHost());
-        $this->assertEquals(8080, $request->getPort());
-        $this->assertFalse($request->isSecure());
-        $this->assertEquals('thomas', $request->getUser());
-        $this->assertEquals('pokemon', $request->getPassword());
-        $this->assertEquals('foo=bar', $request->getQueryString());
+        self::assertEquals('example.net', $request->getHost());
+        self::assertEquals(8080, $request->getPort());
+        self::assertFalse($request->isSecure());
+        self::assertEquals('thomas', $request->getUser());
+        self::assertEquals('pokemon', $request->getPassword());
+        self::assertEquals('foo=bar', $request->getQueryString());
     }
 
     public function testDuplicate()
@@ -379,17 +379,17 @@ class RequestTest extends TestCase
         $request = new Request(['foo' => 'bar'], ['foo' => 'bar'], ['foo' => 'bar'], [], [], ['HTTP_FOO' => 'bar']);
         $dup = $request->duplicate();
 
-        $this->assertEquals($request->query->all(), $dup->query->all(), '->duplicate() duplicates a request an copy the current query parameters');
-        $this->assertEquals($request->request->all(), $dup->request->all(), '->duplicate() duplicates a request an copy the current request parameters');
-        $this->assertEquals($request->attributes->all(), $dup->attributes->all(), '->duplicate() duplicates a request an copy the current attributes');
-        $this->assertEquals($request->headers->all(), $dup->headers->all(), '->duplicate() duplicates a request an copy the current HTTP headers');
+        self::assertEquals($request->query->all(), $dup->query->all(), '->duplicate() duplicates a request an copy the current query parameters');
+        self::assertEquals($request->request->all(), $dup->request->all(), '->duplicate() duplicates a request an copy the current request parameters');
+        self::assertEquals($request->attributes->all(), $dup->attributes->all(), '->duplicate() duplicates a request an copy the current attributes');
+        self::assertEquals($request->headers->all(), $dup->headers->all(), '->duplicate() duplicates a request an copy the current HTTP headers');
 
         $dup = $request->duplicate(['foo' => 'foobar'], ['foo' => 'foobar'], ['foo' => 'foobar'], [], [], ['HTTP_FOO' => 'foobar']);
 
-        $this->assertEquals(['foo' => 'foobar'], $dup->query->all(), '->duplicate() overrides the query parameters if provided');
-        $this->assertEquals(['foo' => 'foobar'], $dup->request->all(), '->duplicate() overrides the request parameters if provided');
-        $this->assertEquals(['foo' => 'foobar'], $dup->attributes->all(), '->duplicate() overrides the attributes if provided');
-        $this->assertEquals(['foo' => ['foobar']], $dup->headers->all(), '->duplicate() overrides the HTTP header if provided');
+        self::assertEquals(['foo' => 'foobar'], $dup->query->all(), '->duplicate() overrides the query parameters if provided');
+        self::assertEquals(['foo' => 'foobar'], $dup->request->all(), '->duplicate() overrides the request parameters if provided');
+        self::assertEquals(['foo' => 'foobar'], $dup->attributes->all(), '->duplicate() overrides the attributes if provided');
+        self::assertEquals(['foo' => ['foobar']], $dup->headers->all(), '->duplicate() overrides the HTTP header if provided');
     }
 
     public function testDuplicateWithFormat()
@@ -397,38 +397,38 @@ class RequestTest extends TestCase
         $request = new Request([], [], ['_format' => 'json']);
         $dup = $request->duplicate();
 
-        $this->assertEquals('json', $dup->getRequestFormat());
-        $this->assertEquals('json', $dup->attributes->get('_format'));
+        self::assertEquals('json', $dup->getRequestFormat());
+        self::assertEquals('json', $dup->attributes->get('_format'));
 
         $request = new Request();
         $request->setRequestFormat('xml');
         $dup = $request->duplicate();
 
-        $this->assertEquals('xml', $dup->getRequestFormat());
+        self::assertEquals('xml', $dup->getRequestFormat());
     }
 
     public function testGetPreferredFormat()
     {
         $request = new Request();
-        $this->assertNull($request->getPreferredFormat(null));
-        $this->assertSame('html', $request->getPreferredFormat());
-        $this->assertSame('json', $request->getPreferredFormat('json'));
+        self::assertNull($request->getPreferredFormat(null));
+        self::assertSame('html', $request->getPreferredFormat());
+        self::assertSame('json', $request->getPreferredFormat('json'));
 
         $request->setRequestFormat('atom');
         $request->headers->set('Accept', 'application/ld+json');
-        $this->assertSame('atom', $request->getPreferredFormat());
+        self::assertSame('atom', $request->getPreferredFormat());
 
         $request = new Request();
         $request->headers->set('Accept', 'application/xml');
-        $this->assertSame('xml', $request->getPreferredFormat());
+        self::assertSame('xml', $request->getPreferredFormat());
 
         $request = new Request();
         $request->headers->set('Accept', 'application/xml');
-        $this->assertSame('xml', $request->getPreferredFormat());
+        self::assertSame('xml', $request->getPreferredFormat());
 
         $request = new Request();
         $request->headers->set('Accept', 'application/json;q=0.8,application/xml;q=0.9');
-        $this->assertSame('xml', $request->getPreferredFormat());
+        self::assertSame('xml', $request->getPreferredFormat());
     }
 
     /**
@@ -438,14 +438,14 @@ class RequestTest extends TestCase
     {
         $request = new Request();
         foreach ($mimeTypes as $mime) {
-            $this->assertEquals($format, $request->getFormat($mime));
+            self::assertEquals($format, $request->getFormat($mime));
         }
         $request->setFormat($format, $mimeTypes);
         foreach ($mimeTypes as $mime) {
-            $this->assertEquals($format, $request->getFormat($mime));
+            self::assertEquals($format, $request->getFormat($mime));
 
             if (null !== $format) {
-                $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
+                self::assertEquals($mimeTypes[0], $request->getMimeType($format));
             }
         }
     }
@@ -453,10 +453,10 @@ class RequestTest extends TestCase
     public function testGetFormatFromMimeTypeWithParameters()
     {
         $request = new Request();
-        $this->assertEquals('json', $request->getFormat('application/json; charset=utf-8'));
-        $this->assertEquals('json', $request->getFormat('application/json;charset=utf-8'));
-        $this->assertEquals('json', $request->getFormat('application/json ; charset=utf-8'));
-        $this->assertEquals('json', $request->getFormat('application/json ;charset=utf-8'));
+        self::assertEquals('json', $request->getFormat('application/json; charset=utf-8'));
+        self::assertEquals('json', $request->getFormat('application/json;charset=utf-8'));
+        self::assertEquals('json', $request->getFormat('application/json ; charset=utf-8'));
+        self::assertEquals('json', $request->getFormat('application/json ;charset=utf-8'));
     }
 
     /**
@@ -465,7 +465,7 @@ class RequestTest extends TestCase
     public function testGetMimeTypeFromFormat($format, $mimeTypes)
     {
         $request = new Request();
-        $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
+        self::assertEquals($mimeTypes[0], $request->getMimeType($format));
     }
 
     /**
@@ -473,21 +473,21 @@ class RequestTest extends TestCase
      */
     public function testGetMimeTypesFromFormat($format, $mimeTypes)
     {
-        $this->assertEquals($mimeTypes, Request::getMimeTypes($format));
+        self::assertEquals($mimeTypes, Request::getMimeTypes($format));
     }
 
     public function testGetMimeTypesFromInexistentFormat()
     {
         $request = new Request();
-        $this->assertNull($request->getMimeType('foo'));
-        $this->assertEquals([], Request::getMimeTypes('foo'));
+        self::assertNull($request->getMimeType('foo'));
+        self::assertEquals([], Request::getMimeTypes('foo'));
     }
 
     public function testGetFormatWithCustomMimeType()
     {
         $request = new Request();
         $request->setFormat('custom', 'application/vnd.foo.api;myversion=2.3');
-        $this->assertEquals('custom', $request->getFormat('application/vnd.foo.api;myversion=2.3'));
+        self::assertEquals('custom', $request->getFormat('application/vnd.foo.api;myversion=2.3'));
     }
 
     public function getFormatToMimeTypeMapProvider()
@@ -528,7 +528,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://host:8080/index.php/path/info?query=string', $request->getUri(), '->getUri() with non default port');
+        self::assertEquals('http://host:8080/index.php/path/info?query=string', $request->getUri(), '->getUri() with non default port');
 
         // Use std port number
         $server['HTTP_HOST'] = 'host';
@@ -537,7 +537,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://host/index.php/path/info?query=string', $request->getUri(), '->getUri() with default port');
+        self::assertEquals('http://host/index.php/path/info?query=string', $request->getUri(), '->getUri() with default port');
 
         // Without HOST HEADER
         unset($server['HTTP_HOST']);
@@ -546,7 +546,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://servername/index.php/path/info?query=string', $request->getUri(), '->getUri() with default port without HOST_HEADER');
+        self::assertEquals('http://servername/index.php/path/info?query=string', $request->getUri(), '->getUri() with default port without HOST_HEADER');
 
         // Request with URL REWRITING (hide index.php)
         //   RewriteCond %{REQUEST_FILENAME} !-f
@@ -567,7 +567,7 @@ class RequestTest extends TestCase
         $server['SCRIPT_FILENAME'] = '/some/where/index.php';
 
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://host:8080/path/info?query=string', $request->getUri(), '->getUri() with rewrite');
+        self::assertEquals('http://host:8080/path/info?query=string', $request->getUri(), '->getUri() with rewrite');
 
         // Use std port number
         //  http://host/path/info?query=string
@@ -577,7 +577,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://host/path/info?query=string', $request->getUri(), '->getUri() with rewrite and default port');
+        self::assertEquals('http://host/path/info?query=string', $request->getUri(), '->getUri() with rewrite and default port');
 
         // Without HOST HEADER
         unset($server['HTTP_HOST']);
@@ -586,7 +586,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://servername/path/info?query=string', $request->getUri(), '->getUri() with rewrite, default port without HOST_HEADER');
+        self::assertEquals('http://servername/path/info?query=string', $request->getUri(), '->getUri() with rewrite, default port without HOST_HEADER');
 
         // With encoded characters
 
@@ -604,35 +604,32 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals(
-            'http://host:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string',
-            $request->getUri()
-        );
+        self::assertEquals('http://host:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
 
         // with user info
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://host:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
+        self::assertEquals('http://host:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
 
         $server['PHP_AUTH_PW'] = 'symfony';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://host:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
+        self::assertEquals('http://host:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
     }
 
     public function testGetUriForPath()
     {
         $request = Request::create('http://test.com/foo?bar=baz');
-        $this->assertEquals('http://test.com/some/path', $request->getUriForPath('/some/path'));
+        self::assertEquals('http://test.com/some/path', $request->getUriForPath('/some/path'));
 
         $request = Request::create('http://test.com:90/foo?bar=baz');
-        $this->assertEquals('http://test.com:90/some/path', $request->getUriForPath('/some/path'));
+        self::assertEquals('http://test.com:90/some/path', $request->getUriForPath('/some/path'));
 
         $request = Request::create('https://test.com/foo?bar=baz');
-        $this->assertEquals('https://test.com/some/path', $request->getUriForPath('/some/path'));
+        self::assertEquals('https://test.com/some/path', $request->getUriForPath('/some/path'));
 
         $request = Request::create('https://test.com:90/foo?bar=baz');
-        $this->assertEquals('https://test.com:90/some/path', $request->getUriForPath('/some/path'));
+        self::assertEquals('https://test.com:90/some/path', $request->getUriForPath('/some/path'));
 
         $server = [];
 
@@ -655,7 +652,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://host:8080/index.php/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with non default port');
+        self::assertEquals('http://host:8080/index.php/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with non default port');
 
         // Use std port number
         $server['HTTP_HOST'] = 'host';
@@ -664,7 +661,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://host/index.php/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with default port');
+        self::assertEquals('http://host/index.php/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with default port');
 
         // Without HOST HEADER
         unset($server['HTTP_HOST']);
@@ -673,7 +670,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://servername/index.php/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with default port without HOST_HEADER');
+        self::assertEquals('http://servername/index.php/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with default port without HOST_HEADER');
 
         // Request with URL REWRITING (hide index.php)
         //   RewriteCond %{REQUEST_FILENAME} !-f
@@ -694,7 +691,7 @@ class RequestTest extends TestCase
         $server['SCRIPT_FILENAME'] = '/some/where/index.php';
 
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://host:8080/some/path', $request->getUriForPath('/some/path'), '->getUri() with rewrite');
+        self::assertEquals('http://host:8080/some/path', $request->getUriForPath('/some/path'), '->getUri() with rewrite');
 
         // Use std port number
         //  http://host/path/info?query=string
@@ -704,7 +701,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://host/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with rewrite and default port');
+        self::assertEquals('http://host/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with rewrite and default port');
 
         // Without HOST HEADER
         unset($server['HTTP_HOST']);
@@ -713,18 +710,18 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with rewrite, default port without HOST_HEADER');
-        $this->assertEquals('servername', $request->getHttpHost());
+        self::assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with rewrite, default port without HOST_HEADER');
+        self::assertEquals('servername', $request->getHttpHost());
 
         // with user info
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'));
+        self::assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'));
 
         $server['PHP_AUTH_PW'] = 'symfony';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'));
+        self::assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'));
     }
 
     /**
@@ -732,7 +729,7 @@ class RequestTest extends TestCase
      */
     public function testGetRelativeUriForPath($expected, $pathinfo, $path)
     {
-        $this->assertEquals($expected, Request::create($pathinfo)->getRelativeUriForPath($path));
+        self::assertEquals($expected, Request::create($pathinfo)->getRelativeUriForPath($path));
     }
 
     public function getRelativeUriForPathData()
@@ -753,15 +750,15 @@ class RequestTest extends TestCase
 
         $server = ['PHP_AUTH_USER' => 'fabien'];
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('fabien', $request->getUserInfo());
+        self::assertEquals('fabien', $request->getUserInfo());
 
         $server['PHP_AUTH_USER'] = '0';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('0', $request->getUserInfo());
+        self::assertEquals('0', $request->getUserInfo());
 
         $server['PHP_AUTH_PW'] = '0';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('0:0', $request->getUserInfo());
+        self::assertEquals('0:0', $request->getUserInfo());
     }
 
     public function testGetSchemeAndHttpHost()
@@ -772,19 +769,19 @@ class RequestTest extends TestCase
         $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '90';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
+        self::assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
+        self::assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_USER'] = '0';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
+        self::assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_PW'] = '0';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
+        self::assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
     }
 
     /**
@@ -795,7 +792,7 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $request->server->set('QUERY_STRING', $query);
-        $this->assertSame($expectedQuery, $request->getQueryString(), $msg);
+        self::assertSame($expectedQuery, $request->getQueryString(), $msg);
     }
 
     public function getQueryStringNormalizationData()
@@ -835,10 +832,10 @@ class RequestTest extends TestCase
     {
         $request = new Request();
 
-        $this->assertNull($request->getQueryString(), '->getQueryString() returns null for non-existent query string');
+        self::assertNull($request->getQueryString(), '->getQueryString() returns null for non-existent query string');
 
         $request->server->set('QUERY_STRING', '');
-        $this->assertNull($request->getQueryString(), '->getQueryString() returns null for empty query string');
+        self::assertNull($request->getQueryString(), '->getQueryString() returns null for empty query string');
     }
 
     public function testGetHost()
@@ -846,21 +843,21 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $request->initialize(['foo' => 'bar']);
-        $this->assertEquals('', $request->getHost(), '->getHost() return empty string if not initialized');
+        self::assertEquals('', $request->getHost(), '->getHost() return empty string if not initialized');
 
         $request->initialize([], [], [], [], [], ['HTTP_HOST' => 'www.example.com']);
-        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from Host Header');
+        self::assertEquals('www.example.com', $request->getHost(), '->getHost() from Host Header');
 
         // Host header with port number
         $request->initialize([], [], [], [], [], ['HTTP_HOST' => 'www.example.com:8080']);
-        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from Host Header with port number');
+        self::assertEquals('www.example.com', $request->getHost(), '->getHost() from Host Header with port number');
 
         // Server values
         $request->initialize([], [], [], [], [], ['SERVER_NAME' => 'www.example.com']);
-        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from server name');
+        self::assertEquals('www.example.com', $request->getHost(), '->getHost() from server name');
 
         $request->initialize([], [], [], [], [], ['SERVER_NAME' => 'www.example.com', 'HTTP_HOST' => 'www.host.com']);
-        $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
+        self::assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
     }
 
     public function testGetPort()
@@ -871,55 +868,55 @@ class RequestTest extends TestCase
         ]);
         $port = $request->getPort();
 
-        $this->assertEquals(80, $port, 'Without trusted proxies FORWARDED_PROTO and FORWARDED_PORT are ignored.');
+        self::assertEquals(80, $port, 'Without trusted proxies FORWARDED_PROTO and FORWARDED_PORT are ignored.');
 
         Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_PORT);
         $request = Request::create('http://example.com', 'GET', [], [], [], [
             'HTTP_X_FORWARDED_PROTO' => 'https',
             'HTTP_X_FORWARDED_PORT' => '8443',
         ]);
-        $this->assertEquals(80, $request->getPort(), 'With PROTO and PORT on untrusted connection server value takes precedence.');
+        self::assertEquals(80, $request->getPort(), 'With PROTO and PORT on untrusted connection server value takes precedence.');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $this->assertEquals(8443, $request->getPort(), 'With PROTO and PORT set PORT takes precedence.');
+        self::assertEquals(8443, $request->getPort(), 'With PROTO and PORT set PORT takes precedence.');
 
         $request = Request::create('http://example.com', 'GET', [], [], [], [
             'HTTP_X_FORWARDED_PROTO' => 'https',
         ]);
-        $this->assertEquals(80, $request->getPort(), 'With only PROTO set getPort() ignores trusted headers on untrusted connection.');
+        self::assertEquals(80, $request->getPort(), 'With only PROTO set getPort() ignores trusted headers on untrusted connection.');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $this->assertEquals(443, $request->getPort(), 'With only PROTO set getPort() defaults to 443.');
+        self::assertEquals(443, $request->getPort(), 'With only PROTO set getPort() defaults to 443.');
 
         $request = Request::create('http://example.com', 'GET', [], [], [], [
             'HTTP_X_FORWARDED_PROTO' => 'http',
         ]);
-        $this->assertEquals(80, $request->getPort(), 'If X_FORWARDED_PROTO is set to HTTP getPort() ignores trusted headers on untrusted connection.');
+        self::assertEquals(80, $request->getPort(), 'If X_FORWARDED_PROTO is set to HTTP getPort() ignores trusted headers on untrusted connection.');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $this->assertEquals(80, $request->getPort(), 'If X_FORWARDED_PROTO is set to HTTP getPort() returns port of the original request.');
+        self::assertEquals(80, $request->getPort(), 'If X_FORWARDED_PROTO is set to HTTP getPort() returns port of the original request.');
 
         $request = Request::create('http://example.com', 'GET', [], [], [], [
             'HTTP_X_FORWARDED_PROTO' => 'On',
         ]);
-        $this->assertEquals(80, $request->getPort(), 'With only PROTO set and value is On, getPort() ignores trusted headers on untrusted connection.');
+        self::assertEquals(80, $request->getPort(), 'With only PROTO set and value is On, getPort() ignores trusted headers on untrusted connection.');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $this->assertEquals(443, $request->getPort(), 'With only PROTO set and value is On, getPort() defaults to 443.');
+        self::assertEquals(443, $request->getPort(), 'With only PROTO set and value is On, getPort() defaults to 443.');
 
         $request = Request::create('http://example.com', 'GET', [], [], [], [
             'HTTP_X_FORWARDED_PROTO' => '1',
         ]);
-        $this->assertEquals(80, $request->getPort(), 'With only PROTO set and value is 1, getPort() ignores trusted headers on untrusted connection.');
+        self::assertEquals(80, $request->getPort(), 'With only PROTO set and value is 1, getPort() ignores trusted headers on untrusted connection.');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $this->assertEquals(443, $request->getPort(), 'With only PROTO set and value is 1, getPort() defaults to 443.');
+        self::assertEquals(443, $request->getPort(), 'With only PROTO set and value is 1, getPort() defaults to 443.');
 
         $request = Request::create('http://example.com', 'GET', [], [], [], [
             'HTTP_X_FORWARDED_PROTO' => 'something-else',
         ]);
         $port = $request->getPort();
-        $this->assertEquals(80, $port, 'With only PROTO set and value is not recognized, getPort() defaults to 80.');
+        self::assertEquals(80, $port, 'With only PROTO set and value is not recognized, getPort() defaults to 80.');
     }
 
     public function testGetHostWithFakeHttpHostValue()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $request = new Request();
         $request->initialize([], [], [], [], [], ['HTTP_HOST' => 'www.host.com?query=string']);
         $request->getHost();
@@ -929,60 +926,60 @@ class RequestTest extends TestCase
     {
         $request = new Request();
 
-        $this->assertEquals('GET', $request->getMethod(), '->getMethod() returns GET if no method is defined');
+        self::assertEquals('GET', $request->getMethod(), '->getMethod() returns GET if no method is defined');
 
         $request->setMethod('get');
-        $this->assertEquals('GET', $request->getMethod(), '->getMethod() returns an uppercased string');
+        self::assertEquals('GET', $request->getMethod(), '->getMethod() returns an uppercased string');
 
         $request->setMethod('PURGE');
-        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method even if it is not a standard one');
+        self::assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method even if it is not a standard one');
 
         $request->setMethod('POST');
-        $this->assertEquals('POST', $request->getMethod(), '->getMethod() returns the method POST if no _method is defined');
+        self::assertEquals('POST', $request->getMethod(), '->getMethod() returns the method POST if no _method is defined');
 
         $request->setMethod('POST');
         $request->request->set('_method', 'purge');
-        $this->assertEquals('POST', $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
+        self::assertEquals('POST', $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
 
         $request = new Request();
         $request->setMethod('POST');
         $request->request->set('_method', 'purge');
 
-        $this->assertFalse(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be disabled by default');
+        self::assertFalse(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be disabled by default');
 
         Request::enableHttpMethodParameterOverride();
 
-        $this->assertTrue(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be enabled now but it is not');
+        self::assertTrue(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be enabled now but it is not');
 
-        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
+        self::assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
         $this->disableHttpMethodParameterOverride();
 
         $request = new Request();
         $request->setMethod('POST');
         $request->query->set('_method', 'purge');
-        $this->assertEquals('POST', $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
+        self::assertEquals('POST', $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
 
         $request = new Request();
         $request->setMethod('POST');
         $request->query->set('_method', 'purge');
         Request::enableHttpMethodParameterOverride();
-        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
+        self::assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
         $this->disableHttpMethodParameterOverride();
 
         $request = new Request();
         $request->setMethod('POST');
         $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
-        $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
+        self::assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
 
         $request = new Request();
         $request->setMethod('POST');
         $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
-        $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
+        self::assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
 
         $request = new Request();
         $request->setMethod('POST');
         $request->query->set('_method', ['delete', 'patch']);
-        $this->assertSame('POST', $request->getMethod(), '->getMethod() returns the request method if invalid type is defined in query');
+        self::assertSame('POST', $request->getMethod(), '->getMethod() returns the request method if invalid type is defined in query');
     }
 
     /**
@@ -992,7 +989,7 @@ class RequestTest extends TestCase
     {
         $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
-        $this->assertEquals($expected[0], $request->getClientIp());
+        self::assertEquals($expected[0], $request->getClientIp());
     }
 
     /**
@@ -1002,7 +999,7 @@ class RequestTest extends TestCase
     {
         $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
-        $this->assertEquals($expected, $request->getClientIps());
+        self::assertEquals($expected, $request->getClientIps());
     }
 
     /**
@@ -1012,7 +1009,7 @@ class RequestTest extends TestCase
     {
         $request = $this->getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies);
 
-        $this->assertEquals($expected, $request->getClientIps());
+        self::assertEquals($expected, $request->getClientIps());
     }
 
     public function getClientIpsForwardedProvider()
@@ -1088,7 +1085,7 @@ class RequestTest extends TestCase
      */
     public function testGetClientIpsWithConflictingHeaders($httpForwarded, $httpXForwardedFor)
     {
-        $this->expectException(ConflictingHeadersException::class);
+        self::expectException(ConflictingHeadersException::class);
         $request = new Request();
 
         $server = [
@@ -1121,7 +1118,7 @@ class RequestTest extends TestCase
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertSame(array_reverse(explode(',', $httpXForwardedFor)), $request->getClientIps());
+        self::assertSame(array_reverse(explode(',', $httpXForwardedFor)), $request->getClientIps());
     }
 
     public function getClientIpsWithConflictingHeadersProvider()
@@ -1155,7 +1152,7 @@ class RequestTest extends TestCase
 
         $clientIps = $request->getClientIps();
 
-        $this->assertSame($expectedIps, $clientIps);
+        self::assertSame($expectedIps, $clientIps);
     }
 
     public function getClientIpsWithAgreeingHeadersProvider()
@@ -1174,17 +1171,17 @@ class RequestTest extends TestCase
     public function testGetContentWorksTwiceInDefaultMode()
     {
         $req = new Request();
-        $this->assertEquals('', $req->getContent());
-        $this->assertEquals('', $req->getContent());
+        self::assertEquals('', $req->getContent());
+        self::assertEquals('', $req->getContent());
     }
 
     public function testGetContentReturnsResource()
     {
         $req = new Request();
         $retval = $req->getContent(true);
-        $this->assertIsResource($retval);
-        $this->assertEquals('', fread($retval, 1));
-        $this->assertTrue(feof($retval));
+        self::assertIsResource($retval);
+        self::assertEquals('', fread($retval, 1));
+        self::assertTrue(feof($retval));
     }
 
     public function testGetContentReturnsResourceWhenContentSetInConstructor()
@@ -1192,8 +1189,8 @@ class RequestTest extends TestCase
         $req = new Request([], [], [], [], [], [], 'MyContent');
         $resource = $req->getContent(true);
 
-        $this->assertIsResource($resource);
-        $this->assertEquals('MyContent', stream_get_contents($resource));
+        self::assertIsResource($resource);
+        self::assertEquals('MyContent', stream_get_contents($resource));
     }
 
     public function testContentAsResource()
@@ -1203,8 +1200,8 @@ class RequestTest extends TestCase
         rewind($resource);
 
         $req = new Request([], [], [], [], [], [], $resource);
-        $this->assertEquals('My other content', stream_get_contents($req->getContent(true)));
-        $this->assertEquals('My other content', $req->getContent());
+        self::assertEquals('My other content', stream_get_contents($req->getContent(true)));
+        self::assertEquals('My other content', $req->getContent());
     }
 
     public function getContentCantBeCalledTwiceWithResourcesProvider()
@@ -1232,7 +1229,7 @@ class RequestTest extends TestCase
             $b = stream_get_contents($b);
         }
 
-        $this->assertSame($a, $b);
+        self::assertSame($a, $b);
     }
 
     public function getContentCanBeCalledTwiceWithResourcesProvider()
@@ -1260,25 +1257,25 @@ class RequestTest extends TestCase
     public function testToArrayEmpty()
     {
         $req = new Request();
-        $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Request body is empty.');
+        self::expectException(JsonException::class);
+        self::expectExceptionMessage('Request body is empty.');
         $req->toArray();
     }
 
     public function testToArrayNonJson()
     {
         $req = new Request([], [], [], [], [], [], 'foobar');
-        $this->expectException(JsonException::class);
-        $this->expectExceptionMessageMatches('|Could not decode request body.+|');
+        self::expectException(JsonException::class);
+        self::expectExceptionMessageMatches('|Could not decode request body.+|');
         $req->toArray();
     }
 
     public function testToArray()
     {
         $req = new Request([], [], [], [], [], [], json_encode([]));
-        $this->assertEquals([], $req->toArray());
+        self::assertEquals([], $req->toArray());
         $req = new Request([], [], [], [], [], [], json_encode(['foo' => 'bar']));
-        $this->assertEquals(['foo' => 'bar'], $req->toArray());
+        self::assertEquals(['foo' => 'bar'], $req->toArray());
     }
 
     /**
@@ -1295,23 +1292,23 @@ class RequestTest extends TestCase
         $_SERVER['foo5'] = 'bar5';
 
         $request = Request::createFromGlobals();
-        $this->assertEquals('bar1', $request->query->get('foo1'), '::fromGlobals() uses values from $_GET');
-        $this->assertEquals('bar2', $request->request->get('foo2'), '::fromGlobals() uses values from $_POST');
-        $this->assertEquals('bar3', $request->cookies->get('foo3'), '::fromGlobals() uses values from $_COOKIE');
-        $this->assertEquals(['bar4'], $request->files->get('foo4'), '::fromGlobals() uses values from $_FILES');
-        $this->assertEquals('bar5', $request->server->get('foo5'), '::fromGlobals() uses values from $_SERVER');
-        $this->assertInstanceOf(InputBag::class, $request->request);
-        $this->assertInstanceOf(ParameterBag::class, $request->request);
+        self::assertEquals('bar1', $request->query->get('foo1'), '::fromGlobals() uses values from $_GET');
+        self::assertEquals('bar2', $request->request->get('foo2'), '::fromGlobals() uses values from $_POST');
+        self::assertEquals('bar3', $request->cookies->get('foo3'), '::fromGlobals() uses values from $_COOKIE');
+        self::assertEquals(['bar4'], $request->files->get('foo4'), '::fromGlobals() uses values from $_FILES');
+        self::assertEquals('bar5', $request->server->get('foo5'), '::fromGlobals() uses values from $_SERVER');
+        self::assertInstanceOf(InputBag::class, $request->request);
+        self::assertInstanceOf(ParameterBag::class, $request->request);
 
         unset($_GET['foo1'], $_POST['foo2'], $_COOKIE['foo3'], $_FILES['foo4'], $_SERVER['foo5']);
 
         $_SERVER['REQUEST_METHOD'] = $method;
         $_SERVER['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
         $request = RequestContentProxy::createFromGlobals();
-        $this->assertEquals($normalizedMethod, $request->getMethod());
-        $this->assertEquals('mycontent', $request->request->get('content'));
-        $this->assertInstanceOf(InputBag::class, $request->request);
-        $this->assertInstanceOf(ParameterBag::class, $request->request);
+        self::assertEquals($normalizedMethod, $request->getMethod());
+        self::assertEquals('mycontent', $request->request->get('content'));
+        self::assertInstanceOf(InputBag::class, $request->request);
+        self::assertInstanceOf(ParameterBag::class, $request->request);
 
         unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
 
@@ -1321,9 +1318,9 @@ class RequestTest extends TestCase
         $_POST['foo6'] = 'bar6';
         $_SERVER['REQUEST_METHOD'] = 'PoSt';
         $request = Request::createFromGlobals();
-        $this->assertEquals($normalizedMethod, $request->getMethod());
-        $this->assertEquals('POST', $request->getRealMethod());
-        $this->assertEquals('bar6', $request->request->get('foo6'));
+        self::assertEquals($normalizedMethod, $request->getMethod());
+        self::assertEquals('POST', $request->getRealMethod());
+        self::assertEquals('bar6', $request->request->get('foo6'));
 
         unset($_POST['_method'], $_POST['foo6'], $_SERVER['REQUEST_METHOD']);
         $this->disableHttpMethodParameterOverride();
@@ -1339,42 +1336,42 @@ class RequestTest extends TestCase
 
         $request->overrideGlobals();
 
-        $this->assertEquals(['foo' => 'bar'], $_GET);
+        self::assertEquals(['foo' => 'bar'], $_GET);
 
         $request->initialize([], ['foo' => 'bar']);
         $request->overrideGlobals();
 
-        $this->assertEquals(['foo' => 'bar'], $_POST);
+        self::assertEquals(['foo' => 'bar'], $_POST);
 
-        $this->assertArrayNotHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
+        self::assertArrayNotHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
 
         $request->headers->set('X_FORWARDED_PROTO', 'https');
 
         Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_PROTO);
-        $this->assertFalse($request->isSecure());
+        self::assertFalse($request->isSecure());
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $this->assertTrue($request->isSecure());
+        self::assertTrue($request->isSecure());
 
         $request->overrideGlobals();
 
-        $this->assertArrayHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
+        self::assertArrayHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
 
         $request->headers->set('CONTENT_TYPE', 'multipart/form-data');
         $request->headers->set('CONTENT_LENGTH', 12345);
 
         $request->overrideGlobals();
 
-        $this->assertArrayHasKey('CONTENT_TYPE', $_SERVER);
-        $this->assertArrayHasKey('CONTENT_LENGTH', $_SERVER);
+        self::assertArrayHasKey('CONTENT_TYPE', $_SERVER);
+        self::assertArrayHasKey('CONTENT_LENGTH', $_SERVER);
 
         $request->initialize(['foo' => 'bar', 'baz' => 'foo']);
         $request->query->remove('baz');
 
         $request->overrideGlobals();
 
-        $this->assertEquals(['foo' => 'bar'], $_GET);
-        $this->assertEquals('foo=bar', $_SERVER['QUERY_STRING']);
-        $this->assertEquals('foo=bar', $request->server->get('QUERY_STRING'));
+        self::assertEquals(['foo' => 'bar'], $_GET);
+        self::assertEquals('foo=bar', $_SERVER['QUERY_STRING']);
+        self::assertEquals('foo=bar', $request->server->get('QUERY_STRING'));
 
         // restore initial $_SERVER array
         $_SERVER = $server;
@@ -1383,83 +1380,83 @@ class RequestTest extends TestCase
     public function testGetScriptName()
     {
         $request = new Request();
-        $this->assertEquals('', $request->getScriptName());
+        self::assertEquals('', $request->getScriptName());
 
         $server = [];
         $server['SCRIPT_NAME'] = '/index.php';
 
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('/index.php', $request->getScriptName());
+        self::assertEquals('/index.php', $request->getScriptName());
 
         $server = [];
         $server['ORIG_SCRIPT_NAME'] = '/frontend.php';
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('/frontend.php', $request->getScriptName());
+        self::assertEquals('/frontend.php', $request->getScriptName());
 
         $server = [];
         $server['SCRIPT_NAME'] = '/index.php';
         $server['ORIG_SCRIPT_NAME'] = '/frontend.php';
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('/index.php', $request->getScriptName());
+        self::assertEquals('/index.php', $request->getScriptName());
     }
 
     public function testGetBasePath()
     {
         $request = new Request();
-        $this->assertEquals('', $request->getBasePath());
+        self::assertEquals('', $request->getBasePath());
 
         $server = [];
         $server['SCRIPT_FILENAME'] = '/some/where/index.php';
         $request->initialize([], [], [], [], [], $server);
-        $this->assertEquals('', $request->getBasePath());
+        self::assertEquals('', $request->getBasePath());
 
         $server = [];
         $server['SCRIPT_FILENAME'] = '/some/where/index.php';
         $server['SCRIPT_NAME'] = '/index.php';
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('', $request->getBasePath());
+        self::assertEquals('', $request->getBasePath());
 
         $server = [];
         $server['SCRIPT_FILENAME'] = '/some/where/index.php';
         $server['PHP_SELF'] = '/index.php';
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('', $request->getBasePath());
+        self::assertEquals('', $request->getBasePath());
 
         $server = [];
         $server['SCRIPT_FILENAME'] = '/some/where/index.php';
         $server['ORIG_SCRIPT_NAME'] = '/index.php';
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('', $request->getBasePath());
+        self::assertEquals('', $request->getBasePath());
     }
 
     public function testGetPathInfo()
     {
         $request = new Request();
-        $this->assertEquals('/', $request->getPathInfo());
+        self::assertEquals('/', $request->getPathInfo());
 
         $server = [];
         $server['REQUEST_URI'] = '/path/info';
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('/path/info', $request->getPathInfo());
+        self::assertEquals('/path/info', $request->getPathInfo());
 
         $server = [];
         $server['REQUEST_URI'] = '/path%20test/info';
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('/path%20test/info', $request->getPathInfo());
+        self::assertEquals('/path%20test/info', $request->getPathInfo());
 
         $server = [];
         $server['REQUEST_URI'] = '?a=b';
         $request->initialize([], [], [], [], [], $server);
 
-        $this->assertEquals('/', $request->getPathInfo());
+        self::assertEquals('/', $request->getPathInfo());
     }
 
     public function testGetParameterPrecedence()
@@ -1469,55 +1466,55 @@ class RequestTest extends TestCase
         $request->query->set('foo', 'query');
         $request->request->set('foo', 'body');
 
-        $this->assertSame('attr', $request->get('foo'));
+        self::assertSame('attr', $request->get('foo'));
 
         $request->attributes->remove('foo');
-        $this->assertSame('query', $request->get('foo'));
+        self::assertSame('query', $request->get('foo'));
 
         $request->query->remove('foo');
-        $this->assertSame('body', $request->get('foo'));
+        self::assertSame('body', $request->get('foo'));
 
         $request->request->remove('foo');
-        $this->assertNull($request->get('foo'));
+        self::assertNull($request->get('foo'));
     }
 
     public function testGetPreferredLanguage()
     {
         $request = new Request();
-        $this->assertNull($request->getPreferredLanguage());
-        $this->assertNull($request->getPreferredLanguage([]));
-        $this->assertEquals('fr', $request->getPreferredLanguage(['fr']));
-        $this->assertEquals('fr', $request->getPreferredLanguage(['fr', 'en']));
-        $this->assertEquals('en', $request->getPreferredLanguage(['en', 'fr']));
-        $this->assertEquals('fr-ch', $request->getPreferredLanguage(['fr-ch', 'fr-fr']));
+        self::assertNull($request->getPreferredLanguage());
+        self::assertNull($request->getPreferredLanguage([]));
+        self::assertEquals('fr', $request->getPreferredLanguage(['fr']));
+        self::assertEquals('fr', $request->getPreferredLanguage(['fr', 'en']));
+        self::assertEquals('en', $request->getPreferredLanguage(['en', 'fr']));
+        self::assertEquals('fr-ch', $request->getPreferredLanguage(['fr-ch', 'fr-fr']));
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
-        $this->assertEquals('en', $request->getPreferredLanguage(['en', 'en-us']));
+        self::assertEquals('en', $request->getPreferredLanguage(['en', 'en-us']));
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
-        $this->assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
+        self::assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8');
-        $this->assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
+        self::assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, fr-fr; q=0.6, fr; q=0.5');
-        $this->assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
+        self::assertEquals('en', $request->getPreferredLanguage(['fr', 'en']));
     }
 
     public function testIsXmlHttpRequest()
     {
         $request = new Request();
-        $this->assertFalse($request->isXmlHttpRequest());
+        self::assertFalse($request->isXmlHttpRequest());
 
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
-        $this->assertTrue($request->isXmlHttpRequest());
+        self::assertTrue($request->isXmlHttpRequest());
 
         $request->headers->remove('X-Requested-With');
-        $this->assertFalse($request->isXmlHttpRequest());
+        self::assertFalse($request->isXmlHttpRequest());
     }
 
     /**
@@ -1528,86 +1525,86 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $request->setDefaultLocale('fr');
-        $this->assertEquals('fr', $request->getLocale());
-        $this->assertEquals('fr', \Locale::getDefault());
+        self::assertEquals('fr', $request->getLocale());
+        self::assertEquals('fr', \Locale::getDefault());
 
         $request->setLocale('en');
-        $this->assertEquals('en', $request->getLocale());
-        $this->assertEquals('en', \Locale::getDefault());
+        self::assertEquals('en', $request->getLocale());
+        self::assertEquals('en', \Locale::getDefault());
 
         $request->setDefaultLocale('de');
-        $this->assertEquals('en', $request->getLocale());
-        $this->assertEquals('en', \Locale::getDefault());
+        self::assertEquals('en', $request->getLocale());
+        self::assertEquals('en', \Locale::getDefault());
     }
 
     public function testGetCharsets()
     {
         $request = new Request();
-        $this->assertEquals([], $request->getCharsets());
+        self::assertEquals([], $request->getCharsets());
         $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
-        $this->assertEquals([], $request->getCharsets()); // testing caching
+        self::assertEquals([], $request->getCharsets()); // testing caching
 
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
-        $this->assertEquals(['ISO-8859-1', 'US-ASCII', 'UTF-8', 'ISO-10646-UCS-2'], $request->getCharsets());
+        self::assertEquals(['ISO-8859-1', 'US-ASCII', 'UTF-8', 'ISO-10646-UCS-2'], $request->getCharsets());
 
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7');
-        $this->assertEquals(['ISO-8859-1', 'utf-8', '*'], $request->getCharsets());
+        self::assertEquals(['ISO-8859-1', 'utf-8', '*'], $request->getCharsets());
     }
 
     public function testGetEncodings()
     {
         $request = new Request();
-        $this->assertEquals([], $request->getEncodings());
+        self::assertEquals([], $request->getEncodings());
         $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
-        $this->assertEquals([], $request->getEncodings()); // testing caching
+        self::assertEquals([], $request->getEncodings()); // testing caching
 
         $request = new Request();
         $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
-        $this->assertEquals(['gzip', 'deflate', 'sdch'], $request->getEncodings());
+        self::assertEquals(['gzip', 'deflate', 'sdch'], $request->getEncodings());
 
         $request = new Request();
         $request->headers->set('Accept-Encoding', 'gzip;q=0.4,deflate;q=0.9,compress;q=0.7');
-        $this->assertEquals(['deflate', 'compress', 'gzip'], $request->getEncodings());
+        self::assertEquals(['deflate', 'compress', 'gzip'], $request->getEncodings());
     }
 
     public function testGetAcceptableContentTypes()
     {
         $request = new Request();
-        $this->assertEquals([], $request->getAcceptableContentTypes());
+        self::assertEquals([], $request->getAcceptableContentTypes());
         $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
-        $this->assertEquals([], $request->getAcceptableContentTypes()); // testing caching
+        self::assertEquals([], $request->getAcceptableContentTypes()); // testing caching
 
         $request = new Request();
         $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
-        $this->assertEquals(['application/vnd.wap.wmlscriptc', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/xhtml+xml', 'text/html', 'multipart/mixed', '*/*'], $request->getAcceptableContentTypes());
+        self::assertEquals(['application/vnd.wap.wmlscriptc', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/xhtml+xml', 'text/html', 'multipart/mixed', '*/*'], $request->getAcceptableContentTypes());
     }
 
     public function testGetLanguages()
     {
         $request = new Request();
-        $this->assertEquals([], $request->getLanguages());
+        self::assertEquals([], $request->getLanguages());
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
-        $this->assertEquals(['zh', 'en_US', 'en'], $request->getLanguages());
+        self::assertEquals(['zh', 'en_US', 'en'], $request->getLanguages());
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.6, en; q=0.8');
-        $this->assertEquals(['zh', 'en', 'en_US'], $request->getLanguages()); // Test out of order qvalues
+        self::assertEquals(['zh', 'en', 'en_US'], $request->getLanguages()); // Test out of order qvalues
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en, en-us');
-        $this->assertEquals(['zh', 'en', 'en_US'], $request->getLanguages()); // Test equal weighting without qvalues
+        self::assertEquals(['zh', 'en', 'en_US'], $request->getLanguages()); // Test equal weighting without qvalues
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh; q=0.6, en, en-us; q=0.6');
-        $this->assertEquals(['en', 'zh', 'en_US'], $request->getLanguages()); // Test equal weighting with qvalues
+        self::assertEquals(['en', 'zh', 'en_US'], $request->getLanguages()); // Test equal weighting with qvalues
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, i-cherokee; q=0.6');
-        $this->assertEquals(['zh', 'cherokee'], $request->getLanguages());
+        self::assertEquals(['zh', 'cherokee'], $request->getLanguages());
     }
 
     public function testGetAcceptHeadersReturnString()
@@ -1618,47 +1615,47 @@ class RequestTest extends TestCase
         $request->headers->set('Accept-Encoding', '123');
         $request->headers->set('Accept-Language', '123');
 
-        $this->assertSame(['123'], $request->getAcceptableContentTypes());
-        $this->assertSame(['123'], $request->getCharsets());
-        $this->assertSame(['123'], $request->getEncodings());
-        $this->assertSame(['123'], $request->getLanguages());
+        self::assertSame(['123'], $request->getAcceptableContentTypes());
+        self::assertSame(['123'], $request->getCharsets());
+        self::assertSame(['123'], $request->getEncodings());
+        self::assertSame(['123'], $request->getLanguages());
     }
 
     public function testGetRequestFormat()
     {
         $request = new Request();
-        $this->assertEquals('html', $request->getRequestFormat());
+        self::assertEquals('html', $request->getRequestFormat());
 
         // Ensure that setting different default values over time is possible,
         // aka. setRequestFormat determines the state.
-        $this->assertEquals('json', $request->getRequestFormat('json'));
-        $this->assertEquals('html', $request->getRequestFormat('html'));
+        self::assertEquals('json', $request->getRequestFormat('json'));
+        self::assertEquals('html', $request->getRequestFormat('html'));
 
         $request = new Request();
-        $this->assertNull($request->getRequestFormat(null));
+        self::assertNull($request->getRequestFormat(null));
 
         $request = new Request();
-        $this->assertNull($request->setRequestFormat('foo'));
-        $this->assertEquals('foo', $request->getRequestFormat(null));
+        self::assertNull($request->setRequestFormat('foo'));
+        self::assertEquals('foo', $request->getRequestFormat(null));
 
         $request = new Request(['_format' => 'foo']);
-        $this->assertEquals('html', $request->getRequestFormat());
+        self::assertEquals('html', $request->getRequestFormat());
     }
 
     public function testHasSession()
     {
         $request = new Request();
 
-        $this->assertFalse($request->hasSession());
-        $this->assertFalse($request->hasSession(true));
+        self::assertFalse($request->hasSession());
+        self::assertFalse($request->hasSession(true));
 
         $request->setSessionFactory(function () {});
-        $this->assertTrue($request->hasSession());
-        $this->assertFalse($request->hasSession(true));
+        self::assertTrue($request->hasSession());
+        self::assertFalse($request->hasSession(true));
 
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $this->assertTrue($request->hasSession());
-        $this->assertTrue($request->hasSession(true));
+        self::assertTrue($request->hasSession());
+        self::assertTrue($request->hasSession(true));
     }
 
     public function testGetSession()
@@ -1666,23 +1663,23 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $this->assertTrue($request->hasSession());
+        self::assertTrue($request->hasSession());
 
         $session = $request->getSession();
-        $this->assertObjectHasAttribute('storage', $session);
-        $this->assertObjectHasAttribute('flashName', $session);
-        $this->assertObjectHasAttribute('attributeName', $session);
+        self::assertObjectHasAttribute('storage', $session);
+        self::assertObjectHasAttribute('flashName', $session);
+        self::assertObjectHasAttribute('attributeName', $session);
     }
 
     public function testHasPreviousSession()
     {
         $request = new Request();
 
-        $this->assertFalse($request->hasPreviousSession());
+        self::assertFalse($request->hasPreviousSession());
         $request->cookies->set('MOCKSESSID', 'foo');
-        $this->assertFalse($request->hasPreviousSession());
+        self::assertFalse($request->hasPreviousSession());
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $this->assertTrue($request->hasPreviousSession());
+        self::assertTrue($request->hasPreviousSession());
     }
 
     public function testToString()
@@ -1694,36 +1691,36 @@ class RequestTest extends TestCase
 
         $asString = (string) $request;
 
-        $this->assertStringContainsString('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $asString);
-        $this->assertStringContainsString('Cookie: Foo=Bar', $asString);
+        self::assertStringContainsString('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $asString);
+        self::assertStringContainsString('Cookie: Foo=Bar', $asString);
 
         $request->cookies->set('Another', 'Cookie');
 
         $asString = (string) $request;
 
-        $this->assertStringContainsString('Cookie: Foo=Bar; Another=Cookie', $asString);
+        self::assertStringContainsString('Cookie: Foo=Bar; Another=Cookie', $asString);
 
         $request->cookies->set('foo.bar', [1, 2]);
 
         $asString = (string) $request;
 
-        $this->assertStringContainsString('foo.bar%5B0%5D=1; foo.bar%5B1%5D=2', $asString);
+        self::assertStringContainsString('foo.bar%5B0%5D=1; foo.bar%5B1%5D=2', $asString);
     }
 
     public function testIsMethod()
     {
         $request = new Request();
         $request->setMethod('POST');
-        $this->assertTrue($request->isMethod('POST'));
-        $this->assertTrue($request->isMethod('post'));
-        $this->assertFalse($request->isMethod('GET'));
-        $this->assertFalse($request->isMethod('get'));
+        self::assertTrue($request->isMethod('POST'));
+        self::assertTrue($request->isMethod('post'));
+        self::assertFalse($request->isMethod('GET'));
+        self::assertFalse($request->isMethod('get'));
 
         $request->setMethod('GET');
-        $this->assertTrue($request->isMethod('GET'));
-        $this->assertTrue($request->isMethod('get'));
-        $this->assertFalse($request->isMethod('POST'));
-        $this->assertFalse($request->isMethod('post'));
+        self::assertTrue($request->isMethod('GET'));
+        self::assertTrue($request->isMethod('get'));
+        self::assertFalse($request->isMethod('POST'));
+        self::assertFalse($request->isMethod('post'));
     }
 
     /**
@@ -1733,8 +1730,8 @@ class RequestTest extends TestCase
     {
         $request = Request::create($uri, 'GET', [], [], [], $server);
 
-        $this->assertSame($expectedBaseUrl, $request->getBaseUrl(), 'baseUrl');
-        $this->assertSame($expectedPathInfo, $request->getPathInfo(), 'pathInfo');
+        self::assertSame($expectedBaseUrl, $request->getBaseUrl(), 'baseUrl');
+        self::assertSame($expectedPathInfo, $request->getPathInfo(), 'pathInfo');
     }
 
     public function getBaseUrlData()
@@ -1863,7 +1860,7 @@ class RequestTest extends TestCase
         $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
         $me->setAccessible(true);
 
-        $this->assertSame($expect, $me->invoke($request, $string, $prefix));
+        self::assertSame($expect, $me->invoke($request, $string, $prefix));
     }
 
     public function urlencodedStringPrefixData()
@@ -1935,46 +1932,46 @@ class RequestTest extends TestCase
         $request->headers->set('X_FORWARDED_PORT', 443);
 
         // no trusted proxies
-        $this->assertEquals('3.3.3.3', $request->getClientIp());
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('3.3.3.3', $request->getClientIp());
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         // disabling proxy trusting
         Request::setTrustedProxies([], Request::HEADER_X_FORWARDED_FOR);
-        $this->assertEquals('3.3.3.3', $request->getClientIp());
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('3.3.3.3', $request->getClientIp());
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         // request is forwarded by a non-trusted proxy
         Request::setTrustedProxies(['2.2.2.2'], Request::HEADER_X_FORWARDED_FOR);
-        $this->assertEquals('3.3.3.3', $request->getClientIp());
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('3.3.3.3', $request->getClientIp());
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         // trusted proxy via setTrustedProxies()
         Request::setTrustedProxies(['3.3.3.3', '2.2.2.2'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
-        $this->assertEquals('1.1.1.1', $request->getClientIp());
-        $this->assertEquals('foo.example.com', $request->getHost());
-        $this->assertEquals(443, $request->getPort());
-        $this->assertTrue($request->isSecure());
+        self::assertEquals('1.1.1.1', $request->getClientIp());
+        self::assertEquals('foo.example.com', $request->getHost());
+        self::assertEquals(443, $request->getPort());
+        self::assertTrue($request->isSecure());
 
         // trusted proxy via setTrustedProxies()
         Request::setTrustedProxies(['3.3.3.4', '2.2.2.2'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
-        $this->assertEquals('3.3.3.3', $request->getClientIp());
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('3.3.3.3', $request->getClientIp());
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         // check various X_FORWARDED_PROTO header values
         Request::setTrustedProxies(['3.3.3.3', '2.2.2.2'], Request::HEADER_X_FORWARDED_PROTO);
         $request->headers->set('X_FORWARDED_PROTO', 'ssl');
-        $this->assertTrue($request->isSecure());
+        self::assertTrue($request->isSecure());
 
         $request->headers->set('X_FORWARDED_PROTO', 'https, http');
-        $this->assertTrue($request->isSecure());
+        self::assertTrue($request->isSecure());
     }
 
     public function testTrustedProxiesForwarded()
@@ -1984,46 +1981,46 @@ class RequestTest extends TestCase
         $request->headers->set('FORWARDED', 'for=1.1.1.1, host=foo.example.com:8080, proto=https, for=2.2.2.2, host=real.example.com:8080');
 
         // no trusted proxies
-        $this->assertEquals('3.3.3.3', $request->getClientIp());
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('3.3.3.3', $request->getClientIp());
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         // disabling proxy trusting
         Request::setTrustedProxies([], Request::HEADER_FORWARDED);
-        $this->assertEquals('3.3.3.3', $request->getClientIp());
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('3.3.3.3', $request->getClientIp());
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         // request is forwarded by a non-trusted proxy
         Request::setTrustedProxies(['2.2.2.2'], Request::HEADER_FORWARDED);
-        $this->assertEquals('3.3.3.3', $request->getClientIp());
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('3.3.3.3', $request->getClientIp());
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         // trusted proxy via setTrustedProxies()
         Request::setTrustedProxies(['3.3.3.3', '2.2.2.2'], Request::HEADER_FORWARDED);
-        $this->assertEquals('1.1.1.1', $request->getClientIp());
-        $this->assertEquals('foo.example.com', $request->getHost());
-        $this->assertEquals(8080, $request->getPort());
-        $this->assertTrue($request->isSecure());
+        self::assertEquals('1.1.1.1', $request->getClientIp());
+        self::assertEquals('foo.example.com', $request->getHost());
+        self::assertEquals(8080, $request->getPort());
+        self::assertTrue($request->isSecure());
 
         // trusted proxy via setTrustedProxies()
         Request::setTrustedProxies(['3.3.3.4', '2.2.2.2'], Request::HEADER_FORWARDED);
-        $this->assertEquals('3.3.3.3', $request->getClientIp());
-        $this->assertEquals('example.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
-        $this->assertFalse($request->isSecure());
+        self::assertEquals('3.3.3.3', $request->getClientIp());
+        self::assertEquals('example.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
+        self::assertFalse($request->isSecure());
 
         // check various X_FORWARDED_PROTO header values
         Request::setTrustedProxies(['3.3.3.3', '2.2.2.2'], Request::HEADER_FORWARDED);
         $request->headers->set('FORWARDED', 'proto=ssl');
-        $this->assertTrue($request->isSecure());
+        self::assertTrue($request->isSecure());
 
         $request->headers->set('FORWARDED', 'proto=https, proto=http');
-        $this->assertTrue($request->isSecure());
+        self::assertTrue($request->isSecure());
     }
 
     /**
@@ -2035,11 +2032,11 @@ class RequestTest extends TestCase
         $request->headers->replace($headers);
         $request->server->replace($server);
 
-        $this->assertEquals($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
+        self::assertEquals($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
 
         $subRequestUri = '/bar/foo';
         $subRequest = Request::create($subRequestUri, 'get', [], [], [], $request->server->all());
-        $this->assertEquals($subRequestUri, $subRequest->getRequestUri(), '->getRequestUri() is correct in sub request');
+        self::assertEquals($subRequestUri, $subRequest->getRequestUri(), '->getRequestUri() is correct in sub request');
     }
 
     public function iisRequestUriProvider()
@@ -2078,7 +2075,7 @@ class RequestTest extends TestCase
 
         // no trusted host set -> no host check
         $request->headers->set('host', 'evil.com');
-        $this->assertEquals('evil.com', $request->getHost());
+        self::assertEquals('evil.com', $request->getHost());
 
         // add a trusted domain and all its subdomains
         Request::setTrustedHosts(['^([a-z]{9}\.)?trusted\.com$']);
@@ -2087,28 +2084,28 @@ class RequestTest extends TestCase
         $request->headers->set('host', 'evil.com');
         try {
             $request->getHost();
-            $this->fail('Request::getHost() should throw an exception when host is not trusted.');
+            self::fail('Request::getHost() should throw an exception when host is not trusted.');
         } catch (SuspiciousOperationException $e) {
-            $this->assertEquals('Untrusted Host "evil.com".', $e->getMessage());
+            self::assertEquals('Untrusted Host "evil.com".', $e->getMessage());
         }
 
         // trusted hosts
         $request->headers->set('host', 'trusted.com');
-        $this->assertEquals('trusted.com', $request->getHost());
-        $this->assertEquals(80, $request->getPort());
+        self::assertEquals('trusted.com', $request->getHost());
+        self::assertEquals(80, $request->getPort());
 
         $request->server->set('HTTPS', true);
         $request->headers->set('host', 'trusted.com');
-        $this->assertEquals('trusted.com', $request->getHost());
-        $this->assertEquals(443, $request->getPort());
+        self::assertEquals('trusted.com', $request->getHost());
+        self::assertEquals(443, $request->getPort());
         $request->server->set('HTTPS', false);
 
         $request->headers->set('host', 'trusted.com:8000');
-        $this->assertEquals('trusted.com', $request->getHost());
-        $this->assertEquals(8000, $request->getPort());
+        self::assertEquals('trusted.com', $request->getHost());
+        self::assertEquals(8000, $request->getPort());
 
         $request->headers->set('host', 'subdomain.trusted.com');
-        $this->assertEquals('subdomain.trusted.com', $request->getHost());
+        self::assertEquals('subdomain.trusted.com', $request->getHost());
     }
 
     public function testSetTrustedHostsDoesNotBreakOnSpecialCharacters()
@@ -2117,7 +2114,7 @@ class RequestTest extends TestCase
 
         $request = Request::create('/');
         $request->headers->set('host', 'localhost');
-        $this->assertSame('localhost', $request->getHost());
+        self::assertSame('localhost', $request->getHost());
     }
 
     public function testFactory()
@@ -2126,7 +2123,7 @@ class RequestTest extends TestCase
             return new NewRequest();
         });
 
-        $this->assertEquals('foo', Request::create('/')->getFoo());
+        self::assertEquals('foo', Request::create('/')->getFoo());
 
         Request::setFactory(null);
     }
@@ -2140,8 +2137,8 @@ class RequestTest extends TestCase
 
         $request = Request::create('/');
         $request->headers->set('host', $host);
-        $this->assertEquals($host, $request->getHost());
-        $this->assertLessThan(5, microtime(true) - $start);
+        self::assertEquals($host, $request->getHost());
+        self::assertLessThan(5, microtime(true) - $start);
     }
 
     /**
@@ -2153,13 +2150,13 @@ class RequestTest extends TestCase
         $request->headers->set('host', $host);
 
         if ($isValid) {
-            $this->assertSame($expectedHost ?: $host, $request->getHost());
+            self::assertSame($expectedHost ?: $host, $request->getHost());
             if ($expectedPort) {
-                $this->assertSame($expectedPort, $request->getPort());
+                self::assertSame($expectedPort, $request->getPort());
             }
         } else {
-            $this->expectException(SuspiciousOperationException::class);
-            $this->expectExceptionMessage('Invalid Host');
+            self::expectException(SuspiciousOperationException::class);
+            self::expectExceptionMessage('Invalid Host');
 
             $request->getHost();
         }
@@ -2193,7 +2190,7 @@ class RequestTest extends TestCase
     {
         $request = new Request();
         $request->setMethod($method);
-        $this->assertEquals($idempotent, $request->isMethodIdempotent());
+        self::assertEquals($idempotent, $request->isMethodIdempotent());
     }
 
     public function methodIdempotentProvider()
@@ -2219,7 +2216,7 @@ class RequestTest extends TestCase
     {
         $request = new Request();
         $request->setMethod($method);
-        $this->assertEquals($safe, $request->isMethodSafe());
+        self::assertEquals($safe, $request->isMethodSafe());
     }
 
     public function methodSafeProvider()
@@ -2245,7 +2242,7 @@ class RequestTest extends TestCase
     {
         $request = new Request();
         $request->setMethod($method);
-        $this->assertEquals($cacheable, $request->isMethodCacheable());
+        self::assertEquals($cacheable, $request->isMethodCacheable());
     }
 
     public function methodCacheableProvider()
@@ -2281,7 +2278,7 @@ class RequestTest extends TestCase
             $request->headers->set('Via', $via);
         }
 
-        $this->assertSame($expected, $request->getProtocolVersion());
+        self::assertSame($expected, $request->getProtocolVersion());
     }
 
     public function protocolVersionProvider()
@@ -2345,13 +2342,13 @@ class RequestTest extends TestCase
 
         $request = new Request([], [], [], [], [], $server);
 
-        $this->assertEquals($expectedPathInfo, $request->getPathInfo());
-        $this->assertEquals($expectedUri, $request->getUri());
-        $this->assertEquals($queryString, $request->getQueryString());
-        $this->assertEquals(8080, $request->getPort());
-        $this->assertEquals('host:8080', $request->getHttpHost());
-        $this->assertEquals($expectedBaseUrl, $request->getBaseUrl());
-        $this->assertEquals($expectedBasePath, $request->getBasePath());
+        self::assertEquals($expectedPathInfo, $request->getPathInfo());
+        self::assertEquals($expectedUri, $request->getUri());
+        self::assertEquals($queryString, $request->getQueryString());
+        self::assertEquals(8080, $request->getPort());
+        self::assertEquals('host:8080', $request->getHttpHost());
+        self::assertEquals($expectedBaseUrl, $request->getBaseUrl());
+        self::assertEquals($expectedBasePath, $request->getBasePath());
     }
 
     public function testTrustedHost()
@@ -2363,8 +2360,8 @@ class RequestTest extends TestCase
         $request->headers->set('Forwarded', 'host=localhost:8080');
         $request->headers->set('X-Forwarded-Host', 'localhost:8080');
 
-        $this->assertSame('localhost:8080', $request->getHttpHost());
-        $this->assertSame(8080, $request->getPort());
+        self::assertSame('localhost:8080', $request->getHttpHost());
+        self::assertSame(8080, $request->getPort());
 
         $request = Request::create('/');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
@@ -2372,8 +2369,8 @@ class RequestTest extends TestCase
         $request->headers->set('X-Forwarded-Host', '[::1]:443');
         $request->headers->set('X-Forwarded-Port', 443);
 
-        $this->assertSame('[::1]:443', $request->getHttpHost());
-        $this->assertSame(443, $request->getPort());
+        self::assertSame('[::1]:443', $request->getHttpHost());
+        self::assertSame(443, $request->getPort());
     }
 
     public function testTrustedPrefix()
@@ -2386,9 +2383,9 @@ class RequestTest extends TestCase
         $request->headers->set('X-Forwarded-Prefix', '/myprefix');
         $request->headers->set('Forwarded', 'host=localhost:8080');
 
-        $this->assertSame('/myprefix', $request->getBaseUrl());
-        $this->assertSame('/myprefix', $request->getBasePath());
-        $this->assertSame('/method', $request->getPathInfo());
+        self::assertSame('/myprefix', $request->getBaseUrl());
+        self::assertSame('/myprefix', $request->getBasePath());
+        self::assertSame('/method', $request->getPathInfo());
     }
 
     public function testTrustedPrefixWithSubdir()
@@ -2407,9 +2404,9 @@ class RequestTest extends TestCase
         $request->headers->set('X-Forwarded-Prefix', '/prefix');
         $request->headers->set('Forwarded', 'host=localhost:8080');
 
-        $this->assertSame('/prefix/public', $request->getBaseUrl());
-        $this->assertSame('/prefix/public', $request->getBasePath());
-        $this->assertSame('/method', $request->getPathInfo());
+        self::assertSame('/prefix/public', $request->getBaseUrl());
+        self::assertSame('/prefix/public', $request->getBasePath());
+        self::assertSame('/method', $request->getPathInfo());
     }
 
     public function testTrustedPrefixEmpty()
@@ -2418,7 +2415,7 @@ class RequestTest extends TestCase
         Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_TRAEFIK);
         $request = Request::create('/method');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $this->assertSame('', $request->getBaseUrl());
+        self::assertSame('', $request->getBaseUrl());
     }
 
     public function testTrustedPort()
@@ -2430,14 +2427,14 @@ class RequestTest extends TestCase
         $request->headers->set('Forwarded', 'host=localhost:8080');
         $request->headers->set('X-Forwarded-Port', 8080);
 
-        $this->assertSame(8080, $request->getPort());
+        self::assertSame(8080, $request->getPort());
 
         $request = Request::create('/');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
         $request->headers->set('Forwarded', 'host=localhost');
         $request->headers->set('X-Forwarded-Port', 80);
 
-        $this->assertSame(80, $request->getPort());
+        self::assertSame(80, $request->getPort());
 
         $request = Request::create('/');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
@@ -2445,7 +2442,7 @@ class RequestTest extends TestCase
         $request->headers->set('X-Forwarded-Proto', 'https');
         $request->headers->set('X-Forwarded-Port', 443);
 
-        $this->assertSame(443, $request->getPort());
+        self::assertSame(443, $request->getPort());
     }
 
     public function testTrustedPortDoesNotDefaultToZero()
@@ -2457,7 +2454,7 @@ class RequestTest extends TestCase
         $request->headers->set('X-Forwarded-Host', 'test.example.com');
         $request->headers->set('X-Forwarded-Port', '');
 
-        $this->assertSame(80, $request->getPort());
+        self::assertSame(80, $request->getPort());
     }
 
     /**
@@ -2467,7 +2464,7 @@ class RequestTest extends TestCase
     {
         $_SERVER['REMOTE_ADDR'] = $serverRemoteAddr;
         Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR);
-        $this->assertSame($result, Request::getTrustedProxies());
+        self::assertSame($result, Request::getTrustedProxies());
     }
 
     public function trustedProxiesRemoteAddr()
@@ -2487,7 +2484,7 @@ class RequestTest extends TestCase
     {
         $request = new Request([], [], [], [], [], $server);
 
-        $this->assertEquals($safePreferenceExpected, $request->preferSafeContent());
+        self::assertEquals($safePreferenceExpected, $request->preferSafeContent());
     }
 
     public function preferSafeContentData()
@@ -2551,7 +2548,7 @@ class RequestTest extends TestCase
     public function testReservedFlags()
     {
         foreach ((new \ReflectionClass(Request::class))->getConstants() as $constant => $value) {
-            $this->assertNotSame(0b10000000, $value, sprintf('The constant "%s" should not use the reserved value "0b10000000".', $constant));
+            self::assertNotSame(0b10000000, $value, sprintf('The constant "%s" should not use the reserved value "0b10000000".', $constant));
         }
     }
 }

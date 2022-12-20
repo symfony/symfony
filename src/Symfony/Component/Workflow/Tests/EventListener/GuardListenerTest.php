@@ -54,11 +54,11 @@ class GuardListenerTest extends TestCase
         } else {
             $token = new UsernamePasswordToken(new User('username', 'credentials', ['ROLE_USER']), null, 'provider', ['ROLE_USER']);
         }
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
-        $this->authenticationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
-        $this->validator = $this->createMock(ValidatorInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
+        $tokenStorage->expects(self::any())->method('getToken')->willReturn($token);
+        $this->authenticationChecker = self::createMock(AuthorizationCheckerInterface::class);
+        $trustResolver = self::createMock(AuthenticationTrustResolverInterface::class);
+        $this->validator = self::createMock(ValidatorInterface::class);
         $roleHierarchy = new RoleHierarchy([]);
         $this->listener = new GuardListener($this->configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, $roleHierarchy, $this->validator);
     }
@@ -78,7 +78,7 @@ class GuardListenerTest extends TestCase
 
         $this->listener->onTransition($event, 'not supported');
 
-        $this->assertFalse($event->isBlocked());
+        self::assertFalse($event->isBlocked());
     }
 
     public function testWithSecuritySupportedEventAndReject()
@@ -88,7 +88,7 @@ class GuardListenerTest extends TestCase
 
         $this->listener->onTransition($event, 'test_is_granted');
 
-        $this->assertTrue($event->isBlocked());
+        self::assertTrue($event->isBlocked());
     }
 
     public function testWithSecuritySupportedEventAndAccept()
@@ -98,7 +98,7 @@ class GuardListenerTest extends TestCase
 
         $this->listener->onTransition($event, 'test_is_granted');
 
-        $this->assertFalse($event->isBlocked());
+        self::assertFalse($event->isBlocked());
     }
 
     public function testWithValidatorSupportedEventAndReject()
@@ -108,7 +108,7 @@ class GuardListenerTest extends TestCase
 
         $this->listener->onTransition($event, 'test_is_valid');
 
-        $this->assertTrue($event->isBlocked());
+        self::assertTrue($event->isBlocked());
     }
 
     public function testWithValidatorSupportedEventAndAccept()
@@ -118,7 +118,7 @@ class GuardListenerTest extends TestCase
 
         $this->listener->onTransition($event, 'test_is_valid');
 
-        $this->assertFalse($event->isBlocked());
+        self::assertFalse($event->isBlocked());
     }
 
     public function testWithGuardExpressionWithNotSupportedTransition()
@@ -127,7 +127,7 @@ class GuardListenerTest extends TestCase
         $this->configureValidator(false);
         $this->listener->onTransition($event, 'test_expression');
 
-        $this->assertFalse($event->isBlocked());
+        self::assertFalse($event->isBlocked());
     }
 
     public function testWithGuardExpressionWithSupportedTransition()
@@ -136,7 +136,7 @@ class GuardListenerTest extends TestCase
         $this->configureValidator(true, true);
         $this->listener->onTransition($event, 'test_expression');
 
-        $this->assertFalse($event->isBlocked());
+        self::assertFalse($event->isBlocked());
     }
 
     public function testGuardExpressionBlocks()
@@ -145,7 +145,7 @@ class GuardListenerTest extends TestCase
         $this->configureValidator(true, false);
         $this->listener->onTransition($event, 'test_expression');
 
-        $this->assertTrue($event->isBlocked());
+        self::assertTrue($event->isBlocked());
     }
 
     private function createEvent(Transition $transition = null)
@@ -153,7 +153,7 @@ class GuardListenerTest extends TestCase
         $subject = new Subject();
         $transition = $transition ?? new Transition('name', 'from', 'to');
 
-        $workflow = $this->createMock(WorkflowInterface::class);
+        $workflow = self::createMock(WorkflowInterface::class);
 
         return new GuardEvent($subject, new Marking($subject->getMarking() ?? []), $transition, $workflow);
     }
@@ -162,7 +162,7 @@ class GuardListenerTest extends TestCase
     {
         if (!$isUsed) {
             $this->authenticationChecker
-                ->expects($this->never())
+                ->expects(self::never())
                 ->method('isGranted')
             ;
 
@@ -170,7 +170,7 @@ class GuardListenerTest extends TestCase
         }
 
         $this->authenticationChecker
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isGranted')
             ->willReturn($granted)
         ;
@@ -180,7 +180,7 @@ class GuardListenerTest extends TestCase
     {
         if (!$isUsed) {
             $this->validator
-                ->expects($this->never())
+                ->expects(self::never())
                 ->method('validate')
             ;
 
@@ -188,7 +188,7 @@ class GuardListenerTest extends TestCase
         }
 
         $this->validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->willReturn(new ConstraintViolationList($valid ? [] : [new ConstraintViolation('a violation', null, [], '', null, '')]))
         ;

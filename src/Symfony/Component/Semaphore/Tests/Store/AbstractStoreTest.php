@@ -31,11 +31,11 @@ abstract class AbstractStoreTest extends TestCase
 
         $key = new Key(__METHOD__, 1);
 
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
         $store->save($key, 10);
-        $this->assertTrue($store->exists($key));
+        self::assertTrue($store->exists($key));
         $store->delete($key);
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
     }
 
     public function testSaveWithDifferentResources()
@@ -46,20 +46,20 @@ abstract class AbstractStoreTest extends TestCase
         $key2 = new Key(__METHOD__.'2', 1);
 
         $store->save($key1, 10);
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         $store->save($key2, 10);
-        $this->assertTrue($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertTrue($store->exists($key2));
 
         $store->delete($key1);
-        $this->assertFalse($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertTrue($store->exists($key2));
 
         $store->delete($key2);
-        $this->assertFalse($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertFalse($store->exists($key2));
     }
 
     public function testSaveWithDifferentKeysOnSameResource()
@@ -71,30 +71,30 @@ abstract class AbstractStoreTest extends TestCase
         $key2 = new Key($resource, 1);
 
         $store->save($key1, 10);
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         try {
             $store->save($key2, 10);
-            $this->fail('The store shouldn\'t save the second key');
+            self::fail('The store shouldn\'t save the second key');
         } catch (SemaphoreAcquiringException $e) {
         }
 
         // The failure of previous attempt should not impact the state of current semaphores
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         $store->delete($key1);
-        $this->assertFalse($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertFalse($store->exists($key2));
 
         $store->save($key2, 10);
-        $this->assertFalse($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertTrue($store->exists($key2));
 
         $store->delete($key2);
-        $this->assertFalse($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key1));
+        self::assertFalse($store->exists($key2));
     }
 
     public function testSaveWithLimitAt2()
@@ -107,35 +107,35 @@ abstract class AbstractStoreTest extends TestCase
         $key3 = new Key($resource, 2);
 
         $store->save($key1, 10);
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
-        $this->assertFalse($store->exists($key3));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key3));
 
         $store->save($key2, 10);
-        $this->assertTrue($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
-        $this->assertFalse($store->exists($key3));
+        self::assertTrue($store->exists($key1));
+        self::assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key3));
 
         try {
             $store->save($key3, 10);
-            $this->fail('The store shouldn\'t save the third key');
+            self::fail('The store shouldn\'t save the third key');
         } catch (SemaphoreAcquiringException $e) {
         }
 
         // The failure of previous attempt should not impact the state of current semaphores
-        $this->assertTrue($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
-        $this->assertFalse($store->exists($key3));
+        self::assertTrue($store->exists($key1));
+        self::assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key3));
 
         $store->delete($key1);
-        $this->assertFalse($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
-        $this->assertFalse($store->exists($key3));
+        self::assertFalse($store->exists($key1));
+        self::assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key3));
 
         $store->save($key3, 10);
-        $this->assertFalse($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
-        $this->assertTrue($store->exists($key3));
+        self::assertFalse($store->exists($key1));
+        self::assertTrue($store->exists($key2));
+        self::assertTrue($store->exists($key3));
 
         $store->delete($key2);
         $store->delete($key3);
@@ -151,35 +151,35 @@ abstract class AbstractStoreTest extends TestCase
         $key3 = new Key($resource, 4, 2);
 
         $store->save($key1, 10);
-        $this->assertTrue($store->exists($key1));
-        $this->assertFalse($store->exists($key2));
-        $this->assertFalse($store->exists($key3));
+        self::assertTrue($store->exists($key1));
+        self::assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key3));
 
         $store->save($key2, 10);
-        $this->assertTrue($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
-        $this->assertFalse($store->exists($key3));
+        self::assertTrue($store->exists($key1));
+        self::assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key3));
 
         try {
             $store->save($key3, 10);
-            $this->fail('The store shouldn\'t save the third key');
+            self::fail('The store shouldn\'t save the third key');
         } catch (SemaphoreAcquiringException $e) {
         }
 
         // The failure of previous attempt should not impact the state of current semaphores
-        $this->assertTrue($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
-        $this->assertFalse($store->exists($key3));
+        self::assertTrue($store->exists($key1));
+        self::assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key3));
 
         $store->delete($key1);
-        $this->assertFalse($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
-        $this->assertFalse($store->exists($key3));
+        self::assertFalse($store->exists($key1));
+        self::assertTrue($store->exists($key2));
+        self::assertFalse($store->exists($key3));
 
         $store->save($key3, 10);
-        $this->assertFalse($store->exists($key1));
-        $this->assertTrue($store->exists($key2));
-        $this->assertTrue($store->exists($key3));
+        self::assertFalse($store->exists($key1));
+        self::assertTrue($store->exists($key2));
+        self::assertTrue($store->exists($key3));
 
         $store->delete($key2);
         $store->delete($key3);
@@ -194,7 +194,7 @@ abstract class AbstractStoreTest extends TestCase
         $store->putOffExpiration($key, 20);
 
         // just asserts it doesn't throw an exception
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testPutOffExpirationWhenSaveHasNotBeenCalled()
@@ -203,8 +203,8 @@ abstract class AbstractStoreTest extends TestCase
         $store = $this->getStore();
         $key1 = new Key(__METHOD__, 4, 2);
 
-        $this->expectException(SemaphoreExpiredException::class);
-        $this->expectExceptionMessage('The semaphore "Symfony\Component\Semaphore\Tests\Store\AbstractStoreTest::testPutOffExpirationWhenSaveHasNotBeenCalled" has expired: the script returns a positive number.');
+        self::expectException(SemaphoreExpiredException::class);
+        self::expectExceptionMessage('The semaphore "Symfony\Component\Semaphore\Tests\Store\AbstractStoreTest::testPutOffExpirationWhenSaveHasNotBeenCalled" has expired: the script returns a positive number.');
 
         $store->putOffExpiration($key1, 20);
     }
@@ -219,7 +219,7 @@ abstract class AbstractStoreTest extends TestCase
         $store->save($key, 10);
 
         // just asserts it doesn't throw an exception
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
 
         $store->delete($key);
     }

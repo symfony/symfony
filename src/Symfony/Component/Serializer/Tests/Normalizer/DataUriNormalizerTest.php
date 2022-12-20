@@ -39,14 +39,14 @@ class DataUriNormalizerTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf(NormalizerInterface::class, $this->normalizer);
-        $this->assertInstanceOf(DenormalizerInterface::class, $this->normalizer);
+        self::assertInstanceOf(NormalizerInterface::class, $this->normalizer);
+        self::assertInstanceOf(DenormalizerInterface::class, $this->normalizer);
     }
 
     public function testSupportNormalization()
     {
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
-        $this->assertTrue($this->normalizer->supportsNormalization(new \SplFileObject('data:,Hello%2C%20World!')));
+        self::assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        self::assertTrue($this->normalizer->supportsNormalization(new \SplFileObject('data:,Hello%2C%20World!')));
     }
 
     /**
@@ -56,7 +56,7 @@ class DataUriNormalizerTest extends TestCase
     {
         $file = new File(__DIR__.'/../Fixtures/test.gif');
 
-        $this->assertSame(self::TEST_GIF_DATA, $this->normalizer->normalize($file));
+        self::assertSame(self::TEST_GIF_DATA, $this->normalizer->normalize($file));
     }
 
     /**
@@ -66,7 +66,7 @@ class DataUriNormalizerTest extends TestCase
     {
         $file = new \SplFileInfo(__DIR__.'/../Fixtures/test.gif');
 
-        $this->assertSame(self::TEST_GIF_DATA, $this->normalizer->normalize($file));
+        self::assertSame(self::TEST_GIF_DATA, $this->normalizer->normalize($file));
     }
 
     /**
@@ -78,46 +78,46 @@ class DataUriNormalizerTest extends TestCase
 
         $data = $this->normalizer->normalize($file);
 
-        $this->assertSame(self::TEST_TXT_DATA, $data);
-        $this->assertSame(self::TEST_TXT_CONTENT, file_get_contents($data));
+        self::assertSame(self::TEST_TXT_DATA, $data);
+        self::assertSame(self::TEST_TXT_CONTENT, file_get_contents($data));
     }
 
     public function testSupportsDenormalization()
     {
-        $this->assertFalse($this->normalizer->supportsDenormalization('foo', 'Bar'));
-        $this->assertTrue($this->normalizer->supportsDenormalization(self::TEST_GIF_DATA, 'SplFileInfo'));
-        $this->assertTrue($this->normalizer->supportsDenormalization(self::TEST_GIF_DATA, 'SplFileObject'));
-        $this->assertTrue($this->normalizer->supportsDenormalization(self::TEST_TXT_DATA, 'Symfony\Component\HttpFoundation\File\File'));
+        self::assertFalse($this->normalizer->supportsDenormalization('foo', 'Bar'));
+        self::assertTrue($this->normalizer->supportsDenormalization(self::TEST_GIF_DATA, 'SplFileInfo'));
+        self::assertTrue($this->normalizer->supportsDenormalization(self::TEST_GIF_DATA, 'SplFileObject'));
+        self::assertTrue($this->normalizer->supportsDenormalization(self::TEST_TXT_DATA, 'Symfony\Component\HttpFoundation\File\File'));
     }
 
     public function testDenormalizeSplFileInfo()
     {
         $file = $this->normalizer->denormalize(self::TEST_TXT_DATA, 'SplFileInfo');
 
-        $this->assertInstanceOf(\SplFileInfo::class, $file);
-        $this->assertSame(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
+        self::assertInstanceOf(\SplFileInfo::class, $file);
+        self::assertSame(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
     }
 
     public function testDenormalizeSplFileObject()
     {
         $file = $this->normalizer->denormalize(self::TEST_TXT_DATA, 'SplFileObject');
 
-        $this->assertInstanceOf(\SplFileObject::class, $file);
-        $this->assertEquals(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
+        self::assertInstanceOf(\SplFileObject::class, $file);
+        self::assertEquals(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
     }
 
     public function testDenormalizeHttpFoundationFile()
     {
         $file = $this->normalizer->denormalize(self::TEST_GIF_DATA, 'Symfony\Component\HttpFoundation\File\File');
 
-        $this->assertInstanceOf(File::class, $file);
-        $this->assertSame(file_get_contents(self::TEST_GIF_DATA), $this->getContent($file->openFile()));
+        self::assertInstanceOf(File::class, $file);
+        self::assertSame(file_get_contents(self::TEST_GIF_DATA), $this->getContent($file->openFile()));
     }
 
     public function testGiveNotAccessToLocalFiles()
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('The provided "data:" URI is not valid.');
+        self::expectException(UnexpectedValueException::class);
+        self::expectExceptionMessage('The provided "data:" URI is not valid.');
         $this->normalizer->denormalize('/etc/shadow', 'SplFileObject');
     }
 
@@ -126,7 +126,7 @@ class DataUriNormalizerTest extends TestCase
      */
     public function testInvalidData($uri)
     {
-        $this->expectException(UnexpectedValueException::class);
+        self::expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize($uri, 'SplFileObject');
     }
 
@@ -153,7 +153,7 @@ class DataUriNormalizerTest extends TestCase
      */
     public function testValidData($uri)
     {
-        $this->assertInstanceOf(\SplFileObject::class, $this->normalizer->denormalize($uri, 'SplFileObject'));
+        self::assertInstanceOf(\SplFileObject::class, $this->normalizer->denormalize($uri, 'SplFileObject'));
     }
 
     public function validUriProvider()

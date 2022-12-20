@@ -22,7 +22,7 @@ class BirthdayTypeTest extends DateTypeTest
 
     public function testSetInvalidYearsOption()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'years' => 'bad value',
         ]);

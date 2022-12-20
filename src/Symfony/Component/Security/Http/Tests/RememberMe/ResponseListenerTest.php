@@ -32,7 +32,7 @@ class ResponseListenerTest extends TestCase
         ]);
 
         $response = $this->getResponse();
-        $response->headers->expects($this->once())->method('setCookie')->with($cookie);
+        $response->headers->expects(self::once())->method('setCookie')->with($cookie);
 
         $listener = new ResponseListener();
         $listener->onKernelResponse($this->getEvent($request, $response));
@@ -47,7 +47,7 @@ class ResponseListenerTest extends TestCase
         ]);
 
         $response = $this->getResponse();
-        $response->headers->expects($this->never())->method('setCookie');
+        $response->headers->expects(self::never())->method('setCookie');
 
         $listener = new ResponseListener();
         $listener->onKernelResponse($this->getEvent($request, $response, HttpKernelInterface::SUB_REQUEST));
@@ -58,7 +58,7 @@ class ResponseListenerTest extends TestCase
         $request = $this->getRequest();
 
         $response = $this->getResponse();
-        $response->headers->expects($this->never())->method('setCookie');
+        $response->headers->expects(self::never())->method('setCookie');
 
         $listener = new ResponseListener();
         $listener->onKernelResponse($this->getEvent($request, $response));
@@ -66,7 +66,7 @@ class ResponseListenerTest extends TestCase
 
     public function testItSubscribesToTheOnKernelResponseEvent()
     {
-        $this->assertSame([KernelEvents::RESPONSE => 'onKernelResponse'], ResponseListener::getSubscribedEvents());
+        self::assertSame([KernelEvents::RESPONSE => 'onKernelResponse'], ResponseListener::getSubscribedEvents());
     }
 
     private function getRequest(array $attributes = [])
@@ -83,13 +83,13 @@ class ResponseListenerTest extends TestCase
     private function getResponse()
     {
         $response = new Response();
-        $response->headers = $this->createMock(ResponseHeaderBag::class);
+        $response->headers = self::createMock(ResponseHeaderBag::class);
 
         return $response;
     }
 
     private function getEvent(Request $request, Response $response, int $type = HttpKernelInterface::MAIN_REQUEST): ResponseEvent
     {
-        return new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, $type, $response);
+        return new ResponseEvent(self::createMock(HttpKernelInterface::class), $request, $type, $response);
     }
 }

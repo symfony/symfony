@@ -32,16 +32,16 @@ class AuthenticationProviderManagerTest extends TestCase
 {
     public function testAuthenticateWithoutProviders()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new AuthenticationProviderManager([]);
     }
 
     public function testAuthenticateWithProvidersWithIncorrectInterface()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         (new AuthenticationProviderManager([
             new \stdClass(),
-        ]))->authenticate($this->createMock(TokenInterface::class));
+        ]))->authenticate(self::createMock(TokenInterface::class));
     }
 
     public function testAuthenticateWhenNoProviderSupportsToken()
@@ -51,16 +51,16 @@ class AuthenticationProviderManagerTest extends TestCase
         ]);
 
         try {
-            $manager->authenticate($token = $this->createMock(TokenInterface::class));
-            $this->fail();
+            $manager->authenticate($token = self::createMock(TokenInterface::class));
+            self::fail();
         } catch (ProviderNotFoundException $e) {
-            $this->assertSame($token, $e->getToken());
+            self::assertSame($token, $e->getToken());
         }
     }
 
     public function testAuthenticateWhenProviderReturnsAccountStatusException()
     {
-        $secondAuthenticationProvider = $this->createMock(AuthenticationProviderInterface::class);
+        $secondAuthenticationProvider = self::createMock(AuthenticationProviderInterface::class);
 
         $manager = new AuthenticationProviderManager([
             $this->getAuthenticationProvider(true, null, AccountStatusException::class),
@@ -68,13 +68,13 @@ class AuthenticationProviderManagerTest extends TestCase
         ]);
 
         // AccountStatusException stops authentication
-        $secondAuthenticationProvider->expects($this->never())->method('supports');
+        $secondAuthenticationProvider->expects(self::never())->method('supports');
 
         try {
-            $manager->authenticate($token = $this->createMock(TokenInterface::class));
-            $this->fail();
+            $manager->authenticate($token = self::createMock(TokenInterface::class));
+            self::fail();
         } catch (AccountStatusException $e) {
-            $this->assertSame($token, $e->getToken());
+            self::assertSame($token, $e->getToken());
         }
     }
 
@@ -85,43 +85,43 @@ class AuthenticationProviderManagerTest extends TestCase
         ]);
 
         try {
-            $manager->authenticate($token = $this->createMock(TokenInterface::class));
-            $this->fail();
+            $manager->authenticate($token = self::createMock(TokenInterface::class));
+            self::fail();
         } catch (AuthenticationException $e) {
-            $this->assertSame($token, $e->getToken());
+            self::assertSame($token, $e->getToken());
         }
     }
 
     public function testAuthenticateWhenOneReturnsAuthenticationExceptionButNotAll()
     {
-        $expected = $this->createMock(TokenInterface::class);
-        $expected->expects($this->any())->method('getUser')->willReturn(new InMemoryUser('wouter', null));
+        $expected = self::createMock(TokenInterface::class);
+        $expected->expects(self::any())->method('getUser')->willReturn(new InMemoryUser('wouter', null));
 
         $manager = new AuthenticationProviderManager([
             $this->getAuthenticationProvider(true, null, AuthenticationException::class),
             $this->getAuthenticationProvider(true, $expected),
         ]);
 
-        $token = $manager->authenticate($this->createMock(TokenInterface::class));
-        $this->assertSame($expected, $token);
+        $token = $manager->authenticate(self::createMock(TokenInterface::class));
+        self::assertSame($expected, $token);
     }
 
     public function testAuthenticateReturnsTokenOfTheFirstMatchingProvider()
     {
-        $second = $this->createMock(AuthenticationProviderInterface::class);
+        $second = self::createMock(AuthenticationProviderInterface::class);
         $second
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('supports')
         ;
-        $expected = $this->createMock(TokenInterface::class);
-        $expected->expects($this->any())->method('getUser')->willReturn(new InMemoryUser('wouter', null));
+        $expected = self::createMock(TokenInterface::class);
+        $expected->expects(self::any())->method('getUser')->willReturn(new InMemoryUser('wouter', null));
         $manager = new AuthenticationProviderManager([
             $this->getAuthenticationProvider(true, $expected),
             $second,
         ]);
 
-        $token = $manager->authenticate($this->createMock(TokenInterface::class));
-        $this->assertSame($expected, $token);
+        $token = $manager->authenticate(self::createMock(TokenInterface::class));
+        self::assertSame($expected, $token);
     }
 
     public function testEraseCredentialFlag()
@@ -130,38 +130,38 @@ class AuthenticationProviderManagerTest extends TestCase
             $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
         ]);
 
-        $token = $manager->authenticate($this->createMock(TokenInterface::class));
-        $this->assertEquals('', $token->getCredentials());
+        $token = $manager->authenticate(self::createMock(TokenInterface::class));
+        self::assertEquals('', $token->getCredentials());
 
         $manager = new AuthenticationProviderManager([
             $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
         ], false);
 
-        $token = $manager->authenticate($this->createMock(TokenInterface::class));
-        $this->assertEquals('bar', $token->getCredentials());
+        $token = $manager->authenticate(self::createMock(TokenInterface::class));
+        self::assertEquals('bar', $token->getCredentials());
     }
 
     public function testAuthenticateDispatchesAuthenticationFailureEvent()
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
-        $provider = $this->createMock(AuthenticationProviderInterface::class);
-        $provider->expects($this->once())->method('supports')->willReturn(true);
-        $provider->expects($this->once())->method('authenticate')->willThrowException($exception = new AuthenticationException());
+        $provider = self::createMock(AuthenticationProviderInterface::class);
+        $provider->expects(self::once())->method('supports')->willReturn(true);
+        $provider->expects(self::once())->method('authenticate')->willThrowException($exception = new AuthenticationException());
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = self::createMock(EventDispatcherInterface::class);
         $dispatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('dispatch')
-            ->with($this->equalTo(new AuthenticationFailureEvent($token, $exception)), AuthenticationEvents::AUTHENTICATION_FAILURE);
+            ->with(self::equalTo(new AuthenticationFailureEvent($token, $exception)), AuthenticationEvents::AUTHENTICATION_FAILURE);
 
         $manager = new AuthenticationProviderManager([$provider]);
         $manager->setEventDispatcher($dispatcher);
 
         try {
             $manager->authenticate($token);
-            $this->fail('->authenticate() should rethrow exceptions');
+            self::fail('->authenticate() should rethrow exceptions');
         } catch (AuthenticationException $e) {
-            $this->assertSame($token, $exception->getToken());
+            self::assertSame($token, $exception->getToken());
         }
     }
 
@@ -169,39 +169,39 @@ class AuthenticationProviderManagerTest extends TestCase
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
 
-        $provider = $this->createMock(AuthenticationProviderInterface::class);
-        $provider->expects($this->once())->method('supports')->willReturn(true);
-        $provider->expects($this->once())->method('authenticate')->willReturn($token);
+        $provider = self::createMock(AuthenticationProviderInterface::class);
+        $provider->expects(self::once())->method('supports')->willReturn(true);
+        $provider->expects(self::once())->method('authenticate')->willReturn($token);
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = self::createMock(EventDispatcherInterface::class);
         $dispatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('dispatch')
-            ->with($this->equalTo(new AuthenticationSuccessEvent($token)), AuthenticationEvents::AUTHENTICATION_SUCCESS);
+            ->with(self::equalTo(new AuthenticationSuccessEvent($token)), AuthenticationEvents::AUTHENTICATION_SUCCESS);
 
         $manager = new AuthenticationProviderManager([$provider]);
         $manager->setEventDispatcher($dispatcher);
 
-        $this->assertSame($token, $manager->authenticate($token));
+        self::assertSame($token, $manager->authenticate($token));
     }
 
     protected function getAuthenticationProvider($supports, $token = null, $exception = null)
     {
-        $provider = $this->createMock(AuthenticationProviderInterface::class);
-        $provider->expects($this->once())
+        $provider = self::createMock(AuthenticationProviderInterface::class);
+        $provider->expects(self::once())
                  ->method('supports')
                  ->willReturn($supports)
         ;
 
         if (null !== $token) {
-            $provider->expects($this->once())
+            $provider->expects(self::once())
                      ->method('authenticate')
                      ->willReturn($token)
             ;
         } elseif (null !== $exception) {
-            $provider->expects($this->once())
+            $provider->expects(self::once())
                      ->method('authenticate')
-                     ->willThrowException($this->getMockBuilder($exception)->setMethods(null)->getMock())
+                     ->willThrowException(self::getMockBuilder($exception)->setMethods(null)->getMock())
             ;
         }
 

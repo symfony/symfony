@@ -49,8 +49,8 @@ final class SlackTransportFactoryTest extends TransportFactoryTestCase
     {
         $factory = $this->createFactory();
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Support for Slack webhook DSN has been dropped since 5.2 (maybe you haven\'t updated the DSN when upgrading from 5.1).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Support for Slack webhook DSN has been dropped since 5.2 (maybe you haven\'t updated the DSN when upgrading from 5.1).');
 
         $factory->create(new Dsn('slack://default/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX'));
     }

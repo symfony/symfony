@@ -21,33 +21,33 @@ class CssSelectorConverterTest extends TestCase
     {
         $converter = new CssSelectorConverter();
 
-        $this->assertEquals('descendant-or-self::*', $converter->toXPath(''));
-        $this->assertEquals('descendant-or-self::h1', $converter->toXPath('h1'));
-        $this->assertEquals("descendant-or-self::h1[@id = 'foo']", $converter->toXPath('h1#foo'));
-        $this->assertEquals("descendant-or-self::h1[@class and contains(concat(' ', normalize-space(@class), ' '), ' foo ')]", $converter->toXPath('h1.foo'));
-        $this->assertEquals('descendant-or-self::foo:h1', $converter->toXPath('foo|h1'));
-        $this->assertEquals('descendant-or-self::h1', $converter->toXPath('H1'));
+        self::assertEquals('descendant-or-self::*', $converter->toXPath(''));
+        self::assertEquals('descendant-or-self::h1', $converter->toXPath('h1'));
+        self::assertEquals("descendant-or-self::h1[@id = 'foo']", $converter->toXPath('h1#foo'));
+        self::assertEquals("descendant-or-self::h1[@class and contains(concat(' ', normalize-space(@class), ' '), ' foo ')]", $converter->toXPath('h1.foo'));
+        self::assertEquals('descendant-or-self::foo:h1', $converter->toXPath('foo|h1'));
+        self::assertEquals('descendant-or-self::h1', $converter->toXPath('H1'));
 
         // Test the cache layer
         $converter = new CssSelectorConverter();
-        $this->assertEquals('descendant-or-self::h1', $converter->toXPath('H1'));
+        self::assertEquals('descendant-or-self::h1', $converter->toXPath('H1'));
     }
 
     public function testCssToXPathXml()
     {
         $converter = new CssSelectorConverter(false);
 
-        $this->assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
+        self::assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
 
         $converter = new CssSelectorConverter(false);
         // Test the cache layer
-        $this->assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
+        self::assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
     }
 
     public function testParseExceptions()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Expected identifier, but <eof at 3> found.');
+        self::expectException(ParseException::class);
+        self::expectExceptionMessage('Expected identifier, but <eof at 3> found.');
         $converter = new CssSelectorConverter();
         $converter->toXPath('h1:');
     }
@@ -57,7 +57,7 @@ class CssSelectorConverterTest extends TestCase
     {
         $converter = new CssSelectorConverter();
 
-        $this->assertEquals($xpath, $converter->toXPath($css, ''), '->parse() parses an input string and returns a node');
+        self::assertEquals($xpath, $converter->toXPath($css, ''), '->parse() parses an input string and returns a node');
     }
 
     public function getCssToXPathWithoutPrefixTestData()

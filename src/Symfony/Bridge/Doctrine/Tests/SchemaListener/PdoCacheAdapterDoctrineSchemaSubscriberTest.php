@@ -30,16 +30,16 @@ class PdoCacheAdapterDoctrineSchemaSubscriberTest extends TestCase
     public function testPostGenerateSchema()
     {
         $schema = new Schema();
-        $dbalConnection = $this->createMock(Connection::class);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->any())
+        $dbalConnection = self::createMock(Connection::class);
+        $entityManager = self::createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::any())
             ->method('getConnection')
             ->willReturn($dbalConnection);
 
         $event = new GenerateSchemaEventArgs($entityManager, $schema);
 
-        $pdoAdapter = $this->createMock(PdoAdapter::class);
-        $pdoAdapter->expects($this->once())
+        $pdoAdapter = self::createMock(PdoAdapter::class);
+        $pdoAdapter->expects(self::once())
             ->method('configureSchema')
             ->with($event->getSchema(), $event->getEntityManager()->getConnection());
 

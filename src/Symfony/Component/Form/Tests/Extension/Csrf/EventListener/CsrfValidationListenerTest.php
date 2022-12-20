@@ -61,7 +61,7 @@ class CsrfValidationListenerTest extends TestCase
         $validation->preSubmit($event);
 
         // Validate accordingly
-        $this->assertSame($data, $event->getData());
+        self::assertSame($data, $event->getData());
     }
 
     public function testArrayCsrfToken()
@@ -71,7 +71,7 @@ class CsrfValidationListenerTest extends TestCase
         $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Invalid.');
         $validation->preSubmit($event);
 
-        $this->assertNotEmpty($this->form->getErrors());
+        self::assertNotEmpty($this->form->getErrors());
     }
 
     public function testMaxPostSizeExceeded()
@@ -80,7 +80,7 @@ class CsrfValidationListenerTest extends TestCase
         $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, new ServerParamsPostMaxSizeExceeded());
 
         $validation->preSubmit($event);
-        $this->assertEmpty($this->form->getErrors());
+        self::assertEmpty($this->form->getErrors());
     }
 }
 

@@ -51,7 +51,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
             ->addMethodCall('setBar', [2, 3])
             ->setBindings(['$bar' => $argument])
         ;
-        $this->assertEquals([AutoconfigureAttributed::class => $expected], $container->getAutoconfiguredInstanceof());
+        self::assertEquals([AutoconfigureAttributed::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
     public function testIgnoreAttribute()
@@ -63,7 +63,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
 
         (new RegisterAutoconfigureAttributesPass())->process($container);
 
-        $this->assertSame([], $container->getAutoconfiguredInstanceof());
+        self::assertSame([], $container->getAutoconfiguredInstanceof());
     }
 
     public function testAutoconfiguredTag()
@@ -77,7 +77,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $expected = (new ChildDefinition(''))
             ->addTag(AutoconfiguredInterface::class, ['foo' => 123])
         ;
-        $this->assertEquals([AutoconfiguredInterface::class => $expected], $container->getAutoconfiguredInstanceof());
+        self::assertEquals([AutoconfiguredInterface::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
     public function testMissingParent()
@@ -89,6 +89,6 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
 
         (new RegisterAutoconfigureAttributesPass())->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 }

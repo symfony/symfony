@@ -21,16 +21,16 @@ class ConsoleOutputTest extends TestCase
     public function testConstructorWithoutFormatter()
     {
         $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
-        $this->assertNotSame($output->getFormatter(), $output->getErrorOutput()->getFormatter(), 'ErrorOutput should use it own formatter');
+        self::assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        self::assertNotSame($output->getFormatter(), $output->getErrorOutput()->getFormatter(), 'ErrorOutput should use it own formatter');
     }
 
     public function testConstructorWithFormatter()
     {
         $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true, $formatter = new OutputFormatter());
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
-        $this->assertSame($formatter, $output->getFormatter());
-        $this->assertSame($formatter, $output->getErrorOutput()->getFormatter(), 'Output and ErrorOutput should use the same provided formatter');
+        self::assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        self::assertSame($formatter, $output->getFormatter());
+        self::assertSame($formatter, $output->getErrorOutput()->getFormatter(), 'Output and ErrorOutput should use the same provided formatter');
     }
 
     public function testSetFormatter()
@@ -38,14 +38,14 @@ class ConsoleOutputTest extends TestCase
         $output = new ConsoleOutput();
         $outputFormatter = new OutputFormatter();
         $output->setFormatter($outputFormatter);
-        $this->assertSame($outputFormatter, $output->getFormatter());
-        $this->assertSame($outputFormatter, $output->getErrorOutput()->getFormatter());
+        self::assertSame($outputFormatter, $output->getFormatter());
+        self::assertSame($outputFormatter, $output->getErrorOutput()->getFormatter());
     }
 
     public function testSetVerbosity()
     {
         $output = new ConsoleOutput();
         $output->setVerbosity(Output::VERBOSITY_VERBOSE);
-        $this->assertSame(Output::VERBOSITY_VERBOSE, $output->getVerbosity());
+        self::assertSame(Output::VERBOSITY_VERBOSE, $output->getVerbosity());
     }
 }

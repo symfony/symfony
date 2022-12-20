@@ -27,20 +27,20 @@ abstract class AbstractAsciiTestCase extends TestCase
 
     public function testCreateFromString()
     {
-        $bytes = static::createFromString('Symfony is a PHP framework!');
+        $bytes = self::createFromString('Symfony is a PHP framework!');
 
-        $this->assertSame('Symfony is a PHP framework!', (string) $bytes);
-        $this->assertSame(27, $bytes->length());
-        $this->assertFalse($bytes->isEmpty());
+        self::assertSame('Symfony is a PHP framework!', (string) $bytes);
+        self::assertSame(27, $bytes->length());
+        self::assertFalse($bytes->isEmpty());
     }
 
     public function testCreateFromEmptyString()
     {
-        $instance = static::createFromString('');
+        $instance = self::createFromString('');
 
-        $this->assertSame('', (string) $instance);
-        $this->assertSame(0, $instance->length());
-        $this->assertTrue($instance->isEmpty());
+        self::assertSame('', (string) $instance);
+        self::assertSame(0, $instance->length());
+        self::assertTrue($instance->isEmpty());
     }
 
     /**
@@ -49,13 +49,13 @@ abstract class AbstractAsciiTestCase extends TestCase
     public function testBytesAt(array $expected, string $string, int $offset, int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
-            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+            self::markTestSkipped('Skipping due to issue ICU-21661.');
         }
 
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
         $instance = $form ? $instance->normalize($form) : $instance;
 
-        $this->assertSame($expected, $instance->bytesAt($offset));
+        self::assertSame($expected, $instance->bytesAt($offset));
     }
 
     public static function provideBytesAt(): array
@@ -73,9 +73,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testContainsAny(?int $result, string $string, $needle)
     {
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
 
-        $this->assertSame(null !== $instance->indexOf($needle), $instance->containsAny($needle));
+        self::assertSame(null !== $instance->indexOf($needle), $instance->containsAny($needle));
     }
 
     /**
@@ -83,20 +83,20 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testContainsAnyIgnoreCase(?int $result, string $string, $needle)
     {
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
 
-        $this->assertSame(null !== $instance->ignoreCase()->indexOf($needle), $instance->ignoreCase()->containsAny($needle));
+        self::assertSame(null !== $instance->ignoreCase()->indexOf($needle), $instance->ignoreCase()->containsAny($needle));
     }
 
     public function testUnwrap()
     {
         $expected = ['hello', 'world'];
 
-        $s = static::createFromString('');
+        $s = self::createFromString('');
 
-        $actual = $s::unwrap([static::createFromString('hello'), static::createFromString('world')]);
+        $actual = $s::unwrap([self::createFromString('hello'), self::createFromString('world')]);
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     /**
@@ -104,10 +104,10 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testWordwrap($expected, $actual, $length, $break, $cut = false)
     {
-        $instance = static::createFromString($actual);
+        $instance = self::createFromString($actual);
         $actual = $instance->wordwrap($length, $break, $cut);
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function wordwrapProvider()
@@ -148,9 +148,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testWrap(array $expected, array $values)
     {
-        $s = static::createFromString('');
+        $s = self::createFromString('');
 
-        $this->assertEquals($expected, $s::wrap($values));
+        self::assertEquals($expected, $s::wrap($values));
     }
 
     public static function provideWrap(): array
@@ -158,11 +158,11 @@ abstract class AbstractAsciiTestCase extends TestCase
         return [
             [[], []],
             [
-                ['abc' => static::createFromString('foo'), 1, static::createFromString('bar'), 'baz' => true],
+                ['abc' => self::createFromString('foo'), 1, self::createFromString('bar'), 'baz' => true],
                 ['abc' => 'foo', 1, 'bar', 'baz' => true],
             ],
             [
-                ['a' => ['b' => static::createFromString('c'), [static::createFromString('d')]], static::createFromString('e')],
+                ['a' => ['b' => self::createFromString('c'), [self::createFromString('d')]], self::createFromString('e')],
                 ['a' => ['b' => 'c', ['d']], 'e'],
             ],
         ];
@@ -174,12 +174,12 @@ abstract class AbstractAsciiTestCase extends TestCase
     public function testLength(int $length, string $string)
     {
         if (2 !== grapheme_strlen('च्छे') && 'अनुच्छेद' === $string) {
-            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+            self::markTestSkipped('Skipping due to issue ICU-21661.');
         }
 
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
 
-        $this->assertSame($length, $instance->length());
+        self::assertSame($length, $instance->length());
     }
 
     public static function provideLength(): array
@@ -200,9 +200,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testIndexOf(?int $result, string $string, $needle, int $offset)
     {
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
 
-        $this->assertSame($result, $instance->indexOf($needle, $offset));
+        self::assertSame($result, $instance->indexOf($needle, $offset));
     }
 
     public static function provideIndexOf(): array
@@ -231,9 +231,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testIndexOfIgnoreCase(?int $result, string $string, $needle, int $offset)
     {
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
 
-        $this->assertSame($result, $instance->ignoreCase()->indexOf($needle, $offset));
+        self::assertSame($result, $instance->ignoreCase()->indexOf($needle, $offset));
     }
 
     public static function provideIndexOfIgnoreCase(): array
@@ -263,9 +263,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testIndexOfLast(?int $result, string $string, $needle, int $offset)
     {
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
 
-        $this->assertSame($result, $instance->indexOfLast($needle, $offset));
+        self::assertSame($result, $instance->indexOfLast($needle, $offset));
     }
 
     public static function provideIndexOfLast(): array
@@ -290,9 +290,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testIndexOfLastIgnoreCase(?int $result, string $string, string $needle, int $offset)
     {
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
 
-        $this->assertSame($result, $instance->ignoreCase()->indexOfLast($needle, $offset));
+        self::assertSame($result, $instance->ignoreCase()->indexOfLast($needle, $offset));
     }
 
     public static function provideIndexOfLastIgnoreCase(): array
@@ -321,7 +321,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testSplit(string $string, string $delimiter, array $chunks, ?int $limit, int $flags = null)
     {
-        $this->assertEquals($chunks, static::createFromString($string)->split($delimiter, $limit, $flags));
+        self::assertEquals($chunks, self::createFromString($string)->split($delimiter, $limit, $flags));
     }
 
     public static function provideSplit(): array
@@ -331,8 +331,8 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'hello world',
                 ' ',
                 [
-                    static::createFromString('hello'),
-                    static::createFromString('world'),
+                    self::createFromString('hello'),
+                    self::createFromString('world'),
                 ],
                 null,
             ],
@@ -340,8 +340,8 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'radar',
                 'd',
                 [
-                    static::createFromString('ra'),
-                    static::createFromString('ar'),
+                    self::createFromString('ra'),
+                    self::createFromString('ar'),
                 ],
                 2,
             ],
@@ -349,11 +349,11 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'foo,bar,baz,qux,kix',
                 ',',
                 [
-                    static::createFromString('foo'),
-                    static::createFromString('bar'),
-                    static::createFromString('baz'),
-                    static::createFromString('qux'),
-                    static::createFromString('kix'),
+                    self::createFromString('foo'),
+                    self::createFromString('bar'),
+                    self::createFromString('baz'),
+                    self::createFromString('qux'),
+                    self::createFromString('kix'),
                 ],
                 null,
             ],
@@ -361,7 +361,7 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'foo,bar,baz,qux,kix',
                 ',',
                 [
-                    static::createFromString('foo,bar,baz,qux,kix'),
+                    self::createFromString('foo,bar,baz,qux,kix'),
                 ],
                 1,
             ],
@@ -369,9 +369,9 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'foo,bar,baz,qux,kix',
                 ',',
                 [
-                    static::createFromString('foo'),
-                    static::createFromString('bar'),
-                    static::createFromString('baz,qux,kix'),
+                    self::createFromString('foo'),
+                    self::createFromString('bar'),
+                    self::createFromString('baz,qux,kix'),
                 ],
                 3,
             ],
@@ -379,10 +379,10 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'Quisque viverra tincidunt elit. Vestibulum convallis dui nec lacis suscipit cursus.',
                 'is',
                 [
-                    static::createFromString('Qu'),
-                    static::createFromString('que viverra tincidunt elit. Vestibulum convall'),
-                    static::createFromString(' dui nec lac'),
-                    static::createFromString(' suscipit cursus.'),
+                    self::createFromString('Qu'),
+                    self::createFromString('que viverra tincidunt elit. Vestibulum convall'),
+                    self::createFromString(' dui nec lac'),
+                    self::createFromString(' suscipit cursus.'),
                 ],
                 null,
             ],
@@ -390,11 +390,11 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'foo,,bar, baz , qux,kix',
                 '/\s*,\s*/',
                 [
-                    static::createFromString('foo'),
-                    static::createFromString(''),
-                    static::createFromString('bar'),
-                    static::createFromString('baz'),
-                    static::createFromString('qux,kix'),
+                    self::createFromString('foo'),
+                    self::createFromString(''),
+                    self::createFromString('bar'),
+                    self::createFromString('baz'),
+                    self::createFromString('qux,kix'),
                 ],
                 5,
                 AbstractString::PREG_SPLIT,
@@ -403,12 +403,12 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'foo ,,bar, baz',
                 '/\s*(,)\s*/',
                 [
-                    static::createFromString('foo'),
-                    static::createFromString(','),
-                    static::createFromString(','),
-                    static::createFromString('bar'),
-                    static::createFromString(','),
-                    static::createFromString('baz'),
+                    self::createFromString('foo'),
+                    self::createFromString(','),
+                    self::createFromString(','),
+                    self::createFromString('bar'),
+                    self::createFromString(','),
+                    self::createFromString('baz'),
                 ],
                 null,
                 AbstractString::PREG_SPLIT_NO_EMPTY | AbstractString::PREG_SPLIT_DELIM_CAPTURE,
@@ -417,9 +417,9 @@ abstract class AbstractAsciiTestCase extends TestCase
                 'foo, bar,baz',
                 '/\s*(,)\s*/',
                 [
-                    [static::createFromString('foo'), 0],
-                    [static::createFromString('bar'), 5],
-                    [static::createFromString('baz'), 9],
+                    [self::createFromString('foo'), 0],
+                    [self::createFromString('bar'), 5],
+                    [self::createFromString('baz'), 9],
                 ],
                 null,
                 AbstractString::PREG_SPLIT_OFFSET_CAPTURE,
@@ -432,9 +432,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testInvalidChunkLength(int $length)
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
-        static::createFromString('foo|bar|baz')->chunk($length);
+        self::createFromString('foo|bar|baz')->chunk($length);
     }
 
     public static function provideInvalidChunkLength(): array
@@ -451,7 +451,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testChunk(string $string, array $chunks, int $length)
     {
-        $this->assertEquals($chunks, static::createFromString($string)->chunk($length));
+        self::assertEquals($chunks, self::createFromString($string)->chunk($length));
     }
 
     public static function provideChunk()
@@ -465,53 +465,53 @@ abstract class AbstractAsciiTestCase extends TestCase
             [
                 'hello',
                 [
-                    static::createFromString('h'),
-                    static::createFromString('e'),
-                    static::createFromString('l'),
-                    static::createFromString('l'),
-                    static::createFromString('o'),
+                    self::createFromString('h'),
+                    self::createFromString('e'),
+                    self::createFromString('l'),
+                    self::createFromString('l'),
+                    self::createFromString('o'),
                 ],
                 1,
             ],
             [
                 'hello you!',
                 [
-                    static::createFromString('h'),
-                    static::createFromString('e'),
-                    static::createFromString('l'),
-                    static::createFromString('l'),
-                    static::createFromString('o'),
-                    static::createFromString(' '),
-                    static::createFromString('y'),
-                    static::createFromString('o'),
-                    static::createFromString('u'),
-                    static::createFromString('!'),
+                    self::createFromString('h'),
+                    self::createFromString('e'),
+                    self::createFromString('l'),
+                    self::createFromString('l'),
+                    self::createFromString('o'),
+                    self::createFromString(' '),
+                    self::createFromString('y'),
+                    self::createFromString('o'),
+                    self::createFromString('u'),
+                    self::createFromString('!'),
                 ],
                 1,
             ],
             [
                 'hell',
                 [
-                    static::createFromString('h'),
-                    static::createFromString('e'),
-                    static::createFromString('l'),
-                    static::createFromString('l'),
+                    self::createFromString('h'),
+                    self::createFromString('e'),
+                    self::createFromString('l'),
+                    self::createFromString('l'),
                 ],
                 1,
             ],
             [
                 'hell',
                 [
-                    static::createFromString('he'),
-                    static::createFromString('ll'),
+                    self::createFromString('he'),
+                    self::createFromString('ll'),
                 ],
                 2,
             ],
             [
                 str_repeat('-', 65537),
                 [
-                    static::createFromString(str_repeat('-', 65536)),
-                    static::createFromString('-'),
+                    self::createFromString(str_repeat('-', 65536)),
+                    self::createFromString('-'),
                 ],
                 65536,
             ],
@@ -523,11 +523,11 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testLower(string $expected, string $origin)
     {
-        $instance = static::createFromString($origin)->lower();
+        $instance = self::createFromString($origin)->lower();
 
-        $this->assertNotSame(static::createFromString($origin), $instance);
-        $this->assertEquals(static::createFromString($expected), $instance);
-        $this->assertSame($expected, (string) $instance);
+        self::assertNotSame(self::createFromString($origin), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
+        self::assertSame($expected, (string) $instance);
     }
 
     public static function provideLower()
@@ -547,11 +547,11 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testUpper(string $expected, string $origin)
     {
-        $instance = static::createFromString($origin)->upper();
+        $instance = self::createFromString($origin)->upper();
 
-        $this->assertNotSame(static::createFromString($origin), $instance);
-        $this->assertEquals(static::createFromString($expected), $instance);
-        $this->assertSame($expected, (string) $instance);
+        self::assertNotSame(self::createFromString($origin), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
+        self::assertSame($expected, (string) $instance);
     }
 
     public static function provideUpper()
@@ -571,10 +571,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testTitle(string $expected, string $origin, bool $allWords)
     {
-        $this->assertEquals(
-            static::createFromString($expected),
-            static::createFromString($origin)->title($allWords)
-        );
+        self::assertEquals(self::createFromString($expected), self::createFromString($origin)->title($allWords));
     }
 
     public static function provideTitle()
@@ -597,10 +594,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testSlice(string $expected, string $origin, int $start, int $length = null)
     {
-        $this->assertEquals(
-            static::createFromString($expected),
-            static::createFromString($origin)->slice($start, $length)
-        );
+        self::assertEquals(self::createFromString($expected), self::createFromString($origin)->slice($start, $length));
     }
 
     public static function provideSlice()
@@ -625,10 +619,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testSplice(string $expected, int $start, int $length = null)
     {
-        $this->assertEquals(
-            static::createFromString($expected),
-            static::createFromString('Symfony is awesome')->splice('X', $start, $length)
-        );
+        self::assertEquals(self::createFromString($expected), self::createFromString('Symfony is awesome')->splice('X', $start, $length));
     }
 
     public static function provideSplice()
@@ -653,16 +644,16 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testAppend(string $expected, array $suffixes)
     {
-        $instance = static::createFromString('');
+        $instance = self::createFromString('');
         foreach ($suffixes as $suffix) {
             $instance = $instance->append($suffix);
         }
 
-        $this->assertEquals($expected, $instance);
+        self::assertEquals($expected, $instance);
 
-        $instance = static::createFromString('')->append(...$suffixes);
+        $instance = self::createFromString('')->append(...$suffixes);
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     public static function provideAppend()
@@ -688,16 +679,16 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testPrepend(string $expected, array $prefixes)
     {
-        $instance = static::createFromString('');
+        $instance = self::createFromString('');
         foreach (array_reverse($prefixes) as $suffix) {
             $instance = $instance->prepend($suffix);
         }
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
 
-        $instance = static::createFromString('')->prepend(...$prefixes);
+        $instance = self::createFromString('')->prepend(...$prefixes);
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     /**
@@ -705,10 +696,10 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testTrim(string $expected, string $origin, ?string $chars)
     {
-        $result = static::createFromString($origin);
+        $result = self::createFromString($origin);
         $result = null !== $chars ? $result->trim($chars) : $result->trim();
 
-        $this->assertEquals(static::createFromString($expected), $result);
+        self::assertEquals(self::createFromString($expected), $result);
     }
 
     public static function provideTrim()
@@ -744,11 +735,11 @@ abstract class AbstractAsciiTestCase extends TestCase
 
     public function testTrimPrefix()
     {
-        $str = static::createFromString('abc.def');
+        $str = self::createFromString('abc.def');
 
-        $this->assertEquals(static::createFromString('def'), $str->trimPrefix('abc.'));
-        $this->assertEquals(static::createFromString('def'), $str->trimPrefix(['abc.', 'def']));
-        $this->assertEquals(static::createFromString('def'), $str->ignoreCase()->trimPrefix('ABC.'));
+        self::assertEquals(self::createFromString('def'), $str->trimPrefix('abc.'));
+        self::assertEquals(self::createFromString('def'), $str->trimPrefix(['abc.', 'def']));
+        self::assertEquals(self::createFromString('def'), $str->ignoreCase()->trimPrefix('ABC.'));
     }
 
     /**
@@ -756,19 +747,19 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testTrimStart(string $expected, string $origin, ?string $chars)
     {
-        $result = static::createFromString($origin);
+        $result = self::createFromString($origin);
         $result = null !== $chars ? $result->trimStart($chars) : $result->trimStart();
 
-        $this->assertEquals(static::createFromString($expected), $result);
+        self::assertEquals(self::createFromString($expected), $result);
     }
 
     public function testTrimSuffix()
     {
-        $str = static::createFromString('abc.def');
+        $str = self::createFromString('abc.def');
 
-        $this->assertEquals(static::createFromString('abc'), $str->trimSuffix('.def'));
-        $this->assertEquals(static::createFromString('abc'), $str->trimSuffix(['.def', 'abc']));
-        $this->assertEquals(static::createFromString('abc'), $str->ignoreCase()->trimSuffix('.DEF'));
+        self::assertEquals(self::createFromString('abc'), $str->trimSuffix('.def'));
+        self::assertEquals(self::createFromString('abc'), $str->trimSuffix(['.def', 'abc']));
+        self::assertEquals(self::createFromString('abc'), $str->ignoreCase()->trimSuffix('.DEF'));
     }
 
     public static function provideTrimStart()
@@ -792,10 +783,10 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testTrimEnd(string $expected, string $origin, ?string $chars)
     {
-        $result = static::createFromString($origin);
+        $result = self::createFromString($origin);
         $result = null !== $chars ? $result->trimEnd($chars) : $result->trimEnd();
 
-        $this->assertEquals(static::createFromString($expected), $result);
+        self::assertEquals(self::createFromString($expected), $result);
     }
 
     public static function provideTrimEnd()
@@ -824,9 +815,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testBeforeAfter(string $expected, string $needle, string $origin, int $offset, bool $before)
     {
-        $result = static::createFromString($origin);
+        $result = self::createFromString($origin);
         $result = $before ? $result->before($needle, false, $offset) : $result->after($needle, true, $offset);
-        $this->assertEquals(static::createFromString($expected), $result);
+        self::assertEquals(self::createFromString($expected), $result);
     }
 
     public static function provideBeforeAfter()
@@ -852,9 +843,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testBeforeAfterIgnoreCase(string $expected, string $needle, string $origin, int $offset, bool $before)
     {
-        $result = static::createFromString($origin)->ignoreCase();
+        $result = self::createFromString($origin)->ignoreCase();
         $result = $before ? $result->before($needle, false, $offset) : $result->after($needle, true, $offset);
-        $this->assertEquals(static::createFromString($expected), $result);
+        self::assertEquals(self::createFromString($expected), $result);
     }
 
     public static function provideBeforeAfterIgnoreCase()
@@ -880,9 +871,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testBeforeAfterLast(string $expected, string $needle, string $origin, int $offset, bool $before)
     {
-        $result = static::createFromString($origin);
+        $result = self::createFromString($origin);
         $result = $before ? $result->beforeLast($needle, false, $offset) : $result->afterLast($needle, true, $offset);
-        $this->assertEquals(static::createFromString($expected), $result);
+        self::assertEquals(self::createFromString($expected), $result);
     }
 
     public static function provideBeforeAfterLast()
@@ -909,9 +900,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testBeforeAfterLastIgnoreCase(string $expected, string $needle, string $origin, int $offset, bool $before)
     {
-        $result = static::createFromString($origin)->ignoreCase();
+        $result = self::createFromString($origin)->ignoreCase();
         $result = $before ? $result->beforeLast($needle, false, $offset) : $result->afterLast($needle, true, $offset);
-        $this->assertEquals(static::createFromString($expected), $result);
+        self::assertEquals(self::createFromString($expected), $result);
     }
 
     public static function provideBeforeAfterLastIgnoreCase()
@@ -939,10 +930,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testFolded(string $expected, string $origin)
     {
-        $this->assertEquals(
-            static::createFromString($expected),
-            static::createFromString($origin)->folded()
-        );
+        self::assertEquals(self::createFromString($expected), self::createFromString($origin)->folded());
     }
 
     public static function provideFolded()
@@ -958,10 +946,10 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testReplace(string $expectedString, int $expectedCount, string $origin, string $from, string $to)
     {
-        $origin = static::createFromString($origin);
+        $origin = self::createFromString($origin);
         $result = $origin->replace($from, $to);
 
-        $this->assertEquals(static::createFromString($expectedString), $result);
+        self::assertEquals(self::createFromString($expectedString), $result);
     }
 
     public static function provideReplace()
@@ -981,10 +969,10 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testReplaceMatches(string $expectedString, string $origin, string $fromRegexp, $to)
     {
-        $origin = static::createFromString($origin);
+        $origin = self::createFromString($origin);
         $result = $origin->replaceMatches($fromRegexp, $to);
 
-        $this->assertEquals(static::createFromString($expectedString), $result);
+        self::assertEquals(self::createFromString($expectedString), $result);
     }
 
     public static function provideReplaceMatches()
@@ -1009,10 +997,10 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testReplaceIgnoreCase(string $expectedString, int $expectedCount, string $origin, string $from, string $to)
     {
-        $origin = static::createFromString($origin);
+        $origin = self::createFromString($origin);
         $result = $origin->ignoreCase()->replace($from, $to);
 
-        $this->assertEquals(static::createFromString($expectedString), $result);
+        self::assertEquals(self::createFromString($expectedString), $result);
     }
 
     public static function provideReplaceIgnoreCase()
@@ -1032,9 +1020,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testCamel(string $expectedString, string $origin)
     {
-        $instance = static::createFromString($origin)->camel();
+        $instance = self::createFromString($origin)->camel();
 
-        $this->assertEquals(static::createFromString($expectedString), $instance);
+        self::assertEquals(self::createFromString($expectedString), $instance);
     }
 
     public static function provideCamel()
@@ -1057,9 +1045,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testSnake(string $expectedString, string $origin)
     {
-        $instance = static::createFromString($origin)->snake();
+        $instance = self::createFromString($origin)->snake();
 
-        $this->assertEquals(static::createFromString($expectedString), $instance);
+        self::assertEquals(self::createFromString($expectedString), $instance);
     }
 
     public static function provideSnake()
@@ -1085,10 +1073,10 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testStartsWith(bool $expected, string $origin, $prefix, int $form = null)
     {
-        $instance = static::createFromString($origin);
+        $instance = self::createFromString($origin);
         $instance = $form ? $instance->normalize($form) : $instance;
 
-        $this->assertSame($expected, $instance->startsWith($prefix));
+        self::assertSame($expected, $instance->startsWith($prefix));
     }
 
     public static function provideStartsWith()
@@ -1114,7 +1102,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testStartsWithIgnoreCase(bool $expected, string $origin, $prefix)
     {
-        $this->assertSame($expected, static::createFromString($origin)->ignoreCase()->startsWith($prefix));
+        self::assertSame($expected, self::createFromString($origin)->ignoreCase()->startsWith($prefix));
     }
 
     public static function provideStartsWithIgnoreCase()
@@ -1139,10 +1127,10 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testEndsWith(bool $expected, string $origin, $suffix, int $form = null)
     {
-        $instance = static::createFromString($origin);
+        $instance = self::createFromString($origin);
         $instance = $form ? $instance->normalize($form) : $instance;
 
-        $this->assertSame($expected, $instance->endsWith($suffix));
+        self::assertSame($expected, $instance->endsWith($suffix));
     }
 
     public static function provideEndsWith()
@@ -1168,7 +1156,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testEndsWithIgnoreCase(bool $expected, string $origin, $suffix)
     {
-        $this->assertSame($expected, static::createFromString($origin)->ignoreCase()->endsWith($suffix));
+        self::assertSame($expected, self::createFromString($origin)->ignoreCase()->endsWith($suffix));
     }
 
     public static function provideEndsWithIgnoreCase()
@@ -1193,9 +1181,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testEnsureStart(string $expectedString, string $origin, $prefix)
     {
-        $instance = static::createFromString($origin)->ensureStart($prefix);
+        $instance = self::createFromString($origin)->ensureStart($prefix);
 
-        $this->assertEquals(static::createFromString($expectedString), $instance);
+        self::assertEquals(self::createFromString($expectedString), $instance);
     }
 
     public static function provideEnsureStart()
@@ -1219,9 +1207,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testEnsureStartIgnoreCase(string $expectedString, string $origin, $prefix)
     {
-        $instance = static::createFromString($origin)->ignoreCase()->ensureStart($prefix);
+        $instance = self::createFromString($origin)->ignoreCase()->ensureStart($prefix);
 
-        $this->assertEquals(static::createFromString($expectedString), $instance);
+        self::assertEquals(self::createFromString($expectedString), $instance);
     }
 
     public static function provideEnsureStartIgnoreCase()
@@ -1244,9 +1232,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testEnsureEnd(string $expectedString, string $origin, $suffix)
     {
-        $instance = static::createFromString($origin)->ensureEnd($suffix);
+        $instance = self::createFromString($origin)->ensureEnd($suffix);
 
-        $this->assertEquals(static::createFromString($expectedString), $instance);
+        self::assertEquals(self::createFromString($expectedString), $instance);
     }
 
     public static function provideEnsureEnd()
@@ -1270,9 +1258,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testEnsureEndIgnoreCase(string $expectedString, string $origin, $suffix)
     {
-        $instance = static::createFromString($origin)->ignoreCase()->ensureEnd($suffix);
+        $instance = self::createFromString($origin)->ignoreCase()->ensureEnd($suffix);
 
-        $this->assertEquals(static::createFromString($expectedString), $instance);
+        self::assertEquals(self::createFromString($expectedString), $instance);
     }
 
     public static function provideEnsureEndIgnoreCase()
@@ -1295,9 +1283,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testCollapseWhitespace(string $expectedString, string $origin)
     {
-        $instance = static::createFromString($origin)->collapseWhitespace();
+        $instance = self::createFromString($origin)->collapseWhitespace();
 
-        $this->assertEquals(static::createFromString($expectedString), $instance);
+        self::assertEquals(self::createFromString($expectedString), $instance);
     }
 
     public static function provideCollapseWhitespace()
@@ -1316,7 +1304,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testEqualsTo(bool $expected, string $origin, $other)
     {
-        $this->assertSame($expected, static::createFromString($origin)->equalsTo($other));
+        self::assertSame($expected, self::createFromString($origin)->equalsTo($other));
     }
 
     public static function provideEqualsTo()
@@ -1342,7 +1330,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testEqualsToIgnoreCase(bool $expected, string $origin, $other)
     {
-        $this->assertSame($expected, static::createFromString($origin)->ignoreCase()->equalsTo($other));
+        self::assertSame($expected, self::createFromString($origin)->ignoreCase()->equalsTo($other));
     }
 
     public static function provideEqualsToIgnoreCase()
@@ -1367,7 +1355,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testIsEmpty(bool $expected, string $origin)
     {
-        $this->assertSame($expected, static::createFromString($origin)->isEmpty());
+        self::assertSame($expected, self::createFromString($origin)->isEmpty());
     }
 
     public static function provideIsEmpty()
@@ -1385,14 +1373,14 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testJoin(string $expected, string $origin, array $join)
     {
-        $instance = static::createFromString($origin)->join($join);
+        $instance = self::createFromString($origin)->join($join);
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     public function testJoinWithLastGlue()
     {
-        $this->assertSame('foo, bar and baz', (string) static::createFromString(', ')->join(['foo', 'bar', 'baz'], ' and '));
+        self::assertSame('foo, bar and baz', (string) self::createFromString(', ')->join(['foo', 'bar', 'baz'], ' and '));
     }
 
     public static function provideJoin()
@@ -1411,9 +1399,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testRepeat(string $expected, string $origin, int $multiplier)
     {
-        $instance = static::createFromString($origin)->repeat($multiplier);
+        $instance = self::createFromString($origin)->repeat($multiplier);
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     public static function provideRepeat()
@@ -1432,9 +1420,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testPadBoth(string $expected, string $origin, int $length, string $padStr)
     {
-        $instance = static::createFromString($origin)->padBoth($length, $padStr);
+        $instance = self::createFromString($origin)->padBoth($length, $padStr);
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     public static function providePadBoth()
@@ -1456,9 +1444,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testPadEnd(string $expected, string $origin, int $length, string $padStr)
     {
-        $instance = static::createFromString($origin)->padEnd($length, $padStr);
+        $instance = self::createFromString($origin)->padEnd($length, $padStr);
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     public static function providePadEnd()
@@ -1479,9 +1467,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testPadStart(string $expected, string $origin, int $length, string $padStr)
     {
-        $instance = static::createFromString($origin)->padStart($length, $padStr);
+        $instance = self::createFromString($origin)->padStart($length, $padStr);
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     public static function providePadStart()
@@ -1502,9 +1490,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testTruncate(string $expected, string $origin, int $length, string $ellipsis, bool $cut = true)
     {
-        $instance = static::createFromString($origin)->truncate($length, $ellipsis, $cut);
+        $instance = self::createFromString($origin)->truncate($length, $ellipsis, $cut);
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     public static function provideTruncate()
@@ -1529,7 +1517,7 @@ abstract class AbstractAsciiTestCase extends TestCase
 
     public function testToString()
     {
-        $instance = static::createFromString('foobar');
+        $instance = self::createFromString('foobar');
 
         self::assertSame('foobar', $instance->toString());
     }
@@ -1539,9 +1527,9 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testReverse(string $expected, string $origin)
     {
-        $instance = static::createFromString($origin)->reverse();
+        $instance = self::createFromString($origin)->reverse();
 
-        $this->assertEquals(static::createFromString($expected), $instance);
+        self::assertEquals(self::createFromString($expected), $instance);
     }
 
     public static function provideReverse()
@@ -1558,7 +1546,7 @@ abstract class AbstractAsciiTestCase extends TestCase
      */
     public function testWidth(int $expected, string $origin, bool $ignoreAnsiDecoration = true)
     {
-        $this->assertSame($expected, static::createFromString($origin)->width($ignoreAnsiDecoration));
+        self::assertSame($expected, self::createFromString($origin)->width($ignoreAnsiDecoration));
     }
 
     public static function provideWidth(): array

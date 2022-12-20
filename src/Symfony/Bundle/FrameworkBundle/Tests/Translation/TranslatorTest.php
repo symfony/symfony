@@ -54,15 +54,15 @@ class TranslatorTest extends TestCase
         $translator->setLocale('fr');
         $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
-        $this->assertEquals('foo (FR)', $translator->trans('foo'));
-        $this->assertEquals('bar (EN)', $translator->trans('bar'));
-        $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', ['%count%' => 0]));
-        $this->assertEquals('no translation', $translator->trans('no translation'));
-        $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', ['%count%' => 1]));
-        $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
-        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
+        self::assertEquals('foo (FR)', $translator->trans('foo'));
+        self::assertEquals('bar (EN)', $translator->trans('bar'));
+        self::assertEquals('foobar (ES)', $translator->trans('foobar'));
+        self::assertEquals('choice 0 (EN)', $translator->trans('choice', ['%count%' => 0]));
+        self::assertEquals('no translation', $translator->trans('no translation'));
+        self::assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
+        self::assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', ['%count%' => 1]));
+        self::assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        self::assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
     public function testTransWithCaching()
@@ -72,38 +72,38 @@ class TranslatorTest extends TestCase
         $translator->setLocale('fr');
         $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
-        $this->assertEquals('foo (FR)', $translator->trans('foo'));
-        $this->assertEquals('bar (EN)', $translator->trans('bar'));
-        $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', ['%count%' => 0]));
-        $this->assertEquals('no translation', $translator->trans('no translation'));
-        $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', ['%count%' => 1]));
-        $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
-        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
+        self::assertEquals('foo (FR)', $translator->trans('foo'));
+        self::assertEquals('bar (EN)', $translator->trans('bar'));
+        self::assertEquals('foobar (ES)', $translator->trans('foobar'));
+        self::assertEquals('choice 0 (EN)', $translator->trans('choice', ['%count%' => 0]));
+        self::assertEquals('no translation', $translator->trans('no translation'));
+        self::assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
+        self::assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', ['%count%' => 1]));
+        self::assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        self::assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 
         // do it another time as the cache is primed now
-        $loader = $this->createMock(LoaderInterface::class);
-        $loader->expects($this->never())->method('load');
+        $loader = self::createMock(LoaderInterface::class);
+        $loader->expects(self::never())->method('load');
 
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir]);
         $translator->setLocale('fr');
         $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
-        $this->assertEquals('foo (FR)', $translator->trans('foo'));
-        $this->assertEquals('bar (EN)', $translator->trans('bar'));
-        $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('no translation', $translator->trans('no translation'));
-        $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
-        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
+        self::assertEquals('foo (FR)', $translator->trans('foo'));
+        self::assertEquals('bar (EN)', $translator->trans('bar'));
+        self::assertEquals('foobar (ES)', $translator->trans('foobar'));
+        self::assertEquals('no translation', $translator->trans('no translation'));
+        self::assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
+        self::assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        self::assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
     public function testTransWithCachingWithInvalidLocale()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "invalid locale" locale.');
-        $loader = $this->createMock(LoaderInterface::class);
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid "invalid locale" locale.');
+        $loader = self::createMock(LoaderInterface::class);
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', TranslatorWithInvalidLocale::class);
 
         $translator->trans('foo');
@@ -121,22 +121,22 @@ class TranslatorTest extends TestCase
         $translator = $this->getTranslator($loader, ['resource_files' => $resourceFiles], 'yml');
         $translator->setLocale('fr');
 
-        $this->assertEquals('répertoire', $translator->trans('folder'));
+        self::assertEquals('répertoire', $translator->trans('folder'));
     }
 
     public function testGetDefaultLocale()
     {
-        $container = $this->createMock(\Psr\Container\ContainerInterface::class);
+        $container = self::createMock(\Psr\Container\ContainerInterface::class);
         $translator = new Translator($container, new MessageFormatter(), 'en');
 
-        $this->assertSame('en', $translator->getLocale());
+        self::assertSame('en', $translator->getLocale());
     }
 
     public function testInvalidOptions()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The Translator does not support the following options: \'foo\'');
-        $container = $this->createMock(ContainerInterface::class);
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The Translator does not support the following options: \'foo\'');
+        $container = self::createMock(ContainerInterface::class);
 
         new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']);
     }
@@ -146,9 +146,9 @@ class TranslatorTest extends TestCase
     {
         $someCatalogue = $this->getCatalogue('some_locale', []);
 
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
 
-        $loader->expects($this->exactly(2))
+        $loader->expects(self::exactly(2))
             ->method('load')
             ->withConsecutive(
                 /* The "messages.some_locale.loader" is passed via the resource_file option and shall be loaded first */
@@ -206,8 +206,8 @@ class TranslatorTest extends TestCase
 
         $resources = $catalogue->getResources();
 
-        $this->assertEquals(new DirectoryResource(__DIR__), $resources[1]);
-        $this->assertEquals(new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'), $resources[2]);
+        self::assertEquals(new DirectoryResource(__DIR__), $resources[1]);
+        self::assertEquals(new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'), $resources[2]);
     }
 
     public function testCachedCatalogueIsReDumpedWhenScannedDirectoriesChange()
@@ -228,7 +228,7 @@ class TranslatorTest extends TestCase
         ], 'yml');
 
         // Cached catalogue is dumped
-        $this->assertSame('répertoire', $translator->trans('folder', [], 'messages', 'fr'));
+        self::assertSame('répertoire', $translator->trans('folder', [], 'messages', 'fr'));
 
         $translator = $this->getTranslator(new YamlFileLoader(), [
             'cache_dir' => $this->tmpDir,
@@ -246,7 +246,7 @@ class TranslatorTest extends TestCase
             ],
         ], 'yml');
 
-        $this->assertSame('bar', $translator->trans('foo', [], 'ccc', 'fr'));
+        self::assertSame('bar', $translator->trans('foo', [], 'ccc', 'fr'));
     }
 
     protected function getCatalogue($locale, $messages, $resources = [])
@@ -264,9 +264,9 @@ class TranslatorTest extends TestCase
 
     protected function getLoader()
     {
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
         $loader
-            ->expects($this->exactly(7))
+            ->expects(self::exactly(7))
             ->method('load')
             ->willReturnOnConsecutiveCalls(
                 $this->getCatalogue('fr', [
@@ -300,9 +300,9 @@ class TranslatorTest extends TestCase
 
     protected function getContainer($loader)
     {
-        $container = $this->createMock(ContainerInterface::class);
+        $container = self::createMock(ContainerInterface::class);
         $container
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('get')
             ->willReturn($loader)
         ;
@@ -341,15 +341,15 @@ class TranslatorTest extends TestCase
         $translator->setFallbackLocales(['fr']);
         $translator->warmup($this->tmpDir);
 
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = self::createMock(LoaderInterface::class);
         $loader
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('load');
 
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml');
         $translator->setLocale('fr');
         $translator->setFallbackLocales(['fr']);
-        $this->assertEquals('répertoire', $translator->trans('folder'));
+        self::assertEquals('répertoire', $translator->trans('folder'));
     }
 
     public function testEnabledLocales()
@@ -366,7 +366,7 @@ class TranslatorTest extends TestCase
         $translator->setFallbackLocales(['fr']);
         $translator->warmup($this->tmpDir);
 
-        $this->assertCount(2, glob($this->tmpDir.'/catalogue.*.*.php'), 'Both "en" and "fr" catalogues are generated.');
+        self::assertCount(2, glob($this->tmpDir.'/catalogue.*.*.php'), 'Both "en" and "fr" catalogues are generated.');
 
         // prime the cache and configure the enabled locales
         $this->deleteTmpDir();
@@ -374,7 +374,7 @@ class TranslatorTest extends TestCase
         $translator->setFallbackLocales(['fr']);
         $translator->warmup($this->tmpDir);
 
-        $this->assertCount(1, glob($this->tmpDir.'/catalogue.*.*.php'), 'Only the "fr" catalogue is generated.');
+        self::assertCount(1, glob($this->tmpDir.'/catalogue.*.*.php'), 'Only the "fr" catalogue is generated.');
     }
 
     public function testLoadingTranslationFilesWithDotsInMessageDomain()
@@ -389,7 +389,7 @@ class TranslatorTest extends TestCase
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml');
         $translator->setLocale('en');
         $translator->setFallbackLocales(['fr']);
-        $this->assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));
+        self::assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));
     }
 
     private function createTranslator($loader, $options, $translatorClass = Translator::class, $loaderFomat = 'loader', $defaultLocale = 'en', array $enabledLocales = [])

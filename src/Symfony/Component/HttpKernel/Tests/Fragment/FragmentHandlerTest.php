@@ -25,9 +25,9 @@ class FragmentHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack = self::createMock(RequestStack::class);
         $this->requestStack
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getCurrentRequest')
             ->willReturn(Request::create('/'))
         ;
@@ -35,34 +35,34 @@ class FragmentHandlerTest extends TestCase
 
     public function testRenderWhenRendererDoesNotExist()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $handler = new FragmentHandler($this->requestStack);
         $handler->render('/', 'foo');
     }
 
     public function testRenderWithUnknownRenderer()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $handler = $this->getHandler($this->returnValue(new Response('foo')));
+        self::expectException(\InvalidArgumentException::class);
+        $handler = $this->getHandler(self::returnValue(new Response('foo')));
 
         $handler->render('/', 'bar');
     }
 
     public function testDeliverWithUnsuccessfulResponse()
     {
-        $handler = $this->getHandler($this->returnValue(new Response('foo', 404)));
+        $handler = $this->getHandler(self::returnValue(new Response('foo', 404)));
         try {
             $handler->render('/', 'foo');
-            $this->fail('->render() throws a \RuntimeException exception if response is not successful');
+            self::fail('->render() throws a \RuntimeException exception if response is not successful');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\RuntimeException::class, $e);
-            $this->assertEquals(0, $e->getCode());
-            $this->assertEquals('Error when rendering "http://localhost/" (Status code is 404).', $e->getMessage());
+            self::assertInstanceOf(\RuntimeException::class, $e);
+            self::assertEquals(0, $e->getCode());
+            self::assertEquals('Error when rendering "http://localhost/" (Status code is 404).', $e->getMessage());
 
             $previousException = $e->getPrevious();
-            $this->assertInstanceOf(HttpException::class, $previousException);
-            $this->assertEquals(404, $previousException->getStatusCode());
-            $this->assertEquals(0, $previousException->getCode());
+            self::assertInstanceOf(HttpException::class, $previousException);
+            self::assertEquals(404, $previousException->getStatusCode());
+            self::assertEquals(0, $previousException->getCode());
         }
     }
 
@@ -70,10 +70,10 @@ class FragmentHandlerTest extends TestCase
     {
         $expectedRequest = Request::create('/');
         $handler = $this->getHandler(
-            $this->returnValue(new Response('foo')),
+            self::returnValue(new Response('foo')),
             [
                 '/',
-                $this->callback(function (Request $request) use ($expectedRequest) {
+                self::callback(function (Request $request) use ($expectedRequest) {
                     $expectedRequest->server->remove('REQUEST_TIME_FLOAT');
                     $request->server->remove('REQUEST_TIME_FLOAT');
 
@@ -83,19 +83,19 @@ class FragmentHandlerTest extends TestCase
             ]
         );
 
-        $this->assertEquals('foo', $handler->render('/', 'foo', ['foo' => 'foo']));
+        self::assertEquals('foo', $handler->render('/', 'foo', ['foo' => 'foo']));
     }
 
     protected function getHandler($returnValue, $arguments = [])
     {
-        $renderer = $this->createMock(FragmentRendererInterface::class);
+        $renderer = self::createMock(FragmentRendererInterface::class);
         $renderer
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getName')
             ->willReturn('foo')
         ;
         $e = $renderer
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('render')
             ->will($returnValue)
         ;

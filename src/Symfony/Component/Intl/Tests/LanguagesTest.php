@@ -1671,7 +1671,7 @@ class LanguagesTest extends ResourceBundleTestCase
 
     public function testGetLanguageCodes()
     {
-        $this->assertEquals(self::LANGUAGES, Languages::getLanguageCodes());
+        self::assertEquals(self::LANGUAGES, Languages::getLanguageCodes());
     }
 
     /**
@@ -1683,13 +1683,13 @@ class LanguagesTest extends ResourceBundleTestCase
 
         sort($languages);
 
-        $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::LANGUAGES));
+        self::assertNotEmpty($languages);
+        self::assertEmpty(array_diff($languages, self::LANGUAGES));
 
         foreach (Languages::getAlpha3Names($displayLocale) as $alpha3Code => $name) {
             $alpha2Code = self::ALPHA3_TO_ALPHA2[$alpha3Code] ?? null;
             if (null !== $alpha2Code) {
-                $this->assertSame($name, $names[$alpha2Code]);
+                self::assertSame($name, $names[$alpha2Code]);
             }
         }
     }
@@ -1698,7 +1698,7 @@ class LanguagesTest extends ResourceBundleTestCase
     {
         \Locale::setDefault('de_AT');
 
-        $this->assertSame(Languages::getNames('de_AT'), Languages::getNames());
+        self::assertSame(Languages::getNames('de_AT'), Languages::getNames());
     }
 
     /**
@@ -1709,7 +1709,7 @@ class LanguagesTest extends ResourceBundleTestCase
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(Languages::getNames($ofLocale), Languages::getNames($alias));
+        self::assertEquals(Languages::getNames($ofLocale), Languages::getNames($alias));
     }
 
     /**
@@ -1720,15 +1720,15 @@ class LanguagesTest extends ResourceBundleTestCase
         $names = Languages::getNames($displayLocale);
 
         foreach ($names as $language => $name) {
-            $this->assertSame($name, Languages::getName($language, $displayLocale));
+            self::assertSame($name, Languages::getName($language, $displayLocale));
         }
     }
 
     public function testLocalizedGetName()
     {
-        $this->assertSame('Australian English', Languages::getName('en_AU', 'en'));
-        $this->assertSame('Australian English', Languages::getName('en_AU_Zzzz', 'en'));
-        $this->assertSame('English', Languages::getName('en_ZZ', 'en'));
+        self::assertSame('Australian English', Languages::getName('en_AU', 'en'));
+        self::assertSame('Australian English', Languages::getName('en_AU_Zzzz', 'en'));
+        self::assertSame('English', Languages::getName('en_ZZ', 'en'));
     }
 
     public function testGetNameDefaultLocale()
@@ -1738,7 +1738,7 @@ class LanguagesTest extends ResourceBundleTestCase
         $names = Languages::getNames('de_AT');
 
         foreach ($names as $language => $name) {
-            $this->assertSame($name, Languages::getName($language));
+            self::assertSame($name, Languages::getName($language));
         }
     }
 
@@ -1755,7 +1755,7 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha3Code($language)
     {
-        $this->assertSame(self::ALPHA2_TO_ALPHA3[$language], Languages::getAlpha3Code($language));
+        self::assertSame(self::ALPHA2_TO_ALPHA3[$language], Languages::getAlpha3Code($language));
     }
 
     public function provideLanguagesWithoutAlpha3Equivalent()
@@ -1771,25 +1771,25 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($language)
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Languages::getAlpha3Code($language);
     }
 
     public function testGetNameWithInvalidLanguageCode()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Languages::getName('foo');
     }
 
     public function testExists()
     {
-        $this->assertTrue(Languages::exists('nl'));
-        $this->assertFalse(Languages::exists('zxx'));
+        self::assertTrue(Languages::exists('nl'));
+        self::assertFalse(Languages::exists('zxx'));
     }
 
     public function testGetAlpha3Codes()
     {
-        $this->assertSame(self::ALPHA3_CODES, Languages::getAlpha3Codes());
+        self::assertSame(self::ALPHA3_CODES, Languages::getAlpha3Codes());
     }
 
     public function provideLanguagesWithAlpha2Equivalent()
@@ -1805,7 +1805,7 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha2Code($language)
     {
-        $this->assertSame(self::ALPHA3_TO_ALPHA2[$language], Languages::getAlpha2Code($language));
+        self::assertSame(self::ALPHA3_TO_ALPHA2[$language], Languages::getAlpha2Code($language));
     }
 
     public function provideLanguagesWithoutAlpha2Equivalent()
@@ -1821,21 +1821,21 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha2CodeFailsIfNoAlpha2Equivalent($language)
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
         Languages::getAlpha2Code($language);
     }
 
     public function testAlpha3CodeExists()
     {
-        $this->assertTrue(Languages::alpha3CodeExists('nob'));
-        $this->assertTrue(Languages::alpha3CodeExists('nld'));
-        $this->assertTrue(Languages::alpha3CodeExists('ace'));
-        $this->assertTrue(Languages::alpha3CodeExists('nor'));
-        $this->assertTrue(Languages::alpha3CodeExists('twi'));
-        $this->assertTrue(Languages::alpha3CodeExists('tgl'));
-        $this->assertFalse(Languages::alpha3CodeExists('en'));
-        $this->assertFalse(Languages::alpha3CodeExists('foo'));
-        $this->assertFalse(Languages::alpha3CodeExists('zzz'));
+        self::assertTrue(Languages::alpha3CodeExists('nob'));
+        self::assertTrue(Languages::alpha3CodeExists('nld'));
+        self::assertTrue(Languages::alpha3CodeExists('ace'));
+        self::assertTrue(Languages::alpha3CodeExists('nor'));
+        self::assertTrue(Languages::alpha3CodeExists('twi'));
+        self::assertTrue(Languages::alpha3CodeExists('tgl'));
+        self::assertFalse(Languages::alpha3CodeExists('en'));
+        self::assertFalse(Languages::alpha3CodeExists('foo'));
+        self::assertFalse(Languages::alpha3CodeExists('zzz'));
     }
 
     /**
@@ -1846,13 +1846,13 @@ class LanguagesTest extends ResourceBundleTestCase
         $names = Languages::getAlpha3Names($displayLocale);
 
         foreach ($names as $language => $name) {
-            $this->assertSame($name, Languages::getAlpha3Name($language, $displayLocale));
+            self::assertSame($name, Languages::getAlpha3Name($language, $displayLocale));
         }
     }
 
     public function testGetAlpha3NameWithInvalidLanguageCode()
     {
-        $this->expectException(MissingResourceException::class);
+        self::expectException(MissingResourceException::class);
 
         Languages::getAlpha3Name('zzz');
     }
@@ -1866,13 +1866,13 @@ class LanguagesTest extends ResourceBundleTestCase
 
         sort($languages);
 
-        $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::ALPHA3_CODES));
+        self::assertNotEmpty($languages);
+        self::assertEmpty(array_diff($languages, self::ALPHA3_CODES));
 
         foreach (Languages::getNames($displayLocale) as $alpha2Code => $name) {
             $alpha3Code = self::ALPHA2_TO_ALPHA3[$alpha2Code] ?? (3 === \strlen($alpha2Code) ? $alpha2Code : null);
             if (null !== $alpha3Code) {
-                $this->assertSame($name, $names[$alpha3Code]);
+                self::assertSame($name, $names[$alpha3Code]);
             }
         }
     }

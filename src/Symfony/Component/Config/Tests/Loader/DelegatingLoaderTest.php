@@ -22,36 +22,36 @@ class DelegatingLoaderTest extends TestCase
     public function testConstructor()
     {
         new DelegatingLoader($resolver = new LoaderResolver());
-        $this->assertTrue(true, '__construct() takes a loader resolver as its first argument');
+        self::assertTrue(true, '__construct() takes a loader resolver as its first argument');
     }
 
     public function testGetSetResolver()
     {
         $resolver = new LoaderResolver();
         $loader = new DelegatingLoader($resolver);
-        $this->assertSame($resolver, $loader->getResolver(), '->getResolver() gets the resolver loader');
+        self::assertSame($resolver, $loader->getResolver(), '->getResolver() gets the resolver loader');
         $loader->setResolver($resolver = new LoaderResolver());
-        $this->assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
+        self::assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
     }
 
     public function testSupports()
     {
-        $loader1 = $this->createMock(LoaderInterface::class);
-        $loader1->expects($this->once())->method('supports')->willReturn(true);
+        $loader1 = self::createMock(LoaderInterface::class);
+        $loader1->expects(self::once())->method('supports')->willReturn(true);
         $loader = new DelegatingLoader(new LoaderResolver([$loader1]));
-        $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
+        self::assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
 
-        $loader1 = $this->createMock(LoaderInterface::class);
-        $loader1->expects($this->once())->method('supports')->willReturn(false);
+        $loader1 = self::createMock(LoaderInterface::class);
+        $loader1->expects(self::once())->method('supports')->willReturn(false);
         $loader = new DelegatingLoader(new LoaderResolver([$loader1]));
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        self::assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
     }
 
     public function testLoad()
     {
-        $loader = $this->createMock(LoaderInterface::class);
-        $loader->expects($this->once())->method('supports')->willReturn(true);
-        $loader->expects($this->once())->method('load');
+        $loader = self::createMock(LoaderInterface::class);
+        $loader->expects(self::once())->method('supports')->willReturn(true);
+        $loader->expects(self::once())->method('load');
         $resolver = new LoaderResolver([$loader]);
         $loader = new DelegatingLoader($resolver);
 
@@ -60,9 +60,9 @@ class DelegatingLoaderTest extends TestCase
 
     public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded()
     {
-        $this->expectException(LoaderLoadException::class);
-        $loader = $this->createMock(LoaderInterface::class);
-        $loader->expects($this->once())->method('supports')->willReturn(false);
+        self::expectException(LoaderLoadException::class);
+        $loader = self::createMock(LoaderInterface::class);
+        $loader->expects(self::once())->method('supports')->willReturn(false);
         $resolver = new LoaderResolver([$loader]);
         $loader = new DelegatingLoader($resolver);
 

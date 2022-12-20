@@ -24,7 +24,7 @@ final class SlackSectionBlockTest extends TestCase
         $section->field('section field');
         $section->accessory(new SlackImageBlockElement('https://example.com/image.jpg', 'an image'));
 
-        $this->assertSame([
+        self::assertSame([
             'type' => 'section',
             'text' => [
                 'type' => 'mrkdwn',
@@ -51,8 +51,8 @@ final class SlackSectionBlockTest extends TestCase
             $section->field($i);
         }
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Maximum number of fields should not exceed 10.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Maximum number of fields should not exceed 10.');
 
         $section->field('fail');
     }

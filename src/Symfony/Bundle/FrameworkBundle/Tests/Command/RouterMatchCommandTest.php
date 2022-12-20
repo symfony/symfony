@@ -30,8 +30,8 @@ class RouterMatchCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['path_info' => '/foo', 'foo'], ['decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('Route Name   | foo', $tester->getDisplay());
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('Route Name   | foo', $tester->getDisplay());
     }
 
     public function testWithNotMatchPath()
@@ -39,8 +39,8 @@ class RouterMatchCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['path_info' => '/test', 'foo'], ['decorated' => false]);
 
-        $this->assertEquals(1, $ret, 'Returns 1 in case of failure');
-        $this->assertStringContainsString('None of the routes match the path "/test"', $tester->getDisplay());
+        self::assertEquals(1, $ret, 'Returns 1 in case of failure');
+        self::assertStringContainsString('None of the routes match the path "/test"', $tester->getDisplay());
     }
 
     private function createCommandTester(): CommandTester
@@ -57,13 +57,13 @@ class RouterMatchCommandTest extends TestCase
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
         $requestContext = new RequestContext();
-        $router = $this->createMock(RouterInterface::class);
+        $router = self::createMock(RouterInterface::class);
         $router
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getRouteCollection')
             ->willReturn($routeCollection);
         $router
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getContext')
             ->willReturn($requestContext);
 
@@ -72,29 +72,29 @@ class RouterMatchCommandTest extends TestCase
 
     private function getKernel()
     {
-        $container = $this->createMock(ContainerInterface::class);
+        $container = self::createMock(ContainerInterface::class);
         $container
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('has')
             ->willReturnCallback(function ($id) {
                 return 'console.command_loader' !== $id;
             })
         ;
         $container
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('get')
             ->with('router')
             ->willReturn($this->getRouter())
         ;
 
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = self::createMock(KernelInterface::class);
         $kernel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getContainer')
             ->willReturn($container)
         ;
         $kernel
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getBundles')
             ->willReturn([])
         ;

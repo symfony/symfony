@@ -23,7 +23,7 @@ class ScopingHttpClientTest extends TestCase
         $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, []);
 
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $client->request('GET', '/foo');
     }
 
@@ -32,7 +32,7 @@ class ScopingHttpClientTest extends TestCase
         $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, ['.*' => ['base_uri' => 'http://example.com', 'query' => ['a' => 'b']]], '.*');
 
-        $this->assertSame('http://example.com/foo?f=g&a=b', $client->request('GET', '/foo?f=g')->getInfo('url'));
+        self::assertSame('http://example.com/foo?f=g&a=b', $client->request('GET', '/foo?f=g')->getInfo('url'));
     }
 
     /**
@@ -46,7 +46,7 @@ class ScopingHttpClientTest extends TestCase
         $response = $client->request('GET', $url);
         $requestedOptions = $response->getRequestOptions();
 
-        $this->assertSame($options[$regexp]['case'], $requestedOptions['case']);
+        self::assertSame($options[$regexp]['case'], $requestedOptions['case']);
     }
 
     public function provideMatchingUrls()
@@ -73,20 +73,20 @@ class ScopingHttpClientTest extends TestCase
 
         $response = $client->request('GET', 'http://example.com/foo-bar', ['json' => ['url' => 'http://example.com']]);
         $requestOptions = $response->getRequestOptions();
-        $this->assertSame('Content-Type: application/json', $requestOptions['headers'][1]);
+        self::assertSame('Content-Type: application/json', $requestOptions['headers'][1]);
         $requestJson = json_decode($requestOptions['body'], true);
-        $this->assertSame('http://example.com', $requestJson['url']);
-        $this->assertSame('X-FooBar: '.$defaultOptions['.*/foo-bar']['headers']['X-FooBar'], $requestOptions['headers'][0]);
+        self::assertSame('http://example.com', $requestJson['url']);
+        self::assertSame('X-FooBar: '.$defaultOptions['.*/foo-bar']['headers']['X-FooBar'], $requestOptions['headers'][0]);
 
         $response = $client->request('GET', 'http://example.com/bar-foo', ['headers' => ['X-FooBar' => 'unit-test']]);
         $requestOptions = $response->getRequestOptions();
-        $this->assertSame('X-FooBar: unit-test', $requestOptions['headers'][0]);
-        $this->assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
+        self::assertSame('X-FooBar: unit-test', $requestOptions['headers'][0]);
+        self::assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
 
         $response = $client->request('GET', 'http://example.com/foobar-foo', ['headers' => ['X-FooBar' => 'unit-test']]);
         $requestOptions = $response->getRequestOptions();
-        $this->assertSame('X-FooBar: unit-test', $requestOptions['headers'][0]);
-        $this->assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
+        self::assertSame('X-FooBar: unit-test', $requestOptions['headers'][0]);
+        self::assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
     }
 
     public function testForBaseUri()
@@ -94,10 +94,10 @@ class ScopingHttpClientTest extends TestCase
         $client = ScopingHttpClient::forBaseUri(new MockHttpClient(null, null), 'http://example.com/foo');
 
         $response = $client->request('GET', '/bar');
-        $this->assertSame('http://example.com/foo', implode('', $response->getRequestOptions()['base_uri']));
-        $this->assertSame('http://example.com/bar', $response->getInfo('url'));
+        self::assertSame('http://example.com/foo', implode('', $response->getRequestOptions()['base_uri']));
+        self::assertSame('http://example.com/bar', $response->getInfo('url'));
 
         $response = $client->request('GET', 'http://foo.bar/');
-        $this->assertNull($response->getRequestOptions()['base_uri']);
+        self::assertNull($response->getRequestOptions()['base_uri']);
     }
 }

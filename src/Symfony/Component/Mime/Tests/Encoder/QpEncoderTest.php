@@ -46,7 +46,7 @@ class QpEncoderTest extends TestCase
         $encoder = new QpEncoder();
         foreach (array_merge(range(33, 60), range(62, 126)) as $ordinal) {
             $char = \chr($ordinal);
-            $this->assertSame($char, $encoder->encodeString($char));
+            self::assertSame($char, $encoder->encodeString($char));
         }
     }
 
@@ -82,11 +82,11 @@ class QpEncoderTest extends TestCase
 
         // HT
         $string = 'a'.$HT.$HT."\r\n".'b';
-        $this->assertEquals('a'.$HT.'=09'."\r\n".'b', $encoder->encodeString($string));
+        self::assertEquals('a'.$HT.'=09'."\r\n".'b', $encoder->encodeString($string));
 
         // SPACE
         $string = 'a'.$SPACE.$SPACE."\r\n".'b';
-        $this->assertEquals('a'.$SPACE.'=20'."\r\n".'b', $encoder->encodeString($string));
+        self::assertEquals('a'.$SPACE.'=20'."\r\n".'b', $encoder->encodeString($string));
     }
 
     public function testCRLFIsLeftAlone()
@@ -120,7 +120,7 @@ class QpEncoderTest extends TestCase
 
         $encoder = new QpEncoder();
         $string = 'a'."\r\n".'b'."\r\n".'c'."\r\n";
-        $this->assertEquals($string, $encoder->encodeString($string));
+        self::assertEquals($string, $encoder->encodeString($string));
     }
 
     public function testLinesLongerThan76CharactersAreSoftBroken()
@@ -145,7 +145,7 @@ class QpEncoderTest extends TestCase
             }
             $output .= 'a';
         }
-        $this->assertEquals($output, $encoder->encodeString($input));
+        self::assertEquals($output, $encoder->encodeString($input));
     }
 
     public function testMaxLineLengthCanBeSpecified()
@@ -160,7 +160,7 @@ class QpEncoderTest extends TestCase
             }
             $output .= 'a';
         }
-        $this->assertEquals($output, $encoder->encodeString($input, 'utf-8', 0, 54));
+        self::assertEquals($output, $encoder->encodeString($input, 'utf-8', 0, 54));
     }
 
     public function testBytesBelowPermittedRangeAreEncoded()
@@ -169,7 +169,7 @@ class QpEncoderTest extends TestCase
         $encoder = new QpEncoder();
         foreach (range(0, 32) as $ordinal) {
             $char = \chr($ordinal);
-            $this->assertEquals(sprintf('=%02X', $ordinal), $encoder->encodeString($char));
+            self::assertEquals(sprintf('=%02X', $ordinal), $encoder->encodeString($char));
         }
     }
 
@@ -177,7 +177,7 @@ class QpEncoderTest extends TestCase
     {
         // According to Rule (1 & 2)
         $encoder = new QpEncoder();
-        $this->assertEquals('=3D', $encoder->encodeString('='));
+        self::assertEquals('=3D', $encoder->encodeString('='));
     }
 
     public function testBytesAbovePermittedRangeAreEncoded()
@@ -185,7 +185,7 @@ class QpEncoderTest extends TestCase
         // According to Rule (1 & 2)
         $encoder = new QpEncoder();
         foreach (range(127, 255) as $ordinal) {
-            $this->assertSame(sprintf('=%02X', $ordinal), $encoder->encodeString(\chr($ordinal), 'iso-8859-1'));
+            self::assertSame(sprintf('=%02X', $ordinal), $encoder->encodeString(\chr($ordinal), 'iso-8859-1'));
         }
     }
 
@@ -201,13 +201,13 @@ class QpEncoderTest extends TestCase
             }
             $output .= 'a';
         }
-        $this->assertEquals($output, $encoder->encodeString($input, 'utf-8', 22), 'First line should start at offset 22 so can only have max length 54');
+        self::assertEquals($output, $encoder->encodeString($input, 'utf-8', 22), 'First line should start at offset 22 so can only have max length 54');
     }
 
     public function testTextIsPreWrapped()
     {
         $encoder = new QpEncoder();
         $input = str_repeat('a', 70)."\r\n".str_repeat('a', 70)."\r\n".str_repeat('a', 70);
-        $this->assertEquals($input, $encoder->encodeString($input));
+        self::assertEquals($input, $encoder->encodeString($input));
     }
 }

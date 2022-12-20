@@ -30,7 +30,7 @@ class PlantUmlDumperTest extends TestCase
         // handle windows, and avoid to create more fixtures
         $dump = str_replace(\PHP_EOL, "\n", $dump.\PHP_EOL);
         $file = $this->getFixturePath($expectedFileName, PlantUmlDumper::WORKFLOW_TRANSITION);
-        $this->assertStringEqualsFile($file, $dump);
+        self::assertStringEqualsFile($file, $dump);
     }
 
     public function provideWorkflowDefinitionWithoutMarking()
@@ -53,7 +53,7 @@ class PlantUmlDumperTest extends TestCase
         // handle windows, and avoid to create more fixtures
         $dump = str_replace(\PHP_EOL, "\n", $dump.\PHP_EOL);
         $file = $this->getFixturePath($expectedFileName, PlantUmlDumper::STATEMACHINE_TRANSITION);
-        $this->assertStringEqualsFile($file, $dump);
+        self::assertStringEqualsFile($file, $dump);
     }
 
     public function provideStateMachineDefinitionWithoutMarking()

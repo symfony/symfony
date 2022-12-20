@@ -34,21 +34,21 @@ class UlidToStringTransformerTest extends TestCase
 
         $input = new Ulid($input);
 
-        $this->assertEquals($output, $transformer->transform($input));
+        self::assertEquals($output, $transformer->transform($input));
     }
 
     public function testTransformEmpty()
     {
         $transformer = new UlidToStringTransformer();
 
-        $this->assertNull($transformer->transform(null));
+        self::assertNull($transformer->transform(null));
     }
 
     public function testTransformExpectsUlid()
     {
         $transformer = new UlidToStringTransformer();
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $transformer->transform('1234');
     }
@@ -62,21 +62,21 @@ class UlidToStringTransformerTest extends TestCase
 
         $output = new Ulid($output);
 
-        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
+        self::assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformEmpty()
     {
         $reverseTransformer = new UlidToStringTransformer();
 
-        $this->assertNull($reverseTransformer->reverseTransform(''));
+        self::assertNull($reverseTransformer->reverseTransform(''));
     }
 
     public function testReverseTransformExpectsString()
     {
         $reverseTransformer = new UlidToStringTransformer();
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform(1234);
     }
@@ -85,7 +85,7 @@ class UlidToStringTransformerTest extends TestCase
     {
         $reverseTransformer = new UlidToStringTransformer();
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('1234');
     }

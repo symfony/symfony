@@ -21,11 +21,11 @@ class StopWorkersCommandTest extends TestCase
 {
     public function testItSetsCacheItem()
     {
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('set');
-        $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
-        $cachePool->expects($this->once())->method('save')->with($cacheItem);
+        $cachePool = self::createMock(CacheItemPoolInterface::class);
+        $cacheItem = self::createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::once())->method('set');
+        $cachePool->expects(self::once())->method('getItem')->willReturn($cacheItem);
+        $cachePool->expects(self::once())->method('save')->with($cacheItem);
 
         $command = new StopWorkersCommand($cachePool);
 

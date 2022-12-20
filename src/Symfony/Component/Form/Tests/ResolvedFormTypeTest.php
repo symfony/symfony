@@ -92,7 +92,7 @@ class ResolvedFormTypeTest extends TestCase
 
         $resolver = $this->resolvedType->getOptionsResolver();
 
-        $this->assertEquals($resolvedOptions, $resolver->resolve($givenOptions));
+        self::assertEquals($resolvedOptions, $resolver->resolve($givenOptions));
     }
 
     public function testCreateBuilder()
@@ -102,9 +102,9 @@ class ResolvedFormTypeTest extends TestCase
 
         $builder = $this->resolvedType->createBuilder($this->formFactory, 'name', $givenOptions);
 
-        $this->assertSame($this->resolvedType, $builder->getType());
-        $this->assertSame($resolvedOptions, $builder->getOptions());
-        $this->assertNull($builder->getDataClass());
+        self::assertSame($this->resolvedType, $builder->getType());
+        self::assertSame($resolvedOptions, $builder->getOptions());
+        self::assertNull($builder->getDataClass());
     }
 
     public function testCreateBuilderWithDataClassOption()
@@ -123,15 +123,15 @@ class ResolvedFormTypeTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->assertSame($this->resolvedType, $builder->getType());
-        $this->assertSame($resolvedOptions, $builder->getOptions());
-        $this->assertSame(\stdClass::class, $builder->getDataClass());
+        self::assertSame($this->resolvedType, $builder->getType());
+        self::assertSame($resolvedOptions, $builder->getOptions());
+        self::assertSame(\stdClass::class, $builder->getDataClass());
     }
 
     public function testFailsCreateBuilderOnInvalidFormOptionsResolution()
     {
-        $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage(sprintf('An error has occurred resolving the options of the form "%s": The required option "foo" is missing.', UsageTrackingFormType::class));
+        self::expectException(MissingOptionsException::class);
+        self::expectExceptionMessage(sprintf('An error has occurred resolving the options of the form "%s": The required option "foo" is missing.', UsageTrackingFormType::class));
 
         $this->resolvedType->createBuilder($this->formFactory, 'name');
     }
@@ -140,15 +140,15 @@ class ResolvedFormTypeTest extends TestCase
     {
         $this->resolvedType->buildForm(new FormBuilder(null, null, new EventDispatcher(), $this->formFactory), []);
 
-        $this->assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['buildForm']);
+        self::assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['buildForm']);
     }
 
     public function testCreateView()
     {
         $view = $this->resolvedType->createView($this->formFactory->create());
 
-        $this->assertInstanceOf(FormView::class, $view);
-        $this->assertNull($view->parent);
+        self::assertInstanceOf(FormView::class, $view);
+        self::assertNull($view->parent);
     }
 
     public function testCreateViewWithParent()
@@ -157,29 +157,29 @@ class ResolvedFormTypeTest extends TestCase
 
         $view = $this->resolvedType->createView($this->formFactory->create(), $parentView);
 
-        $this->assertInstanceOf(FormView::class, $view);
-        $this->assertSame($parentView, $view->parent);
+        self::assertInstanceOf(FormView::class, $view);
+        self::assertSame($parentView, $view->parent);
     }
 
     public function testBuildView()
     {
         $this->resolvedType->buildView(new FormView(), $this->formFactory->create(), []);
 
-        $this->assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['buildView']);
+        self::assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['buildView']);
     }
 
     public function testFinishView()
     {
         $this->resolvedType->finishView(new FormView(), $this->formFactory->create(), []);
 
-        $this->assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['finishView']);
+        self::assertSame([$this->parentType, $this->type, $this->extension1, $this->extension2], $this->calls['finishView']);
     }
 
     public function testGetBlockPrefix()
     {
         $resolvedType = new ResolvedFormType(new ConfigurableFormType());
 
-        $this->assertSame('configurable_form_prefix', $resolvedType->getBlockPrefix());
+        self::assertSame('configurable_form_prefix', $resolvedType->getBlockPrefix());
     }
 
     /**
@@ -189,7 +189,7 @@ class ResolvedFormTypeTest extends TestCase
     {
         $resolvedType = new ResolvedFormType(new $typeClass());
 
-        $this->assertSame($blockPrefix, $resolvedType->getBlockPrefix());
+        self::assertSame($blockPrefix, $resolvedType->getBlockPrefix());
     }
 
     public function provideTypeClassBlockPrefixTuples()

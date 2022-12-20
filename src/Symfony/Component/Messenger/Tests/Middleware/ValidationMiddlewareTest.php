@@ -27,12 +27,12 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
 
-        $validator = $this->createMock(ValidatorInterface::class);
+        $validator = self::createMock(ValidatorInterface::class);
         $validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($message)
-            ->willReturn($this->createMock(ConstraintViolationListInterface::class))
+            ->willReturn(self::createMock(ConstraintViolationListInterface::class))
         ;
 
         (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());
@@ -42,12 +42,12 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
     {
         $message = new DummyMessage('Hey');
         $envelope = (new Envelope($message))->with(new ValidationStamp($groups = ['Default', 'Extra']));
-        $validator = $this->createMock(ValidatorInterface::class);
+        $validator = self::createMock(ValidatorInterface::class);
         $validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($message, null, $groups)
-            ->willReturn($this->createMock(ConstraintViolationListInterface::class))
+            ->willReturn(self::createMock(ConstraintViolationListInterface::class))
         ;
 
         (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());
@@ -55,20 +55,20 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
 
     public function testValidationFailedException()
     {
-        $this->expectException(ValidationFailedException::class);
-        $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" failed validation.');
+        self::expectException(ValidationFailedException::class);
+        self::expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" failed validation.');
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
 
-        $violationList = $this->createMock(ConstraintViolationListInterface::class);
+        $violationList = self::createMock(ConstraintViolationListInterface::class);
         $violationList
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('count')
             ->willReturn(1)
         ;
-        $validator = $this->createMock(ValidatorInterface::class);
+        $validator = self::createMock(ValidatorInterface::class);
         $validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($message)
             ->willReturn($violationList)

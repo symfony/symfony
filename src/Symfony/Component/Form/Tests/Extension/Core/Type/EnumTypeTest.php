@@ -28,13 +28,13 @@ final class EnumTypeTest extends BaseTypeTest
 
     public function testClassOptionIsRequired()
     {
-        $this->expectException(MissingOptionsException::class);
+        self::expectException(MissingOptionsException::class);
         $this->factory->createNamed('name', $this->getTestedType());
     }
 
     public function testInvalidClassOption()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->createNamed('name', $this->getTestedType(), null, [
             'class' => 'foo',
         ]);
@@ -42,7 +42,7 @@ final class EnumTypeTest extends BaseTypeTest
 
     public function testInvalidClassOptionType()
     {
-        $this->expectException(InvalidOptionsException::class);
+        self::expectException(InvalidOptionsException::class);
         $this->factory->createNamed('name', $this->getTestedType(), null, [
             'class' => new \stdClass(),
         ]);
@@ -61,9 +61,9 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit($submittedData);
 
-        $this->assertEquals($expectedData, $form->getData());
-        $this->assertEquals($submittedData, $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertEquals($expectedData, $form->getData());
+        self::assertEquals($submittedData, $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     /**
@@ -79,9 +79,9 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit($submittedData);
 
-        $this->assertEquals($expectedData, $form->getData());
-        $this->assertEquals($submittedData, $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertEquals($expectedData, $form->getData());
+        self::assertEquals($submittedData, $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function provideSingleSubmitData(): iterable
@@ -115,9 +115,9 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit('foobar');
 
-        $this->assertNull($form->getData());
-        $this->assertEquals('foobar', $form->getViewData());
-        $this->assertFalse($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertEquals('foobar', $form->getViewData());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -126,10 +126,10 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertNull($form->getData());
-        $this->assertNull($form->getNormData());
-        $this->assertSame('', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertNull($form->getData());
+        self::assertNull($form->getNormData());
+        self::assertSame('', $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
@@ -143,9 +143,9 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame($emptyData, $form->getViewData());
-        $this->assertSame(Suit::Hearts, $form->getNormData());
-        $this->assertSame(Suit::Hearts, $form->getData());
+        self::assertSame($emptyData, $form->getViewData());
+        self::assertSame(Suit::Hearts, $form->getNormData());
+        self::assertSame(Suit::Hearts, $form->getData());
     }
 
     public function testSubmitMultipleChoiceWithEmptyData()
@@ -159,7 +159,7 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame([Suit::Diamonds], $form->getData());
+        self::assertSame([Suit::Diamonds], $form->getData());
     }
 
     public function testSubmitSingleChoiceExpandedWithEmptyData()
@@ -173,7 +173,7 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame(Suit::Hearts, $form->getData());
+        self::assertSame(Suit::Hearts, $form->getData());
     }
 
     public function testSubmitMultipleChoiceExpandedWithEmptyData()
@@ -187,7 +187,7 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit(null);
 
-        $this->assertSame([Suit::Spades], $form->getData());
+        self::assertSame([Suit::Spades], $form->getData());
     }
 
     /**
@@ -203,9 +203,9 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit($submittedValues);
 
-        $this->assertSame($expectedValues, $form->getData());
-        $this->assertSame($submittedValues, $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame($expectedValues, $form->getData());
+        self::assertSame($submittedValues, $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     /**
@@ -221,9 +221,9 @@ final class EnumTypeTest extends BaseTypeTest
 
         $form->submit($submittedValues);
 
-        $this->assertSame($expectedValues, $form->getData());
-        $this->assertSame($submittedValues, $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
+        self::assertSame($expectedValues, $form->getData());
+        self::assertSame($submittedValues, $form->getViewData());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function provideMultiSubmitData(): iterable
@@ -257,7 +257,7 @@ final class EnumTypeTest extends BaseTypeTest
 
         $view = $form->createView();
 
-        $this->assertSame('Yes', $view->children[0]->vars['label']);
+        self::assertSame('Yes', $view->children[0]->vars['label']);
     }
 
     protected function getTestOptions(): array

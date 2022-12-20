@@ -27,7 +27,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     /** @dataProvider getDefaultDomainAssignmentTestData */
     public function testDefaultDomainAssignment(Node $node)
     {
-        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment(self::createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag
@@ -38,8 +38,8 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         // visit tested node
         $enteredNode = $visitor->enterNode($node, $env);
         $leavedNode = $visitor->leaveNode($node, $env);
-        $this->assertSame($node, $enteredNode);
-        $this->assertSame($node, $leavedNode);
+        self::assertSame($node, $enteredNode);
+        self::assertSame($node, $leavedNode);
 
         // extracting tested node messages
         $visitor = new TranslationNodeVisitor();
@@ -47,13 +47,13 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
 
-        $this->assertEquals([[self::$message, self::$domain]], $visitor->getMessages());
+        self::assertEquals([[self::$message, self::$domain]], $visitor->getMessages());
     }
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
     public function testNewModuleWithoutDefaultDomainTag(Node $node)
     {
-        $env = new Environment($this->createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment(self::createMock(LoaderInterface::class), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag
@@ -64,8 +64,8 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         // visit tested node
         $enteredNode = $visitor->enterNode($node, $env);
         $leavedNode = $visitor->leaveNode($node, $env);
-        $this->assertSame($node, $enteredNode);
-        $this->assertSame($node, $leavedNode);
+        self::assertSame($node, $enteredNode);
+        self::assertSame($node, $leavedNode);
 
         // extracting tested node messages
         $visitor = new TranslationNodeVisitor();
@@ -73,7 +73,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
 
-        $this->assertEquals([[self::$message, null]], $visitor->getMessages());
+        self::assertEquals([[self::$message, null]], $visitor->getMessages());
     }
 
     public function getDefaultDomainAssignmentTestData()

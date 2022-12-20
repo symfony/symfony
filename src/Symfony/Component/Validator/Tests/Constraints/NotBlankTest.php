@@ -26,7 +26,7 @@ class NotBlankTest extends TestCase
     {
         $notBlank = new NotBlank(['normalizer' => 'trim']);
 
-        $this->assertEquals('trim', $notBlank->normalizer);
+        self::assertEquals('trim', $notBlank->normalizer);
     }
 
     /**
@@ -50,15 +50,15 @@ class NotBlankTest extends TestCase
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new NotBlank(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new NotBlank(['normalizer' => new \stdClass()]);
     }
 }

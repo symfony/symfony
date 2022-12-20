@@ -41,23 +41,20 @@ class AddRequestFormatsListenerTest extends TestCase
 
     public function testIsAnEventSubscriber()
     {
-        $this->assertInstanceOf(EventSubscriberInterface::class, $this->listener);
+        self::assertInstanceOf(EventSubscriberInterface::class, $this->listener);
     }
 
     public function testRegisteredEvent()
     {
-        $this->assertSame(
-            [KernelEvents::REQUEST => ['onKernelRequest', 100]],
-            AddRequestFormatsListener::getSubscribedEvents()
-        );
+        self::assertSame([KernelEvents::REQUEST => ['onKernelRequest', 100]], AddRequestFormatsListener::getSubscribedEvents());
     }
 
     public function testSetAdditionalFormats()
     {
-        $request = $this->createMock(Request::class);
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $request = self::createMock(Request::class);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $request->expects($this->once())
+        $request->expects(self::once())
             ->method('setFormat')
             ->with('csv', ['text/csv', 'text/plain']);
 

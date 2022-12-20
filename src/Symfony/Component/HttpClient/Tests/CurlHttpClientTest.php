@@ -24,11 +24,11 @@ class CurlHttpClientTest extends HttpClientTestCase
     {
         if (false !== strpos($testCase, 'Push')) {
             if (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304) {
-                $this->markTestSkipped('PHP 7.3.0 to 7.3.3 don\'t support HTTP/2 PUSH');
+                self::markTestSkipped('PHP 7.3.0 to 7.3.3 don\'t support HTTP/2 PUSH');
             }
 
             if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073D00 > ($v = curl_version())['version_number'] || !(\CURL_VERSION_HTTP2 & $v['features'])) {
-                $this->markTestSkipped('curl <7.61 is used or it is not compiled with support for HTTP/2 PUSH');
+                self::markTestSkipped('curl <7.61 is used or it is not compiled with support for HTTP/2 PUSH');
             }
         }
 
@@ -53,7 +53,7 @@ class CurlHttpClientTest extends HttpClientTestCase
     public function testTimeoutIsNotAFatalError()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Too transient on Windows');
+            self::markTestSkipped('Too transient on Windows');
         }
 
         parent::testTimeoutIsNotAFatalError();
@@ -79,14 +79,14 @@ class CurlHttpClientTest extends HttpClientTestCase
 
         $client->reset();
 
-        $this->assertSame(['application/json'], $response->getHeaders()['content-type']);
+        self::assertSame(['application/json'], $response->getHeaders()['content-type']);
     }
 
     public function testOverridingRefererUsingCurlOptions()
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot set "CURLOPT_REFERER" with "extra.curl", use option "headers" instead.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Cannot set "CURLOPT_REFERER" with "extra.curl", use option "headers" instead.');
 
         $httpClient->request('GET', 'http://localhost:8057/', [
             'extra' => [
@@ -100,8 +100,8 @@ class CurlHttpClientTest extends HttpClientTestCase
     public function testOverridingHttpMethodUsingCurlOptions()
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The HTTP method cannot be overridden using "extra.curl".');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The HTTP method cannot be overridden using "extra.curl".');
 
         $httpClient->request('POST', 'http://localhost:8057/', [
             'extra' => [
@@ -115,8 +115,8 @@ class CurlHttpClientTest extends HttpClientTestCase
     public function testOverridingInternalAttributesUsingCurlOptions()
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot set "CURLOPT_PRIVATE" with "extra.curl".');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Cannot set "CURLOPT_PRIVATE" with "extra.curl".');
 
         $httpClient->request('POST', 'http://localhost:8057/', [
             'extra' => [

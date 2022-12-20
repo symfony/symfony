@@ -21,19 +21,19 @@ class InstanceOfSupportStrategyTest extends TestCase
     {
         $strategy = new InstanceOfSupportStrategy(Subject1::class);
 
-        $this->assertTrue($strategy->supports($this->createWorkflow(), new Subject1()));
+        self::assertTrue($strategy->supports($this->createWorkflow(), new Subject1()));
     }
 
     public function testSupportsIfNotClassInstance()
     {
         $strategy = new InstanceOfSupportStrategy(Subject2::class);
 
-        $this->assertFalse($strategy->supports($this->createWorkflow(), new Subject1()));
+        self::assertFalse($strategy->supports($this->createWorkflow(), new Subject1()));
     }
 
     private function createWorkflow()
     {
-        return $this->getMockBuilder(Workflow::class)
+        return self::getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

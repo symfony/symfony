@@ -34,10 +34,10 @@ class HandlerFailedExceptionTest extends TestCase
         $handlerException = new HandlerFailedException($envelope, [$exception]);
         $originalException = $handlerException->getNestedExceptions()[0];
 
-        $this->assertIsInt($handlerException->getCode(), 'Exception codes must converts to int');
-        $this->assertSame(0, $handlerException->getCode(), 'String code (HY000) converted to int must be 0');
-        $this->assertIsString($originalException->getCode(), 'Original exception code still with original type (string)');
-        $this->assertSame($exception->getCode(), $originalException->getCode(), 'Original exception code is not modified');
+        self::assertIsInt($handlerException->getCode(), 'Exception codes must converts to int');
+        self::assertSame(0, $handlerException->getCode(), 'String code (HY000) converted to int must be 0');
+        self::assertIsString($originalException->getCode(), 'Original exception code still with original type (string)');
+        self::assertSame($exception->getCode(), $originalException->getCode(), 'Original exception code is not modified');
     }
 
     public function testThatNestedExceptionClassAreFound()
@@ -46,7 +46,7 @@ class HandlerFailedExceptionTest extends TestCase
         $exception = new MyOwnException();
 
         $handlerException = new HandlerFailedException($envelope, [new \LogicException(), $exception]);
-        $this->assertSame([$exception], $handlerException->getNestedExceptionOfClass(MyOwnException::class));
+        self::assertSame([$exception], $handlerException->getNestedExceptionOfClass(MyOwnException::class));
     }
 
     public function testThatNestedExceptionClassAreFoundWhenUsingChildException()
@@ -55,7 +55,7 @@ class HandlerFailedExceptionTest extends TestCase
         $exception = new MyOwnChildException();
 
         $handlerException = new HandlerFailedException($envelope, [$exception]);
-        $this->assertSame([$exception], $handlerException->getNestedExceptionOfClass(MyOwnException::class));
+        self::assertSame([$exception], $handlerException->getNestedExceptionOfClass(MyOwnException::class));
     }
 
     public function testThatNestedExceptionClassAreNotFoundIfNotPresent()
@@ -64,6 +64,6 @@ class HandlerFailedExceptionTest extends TestCase
         $exception = new \LogicException();
 
         $handlerException = new HandlerFailedException($envelope, [$exception]);
-        $this->assertCount(0, $handlerException->getNestedExceptionOfClass(MyOwnException::class));
+        self::assertCount(0, $handlerException->getNestedExceptionOfClass(MyOwnException::class));
     }
 }

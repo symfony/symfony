@@ -33,8 +33,8 @@ class LintCommandTest extends TestCase
 
         $ret = $tester->execute(['filename' => [$filename]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('OK in', trim($tester->getDisplay()));
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('OK in', trim($tester->getDisplay()));
     }
 
     public function testLintIncorrectFile()
@@ -44,13 +44,13 @@ class LintCommandTest extends TestCase
 
         $ret = $tester->execute(['filename' => [$filename]], ['decorated' => false]);
 
-        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertMatchesRegularExpression('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
+        self::assertEquals(1, $ret, 'Returns 1 in case of error');
+        self::assertMatchesRegularExpression('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
     public function testLintFileNotReadable()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
         unlink($filename);
@@ -65,8 +65,8 @@ class LintCommandTest extends TestCase
 
         $ret = $tester->execute(['filename' => [$filename]], ['decorated' => false]);
 
-        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertMatchesRegularExpression('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
+        self::assertEquals(1, $ret, 'Returns 1 in case of error');
+        self::assertMatchesRegularExpression('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
     /**
@@ -81,8 +81,8 @@ class LintCommandTest extends TestCase
 
         $ret = $tester->execute(['filename' => [$filename]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('OK in', trim($tester->getDisplay()));
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('OK in', trim($tester->getDisplay()));
     }
 
     public function testLintFileWithReportedDeprecation()
@@ -92,9 +92,9 @@ class LintCommandTest extends TestCase
 
         $ret = $tester->execute(['filename' => [$filename], '--show-deprecations' => true], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
-        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertMatchesRegularExpression('/ERROR  in \S+ \(line 1\)/', trim($tester->getDisplay()));
-        $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
+        self::assertEquals(1, $ret, 'Returns 1 in case of error');
+        self::assertMatchesRegularExpression('/ERROR  in \S+ \(line 1\)/', trim($tester->getDisplay()));
+        self::assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
     }
 
     /**
@@ -105,7 +105,7 @@ class LintCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute([], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertEquals(0, $ret, 'Returns 0 in case of success');
         self::assertStringContainsString('OK in', trim($tester->getDisplay()));
     }
 
@@ -142,12 +142,12 @@ class LintCommandTest extends TestCase
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $tester = new CommandCompletionTester($this->createCommand());
 
-        $this->assertSame($expectedSuggestions, $tester->complete($input));
+        self::assertSame($expectedSuggestions, $tester->complete($input));
     }
 
     public function provideCompletionSuggestions()

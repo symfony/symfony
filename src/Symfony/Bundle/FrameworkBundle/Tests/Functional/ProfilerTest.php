@@ -18,22 +18,22 @@ class ProfilerTest extends AbstractWebTestCase
      */
     public function testProfilerIsDisabled($insulate)
     {
-        $client = $this->createClient(['test_case' => 'Profiler', 'root_config' => 'config.yml']);
+        $client = self::createClient(['test_case' => 'Profiler', 'root_config' => 'config.yml']);
         if ($insulate) {
             $client->insulate();
         }
 
         $client->request('GET', '/profiler');
-        $this->assertNull($client->getProfile());
+        self::assertNull($client->getProfile());
 
         // enable the profiler for the next request
         $client->enableProfiler();
-        $this->assertNull($client->getProfile());
+        self::assertNull($client->getProfile());
         $client->request('GET', '/profiler');
-        $this->assertIsObject($client->getProfile());
+        self::assertIsObject($client->getProfile());
 
         $client->request('GET', '/profiler');
-        $this->assertNull($client->getProfile());
+        self::assertNull($client->getProfile());
     }
 
     /**
@@ -41,20 +41,20 @@ class ProfilerTest extends AbstractWebTestCase
      */
     public function testProfilerCollectParameter($insulate)
     {
-        $client = $this->createClient(['test_case' => 'ProfilerCollectParameter', 'root_config' => 'config.yml']);
+        $client = self::createClient(['test_case' => 'ProfilerCollectParameter', 'root_config' => 'config.yml']);
         if ($insulate) {
             $client->insulate();
         }
 
         $client->request('GET', '/profiler');
-        $this->assertNull($client->getProfile());
+        self::assertNull($client->getProfile());
 
         // enable the profiler for the next request
         $client->request('GET', '/profiler?profile=1');
-        $this->assertIsObject($client->getProfile());
+        self::assertIsObject($client->getProfile());
 
         $client->request('GET', '/profiler');
-        $this->assertNull($client->getProfile());
+        self::assertNull($client->getProfile());
     }
 
     public function getConfigs()

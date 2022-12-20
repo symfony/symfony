@@ -21,16 +21,16 @@ final class InspectUuidCommandTest extends TestCase
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
-        $this->assertSame(1, $commandTester->execute(['uuid' => 'foobar']));
-        $this->assertStringContainsString('Invalid UUID: "foobar"', $commandTester->getDisplay());
+        self::assertSame(1, $commandTester->execute(['uuid' => 'foobar']));
+        self::assertStringContainsString('Invalid UUID: "foobar"', $commandTester->getDisplay());
     }
 
     public function testNil()
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '00000000-0000-0000-0000-000000000000']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '00000000-0000-0000-0000-000000000000']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -41,16 +41,15 @@ final class InspectUuidCommandTest extends TestCase
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
     }
 
     public function testUnknown()
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-0dba-91e9-33af4c63f7ec']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-0dba-91e9-33af4c63f7ec']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -61,11 +60,10 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-2dba-91e9-33af4c63f7ec']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-2dba-91e9-33af4c63f7ec']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -76,11 +74,10 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-7dba-91e9-33af4c63f7ec']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-7dba-91e9-33af4c63f7ec']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -91,11 +88,10 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-cdba-91e9-33af4c63f7ec']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '461cc9b9-2397-cdba-91e9-33af4c63f7ec']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -106,16 +102,15 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
     }
 
     public function testV1()
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '4c8e3a2a-5993-11eb-a861-2bf05af69e52']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '4c8e3a2a-5993-11eb-a861-2bf05af69e52']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -128,16 +123,15 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
     }
 
     public function testV3()
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => 'd108a1a0-957e-3c77-b110-d3f912374439']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => 'd108a1a0-957e-3c77-b110-d3f912374439']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -148,16 +142,15 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
     }
 
     public function testV4()
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '705c6eab-a535-4f49-bd51-436d0e81206a']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '705c6eab-a535-4f49-bd51-436d0e81206a']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -168,16 +161,15 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
     }
 
     public function testV5()
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '4ec6c3ad-de94-5f75-b5f0-ad56661a30c4']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '4ec6c3ad-de94-5f75-b5f0-ad56661a30c4']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -188,16 +180,15 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
     }
 
     public function testV6()
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['uuid' => '1eb59937-b0a7-6288-a861-db3dc2d8d4db']));
-        $this->assertSame(<<<EOF
+        self::assertSame(0, $commandTester->execute(['uuid' => '1eb59937-b0a7-6288-a861-db3dc2d8d4db']));
+        self::assertSame(<<<EOF
  ----------------------- -------------------------------------- 
   Label                   Value                                 
  ----------------------- -------------------------------------- 
@@ -210,7 +201,6 @@ EOF
  ----------------------- -------------------------------------- 
 
 
-EOF
-            , $commandTester->getDisplay(true));
+EOF, $commandTester->getDisplay(true));
     }
 }

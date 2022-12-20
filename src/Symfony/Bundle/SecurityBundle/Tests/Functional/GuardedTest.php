@@ -18,20 +18,20 @@ class GuardedTest extends AbstractWebTestCase
 {
     public function testGuarded()
     {
-        $client = $this->createClient(['test_case' => 'Guarded', 'root_config' => 'config.yml']);
+        $client = self::createClient(['test_case' => 'Guarded', 'root_config' => 'config.yml']);
 
         $client->request('GET', '/');
 
-        $this->assertSame(418, $client->getResponse()->getStatusCode());
+        self::assertSame(418, $client->getResponse()->getStatusCode());
     }
 
     public function testManualLogin()
     {
-        $client = $this->createClient(['debug' => true, 'test_case' => 'Guarded', 'root_config' => 'config.yml']);
+        $client = self::createClient(['debug' => true, 'test_case' => 'Guarded', 'root_config' => 'config.yml']);
 
         $client->request('GET', '/manual_login');
         $client->request('GET', '/profile');
 
-        $this->assertSame('Username: Jane', $client->getResponse()->getContent());
+        self::assertSame('Username: Jane', $client->getResponse()->getContent());
     }
 }

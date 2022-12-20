@@ -24,7 +24,7 @@ class TranslatorBagTest extends TestCase
         $bag = new TranslatorBag();
         $bag->addCatalogue($catalogue);
 
-        $this->assertEquals(['en' => $messages], $this->getAllMessagesFromTranslatorBag($bag));
+        self::assertEquals(['en' => $messages], $this->getAllMessagesFromTranslatorBag($bag));
 
         $messages = ['domain1+intl-icu' => ['foo' => 'bar']] + $messages + [
                 'domain2+intl-icu' => ['bar' => 'foo'],
@@ -35,7 +35,7 @@ class TranslatorBagTest extends TestCase
         $bag = new TranslatorBag();
         $bag->addCatalogue($catalogue);
 
-        $this->assertEquals([
+        self::assertEquals([
             'en' => [
                 'domain1' => ['foo' => 'bar'],
                 'domain2' => ['bar' => 'foo'],
@@ -58,7 +58,7 @@ class TranslatorBagTest extends TestCase
 
         $bagResult = $bagA->diff($bagB);
 
-        $this->assertEquals([
+        self::assertEquals([
             'en' => [
                 'domain1' => ['bar' => 'bar'],
                 'domain2' => ['qux' => 'qux'],
@@ -80,7 +80,7 @@ class TranslatorBagTest extends TestCase
 
         $bagResult = $bagA->intersect($bagB);
 
-        $this->assertEquals([
+        self::assertEquals([
             'en' => [
                 'domain1' => ['foo' => 'foo'],
                 'domain2' => ['baz' => 'baz'],

@@ -73,14 +73,14 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
 
         $input = new \DateTime($input);
 
-        $this->assertEquals($output, $transformer->transform($input));
+        self::assertEquals($output, $transformer->transform($input));
     }
 
     public function testTransformEmpty()
     {
         $transformer = new DateTimeToStringTransformer();
 
-        $this->assertSame('', $transformer->transform(null));
+        self::assertSame('', $transformer->transform(null));
     }
 
     public function testTransformWithDifferentTimezones()
@@ -91,7 +91,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
         $output = $input->format('Y-m-d H:i:s');
         $input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertEquals($output, $transformer->transform($input));
+        self::assertEquals($output, $transformer->transform($input));
     }
 
     public function testTransformDateTimeImmutable()
@@ -102,14 +102,14 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
         $output = $input->format('Y-m-d H:i:s');
         $input = $input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertEquals($output, $transformer->transform($input));
+        self::assertEquals($output, $transformer->transform($input));
     }
 
     public function testTransformExpectsDateTime()
     {
         $transformer = new DateTimeToStringTransformer();
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $transformer->transform('1234');
     }
@@ -123,14 +123,14 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
 
         $output = new \DateTime($output);
 
-        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
+        self::assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformEmpty()
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->assertNull($reverseTransformer->reverseTransform(''));
+        self::assertNull($reverseTransformer->reverseTransform(''));
     }
 
     public function testReverseTransformWithDifferentTimezones()
@@ -141,14 +141,14 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
         $input = $output->format('Y-m-d H:i:s');
         $output->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
+        self::assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformExpectsString()
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform(1234);
     }
@@ -157,7 +157,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
     }
@@ -166,7 +166,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('2010-04-31');
     }

@@ -46,12 +46,12 @@ class ResolveHotPathPassTest extends TestCase
 
         (new ResolveHotPathPass())->process($container);
 
-        $this->assertFalse($container->getDefinition('lazy')->hasTag('container.hot_path'));
-        $this->assertTrue($container->getDefinition('bar')->hasTag('container.hot_path'));
-        $this->assertTrue($container->getDefinition('buz')->hasTag('container.hot_path'));
-        $this->assertFalse($container->getDefinition('baz')->hasTag('container.hot_path'));
-        $this->assertFalse($container->getDefinition('service_container')->hasTag('container.hot_path'));
-        $this->assertFalse($container->getDefinition('deprec_with_tag')->hasTag('container.hot_path'));
-        $this->assertFalse($container->getDefinition('deprec_ref_notag')->hasTag('container.hot_path'));
+        self::assertFalse($container->getDefinition('lazy')->hasTag('container.hot_path'));
+        self::assertTrue($container->getDefinition('bar')->hasTag('container.hot_path'));
+        self::assertTrue($container->getDefinition('buz')->hasTag('container.hot_path'));
+        self::assertFalse($container->getDefinition('baz')->hasTag('container.hot_path'));
+        self::assertFalse($container->getDefinition('service_container')->hasTag('container.hot_path'));
+        self::assertFalse($container->getDefinition('deprec_with_tag')->hasTag('container.hot_path'));
+        self::assertFalse($container->getDefinition('deprec_ref_notag')->hasTag('container.hot_path'));
     }
 }

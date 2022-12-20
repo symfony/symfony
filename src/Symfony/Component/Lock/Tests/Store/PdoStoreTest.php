@@ -59,19 +59,19 @@ class PdoStoreTest extends AbstractStoreTest
 
     public function testAbortAfterExpiration()
     {
-        $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
+        self::markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
     public function testInvalidTtl()
     {
-        $this->expectException(InvalidTtlException::class);
+        self::expectException(InvalidTtlException::class);
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }
 
     public function testInvalidTtlConstruct()
     {
-        $this->expectException(InvalidTtlException::class);
+        self::expectException(InvalidTtlException::class);
 
         return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0);
     }
@@ -87,7 +87,7 @@ class PdoStoreTest extends AbstractStoreTest
             $store = new PdoStore($dsn);
 
             $store->save($key);
-            $this->assertTrue($store->exists($key));
+            self::assertTrue($store->exists($key));
         } finally {
             if (null !== $file) {
                 @unlink($file);

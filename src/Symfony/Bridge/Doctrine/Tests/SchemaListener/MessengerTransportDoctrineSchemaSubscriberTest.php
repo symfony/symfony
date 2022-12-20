@@ -28,20 +28,20 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
     public function testPostGenerateSchema()
     {
         $schema = new Schema();
-        $dbalConnection = $this->createMock(Connection::class);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->once())
+        $dbalConnection = self::createMock(Connection::class);
+        $entityManager = self::createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
             ->method('getConnection')
             ->willReturn($dbalConnection);
         $event = new GenerateSchemaEventArgs($entityManager, $schema);
 
-        $doctrineTransport = $this->createMock(DoctrineTransport::class);
-        $doctrineTransport->expects($this->once())
+        $doctrineTransport = self::createMock(DoctrineTransport::class);
+        $doctrineTransport->expects(self::once())
             ->method('configureSchema')
             ->with($schema, $dbalConnection);
-        $otherTransport = $this->createMock(TransportInterface::class);
-        $otherTransport->expects($this->never())
-            ->method($this->anything());
+        $otherTransport = self::createMock(TransportInterface::class);
+        $otherTransport->expects(self::never())
+            ->method(self::anything());
 
         $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$doctrineTransport, $otherTransport]);
         $subscriber->postGenerateSchema($event);
@@ -49,30 +49,30 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
 
     public function testOnSchemaCreateTable()
     {
-        $platform = $this->createMock(AbstractPlatform::class);
+        $platform = self::createMock(AbstractPlatform::class);
         $table = new Table('queue_table');
         $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
 
-        $otherTransport = $this->createMock(TransportInterface::class);
-        $otherTransport->expects($this->never())
-            ->method($this->anything());
+        $otherTransport = self::createMock(TransportInterface::class);
+        $otherTransport->expects(self::never())
+            ->method(self::anything());
 
-        $doctrineTransport = $this->createMock(DoctrineTransport::class);
-        $doctrineTransport->expects($this->once())
+        $doctrineTransport = self::createMock(DoctrineTransport::class);
+        $doctrineTransport->expects(self::once())
             ->method('getExtraSetupSqlForTable')
             ->with($table)
             ->willReturn(['ALTER TABLE pizza ADD COLUMN extra_cheese boolean']);
 
         // we use the platform to generate the full create table sql
-        $platform->expects($this->once())
+        $platform->expects(self::once())
             ->method('getCreateTableSQL')
             ->with($table)
             ->willReturn('CREATE TABLE pizza (id integer NOT NULL)');
 
         $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$otherTransport, $doctrineTransport]);
         $subscriber->onSchemaCreateTable($event);
-        $this->assertTrue($event->isDefaultPrevented());
-        $this->assertSame([
+        self::assertTrue($event->isDefaultPrevented());
+        self::assertSame([
             'CREATE TABLE pizza (id integer NOT NULL)',
             'ALTER TABLE pizza ADD COLUMN extra_cheese boolean',
         ], $event->getSql());
@@ -80,20 +80,20 @@ class MessengerTransportDoctrineSchemaSubscriberTest extends TestCase
 
     public function testOnSchemaCreateTableNoExtraSql()
     {
-        $platform = $this->createMock(AbstractPlatform::class);
+        $platform = self::createMock(AbstractPlatform::class);
         $table = new Table('queue_table');
         $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
 
-        $doctrineTransport = $this->createMock(DoctrineTransport::class);
-        $doctrineTransport->expects($this->once())
+        $doctrineTransport = self::createMock(DoctrineTransport::class);
+        $doctrineTransport->expects(self::once())
             ->method('getExtraSetupSqlForTable')
             ->willReturn([]);
 
-        $platform->expects($this->never())
+        $platform->expects(self::never())
             ->method('getCreateTableSQL');
 
         $subscriber = new MessengerTransportDoctrineSchemaSubscriber([$doctrineTransport]);
         $subscriber->onSchemaCreateTable($event);
-        $this->assertFalse($event->isDefaultPrevented());
+        self::assertFalse($event->isDefaultPrevented());
     }
 }

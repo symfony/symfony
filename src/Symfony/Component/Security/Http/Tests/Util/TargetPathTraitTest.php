@@ -21,8 +21,8 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())
+        $session = self::createMock(SessionInterface::class);
+        $session->expects(self::once())
             ->method('set')
             ->with('_security.firewall_name.target_path', '/foo');
 
@@ -33,25 +33,22 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())
+        $session = self::createMock(SessionInterface::class);
+        $session->expects(self::once())
             ->method('get')
             ->with('_security.cool_firewall.target_path')
             ->willReturn('/bar');
 
         $actualUri = $obj->doGetTargetPath($session, 'cool_firewall');
-        $this->assertEquals(
-            '/bar',
-            $actualUri
-        );
+        self::assertEquals('/bar', $actualUri);
     }
 
     public function testRemoveTargetPath()
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())
+        $session = self::createMock(SessionInterface::class);
+        $session->expects(self::once())
             ->method('remove')
             ->with('_security.best_firewall.target_path');
 

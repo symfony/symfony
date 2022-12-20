@@ -31,7 +31,7 @@ class IniFileLoaderTest extends TestCase
     public function testIniFileCanBeLoaded()
     {
         $this->loader->load('parameters.ini');
-        $this->assertEquals(['foo' => 'bar', 'bar' => '%foo%'], $this->container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
+        self::assertEquals(['foo' => 'bar', 'bar' => '%foo%'], $this->container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
     }
 
     /**
@@ -41,7 +41,7 @@ class IniFileLoaderTest extends TestCase
     {
         $this->loader->load('types.ini');
         $parameters = $this->container->getParameterBag()->all();
-        $this->assertSame($value, $parameters[$key], '->load() converts values to PHP types');
+        self::assertSame($value, $parameters[$key], '->load() converts values to PHP types');
     }
 
     /**
@@ -51,11 +51,11 @@ class IniFileLoaderTest extends TestCase
     public function testTypeConversionsWithNativePhp($key, $value, $supported)
     {
         if (!$supported) {
-            $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
+            self::markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
         }
 
         $expected = parse_ini_file(__DIR__.'/../Fixtures/ini/types.ini', true, \INI_SCANNER_TYPED);
-        $this->assertSame($value, $expected['parameters'][$key], '->load() converts values to PHP types');
+        self::assertSame($value, $expected['parameters'][$key], '->load() converts values to PHP types');
     }
 
     public function getTypeConversions()
@@ -93,22 +93,22 @@ class IniFileLoaderTest extends TestCase
 
     public function testExceptionIsRaisedWhenIniFileDoesNotExist()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The file "foo.ini" does not exist (in:');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('The file "foo.ini" does not exist (in:');
         $this->loader->load('foo.ini');
     }
 
     public function testExceptionIsRaisedWhenIniFileCannotBeParsed()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "nonvalid.ini" file is not valid.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "nonvalid.ini" file is not valid.');
         @$this->loader->load('nonvalid.ini');
     }
 
     public function testExceptionIsRaisedWhenIniFileIsAlmostValid()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "almostvalid.ini" file is not valid.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "almostvalid.ini" file is not valid.');
         @$this->loader->load('almostvalid.ini');
     }
 
@@ -116,9 +116,9 @@ class IniFileLoaderTest extends TestCase
     {
         $loader = new IniFileLoader(new ContainerBuilder(), new FileLocator());
 
-        $this->assertTrue($loader->supports('foo.ini'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
-        $this->assertTrue($loader->supports('with_wrong_ext.yml', 'ini'), '->supports() returns true if the resource with forced type is loadable');
+        self::assertTrue($loader->supports('foo.ini'), '->supports() returns true if the resource is loadable');
+        self::assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        self::assertTrue($loader->supports('with_wrong_ext.yml', 'ini'), '->supports() returns true if the resource with forced type is loadable');
     }
 
     public function testWhenEnv()
@@ -127,6 +127,6 @@ class IniFileLoaderTest extends TestCase
         $loader = new IniFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures/').'/ini'), 'some-env');
         $loader->load('when-env.ini');
 
-        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
+        self::assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
     }
 }

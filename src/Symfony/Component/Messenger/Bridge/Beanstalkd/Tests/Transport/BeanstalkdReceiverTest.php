@@ -32,47 +32,47 @@ final class BeanstalkdReceiverTest extends TestCase
         $tube = 'foo bar';
 
         $beanstalkdEnvelope = $this->createBeanstalkdEnvelope();
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('get')->willReturn($beanstalkdEnvelope);
-        $connection->expects($this->once())->method('getTube')->willReturn($tube);
+        $connection = self::createMock(Connection::class);
+        $connection->expects(self::once())->method('get')->willReturn($beanstalkdEnvelope);
+        $connection->expects(self::once())->method('getTube')->willReturn($tube);
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->get();
-        $this->assertCount(1, $actualEnvelopes);
-        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+        self::assertCount(1, $actualEnvelopes);
+        self::assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
 
         /** @var BeanstalkdReceivedStamp $receivedStamp */
         $receivedStamp = $actualEnvelopes[0]->last(BeanstalkdReceivedStamp::class);
 
-        $this->assertInstanceOf(BeanstalkdReceivedStamp::class, $receivedStamp);
-        $this->assertSame('1', $receivedStamp->getId());
-        $this->assertSame($tube, $receivedStamp->getTube());
+        self::assertInstanceOf(BeanstalkdReceivedStamp::class, $receivedStamp);
+        self::assertSame('1', $receivedStamp->getId());
+        self::assertSame($tube, $receivedStamp->getTube());
     }
 
     public function testItReturnsEmptyArrayIfThereAreNoMessages()
     {
         $serializer = $this->createSerializer();
 
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('get')->willReturn(null);
+        $connection = self::createMock(Connection::class);
+        $connection->expects(self::once())->method('get')->willReturn(null);
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->get();
-        $this->assertIsArray($actualEnvelopes);
-        $this->assertCount(0, $actualEnvelopes);
+        self::assertIsArray($actualEnvelopes);
+        self::assertCount(0, $actualEnvelopes);
     }
 
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
     {
-        $this->expectException(MessageDecodingFailedException::class);
+        self::expectException(MessageDecodingFailedException::class);
 
-        $serializer = $this->createMock(PhpSerializer::class);
-        $serializer->expects($this->once())->method('decode')->willThrowException(new MessageDecodingFailedException());
+        $serializer = self::createMock(PhpSerializer::class);
+        $serializer->expects(self::once())->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $beanstalkdEnvelope = $this->createBeanstalkdEnvelope();
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('get')->willReturn($beanstalkdEnvelope);
-        $connection->expects($this->once())->method('reject');
+        $connection = self::createMock(Connection::class);
+        $connection->expects(self::once())->method('get')->willReturn($beanstalkdEnvelope);
+        $connection->expects(self::once())->method('reject');
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
         $receiver->get();

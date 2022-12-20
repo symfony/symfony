@@ -21,14 +21,14 @@ class WeekToArrayTransformerTest extends TestCase
     {
         $transformer = new WeekToArrayTransformer();
 
-        $this->assertSame(['year' => 2019, 'week' => 1], $transformer->transform('2019-W01'));
+        self::assertSame(['year' => 2019, 'week' => 1], $transformer->transform('2019-W01'));
     }
 
     public function testTransformEmpty()
     {
         $transformer = new WeekToArrayTransformer();
 
-        $this->assertSame(['year' => null, 'week' => null], $transformer->transform(null));
+        self::assertSame(['year' => null, 'week' => null], $transformer->transform(null));
     }
 
     /**
@@ -36,8 +36,8 @@ class WeekToArrayTransformerTest extends TestCase
      */
     public function testTransformationFailures($input, string $message)
     {
-        $this->expectException(TransformationFailedException::class);
-        $this->expectExceptionMessage($message);
+        self::expectException(TransformationFailedException::class);
+        self::expectExceptionMessage($message);
 
         $transformer = new WeekToArrayTransformer();
         $transformer->transform($input);
@@ -60,7 +60,7 @@ class WeekToArrayTransformerTest extends TestCase
             'week' => 1,
         ];
 
-        $this->assertEquals('2019-W01', $transformer->reverseTransform($input));
+        self::assertEquals('2019-W01', $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyEmpty()
@@ -72,21 +72,21 @@ class WeekToArrayTransformerTest extends TestCase
             'week' => null,
         ];
 
-        $this->assertNull($transformer->reverseTransform($input));
+        self::assertNull($transformer->reverseTransform($input));
     }
 
     public function testReverseTransformNull()
     {
         $transformer = new WeekToArrayTransformer();
 
-        $this->assertNull($transformer->reverseTransform(null));
+        self::assertNull($transformer->reverseTransform(null));
     }
 
     public function testReverseTransformEmpty()
     {
         $transformer = new WeekToArrayTransformer();
 
-        $this->assertNull($transformer->reverseTransform([]));
+        self::assertNull($transformer->reverseTransform([]));
     }
 
     /**
@@ -94,8 +94,8 @@ class WeekToArrayTransformerTest extends TestCase
      */
     public function testReverseTransformFailures($input, string $message)
     {
-        $this->expectException(TransformationFailedException::class);
-        $this->expectExceptionMessage($message);
+        self::expectException(TransformationFailedException::class);
+        self::expectExceptionMessage($message);
 
         $transformer = new WeekToArrayTransformer();
         $transformer->reverseTransform($input);

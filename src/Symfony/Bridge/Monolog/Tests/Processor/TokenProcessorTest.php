@@ -30,38 +30,38 @@ class TokenProcessorTest extends TestCase
     public function testLegacyProcessor()
     {
         if (method_exists(UsernamePasswordToken::class, 'getUserIdentifier')) {
-            $this->markTestSkipped('This test requires symfony/security-core <5.3');
+            self::markTestSkipped('This test requires symfony/security-core <5.3');
         }
 
         $token = new UsernamePasswordToken('user', 'password', 'provider', ['ROLE_USER']);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 
         $processor = new TokenProcessor($tokenStorage);
         $record = ['extra' => []];
         $record = $processor($record);
 
-        $this->assertArrayHasKey('token', $record['extra']);
-        $this->assertEquals($token->getUsername(), $record['extra']['token']['username']);
-        $this->assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
+        self::assertArrayHasKey('token', $record['extra']);
+        self::assertEquals($token->getUsername(), $record['extra']['token']['username']);
+        self::assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
     }
 
     public function testProcessor()
     {
         if (!method_exists(UsernamePasswordToken::class, 'getUserIdentifier')) {
-            $this->markTestSkipped('This test requires symfony/security-core 5.3+');
+            self::markTestSkipped('This test requires symfony/security-core 5.3+');
         }
 
         $token = new UsernamePasswordToken(new InMemoryUser('user', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 
         $processor = new TokenProcessor($tokenStorage);
         $record = ['extra' => []];
         $record = $processor($record);
 
-        $this->assertArrayHasKey('token', $record['extra']);
-        $this->assertEquals($token->getUserIdentifier(), $record['extra']['token']['user_identifier']);
-        $this->assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
+        self::assertArrayHasKey('token', $record['extra']);
+        self::assertEquals($token->getUserIdentifier(), $record['extra']['token']['user_identifier']);
+        self::assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
     }
 }

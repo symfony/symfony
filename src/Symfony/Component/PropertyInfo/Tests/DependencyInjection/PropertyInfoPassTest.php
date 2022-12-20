@@ -39,7 +39,7 @@ class PropertyInfoPassTest extends TestCase
             new Reference('n2'),
             new Reference('n3'),
         ]);
-        $this->assertEquals($expected, $definition->getArgument($index));
+        self::assertEquals($expected, $definition->getArgument($index));
     }
 
     public function provideTags()
@@ -62,10 +62,10 @@ class PropertyInfoPassTest extends TestCase
         $propertyInfoPass = new PropertyInfoPass();
         $propertyInfoPass->process($container);
 
-        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(0));
-        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(1));
-        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(2));
-        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(3));
-        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(4));
+        self::assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(0));
+        self::assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(1));
+        self::assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(2));
+        self::assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(3));
+        self::assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(4));
     }
 }

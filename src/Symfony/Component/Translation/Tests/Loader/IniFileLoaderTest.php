@@ -24,9 +24,9 @@ class IniFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/resources.ini';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        self::assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadDoesNothingIfEmpty()
@@ -35,14 +35,14 @@ class IniFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/empty.ini';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals([], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        self::assertEquals([], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(NotFoundResourceException::class);
+        self::expectException(NotFoundResourceException::class);
         $loader = new IniFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.ini';
         $loader->load($resource, 'en', 'domain1');

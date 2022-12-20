@@ -29,16 +29,16 @@ class StoreFactoryTest extends TestCase
     {
         $store = StoreFactory::createStore($connection);
 
-        $this->assertInstanceOf($expectedStoreClass, $store);
+        self::assertInstanceOf($expectedStoreClass, $store);
     }
 
     public function validConnections()
     {
         if (class_exists(\Redis::class)) {
-            yield [$this->createMock(\Redis::class), RedisStore::class];
+            yield [self::createMock(\Redis::class), RedisStore::class];
         }
         if (class_exists(RedisProxy::class)) {
-            yield [$this->createMock(RedisProxy::class), RedisStore::class];
+            yield [self::createMock(RedisProxy::class), RedisStore::class];
         }
         yield [new \Predis\Client(), RedisStore::class];
         if (class_exists(\Redis::class) && class_exists(AbstractAdapter::class)) {

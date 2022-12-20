@@ -28,7 +28,7 @@ class UrlPackageTest extends TestCase
     public function testGetUrl($baseUrls, $format, $path, $expected)
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format));
-        $this->assertSame($expected, $package->getUrl($path));
+        self::assertSame($expected, $package->getUrl($path));
     }
 
     public function getConfigs()
@@ -69,7 +69,7 @@ class UrlPackageTest extends TestCase
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format), $this->getContext($secure));
 
-        $this->assertSame($expected, $package->getUrl($path));
+        self::assertSame($expected, $package->getUrl($path));
     }
 
     public function getContextConfigs()
@@ -90,18 +90,18 @@ class UrlPackageTest extends TestCase
 
     public function testVersionStrategyGivesAbsoluteURL()
     {
-        $versionStrategy = $this->createMock(VersionStrategyInterface::class);
-        $versionStrategy->expects($this->any())
+        $versionStrategy = self::createMock(VersionStrategyInterface::class);
+        $versionStrategy->expects(self::any())
             ->method('applyVersion')
             ->willReturn('https://cdn.com/bar/main.css');
         $package = new UrlPackage('https://example.com', $versionStrategy);
 
-        $this->assertSame('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
+        self::assertSame('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
     }
 
     public function testNoBaseUrls()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
         new UrlPackage([], new EmptyVersionStrategy());
     }
 
@@ -110,7 +110,7 @@ class UrlPackageTest extends TestCase
      */
     public function testWrongBaseUrl($baseUrls)
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         new UrlPackage($baseUrls, new EmptyVersionStrategy());
     }
 
@@ -124,8 +124,8 @@ class UrlPackageTest extends TestCase
 
     private function getContext($secure)
     {
-        $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->any())->method('isSecure')->willReturn($secure);
+        $context = self::createMock(ContextInterface::class);
+        $context->expects(self::any())->method('isSecure')->willReturn($secure);
 
         return $context;
     }

@@ -31,9 +31,9 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf(ContainerAwareController::class, $controller[0]);
-        $this->assertInstanceOf(ContainerInterface::class, $controller[0]->getContainer());
-        $this->assertSame('testAction', $controller[1]);
+        self::assertInstanceOf(ContainerAwareController::class, $controller[0]);
+        self::assertInstanceOf(ContainerInterface::class, $controller[0]->getContainer());
+        self::assertSame('testAction', $controller[1]);
     }
 
     public function testGetControllerOnContainerAwareInvokable()
@@ -44,8 +44,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf(ContainerAwareController::class, $controller);
-        $this->assertInstanceOf(ContainerInterface::class, $controller->getContainer());
+        self::assertInstanceOf(ContainerAwareController::class, $controller);
+        self::assertInstanceOf(ContainerInterface::class, $controller->getContainer());
     }
 
     public function testContainerAwareControllerGetsContainerWhenNotSet()
@@ -62,14 +62,14 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::testAction');
 
-        $this->assertSame([$controller, 'testAction'], $resolver->getController($request));
-        $this->assertSame($container, $controller->getContainer());
+        self::assertSame([$controller, 'testAction'], $resolver->getController($request));
+        self::assertSame($container, $controller->getContainer());
     }
 
     public function testAbstractControllerGetsContainerWhenNotSet()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\TestAbstractController" has no container set, did you forget to define it as a service subscriber?');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\TestAbstractController" has no container set, did you forget to define it as a service subscriber?');
 
         class_exists(AbstractControllerTest::class);
 
@@ -83,14 +83,14 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
 
-        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
-        $this->assertSame($container, $controller->setContainer($container));
+        self::assertSame([$controller, 'fooAction'], $resolver->getController($request));
+        self::assertSame($container, $controller->setContainer($container));
     }
 
     public function testAbstractControllerServiceWithFqcnIdGetsContainerWhenNotSet()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\DummyController" has no container set, did you forget to define it as a service subscriber?');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\DummyController" has no container set, did you forget to define it as a service subscriber?');
 
         class_exists(AbstractControllerTest::class);
 
@@ -104,8 +104,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', DummyController::class.'::fooAction');
 
-        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
-        $this->assertSame($container, $controller->getContainer());
+        self::assertSame([$controller, 'fooAction'], $resolver->getController($request));
+        self::assertSame($container, $controller->getContainer());
     }
 
     public function testAbstractControllerGetsNoContainerWhenSet()
@@ -124,8 +124,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
 
-        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
-        $this->assertSame($controllerContainer, $controller->setContainer($container));
+        self::assertSame([$controller, 'fooAction'], $resolver->getController($request));
+        self::assertSame($controllerContainer, $controller->setContainer($container));
     }
 
     public function testAbstractControllerServiceWithFcqnIdGetsNoContainerWhenSet()
@@ -144,8 +144,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', DummyController::class.'::fooAction');
 
-        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
-        $this->assertSame($controllerContainer, $controller->getContainer());
+        self::assertSame([$controller, 'fooAction'], $resolver->getController($request));
+        self::assertSame($controllerContainer, $controller->getContainer());
     }
 
     protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null)
@@ -159,12 +159,12 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
     protected function createMockParser()
     {
-        return $this->createMock(ControllerNameParser::class);
+        return self::createMock(ControllerNameParser::class);
     }
 
     protected function createMockContainer()
     {
-        return $this->createMock(ContainerInterface::class);
+        return self::createMock(ContainerInterface::class);
     }
 }
 

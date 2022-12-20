@@ -31,7 +31,7 @@ class MailjetApiTransportTest extends TestCase
      */
     public function testToString(MailjetApiTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -63,39 +63,39 @@ class MailjetApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('Messages', $payload);
-        $this->assertNotEmpty($payload['Messages']);
+        self::assertArrayHasKey('Messages', $payload);
+        self::assertNotEmpty($payload['Messages']);
 
         $message = $payload['Messages'][0];
-        $this->assertArrayHasKey('Subject', $message);
-        $this->assertEquals('Sending email to mailjet API', $message['Subject']);
+        self::assertArrayHasKey('Subject', $message);
+        self::assertEquals('Sending email to mailjet API', $message['Subject']);
 
-        $this->assertArrayHasKey('Headers', $message);
+        self::assertArrayHasKey('Headers', $message);
         $headers = $message['Headers'];
-        $this->assertArrayHasKey('X-authorized-header', $headers);
-        $this->assertEquals('authorized', $headers['X-authorized-header']);
-        $this->assertArrayNotHasKey('x-mj-templatelanguage', $headers);
-        $this->assertArrayNotHasKey('X-MJ-TemplateLanguage', $headers);
+        self::assertArrayHasKey('X-authorized-header', $headers);
+        self::assertEquals('authorized', $headers['X-authorized-header']);
+        self::assertArrayNotHasKey('x-mj-templatelanguage', $headers);
+        self::assertArrayNotHasKey('X-MJ-TemplateLanguage', $headers);
 
-        $this->assertArrayHasKey('From', $message);
+        self::assertArrayHasKey('From', $message);
         $sender = $message['From'];
-        $this->assertArrayHasKey('Email', $sender);
-        $this->assertEquals('foo@example.com', $sender['Email']);
+        self::assertArrayHasKey('Email', $sender);
+        self::assertEquals('foo@example.com', $sender['Email']);
 
-        $this->assertArrayHasKey('To', $message);
+        self::assertArrayHasKey('To', $message);
         $recipients = $message['To'];
-        $this->assertIsArray($recipients);
-        $this->assertCount(2, $recipients);
-        $this->assertEquals('bar@example.com', $recipients[0]['Email']);
-        $this->assertEquals('', $recipients[0]['Name']); // For Recipients, even if the name is filled, it is empty
-        $this->assertEquals('baz@example.com', $recipients[1]['Email']);
-        $this->assertEquals('', $recipients[1]['Name']);
+        self::assertIsArray($recipients);
+        self::assertCount(2, $recipients);
+        self::assertEquals('bar@example.com', $recipients[0]['Email']);
+        self::assertEquals('', $recipients[0]['Name']); // For Recipients, even if the name is filled, it is empty
+        self::assertEquals('baz@example.com', $recipients[1]['Email']);
+        self::assertEquals('', $recipients[1]['Name']);
 
-        $this->assertArrayHasKey('ReplyTo', $message);
+        self::assertArrayHasKey('ReplyTo', $message);
         $replyTo = $message['ReplyTo'];
-        $this->assertIsArray($replyTo);
-        $this->assertEquals('qux@example.com', $replyTo['Email']);
-        $this->assertEquals('Qux', $replyTo['Name']);
+        self::assertIsArray($replyTo);
+        self::assertEquals('qux@example.com', $replyTo['Email']);
+        self::assertEquals('Qux', $replyTo['Name']);
     }
 
     public function testSendSuccess()
@@ -123,8 +123,8 @@ class MailjetApiTransportTest extends TestCase
             ->text('foobar');
 
         $sentMessage = $transport->send($email);
-        $this->assertInstanceOf(SentMessage::class, $sentMessage);
-        $this->assertSame('baz', $sentMessage->getMessageId());
+        self::assertInstanceOf(SentMessage::class, $sentMessage);
+        self::assertSame('baz', $sentMessage->getMessageId());
     }
 
     public function testSendWithDecodingException()
@@ -141,9 +141,7 @@ class MailjetApiTransportTest extends TestCase
             ->to('bar@example.com')
             ->text('foobar');
 
-        $this->expectExceptionObject(
-            new HttpTransportException('Unable to send an email: "cannot-be-decoded" (code 200).', $response)
-        );
+        self::expectExceptionObject(new HttpTransportException('Unable to send an email: "cannot-be-decoded" (code 200).', $response));
 
         $transport->send($email);
     }
@@ -162,9 +160,7 @@ class MailjetApiTransportTest extends TestCase
             ->to('bar@example.com')
             ->text('foobar');
 
-        $this->expectExceptionObject(
-            new HttpTransportException('Could not reach the remote Mailjet server.', $response)
-        );
+        self::expectExceptionObject(new HttpTransportException('Could not reach the remote Mailjet server.', $response));
 
         $transport->send($email);
     }
@@ -200,9 +196,7 @@ class MailjetApiTransportTest extends TestCase
             ->to('bar@example.com')
             ->text('foobar');
 
-        $this->expectExceptionObject(
-            new HttpTransportException('Unable to send an email: "The To is mandatory but missing from the input" (code 400).', $response)
-        );
+        self::expectExceptionObject(new HttpTransportException('Unable to send an email: "The To is mandatory but missing from the input" (code 400).', $response));
 
         $transport->send($email);
     }
@@ -221,9 +215,7 @@ class MailjetApiTransportTest extends TestCase
             ->to('bar@example.com')
             ->text('foobar');
 
-        $this->expectExceptionObject(
-            new HttpTransportException('Unable to send an email: "response-content" (code 400).', $response)
-        );
+        self::expectExceptionObject(new HttpTransportException('Unable to send an email: "response-content" (code 400).', $response));
 
         $transport->send($email);
     }
@@ -247,9 +239,7 @@ class MailjetApiTransportTest extends TestCase
             ->to('bar@example.com')
             ->text('foobar');
 
-        $this->expectExceptionObject(
-            new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $json), $response)
-        );
+        self::expectExceptionObject(new HttpTransportException(sprintf('Unable to send an email: "%s" malformed api response.', $json), $response));
 
         $transport->send($email);
     }
@@ -290,7 +280,7 @@ class MailjetApiTransportTest extends TestCase
         $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
         $method->setAccessible(true);
 
-        $this->expectExceptionMessage('Mailjet\'s API only supports one Reply-To email, 2 given.');
+        self::expectExceptionMessage('Mailjet\'s API only supports one Reply-To email, 2 given.');
 
         $method->invoke($transport, $email, $envelope);
     }

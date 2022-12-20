@@ -36,24 +36,24 @@ class DataCollectorTypeExtensionTest extends TestCase
 
     public function testGetExtendedType()
     {
-        $this->assertEquals(['Symfony\Component\Form\Extension\Core\Type\FormType'], $this->extension::getExtendedTypes());
+        self::assertEquals(['Symfony\Component\Form\Extension\Core\Type\FormType'], $this->extension::getExtendedTypes());
     }
 
     public function testBuildForm()
     {
         $eventDispatcher = new EventDispatcher();
-        $this->assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SET_DATA));
-        $this->assertFalse($eventDispatcher->hasListeners(FormEvents::POST_SET_DATA));
-        $this->assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SUBMIT));
-        $this->assertFalse($eventDispatcher->hasListeners(FormEvents::SUBMIT));
-        $this->assertFalse($eventDispatcher->hasListeners(FormEvents::POST_SUBMIT));
+        self::assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SET_DATA));
+        self::assertFalse($eventDispatcher->hasListeners(FormEvents::POST_SET_DATA));
+        self::assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SUBMIT));
+        self::assertFalse($eventDispatcher->hasListeners(FormEvents::SUBMIT));
+        self::assertFalse($eventDispatcher->hasListeners(FormEvents::POST_SUBMIT));
 
         $this->extension->buildForm(new FormBuilder(null, null, $eventDispatcher, new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory()))), []);
 
-        $this->assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SET_DATA));
-        $this->assertTrue($eventDispatcher->hasListeners(FormEvents::POST_SET_DATA));
-        $this->assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SUBMIT));
-        $this->assertFalse($eventDispatcher->hasListeners(FormEvents::SUBMIT));
-        $this->assertTrue($eventDispatcher->hasListeners(FormEvents::POST_SUBMIT));
+        self::assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SET_DATA));
+        self::assertTrue($eventDispatcher->hasListeners(FormEvents::POST_SET_DATA));
+        self::assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SUBMIT));
+        self::assertFalse($eventDispatcher->hasListeners(FormEvents::SUBMIT));
+        self::assertTrue($eventDispatcher->hasListeners(FormEvents::POST_SUBMIT));
     }
 }

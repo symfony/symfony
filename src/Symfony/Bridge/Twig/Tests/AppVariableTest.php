@@ -40,7 +40,7 @@ class AppVariableTest extends TestCase
     {
         $this->appVariable->setDebug($debugFlag);
 
-        $this->assertEquals($debugFlag, $this->appVariable->getDebug());
+        self::assertEquals($debugFlag, $this->appVariable->getDebug());
     }
 
     public function debugDataProvider()
@@ -55,7 +55,7 @@ class AppVariableTest extends TestCase
     {
         $this->appVariable->setEnvironment('dev');
 
-        $this->assertEquals('dev', $this->appVariable->getEnvironment());
+        self::assertEquals('dev', $this->appVariable->getEnvironment());
     }
 
     /**
@@ -63,45 +63,45 @@ class AppVariableTest extends TestCase
      */
     public function testGetSession()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request->method('hasSession')->willReturn(true);
         $request->method('getSession')->willReturn($session = new Session());
 
         $this->setRequestStack($request);
 
-        $this->assertEquals($session, $this->appVariable->getSession());
+        self::assertEquals($session, $this->appVariable->getSession());
     }
 
     public function testGetSessionWithNoRequest()
     {
         $this->setRequestStack(null);
 
-        $this->assertNull($this->appVariable->getSession());
+        self::assertNull($this->appVariable->getSession());
     }
 
     public function testGetRequest()
     {
         $this->setRequestStack($request = new Request());
 
-        $this->assertEquals($request, $this->appVariable->getRequest());
+        self::assertEquals($request, $this->appVariable->getRequest());
     }
 
     public function testGetToken()
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 
-        $this->assertEquals($token, $this->appVariable->getToken());
+        self::assertEquals($token, $this->appVariable->getToken());
     }
 
     public function testGetUser()
     {
-        $this->setTokenStorage($user = $this->createMock(UserInterface::class));
+        $this->setTokenStorage($user = self::createMock(UserInterface::class));
 
-        $this->assertEquals($user, $this->appVariable->getUser());
+        self::assertEquals($user, $this->appVariable->getUser());
     }
 
     /**
@@ -111,58 +111,58 @@ class AppVariableTest extends TestCase
     {
         $this->setTokenStorage('username');
 
-        $this->assertNull($this->appVariable->getUser());
+        self::assertNull($this->appVariable->getUser());
     }
 
     public function testGetTokenWithNoToken()
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
 
-        $this->assertNull($this->appVariable->getToken());
+        self::assertNull($this->appVariable->getToken());
     }
 
     public function testGetUserWithNoToken()
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
 
-        $this->assertNull($this->appVariable->getUser());
+        self::assertNull($this->appVariable->getUser());
     }
 
     public function testEnvironmentNotSet()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $this->appVariable->getEnvironment();
     }
 
     public function testDebugNotSet()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $this->appVariable->getDebug();
     }
 
     public function testGetTokenWithTokenStorageNotSet()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $this->appVariable->getToken();
     }
 
     public function testGetUserWithTokenStorageNotSet()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $this->appVariable->getUser();
     }
 
     public function testGetRequestWithRequestStackNotSet()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $this->appVariable->getRequest();
     }
 
     public function testGetSessionWithRequestStackNotSet()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $this->appVariable->getSession();
     }
 
@@ -170,7 +170,7 @@ class AppVariableTest extends TestCase
     {
         $this->setRequestStack(null);
 
-        $this->assertEquals([], $this->appVariable->getFlashes());
+        self::assertEquals([], $this->appVariable->getFlashes());
     }
 
     /**
@@ -179,7 +179,7 @@ class AppVariableTest extends TestCase
     public function testGetFlashesWithNoSessionStarted()
     {
         $flashMessages = $this->setFlashMessages(false);
-        $this->assertEquals($flashMessages, $this->appVariable->getFlashes());
+        self::assertEquals($flashMessages, $this->appVariable->getFlashes());
     }
 
     /**
@@ -188,59 +188,40 @@ class AppVariableTest extends TestCase
     public function testGetFlashes()
     {
         $flashMessages = $this->setFlashMessages();
-        $this->assertEquals($flashMessages, $this->appVariable->getFlashes(null));
+        self::assertEquals($flashMessages, $this->appVariable->getFlashes(null));
 
         $flashMessages = $this->setFlashMessages();
-        $this->assertEquals($flashMessages, $this->appVariable->getFlashes(''));
+        self::assertEquals($flashMessages, $this->appVariable->getFlashes(''));
 
         $flashMessages = $this->setFlashMessages();
-        $this->assertEquals($flashMessages, $this->appVariable->getFlashes([]));
+        self::assertEquals($flashMessages, $this->appVariable->getFlashes([]));
 
         $this->setFlashMessages();
-        $this->assertEquals([], $this->appVariable->getFlashes('this-does-not-exist'));
+        self::assertEquals([], $this->appVariable->getFlashes('this-does-not-exist'));
 
         $this->setFlashMessages();
-        $this->assertEquals(
-            ['this-does-not-exist' => []],
-            $this->appVariable->getFlashes(['this-does-not-exist'])
-        );
+        self::assertEquals(['this-does-not-exist' => []], $this->appVariable->getFlashes(['this-does-not-exist']));
 
         $flashMessages = $this->setFlashMessages();
-        $this->assertEquals($flashMessages['notice'], $this->appVariable->getFlashes('notice'));
+        self::assertEquals($flashMessages['notice'], $this->appVariable->getFlashes('notice'));
 
         $flashMessages = $this->setFlashMessages();
-        $this->assertEquals(
-            ['notice' => $flashMessages['notice']],
-            $this->appVariable->getFlashes(['notice'])
-        );
+        self::assertEquals(['notice' => $flashMessages['notice']], $this->appVariable->getFlashes(['notice']));
 
         $flashMessages = $this->setFlashMessages();
-        $this->assertEquals(
-            ['notice' => $flashMessages['notice'], 'this-does-not-exist' => []],
-            $this->appVariable->getFlashes(['notice', 'this-does-not-exist'])
-        );
+        self::assertEquals(['notice' => $flashMessages['notice'], 'this-does-not-exist' => []], $this->appVariable->getFlashes(['notice', 'this-does-not-exist']));
 
         $flashMessages = $this->setFlashMessages();
-        $this->assertEquals(
-            ['notice' => $flashMessages['notice'], 'error' => $flashMessages['error']],
-            $this->appVariable->getFlashes(['notice', 'error'])
-        );
+        self::assertEquals(['notice' => $flashMessages['notice'], 'error' => $flashMessages['error']], $this->appVariable->getFlashes(['notice', 'error']));
 
-        $this->assertEquals(
-            ['warning' => $flashMessages['warning']],
-            $this->appVariable->getFlashes(['warning']),
-            'After getting some flash types (e.g. "notice" and "error"), the rest of flash messages must remain (e.g. "warning").'
-        );
+        self::assertEquals(['warning' => $flashMessages['warning']], $this->appVariable->getFlashes(['warning']), 'After getting some flash types (e.g. "notice" and "error"), the rest of flash messages must remain (e.g. "warning").');
 
-        $this->assertEquals(
-            ['this-does-not-exist' => []],
-            $this->appVariable->getFlashes(['this-does-not-exist'])
-        );
+        self::assertEquals(['this-does-not-exist' => []], $this->appVariable->getFlashes(['this-does-not-exist']));
     }
 
     protected function setRequestStack($request)
     {
-        $requestStackMock = $this->createMock(RequestStack::class);
+        $requestStackMock = self::createMock(RequestStack::class);
         $requestStackMock->method('getCurrentRequest')->willReturn($request);
 
         $this->appVariable->setRequestStack($requestStackMock);
@@ -248,10 +229,10 @@ class AppVariableTest extends TestCase
 
     protected function setTokenStorage($user)
     {
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 
         $token->method('getUser')->willReturn($user);
@@ -267,11 +248,11 @@ class AppVariableTest extends TestCase
         $flashBag = new FlashBag();
         $flashBag->initialize($flashMessages);
 
-        $session = $this->createMock(Session::class);
+        $session = self::createMock(Session::class);
         $session->method('isStarted')->willReturn($sessionHasStarted);
         $session->method('getFlashBag')->willReturn($flashBag);
 
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request->method('hasSession')->willReturn(true);
         $request->method('getSession')->willReturn($session);
         $this->setRequestStack($request);

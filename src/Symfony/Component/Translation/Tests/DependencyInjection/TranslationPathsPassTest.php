@@ -83,7 +83,7 @@ class TranslationPathsPassTest extends TestCase
             $container->getReflectionClass(ServiceSubscriber::class)->getFileName(),
         ];
 
-        $this->assertSame($expectedPaths, $debugCommand->getArgument(6));
-        $this->assertSame($expectedPaths, $updateCommand->getArgument(7));
+        self::assertSame($expectedPaths, $debugCommand->getArgument(6));
+        self::assertSame($expectedPaths, $updateCommand->getArgument(7));
     }
 }

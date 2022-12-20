@@ -32,7 +32,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
     {
         $service = $this->getService(null, ['name' => 'foo']);
 
-        $this->assertNull($service->autoLogin(new Request()));
+        self::assertNull($service->autoLogin(new Request()));
     }
 
     public function testAutoLoginThrowsExceptionOnInvalidCookie()
@@ -42,8 +42,8 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request->request->set('foo', 'true');
         $request->cookies->set('foo', 'foo');
 
-        $this->assertNull($service->autoLogin($request));
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertNull($service->autoLogin($request));
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testAutoLoginThrowsExceptionOnNonExistentUser()
@@ -53,8 +53,8 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() + 3600, 'foopass'));
 
-        $this->assertNull($service->autoLogin($request));
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertNull($service->autoLogin($request));
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testAutoLoginDoesNotAcceptCookieWithInvalidHash()
@@ -67,8 +67,8 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user = new InMemoryUser('foouser', 'foopass');
         $userProvider->createUser($user);
 
-        $this->assertNull($service->autoLogin($request));
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertNull($service->autoLogin($request));
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testAutoLoginDoesNotAcceptAnExpiredCookie()
@@ -81,8 +81,8 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user = new InMemoryUser('foouser', 'foopass');
         $userProvider->createUser($user);
 
-        $this->assertNull($service->autoLogin($request));
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        self::assertNull($service->autoLogin($request));
+        self::assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     /**
@@ -102,9 +102,9 @@ class TokenBasedRememberMeServicesTest extends TestCase
 
         $returnedToken = $service->autoLogin($request);
 
-        $this->assertInstanceOf(RememberMeToken::class, $returnedToken);
-        $this->assertTrue($user->isEqualTo($returnedToken->getUser()));
-        $this->assertEquals('foosecret', $returnedToken->getSecret());
+        self::assertInstanceOf(RememberMeToken::class, $returnedToken);
+        self::assertTrue($user->isEqualTo($returnedToken->getUser()));
+        self::assertEquals('foosecret', $returnedToken->getSecret());
     }
 
     public function provideUsernamesForAutoLogin()
@@ -120,16 +120,16 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => false]);
         $request = new Request();
         $response = new Response();
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
 
         $service->logout($request, $response, $token);
 
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
-        $this->assertTrue($cookie->isCleared());
-        $this->assertEquals('/', $cookie->getPath());
-        $this->assertNull($cookie->getDomain());
-        $this->assertTrue($cookie->isSecure());
-        $this->assertFalse($cookie->isHttpOnly());
+        self::assertTrue($cookie->isCleared());
+        self::assertEquals('/', $cookie->getPath());
+        self::assertNull($cookie->getDomain());
+        self::assertTrue($cookie->isSecure());
+        self::assertFalse($cookie->isHttpOnly());
     }
 
     public function testLoginFail()
@@ -140,9 +140,9 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $service->loginFail($request);
 
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
-        $this->assertTrue($cookie->isCleared());
-        $this->assertEquals('/foo', $cookie->getPath());
-        $this->assertEquals('foodomain.foo', $cookie->getDomain());
+        self::assertTrue($cookie->isCleared());
+        self::assertEquals('/foo', $cookie->getPath());
+        self::assertEquals('foodomain.foo', $cookie->getDomain());
     }
 
     public function testLoginSuccessIgnoresTokensWhichDoNotContainAnUserInterfaceImplementation()
@@ -150,20 +150,20 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $token
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getUser')
             ->willReturn('foo')
         ;
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(0, $cookies);
+        self::assertCount(0, $cookies);
 
         $service->loginSuccess($request, $response, $token);
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(0, $cookies);
+        self::assertCount(0, $cookies);
     }
 
     public function testLoginSuccess()
@@ -173,27 +173,27 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $response = new Response();
 
         $user = new InMemoryUser('foouser', 'foopass');
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $token
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getUser')
             ->willReturn($user)
         ;
 
         $cookies = $response->headers->getCookies();
-        $this->assertCount(0, $cookies);
+        self::assertCount(0, $cookies);
 
         $service->loginSuccess($request, $response, $token);
 
         $cookies = $response->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
         $cookie = $cookies['myfoodomain.foo']['/foo/path']['foo'];
-        $this->assertFalse($cookie->isCleared());
-        $this->assertTrue($cookie->isSecure());
-        $this->assertTrue($cookie->isHttpOnly());
-        $this->assertTrue($cookie->getExpiresTime() > time() + 3590 && $cookie->getExpiresTime() < time() + 3610);
-        $this->assertEquals('myfoodomain.foo', $cookie->getDomain());
-        $this->assertEquals('/foo/path', $cookie->getPath());
-        $this->assertSame(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
+        self::assertFalse($cookie->isCleared());
+        self::assertTrue($cookie->isSecure());
+        self::assertTrue($cookie->isHttpOnly());
+        self::assertTrue($cookie->getExpiresTime() > time() + 3590 && $cookie->getExpiresTime() < time() + 3610);
+        self::assertEquals('myfoodomain.foo', $cookie->getDomain());
+        self::assertEquals('/foo/path', $cookie->getPath());
+        self::assertSame(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
     }
 
     protected function getCookie($class, $username, $expires, $password)

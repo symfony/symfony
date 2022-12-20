@@ -46,25 +46,25 @@ class ApplicationTesterTest extends TestCase
 
     public function testRun()
     {
-        $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
-        $this->assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
-        $this->assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
+        self::assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
+        self::assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
+        self::assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
     }
 
     public function testGetInput()
     {
-        $this->assertEquals('bar', $this->tester->getInput()->getArgument('foo'), '->getInput() returns the current input instance');
+        self::assertEquals('bar', $this->tester->getInput()->getArgument('foo'), '->getInput() returns the current input instance');
     }
 
     public function testGetOutput()
     {
         rewind($this->tester->getOutput()->getStream());
-        $this->assertEquals('foo'.\PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
+        self::assertEquals('foo'.\PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
     }
 
     public function testGetDisplay()
     {
-        $this->assertEquals('foo'.\PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
+        self::assertEquals('foo'.\PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
     }
 
     public function testSetInputs()
@@ -83,7 +83,7 @@ class ApplicationTesterTest extends TestCase
         $tester->run(['command' => 'foo']);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertEquals('Q1Q2Q3', $tester->getDisplay(true));
+        self::assertEquals('Q1Q2Q3', $tester->getDisplay(true));
     }
 
     public function testGetStatusCode()
@@ -108,6 +108,6 @@ class ApplicationTesterTest extends TestCase
             ['capture_stderr_separately' => true]
         );
 
-        $this->assertSame('foo', $tester->getErrorOutput());
+        self::assertSame('foo', $tester->getErrorOutput());
     }
 }

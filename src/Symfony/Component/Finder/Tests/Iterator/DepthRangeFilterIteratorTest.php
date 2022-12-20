@@ -20,14 +20,14 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($minDepth, $maxDepth, $expected)
     {
-        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->toAbsolute(), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(self::toAbsolute(), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
         $iterator = new DepthRangeFilterIterator($inner, $minDepth, $maxDepth);
 
         $actual = array_keys(iterator_to_array($iterator));
         sort($expected);
         sort($actual);
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function getAcceptData()
@@ -93,11 +93,11 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [0, 0, $this->toAbsolute($lessThan1)],
-            [0, 1, $this->toAbsolute($lessThanOrEqualTo1)],
+            [0, 0, self::toAbsolute($lessThan1)],
+            [0, 1, self::toAbsolute($lessThanOrEqualTo1)],
             [2, \PHP_INT_MAX, []],
-            [1, \PHP_INT_MAX, $this->toAbsolute($graterThanOrEqualTo1)],
-            [1, 1, $this->toAbsolute($equalTo1)],
+            [1, \PHP_INT_MAX, self::toAbsolute($graterThanOrEqualTo1)],
+            [1, 1, self::toAbsolute($equalTo1)],
         ];
     }
 }

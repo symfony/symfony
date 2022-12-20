@@ -33,7 +33,7 @@ class MessageListenerTest extends TestCase
         $event = new MessageEvent($message, new Envelope(new Address('sender@example.com'), [new Address('recipient@example.com')]), 'smtp');
         $listener->onMessage($event);
 
-        $this->assertEquals($expectedHeaders, $event->getMessage()->getHeaders());
+        self::assertEquals($expectedHeaders, $event->getMessage()->getHeaders());
     }
 
     public function provideHeaders(): iterable

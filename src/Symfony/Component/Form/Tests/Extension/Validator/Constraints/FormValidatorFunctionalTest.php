@@ -55,10 +55,10 @@ class FormValidatorFunctionalTest extends TestCase
         $form = $this->formFactory->create(FooType::class);
         $form->submit(['baz' => 'foobar'], false);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertFalse($form->isValid());
-        $this->assertFalse($form->get('bar')->isSubmitted());
-        $this->assertCount(1, $form->get('bar')->getErrors());
+        self::assertTrue($form->isSubmitted());
+        self::assertFalse($form->isValid());
+        self::assertFalse($form->get('bar')->isSubmitted());
+        self::assertCount(1, $form->get('bar')->getErrors());
     }
 
     public function testFieldConstraintsDoNotInvalidateFormIfFieldIsNotSubmitted()
@@ -66,8 +66,8 @@ class FormValidatorFunctionalTest extends TestCase
         $form = $this->formFactory->create(FooType::class);
         $form->submit(['bar' => 'foobar'], false);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertTrue($form->isValid());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isValid());
     }
 
     public function testFieldConstraintsInvalidateFormIfFieldIsSubmitted()
@@ -75,12 +75,12 @@ class FormValidatorFunctionalTest extends TestCase
         $form = $this->formFactory->create(FooType::class);
         $form->submit(['bar' => 'foobar', 'baz' => ''], false);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($form->get('bar')->isSubmitted());
-        $this->assertTrue($form->get('bar')->isValid());
-        $this->assertTrue($form->get('baz')->isSubmitted());
-        $this->assertFalse($form->get('baz')->isValid());
+        self::assertTrue($form->isSubmitted());
+        self::assertFalse($form->isValid());
+        self::assertTrue($form->get('bar')->isSubmitted());
+        self::assertTrue($form->get('bar')->isValid());
+        self::assertTrue($form->get('baz')->isSubmitted());
+        self::assertFalse($form->get('baz')->isValid());
     }
 
     public function testNonCompositeConstraintValidatedOnce()
@@ -93,9 +93,9 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(1, $violations);
-        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
-        $this->assertSame('data', $violations[0]->getPropertyPath());
+        self::assertCount(1, $violations);
+        self::assertSame('This value should not be blank.', $violations[0]->getMessage());
+        self::assertSame('data', $violations[0]->getPropertyPath());
     }
 
     public function testCompositeConstraintValidatedInEachGroup()
@@ -122,11 +122,11 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(2, $violations);
-        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
-        $this->assertSame('data[field1]', $violations[0]->getPropertyPath());
-        $this->assertSame('This value should not be blank.', $violations[1]->getMessage());
-        $this->assertSame('data[field2]', $violations[1]->getPropertyPath());
+        self::assertCount(2, $violations);
+        self::assertSame('This value should not be blank.', $violations[0]->getMessage());
+        self::assertSame('data[field1]', $violations[0]->getPropertyPath());
+        self::assertSame('This value should not be blank.', $violations[1]->getMessage());
+        self::assertSame('data[field2]', $violations[1]->getPropertyPath());
     }
 
     public function testCompositeConstraintValidatedInSequence()
@@ -154,9 +154,9 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(1, $violations);
-        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
-        $this->assertSame('data[field1]', $violations[0]->getPropertyPath());
+        self::assertCount(1, $violations);
+        self::assertSame('This value should not be blank.', $violations[0]->getMessage());
+        self::assertSame('data[field1]', $violations[0]->getPropertyPath());
     }
 
     public function testFieldsValidateInSequence()
@@ -176,8 +176,8 @@ class FormValidatorFunctionalTest extends TestCase
 
         $errors = $form->getErrors(true);
 
-        $this->assertCount(1, $errors);
-        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+        self::assertCount(1, $errors);
+        self::assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
     public function testFieldsValidateInSequenceWithNestedGroupsArray()
@@ -200,9 +200,9 @@ class FormValidatorFunctionalTest extends TestCase
 
         $errors = $form->getErrors(true);
 
-        $this->assertCount(2, $errors);
-        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
-        $this->assertInstanceOf(Length::class, $errors[1]->getCause()->getConstraint());
+        self::assertCount(2, $errors);
+        self::assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+        self::assertInstanceOf(Length::class, $errors[1]->getCause()->getConstraint());
     }
 
     public function testConstraintsInDifferentGroupsOnSingleField()
@@ -227,9 +227,9 @@ class FormValidatorFunctionalTest extends TestCase
 
         $errors = $form->getErrors(true);
 
-        $this->assertFalse($form->isValid());
-        $this->assertCount(1, $errors);
-        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+        self::assertFalse($form->isValid());
+        self::assertCount(1, $errors);
+        self::assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
     public function testConstraintsInDifferentGroupsOnSingleFieldWithAdditionalFieldThatHasNoConstraintsAddedBeforeTheFieldWithConstraints()
@@ -255,9 +255,9 @@ class FormValidatorFunctionalTest extends TestCase
 
         $errors = $form->getErrors(true);
 
-        $this->assertFalse($form->isValid());
-        $this->assertCount(1, $errors);
-        $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+        self::assertFalse($form->isValid());
+        self::assertCount(1, $errors);
+        self::assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
     public function testCascadeValidationToChildFormsUsingPropertyPaths()
@@ -282,11 +282,11 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(2, $violations);
-        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
-        $this->assertSame('children[field1].data', $violations[0]->getPropertyPath());
-        $this->assertSame('This value should not be blank.', $violations[1]->getMessage());
-        $this->assertSame('children[field2].data', $violations[1]->getPropertyPath());
+        self::assertCount(2, $violations);
+        self::assertSame('This value should not be blank.', $violations[0]->getMessage());
+        self::assertSame('children[field1].data', $violations[0]->getPropertyPath());
+        self::assertSame('This value should not be blank.', $violations[1]->getMessage());
+        self::assertSame('children[field2].data', $violations[1]->getPropertyPath());
     }
 
     public function testCascadeValidationToChildFormsWithTwoValidConstraints()
@@ -300,9 +300,9 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(1, $violations);
-        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
-        $this->assertSame('children[author].data.email', $violations[0]->getPropertyPath());
+        self::assertCount(1, $violations);
+        self::assertSame('This value should not be blank.', $violations[0]->getMessage());
+        self::assertSame('children[author].data.email', $violations[0]->getPropertyPath());
     }
 
     public function testCascadeValidationToChildFormsWithTwoValidConstraints2()
@@ -315,11 +315,11 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(2, $violations);
-        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
-        $this->assertSame('data.rating', $violations[0]->getPropertyPath());
-        $this->assertSame('This value should not be blank.', $violations[1]->getMessage());
-        $this->assertSame('children[author].data.email', $violations[1]->getPropertyPath());
+        self::assertCount(2, $violations);
+        self::assertSame('This value should not be blank.', $violations[0]->getMessage());
+        self::assertSame('data.rating', $violations[0]->getPropertyPath());
+        self::assertSame('This value should not be blank.', $violations[1]->getMessage());
+        self::assertSame('children[author].data.email', $violations[1]->getPropertyPath());
     }
 
     public function testCascadeValidationToArrayChildForm()
@@ -344,11 +344,11 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(2, $violations);
-        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
-        $this->assertSame('data.rating', $violations[0]->getPropertyPath());
-        $this->assertSame('This value should not be blank.', $violations[1]->getMessage());
-        $this->assertSame('children[customers].data[0].email', $violations[1]->getPropertyPath());
+        self::assertCount(2, $violations);
+        self::assertSame('This value should not be blank.', $violations[0]->getMessage());
+        self::assertSame('data.rating', $violations[0]->getPropertyPath());
+        self::assertSame('This value should not be blank.', $violations[1]->getMessage());
+        self::assertSame('children[customers].data[0].email', $violations[1]->getPropertyPath());
     }
 
     public function testCascadeValidationToChildFormsUsingPropertyPathsValidatedInSequence()
@@ -373,9 +373,9 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(1, $violations);
-        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
-        $this->assertSame('children[field1].data', $violations[0]->getPropertyPath());
+        self::assertCount(1, $violations);
+        self::assertSame('This value should not be blank.', $violations[0]->getMessage());
+        self::assertSame('children[field1].data', $violations[0]->getPropertyPath());
     }
 
     public function testContextIsPopulatedWithFormBeingValidated()
@@ -396,7 +396,7 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testContextIsPopulatedWithFormBeingValidatedUsingGroupSequence()
@@ -420,7 +420,7 @@ class FormValidatorFunctionalTest extends TestCase
 
         $violations = $this->validator->validate($form);
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function testSubmitFormChoiceInvalid()
@@ -436,13 +436,13 @@ class FormValidatorFunctionalTest extends TestCase
             'day' => '13',
         ]);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertFalse($form->isValid());
-        $this->assertCount(2, $form->getErrors());
-        $this->assertSame('This value is not valid.', $form->getErrors()[0]->getMessage());
-        $this->assertSame($form->get('year'), $form->getErrors()[0]->getOrigin());
-        $this->assertSame('This value is not valid.', $form->getErrors()[1]->getMessage());
-        $this->assertSame($form->get('month'), $form->getErrors()[1]->getOrigin());
+        self::assertTrue($form->isSubmitted());
+        self::assertFalse($form->isValid());
+        self::assertCount(2, $form->getErrors());
+        self::assertSame('This value is not valid.', $form->getErrors()[0]->getMessage());
+        self::assertSame($form->get('year'), $form->getErrors()[0]->getOrigin());
+        self::assertSame('This value is not valid.', $form->getErrors()[1]->getMessage());
+        self::assertSame($form->get('month'), $form->getErrors()[1]->getOrigin());
     }
 
     public function testDoNotAddInvalidMessageIfChildFormIsAlreadyNotSynchronized()
@@ -471,13 +471,13 @@ class FormValidatorFunctionalTest extends TestCase
             'field2' => 'bar',
         ]);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertFalse($form->isValid());
-        $this->assertCount(0, $form->getErrors());
-        $this->assertTrue($form->get('field1')->isValid());
-        $this->assertCount(0, $form->get('field1')->getErrors());
-        $this->assertFalse($form->get('field2')->isValid());
-        $this->assertCount(1, $form->get('field2')->getErrors());
+        self::assertTrue($form->isSubmitted());
+        self::assertFalse($form->isValid());
+        self::assertCount(0, $form->getErrors());
+        self::assertTrue($form->get('field1')->isValid());
+        self::assertCount(0, $form->get('field1')->getErrors());
+        self::assertFalse($form->get('field2')->isValid());
+        self::assertCount(1, $form->get('field2')->getErrors());
     }
 }
 

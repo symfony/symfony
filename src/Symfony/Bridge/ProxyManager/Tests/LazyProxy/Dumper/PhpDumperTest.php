@@ -27,11 +27,7 @@ class PhpDumperTest extends TestCase
 {
     public function testDumpContainerWithProxyService()
     {
-        $this->assertStringMatchesFormatFile(
-            __DIR__.'/../Fixtures/php/lazy_service_structure.txt',
-            $this->dumpLazyServiceProjectServiceContainer(),
-            '->dump() does generate proxy lazy loading logic.'
-        );
+        self::assertStringMatchesFormatFile(__DIR__.'/../Fixtures/php/lazy_service_structure.txt', $this->dumpLazyServiceProjectServiceContainer(), '->dump() does generate proxy lazy loading logic.');
     }
 
     /**
@@ -46,16 +42,16 @@ class PhpDumperTest extends TestCase
         $container = new \LazyServiceProjectServiceContainer();
 
         $proxy = $container->get('foo');
-        $this->assertInstanceOf(\stdClass::class, $proxy);
-        $this->assertInstanceOf(LazyLoadingInterface::class, $proxy);
-        $this->assertSame($proxy, $container->get('foo'));
+        self::assertInstanceOf(\stdClass::class, $proxy);
+        self::assertInstanceOf(LazyLoadingInterface::class, $proxy);
+        self::assertSame($proxy, $container->get('foo'));
 
-        $this->assertFalse($proxy->isProxyInitialized());
+        self::assertFalse($proxy->isProxyInitialized());
 
         $proxy->initializeProxy();
 
-        $this->assertTrue($proxy->isProxyInitialized());
-        $this->assertSame($proxy, $container->get('foo'));
+        self::assertTrue($proxy->isProxyInitialized());
+        self::assertSame($proxy, $container->get('foo'));
     }
 
     private function dumpLazyServiceProjectServiceContainer()

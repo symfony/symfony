@@ -22,7 +22,7 @@ class StopwatchPeriodTest extends TestCase
     public function testGetStartTime($start, $useMorePrecision, $expected)
     {
         $period = new StopwatchPeriod($start, $start, $useMorePrecision);
-        $this->assertSame($expected, $period->getStartTime());
+        self::assertSame($expected, $period->getStartTime());
     }
 
     /**
@@ -31,7 +31,7 @@ class StopwatchPeriodTest extends TestCase
     public function testGetEndTime($end, $useMorePrecision, $expected)
     {
         $period = new StopwatchPeriod($end, $end, $useMorePrecision);
-        $this->assertSame($expected, $period->getEndTime());
+        self::assertSame($expected, $period->getEndTime());
     }
 
     /**
@@ -40,7 +40,7 @@ class StopwatchPeriodTest extends TestCase
     public function testGetDuration($start, $end, $useMorePrecision, $duration)
     {
         $period = new StopwatchPeriod($start, $end, $useMorePrecision);
-        $this->assertEqualsWithDelta($duration, $period->getDuration(), \PHP_FLOAT_EPSILON);
+        self::assertEqualsWithDelta($duration, $period->getDuration(), \PHP_FLOAT_EPSILON);
     }
 
     public function provideTimeValues()

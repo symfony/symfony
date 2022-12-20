@@ -40,7 +40,7 @@ class DumpExtensionTest extends TestCase
         $prevDumper = VarDumper::setHandler(function ($var) use (&$dumped) { $dumped = $var; });
 
         try {
-            $this->assertEquals($expectedOutput, $twig->render('template'));
+            self::assertEquals($expectedOutput, $twig->render('template'));
         } catch (\Exception $exception) {
         }
 
@@ -50,7 +50,7 @@ class DumpExtensionTest extends TestCase
             throw $exception;
         }
 
-        $this->assertSame($expectedDumped, $dumped);
+        self::assertSame($expectedDumped, $dumped);
     }
 
     public function getDumpTags()
@@ -68,7 +68,7 @@ class DumpExtensionTest extends TestCase
     public function testDump($context, $args, $expectedOutput, $debug = true)
     {
         $extension = new DumpExtension(new VarCloner());
-        $twig = new Environment($this->createMock(LoaderInterface::class), [
+        $twig = new Environment(self::createMock(LoaderInterface::class), [
             'debug' => $debug,
             'cache' => false,
             'optimizations' => 0,
@@ -80,12 +80,12 @@ class DumpExtensionTest extends TestCase
         $dump = $extension->dump(...$args);
 
         if ($debug) {
-            $this->assertStringStartsWith('<script>', $dump);
+            self::assertStringStartsWith('<script>', $dump);
             $dump = preg_replace('/^.*?<pre/', '<pre', $dump);
             $dump = preg_replace('/sf-dump-\d+/', 'sf-dump', $dump);
             $dump = preg_replace('/<samp [^>]++>/', '<samp>', $dump);
         }
-        $this->assertEquals($expectedOutput, $dump);
+        self::assertEquals($expectedOutput, $dump);
     }
 
     public function getDumpArgs()
@@ -125,7 +125,7 @@ class DumpExtensionTest extends TestCase
             '</pre><script>Sfdump("%s")</script>'
         );
         $extension = new DumpExtension(new VarCloner(), $dumper);
-        $twig = new Environment($this->createMock(LoaderInterface::class), [
+        $twig = new Environment(self::createMock(LoaderInterface::class), [
             'debug' => true,
             'cache' => false,
             'optimizations' => 0,
@@ -134,14 +134,10 @@ class DumpExtensionTest extends TestCase
         $dump = $extension->dump($twig, [], 'foo');
         $dump = preg_replace('/sf-dump-\d+/', 'sf-dump', $dump);
 
-        $this->assertEquals(
-            '<pre class=sf-dump-test id=sf-dump data-indent-pad="  ">"'.
-            "<span class=sf-dump-str title=\"3 characters\">foo</span>\"\n".
-            "</pre><script>Sfdump(\"sf-dump\")</script>\n",
-            $dump,
-            'Custom dumper should be used to dump data.'
-        );
+        self::assertEquals('<pre class=sf-dump-test id=sf-dump data-indent-pad="  ">"'.
+        "<span class=sf-dump-str title=\"3 characters\">foo</span>\"\n".
+        "</pre><script>Sfdump(\"sf-dump\")</script>\n", $dump, 'Custom dumper should be used to dump data.');
 
-        $this->assertEmpty($output, 'Dumper output should be ignored.');
+        self::assertEmpty($output, 'Dumper output should be ignored.');
     }
 }

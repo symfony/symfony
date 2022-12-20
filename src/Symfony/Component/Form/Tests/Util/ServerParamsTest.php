@@ -21,11 +21,11 @@ class ServerParamsTest extends TestCase
     public function testGetContentLengthFromSuperglobals()
     {
         $serverParams = new ServerParams();
-        $this->assertNull($serverParams->getContentLength());
+        self::assertNull($serverParams->getContentLength());
 
         $_SERVER['CONTENT_LENGTH'] = 1024;
 
-        $this->assertEquals(1024, $serverParams->getContentLength());
+        self::assertEquals(1024, $serverParams->getContentLength());
 
         unset($_SERVER['CONTENT_LENGTH']);
     }
@@ -37,7 +37,7 @@ class ServerParamsTest extends TestCase
         $requestStack->push($request);
         $serverParams = new ServerParams($requestStack);
 
-        $this->assertEquals(1024, $serverParams->getContentLength());
+        self::assertEquals(1024, $serverParams->getContentLength());
     }
 
     /** @dataProvider getGetPostMaxSizeTestData */
@@ -45,7 +45,7 @@ class ServerParamsTest extends TestCase
     {
         $serverParams = new DummyServerParams($size);
 
-        $this->assertEquals($bytes, $serverParams->getPostMaxSize());
+        self::assertEquals($bytes, $serverParams->getPostMaxSize());
     }
 
     public function getGetPostMaxSizeTestData()

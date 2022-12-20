@@ -22,15 +22,19 @@ class FileLoaderTest extends TestCase
 {
     public function testImportWithFileLocatorDelegation()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
+        $locatorMock = self::createMock(FileLocatorInterface::class);
 
-        $locatorMockForAdditionalLoader = $this->createMock(FileLocatorInterface::class);
-        $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
-            ['path/to/file1'],                    // Default
-            ['path/to/file1', 'path/to/file2'],   // First is imported
-            ['path/to/file1', 'path/to/file2'],   // Second is imported
-            ['path/to/file1'],                    // Exception
-            ['path/to/file1', 'path/to/file2']    // Exception
+        $locatorMockForAdditionalLoader = self::createMock(FileLocatorInterface::class);
+        $locatorMockForAdditionalLoader->expects(self::any())->method('locate')->will(self::onConsecutiveCalls(
+            ['path/to/file1'],
+            // Default
+            ['path/to/file1', 'path/to/file2'],
+            // First is imported
+            ['path/to/file1', 'path/to/file2'],
+            // Second is imported
+            ['path/to/file1'],
+            // Exception
+            ['path/to/file1', 'path/to/file2']
         ));
 
         $fileLoader = new TestFileLoader($locatorMock);
@@ -43,89 +47,89 @@ class FileLoaderTest extends TestCase
         $fileLoader->setResolver($loaderResolver = new LoaderResolver([$fileLoader, $additionalLoader]));
 
         // Default case
-        $this->assertSame('path/to/file1', $fileLoader->import('my_resource'));
+        self::assertSame('path/to/file1', $fileLoader->import('my_resource'));
 
         // Check first file is imported if not already loading
-        $this->assertSame('path/to/file1', $fileLoader->import('my_resource'));
+        self::assertSame('path/to/file1', $fileLoader->import('my_resource'));
 
         // Check second file is imported if first is already loading
         $fileLoader->addLoading('path/to/file1');
-        $this->assertSame('path/to/file2', $fileLoader->import('my_resource'));
+        self::assertSame('path/to/file2', $fileLoader->import('my_resource'));
 
         // Check exception throws if first (and only available) file is already loading
         try {
             $fileLoader->import('my_resource');
-            $this->fail('->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
+            self::fail('->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(FileLoaderImportCircularReferenceException::class, $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
+            self::assertInstanceOf(FileLoaderImportCircularReferenceException::class, $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         }
 
         // Check exception throws if all files are already loading
         try {
             $fileLoader->addLoading('path/to/file2');
             $fileLoader->import('my_resource');
-            $this->fail('->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
+            self::fail('->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         } catch (\Exception $e) {
-            $this->assertInstanceOf(FileLoaderImportCircularReferenceException::class, $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
+            self::assertInstanceOf(FileLoaderImportCircularReferenceException::class, $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         }
     }
 
     public function testImportWithGlobLikeResource()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-        $locatorMock->expects($this->once())->method('locate')->willReturn('');
+        $locatorMock = self::createMock(FileLocatorInterface::class);
+        $locatorMock->expects(self::once())->method('locate')->willReturn('');
         $loader = new TestFileLoader($locatorMock);
 
-        $this->assertSame('[foo]', $loader->import('[foo]'));
+        self::assertSame('[foo]', $loader->import('[foo]'));
     }
 
     public function testImportWithGlobLikeResourceWhichContainsSlashes()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-        $locatorMock->expects($this->once())->method('locate')->willReturn('');
+        $locatorMock = self::createMock(FileLocatorInterface::class);
+        $locatorMock->expects(self::once())->method('locate')->willReturn('');
         $loader = new TestFileLoader($locatorMock);
 
-        $this->assertNull($loader->import('foo/bar[foo]'));
+        self::assertNull($loader->import('foo/bar[foo]'));
     }
 
     public function testImportWithGlobLikeResourceWhichContainsMultipleLines()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
+        $locatorMock = self::createMock(FileLocatorInterface::class);
         $loader = new TestFileLoader($locatorMock);
 
-        $this->assertSame("foo\nfoobar[foo]", $loader->import("foo\nfoobar[foo]"));
+        self::assertSame("foo\nfoobar[foo]", $loader->import("foo\nfoobar[foo]"));
     }
 
     public function testImportWithGlobLikeResourceWhichContainsSlashesAndMultipleLines()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
+        $locatorMock = self::createMock(FileLocatorInterface::class);
         $loader = new TestFileLoader($locatorMock);
 
-        $this->assertSame("foo\nfoo/bar[foo]", $loader->import("foo\nfoo/bar[foo]"));
+        self::assertSame("foo\nfoo/bar[foo]", $loader->import("foo\nfoo/bar[foo]"));
     }
 
     public function testImportWithNoGlobMatch()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-        $locatorMock->expects($this->once())->method('locate')->willReturn('');
+        $locatorMock = self::createMock(FileLocatorInterface::class);
+        $locatorMock->expects(self::once())->method('locate')->willReturn('');
         $loader = new TestFileLoader($locatorMock);
 
-        $this->assertNull($loader->import('./*.abc'));
+        self::assertNull($loader->import('./*.abc'));
     }
 
     public function testImportWithSimpleGlob()
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__));
 
-        $this->assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', \DIRECTORY_SEPARATOR));
+        self::assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', \DIRECTORY_SEPARATOR));
     }
 
     public function testImportWithExclude()
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__.'/../Fixtures'));
         $loadedFiles = $loader->import('Include/*', null, false, null, __DIR__.'/../Fixtures/Include/{ExcludeFile.txt}');
-        $this->assertCount(2, $loadedFiles);
-        $this->assertNotContains('ExcludeFile.txt', $loadedFiles);
+        self::assertCount(2, $loadedFiles);
+        self::assertNotContains('ExcludeFile.txt', $loadedFiles);
     }
 
     /**
@@ -135,8 +139,8 @@ class FileLoaderTest extends TestCase
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__.'/../Fixtures'));
         $loadedFiles = $loader->import('ExcludeTrailingSlash/*', null, false, null, $exclude);
-        $this->assertCount(2, $loadedFiles);
-        $this->assertNotContains('baz.txt', $loadedFiles);
+        self::assertCount(2, $loadedFiles);
+        self::assertNotContains('baz.txt', $loadedFiles);
     }
 
     public function excludeTrailingSlashConsistencyProvider(): iterable

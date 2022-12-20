@@ -25,20 +25,20 @@ class SemaphoreFactoryTest extends TestCase
 {
     public function testCreateSemaphore()
     {
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
 
         $keys = [];
         $store
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('save')
-            ->with($this->callback(function ($key) use (&$keys) {
+            ->with(self::callback(function ($key) use (&$keys) {
                 $keys[] = $key;
 
                 return true;
             }))
             ->willReturn(true);
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $factory = new SemaphoreFactory($store);
         $factory->setLogger($logger);
 
@@ -49,25 +49,25 @@ class SemaphoreFactoryTest extends TestCase
         $semaphore1->acquire();
         $semaphore2->acquire();
 
-        $this->assertNotSame($keys[0], $keys[1]);
+        self::assertNotSame($keys[0], $keys[1]);
     }
 
     public function testCreateSemaphoreFromKey()
     {
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
 
         $keys = [];
         $store
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('save')
-            ->with($this->callback(function ($key) use (&$keys) {
+            ->with(self::callback(function ($key) use (&$keys) {
                 $keys[] = $key;
 
                 return true;
             }))
             ->willReturn(true);
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $factory = new SemaphoreFactory($store);
         $factory->setLogger($logger);
 
@@ -79,6 +79,6 @@ class SemaphoreFactoryTest extends TestCase
         $semaphore1->acquire();
         $semaphore2->acquire();
 
-        $this->assertSame($keys[0], $keys[1]);
+        self::assertSame($keys[0], $keys[1]);
     }
 }

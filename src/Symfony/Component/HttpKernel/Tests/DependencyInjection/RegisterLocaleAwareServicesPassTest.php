@@ -40,16 +40,13 @@ class RegisterLocaleAwareServicesPassTest extends TestCase
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->compile();
 
-        $this->assertEquals(
-            [
-                new IteratorArgument([
-                    0 => new Reference('some_locale_aware_service'),
-                    1 => new Reference('another_locale_aware_service'),
-                ]),
-                null,
-            ],
-            $container->getDefinition('locale_aware_listener')->getArguments()
-        );
+        self::assertEquals([
+            new IteratorArgument([
+                0 => new Reference('some_locale_aware_service'),
+                1 => new Reference('another_locale_aware_service'),
+            ]),
+            null,
+        ], $container->getDefinition('locale_aware_listener')->getArguments());
     }
 
     public function testListenerUnregisteredWhenNoLocaleAwareServices()
@@ -63,6 +60,6 @@ class RegisterLocaleAwareServicesPassTest extends TestCase
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->compile();
 
-        $this->assertFalse($container->hasDefinition('locale_aware_listener'));
+        self::assertFalse($container->hasDefinition('locale_aware_listener'));
     }
 }

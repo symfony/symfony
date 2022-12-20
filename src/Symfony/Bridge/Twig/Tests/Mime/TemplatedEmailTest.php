@@ -27,13 +27,13 @@ class TemplatedEmailTest extends TestCase
     {
         $email = new TemplatedEmail();
         $email->context($context = ['product' => 'Symfony']);
-        $this->assertEquals($context, $email->getContext());
+        self::assertEquals($context, $email->getContext());
 
         $email->textTemplate($template = 'text');
-        $this->assertEquals($template, $email->getTextTemplate());
+        self::assertEquals($template, $email->getTextTemplate());
 
         $email->htmlTemplate($template = 'html');
-        $this->assertEquals($template, $email->getHtmlTemplate());
+        self::assertEquals($template, $email->getHtmlTemplate());
     }
 
     public function testSerialize()
@@ -45,9 +45,9 @@ class TemplatedEmailTest extends TestCase
         ;
 
         $email = unserialize(serialize($email));
-        $this->assertEquals('text.txt.twig', $email->getTextTemplate());
-        $this->assertEquals('text.html.twig', $email->getHtmlTemplate());
-        $this->assertEquals($context, $email->getContext());
+        self::assertEquals('text.txt.twig', $email->getTextTemplate());
+        self::assertEquals('text.html.twig', $email->getHtmlTemplate());
+        self::assertEquals($context, $email->getContext());
     }
 
     public function testSymfonySerialize()
@@ -111,15 +111,15 @@ EOF;
         ], [new JsonEncoder()]);
 
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        self::assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n = $serializer->deserialize($serialized, TemplatedEmail::class, 'json');
         $serialized = $serializer->serialize($e, 'json', [ObjectNormalizer::IGNORED_ATTRIBUTES => ['cachedBody']]);
-        $this->assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        self::assertSame($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         $n->from('fabien@symfony.com');
         $expected->from('fabien@symfony.com');
-        $this->assertEquals($expected->getHeaders(), $n->getHeaders());
-        $this->assertEquals($expected->getBody(), $n->getBody());
+        self::assertEquals($expected->getHeaders(), $n->getHeaders());
+        self::assertEquals($expected->getBody(), $n->getBody());
     }
 }

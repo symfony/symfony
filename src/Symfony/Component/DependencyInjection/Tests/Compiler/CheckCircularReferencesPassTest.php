@@ -24,7 +24,7 @@ class CheckCircularReferencesPassTest extends TestCase
 {
     public function testProcess()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
+        self::expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
         $container->register('b')->addArgument(new Reference('a'));
@@ -34,7 +34,7 @@ class CheckCircularReferencesPassTest extends TestCase
 
     public function testProcessWithAliases()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
+        self::expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
         $container->setAlias('b', 'c');
@@ -45,7 +45,7 @@ class CheckCircularReferencesPassTest extends TestCase
 
     public function testProcessWithFactory()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
+        self::expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
 
         $container
@@ -61,7 +61,7 @@ class CheckCircularReferencesPassTest extends TestCase
 
     public function testProcessDetectsIndirectCircularReference()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
+        self::expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
         $container->register('b')->addArgument(new Reference('c'));
@@ -72,7 +72,7 @@ class CheckCircularReferencesPassTest extends TestCase
 
     public function testProcessDetectsIndirectCircularReferenceWithFactory()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
+        self::expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
 
         $container->register('a')->addArgument(new Reference('b'));
@@ -88,7 +88,7 @@ class CheckCircularReferencesPassTest extends TestCase
 
     public function testDeepCircularReference()
     {
-        $this->expectException(ServiceCircularReferenceException::class);
+        self::expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
         $container->register('b')->addArgument(new Reference('c'));
@@ -105,7 +105,7 @@ class CheckCircularReferencesPassTest extends TestCase
 
         $this->process($container);
 
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testProcessIgnoresLazyServices()
@@ -117,7 +117,7 @@ class CheckCircularReferencesPassTest extends TestCase
         $this->process($container);
 
         // just make sure that a lazily loaded service does not trigger a CircularReferenceException
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     public function testProcessIgnoresIteratorArguments()
@@ -129,7 +129,7 @@ class CheckCircularReferencesPassTest extends TestCase
         $this->process($container);
 
         // just make sure that an IteratorArgument does not trigger a CircularReferenceException
-        $this->addToAssertionCount(1);
+        self::addToAssertionCount(1);
     }
 
     protected function process(ContainerBuilder $container)

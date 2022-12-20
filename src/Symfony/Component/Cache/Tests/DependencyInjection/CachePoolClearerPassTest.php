@@ -64,7 +64,7 @@ class CachePoolClearerPassTest extends TestCase
             'public.pool' => new Reference('public.pool'),
             'pool2' => new Reference('public.pool2'),
         ]];
-        $this->assertEquals($expected, $clearer->getArguments());
-        $this->assertEquals($expected, $globalClearer->getArguments());
+        self::assertEquals($expected, $clearer->getArguments());
+        self::assertEquals($expected, $globalClearer->getArguments());
     }
 }

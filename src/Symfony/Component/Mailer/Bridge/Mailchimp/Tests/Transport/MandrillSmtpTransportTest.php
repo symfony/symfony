@@ -33,9 +33,9 @@ class MandrillSmtpTransportTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 
-        $this->assertCount(3, $email->getHeaders()->toArray());
-        $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
-        $this->assertSame('X-MC-Tags: password-reset,user,another', $email->getHeaders()->get('X-MC-Tags')->toString());
-        $this->assertSame('X-MC-Metadata: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-MC-Metadata')->toString());
+        self::assertCount(3, $email->getHeaders()->toArray());
+        self::assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
+        self::assertSame('X-MC-Tags: password-reset,user,another', $email->getHeaders()->get('X-MC-Tags')->toString());
+        self::assertSame('X-MC-Metadata: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-MC-Metadata')->toString());
     }
 }

@@ -50,7 +50,7 @@ class DoctrineDataCollectorTest extends TestCase
         $c->collect(new Request(), new Response());
         $c = unserialize(serialize($c));
 
-        $this->assertEquals([], $c->getQueries());
+        self::assertEquals([], $c->getQueries());
     }
 
     /**
@@ -72,15 +72,15 @@ class DoctrineDataCollectorTest extends TestCase
             $dumper = new CliDumper($out = fopen('php://memory', 'r+'));
             $dumper->setColors(false);
             $collectedParam->dump($dumper);
-            $this->assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
+            self::assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
         } elseif (\is_string($expected)) {
-            $this->assertStringMatchesFormat($expected, $collectedParam);
+            self::assertStringMatchesFormat($expected, $collectedParam);
         } else {
-            $this->assertEquals($expected, $collectedParam);
+            self::assertEquals($expected, $collectedParam);
         }
 
-        $this->assertTrue($collectedQueries['default'][0]['explainable']);
-        $this->assertTrue($collectedQueries['default'][0]['runnable']);
+        self::assertTrue($collectedQueries['default'][0]['explainable']);
+        self::assertTrue($collectedQueries['default'][0]['runnable']);
     }
 
     public function testCollectQueryWithNoParams()
@@ -94,14 +94,14 @@ class DoctrineDataCollectorTest extends TestCase
         $c = unserialize(serialize($c));
 
         $collectedQueries = $c->getQueries();
-        $this->assertInstanceOf(Data::class, $collectedQueries['default'][0]['params']);
-        $this->assertEquals([], $collectedQueries['default'][0]['params']->getValue());
-        $this->assertTrue($collectedQueries['default'][0]['explainable']);
-        $this->assertTrue($collectedQueries['default'][0]['runnable']);
-        $this->assertInstanceOf(Data::class, $collectedQueries['default'][1]['params']);
-        $this->assertEquals([], $collectedQueries['default'][1]['params']->getValue());
-        $this->assertTrue($collectedQueries['default'][1]['explainable']);
-        $this->assertTrue($collectedQueries['default'][1]['runnable']);
+        self::assertInstanceOf(Data::class, $collectedQueries['default'][0]['params']);
+        self::assertEquals([], $collectedQueries['default'][0]['params']->getValue());
+        self::assertTrue($collectedQueries['default'][0]['explainable']);
+        self::assertTrue($collectedQueries['default'][0]['runnable']);
+        self::assertInstanceOf(Data::class, $collectedQueries['default'][1]['params']);
+        self::assertEquals([], $collectedQueries['default'][1]['params']->getValue());
+        self::assertTrue($collectedQueries['default'][1]['explainable']);
+        self::assertTrue($collectedQueries['default'][1]['runnable']);
     }
 
     /**
@@ -123,15 +123,15 @@ class DoctrineDataCollectorTest extends TestCase
             $dumper = new CliDumper($out = fopen('php://memory', 'r+'));
             $dumper->setColors(false);
             $collectedParam->dump($dumper);
-            $this->assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
+            self::assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
         } elseif (\is_string($expected)) {
-            $this->assertStringMatchesFormat($expected, $collectedParam);
+            self::assertStringMatchesFormat($expected, $collectedParam);
         } else {
-            $this->assertEquals($expected, $collectedParam);
+            self::assertEquals($expected, $collectedParam);
         }
 
-        $this->assertTrue($collectedQueries['default'][0]['explainable']);
-        $this->assertTrue($collectedQueries['default'][0]['runnable']);
+        self::assertTrue($collectedQueries['default'][0]['explainable']);
+        self::assertTrue($collectedQueries['default'][0]['runnable']);
     }
 
     public function paramProvider(): array
@@ -146,23 +146,23 @@ class DoctrineDataCollectorTest extends TestCase
 
     private function createCollector(array $queries): DoctrineDataCollector
     {
-        $connection = $this->getMockBuilder(Connection::class)
+        $connection = self::getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $connection->expects($this->any())
+        $connection->expects(self::any())
             ->method('getDatabasePlatform')
             ->willReturn(new MySqlPlatform());
 
-        $registry = $this->createMock(ManagerRegistry::class);
+        $registry = self::createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getConnectionNames')
             ->willReturn(['default' => 'doctrine.dbal.default_connection']);
         $registry
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getManagerNames')
             ->willReturn(['default' => 'doctrine.orm.default_entity_manager']);
-        $registry->expects($this->any())
+        $registry->expects(self::any())
             ->method('getConnection')
             ->willReturn($connection);
 

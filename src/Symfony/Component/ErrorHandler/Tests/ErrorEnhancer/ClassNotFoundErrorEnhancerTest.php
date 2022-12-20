@@ -66,10 +66,10 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
             }
         }
 
-        $this->assertInstanceOf(ClassNotFoundError::class, $error);
-        $this->assertSame($enhancedMessage, $error->getMessage());
-        $this->assertSame(realpath(__FILE__), $error->getFile());
-        $this->assertSame($expectedLine, $error->getLine());
+        self::assertInstanceOf(ClassNotFoundError::class, $error);
+        self::assertSame($enhancedMessage, $error->getMessage());
+        self::assertSame(realpath(__FILE__), $error->getFile());
+        self::assertSame($expectedLine, $error->getLine());
     }
 
     public function provideClassNotFoundData()
@@ -147,16 +147,16 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
             'line' => $expectedLine = __LINE__,
         ]));
 
-        $this->assertInstanceOf(ClassNotFoundError::class, $error);
-        $this->assertSame("Attempted to load class \"FooBarCcc\" from the global namespace.\nDid you forget a \"use\" statement?", $error->getMessage());
-        $this->assertSame($expectedFile, $error->getFile());
-        $this->assertSame($expectedLine, $error->getLine());
+        self::assertInstanceOf(ClassNotFoundError::class, $error);
+        self::assertSame("Attempted to load class \"FooBarCcc\" from the global namespace.\nDid you forget a \"use\" statement?", $error->getMessage());
+        self::assertSame($expectedFile, $error->getFile());
+        self::assertSame($expectedLine, $error->getLine());
     }
 
     public function testCannotRedeclareClass()
     {
         if (!file_exists(__DIR__.'/../FIXTURES2/REQUIREDTWICE.PHP')) {
-            $this->markTestSkipped('Can only be run on case insensitive filesystems');
+            self::markTestSkipped('Can only be run on case insensitive filesystems');
         }
 
         require_once __DIR__.'/../FIXTURES2/REQUIREDTWICE.PHP';
@@ -164,6 +164,6 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
         $enhancer = new ClassNotFoundErrorEnhancer();
         $error = $enhancer->enhance(new \Error("Class 'Foo\\Bar\\RequiredTwice' not found"));
 
-        $this->assertInstanceOf(ClassNotFoundError::class, $error);
+        self::assertInstanceOf(ClassNotFoundError::class, $error);
     }
 }

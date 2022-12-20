@@ -38,9 +38,9 @@ class X509AuthenticationListenerTest extends TestCase
 
         $request = new Request([], [], [], [], [], $serverVars);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
@@ -48,7 +48,7 @@ class X509AuthenticationListenerTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invokeArgs($listener, [$request]);
-        $this->assertSame($result, [$user, $credentials]);
+        self::assertSame($result, [$user, $credentials]);
     }
 
     public static function dataProviderGetPreAuthenticatedData()
@@ -66,9 +66,9 @@ class X509AuthenticationListenerTest extends TestCase
     {
         $request = new Request([], [], [], [], [], ['SSL_CLIENT_S_DN' => $credentials]);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
@@ -76,7 +76,7 @@ class X509AuthenticationListenerTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invokeArgs($listener, [$request]);
-        $this->assertSame($result, [$emailAddress, $credentials]);
+        self::assertSame($result, [$emailAddress, $credentials]);
     }
 
     public static function dataProviderGetPreAuthenticatedDataNoUser()
@@ -92,12 +92,12 @@ class X509AuthenticationListenerTest extends TestCase
 
     public function testGetPreAuthenticatedDataNoData()
     {
-        $this->expectException(BadCredentialsException::class);
+        self::expectException(BadCredentialsException::class);
         $request = new Request([], [], [], [], [], []);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
@@ -115,9 +115,9 @@ class X509AuthenticationListenerTest extends TestCase
             'TheUserKey' => 'TheUser',
             'TheCredentialsKey' => 'TheCredentials',
         ]);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage = self::createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
+        $authenticationManager = self::createMock(AuthenticationManagerInterface::class);
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey', 'TheUserKey', 'TheCredentialsKey');
 
@@ -125,6 +125,6 @@ class X509AuthenticationListenerTest extends TestCase
         $method->setAccessible(true);
 
         $result = $method->invokeArgs($listener, [$request]);
-        $this->assertSame($result, $userCredentials);
+        self::assertSame($result, $userCredentials);
     }
 }

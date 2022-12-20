@@ -34,15 +34,15 @@ class TraceableAdapterTest extends AdapterTestCase
         $pool = $this->createCachePool();
         $pool->getItem('k');
         $calls = $pool->getCalls();
-        $this->assertCount(1, $calls);
+        self::assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertSame('getItem', $call->name);
-        $this->assertSame(['k' => false], $call->result);
-        $this->assertSame(0, $call->hits);
-        $this->assertSame(1, $call->misses);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('getItem', $call->name);
+        self::assertSame(['k' => false], $call->result);
+        self::assertSame(0, $call->hits);
+        self::assertSame(1, $call->misses);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 
     public function testGetItemHitTrace()
@@ -52,11 +52,11 @@ class TraceableAdapterTest extends AdapterTestCase
         $pool->save($item);
         $pool->getItem('k');
         $calls = $pool->getCalls();
-        $this->assertCount(3, $calls);
+        self::assertCount(3, $calls);
 
         $call = $calls[2];
-        $this->assertSame(1, $call->hits);
-        $this->assertSame(0, $call->misses);
+        self::assertSame(1, $call->hits);
+        self::assertSame(0, $call->misses);
     }
 
     public function testGetItemsMissTrace()
@@ -67,14 +67,14 @@ class TraceableAdapterTest extends AdapterTestCase
         foreach ($items as $item) {
         }
         $calls = $pool->getCalls();
-        $this->assertCount(1, $calls);
+        self::assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertSame('getItems', $call->name);
-        $this->assertSame(['k0' => false, 'k1' => false], $call->result);
-        $this->assertSame(2, $call->misses);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('getItems', $call->name);
+        self::assertSame(['k0' => false, 'k1' => false], $call->result);
+        self::assertSame(2, $call->misses);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 
     public function testHasItemMissTrace()
@@ -82,13 +82,13 @@ class TraceableAdapterTest extends AdapterTestCase
         $pool = $this->createCachePool();
         $pool->hasItem('k');
         $calls = $pool->getCalls();
-        $this->assertCount(1, $calls);
+        self::assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertSame('hasItem', $call->name);
-        $this->assertSame(['k' => false], $call->result);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('hasItem', $call->name);
+        self::assertSame(['k' => false], $call->result);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 
     public function testHasItemHitTrace()
@@ -98,13 +98,13 @@ class TraceableAdapterTest extends AdapterTestCase
         $pool->save($item);
         $pool->hasItem('k');
         $calls = $pool->getCalls();
-        $this->assertCount(3, $calls);
+        self::assertCount(3, $calls);
 
         $call = $calls[2];
-        $this->assertSame('hasItem', $call->name);
-        $this->assertSame(['k' => true], $call->result);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('hasItem', $call->name);
+        self::assertSame(['k' => true], $call->result);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 
     public function testDeleteItemTrace()
@@ -112,15 +112,15 @@ class TraceableAdapterTest extends AdapterTestCase
         $pool = $this->createCachePool();
         $pool->deleteItem('k');
         $calls = $pool->getCalls();
-        $this->assertCount(1, $calls);
+        self::assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertSame('deleteItem', $call->name);
-        $this->assertSame(['k' => true], $call->result);
-        $this->assertSame(0, $call->hits);
-        $this->assertSame(0, $call->misses);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('deleteItem', $call->name);
+        self::assertSame(['k' => true], $call->result);
+        self::assertSame(0, $call->hits);
+        self::assertSame(0, $call->misses);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 
     public function testDeleteItemsTrace()
@@ -129,15 +129,15 @@ class TraceableAdapterTest extends AdapterTestCase
         $arg = ['k0', 'k1'];
         $pool->deleteItems($arg);
         $calls = $pool->getCalls();
-        $this->assertCount(1, $calls);
+        self::assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertSame('deleteItems', $call->name);
-        $this->assertSame(['keys' => $arg, 'result' => true], $call->result);
-        $this->assertSame(0, $call->hits);
-        $this->assertSame(0, $call->misses);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('deleteItems', $call->name);
+        self::assertSame(['keys' => $arg, 'result' => true], $call->result);
+        self::assertSame(0, $call->hits);
+        self::assertSame(0, $call->misses);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 
     public function testSaveTrace()
@@ -146,15 +146,15 @@ class TraceableAdapterTest extends AdapterTestCase
         $item = $pool->getItem('k')->set('foo');
         $pool->save($item);
         $calls = $pool->getCalls();
-        $this->assertCount(2, $calls);
+        self::assertCount(2, $calls);
 
         $call = $calls[1];
-        $this->assertSame('save', $call->name);
-        $this->assertSame(['k' => true], $call->result);
-        $this->assertSame(0, $call->hits);
-        $this->assertSame(0, $call->misses);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('save', $call->name);
+        self::assertSame(['k' => true], $call->result);
+        self::assertSame(0, $call->hits);
+        self::assertSame(0, $call->misses);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 
     public function testSaveDeferredTrace()
@@ -163,15 +163,15 @@ class TraceableAdapterTest extends AdapterTestCase
         $item = $pool->getItem('k')->set('foo');
         $pool->saveDeferred($item);
         $calls = $pool->getCalls();
-        $this->assertCount(2, $calls);
+        self::assertCount(2, $calls);
 
         $call = $calls[1];
-        $this->assertSame('saveDeferred', $call->name);
-        $this->assertSame(['k' => true], $call->result);
-        $this->assertSame(0, $call->hits);
-        $this->assertSame(0, $call->misses);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('saveDeferred', $call->name);
+        self::assertSame(['k' => true], $call->result);
+        self::assertSame(0, $call->hits);
+        self::assertSame(0, $call->misses);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 
     public function testCommitTrace()
@@ -179,14 +179,14 @@ class TraceableAdapterTest extends AdapterTestCase
         $pool = $this->createCachePool();
         $pool->commit();
         $calls = $pool->getCalls();
-        $this->assertCount(1, $calls);
+        self::assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertSame('commit', $call->name);
-        $this->assertTrue($call->result);
-        $this->assertSame(0, $call->hits);
-        $this->assertSame(0, $call->misses);
-        $this->assertNotEmpty($call->start);
-        $this->assertNotEmpty($call->end);
+        self::assertSame('commit', $call->name);
+        self::assertTrue($call->result);
+        self::assertSame(0, $call->hits);
+        self::assertSame(0, $call->misses);
+        self::assertNotEmpty($call->start);
+        self::assertNotEmpty($call->end);
     }
 }

@@ -20,6 +20,6 @@ final class TestBrowserTokenTest extends TestCase
     {
         $token = unserialize(serialize(new TestBrowserToken()));
 
-        $this->assertSame('main', $token->getFirewallName());
+        self::assertSame('main', $token->getFirewallName());
     }
 }

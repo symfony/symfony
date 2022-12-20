@@ -26,7 +26,7 @@ class RegexTest extends TestCase
     {
         $constraint = new Regex('/^[0-9]+$/');
 
-        $this->assertSame('/^[0-9]+$/', $constraint->pattern);
+        self::assertSame('/^[0-9]+$/', $constraint->pattern);
     }
 
     public function provideHtmlPatterns()
@@ -74,8 +74,8 @@ class RegexTest extends TestCase
             'match' => $match,
         ]);
 
-        $this->assertSame($pattern, $constraint->pattern);
-        $this->assertSame($htmlPattern, $constraint->getHtmlPattern());
+        self::assertSame($pattern, $constraint->pattern);
+        self::assertSame($htmlPattern, $constraint->getHtmlPattern());
     }
 
     public function testGetCustomHtmlPattern()
@@ -85,28 +85,28 @@ class RegexTest extends TestCase
             'htmlPattern' => 'foobar',
         ]);
 
-        $this->assertSame('((?![0-9]$|[a-z]+).)*', $constraint->pattern);
-        $this->assertSame('foobar', $constraint->getHtmlPattern());
+        self::assertSame('((?![0-9]$|[a-z]+).)*', $constraint->pattern);
+        self::assertSame('foobar', $constraint->getHtmlPattern());
     }
 
     public function testNormalizerCanBeSet()
     {
         $regex = new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'trim']);
 
-        $this->assertEquals('trim', $regex->normalizer);
+        self::assertEquals('trim', $regex->normalizer);
     }
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => new \stdClass()]);
     }
 

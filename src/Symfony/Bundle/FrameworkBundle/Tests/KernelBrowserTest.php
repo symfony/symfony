@@ -20,7 +20,7 @@ class KernelBrowserTest extends AbstractWebTestCase
     public function testRebootKernelBetweenRequests()
     {
         $mock = $this->getKernelMock();
-        $mock->expects($this->once())->method('shutdown');
+        $mock->expects(self::once())->method('shutdown');
 
         $client = new KernelBrowser($mock);
         $client->request('GET', '/');
@@ -30,7 +30,7 @@ class KernelBrowserTest extends AbstractWebTestCase
     public function testDisabledRebootKernel()
     {
         $mock = $this->getKernelMock();
-        $mock->expects($this->never())->method('shutdown');
+        $mock->expects(self::never())->method('shutdown');
 
         $client = new KernelBrowser($mock);
         $client->disableReboot();
@@ -41,7 +41,7 @@ class KernelBrowserTest extends AbstractWebTestCase
     public function testEnableRebootKernel()
     {
         $mock = $this->getKernelMock();
-        $mock->expects($this->once())->method('shutdown');
+        $mock->expects(self::once())->method('shutdown');
 
         $client = new KernelBrowser($mock);
         $client->disableReboot();
@@ -53,22 +53,22 @@ class KernelBrowserTest extends AbstractWebTestCase
 
     public function testRequestAfterKernelShutdownAndPerformedRequest()
     {
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
 
-        $client = static::createClient(['test_case' => 'TestServiceContainer']);
+        $client = self::createClient(['test_case' => 'TestServiceContainer']);
         $client->request('GET', '/');
-        static::ensureKernelShutdown();
+        self::ensureKernelShutdown();
         $client->request('GET', '/');
     }
 
     private function getKernelMock()
     {
-        $mock = $this->getMockBuilder($this->getKernelClass())
+        $mock = self::getMockBuilder(self::getKernelClass())
             ->setMethods(['shutdown', 'boot', 'handle', 'getContainer'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mock->expects($this->any())->method('handle')->willReturn(new Response('foo'));
+        $mock->expects(self::any())->method('handle')->willReturn(new Response('foo'));
 
         return $mock;
     }

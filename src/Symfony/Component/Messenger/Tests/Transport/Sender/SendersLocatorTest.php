@@ -23,7 +23,7 @@ class SendersLocatorTest extends TestCase
 {
     public function testItReturnsTheSenderBasedOnTheMessageClass()
     {
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = self::createMock(SenderInterface::class);
         $sendersLocator = $this->createContainer([
             'my_sender' => $sender,
         ]);
@@ -31,19 +31,19 @@ class SendersLocatorTest extends TestCase
             DummyMessage::class => ['my_sender'],
         ], $sendersLocator);
 
-        $this->assertSame(['my_sender' => $sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
-        $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
+        self::assertSame(['my_sender' => $sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
+        self::assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 
     private function createContainer(array $senders): ContainerInterface
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())
+        $container = self::createMock(ContainerInterface::class);
+        $container->expects(self::any())
             ->method('has')
             ->willReturnCallback(function ($id) use ($senders) {
                 return isset($senders[$id]);
             });
-        $container->expects($this->any())
+        $container->expects(self::any())
             ->method('get')
             ->willReturnCallback(function ($id) use ($senders) {
                 return $senders[$id];

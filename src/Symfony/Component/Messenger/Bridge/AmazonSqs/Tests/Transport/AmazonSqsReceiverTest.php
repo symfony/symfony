@@ -29,26 +29,26 @@ class AmazonSqsReceiverTest extends TestCase
         $serializer = $this->createSerializer();
 
         $sqsEnvelop = $this->createSqsEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $connection->method('get')->willReturn($sqsEnvelop);
 
         $receiver = new AmazonSqsReceiver($connection, $serializer);
         $actualEnvelopes = iterator_to_array($receiver->get());
-        $this->assertCount(1, $actualEnvelopes);
-        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+        self::assertCount(1, $actualEnvelopes);
+        self::assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
 
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
     {
-        $this->expectException(MessageDecodingFailedException::class);
+        self::expectException(MessageDecodingFailedException::class);
 
-        $serializer = $this->createMock(PhpSerializer::class);
+        $serializer = self::createMock(PhpSerializer::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $sqsEnvelop = $this->createSqsEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createMock(Connection::class);
         $connection->method('get')->willReturn($sqsEnvelop);
-        $connection->expects($this->once())->method('delete');
+        $connection->expects(self::once())->method('delete');
 
         $receiver = new AmazonSqsReceiver($connection, $serializer);
         iterator_to_array($receiver->get());

@@ -23,26 +23,26 @@ class BasicAuthenticationEntryPointTest extends TestCase
 {
     public function testStart()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
 
         $authException = new AuthenticationException('The exception message');
 
         $entryPoint = new BasicAuthenticationEntryPoint('TheRealmName');
         $response = $entryPoint->start($request, $authException);
 
-        $this->assertEquals('Basic realm="TheRealmName"', $response->headers->get('WWW-Authenticate'));
-        $this->assertEquals(401, $response->getStatusCode());
+        self::assertEquals('Basic realm="TheRealmName"', $response->headers->get('WWW-Authenticate'));
+        self::assertEquals(401, $response->getStatusCode());
     }
 
     public function testStartWithoutAuthException()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
 
         $entryPoint = new BasicAuthenticationEntryPoint('TheRealmName');
 
         $response = $entryPoint->start($request);
 
-        $this->assertEquals('Basic realm="TheRealmName"', $response->headers->get('WWW-Authenticate'));
-        $this->assertEquals(401, $response->getStatusCode());
+        self::assertEquals('Basic realm="TheRealmName"', $response->headers->get('WWW-Authenticate'));
+        self::assertEquals(401, $response->getStatusCode());
     }
 }

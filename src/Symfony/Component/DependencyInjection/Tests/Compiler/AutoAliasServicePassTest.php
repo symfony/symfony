@@ -21,7 +21,7 @@ class AutoAliasServicePassTest extends TestCase
 {
     public function testProcessWithMissingParameter()
     {
-        $this->expectException(ParameterNotFoundException::class);
+        self::expectException(ParameterNotFoundException::class);
         $container = new ContainerBuilder();
 
         $container->register('example')
@@ -33,7 +33,7 @@ class AutoAliasServicePassTest extends TestCase
 
     public function testProcessWithMissingFormat()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $container = new ContainerBuilder();
 
         $container->register('example')
@@ -55,7 +55,7 @@ class AutoAliasServicePassTest extends TestCase
         $pass = new AutoAliasServicePass();
         $pass->process($container);
 
-        $this->assertEquals('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault', $container->getDefinition('example')->getClass());
+        self::assertEquals('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault', $container->getDefinition('example')->getClass());
     }
 
     public function testProcessWithExistingAlias()
@@ -71,9 +71,9 @@ class AutoAliasServicePassTest extends TestCase
         $pass = new AutoAliasServicePass();
         $pass->process($container);
 
-        $this->assertTrue($container->hasAlias('example'));
-        $this->assertEquals('mysql.example', $container->getAlias('example'));
-        $this->assertSame('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMysql', $container->getDefinition('mysql.example')->getClass());
+        self::assertTrue($container->hasAlias('example'));
+        self::assertEquals('mysql.example', $container->getAlias('example'));
+        self::assertSame('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMysql', $container->getDefinition('mysql.example')->getClass());
     }
 
     public function testProcessWithManualAlias()
@@ -91,9 +91,9 @@ class AutoAliasServicePassTest extends TestCase
         $pass = new AutoAliasServicePass();
         $pass->process($container);
 
-        $this->assertTrue($container->hasAlias('example'));
-        $this->assertEquals('mariadb.example', $container->getAlias('example'));
-        $this->assertSame('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMariaDb', $container->getDefinition('mariadb.example')->getClass());
+        self::assertTrue($container->hasAlias('example'));
+        self::assertEquals('mariadb.example', $container->getAlias('example'));
+        self::assertSame('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMariaDb', $container->getDefinition('mariadb.example')->getClass());
     }
 }
 

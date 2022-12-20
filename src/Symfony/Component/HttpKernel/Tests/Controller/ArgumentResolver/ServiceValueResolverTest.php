@@ -28,7 +28,7 @@ class ServiceValueResolverTest extends TestCase
         $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'my_controller']);
 
-        $this->assertFalse($resolver->supports($request, $argument));
+        self::assertFalse($resolver->supports($request, $argument));
     }
 
     public function testExistingController()
@@ -46,7 +46,7 @@ class ServiceValueResolverTest extends TestCase
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);
         $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
 
-        $this->assertTrue($resolver->supports($request, $argument));
+        self::assertTrue($resolver->supports($request, $argument));
         $this->assertYieldEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
@@ -65,7 +65,7 @@ class ServiceValueResolverTest extends TestCase
         $request = $this->requestWithAttributes(['_controller' => '\\App\\Controller\\Mine::method']);
         $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
 
-        $this->assertTrue($resolver->supports($request, $argument));
+        self::assertTrue($resolver->supports($request, $argument));
         $this->assertYieldEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
@@ -83,7 +83,7 @@ class ServiceValueResolverTest extends TestCase
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::Method']);
         $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
 
-        $this->assertTrue($resolver->supports($request, $argument));
+        self::assertTrue($resolver->supports($request, $argument));
         $this->assertYieldEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
@@ -102,14 +102,14 @@ class ServiceValueResolverTest extends TestCase
         $request = $this->requestWithAttributes(['_controller' => ['App\\Controller\\Mine', 'method']]);
         $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
 
-        $this->assertTrue($resolver->supports($request, $argument));
+        self::assertTrue($resolver->supports($request, $argument));
         $this->assertYieldEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
     public function testErrorIsTruncated()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Cannot autowire argument $dummy of "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyController::index()": it references class "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyService" but no such service exists.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Cannot autowire argument $dummy of "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyController::index()": it references class "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyService" but no such service exists.');
         $container = new ContainerBuilder();
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
 
@@ -141,7 +141,7 @@ class ServiceValueResolverTest extends TestCase
             $args[] = $arg;
         }
 
-        $this->assertEquals($expected, $args);
+        self::assertEquals($expected, $args);
     }
 }
 

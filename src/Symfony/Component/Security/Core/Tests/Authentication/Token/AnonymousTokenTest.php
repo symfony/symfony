@@ -22,30 +22,30 @@ class AnonymousTokenTest extends TestCase
     public function testConstructor()
     {
         $token = new AnonymousToken('foo', 'bar', ['ROLE_FOO']);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
+        self::assertEquals(['ROLE_FOO'], $token->getRoleNames());
     }
 
     public function testIsAuthenticated()
     {
         $token = new AnonymousToken('foo', 'bar');
-        $this->assertTrue($token->isAuthenticated());
+        self::assertTrue($token->isAuthenticated());
     }
 
     public function testGetKey()
     {
         $token = new AnonymousToken('foo', 'bar');
-        $this->assertEquals('foo', $token->getSecret());
+        self::assertEquals('foo', $token->getSecret());
     }
 
     public function testGetCredentials()
     {
         $token = new AnonymousToken('foo', 'bar');
-        $this->assertEquals('', $token->getCredentials());
+        self::assertEquals('', $token->getCredentials());
     }
 
     public function testGetUser()
     {
         $token = new AnonymousToken('foo', 'bar');
-        $this->assertEquals('bar', $token->getUser());
+        self::assertEquals('bar', $token->getUser());
     }
 }

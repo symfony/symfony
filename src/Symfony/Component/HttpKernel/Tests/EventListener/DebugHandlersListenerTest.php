@@ -39,7 +39,7 @@ class DebugHandlersListenerTest extends TestCase
 
     public function testConfigure()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
         $userHandler = function () {};
         $listener = new DebugHandlersListener($userHandler, $logger);
         $eHandler = new ErrorHandler();
@@ -59,12 +59,12 @@ class DebugHandlersListenerTest extends TestCase
             throw $exception;
         }
 
-        $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
+        self::assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
 
         $loggers = $eHandler->setLoggers([]);
 
-        $this->assertArrayHasKey(\E_DEPRECATED, $loggers);
-        $this->assertSame([$logger, LogLevel::INFO], $loggers[\E_DEPRECATED]);
+        self::assertArrayHasKey(\E_DEPRECATED, $loggers);
+        self::assertSame([$logger, LogLevel::INFO], $loggers[\E_DEPRECATED]);
     }
 
     public function testConfigureForHttpKernelWithNoTerminateWithException()
@@ -72,7 +72,7 @@ class DebugHandlersListenerTest extends TestCase
         $listener = new DebugHandlersListener(null);
         $eHandler = new ErrorHandler();
         $event = new KernelEvent(
-            $this->createMock(HttpKernelInterface::class),
+            self::createMock(HttpKernelInterface::class),
             Request::create('/'),
             HttpKernelInterface::MAIN_REQUEST
         );
@@ -89,15 +89,15 @@ class DebugHandlersListenerTest extends TestCase
             throw $exception;
         }
 
-        $this->assertNull($h);
+        self::assertNull($h);
     }
 
     public function testConsoleEvent()
     {
         $dispatcher = new EventDispatcher();
         $listener = new DebugHandlersListener(null);
-        $app = $this->createMock(Application::class);
-        $app->expects($this->once())->method('getHelperSet')->willReturn(new HelperSet());
+        $app = self::createMock(Application::class);
+        $app->expects(self::once())->method('getHelperSet')->willReturn(new HelperSet());
         $command = new Command(__FUNCTION__);
         $command->setApplication($app);
         $event = new ConsoleEvent($command, new ArgvInput(), new ConsoleOutput());
@@ -108,7 +108,7 @@ class DebugHandlersListenerTest extends TestCase
             KernelEvents::REQUEST => [[$listener, 'configure']],
             ConsoleEvents::COMMAND => [[$listener, 'configure']],
         ];
-        $this->assertSame($xListeners, $dispatcher->getListeners());
+        self::assertSame($xListeners, $dispatcher->getListeners());
 
         $exception = null;
         $eHandler = new ErrorHandler();
@@ -127,9 +127,9 @@ class DebugHandlersListenerTest extends TestCase
         }
 
         $xHandler = $eHandler->setExceptionHandler('var_dump');
-        $this->assertInstanceOf(\Closure::class, $xHandler);
+        self::assertInstanceOf(\Closure::class, $xHandler);
 
-        $app->expects($this->once())
+        $app->expects(self::once())
             ->method(method_exists(Application::class, 'renderThrowable') ? 'renderThrowable' : 'renderException');
 
         $xHandler(new \Exception());
@@ -154,7 +154,7 @@ class DebugHandlersListenerTest extends TestCase
             throw $exception;
         }
 
-        $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
+        self::assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
     }
 
     public function provideLevelsAssignedToLoggers(): array
@@ -196,31 +196,31 @@ class DebugHandlersListenerTest extends TestCase
     public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, $levels, $expectedLoggerLevels, $expectedDeprecationLoggerLevels)
     {
         if (!class_exists(ErrorHandler::class)) {
-            $this->markTestSkipped('ErrorHandler component is required to run this test.');
+            self::markTestSkipped('ErrorHandler component is required to run this test.');
         }
 
-        $handler = $this->createMock(ErrorHandler::class);
+        $handler = self::createMock(ErrorHandler::class);
 
         $expectedCalls = [];
         $logger = null;
 
         $deprecationLogger = null;
         if ($hasDeprecationLogger) {
-            $deprecationLogger = $this->createMock(LoggerInterface::class);
+            $deprecationLogger = self::createMock(LoggerInterface::class);
             if (null !== $expectedDeprecationLoggerLevels) {
                 $expectedCalls[] = [$deprecationLogger, $expectedDeprecationLoggerLevels];
             }
         }
 
         if ($hasLogger) {
-            $logger = $this->createMock(LoggerInterface::class);
+            $logger = self::createMock(LoggerInterface::class);
             if (null !== $expectedLoggerLevels) {
                 $expectedCalls[] = [$logger, $expectedLoggerLevels];
             }
         }
 
         $handler
-            ->expects($this->exactly(\count($expectedCalls)))
+            ->expects(self::exactly(\count($expectedCalls)))
             ->method('setDefaultLogger')
             ->withConsecutive(...$expectedCalls);
 
@@ -249,6 +249,6 @@ class DebugHandlersListenerTest extends TestCase
     {
         $this->expectDeprecation('Since symfony/http-kernel 5.4: Passing a $fileLinkFormat is deprecated.');
 
-        new DebugHandlersListener(null, null, \E_ALL, \E_ALL, true, 'filelinkformat', true, $this->createMock(LoggerInterface::class));
+        new DebugHandlersListener(null, null, \E_ALL, \E_ALL, true, 'filelinkformat', true, self::createMock(LoggerInterface::class));
     }
 }

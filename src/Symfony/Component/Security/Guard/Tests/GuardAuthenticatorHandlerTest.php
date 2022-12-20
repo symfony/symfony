@@ -39,16 +39,16 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     public function testAuthenticateWithToken()
     {
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('setToken')
             ->with($this->token);
 
         $loginEvent = new InteractiveLoginEvent($this->request, $this->token);
 
         $this->dispatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('dispatch')
-            ->with($this->equalTo($loginEvent), $this->equalTo(SecurityEvents::INTERACTIVE_LOGIN))
+            ->with(self::equalTo($loginEvent), self::equalTo(SecurityEvents::INTERACTIVE_LOGIN))
         ;
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
@@ -59,33 +59,33 @@ class GuardAuthenticatorHandlerTest extends TestCase
     {
         $providerKey = 'my_handleable_firewall';
         $response = new Response('Guard all the things!');
-        $this->guardAuthenticator->expects($this->once())
+        $this->guardAuthenticator->expects(self::once())
             ->method('onAuthenticationSuccess')
             ->with($this->request, $this->token, $providerKey)
             ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationSuccess($this->token, $this->request, $this->guardAuthenticator, $providerKey);
-        $this->assertSame($response, $actualResponse);
+        self::assertSame($response, $actualResponse);
     }
 
     public function testHandleAuthenticationFailure()
     {
         // setToken() not called - getToken() will return null, so there's nothing to clear
-        $this->tokenStorage->expects($this->never())
+        $this->tokenStorage->expects(self::never())
             ->method('setToken')
             ->with(null);
         $authException = new AuthenticationException('Bad password!');
 
         $response = new Response('Try again, but with the right password!');
-        $this->guardAuthenticator->expects($this->once())
+        $this->guardAuthenticator->expects(self::once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $authException)
             ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, 'firewall_provider_key');
-        $this->assertSame($response, $actualResponse);
+        self::assertSame($response, $actualResponse);
     }
 
     /**
@@ -93,20 +93,20 @@ class GuardAuthenticatorHandlerTest extends TestCase
      */
     public function testHandleAuthenticationClearsToken($tokenProviderKey, $actualProviderKey)
     {
-        $this->tokenStorage->expects($this->never())
+        $this->tokenStorage->expects(self::never())
             ->method('setToken')
             ->with(null);
         $authException = new AuthenticationException('Bad password!');
 
         $response = new Response('Try again, but with the right password!');
-        $this->guardAuthenticator->expects($this->once())
+        $this->guardAuthenticator->expects(self::once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $authException)
             ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, $actualProviderKey);
-        $this->assertSame($response, $actualResponse);
+        self::assertSame($response, $actualResponse);
     }
 
     public function getTokenClearingTests()
@@ -124,7 +124,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
     {
         $this->configurePreviousSession();
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('setToken')
             ->with($this->token);
 
@@ -136,7 +136,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
     {
         $this->configurePreviousSession();
 
-        $this->sessionStrategy->expects($this->once())
+        $this->sessionStrategy->expects(self::once())
             ->method('onAuthentication')
             ->with($this->request, $this->token);
 
@@ -149,7 +149,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
     {
         $this->configurePreviousSession();
 
-        $this->sessionStrategy->expects($this->never())
+        $this->sessionStrategy->expects(self::never())
             ->method('onAuthentication');
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher, ['some_provider_key']);
@@ -159,11 +159,11 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     public function testSessionIsNotInstantiatedOnStatelessFirewall()
     {
-        $sessionFactory = $this->getMockBuilder(\stdClass::class)
+        $sessionFactory = self::getMockBuilder(\stdClass::class)
             ->setMethods(['__invoke'])
             ->getMock();
 
-        $sessionFactory->expects($this->never())
+        $sessionFactory->expects(self::never())
             ->method('__invoke');
 
         $this->request->setSessionFactory($sessionFactory);
@@ -175,12 +175,12 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->token = $this->createMock(TokenInterface::class);
+        $this->tokenStorage = self::createMock(TokenStorageInterface::class);
+        $this->dispatcher = self::createMock(EventDispatcherInterface::class);
+        $this->token = self::createMock(TokenInterface::class);
         $this->request = new Request([], [], [], [], [], []);
-        $this->sessionStrategy = $this->createMock(SessionAuthenticationStrategyInterface::class);
-        $this->guardAuthenticator = $this->createMock(AuthenticatorInterface::class);
+        $this->sessionStrategy = self::createMock(SessionAuthenticationStrategyInterface::class);
+        $this->guardAuthenticator = self::createMock(AuthenticatorInterface::class);
     }
 
     protected function tearDown(): void
@@ -194,8 +194,8 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     private function configurePreviousSession()
     {
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->any())
+        $session = self::createMock(SessionInterface::class);
+        $session->expects(self::any())
             ->method('getName')
             ->willReturn('test_session_name');
         $this->request->setSession($session);

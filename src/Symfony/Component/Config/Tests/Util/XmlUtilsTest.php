@@ -23,80 +23,80 @@ class XmlUtilsTest extends TestCase
 
         try {
             XmlUtils::loadFile($fixtures);
-            $this->fail();
+            self::fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('is not a file', $e->getMessage());
+            self::assertStringContainsString('is not a file', $e->getMessage());
         }
 
         try {
             XmlUtils::loadFile($fixtures.'non_existing.xml');
-            $this->fail();
+            self::fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('is not a file', $e->getMessage());
+            self::assertStringContainsString('is not a file', $e->getMessage());
         }
 
         try {
             if ('\\' === \DIRECTORY_SEPARATOR) {
-                $this->markTestSkipped('chmod is not supported on Windows');
+                self::markTestSkipped('chmod is not supported on Windows');
             }
             chmod($fixtures.'not_readable.xml', 000);
             XmlUtils::loadFile($fixtures.'not_readable.xml');
-            $this->fail();
+            self::fail();
         } catch (\InvalidArgumentException $e) {
             chmod($fixtures.'not_readable.xml', 0644);
-            $this->assertStringContainsString('is not readable', $e->getMessage());
+            self::assertStringContainsString('is not readable', $e->getMessage());
         }
 
         try {
             XmlUtils::loadFile($fixtures.'invalid.xml');
-            $this->fail();
+            self::fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('ERROR ', $e->getMessage());
+            self::assertStringContainsString('ERROR ', $e->getMessage());
         }
 
         try {
             XmlUtils::loadFile($fixtures.'document_type.xml');
-            $this->fail();
+            self::fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('Document types are not allowed', $e->getMessage());
+            self::assertStringContainsString('Document types are not allowed', $e->getMessage());
         }
 
         try {
             XmlUtils::loadFile($fixtures.'invalid_schema.xml', $fixtures.'schema.xsd');
-            $this->fail();
+            self::fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('ERROR 1845', $e->getMessage());
+            self::assertStringContainsString('ERROR 1845', $e->getMessage());
         }
 
         try {
             XmlUtils::loadFile($fixtures.'invalid_schema.xml', 'invalid_callback_or_file');
-            $this->fail();
+            self::fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('XSD file or callable', $e->getMessage());
+            self::assertStringContainsString('XSD file or callable', $e->getMessage());
         }
 
-        $mock = $this->createMock(Validator::class);
-        $mock->expects($this->exactly(2))->method('validate')->will($this->onConsecutiveCalls(false, true));
+        $mock = self::createMock(Validator::class);
+        $mock->expects(self::exactly(2))->method('validate')->will(self::onConsecutiveCalls(false, true));
 
         try {
             XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']);
-            $this->fail();
+            self::fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertMatchesRegularExpression('/The XML file ".+" is not valid\./', $e->getMessage());
+            self::assertMatchesRegularExpression('/The XML file ".+" is not valid\./', $e->getMessage());
         }
 
-        $this->assertInstanceOf(\DOMDocument::class, XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']));
-        $this->assertSame([], libxml_get_errors());
+        self::assertInstanceOf(\DOMDocument::class, XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']));
+        self::assertSame([], libxml_get_errors());
     }
 
     public function testParseWithInvalidValidatorCallable()
     {
-        $this->expectException(InvalidXmlException::class);
-        $this->expectExceptionMessage('The XML is not valid');
+        self::expectException(InvalidXmlException::class);
+        self::expectExceptionMessage('The XML is not valid');
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
-        $mock = $this->createMock(Validator::class);
-        $mock->expects($this->once())->method('validate')->willReturn(false);
+        $mock = self::createMock(Validator::class);
+        $mock->expects(self::once())->method('validate')->willReturn(false);
 
         XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), [$mock, 'validate']);
     }
@@ -105,9 +105,9 @@ class XmlUtilsTest extends TestCase
     {
         $internalErrors = libxml_use_internal_errors(true);
 
-        $this->assertSame([], libxml_get_errors());
-        $this->assertInstanceOf(\DOMDocument::class, XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/invalid_schema.xml'));
-        $this->assertSame([], libxml_get_errors());
+        self::assertSame([], libxml_get_errors());
+        self::assertInstanceOf(\DOMDocument::class, XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/invalid_schema.xml'));
+        self::assertSame([], libxml_get_errors());
 
         libxml_clear_errors();
         libxml_use_internal_errors($internalErrors);
@@ -121,7 +121,7 @@ class XmlUtilsTest extends TestCase
         $dom = new \DOMDocument();
         $dom->loadXML($root ? $xml : '<root>'.$xml.'</root>');
 
-        $this->assertSame($expected, XmlUtils::convertDomElementToArray($dom->documentElement, $checkPrefix));
+        self::assertSame($expected, XmlUtils::convertDomElementToArray($dom->documentElement, $checkPrefix));
     }
 
     public function getDataForConvertDomToArray(): array
@@ -152,7 +152,7 @@ class XmlUtilsTest extends TestCase
      */
     public function testPhpize($expected, string $value)
     {
-        $this->assertSame($expected, XmlUtils::phpize($value));
+        self::assertSame($expected, XmlUtils::phpize($value));
     }
 
     public function getDataForPhpize(): array
@@ -193,8 +193,8 @@ class XmlUtilsTest extends TestCase
     {
         $file = __DIR__.'/../Fixtures/foo.xml';
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('File "%s" does not contain valid XML, it is empty.', $file));
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('File "%s" does not contain valid XML, it is empty.', $file));
 
         XmlUtils::loadFile($file);
     }
@@ -215,9 +215,9 @@ class XmlUtilsTest extends TestCase
         try {
             try {
                 XmlUtils::loadFile($file);
-                $this->fail('An exception should have been raised');
+                self::fail('An exception should have been raised');
             } catch (\InvalidArgumentException $e) {
-                $this->assertEquals(sprintf('File "%s" does not contain valid XML, it is empty.', $file), $e->getMessage());
+                self::assertEquals(sprintf('File "%s" does not contain valid XML, it is empty.', $file), $e->getMessage());
             }
         } finally {
             restore_error_handler();
@@ -229,7 +229,7 @@ class XmlUtilsTest extends TestCase
             libxml_disable_entity_loader($disableEntities);
 
             libxml_disable_entity_loader($originalDisableEntities);
-            $this->assertFalse($disableEntities);
+            self::assertFalse($disableEntities);
         }
 
         // should not throw an exception

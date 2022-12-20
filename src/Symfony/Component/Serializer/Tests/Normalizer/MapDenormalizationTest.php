@@ -40,17 +40,17 @@ class MapDenormalizationTest extends TestCase
             ],
         ], DummyMapOfStringToNullableObject::class);
 
-        $this->assertInstanceOf(DummyMapOfStringToNullableObject::class, $normalizedData);
+        self::assertInstanceOf(DummyMapOfStringToNullableObject::class, $normalizedData);
 
         // check nullable map value
-        $this->assertIsArray($normalizedData->map);
+        self::assertIsArray($normalizedData->map);
 
-        $this->assertArrayHasKey('assertDummyMapValue', $normalizedData->map);
-        $this->assertInstanceOf(DummyValue::class, $normalizedData->map['assertDummyMapValue']);
+        self::assertArrayHasKey('assertDummyMapValue', $normalizedData->map);
+        self::assertInstanceOf(DummyValue::class, $normalizedData->map['assertDummyMapValue']);
 
-        $this->assertArrayHasKey('assertNull', $normalizedData->map);
+        self::assertArrayHasKey('assertNull', $normalizedData->map);
 
-        $this->assertNull($normalizedData->map['assertNull']);
+        self::assertNull($normalizedData->map['assertNull']);
     }
 
     public function testMapOfStringToAbstractNullableObject()
@@ -62,11 +62,11 @@ class MapDenormalizationTest extends TestCase
                 ],
             ], DummyMapOfStringToNullableAbstractObject::class);
 
-        $this->assertInstanceOf(DummyMapOfStringToNullableAbstractObject::class, $normalizedData);
+        self::assertInstanceOf(DummyMapOfStringToNullableAbstractObject::class, $normalizedData);
 
-        $this->assertIsArray($normalizedData->map);
-        $this->assertArrayHasKey('assertNull', $normalizedData->map);
-        $this->assertNull($normalizedData->map['assertNull']);
+        self::assertIsArray($normalizedData->map);
+        self::assertArrayHasKey('assertNull', $normalizedData->map);
+        self::assertNull($normalizedData->map['assertNull']);
     }
 
     public function testMapOfStringToObject()
@@ -81,18 +81,18 @@ class MapDenormalizationTest extends TestCase
                 ],
             ], DummyMapOfStringToObject::class);
 
-        $this->assertInstanceOf(DummyMapOfStringToObject::class, $normalizedData);
+        self::assertInstanceOf(DummyMapOfStringToObject::class, $normalizedData);
 
         // check nullable map value
-        $this->assertIsArray($normalizedData->map);
+        self::assertIsArray($normalizedData->map);
 
-        $this->assertArrayHasKey('assertDummyMapValue', $normalizedData->map);
-        $this->assertInstanceOf(DummyValue::class, $normalizedData->map['assertDummyMapValue']);
-        $this->assertEquals('foo', $normalizedData->map['assertDummyMapValue']->value);
+        self::assertArrayHasKey('assertDummyMapValue', $normalizedData->map);
+        self::assertInstanceOf(DummyValue::class, $normalizedData->map['assertDummyMapValue']);
+        self::assertEquals('foo', $normalizedData->map['assertDummyMapValue']->value);
 
-        $this->assertArrayHasKey('assertEmptyDummyMapValue', $normalizedData->map);
-        $this->assertInstanceOf(DummyValue::class, $normalizedData->map['assertEmptyDummyMapValue']); // correct since to attribute is not nullable
-        $this->assertNull($normalizedData->map['assertEmptyDummyMapValue']->value);
+        self::assertArrayHasKey('assertEmptyDummyMapValue', $normalizedData->map);
+        self::assertInstanceOf(DummyValue::class, $normalizedData->map['assertEmptyDummyMapValue']); // correct since to attribute is not nullable
+        self::assertNull($normalizedData->map['assertEmptyDummyMapValue']->value);
     }
 
     public function testMapOfStringToAbstractObject()
@@ -107,20 +107,20 @@ class MapDenormalizationTest extends TestCase
                 ],
             ], DummyMapOfStringToNotNullableAbstractObject::class);
 
-        $this->assertInstanceOf(DummyMapOfStringToNotNullableAbstractObject::class, $normalizedData);
+        self::assertInstanceOf(DummyMapOfStringToNotNullableAbstractObject::class, $normalizedData);
 
         // check nullable map value
-        $this->assertIsArray($normalizedData->map);
+        self::assertIsArray($normalizedData->map);
 
-        $this->assertArrayHasKey('assertDummyMapValue', $normalizedData->map);
-        $this->assertInstanceOf(DummyValue::class, $normalizedData->map['assertDummyMapValue']);
-        $this->assertEquals('foo', $normalizedData->map['assertDummyMapValue']->value);
+        self::assertArrayHasKey('assertDummyMapValue', $normalizedData->map);
+        self::assertInstanceOf(DummyValue::class, $normalizedData->map['assertDummyMapValue']);
+        self::assertEquals('foo', $normalizedData->map['assertDummyMapValue']->value);
     }
 
     public function testMapOfStringToAbstractObjectMissingTypeAttribute()
     {
-        $this->expectException(NotNormalizableValueException::class);
-        $this->expectExceptionMessage('Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Normalizer\AbstractDummyValue".');
+        self::expectException(NotNormalizableValueException::class);
+        self::expectExceptionMessage('Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Normalizer\AbstractDummyValue".');
 
         $this->getSerializer()->denormalize(
             [
@@ -140,12 +140,12 @@ class MapDenormalizationTest extends TestCase
                 'nullObject' => null,
             ], DummyNullableObjectValue::class);
 
-        $this->assertInstanceOf(DummyNullableObjectValue::class, $normalizedData);
+        self::assertInstanceOf(DummyNullableObjectValue::class, $normalizedData);
 
-        $this->assertInstanceOf(DummyValue::class, $normalizedData->object);
-        $this->assertEquals('foo', $normalizedData->object->value);
+        self::assertInstanceOf(DummyValue::class, $normalizedData->object);
+        self::assertEquals('foo', $normalizedData->object->value);
 
-        $this->assertNull($normalizedData->nullObject);
+        self::assertNull($normalizedData->nullObject);
     }
 
     public function testNotNullableObject()
@@ -158,13 +158,13 @@ class MapDenormalizationTest extends TestCase
                 'nullObject' => null,
             ], DummyNotNullableObjectValue::class);
 
-        $this->assertInstanceOf(DummyNotNullableObjectValue::class, $normalizedData);
+        self::assertInstanceOf(DummyNotNullableObjectValue::class, $normalizedData);
 
-        $this->assertInstanceOf(DummyValue::class, $normalizedData->object);
-        $this->assertEquals('foo', $normalizedData->object->value);
+        self::assertInstanceOf(DummyValue::class, $normalizedData->object);
+        self::assertEquals('foo', $normalizedData->object->value);
 
-        $this->assertInstanceOf(DummyValue::class, $normalizedData->nullObject);
-        $this->assertNull($normalizedData->nullObject->value);
+        self::assertInstanceOf(DummyValue::class, $normalizedData->nullObject);
+        self::assertNull($normalizedData->nullObject->value);
     }
 
     public function testNullableAbstractObject()
@@ -178,12 +178,12 @@ class MapDenormalizationTest extends TestCase
                 'nullObject' => null,
             ], DummyNullableAbstractObjectValue::class);
 
-        $this->assertInstanceOf(DummyNullableAbstractObjectValue::class, $normalizedData);
+        self::assertInstanceOf(DummyNullableAbstractObjectValue::class, $normalizedData);
 
-        $this->assertInstanceOf(AnotherDummyValue::class, $normalizedData->object);
-        $this->assertEquals('foo', $normalizedData->object->value);
+        self::assertInstanceOf(AnotherDummyValue::class, $normalizedData->object);
+        self::assertEquals('foo', $normalizedData->object->value);
 
-        $this->assertNull($normalizedData->nullObject);
+        self::assertNull($normalizedData->nullObject);
     }
 
     private function getSerializer()

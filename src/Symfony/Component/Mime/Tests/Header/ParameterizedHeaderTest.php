@@ -22,7 +22,7 @@ class ParameterizedHeaderTest extends TestCase
     public function testValueIsReturnedVerbatim()
     {
         $header = new ParameterizedHeader('Content-Type', 'text/plain');
-        $this->assertEquals('text/plain', $header->getValue());
+        self::assertEquals('text/plain', $header->getValue());
     }
 
     public function testParametersAreAppended()
@@ -48,28 +48,28 @@ class ParameterizedHeaderTest extends TestCase
 
         $header = new ParameterizedHeader('Content-Type', 'text/plain');
         $header->setParameters(['charset' => 'utf-8']);
-        $this->assertEquals('text/plain; charset=utf-8', $header->getBodyAsString());
+        self::assertEquals('text/plain; charset=utf-8', $header->getBodyAsString());
     }
 
     public function testSpaceInParamResultsInQuotedString()
     {
         $header = new ParameterizedHeader('Content-Type', 'attachment');
         $header->setParameters(['filename' => 'my file.txt']);
-        $this->assertEquals('attachment; filename="my file.txt"', $header->getBodyAsString());
+        self::assertEquals('attachment; filename="my file.txt"', $header->getBodyAsString());
     }
 
     public function testFormDataResultsInQuotedString()
     {
         $header = new ParameterizedHeader('Content-Disposition', 'form-data');
         $header->setParameters(['filename' => 'file.txt']);
-        $this->assertEquals('form-data; filename="file.txt"', $header->getBodyAsString());
+        self::assertEquals('form-data; filename="file.txt"', $header->getBodyAsString());
     }
 
     public function testFormDataUtf8()
     {
         $header = new ParameterizedHeader('Content-Disposition', 'form-data');
         $header->setParameters(['filename' => "déjà%\"\n\r.txt"]);
-        $this->assertEquals('form-data; filename="déjà%%22%0A%0D.txt"', $header->getBodyAsString());
+        self::assertEquals('form-data; filename="déjà%%22%0A%0D.txt"', $header->getBodyAsString());
     }
 
     public function testLongParamsAreBrokenIntoMultipleAttributeStrings()
@@ -105,13 +105,10 @@ class ParameterizedHeaderTest extends TestCase
 
         $header = new ParameterizedHeader('Content-Disposition', 'attachment');
         $header->setParameters(['filename' => $value]);
-        $this->assertEquals(
-            'attachment; '.
-            'filename*0*=utf-8\'\''.str_repeat('a', 60).";\r\n ".
-            'filename*1*='.str_repeat('a', 60).";\r\n ".
-            'filename*2*='.str_repeat('a', 60),
-            $header->getBodyAsString()
-        );
+        self::assertEquals('attachment; '.
+        'filename*0*=utf-8\'\''.str_repeat('a', 60).";\r\n ".
+        'filename*1*='.str_repeat('a', 60).";\r\n ".
+        'filename*2*='.str_repeat('a', 60), $header->getBodyAsString());
     }
 
     public function testEncodedParamDataIncludesCharsetAndLanguage()
@@ -145,11 +142,8 @@ class ParameterizedHeaderTest extends TestCase
         $header->setValue('attachment');
         $header->setParameters(['filename' => $value]);
         $header->setLanguage($this->lang);
-        $this->assertEquals(
-            'attachment; filename*='.$header->getCharset()."'".$this->lang."'".
-            str_repeat('a', 20).'%8F'.str_repeat('a', 10),
-            $header->getBodyAsString()
-        );
+        self::assertEquals('attachment; filename*='.$header->getCharset()."'".$this->lang."'".
+        str_repeat('a', 20).'%8F'.str_repeat('a', 10), $header->getBodyAsString());
     }
 
     public function testMultipleEncodedParamLinesAreFormattedCorrectly()
@@ -189,19 +183,16 @@ class ParameterizedHeaderTest extends TestCase
         $header->setCharset('utf-6');
         $header->setParameters(['filename' => $value]);
         $header->setLanguage($this->lang);
-        $this->assertEquals(
-            'attachment; filename*0*='.$header->getCharset()."'".$this->lang."'".
-            str_repeat('a', 20).'%8F'.str_repeat('a', 23).";\r\n ".
-            'filename*1*='.str_repeat('a', 37),
-            $header->getBodyAsString()
-        );
+        self::assertEquals('attachment; filename*0*='.$header->getCharset()."'".$this->lang."'".
+        str_repeat('a', 20).'%8F'.str_repeat('a', 23).";\r\n ".
+        'filename*1*='.str_repeat('a', 37), $header->getBodyAsString());
     }
 
     public function testToString()
     {
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setParameters(['charset' => 'utf-8']);
-        $this->assertEquals('Content-Type: text/html; charset=utf-8', $header->toString());
+        self::assertEquals('Content-Type: text/html; charset=utf-8', $header->toString());
     }
 
     public function testValueCanBeEncodedIfNonAscii()
@@ -210,7 +201,7 @@ class ParameterizedHeaderTest extends TestCase
         $header = new ParameterizedHeader('X-Foo', $value);
         $header->setCharset('iso-8859-1');
         $header->setParameters(['lookslike' => 'foobar']);
-        $this->assertEquals('X-Foo: =?'.$header->getCharset().'?Q?fo=8Fbar?=; lookslike=foobar', $header->toString());
+        self::assertEquals('X-Foo: =?'.$header->getCharset().'?Q?fo=8Fbar?=; lookslike=foobar', $header->toString());
     }
 
     public function testValueAndParamCanBeEncodedIfNonAscii()
@@ -219,7 +210,7 @@ class ParameterizedHeaderTest extends TestCase
         $header = new ParameterizedHeader('X-Foo', $value);
         $header->setCharset('iso-8859-1');
         $header->setParameters(['says' => $value]);
-        $this->assertEquals('X-Foo: =?'.$header->getCharset().'?Q?fo=8Fbar?=; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
+        self::assertEquals('X-Foo: =?'.$header->getCharset().'?Q?fo=8Fbar?=; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
     }
 
     public function testParamsAreEncodedIfNonAscii()
@@ -228,7 +219,7 @@ class ParameterizedHeaderTest extends TestCase
         $header = new ParameterizedHeader('X-Foo', 'bar');
         $header->setCharset('iso-8859-1');
         $header->setParameters(['says' => $value]);
-        $this->assertEquals('X-Foo: bar; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
+        self::assertEquals('X-Foo: bar; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
     }
 
     public function testParamsAreEncodedWithLegacyEncodingEnabled()
@@ -237,7 +228,7 @@ class ParameterizedHeaderTest extends TestCase
         $header = new ParameterizedHeader('Content-Type', 'bar');
         $header->setCharset('iso-8859-1');
         $header->setParameters(['says' => $value]);
-        $this->assertEquals('Content-Type: bar; says="=?'.$header->getCharset().'?Q?fo=8Fbar?="', $header->toString());
+        self::assertEquals('Content-Type: bar; says="=?'.$header->getCharset().'?Q?fo=8Fbar?="', $header->toString());
     }
 
     public function testLanguageInformationAppearsInEncodedWords()
@@ -276,20 +267,20 @@ class ParameterizedHeaderTest extends TestCase
         $header->setCharset('iso-8859-1');
         $header->setLanguage('en');
         $header->setParameters(['says' => $value]);
-        $this->assertEquals('X-Foo: =?'.$header->getCharset().'*en?Q?fo=8Fbar?=; says*='.$header->getCharset()."'en'fo%8Fbar", $header->toString());
+        self::assertEquals('X-Foo: =?'.$header->getCharset().'*en?Q?fo=8Fbar?=; says*='.$header->getCharset()."'en'fo%8Fbar", $header->toString());
     }
 
     public function testSetBody()
     {
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setBody('text/plain');
-        $this->assertEquals('text/plain', $header->getValue());
+        self::assertEquals('text/plain', $header->getValue());
     }
 
     public function testGetBody()
     {
         $header = new ParameterizedHeader('Content-Type', 'text/plain');
-        $this->assertEquals('text/plain', $header->getBody());
+        self::assertEquals('text/plain', $header->getBody());
     }
 
     public function testSetParameter()
@@ -297,13 +288,13 @@ class ParameterizedHeaderTest extends TestCase
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setParameters(['charset' => 'utf-8', 'delsp' => 'yes']);
         $header->setParameter('delsp', 'no');
-        $this->assertEquals(['charset' => 'utf-8', 'delsp' => 'no'], $header->getParameters());
+        self::assertEquals(['charset' => 'utf-8', 'delsp' => 'no'], $header->getParameters());
     }
 
     public function testGetParameter()
     {
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setParameters(['charset' => 'utf-8', 'delsp' => 'yes']);
-        $this->assertEquals('utf-8', $header->getParameter('charset'));
+        self::assertEquals('utf-8', $header->getParameter('charset'));
     }
 }

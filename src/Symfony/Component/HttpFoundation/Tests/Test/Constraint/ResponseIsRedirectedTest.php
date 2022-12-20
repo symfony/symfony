@@ -23,17 +23,17 @@ class ResponseIsRedirectedTest extends TestCase
     {
         $constraint = new ResponseIsRedirected();
 
-        $this->assertTrue($constraint->evaluate(new Response('', 301), '', true));
-        $this->assertFalse($constraint->evaluate(new Response(), '', true));
+        self::assertTrue($constraint->evaluate(new Response('', 301), '', true));
+        self::assertFalse($constraint->evaluate(new Response(), '', true));
 
         try {
             $constraint->evaluate(new Response());
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK", TestFailure::exceptionToString($e));
+            self::assertStringContainsString("Failed asserting that the Response is redirected.\nHTTP/1.0 200 OK", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 }

@@ -26,27 +26,27 @@ final class CompiledClassMetadataFactoryTest extends TestCase
 {
     public function testItImplementsClassMetadataFactoryInterface()
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         $compiledClassMetadataFactory = new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/serializer.class.metadata.php', $classMetadataFactory);
 
-        $this->assertInstanceOf(ClassMetadataFactoryInterface::class, $compiledClassMetadataFactory);
+        self::assertInstanceOf(ClassMetadataFactoryInterface::class, $compiledClassMetadataFactory);
     }
 
     public function testItThrowAnExceptionWhenCacheFileIsNotFound()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('#File ".*/Fixtures/not-found-serializer.class.metadata.php" could not be found.#');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessageMatches('#File ".*/Fixtures/not-found-serializer.class.metadata.php" could not be found.#');
 
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/not-found-serializer.class.metadata.php', $classMetadataFactory);
     }
 
     public function testItThrowAnExceptionWhenMetadataIsNotOfTypeArray()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Compiled metadata must be of the type array, object given.');
+        self::expectException(\RuntimeException::class);
+        self::expectExceptionMessage('Compiled metadata must be of the type array, object given.');
 
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/object-metadata.php', $classMetadataFactory);
     }
 
@@ -55,11 +55,11 @@ final class CompiledClassMetadataFactoryTest extends TestCase
      */
     public function testItReturnsTheCompiledMetadata($value)
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         $compiledClassMetadataFactory = new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/serializer.class.metadata.php', $classMetadataFactory);
 
         $classMetadataFactory
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('getMetadataFor')
         ;
 
@@ -69,32 +69,32 @@ final class CompiledClassMetadataFactoryTest extends TestCase
         $expected->addAttributeMetadata(new AttributeMetadata('baz'));
         $expected->addAttributeMetadata(new AttributeMetadata('qux'));
 
-        $this->assertEquals($expected, $compiledClassMetadataFactory->getMetadataFor($value));
+        self::assertEquals($expected, $compiledClassMetadataFactory->getMetadataFor($value));
     }
 
     public function testItDelegatesGetMetadataForCall()
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         $compiledClassMetadataFactory = new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/serializer.class.metadata.php', $classMetadataFactory);
 
         $classMetadata = new ClassMetadata(SerializedNameDummy::class);
 
         $classMetadataFactory
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMetadataFor')
             ->with(SerializedNameDummy::class)
             ->willReturn($classMetadata)
         ;
 
-        $this->assertEquals($classMetadata, $compiledClassMetadataFactory->getMetadataFor(SerializedNameDummy::class));
+        self::assertEquals($classMetadata, $compiledClassMetadataFactory->getMetadataFor(SerializedNameDummy::class));
     }
 
     public function testItReturnsTheSameInstance()
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         $compiledClassMetadataFactory = new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/serializer.class.metadata.php', $classMetadataFactory);
 
-        $this->assertSame($compiledClassMetadataFactory->getMetadataFor(Dummy::class), $compiledClassMetadataFactory->getMetadataFor(Dummy::class));
+        self::assertSame($compiledClassMetadataFactory->getMetadataFor(Dummy::class), $compiledClassMetadataFactory->getMetadataFor(Dummy::class));
     }
 
     /**
@@ -102,30 +102,30 @@ final class CompiledClassMetadataFactoryTest extends TestCase
      */
     public function testItHasMetadataFor($value)
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         $compiledClassMetadataFactory = new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/serializer.class.metadata.php', $classMetadataFactory);
 
         $classMetadataFactory
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('hasMetadataFor')
         ;
 
-        $this->assertTrue($compiledClassMetadataFactory->hasMetadataFor($value));
+        self::assertTrue($compiledClassMetadataFactory->hasMetadataFor($value));
     }
 
     public function testItDelegatesHasMetadataForCall()
     {
-        $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $classMetadataFactory = self::createMock(ClassMetadataFactoryInterface::class);
         $compiledClassMetadataFactory = new CompiledClassMetadataFactory(__DIR__.'/../../Fixtures/serializer.class.metadata.php', $classMetadataFactory);
 
         $classMetadataFactory
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('hasMetadataFor')
             ->with(SerializedNameDummy::class)
             ->willReturn(true)
         ;
 
-        $this->assertTrue($compiledClassMetadataFactory->hasMetadataFor(SerializedNameDummy::class));
+        self::assertTrue($compiledClassMetadataFactory->hasMetadataFor(SerializedNameDummy::class));
     }
 
     public function valueProvider()

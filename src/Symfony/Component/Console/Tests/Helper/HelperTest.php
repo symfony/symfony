@@ -61,7 +61,7 @@ class HelperTest extends TestCase
      */
     public function testFormatTime($secs, $expectedFormat)
     {
-        $this->assertEquals($expectedFormat, Helper::formatTime($secs));
+        self::assertEquals($expectedFormat, Helper::formatTime($secs));
     }
 
     /**
@@ -69,6 +69,6 @@ class HelperTest extends TestCase
      */
     public function testRemoveDecoration(string $decoratedText, string $undecoratedText)
     {
-        $this->assertEquals($undecoratedText, Helper::removeDecoration(new OutputFormatter(), $decoratedText));
+        self::assertEquals($undecoratedText, Helper::removeDecoration(new OutputFormatter(), $decoratedText));
     }
 }

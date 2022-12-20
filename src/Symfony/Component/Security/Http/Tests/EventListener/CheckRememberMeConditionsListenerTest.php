@@ -44,7 +44,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
-        $this->assertFalse($passport->hasBadge(RememberMeBadge::class));
+        self::assertFalse($passport->hasBadge(RememberMeBadge::class));
     }
 
     public function testSuccessfulLoginWithoutRequestParameter()
@@ -54,7 +54,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
-        $this->assertFalse($passport->getBadge(RememberMeBadge::class)->isEnabled());
+        self::assertFalse($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
     public function testSuccessfulLoginWhenRememberMeAlwaysIsTrue()
@@ -64,7 +64,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
-        $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
+        self::assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
     /**
@@ -77,7 +77,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
-        $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
+        self::assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
     public function provideRememberMeOptInValues()
@@ -91,7 +91,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
 
     private function createLoginSuccessfulEvent(PassportInterface $passport)
     {
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), $this->request, $this->response, 'main_firewall');
+        return new LoginSuccessEvent(self::createMock(AuthenticatorInterface::class), $passport, self::createMock(TokenInterface::class), $this->request, $this->response, 'main_firewall');
     }
 
     private function createPassport(array $badges = null)

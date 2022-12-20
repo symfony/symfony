@@ -503,7 +503,7 @@ EOTXT
     public function testGenerator()
     {
         if (\extension_loaded('xdebug')) {
-            $this->markTestSkipped('xdebug is active');
+            self::markTestSkipped('xdebug is active');
         }
 
         $generator = new GeneratorDemo();

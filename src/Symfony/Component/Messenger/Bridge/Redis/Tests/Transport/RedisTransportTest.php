@@ -25,14 +25,14 @@ class RedisTransportTest extends TestCase
     {
         $transport = $this->getTransport();
 
-        $this->assertInstanceOf(TransportInterface::class, $transport);
+        self::assertInstanceOf(TransportInterface::class, $transport);
     }
 
     public function testReceivesMessages()
     {
         $transport = $this->getTransport(
-            $serializer = $this->createMock(SerializerInterface::class),
-            $connection = $this->createMock(Connection::class)
+            $serializer = self::createMock(SerializerInterface::class),
+            $connection = self::createMock(Connection::class)
         );
 
         $decodedMessage = new DummyMessage('Decoded.');
@@ -51,13 +51,13 @@ class RedisTransportTest extends TestCase
         $connection->method('get')->willReturn($redisEnvelope);
 
         $envelopes = $transport->get();
-        $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+        self::assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): RedisTransport
     {
-        $serializer = $serializer ?? $this->createMock(SerializerInterface::class);
-        $connection = $connection ?? $this->createMock(Connection::class);
+        $serializer = $serializer ?? self::createMock(SerializerInterface::class);
+        $connection = $connection ?? self::createMock(Connection::class);
 
         return new RedisTransport($connection, $serializer);
     }

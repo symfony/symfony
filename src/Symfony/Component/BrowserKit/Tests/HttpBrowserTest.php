@@ -29,12 +29,12 @@ class HttpBrowserTest extends AbstractBrowserTest
      */
     public function testRequestHeaders(array $requestArguments, array $expectedArguments)
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $client
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('request')
             ->with(...$expectedArguments)
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn(self::createMock(ResponseInterface::class));
 
         $browser = new HttpBrowser($client);
         $browser->request(...$requestArguments);
@@ -87,22 +87,22 @@ class HttpBrowserTest extends AbstractBrowserTest
 
     public function testMultiPartRequestWithSingleFile()
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $client
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('request')
-            ->with('POST', 'http://example.com/', $this->callback(function ($options) {
-                $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
-                $this->assertInstanceOf(\Generator::class, $options['body']);
+            ->with('POST', 'http://example.com/', self::callback(function ($options) {
+                self::assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
+                self::assertInstanceOf(\Generator::class, $options['body']);
                 $values = implode('', iterator_to_array($options['body'], false));
-                $this->assertStringContainsString('name="foo[file]"', $values);
-                $this->assertStringContainsString('my_file', $values);
-                $this->assertStringContainsString('name="foo[bar]"', $values);
-                $this->assertStringContainsString('foo2', $values);
+                self::assertStringContainsString('name="foo[file]"', $values);
+                self::assertStringContainsString('my_file', $values);
+                self::assertStringContainsString('name="foo[bar]"', $values);
+                self::assertStringContainsString('foo2', $values);
 
                 return true;
             }))
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn(self::createMock(ResponseInterface::class));
 
         $browser = new HttpBrowser($client);
         $path = tempnam(sys_get_temp_dir(), 'http');
@@ -112,7 +112,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
     public function testMultiPartRequestWithNormalFlatArray()
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
 
         $browser = new HttpBrowser($client);
@@ -124,7 +124,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
     public function testMultiPartRequestWithNormalNestedArray()
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
 
         $browser = new HttpBrowser($client);
@@ -140,7 +140,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
     public function testMultiPartRequestWithBracketedArray()
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
 
         $browser = new HttpBrowser($client);
@@ -152,7 +152,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
     public function testMultiPartRequestWithInvalidItem()
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content']);
 
         $browser = new HttpBrowser($client);
@@ -164,7 +164,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
     public function testMultiPartRequestWithAdditionalParameters()
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'baz']);
 
         $browser = new HttpBrowser($client);
@@ -175,7 +175,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
     public function testMultiPartRequestWithAdditionalParametersOfTheSameName()
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $this->expectClientToNotSendRequestWithFiles($client, ['baz']);
 
         $browser = new HttpBrowser($client);
@@ -189,12 +189,12 @@ class HttpBrowserTest extends AbstractBrowserTest
      */
     public function testMultipleForwardSlashesRequestPath(string $requestPath)
     {
-        $client = $this->createMock(HttpClientInterface::class);
+        $client = self::createMock(HttpClientInterface::class);
         $client
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('request')
             ->with('GET', 'http://localhost'.$requestPath)
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn(self::createMock(ResponseInterface::class));
         $browser = new HttpBrowser($client);
         $browser->request('GET', $requestPath);
     }
@@ -227,36 +227,36 @@ class HttpBrowserTest extends AbstractBrowserTest
     protected function expectClientToSendRequestWithFiles(HttpClientInterface $client, $fileContents)
     {
         $client
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('request')
-            ->with('POST', 'http://example.com/', $this->callback(function ($options) use ($fileContents) {
-                $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
-                $this->assertInstanceOf(\Generator::class, $options['body']);
+            ->with('POST', 'http://example.com/', self::callback(function ($options) use ($fileContents) {
+                self::assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
+                self::assertInstanceOf(\Generator::class, $options['body']);
                 $body = implode('', iterator_to_array($options['body'], false));
                 foreach ($fileContents as $content) {
-                    $this->assertStringContainsString($content, $body);
+                    self::assertStringContainsString($content, $body);
                 }
 
                 return true;
             }))
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn(self::createMock(ResponseInterface::class));
     }
 
     protected function expectClientToNotSendRequestWithFiles(HttpClientInterface $client, $fileContents)
     {
         $client
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('request')
-            ->with('POST', 'http://example.com/', $this->callback(function ($options) use ($fileContents) {
-                $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
-                $this->assertInstanceOf(\Generator::class, $options['body']);
+            ->with('POST', 'http://example.com/', self::callback(function ($options) use ($fileContents) {
+                self::assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
+                self::assertInstanceOf(\Generator::class, $options['body']);
                 $body = implode('', iterator_to_array($options['body'], false));
                 foreach ($fileContents as $content) {
-                    $this->assertStringNotContainsString($content, $body);
+                    self::assertStringNotContainsString($content, $body);
                 }
 
                 return true;
             }))
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn(self::createMock(ResponseInterface::class));
     }
 }

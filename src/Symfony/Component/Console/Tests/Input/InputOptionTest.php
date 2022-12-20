@@ -19,155 +19,155 @@ class InputOptionTest extends TestCase
     public function testConstructor()
     {
         $option = new InputOption('foo');
-        $this->assertEquals('foo', $option->getName(), '__construct() takes a name as its first argument');
+        self::assertEquals('foo', $option->getName(), '__construct() takes a name as its first argument');
         $option = new InputOption('--foo');
-        $this->assertEquals('foo', $option->getName(), '__construct() removes the leading -- of the option name');
+        self::assertEquals('foo', $option->getName(), '__construct() removes the leading -- of the option name');
     }
 
     public function testArrayModeWithoutValue()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.');
         new InputOption('foo', 'f', InputOption::VALUE_IS_ARRAY);
     }
 
     public function testBooleanWithRequired()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
         new InputOption('foo', 'f', InputOption::VALUE_REQUIRED | InputOption::VALUE_NEGATABLE);
     }
 
     public function testBooleanWithOptional()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
         new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_NEGATABLE);
     }
 
     public function testShortcut()
     {
         $option = new InputOption('foo', 'f');
-        $this->assertEquals('f', $option->getShortcut(), '__construct() can take a shortcut as its second argument');
+        self::assertEquals('f', $option->getShortcut(), '__construct() can take a shortcut as its second argument');
         $option = new InputOption('foo', '-f|-ff|fff');
-        $this->assertEquals('f|ff|fff', $option->getShortcut(), '__construct() removes the leading - of the shortcuts');
+        self::assertEquals('f|ff|fff', $option->getShortcut(), '__construct() removes the leading - of the shortcuts');
         $option = new InputOption('foo', ['f', 'ff', '-fff']);
-        $this->assertEquals('f|ff|fff', $option->getShortcut(), '__construct() removes the leading - of the shortcuts');
+        self::assertEquals('f|ff|fff', $option->getShortcut(), '__construct() removes the leading - of the shortcuts');
         $option = new InputOption('foo');
-        $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null by default');
+        self::assertNull($option->getShortcut(), '__construct() makes the shortcut null by default');
     }
 
     public function testModes()
     {
         $option = new InputOption('foo', 'f');
-        $this->assertFalse($option->acceptValue(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
-        $this->assertFalse($option->isValueRequired(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
-        $this->assertFalse($option->isValueOptional(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        self::assertFalse($option->acceptValue(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        self::assertFalse($option->isValueRequired(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        self::assertFalse($option->isValueOptional(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
 
         $option = new InputOption('foo', 'f', null);
-        $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
-        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
-        $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        self::assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        self::assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        self::assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
-        $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
-        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
-        $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        self::assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        self::assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        self::assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_REQUIRED);
-        $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
-        $this->assertTrue($option->isValueRequired(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
-        $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
+        self::assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
+        self::assertTrue($option->isValueRequired(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
+        self::assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_REQUIRED" as its mode');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL);
-        $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
-        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
-        $this->assertTrue($option->isValueOptional(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+        self::assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+        self::assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+        self::assertTrue($option->isValueOptional(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
     }
 
     public function testInvalidModes()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Option mode "-1" is not valid.');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Option mode "-1" is not valid.');
 
         new InputOption('foo', 'f', '-1');
     }
 
     public function testEmptyNameIsInvalid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new InputOption('');
     }
 
     public function testDoubleDashNameIsInvalid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new InputOption('--');
     }
 
     public function testSingleDashOptionIsInvalid()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new InputOption('foo', '-');
     }
 
     public function testIsArray()
     {
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
-        $this->assertTrue($option->isArray(), '->isArray() returns true if the option can be an array');
+        self::assertTrue($option->isArray(), '->isArray() returns true if the option can be an array');
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
-        $this->assertFalse($option->isArray(), '->isArray() returns false if the option cannot be an array');
+        self::assertFalse($option->isArray(), '->isArray() returns false if the option cannot be an array');
     }
 
     public function testGetDescription()
     {
         $option = new InputOption('foo', 'f', null, 'Some description');
-        $this->assertEquals('Some description', $option->getDescription(), '->getDescription() returns the description message');
+        self::assertEquals('Some description', $option->getDescription(), '->getDescription() returns the description message');
     }
 
     public function testGetDefault()
     {
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', 'default');
-        $this->assertEquals('default', $option->getDefault(), '->getDefault() returns the default value');
+        self::assertEquals('default', $option->getDefault(), '->getDefault() returns the default value');
 
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED, '', 'default');
-        $this->assertEquals('default', $option->getDefault(), '->getDefault() returns the default value');
+        self::assertEquals('default', $option->getDefault(), '->getDefault() returns the default value');
 
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED);
-        $this->assertNull($option->getDefault(), '->getDefault() returns null if no default value is configured');
+        self::assertNull($option->getDefault(), '->getDefault() returns null if no default value is configured');
 
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
-        $this->assertEquals([], $option->getDefault(), '->getDefault() returns an empty array if option is an array');
+        self::assertEquals([], $option->getDefault(), '->getDefault() returns an empty array if option is an array');
 
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
-        $this->assertFalse($option->getDefault(), '->getDefault() returns false if the option does not take a value');
+        self::assertFalse($option->getDefault(), '->getDefault() returns false if the option does not take a value');
     }
 
     public function testSetDefault()
     {
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED, '', 'default');
         $option->setDefault(null);
-        $this->assertNull($option->getDefault(), '->setDefault() can reset the default value by passing null');
+        self::assertNull($option->getDefault(), '->setDefault() can reset the default value by passing null');
         $option->setDefault('another');
-        $this->assertEquals('another', $option->getDefault(), '->setDefault() changes the default value');
+        self::assertEquals('another', $option->getDefault(), '->setDefault() changes the default value');
 
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
         $option->setDefault([1, 2]);
-        $this->assertEquals([1, 2], $option->getDefault(), '->setDefault() changes the default value');
+        self::assertEquals([1, 2], $option->getDefault(), '->setDefault() changes the default value');
     }
 
     public function testDefaultValueWithValueNoneMode()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot set a default value when using InputOption::VALUE_NONE mode.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
         $option->setDefault('default');
     }
 
     public function testDefaultValueWithIsArrayMode()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('A default value for an array option must be an array.');
+        self::expectException(\LogicException::class);
+        self::expectExceptionMessage('A default value for an array option must be an array.');
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
         $option->setDefault('default');
     }
@@ -176,22 +176,22 @@ class InputOptionTest extends TestCase
     {
         $option = new InputOption('foo', 'f', null, 'Some description');
         $option2 = new InputOption('foo', 'f', null, 'Alternative description');
-        $this->assertTrue($option->equals($option2));
+        self::assertTrue($option->equals($option2));
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description');
         $option2 = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description', true);
-        $this->assertFalse($option->equals($option2));
+        self::assertFalse($option->equals($option2));
 
         $option = new InputOption('foo', 'f', null, 'Some description');
         $option2 = new InputOption('bar', 'f', null, 'Some description');
-        $this->assertFalse($option->equals($option2));
+        self::assertFalse($option->equals($option2));
 
         $option = new InputOption('foo', 'f', null, 'Some description');
         $option2 = new InputOption('foo', '', null, 'Some description');
-        $this->assertFalse($option->equals($option2));
+        self::assertFalse($option->equals($option2));
 
         $option = new InputOption('foo', 'f', null, 'Some description');
         $option2 = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description');
-        $this->assertFalse($option->equals($option2));
+        self::assertFalse($option->equals($option2));
     }
 }

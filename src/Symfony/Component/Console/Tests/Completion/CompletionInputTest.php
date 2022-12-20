@@ -34,9 +34,9 @@ class CompletionInputTest extends TestCase
 
         $input->bind($definition);
 
-        $this->assertEquals($expectedType, $input->getCompletionType(), 'Unexpected type');
-        $this->assertEquals($expectedName, $input->getCompletionName(), 'Unexpected name');
-        $this->assertEquals($expectedValue, $input->getCompletionValue(), 'Unexpected value');
+        self::assertEquals($expectedType, $input->getCompletionType(), 'Unexpected type');
+        self::assertEquals($expectedName, $input->getCompletionName(), 'Unexpected name');
+        self::assertEquals($expectedValue, $input->getCompletionValue(), 'Unexpected value');
     }
 
     public function provideBindData()
@@ -85,9 +85,9 @@ class CompletionInputTest extends TestCase
 
         $input->bind($definition);
 
-        $this->assertEquals(CompletionInput::TYPE_ARGUMENT_VALUE, $input->getCompletionType(), 'Unexpected type');
-        $this->assertEquals('list-arg', $input->getCompletionName(), 'Unexpected name');
-        $this->assertEquals($expectedValue, $input->getCompletionValue(), 'Unexpected value');
+        self::assertEquals(CompletionInput::TYPE_ARGUMENT_VALUE, $input->getCompletionType(), 'Unexpected type');
+        self::assertEquals('list-arg', $input->getCompletionName(), 'Unexpected name');
+        self::assertEquals($expectedValue, $input->getCompletionValue(), 'Unexpected value');
     }
 
     public function provideBindWithLastArrayArgumentData()
@@ -106,9 +106,9 @@ class CompletionInputTest extends TestCase
         $input = CompletionInput::fromTokens(['bin/console'], 1);
         $input->bind($definition);
 
-        $this->assertEquals(CompletionInput::TYPE_ARGUMENT_VALUE, $input->getCompletionType(), 'Unexpected type');
-        $this->assertEquals('arg-with-default', $input->getCompletionName(), 'Unexpected name');
-        $this->assertEquals('', $input->getCompletionValue(), 'Unexpected value');
+        self::assertEquals(CompletionInput::TYPE_ARGUMENT_VALUE, $input->getCompletionType(), 'Unexpected type');
+        self::assertEquals('arg-with-default', $input->getCompletionName(), 'Unexpected name');
+        self::assertEquals('', $input->getCompletionValue(), 'Unexpected value');
     }
 
     /**
@@ -121,7 +121,7 @@ class CompletionInputTest extends TestCase
         $tokensProperty = (new \ReflectionClass($input))->getProperty('tokens');
         $tokensProperty->setAccessible(true);
 
-        $this->assertEquals($expectedTokens, $tokensProperty->getValue($input));
+        self::assertEquals($expectedTokens, $tokensProperty->getValue($input));
     }
 
     public function provideFromStringData()

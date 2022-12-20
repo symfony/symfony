@@ -26,10 +26,10 @@ class RedisTransportFactoryTest extends TestCase
     {
         $factory = new RedisTransportFactory();
 
-        $this->assertTrue($factory->supports('redis://localhost', []));
-        $this->assertTrue($factory->supports('rediss://localhost', []));
-        $this->assertFalse($factory->supports('sqs://localhost', []));
-        $this->assertFalse($factory->supports('invalid-dsn', []));
+        self::assertTrue($factory->supports('redis://localhost', []));
+        self::assertTrue($factory->supports('rediss://localhost', []));
+        self::assertFalse($factory->supports('sqs://localhost', []));
+        self::assertFalse($factory->supports('invalid-dsn', []));
     }
 
     /**
@@ -40,10 +40,10 @@ class RedisTransportFactoryTest extends TestCase
         $this->skipIfRedisUnavailable();
 
         $factory = new RedisTransportFactory();
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = self::createMock(SerializerInterface::class);
         $expectedTransport = new RedisTransport(Connection::fromDsn('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar', 'delete_after_ack' => true]), $serializer);
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar', 'delete_after_ack' => true], $serializer));
+        self::assertEquals($expectedTransport, $factory->createTransport('redis://'.getenv('REDIS_HOST'), ['stream' => 'bar', 'delete_after_ack' => true], $serializer));
     }
 
     private function skipIfRedisUnavailable()

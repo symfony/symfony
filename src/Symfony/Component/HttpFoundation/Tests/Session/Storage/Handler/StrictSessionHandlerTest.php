@@ -19,171 +19,171 @@ class StrictSessionHandlerTest extends TestCase
 {
     public function testOpen()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('open')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('open')
             ->with('path', 'name')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertInstanceOf(\SessionUpdateTimestampHandlerInterface::class, $proxy);
-        $this->assertInstanceOf(AbstractSessionHandler::class, $proxy);
-        $this->assertTrue($proxy->open('path', 'name'));
+        self::assertInstanceOf(\SessionUpdateTimestampHandlerInterface::class, $proxy);
+        self::assertInstanceOf(AbstractSessionHandler::class, $proxy);
+        self::assertTrue($proxy->open('path', 'name'));
     }
 
     public function testCloseSession()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('close')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('close')
             ->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertTrue($proxy->close());
+        self::assertTrue($proxy->close());
     }
 
     public function testValidateIdOK()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('read')
             ->with('id')->willReturn('data');
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertTrue($proxy->validateId('id'));
+        self::assertTrue($proxy->validateId('id'));
     }
 
     public function testValidateIdKO()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('read')
             ->with('id')->willReturn('');
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertFalse($proxy->validateId('id'));
+        self::assertFalse($proxy->validateId('id'));
     }
 
     public function testRead()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('read')
             ->with('id')->willReturn('data');
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertSame('data', $proxy->read('id'));
+        self::assertSame('data', $proxy->read('id'));
     }
 
     public function testReadWithValidateIdOK()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('read')
             ->with('id')->willReturn('data');
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertTrue($proxy->validateId('id'));
-        $this->assertSame('data', $proxy->read('id'));
+        self::assertTrue($proxy->validateId('id'));
+        self::assertSame('data', $proxy->read('id'));
     }
 
     public function testReadWithValidateIdMismatch()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->exactly(2))->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::exactly(2))->method('read')
             ->withConsecutive(['id1'], ['id2'])
-            ->will($this->onConsecutiveCalls('data1', 'data2'));
+            ->will(self::onConsecutiveCalls('data1', 'data2'));
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertTrue($proxy->validateId('id1'));
-        $this->assertSame('data2', $proxy->read('id2'));
+        self::assertTrue($proxy->validateId('id1'));
+        self::assertSame('data2', $proxy->read('id2'));
     }
 
     public function testUpdateTimestamp()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('write')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('write')
             ->with('id', 'data')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertTrue($proxy->updateTimestamp('id', 'data'));
+        self::assertTrue($proxy->updateTimestamp('id', 'data'));
     }
 
     public function testWrite()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('write')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('write')
             ->with('id', 'data')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertTrue($proxy->write('id', 'data'));
+        self::assertTrue($proxy->write('id', 'data'));
     }
 
     public function testWriteEmptyNewSession()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('read')
             ->with('id')->willReturn('');
-        $handler->expects($this->never())->method('write');
-        $handler->expects($this->once())->method('destroy')->willReturn(true);
+        $handler->expects(self::never())->method('write');
+        $handler->expects(self::once())->method('destroy')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertFalse($proxy->validateId('id'));
-        $this->assertSame('', $proxy->read('id'));
-        $this->assertTrue($proxy->write('id', ''));
+        self::assertFalse($proxy->validateId('id'));
+        self::assertSame('', $proxy->read('id'));
+        self::assertTrue($proxy->write('id', ''));
     }
 
     public function testWriteEmptyExistingSession()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('read')
             ->with('id')->willReturn('data');
-        $handler->expects($this->never())->method('write');
-        $handler->expects($this->once())->method('destroy')->willReturn(true);
+        $handler->expects(self::never())->method('write');
+        $handler->expects(self::once())->method('destroy')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertSame('data', $proxy->read('id'));
-        $this->assertTrue($proxy->write('id', ''));
+        self::assertSame('data', $proxy->read('id'));
+        self::assertTrue($proxy->write('id', ''));
     }
 
     public function testDestroy()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('destroy')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('destroy')
             ->with('id')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertTrue($proxy->destroy('id'));
+        self::assertTrue($proxy->destroy('id'));
     }
 
     public function testDestroyNewSession()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('read')
             ->with('id')->willReturn('');
-        $handler->expects($this->once())->method('destroy')->willReturn(true);
+        $handler->expects(self::once())->method('destroy')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertSame('', $proxy->read('id'));
-        $this->assertTrue($proxy->destroy('id'));
+        self::assertSame('', $proxy->read('id'));
+        self::assertTrue($proxy->destroy('id'));
     }
 
     public function testDestroyNonEmptyNewSession()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('read')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('read')
             ->with('id')->willReturn('');
-        $handler->expects($this->once())->method('write')
+        $handler->expects(self::once())->method('write')
             ->with('id', 'data')->willReturn(true);
-        $handler->expects($this->once())->method('destroy')
+        $handler->expects(self::once())->method('destroy')
             ->with('id')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertSame('', $proxy->read('id'));
-        $this->assertTrue($proxy->write('id', 'data'));
-        $this->assertTrue($proxy->destroy('id'));
+        self::assertSame('', $proxy->read('id'));
+        self::assertTrue($proxy->write('id', 'data'));
+        self::assertTrue($proxy->destroy('id'));
     }
 
     public function testGc()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
-        $handler->expects($this->once())->method('gc')
+        $handler = self::createMock(\SessionHandlerInterface::class);
+        $handler->expects(self::once())->method('gc')
             ->with(123)->willReturn(1);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertSame(1, $proxy->gc(123));
+        self::assertSame(1, $proxy->gc(123));
     }
 }

@@ -116,7 +116,7 @@ class FormDataCollectorTest extends TestCase
              ],
          ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -147,7 +147,7 @@ class FormDataCollectorTest extends TestCase
             'children' => [],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'form1' => $form1Data,
             ],
@@ -169,7 +169,7 @@ class FormDataCollectorTest extends TestCase
             'children' => [],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'form1' => $form1Data,
                 'form2' => $form2Data,
@@ -197,7 +197,7 @@ class FormDataCollectorTest extends TestCase
             'children' => [],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -224,7 +224,7 @@ class FormDataCollectorTest extends TestCase
             'children' => [],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -243,7 +243,7 @@ class FormDataCollectorTest extends TestCase
             'children' => [],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -312,7 +312,7 @@ class FormDataCollectorTest extends TestCase
             ],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -326,7 +326,7 @@ class FormDataCollectorTest extends TestCase
 
     public function testSerializeWithFormAddedMultipleTimes()
     {
-        $this->expectNotToPerformAssertions();
+        self::expectNotToPerformAssertions();
 
         $form1 = $this->createForm('form1');
         $form2 = $this->createForm('form2');
@@ -384,7 +384,7 @@ class FormDataCollectorTest extends TestCase
             ],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -405,7 +405,7 @@ class FormDataCollectorTest extends TestCase
             ],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -447,7 +447,7 @@ class FormDataCollectorTest extends TestCase
             ],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -496,7 +496,7 @@ class FormDataCollectorTest extends TestCase
             ],
         ];
 
-        $this->assertEquals([
+        self::assertEquals([
             'forms' => [
                 'name' => $formData,
             ],
@@ -524,12 +524,12 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->collectSubmittedData($form1);
 
         $data = $this->dataCollector->getData();
-        $this->assertSame(3, $data['nb_errors']);
+        self::assertSame(3, $data['nb_errors']);
 
         $this->dataCollector->collectSubmittedData($form2);
 
         $data = $this->dataCollector->getData();
-        $this->assertSame(4, $data['nb_errors']);
+        self::assertSame(4, $data['nb_errors']);
     }
 
     public function testCollectSubmittedDataExpandedFormsErrors()
@@ -556,11 +556,11 @@ class FormDataCollectorTest extends TestCase
         $child2Data = $formData['children']['child2'];
         $child21Data = $child2Data['children']['child21'];
 
-        $this->assertTrue($formData['has_children_error']);
-        $this->assertTrue($child1Data['has_children_error']);
-        $this->assertArrayNotHasKey('has_children_error', $child11Data, 'The leaf data does not contains "has_children_error" property.');
-        $this->assertFalse($child2Data['has_children_error']);
-        $this->assertArrayNotHasKey('has_children_error', $child21Data, 'The leaf data does not contains "has_children_error" property.');
+        self::assertTrue($formData['has_children_error']);
+        self::assertTrue($child1Data['has_children_error']);
+        self::assertArrayNotHasKey('has_children_error', $child11Data, 'The leaf data does not contains "has_children_error" property.');
+        self::assertFalse($child2Data['has_children_error']);
+        self::assertArrayNotHasKey('has_children_error', $child21Data, 'The leaf data does not contains "has_children_error" property.');
     }
 
     public function testReset()
@@ -570,19 +570,16 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->buildPreliminaryFormTree($form);
         $this->dataCollector->collectSubmittedData($form);
 
-        $this->assertGreaterThan(0, \count($this->dataCollector->getData()['forms']));
-        $this->assertGreaterThan(0, \count($this->dataCollector->getData()['forms_by_hash']));
+        self::assertGreaterThan(0, \count($this->dataCollector->getData()['forms']));
+        self::assertGreaterThan(0, \count($this->dataCollector->getData()['forms_by_hash']));
 
         $this->dataCollector->reset();
 
-        $this->assertSame(
-            [
-                'forms' => [],
-                'forms_by_hash' => [],
-                'nb_errors' => 0,
-            ],
-            $this->dataCollector->getData()
-        );
+        self::assertSame([
+            'forms' => [],
+            'forms_by_hash' => [],
+            'nb_errors' => 0,
+        ], $this->dataCollector->getData());
     }
 
     public function testCollectMissingDataFromChildFormAddedOnFormEvents()
@@ -604,31 +601,31 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->collectConfiguration($form);
         $this->dataCollector->buildPreliminaryFormTree($form);
         $data = $this->dataCollector->getData();
-        $this->assertCount(2, $data['forms_by_hash'], 'only "root" and "items" forms were collected, the "items" children do not exist yet.');
+        self::assertCount(2, $data['forms_by_hash'], 'only "root" and "items" forms were collected, the "items" children do not exist yet.');
 
         foreach ($data['forms_by_hash'] as $formData) {
-            $this->assertArrayNotHasKey('default_data', $formData);
+            self::assertArrayNotHasKey('default_data', $formData);
         }
 
         $this->dataCollector->collectDefaultData($form);
         $this->dataCollector->buildPreliminaryFormTree($form);
         $data = $this->dataCollector->getData();
-        $this->assertCount(3, $data['forms_by_hash'], 'extracted missing configuration of the "items" children ["0" => foo].');
-        $this->assertSame(['foo'], $form->get('items')->getData());
+        self::assertCount(3, $data['forms_by_hash'], 'extracted missing configuration of the "items" children ["0" => foo].');
+        self::assertSame(['foo'], $form->get('items')->getData());
 
         foreach ($data['forms_by_hash'] as $formData) {
-            $this->assertArrayHasKey('default_data', $formData);
+            self::assertArrayHasKey('default_data', $formData);
         }
 
         $form->submit(['items' => ['foo', 'bar']]);
         $this->dataCollector->collectSubmittedData($form);
         $this->dataCollector->buildPreliminaryFormTree($form);
         $data = $this->dataCollector->getData();
-        $this->assertCount(4, $data['forms_by_hash'], 'extracted missing configuration of the "items" children ["1" => bar].');
-        $this->assertSame(['foo', 'bar'], $form->get('items')->getData());
+        self::assertCount(4, $data['forms_by_hash'], 'extracted missing configuration of the "items" children ["1" => bar].');
+        self::assertSame(['foo', 'bar'], $form->get('items')->getData());
 
         foreach ($data['forms_by_hash'] as $formData) {
-            $this->assertArrayHasKey('default_data', $formData);
+            self::assertArrayHasKey('default_data', $formData);
         }
     }
 

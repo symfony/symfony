@@ -21,14 +21,14 @@ class NodeBuilderTest extends TestCase
 {
     public function testThrowsAnExceptionWhenTryingToCreateANonRegisteredNodeType()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $builder = new BaseNodeBuilder();
         $builder->node('', 'foobar');
     }
 
     public function testThrowsAnExceptionWhenTheNodeClassIsNotFound()
     {
-        $this->expectException(\RuntimeException::class);
+        self::expectException(\RuntimeException::class);
         $builder = new BaseNodeBuilder();
         $builder
             ->setNodeClass('noclasstype', '\\foo\\bar\\noclass')
@@ -44,7 +44,7 @@ class NodeBuilderTest extends TestCase
             ->setNodeClass('newtype', $class)
             ->node('', 'newtype');
 
-        $this->assertInstanceOf($class, $node);
+        self::assertInstanceOf($class, $node);
     }
 
     public function testOverridingAnExistingNodeType()
@@ -56,7 +56,7 @@ class NodeBuilderTest extends TestCase
             ->setNodeClass('variable', $class)
             ->node('', 'variable');
 
-        $this->assertInstanceOf($class, $node);
+        self::assertInstanceOf($class, $node);
     }
 
     public function testNodeTypesAreNotCaseSensitive()
@@ -66,14 +66,14 @@ class NodeBuilderTest extends TestCase
         $node1 = $builder->node('', 'VaRiAbLe');
         $node2 = $builder->node('', 'variable');
 
-        $this->assertInstanceOf(\get_class($node1), $node2);
+        self::assertInstanceOf(\get_class($node1), $node2);
 
         $builder->setNodeClass('CuStOm', SomeNodeDefinition::class);
 
         $node1 = $builder->node('', 'CUSTOM');
         $node2 = $builder->node('', 'custom');
 
-        $this->assertInstanceOf(\get_class($node1), $node2);
+        self::assertInstanceOf(\get_class($node1), $node2);
     }
 
     public function testNumericNodeCreation()
@@ -81,10 +81,10 @@ class NodeBuilderTest extends TestCase
         $builder = new BaseNodeBuilder();
 
         $node = $builder->integerNode('foo')->min(3)->max(5);
-        $this->assertInstanceOf(IntegerNodeDefinition::class, $node);
+        self::assertInstanceOf(IntegerNodeDefinition::class, $node);
 
         $node = $builder->floatNode('bar')->min(3.0)->max(5.0);
-        $this->assertInstanceOf(FloatNodeDefinition::class, $node);
+        self::assertInstanceOf(FloatNodeDefinition::class, $node);
     }
 }
 

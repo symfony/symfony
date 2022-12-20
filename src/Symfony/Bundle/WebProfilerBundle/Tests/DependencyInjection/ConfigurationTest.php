@@ -26,7 +26,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration();
         $config = $processor->processConfiguration($configuration, [$options]);
 
-        $this->assertEquals($expectedResult, $config);
+        self::assertEquals($expectedResult, $config);
     }
 
     public function getDebugModes()
@@ -68,7 +68,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration();
         $config = $processor->processConfiguration($configuration, [['intercept_redirects' => $interceptRedirects]]);
 
-        $this->assertEquals($expectedResult, $config);
+        self::assertEquals($expectedResult, $config);
     }
 
     public function getInterceptRedirectsConfiguration()

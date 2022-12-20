@@ -27,10 +27,10 @@ class UndefinedMethodErrorEnhancerTest extends TestCase
         $expectedLine = __LINE__ + 1;
         $error = $enhancer->enhance(new \Error($originalMessage));
 
-        $this->assertInstanceOf(UndefinedMethodError::class, $error);
-        $this->assertSame($enhancedMessage, $error->getMessage());
-        $this->assertSame(realpath(__FILE__), $error->getFile());
-        $this->assertSame($expectedLine, $error->getLine());
+        self::assertInstanceOf(UndefinedMethodError::class, $error);
+        self::assertSame($enhancedMessage, $error->getMessage());
+        self::assertSame(realpath(__FILE__), $error->getFile());
+        self::assertSame($expectedLine, $error->getLine());
     }
 
     public function provideUndefinedMethodData()

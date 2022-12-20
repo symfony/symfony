@@ -26,7 +26,7 @@ final class FreeMobileTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? $this->createMock(HttpClientInterface::class));
+        return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -44,6 +44,6 @@ final class FreeMobileTransportTest extends TransportTestCase
     {
         yield [new SmsMessage('0699887766', 'Hello!')]; // because this phone number is not configured on the transport!
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

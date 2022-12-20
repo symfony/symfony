@@ -25,17 +25,17 @@ class TraceableValidatorTest extends TestCase
 {
     public function testValidate()
     {
-        $originalValidator = $this->createMock(ValidatorInterface::class);
+        $originalValidator = self::createMock(ValidatorInterface::class);
         $violations = new ConstraintViolationList([
-            $this->createMock(ConstraintViolation::class),
-            $this->createMock(ConstraintViolation::class),
+            self::createMock(ConstraintViolation::class),
+            self::createMock(ConstraintViolation::class),
         ]);
-        $originalValidator->expects($this->exactly(2))->method('validate')->willReturn($violations);
+        $originalValidator->expects(self::exactly(2))->method('validate')->willReturn($violations);
 
         $validator = new TraceableValidator($originalValidator);
 
         $object = new \stdClass();
-        $constraints = [$this->createMock(Constraint::class)];
+        $constraints = [self::createMock(Constraint::class)];
         $groups = ['Default', 'Create'];
 
         $validator->validate($object, $constraints, $groups);
@@ -43,19 +43,19 @@ class TraceableValidatorTest extends TestCase
 
         $collectedData = $validator->getCollectedData();
 
-        $this->assertCount(1, $collectedData);
+        self::assertCount(1, $collectedData);
 
         $callData = $collectedData[0];
 
-        $this->assertSame(iterator_to_array($violations), $callData['violations']);
+        self::assertSame(iterator_to_array($violations), $callData['violations']);
 
-        $this->assertSame([
+        self::assertSame([
             'value' => $object,
             'constraints' => $constraints,
             'groups' => $groups,
         ], $callData['context']);
 
-        $this->assertEquals([
+        self::assertEquals([
             'name' => 'TraceableValidatorTest.php',
             'file' => __FILE__,
             'line' => $line,
@@ -64,35 +64,35 @@ class TraceableValidatorTest extends TestCase
         $validator->validate($object, $constraints, $groups);
         $collectedData = $validator->getCollectedData();
 
-        $this->assertCount(2, $collectedData);
+        self::assertCount(2, $collectedData);
     }
 
     public function testForwardsToOriginalValidator()
     {
-        $originalValidator = $this->createMock(ValidatorInterface::class);
+        $originalValidator = self::createMock(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);
 
-        $expects = function ($method) use ($originalValidator) { return $originalValidator->expects($this->once())->method($method); };
+        $expects = function ($method) use ($originalValidator) { return $originalValidator->expects(self::once())->method($method); };
 
-        $expects('getMetadataFor')->willReturn($expected = $this->createMock(MetadataInterface::class));
-        $this->assertSame($expected, $validator->getMetadataFor('value'), 'returns original validator getMetadataFor() result');
+        $expects('getMetadataFor')->willReturn($expected = self::createMock(MetadataInterface::class));
+        self::assertSame($expected, $validator->getMetadataFor('value'), 'returns original validator getMetadataFor() result');
 
         $expects('hasMetadataFor')->willReturn($expected = false);
-        $this->assertSame($expected, $validator->hasMetadataFor('value'), 'returns original validator hasMetadataFor() result');
+        self::assertSame($expected, $validator->hasMetadataFor('value'), 'returns original validator hasMetadataFor() result');
 
-        $expects('inContext')->willReturn($expected = $this->createMock(ContextualValidatorInterface::class));
-        $this->assertSame($expected, $validator->inContext($this->createMock(ExecutionContextInterface::class)), 'returns original validator inContext() result');
+        $expects('inContext')->willReturn($expected = self::createMock(ContextualValidatorInterface::class));
+        self::assertSame($expected, $validator->inContext(self::createMock(ExecutionContextInterface::class)), 'returns original validator inContext() result');
 
-        $expects('startContext')->willReturn($expected = $this->createMock(ContextualValidatorInterface::class));
-        $this->assertSame($expected, $validator->startContext(), 'returns original validator startContext() result');
+        $expects('startContext')->willReturn($expected = self::createMock(ContextualValidatorInterface::class));
+        self::assertSame($expected, $validator->startContext(), 'returns original validator startContext() result');
 
         $expects('validate')->willReturn($expected = new ConstraintViolationList());
-        $this->assertSame($expected, $validator->validate('value'), 'returns original validator validate() result');
+        self::assertSame($expected, $validator->validate('value'), 'returns original validator validate() result');
 
         $expects('validateProperty')->willReturn($expected = new ConstraintViolationList());
-        $this->assertSame($expected, $validator->validateProperty(new \stdClass(), 'property'), 'returns original validator validateProperty() result');
+        self::assertSame($expected, $validator->validateProperty(new \stdClass(), 'property'), 'returns original validator validateProperty() result');
 
         $expects('validatePropertyValue')->willReturn($expected = new ConstraintViolationList());
-        $this->assertSame($expected, $validator->validatePropertyValue(new \stdClass(), 'property', 'value'), 'returns original validator validatePropertyValue() result');
+        self::assertSame($expected, $validator->validatePropertyValue(new \stdClass(), 'property', 'value'), 'returns original validator validatePropertyValue() result');
     }
 }

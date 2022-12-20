@@ -26,8 +26,8 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
 
         $actualOutput = $transformer->transform($input);
 
-        $this->assertEquals($expectedOutput, $actualOutput);
-        $this->assertEquals($expectedOutput->getTimezone(), $actualOutput->getTimezone());
+        self::assertEquals($expectedOutput, $actualOutput);
+        self::assertEquals($expectedOutput->getTimezone(), $actualOutput->getTimezone());
     }
 
     public function provider()
@@ -50,13 +50,13 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
     {
         $transformer = new DateTimeImmutableToDateTimeTransformer();
 
-        $this->assertNull($transformer->transform(null));
+        self::assertNull($transformer->transform(null));
     }
 
     public function testTransformFail()
     {
-        $this->expectException(TransformationFailedException::class);
-        $this->expectExceptionMessage('Expected a \DateTimeImmutable.');
+        self::expectException(TransformationFailedException::class);
+        self::expectExceptionMessage('Expected a \DateTimeImmutable.');
         $transformer = new DateTimeImmutableToDateTimeTransformer();
         $transformer->transform(new \DateTime());
     }
@@ -70,21 +70,21 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
 
         $actualOutput = $transformer->reverseTransform($input);
 
-        $this->assertEquals($expectedOutput, $actualOutput);
-        $this->assertEquals($expectedOutput->getTimezone(), $actualOutput->getTimezone());
+        self::assertEquals($expectedOutput, $actualOutput);
+        self::assertEquals($expectedOutput->getTimezone(), $actualOutput->getTimezone());
     }
 
     public function testReverseTransformEmpty()
     {
         $transformer = new DateTimeImmutableToDateTimeTransformer();
 
-        $this->assertNull($transformer->reverseTransform(null));
+        self::assertNull($transformer->reverseTransform(null));
     }
 
     public function testReverseTransformFail()
     {
-        $this->expectException(TransformationFailedException::class);
-        $this->expectExceptionMessage('Expected a \DateTime.');
+        self::expectException(TransformationFailedException::class);
+        self::expectExceptionMessage('Expected a \DateTime.');
         $transformer = new DateTimeImmutableToDateTimeTransformer();
         $transformer->reverseTransform(new \DateTimeImmutable());
     }

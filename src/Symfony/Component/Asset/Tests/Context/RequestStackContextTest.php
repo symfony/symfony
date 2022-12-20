@@ -20,56 +20,56 @@ class RequestStackContextTest extends TestCase
 {
     public function testGetBasePathEmpty()
     {
-        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack = self::createMock(RequestStack::class);
         $requestStackContext = new RequestStackContext($requestStack);
 
-        $this->assertEmpty($requestStackContext->getBasePath());
+        self::assertEmpty($requestStackContext->getBasePath());
     }
 
     public function testGetBasePathSet()
     {
         $testBasePath = 'test-path';
 
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request->method('getBasePath')
             ->willReturn($testBasePath);
-        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack = self::createMock(RequestStack::class);
         $requestStack->method('getMainRequest')
             ->willReturn($request);
 
         $requestStackContext = new RequestStackContext($requestStack);
 
-        $this->assertSame($testBasePath, $requestStackContext->getBasePath());
+        self::assertSame($testBasePath, $requestStackContext->getBasePath());
     }
 
     public function testIsSecureFalse()
     {
-        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack = self::createMock(RequestStack::class);
         $requestStackContext = new RequestStackContext($requestStack);
 
-        $this->assertFalse($requestStackContext->isSecure());
+        self::assertFalse($requestStackContext->isSecure());
     }
 
     public function testIsSecureTrue()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request->method('isSecure')
             ->willReturn(true);
-        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack = self::createMock(RequestStack::class);
         $requestStack->method('getMainRequest')
             ->willReturn($request);
 
         $requestStackContext = new RequestStackContext($requestStack);
 
-        $this->assertTrue($requestStackContext->isSecure());
+        self::assertTrue($requestStackContext->isSecure());
     }
 
     public function testDefaultContext()
     {
-        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack = self::createMock(RequestStack::class);
         $requestStackContext = new RequestStackContext($requestStack, 'default-path', true);
 
-        $this->assertSame('default-path', $requestStackContext->getBasePath());
-        $this->assertTrue($requestStackContext->isSecure());
+        self::assertSame('default-path', $requestStackContext->getBasePath());
+        self::assertTrue($requestStackContext->isSecure());
     }
 }

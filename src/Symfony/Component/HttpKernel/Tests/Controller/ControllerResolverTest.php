@@ -20,12 +20,12 @@ class ControllerResolverTest extends TestCase
 {
     public function testGetControllerWithoutControllerParameter()
     {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing.');
+        $logger = self::createMock(LoggerInterface::class);
+        $logger->expects(self::once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing.');
         $resolver = $this->createControllerResolver($logger);
 
         $request = Request::create('/');
-        $this->assertFalse($resolver->getController($request), '->getController() returns false when the request has no _controller attribute');
+        self::assertFalse($resolver->getController($request), '->getController() returns false when the request has no _controller attribute');
     }
 
     public function testGetControllerWithLambda()
@@ -35,7 +35,7 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', $lambda = function () {});
         $controller = $resolver->getController($request);
-        $this->assertSame($lambda, $controller);
+        self::assertSame($lambda, $controller);
     }
 
     public function testGetControllerWithObjectAndInvokeMethod()
@@ -46,7 +46,7 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', $object);
         $controller = $resolver->getController($request);
-        $this->assertSame($object, $controller);
+        self::assertSame($object, $controller);
     }
 
     public function testGetControllerWithObjectAndMethod()
@@ -57,7 +57,7 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', [$object, 'publicAction']);
         $controller = $resolver->getController($request);
-        $this->assertSame([$object, 'publicAction'], $controller);
+        self::assertSame([$object, 'publicAction'], $controller);
     }
 
     public function testGetControllerWithClassAndMethodAsArray()
@@ -67,8 +67,8 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', [ControllerTest::class, 'publicAction']);
         $controller = $resolver->getController($request);
-        $this->assertInstanceOf(ControllerTest::class, $controller[0]);
-        $this->assertSame('publicAction', $controller[1]);
+        self::assertInstanceOf(ControllerTest::class, $controller[0]);
+        self::assertSame('publicAction', $controller[1]);
     }
 
     public function testGetControllerWithClassAndMethodAsString()
@@ -78,8 +78,8 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', ControllerTest::class.'::publicAction');
         $controller = $resolver->getController($request);
-        $this->assertInstanceOf(ControllerTest::class, $controller[0]);
-        $this->assertSame('publicAction', $controller[1]);
+        self::assertInstanceOf(ControllerTest::class, $controller[0]);
+        self::assertSame('publicAction', $controller[1]);
     }
 
     public function testGetControllerWithInvokableClass()
@@ -89,12 +89,12 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', InvokableController::class);
         $controller = $resolver->getController($request);
-        $this->assertInstanceOf(InvokableController::class, $controller);
+        self::assertInstanceOf(InvokableController::class, $controller);
     }
 
     public function testGetControllerOnObjectWithoutInvokeMethod()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
@@ -109,7 +109,7 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\some_controller_function');
         $controller = $resolver->getController($request);
-        $this->assertSame('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function', $controller);
+        self::assertSame('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function', $controller);
     }
 
     public function testGetControllerWithClosure()
@@ -123,8 +123,8 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', $closure);
         $controller = $resolver->getController($request);
-        $this->assertInstanceOf(\Closure::class, $controller);
-        $this->assertSame('test', $controller());
+        self::assertInstanceOf(\Closure::class, $controller);
+        self::assertSame('test', $controller());
     }
 
     /**
@@ -137,8 +137,8 @@ class ControllerResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', $staticController);
         $controller = $resolver->getController($request);
-        $this->assertSame($staticController, $controller);
-        $this->assertSame($returnValue, $controller());
+        self::assertSame($staticController, $controller);
+        self::assertSame($returnValue, $controller());
     }
 
     public function getStaticControllers()
@@ -157,8 +157,8 @@ class ControllerResolverTest extends TestCase
     public function testGetControllerWithUndefinedController($controller, $exceptionName = null, $exceptionMessage = null)
     {
         $resolver = $this->createControllerResolver();
-        $this->expectException($exceptionName);
-        $this->expectExceptionMessage($exceptionMessage);
+        self::expectException($exceptionName);
+        self::expectExceptionMessage($exceptionMessage);
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $controller);

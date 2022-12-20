@@ -25,17 +25,16 @@ class DbalLoggerTest extends TestCase
      */
     public function testLog($sql, $params, $logParams)
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
 
-        $dbalLogger = $this
-            ->getMockBuilder(DbalLogger::class)
+        $dbalLogger = self::getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
             ->setMethods(['log'])
             ->getMock()
         ;
 
         $dbalLogger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('log')
             ->with($sql, $logParams)
         ;
@@ -57,17 +56,16 @@ class DbalLoggerTest extends TestCase
 
     public function testLogNonUtf8()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
 
-        $dbalLogger = $this
-            ->getMockBuilder(DbalLogger::class)
+        $dbalLogger = self::getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
             ->setMethods(['log'])
             ->getMock()
         ;
 
         $dbalLogger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('log')
             ->with('SQL', ['utf8' => 'foo', 'nonutf8' => DbalLogger::BINARY_DATA_VALUE])
         ;
@@ -80,17 +78,16 @@ class DbalLoggerTest extends TestCase
 
     public function testLogNonUtf8Array()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
 
-        $dbalLogger = $this
-            ->getMockBuilder(DbalLogger::class)
+        $dbalLogger = self::getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
             ->setMethods(['log'])
             ->getMock()
         ;
 
         $dbalLogger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('log')
             ->with('SQL', [
                     'utf8' => 'foo',
@@ -111,10 +108,9 @@ class DbalLoggerTest extends TestCase
 
     public function testLogLongString()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
 
-        $dbalLogger = $this
-            ->getMockBuilder(DbalLogger::class)
+        $dbalLogger = self::getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
             ->setMethods(['log'])
             ->getMock()
@@ -126,7 +122,7 @@ class DbalLoggerTest extends TestCase
         $longString = str_pad('', DbalLogger::MAX_STRING_LENGTH + 1, $testString);
 
         $dbalLogger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('log')
             ->with('SQL', ['short' => $shortString, 'long' => substr($longString, 0, DbalLogger::MAX_STRING_LENGTH - 6).' [...]'])
         ;
@@ -139,10 +135,9 @@ class DbalLoggerTest extends TestCase
 
     public function testLogUTF8LongString()
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = self::createMock(LoggerInterface::class);
 
-        $dbalLogger = $this
-            ->getMockBuilder(DbalLogger::class)
+        $dbalLogger = self::getMockBuilder(DbalLogger::class)
             ->setConstructorArgs([$logger, null])
             ->setMethods(['log'])
             ->getMock()
@@ -160,7 +155,7 @@ class DbalLoggerTest extends TestCase
         $longString .= $testStringArray[$i % $testStringCount];
 
         $dbalLogger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('log')
             ->with('SQL', ['short' => $shortString, 'long' => mb_substr($longString, 0, DbalLogger::MAX_STRING_LENGTH - 6, 'UTF-8').' [...]'])
         ;

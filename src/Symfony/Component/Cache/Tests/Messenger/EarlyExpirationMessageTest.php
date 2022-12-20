@@ -45,19 +45,19 @@ class EarlyExpirationMessageTest extends TestCase
 
         $msg = EarlyExpirationMessage::create($reverseContainer, [$computationService, '__invoke'], $item, $pool);
 
-        $this->assertSame('cache_pool', $msg->getPool());
-        $this->assertSame($pool, $msg->findPool($reverseContainer));
+        self::assertSame('cache_pool', $msg->getPool());
+        self::assertSame($pool, $msg->findPool($reverseContainer));
 
-        $this->assertSame('foo', $msg->getItem()->getKey());
-        $this->assertNull($msg->getItem()->get());
-        $this->assertSame(234, $item->get());
+        self::assertSame('foo', $msg->getItem()->getKey());
+        self::assertNull($msg->getItem()->get());
+        self::assertSame(234, $item->get());
 
-        $this->assertSame(['@computation_service', '__invoke'], $msg->getCallback());
-        $this->assertSame([$computationService, '__invoke'], $msg->findCallback($reverseContainer));
+        self::assertSame(['@computation_service', '__invoke'], $msg->getCallback());
+        self::assertSame([$computationService, '__invoke'], $msg->findCallback($reverseContainer));
 
         $msg = EarlyExpirationMessage::create($reverseContainer, $computationService, $item, $pool);
 
-        $this->assertSame('@computation_service', $msg->getCallback());
-        $this->assertSame($computationService, $msg->findCallback($reverseContainer));
+        self::assertSame('@computation_service', $msg->getCallback());
+        self::assertSame($computationService, $msg->findCallback($reverseContainer));
     }
 }

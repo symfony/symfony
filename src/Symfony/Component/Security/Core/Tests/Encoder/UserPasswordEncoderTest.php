@@ -26,55 +26,55 @@ class UserPasswordEncoderTest extends TestCase
 {
     public function testEncodePassword()
     {
-        $userMock = $this->createMock(UserInterface::class);
-        $userMock->expects($this->any())
+        $userMock = self::createMock(UserInterface::class);
+        $userMock->expects(self::any())
             ->method('getSalt')
             ->willReturn('userSalt');
 
-        $mockEncoder = $this->createMock(PasswordEncoderInterface::class);
-        $mockEncoder->expects($this->any())
+        $mockEncoder = self::createMock(PasswordEncoderInterface::class);
+        $mockEncoder->expects(self::any())
             ->method('encodePassword')
-            ->with($this->equalTo('plainPassword'), $this->equalTo('userSalt'))
+            ->with(self::equalTo('plainPassword'), self::equalTo('userSalt'))
             ->willReturn('encodedPassword');
 
-        $mockEncoderFactory = $this->createMock(EncoderFactoryInterface::class);
-        $mockEncoderFactory->expects($this->any())
+        $mockEncoderFactory = self::createMock(EncoderFactoryInterface::class);
+        $mockEncoderFactory->expects(self::any())
             ->method('getEncoder')
-            ->with($this->equalTo($userMock))
+            ->with(self::equalTo($userMock))
             ->willReturn($mockEncoder);
 
         $passwordEncoder = new UserPasswordEncoder($mockEncoderFactory);
 
         $encoded = $passwordEncoder->encodePassword($userMock, 'plainPassword');
-        $this->assertEquals('encodedPassword', $encoded);
+        self::assertEquals('encodedPassword', $encoded);
     }
 
     public function testIsPasswordValid()
     {
-        $userMock = $this->createMock(UserInterface::class);
-        $userMock->expects($this->any())
+        $userMock = self::createMock(UserInterface::class);
+        $userMock->expects(self::any())
             ->method('getSalt')
             ->willReturn('userSalt');
-        $userMock->expects($this->any())
+        $userMock->expects(self::any())
             ->method('getPassword')
             ->willReturn('encodedPassword');
 
-        $mockEncoder = $this->createMock(PasswordEncoderInterface::class);
-        $mockEncoder->expects($this->any())
+        $mockEncoder = self::createMock(PasswordEncoderInterface::class);
+        $mockEncoder->expects(self::any())
             ->method('isPasswordValid')
-            ->with($this->equalTo('encodedPassword'), $this->equalTo('plainPassword'), $this->equalTo('userSalt'))
+            ->with(self::equalTo('encodedPassword'), self::equalTo('plainPassword'), self::equalTo('userSalt'))
             ->willReturn(true);
 
-        $mockEncoderFactory = $this->createMock(EncoderFactoryInterface::class);
-        $mockEncoderFactory->expects($this->any())
+        $mockEncoderFactory = self::createMock(EncoderFactoryInterface::class);
+        $mockEncoderFactory->expects(self::any())
             ->method('getEncoder')
-            ->with($this->equalTo($userMock))
+            ->with(self::equalTo($userMock))
             ->willReturn($mockEncoder);
 
         $passwordEncoder = new UserPasswordEncoder($mockEncoderFactory);
 
         $isValid = $passwordEncoder->isPasswordValid($userMock, 'plainPassword');
-        $this->assertTrue($isValid);
+        self::assertTrue($isValid);
     }
 
     public function testNeedsRehash()
@@ -82,17 +82,17 @@ class UserPasswordEncoderTest extends TestCase
         $user = new User('username', null);
         $encoder = new NativePasswordEncoder(4, 20000, 4);
 
-        $mockEncoderFactory = $this->createMock(EncoderFactoryInterface::class);
-        $mockEncoderFactory->expects($this->any())
+        $mockEncoderFactory = self::createMock(EncoderFactoryInterface::class);
+        $mockEncoderFactory->expects(self::any())
             ->method('getEncoder')
             ->with($user)
-            ->will($this->onConsecutiveCalls($encoder, $encoder, new NativePasswordEncoder(5, 20000, 5), $encoder));
+            ->will(self::onConsecutiveCalls($encoder, $encoder, new NativePasswordEncoder(5, 20000, 5), $encoder));
 
         $passwordEncoder = new UserPasswordEncoder($mockEncoderFactory);
 
         $user->setPassword($passwordEncoder->encodePassword($user, 'foo', 'salt'));
-        $this->assertFalse($passwordEncoder->needsRehash($user));
-        $this->assertTrue($passwordEncoder->needsRehash($user));
-        $this->assertFalse($passwordEncoder->needsRehash($user));
+        self::assertFalse($passwordEncoder->needsRehash($user));
+        self::assertTrue($passwordEncoder->needsRehash($user));
+        self::assertFalse($passwordEncoder->needsRehash($user));
     }
 }

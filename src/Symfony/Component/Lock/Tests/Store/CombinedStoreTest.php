@@ -66,35 +66,35 @@ class CombinedStoreTest extends AbstractStoreTest
 
     protected function setUp(): void
     {
-        $this->strategy = $this->createMock(StrategyInterface::class);
-        $this->store1 = $this->createMock(BlockingStoreInterface::class);
-        $this->store2 = $this->createMock(BlockingStoreInterface::class);
+        $this->strategy = self::createMock(StrategyInterface::class);
+        $this->store1 = self::createMock(BlockingStoreInterface::class);
+        $this->store2 = self::createMock(BlockingStoreInterface::class);
 
         $this->store = new CombinedStore([$this->store1, $this->store2], $this->strategy);
     }
 
     public function testSaveThrowsExceptionOnFailure()
     {
-        $this->expectException(LockConflictedException::class);
+        self::expectException(LockConflictedException::class);
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
         $this->store2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
 
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('canBeMet')
             ->willReturn(true);
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isMet')
             ->willReturn(false);
 
@@ -106,29 +106,29 @@ class CombinedStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
         $this->store2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete');
         $this->store2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete');
 
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('canBeMet')
             ->willReturn(true);
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isMet')
             ->willReturn(false);
 
@@ -144,20 +144,20 @@ class CombinedStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
         $this->store2
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('save');
 
         $this->strategy
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('canBeMet')
             ->willReturn(false);
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isMet')
             ->willReturn(false);
 
@@ -170,27 +170,27 @@ class CombinedStoreTest extends AbstractStoreTest
 
     public function testputOffExpirationThrowsExceptionOnFailure()
     {
-        $this->expectException(LockConflictedException::class);
+        self::expectException(LockConflictedException::class);
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
-            ->with($key, $this->lessThanOrEqual($ttl))
+            ->with($key, self::lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
         $this->store2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
-            ->with($key, $this->lessThanOrEqual($ttl))
+            ->with($key, self::lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
 
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('canBeMet')
             ->willReturn(true);
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isMet')
             ->willReturn(false);
 
@@ -203,29 +203,29 @@ class CombinedStoreTest extends AbstractStoreTest
         $ttl = random_int(1, 10);
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
-            ->with($key, $this->lessThanOrEqual($ttl))
+            ->with($key, self::lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
         $this->store2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
-            ->with($key, $this->lessThanOrEqual($ttl))
+            ->with($key, self::lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete');
         $this->store2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete');
 
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('canBeMet')
             ->willReturn(true);
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isMet')
             ->willReturn(false);
 
@@ -242,20 +242,20 @@ class CombinedStoreTest extends AbstractStoreTest
         $ttl = random_int(1, 10);
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
-            ->with($key, $this->lessThanOrEqual($ttl))
+            ->with($key, self::lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
         $this->store2
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('putOffExpiration');
 
         $this->strategy
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('canBeMet')
             ->willReturn(false);
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isMet')
             ->willReturn(false);
 
@@ -268,8 +268,8 @@ class CombinedStoreTest extends AbstractStoreTest
 
     public function testPutOffExpirationIgnoreNonExpiringStorage()
     {
-        $store1 = $this->createMock(PersistingStoreInterface::class);
-        $store2 = $this->createMock(PersistingStoreInterface::class);
+        $store1 = self::createMock(PersistingStoreInterface::class);
+        $store2 = self::createMock(PersistingStoreInterface::class);
 
         $store = new CombinedStore([$store1, $store2], $this->strategy);
 
@@ -277,11 +277,11 @@ class CombinedStoreTest extends AbstractStoreTest
         $ttl = random_int(1, 10);
 
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('canBeMet')
             ->willReturn(true);
         $this->strategy
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isMet')
             ->with(2, 2)
             ->willReturn(true);
@@ -294,24 +294,24 @@ class CombinedStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->store1
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
         $this->store2
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('exists');
 
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('canBeMet')
             ->willReturn(true);
         $this->strategy
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isMet')
             ->willReturn(true);
 
-        $this->assertTrue($this->store->exists($key));
+        self::assertTrue($this->store->exists($key));
     }
 
     public function testExistsAbortWhenStrategyCantBeMet()
@@ -319,24 +319,24 @@ class CombinedStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->store1
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
         $this->store2
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('exists');
 
         $this->strategy
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('canBeMet')
             ->willReturn(false);
         $this->strategy
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isMet')
             ->willReturn(false);
 
-        $this->assertFalse($this->store->exists($key));
+        self::assertFalse($this->store->exists($key));
     }
 
     public function testDeleteDontStopOnFailure()
@@ -344,12 +344,12 @@ class CombinedStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key)
             ->willThrowException(new \Exception());
         $this->store2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key);
 
@@ -361,32 +361,32 @@ class CombinedStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('canBeMet')
             ->willReturn(true);
         $this->strategy
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isMet')
             ->willReturn(false);
         $this->store1
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('exists')
             ->willThrowException(new \Exception());
         $this->store2
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
 
-        $this->assertFalse($this->store->exists($key));
+        self::assertFalse($this->store->exists($key));
     }
 
     public function testSaveReadWithCompatibleStore()
     {
         $key = new Key(uniqid(__METHOD__, true));
 
-        $goodStore = $this->createMock(SharedLockStoreInterface::class);
-        $goodStore->expects($this->once())
+        $goodStore = self::createMock(SharedLockStoreInterface::class);
+        $goodStore->expects(self::once())
             ->method('saveRead')
             ->with($key);
 

@@ -36,28 +36,28 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 
         $controllers = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
 
-        $this->assertCount(2, $container->getDefinition((string) $controllers['c1::fooAction']->getValues()[0])->getArgument(0));
-        $this->assertCount(1, $container->getDefinition((string) $controllers['c2::setTestCase']->getValues()[0])->getArgument(0));
-        $this->assertCount(1, $container->getDefinition((string) $controllers['c2::fooAction']->getValues()[0])->getArgument(0));
+        self::assertCount(2, $container->getDefinition((string) $controllers['c1::fooAction']->getValues()[0])->getArgument(0));
+        self::assertCount(1, $container->getDefinition((string) $controllers['c2::setTestCase']->getValues()[0])->getArgument(0));
+        self::assertCount(1, $container->getDefinition((string) $controllers['c2::fooAction']->getValues()[0])->getArgument(0));
 
         (new ResolveInvalidReferencesPass())->process($container);
 
-        $this->assertCount(1, $container->getDefinition((string) $controllers['c2::setTestCase']->getValues()[0])->getArgument(0));
-        $this->assertSame([], $container->getDefinition((string) $controllers['c2::fooAction']->getValues()[0])->getArgument(0));
+        self::assertCount(1, $container->getDefinition((string) $controllers['c2::setTestCase']->getValues()[0])->getArgument(0));
+        self::assertSame([], $container->getDefinition((string) $controllers['c2::fooAction']->getValues()[0])->getArgument(0));
 
         (new RemoveEmptyControllerArgumentLocatorsPass())->process($container);
 
         $controllers = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
 
-        $this->assertSame(['c1::fooAction', 'c1:fooAction'], array_keys($controllers));
-        $this->assertSame(['bar'], array_keys($container->getDefinition((string) $controllers['c1::fooAction']->getValues()[0])->getArgument(0)));
+        self::assertSame(['c1::fooAction', 'c1:fooAction'], array_keys($controllers));
+        self::assertSame(['bar'], array_keys($container->getDefinition((string) $controllers['c1::fooAction']->getValues()[0])->getArgument(0)));
 
         $expectedLog = [
             'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing service-argument resolver for controller "c2::fooAction": no corresponding services exist for the referenced types.',
             'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing method "setTestCase" of service "c2" from controller candidates: the method is called at instantiation, thus cannot be an action.',
         ];
 
-        $this->assertEqualsCanonicalizing($expectedLog, $container->getCompiler()->getLog());
+        self::assertEqualsCanonicalizing($expectedLog, $container->getCompiler()->getLog());
     }
 
     public function testInvoke()
@@ -72,10 +72,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         (new RegisterControllerArgumentLocatorsPass())->process($container);
         (new RemoveEmptyControllerArgumentLocatorsPass())->process($container);
 
-        $this->assertEquals(
-            ['invokable::__invoke', 'invokable:__invoke', 'invokable'],
-            array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0))
-        );
+        self::assertEquals(['invokable::__invoke', 'invokable:__invoke', 'invokable'], array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0)));
     }
 }
 

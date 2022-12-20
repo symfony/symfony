@@ -34,7 +34,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
     public function createPostgreSqlConnection(): Connection
     {
         if (!getenv('POSTGRES_HOST')) {
-            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+            self::markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
         return DriverManager::getConnection(['url' => 'pgsql://postgres:password@'.getenv('POSTGRES_HOST')]);
@@ -56,8 +56,8 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
      */
     public function testInvalidDriver($connOrDsn)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The adapter "Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore" does not support');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The adapter "Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore" does not support');
 
         $store = new DoctrineDbalPostgreSqlStore($connOrDsn);
         $store->exists(new Key('foo'));
@@ -77,7 +77,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $store1->save($key);
-        $this->assertTrue($store1->exists($key));
+        self::assertTrue($store1->exists($key));
 
         $lockConflicted = false;
         try {
@@ -86,13 +86,13 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
             $lockConflicted = true;
         }
 
-        $this->assertTrue($lockConflicted);
-        $this->assertFalse($store2->exists($key));
+        self::assertTrue($lockConflicted);
+        self::assertFalse($store2->exists($key));
 
         $store1->delete($key);
 
         $store2->save($key);
-        $this->assertTrue($store2->exists($key));
+        self::assertTrue($store2->exists($key));
     }
 
     public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore()
@@ -114,11 +114,11 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
             $store2->waitAndSave(new Key($keyId));
         } catch (DBALException $waitSaveError) {
         }
-        $this->assertInstanceOf(DBALException::class, $waitSaveError, 'waitAndSave should have thrown');
+        self::assertInstanceOf(DBALException::class, $waitSaveError, 'waitAndSave should have thrown');
         $conn->executeStatement('SET statement_timeout = 0');
 
         $store1->delete($store1Key);
-        $this->assertFalse($store1->exists($store1Key));
+        self::assertFalse($store1->exists($store1Key));
 
         $store2Key = new Key($keyId);
         $lockConflicted = false;
@@ -128,8 +128,8 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
             $lockConflicted = true;
         }
 
-        $this->assertFalse($lockConflicted, 'lock should be available now that its been remove from $store1');
-        $this->assertTrue($store2->exists($store2Key));
+        self::assertFalse($lockConflicted, 'lock should be available now that its been remove from $store1');
+        self::assertTrue($store2->exists($store2Key));
     }
 
     public function testWaitAndSaveReadAfterConflictReleasesLockFromInternalStore()
@@ -151,10 +151,10 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
             $store2->waitAndSaveRead(new Key($keyId));
         } catch (DBALException $waitSaveError) {
         }
-        $this->assertInstanceOf(DBALException::class, $waitSaveError, 'waitAndSaveRead should have thrown');
+        self::assertInstanceOf(DBALException::class, $waitSaveError, 'waitAndSaveRead should have thrown');
 
         $store1->delete($store1Key);
-        $this->assertFalse($store1->exists($store1Key));
+        self::assertFalse($store1->exists($store1Key));
 
         $store2Key = new Key($keyId);
         // since the lock is going to be acquired in read mode and is not exclusive
@@ -164,6 +164,6 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
         $conn->executeStatement('SET statement_timeout = 2000');
         $store2->waitAndSaveRead($store2Key);
 
-        $this->assertTrue($store2->exists($store2Key));
+        self::assertTrue($store2->exists($store2Key));
     }
 }

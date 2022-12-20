@@ -27,11 +27,11 @@ class UndefinedFunctionErrorEnhancerTest extends TestCase
         $expectedLine = __LINE__ + 1;
         $error = $enhancer->enhance(new \Error($originalMessage));
 
-        $this->assertInstanceOf(UndefinedFunctionError::class, $error);
+        self::assertInstanceOf(UndefinedFunctionError::class, $error);
         // class names are case insensitive and PHP do not return the same
-        $this->assertSame(strtolower($enhancedMessage), strtolower($error->getMessage()));
-        $this->assertSame(realpath(__FILE__), $error->getFile());
-        $this->assertSame($expectedLine, $error->getLine());
+        self::assertSame(strtolower($enhancedMessage), strtolower($error->getMessage()));
+        self::assertSame(realpath(__FILE__), $error->getFile());
+        self::assertSame($expectedLine, $error->getLine());
     }
 
     public function provideUndefinedFunctionData()

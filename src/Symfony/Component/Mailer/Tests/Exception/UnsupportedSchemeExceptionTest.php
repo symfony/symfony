@@ -53,10 +53,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     {
         $dsn = new Dsn($scheme, 'localhost');
 
-        $this->assertSame(
-            sprintf('Unable to send emails via "%s" as the bridge is not installed; try running "composer require %s".', $scheme, $package),
-            (new UnsupportedSchemeException($dsn))->getMessage()
-        );
+        self::assertSame(sprintf('Unable to send emails via "%s" as the bridge is not installed; try running "composer require %s".', $scheme, $package), (new UnsupportedSchemeException($dsn))->getMessage());
     }
 
     public function messageWhereSchemeIsPartOfSchemeToPackageMapProvider(): \Generator
@@ -77,10 +74,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
      */
     public function testMessageWhereSchemeIsNotPartOfSchemeToPackageMap(string $expected, Dsn $dsn, ?string $name, array $supported)
     {
-        $this->assertSame(
-            $expected,
-            (new UnsupportedSchemeException($dsn, $name, $supported))->getMessage()
-        );
+        self::assertSame($expected, (new UnsupportedSchemeException($dsn, $name, $supported))->getMessage());
     }
 
     public function messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider(): \Generator

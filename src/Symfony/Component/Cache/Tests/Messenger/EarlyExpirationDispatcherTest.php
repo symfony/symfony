@@ -57,7 +57,7 @@ class EarlyExpirationDispatcherTest extends TestCase
 
         $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
 
-        $bus = $this->createMock(MessageBusInterface::class);
+        $bus = self::createMock(MessageBusInterface::class);
 
         $dispatcher = new EarlyExpirationDispatcher($bus, $reverseContainer);
 
@@ -70,8 +70,8 @@ class EarlyExpirationDispatcherTest extends TestCase
             }
         });
 
-        $this->assertSame(345, $pool->get('foo', function () { return 345; }));
-        $this->assertTrue($saveResult);
+        self::assertSame(345, $pool->get('foo', function () { return 345; }));
+        self::assertTrue($saveResult);
 
         $expected = [
             [
@@ -80,7 +80,7 @@ class EarlyExpirationDispatcherTest extends TestCase
                 'context' => ['key' => 'foo'],
             ],
         ];
-        $this->assertSame($expected, $logger->records);
+        self::assertSame($expected, $logger->records);
     }
 
     public function testEarlyExpiration()
@@ -107,8 +107,8 @@ class EarlyExpirationDispatcherTest extends TestCase
         $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
         $msg = EarlyExpirationMessage::create($reverseContainer, $computationService, $item, $pool);
 
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())
+        $bus = self::createMock(MessageBusInterface::class);
+        $bus->expects(self::once())
             ->method('dispatch')
             ->with($msg)
             ->willReturn(new Envelope($msg));
@@ -120,7 +120,7 @@ class EarlyExpirationDispatcherTest extends TestCase
         };
         $dispatcher($computationService, $item, $saveResult, $pool, $setMetadata, $logger);
 
-        $this->assertFalse($saveResult);
+        self::assertFalse($saveResult);
 
         $expected = [
             [
@@ -129,7 +129,7 @@ class EarlyExpirationDispatcherTest extends TestCase
                 'context' => ['key' => 'foo'],
             ],
         ];
-        $this->assertSame($expected, $logger->records);
+        self::assertSame($expected, $logger->records);
     }
 }
 

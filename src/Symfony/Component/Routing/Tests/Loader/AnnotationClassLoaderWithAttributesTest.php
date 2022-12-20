@@ -33,7 +33,7 @@ class AnnotationClassLoaderWithAttributesTest extends AnnotationClassLoaderTest
         $routeCollection = $this->loader->load($this->getNamespace().'\EncodingClass');
         $defaultName = array_keys($routeCollection->all())[0];
 
-        $this->assertSame('symfony_component_routing_tests_fixtures_attributefixtures_encodingclass_routeàction', $defaultName);
+        self::assertSame('symfony_component_routing_tests_fixtures_attributefixtures_encodingclass_routeàction', $defaultName);
     }
 
     protected function getNamespace(): string

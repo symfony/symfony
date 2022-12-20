@@ -19,8 +19,8 @@ class BooleanNodeDefinitionTest extends TestCase
 {
     public function testCannotBeEmptyThrowsAnException()
     {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('->cannotBeEmpty() is not applicable to BooleanNodeDefinition.');
+        self::expectException(InvalidDefinitionException::class);
+        self::expectExceptionMessage('->cannotBeEmpty() is not applicable to BooleanNodeDefinition.');
         $def = new BooleanNodeDefinition('foo');
         $def->cannotBeEmpty();
     }
@@ -32,10 +32,10 @@ class BooleanNodeDefinitionTest extends TestCase
 
         $node = $def->getNode();
 
-        $this->assertTrue($node->isDeprecated());
+        self::assertTrue($node->isDeprecated());
         $deprecation = $node->getDeprecation($node->getName(), $node->getPath());
-        $this->assertSame('The "foo" node is deprecated.', $deprecation['message']);
-        $this->assertSame('vendor/package', $deprecation['package']);
-        $this->assertSame('1.1', $deprecation['version']);
+        self::assertSame('The "foo" node is deprecated.', $deprecation['message']);
+        self::assertSame('vendor/package', $deprecation['package']);
+        self::assertSame('1.1', $deprecation['version']);
     }
 }

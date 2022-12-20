@@ -25,129 +25,129 @@ class ChannelListenerTest extends TestCase
 {
     public function testHandleWithNotSecuredRequestAndHttpChannel()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isSecure')
             ->willReturn(false)
         ;
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[], 'http'])
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap);
         $listener($event);
 
-        $this->assertNull($event->getResponse());
+        self::assertNull($event->getResponse());
     }
 
     public function testHandleWithSecuredRequestAndHttpsChannel()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isSecure')
             ->willReturn(true)
         ;
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[], 'https'])
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap);
         $listener($event);
 
-        $this->assertNull($event->getResponse());
+        self::assertNull($event->getResponse());
     }
 
     public function testHandleWithNotSecuredRequestAndHttpsChannel()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isSecure')
             ->willReturn(false)
         ;
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[], 'https'])
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap);
         $listener($event);
 
         $response = $event->getResponse();
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals('https://', $response->getTargetUrl());
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertEquals('https://', $response->getTargetUrl());
     }
 
     public function testHandleWithSecuredRequestAndHttpChannel()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isSecure')
             ->willReturn(true)
         ;
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[], 'http'])
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap);
         $listener($event);
 
         $response = $event->getResponse();
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals('http://', $response->getTargetUrl());
+        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertEquals('http://', $response->getTargetUrl());
     }
 
     public function testSupportsWithoutHeaders()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isSecure')
             ->willReturn(false)
         ;
         $request->headers = new HeaderBag();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[], 'https'])
         ;
 
         $listener = new ChannelListener($accessMap);
 
-        $this->assertTrue($listener->supports($request));
+        self::assertTrue($listener->supports($request));
     }
 
     /**
@@ -155,36 +155,36 @@ class ChannelListenerTest extends TestCase
      */
     public function testLegacyHandleWithEntryPoint()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $request
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('isSecure')
             ->willReturn(false)
         ;
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
+        $accessMap = self::createMock(AccessMapInterface::class);
         $accessMap
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn([[], 'https'])
         ;
 
         $response = new RedirectResponse('/redirected');
 
-        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+        $entryPoint = self::createMock(AuthenticationEntryPointInterface::class);
         $entryPoint
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('start')
-            ->with($this->equalTo($request))
+            ->with(self::equalTo($request))
             ->willReturn($response)
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent(self::createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap, $entryPoint);
         $listener($event);
 
-        $this->assertSame($response, $event->getResponse());
+        self::assertSame($response, $event->getResponse());
     }
 }

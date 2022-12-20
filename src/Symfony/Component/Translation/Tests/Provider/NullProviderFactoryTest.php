@@ -24,13 +24,13 @@ class NullProviderFactoryTest extends TestCase
 {
     public function testCreateThrowsUnsupportedSchemeException()
     {
-        $this->expectException(UnsupportedSchemeException::class);
+        self::expectException(UnsupportedSchemeException::class);
 
         (new NullProviderFactory())->create(new Dsn('foo://localhost'));
     }
 
     public function testCreate()
     {
-        $this->assertInstanceOf(NullProvider::class, (new NullProviderFactory())->create(new Dsn('null://null')));
+        self::assertInstanceOf(NullProvider::class, (new NullProviderFactory())->create(new Dsn('null://null')));
     }
 }

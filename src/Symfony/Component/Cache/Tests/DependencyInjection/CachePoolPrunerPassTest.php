@@ -38,8 +38,8 @@ class CachePoolPrunerPassTest extends TestCase
         ];
         $argument = $container->getDefinition('console.command.cache_pool_prune')->getArgument(0);
 
-        $this->assertInstanceOf(IteratorArgument::class, $argument);
-        $this->assertEquals($expected, $argument->getValues());
+        self::assertInstanceOf(IteratorArgument::class, $argument);
+        self::assertEquals($expected, $argument->getValues());
     }
 
     public function testCompilePassIsIgnoredIfCommandDoesNotExist()
@@ -53,14 +53,14 @@ class CachePoolPrunerPassTest extends TestCase
         $pass->process($container);
 
         // the container is untouched (i.e. no new definitions or aliases)
-        $this->assertCount($definitionsBefore, $container->getDefinitions());
-        $this->assertCount($aliasesBefore, $container->getAliases());
+        self::assertCount($definitionsBefore, $container->getDefinitions());
+        self::assertCount($aliasesBefore, $container->getAliases());
     }
 
     public function testCompilerPassThrowsOnInvalidDefinitionClass()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Class "Symfony\Component\Cache\Tests\DependencyInjection\NotFound" used for service "pool.not-found" cannot be found.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Class "Symfony\Component\Cache\Tests\DependencyInjection\NotFound" used for service "pool.not-found" cannot be found.');
         $container = new ContainerBuilder();
         $container->register('console.command.cache_pool_prune')->addArgument([]);
         $container->register('pool.not-found', NotFound::class)->addTag('cache.pool');

@@ -31,9 +31,9 @@ class PhpFileLoaderTest extends TestCase
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
 
-        $this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
-        $this->assertTrue($loader->supports('with_wrong_ext.yml', 'php'), '->supports() returns true if the resource with forced type is loadable');
+        self::assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
+        self::assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        self::assertTrue($loader->supports('with_wrong_ext.yml', 'php'), '->supports() returns true if the resource with forced type is loadable');
     }
 
     public function testLoad()
@@ -42,7 +42,7 @@ class PhpFileLoaderTest extends TestCase
 
         $loader->load(__DIR__.'/../Fixtures/php/simple.php');
 
-        $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a PHP file resource');
+        self::assertEquals('foo', $container->getParameter('foo'), '->load() loads a PHP file resource');
     }
 
     public function testConfigServices()
@@ -54,7 +54,7 @@ class PhpFileLoaderTest extends TestCase
 
         $container->compile();
         $dumper = new PhpDumper($container);
-        $this->assertStringEqualsFile($fixtures.'/php/services9_compiled.php', str_replace(str_replace('\\', '\\\\', $fixtures.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR), '%path%', $dumper->dump()));
+        self::assertStringEqualsFile($fixtures.'/php/services9_compiled.php', str_replace(str_replace('\\', '\\\\', $fixtures.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR), '%path%', $dumper->dump()));
     }
 
     public function testConfigServiceClosure()
@@ -65,7 +65,7 @@ class PhpFileLoaderTest extends TestCase
 
         $container->compile();
         $dumper = new PhpDumper($container);
-        $this->assertStringEqualsFile($fixtures.'/php/services_closure_argument_compiled.php', $dumper->dump());
+        self::assertStringEqualsFile($fixtures.'/php/services_closure_argument_compiled.php', $dumper->dump());
     }
 
     /**
@@ -82,7 +82,7 @@ class PhpFileLoaderTest extends TestCase
         $container->compile();
 
         $dumper = new YamlDumper($container);
-        $this->assertStringMatchesFormatFile($fixtures.'/config/'.$file.'.expected.yml', $dumper->dump());
+        self::assertStringMatchesFormatFile($fixtures.'/config/'.$file.'.expected.yml', $dumper->dump());
     }
 
     public function provideConfig()
@@ -110,13 +110,13 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/services_autoconfigure_with_parent.php');
         $container->compile();
 
-        $this->assertTrue($container->getDefinition('child_service')->isAutoconfigured());
+        self::assertTrue($container->getDefinition('child_service')->isAutoconfigured());
     }
 
     public function testFactoryShortNotationNotAllowed()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid factory "factory:method": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'factory\'), \'method\']" instead.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Invalid factory "factory:method": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'factory\'), \'method\']" instead.');
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator());
@@ -142,18 +142,18 @@ class PhpFileLoaderTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $container->get('stack_a'));
-        $this->assertEquals($expected, $container->get('stack_b'));
+        self::assertEquals($expected, $container->get('stack_a'));
+        self::assertEquals($expected, $container->get('stack_b'));
 
         $expected = (object) [
             'label' => 'Z',
             'inner' => $expected,
         ];
-        $this->assertEquals($expected, $container->get('stack_c'));
+        self::assertEquals($expected, $container->get('stack_c'));
 
         $expected = $expected->inner;
         $expected->label = 'Z';
-        $this->assertEquals($expected, $container->get('stack_d'));
+        self::assertEquals($expected, $container->get('stack_d'));
     }
 
     public function testEnvConfigurator()
@@ -162,7 +162,7 @@ class PhpFileLoaderTest extends TestCase
         $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'), 'some-env');
         $loader->load('env_configurator.php');
 
-        $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
+        self::assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
     }
 
     /**
@@ -183,8 +183,8 @@ class PhpFileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/^'.preg_quote('Could not resolve argument "Symfony\\Config\\AcmeConfig\\NestedConfig $config"', '/').'/');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessageMatches('/^'.preg_quote('Could not resolve argument "Symfony\\Config\\AcmeConfig\\NestedConfig $config"', '/').'/');
 
         $loader->load($fixtures.'/config/nested_bundle_config.php');
     }

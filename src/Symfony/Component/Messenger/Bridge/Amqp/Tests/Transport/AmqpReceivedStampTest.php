@@ -21,11 +21,11 @@ class AmqpReceivedStampTest extends TestCase
 {
     public function testStamp()
     {
-        $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);
+        $amqpEnvelope = self::createMock(\AMQPEnvelope::class);
 
         $stamp = new AmqpReceivedStamp($amqpEnvelope, 'queueName');
 
-        $this->assertSame($amqpEnvelope, $stamp->getAmqpEnvelope());
-        $this->assertSame('queueName', $stamp->getQueueName());
+        self::assertSame($amqpEnvelope, $stamp->getAmqpEnvelope());
+        self::assertSame('queueName', $stamp->getQueueName());
     }
 }

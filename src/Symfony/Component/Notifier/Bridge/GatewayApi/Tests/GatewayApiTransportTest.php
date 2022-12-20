@@ -33,7 +33,7 @@ final class GatewayApiTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new GatewayApiTransport('authtoken', 'Symfony', $client ?? $this->createMock(HttpClientInterface::class));
+        return new GatewayApiTransport('authtoken', 'Symfony', $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -49,16 +49,16 @@ final class GatewayApiTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     public function testSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(200);
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn(json_encode(['ids' => [42]]));
 
@@ -71,7 +71,7 @@ final class GatewayApiTransportTest extends TransportTestCase
         $transport = $this->createTransport($client);
         $sentMessage = $transport->send($message);
 
-        $this->assertInstanceOf(SentMessage::class, $sentMessage);
-        $this->assertSame('42', $sentMessage->getMessageId());
+        self::assertInstanceOf(SentMessage::class, $sentMessage);
+        self::assertSame('42', $sentMessage->getMessageId());
     }
 }

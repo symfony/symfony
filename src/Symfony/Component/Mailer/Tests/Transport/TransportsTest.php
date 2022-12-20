@@ -24,12 +24,12 @@ class TransportsTest extends TestCase
     public function testDefaultTransport()
     {
         $transport = new Transports([
-            'foo' => $foo = $this->createMock(TransportInterface::class),
-            'bar' => $bar = $this->createMock(TransportInterface::class),
+            'foo' => $foo = self::createMock(TransportInterface::class),
+            'bar' => $bar = self::createMock(TransportInterface::class),
         ]);
 
-        $foo->expects($this->once())->method('send');
-        $bar->expects($this->never())->method('send');
+        $foo->expects(self::once())->method('send');
+        $bar->expects(self::never())->method('send');
 
         $email = new Message(new Headers(), new TextPart('...'));
         $transport->send($email);
@@ -38,12 +38,12 @@ class TransportsTest extends TestCase
     public function testOverrideTransport()
     {
         $transport = new Transports([
-            'foo' => $foo = $this->createMock(TransportInterface::class),
-            'bar' => $bar = $this->createMock(TransportInterface::class),
+            'foo' => $foo = self::createMock(TransportInterface::class),
+            'bar' => $bar = self::createMock(TransportInterface::class),
         ]);
 
-        $foo->expects($this->never())->method('send');
-        $bar->expects($this->once())->method('send');
+        $foo->expects(self::never())->method('send');
+        $bar->expects(self::once())->method('send');
 
         $headers = (new Headers())->addTextHeader('X-Transport', 'bar');
         $email = new Message($headers, new TextPart('...'));
@@ -53,15 +53,15 @@ class TransportsTest extends TestCase
     public function testTransportDoesNotExist()
     {
         $transport = new Transports([
-            'foo' => $this->createMock(TransportInterface::class),
-            'bar' => $this->createMock(TransportInterface::class),
+            'foo' => self::createMock(TransportInterface::class),
+            'bar' => self::createMock(TransportInterface::class),
         ]);
 
         $headers = (new Headers())->addTextHeader('X-Transport', 'foobar');
         $email = new Message($headers, new TextPart('...'));
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "foobar" transport does not exist (available transports: "foo", "bar").');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The "foobar" transport does not exist (available transports: "foo", "bar").');
         $transport->send($email);
     }
 
@@ -69,7 +69,7 @@ class TransportsTest extends TestCase
     {
         $exception = new \Exception();
 
-        $fooTransport = $this->createMock(TransportInterface::class);
+        $fooTransport = self::createMock(TransportInterface::class);
         $fooTransport->method('send')
             ->willThrowException($exception);
 
@@ -80,12 +80,12 @@ class TransportsTest extends TestCase
         $headers = (new Headers())->addTextHeader('X-Transport', 'foo');
         $email = new Message($headers, new TextPart('...'));
 
-        $this->expectExceptionObject($exception);
+        self::expectExceptionObject($exception);
 
         try {
             $transport->send($email);
         } finally {
-            $this->assertSame('foo', $email->getHeaders()->getHeaderBody('X-Transport'));
+            self::assertSame('foo', $email->getHeaders()->getHeaderBody('X-Transport'));
         }
     }
 }

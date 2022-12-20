@@ -22,22 +22,22 @@ class DelayStampTest extends TestCase
     public function testDelayFor()
     {
         $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('30 seconds'));
-        $this->assertSame(30000, $stamp->getDelay());
+        self::assertSame(30000, $stamp->getDelay());
         $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('30 minutes'));
-        $this->assertSame(1800000, $stamp->getDelay());
+        self::assertSame(1800000, $stamp->getDelay());
         $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('30 hours'));
-        $this->assertSame(108000000, $stamp->getDelay());
+        self::assertSame(108000000, $stamp->getDelay());
 
         $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('-5 seconds'));
-        $this->assertSame(-5000, $stamp->getDelay());
+        self::assertSame(-5000, $stamp->getDelay());
     }
 
     public function testDelayUntil()
     {
         $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('+30 seconds'));
-        $this->assertSame(30000, $stamp->getDelay());
+        self::assertSame(30000, $stamp->getDelay());
 
         $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('-5 seconds'));
-        $this->assertSame(-5000, $stamp->getDelay());
+        self::assertSame(-5000, $stamp->getDelay());
     }
 }

@@ -29,7 +29,7 @@ class FormErrorIteratorTest extends TestCase
     public function testFindByCodes($code, $violationsCount)
     {
         if (!class_exists(ConstraintViolation::class)) {
-            $this->markTestSkipped('Validator component required.');
+            self::markTestSkipped('Validator component required.');
         }
 
         $formBuilder = new FormBuilder(
@@ -51,8 +51,8 @@ class FormErrorIteratorTest extends TestCase
         $formErrors = $form->getErrors();
 
         $specificFormErrors = $formErrors->findByCodes($code);
-        $this->assertInstanceOf(FormErrorIterator::class, $specificFormErrors);
-        $this->assertCount($violationsCount, $specificFormErrors);
+        self::assertInstanceOf(FormErrorIterator::class, $specificFormErrors);
+        self::assertCount($violationsCount, $specificFormErrors);
     }
 
     public function findByCodesProvider()

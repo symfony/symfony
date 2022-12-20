@@ -22,7 +22,7 @@ final class SlackHeaderBlockTest extends TestCase
         $header = new SlackHeaderBlock('header text');
         $header->id('header_id');
 
-        $this->assertSame([
+        self::assertSame([
             'type' => 'header',
             'text' => [
                 'type' => 'plain_text',
@@ -34,16 +34,16 @@ final class SlackHeaderBlockTest extends TestCase
 
     public function testThrowsWhenTextExceedsCharacterLimit()
     {
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('Maximum length for the text is 150 characters.');
+        self::expectException(LengthException::class);
+        self::expectExceptionMessage('Maximum length for the text is 150 characters.');
 
         new SlackHeaderBlock(str_repeat('h', 151));
     }
 
     public function testThrowsWhenBlockIdExceedsCharacterLimit()
     {
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('Maximum length for the block id is 255 characters.');
+        self::expectException(LengthException::class);
+        self::expectExceptionMessage('Maximum length for the block id is 255 characters.');
 
         $header = new SlackHeaderBlock('header');
         $header->id(str_repeat('h', 256));

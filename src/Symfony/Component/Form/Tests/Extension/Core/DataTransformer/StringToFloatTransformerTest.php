@@ -35,19 +35,19 @@ class StringToFloatTransformerTest extends TestCase
     {
         $transformer = new StringToFloatTransformer();
 
-        $this->assertSame($to, $transformer->transform($from));
+        self::assertSame($to, $transformer->transform($from));
     }
 
     public function testFailIfTransformingANonString()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();
         $transformer->transform(1.0);
     }
 
     public function testFailIfTransformingANonNumericString()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();
         $transformer->transform('foobar');
     }
@@ -75,12 +75,12 @@ class StringToFloatTransformerTest extends TestCase
     {
         $transformer = new StringToFloatTransformer($scale);
 
-        $this->assertSame($to, $transformer->reverseTransform($from));
+        self::assertSame($to, $transformer->reverseTransform($from));
     }
 
     public function testFailIfReverseTransformingANonNumeric()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();
         $transformer->reverseTransform('foobar');
     }

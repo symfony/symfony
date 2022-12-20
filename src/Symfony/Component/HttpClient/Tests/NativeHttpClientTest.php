@@ -23,26 +23,26 @@ class NativeHttpClientTest extends HttpClientTestCase
 
     public function testInformationalResponseStream()
     {
-        $this->markTestSkipped('NativeHttpClient doesn\'t support informational status codes.');
+        self::markTestSkipped('NativeHttpClient doesn\'t support informational status codes.');
     }
 
     public function testTimeoutOnInitialize()
     {
-        $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
+        self::markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
     }
 
     public function testTimeoutOnDestruct()
     {
-        $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
+        self::markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
     }
 
     public function testHttp2PushVulcain()
     {
-        $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
+        self::markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
     }
 
     public function testHttp2PushVulcainWithUnusedResponse()
     {
-        $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
+        self::markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
     }
 }

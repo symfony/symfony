@@ -26,7 +26,7 @@ final class ZulipTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host');
+        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $client ?? self::createMock(HttpClientInterface::class)))->setHost('test.host');
     }
 
     public function toStringProvider(): iterable
@@ -42,6 +42,6 @@ final class ZulipTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new SmsMessage('0611223344', 'Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 }

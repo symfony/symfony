@@ -417,7 +417,7 @@ class DataMapperTest extends TestCase
             'date' => '04/08/2022',
         ]);
 
-        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
+        self::assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 }
 

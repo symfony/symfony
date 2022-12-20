@@ -23,8 +23,8 @@ class WorkerMetadataTest extends TestCase
     {
         $metadata = new WorkerMetadata([]);
 
-        $this->assertNull($metadata->getQueueNames());
-        $this->assertSame([], $metadata->getTransportNames());
+        self::assertNull($metadata->getQueueNames());
+        self::assertSame([], $metadata->getTransportNames());
     }
 
     public function testItReturnsProvidedMetadata()
@@ -36,8 +36,8 @@ class WorkerMetadataTest extends TestCase
 
         $metadata = new WorkerMetadata($data);
 
-        $this->assertSame($data['queueNames'], $metadata->getQueueNames());
-        $this->assertSame($data['transportNames'], $metadata->getTransportNames());
+        self::assertSame($data['queueNames'], $metadata->getQueueNames());
+        self::assertSame($data['transportNames'], $metadata->getTransportNames());
     }
 
     public function testItSetsMetadataViaSetter()
@@ -51,7 +51,7 @@ class WorkerMetadataTest extends TestCase
 
         $metadata->set($data);
 
-        $this->assertSame($data['queueNames'], $metadata->getQueueNames());
-        $this->assertSame($data['transportNames'], $metadata->getTransportNames());
+        self::assertSame($data['queueNames'], $metadata->getQueueNames());
+        self::assertSame($data['transportNames'], $metadata->getTransportNames());
     }
 }

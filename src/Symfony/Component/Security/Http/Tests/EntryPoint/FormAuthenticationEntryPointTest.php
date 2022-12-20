@@ -26,42 +26,42 @@ class FormAuthenticationEntryPointTest extends TestCase
 {
     public function testStart()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $response = new RedirectResponse('/the/login/path');
 
-        $httpKernel = $this->createMock(HttpKernelInterface::class);
-        $httpUtils = $this->createMock(HttpUtils::class);
+        $httpKernel = self::createMock(HttpKernelInterface::class);
+        $httpUtils = self::createMock(HttpUtils::class);
         $httpUtils
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('createRedirectResponse')
-            ->with($this->equalTo($request), $this->equalTo('/the/login/path'))
+            ->with(self::equalTo($request), self::equalTo('/the/login/path'))
             ->willReturn($response)
         ;
 
         $entryPoint = new FormAuthenticationEntryPoint($httpKernel, $httpUtils, '/the/login/path', false);
 
-        $this->assertEquals($response, $entryPoint->start($request));
+        self::assertEquals($response, $entryPoint->start($request));
     }
 
     public function testStartWithUseForward()
     {
-        $request = $this->createMock(Request::class);
-        $subRequest = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
+        $subRequest = self::createMock(Request::class);
         $response = new Response('', 200);
 
-        $httpUtils = $this->createMock(HttpUtils::class);
+        $httpUtils = self::createMock(HttpUtils::class);
         $httpUtils
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('createRequest')
-            ->with($this->equalTo($request), $this->equalTo('/the/login/path'))
+            ->with(self::equalTo($request), self::equalTo('/the/login/path'))
             ->willReturn($subRequest)
         ;
 
-        $httpKernel = $this->createMock(HttpKernelInterface::class);
+        $httpKernel = self::createMock(HttpKernelInterface::class);
         $httpKernel
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handle')
-            ->with($this->equalTo($subRequest), $this->equalTo(HttpKernelInterface::SUB_REQUEST))
+            ->with(self::equalTo($subRequest), self::equalTo(HttpKernelInterface::SUB_REQUEST))
             ->willReturn($response)
         ;
 
@@ -69,7 +69,7 @@ class FormAuthenticationEntryPointTest extends TestCase
 
         $entryPointResponse = $entryPoint->start($request);
 
-        $this->assertEquals($response, $entryPointResponse);
-        $this->assertEquals(401, $entryPointResponse->getStatusCode());
+        self::assertEquals($response, $entryPointResponse);
+        self::assertEquals(401, $entryPointResponse->getStatusCode());
     }
 }

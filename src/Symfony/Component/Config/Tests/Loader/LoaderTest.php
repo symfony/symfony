@@ -21,20 +21,20 @@ class LoaderTest extends TestCase
 {
     public function testGetSetResolver()
     {
-        $resolver = $this->createMock(LoaderResolverInterface::class);
+        $resolver = self::createMock(LoaderResolverInterface::class);
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
 
-        $this->assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
+        self::assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
     }
 
     public function testResolve()
     {
-        $resolvedLoader = $this->createMock(LoaderInterface::class);
+        $resolvedLoader = self::createMock(LoaderInterface::class);
 
-        $resolver = $this->createMock(LoaderResolverInterface::class);
-        $resolver->expects($this->once())
+        $resolver = self::createMock(LoaderResolverInterface::class);
+        $resolver->expects(self::once())
             ->method('resolve')
             ->with('foo.xml')
             ->willReturn($resolvedLoader);
@@ -42,15 +42,15 @@ class LoaderTest extends TestCase
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
 
-        $this->assertSame($loader, $loader->resolve('foo.foo'), '->resolve() finds a loader');
-        $this->assertSame($resolvedLoader, $loader->resolve('foo.xml'), '->resolve() finds a loader');
+        self::assertSame($loader, $loader->resolve('foo.foo'), '->resolve() finds a loader');
+        self::assertSame($resolvedLoader, $loader->resolve('foo.xml'), '->resolve() finds a loader');
     }
 
     public function testResolveWhenResolverCannotFindLoader()
     {
-        $this->expectException(LoaderLoadException::class);
-        $resolver = $this->createMock(LoaderResolverInterface::class);
-        $resolver->expects($this->once())
+        self::expectException(LoaderLoadException::class);
+        $resolver = self::createMock(LoaderResolverInterface::class);
+        $resolver->expects(self::once())
             ->method('resolve')
             ->with('FOOBAR')
             ->willReturn(false);
@@ -63,14 +63,14 @@ class LoaderTest extends TestCase
 
     public function testImport()
     {
-        $resolvedLoader = $this->createMock(LoaderInterface::class);
-        $resolvedLoader->expects($this->once())
+        $resolvedLoader = self::createMock(LoaderInterface::class);
+        $resolvedLoader->expects(self::once())
             ->method('load')
             ->with('foo')
             ->willReturn('yes');
 
-        $resolver = $this->createMock(LoaderResolverInterface::class);
-        $resolver->expects($this->once())
+        $resolver = self::createMock(LoaderResolverInterface::class);
+        $resolver->expects(self::once())
             ->method('resolve')
             ->with('foo')
             ->willReturn($resolvedLoader);
@@ -78,19 +78,19 @@ class LoaderTest extends TestCase
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
 
-        $this->assertEquals('yes', $loader->import('foo'));
+        self::assertEquals('yes', $loader->import('foo'));
     }
 
     public function testImportWithType()
     {
-        $resolvedLoader = $this->createMock(LoaderInterface::class);
-        $resolvedLoader->expects($this->once())
+        $resolvedLoader = self::createMock(LoaderInterface::class);
+        $resolvedLoader->expects(self::once())
             ->method('load')
             ->with('foo', 'bar')
             ->willReturn('yes');
 
-        $resolver = $this->createMock(LoaderResolverInterface::class);
-        $resolver->expects($this->once())
+        $resolver = self::createMock(LoaderResolverInterface::class);
+        $resolver->expects(self::once())
             ->method('resolve')
             ->with('foo', 'bar')
             ->willReturn($resolvedLoader);
@@ -98,7 +98,7 @@ class LoaderTest extends TestCase
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
 
-        $this->assertEquals('yes', $loader->import('foo', 'bar'));
+        self::assertEquals('yes', $loader->import('foo', 'bar'));
     }
 }
 

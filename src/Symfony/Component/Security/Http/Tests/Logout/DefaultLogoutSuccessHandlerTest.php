@@ -24,11 +24,11 @@ class DefaultLogoutSuccessHandlerTest extends TestCase
 {
     public function testLogout()
     {
-        $request = $this->createMock(Request::class);
+        $request = self::createMock(Request::class);
         $response = new RedirectResponse('/dashboard');
 
-        $httpUtils = $this->createMock(HttpUtils::class);
-        $httpUtils->expects($this->once())
+        $httpUtils = self::createMock(HttpUtils::class);
+        $httpUtils->expects(self::once())
             ->method('createRedirectResponse')
             ->with($request, '/dashboard')
             ->willReturn($response);
@@ -36,6 +36,6 @@ class DefaultLogoutSuccessHandlerTest extends TestCase
         $handler = new DefaultLogoutSuccessHandler($httpUtils, '/dashboard');
         $result = $handler->onLogoutSuccess($request);
 
-        $this->assertSame($response, $result);
+        self::assertSame($response, $result);
     }
 }

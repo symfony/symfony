@@ -68,13 +68,13 @@ TXT;
         })());
 
         $hasCorrectHeaders = function ($options) {
-            $this->assertSame(['Accept: text/event-stream', 'Cache-Control: no-cache'], $options['headers']);
+            self::assertSame(['Accept: text/event-stream', 'Cache-Control: no-cache'], $options['headers']);
 
             return true;
         };
 
-        $httpClient = $this->createMock(HttpClientInterface::class);
-        $httpClient->method('request')->with('GET', 'http://localhost:8080/events', $this->callback($hasCorrectHeaders))->willReturn($response);
+        $httpClient = self::createMock(HttpClientInterface::class);
+        $httpClient->method('request')->with('GET', 'http://localhost:8080/events', self::callback($hasCorrectHeaders))->willReturn($response);
 
         $httpClient->method('stream')->willReturn($responseStream);
 
@@ -91,7 +91,7 @@ TXT;
         ];
         $i = 0;
 
-        $this->expectExceptionMessage('Response has been canceled');
+        self::expectExceptionMessage('Response has been canceled');
         while ($res) {
             if ($i > 0) {
                 $res->cancel();
@@ -105,7 +105,7 @@ TXT;
                     continue;
                 }
 
-                $this->assertEquals($expected[$i++], $chunk);
+                self::assertEquals($expected[$i++], $chunk);
             }
         }
     }
@@ -124,13 +124,13 @@ TXT;
         })());
 
         $hasCorrectHeaders = function ($options) {
-            $this->assertSame(['Accept: text/event-stream', 'Cache-Control: no-cache'], $options['headers']);
+            self::assertSame(['Accept: text/event-stream', 'Cache-Control: no-cache'], $options['headers']);
 
             return true;
         };
 
-        $httpClient = $this->createMock(HttpClientInterface::class);
-        $httpClient->method('request')->with('GET', 'http://localhost:8080/events', $this->callback($hasCorrectHeaders))->willReturn($response);
+        $httpClient = self::createMock(HttpClientInterface::class);
+        $httpClient->method('request')->with('GET', 'http://localhost:8080/events', self::callback($hasCorrectHeaders))->willReturn($response);
 
         $httpClient->method('stream')->willReturn($responseStream);
 
@@ -138,7 +138,7 @@ TXT;
         $res = $es->connect('http://localhost:8080/events');
 
         if ($expected instanceof EventSourceException) {
-            $this->expectExceptionMessage($expected->getMessage());
+            self::expectExceptionMessage($expected->getMessage());
         }
 
         foreach ($es->stream($res) as $chunk) {

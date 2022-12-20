@@ -27,9 +27,9 @@ class MailerTest extends TestCase
 {
     public function testSendingRawMessages()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
 
-        $transport = new Mailer($this->createMock(TransportInterface::class), $this->createMock(MessageBusInterface::class), $this->createMock(EventDispatcherInterface::class));
+        $transport = new Mailer(self::createMock(TransportInterface::class), self::createMock(MessageBusInterface::class), self::createMock(EventDispatcherInterface::class));
         $transport->send(new RawMessage('Some raw email message'));
     }
 
@@ -46,8 +46,8 @@ class MailerTest extends TestCase
             }
         };
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects($this->once())
+        $dispatcher = self::createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(self::callback(static function (MessageEvent $event) {
                 return 'Time for Symfony Mailer!' === $event->getMessage()->getSubject();

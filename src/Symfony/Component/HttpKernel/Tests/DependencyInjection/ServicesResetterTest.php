@@ -41,9 +41,9 @@ class ServicesResetterTest extends TestCase
 
         $resetter->reset();
 
-        $this->assertSame(1, ResettableService::$counter);
-        $this->assertSame(1, ClearableService::$counter);
-        $this->assertSame(1, MultiResettableService::$resetFirstCounter);
-        $this->assertSame(1, MultiResettableService::$resetSecondCounter);
+        self::assertSame(1, ResettableService::$counter);
+        self::assertSame(1, ClearableService::$counter);
+        self::assertSame(1, MultiResettableService::$resetFirstCounter);
+        self::assertSame(1, MultiResettableService::$resetSecondCounter);
     }
 }

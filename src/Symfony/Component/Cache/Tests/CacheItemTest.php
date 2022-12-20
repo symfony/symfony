@@ -21,7 +21,7 @@ class CacheItemTest extends TestCase
 {
     public function testValidKey()
     {
-        $this->assertSame('foo', CacheItem::validateKey('foo'));
+        self::assertSame('foo', CacheItem::validateKey('foo'));
     }
 
     /**
@@ -29,8 +29,8 @@ class CacheItemTest extends TestCase
      */
     public function testInvalidKey($key)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache key');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Cache key');
         CacheItem::validateKey($key);
     }
 
@@ -62,10 +62,10 @@ class CacheItemTest extends TestCase
         $r->setAccessible(true);
         $r->setValue($item, true);
 
-        $this->assertSame($item, $item->tag('foo'));
-        $this->assertSame($item, $item->tag(['bar', 'baz']));
-        $this->assertSame($item, $item->tag(new StringableTag('qux')));
-        $this->assertSame($item, $item->tag([new StringableTag('quux'), new StringableTag('quuux')]));
+        self::assertSame($item, $item->tag('foo'));
+        self::assertSame($item, $item->tag(['bar', 'baz']));
+        self::assertSame($item, $item->tag(new StringableTag('qux')));
+        self::assertSame($item, $item->tag([new StringableTag('quux'), new StringableTag('quuux')]));
 
         (\Closure::bind(function () use ($item) {
             $this->assertSame(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz', 'qux' => 'qux', 'quux' => 'quux', 'quuux' => 'quuux'], $item->newMetadata[CacheItem::METADATA_TAGS]);
@@ -77,8 +77,8 @@ class CacheItemTest extends TestCase
      */
     public function testInvalidTag($tag)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache tag');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Cache tag');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
         $r->setAccessible(true);
@@ -89,8 +89,8 @@ class CacheItemTest extends TestCase
 
     public function testNonTaggableItem()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
+        self::expectException(LogicException::class);
+        self::expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'key');
         $r->setAccessible(true);

@@ -24,18 +24,18 @@ class RequestAttributeValueSameTest extends TestCase
         $request = new Request();
         $request->attributes->set('foo', 'bar');
         $constraint = new RequestAttributeValueSame('foo', 'bar');
-        $this->assertTrue($constraint->evaluate($request, '', true));
+        self::assertTrue($constraint->evaluate($request, '', true));
         $constraint = new RequestAttributeValueSame('bar', 'foo');
-        $this->assertFalse($constraint->evaluate($request, '', true));
+        self::assertFalse($constraint->evaluate($request, '', true));
 
         try {
             $constraint->evaluate($request);
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Request has attribute \"bar\" with value \"foo\".\n", TestFailure::exceptionToString($e));
+            self::assertEquals("Failed asserting that the Request has attribute \"bar\" with value \"foo\".\n", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 }

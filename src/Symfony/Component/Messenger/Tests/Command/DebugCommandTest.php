@@ -61,7 +61,7 @@ class DebugCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute([], ['decorated' => false]);
 
-        $this->assertSame(<<<TXT
+        self::assertSame(<<<TXT
 
 Messenger
 =========
@@ -100,13 +100,11 @@ query_bus
  --------------------------------------------------------------------------------------- 
 
 
-TXT
-            , $tester->getDisplay(true)
-        );
+TXT, $tester->getDisplay(true));
 
         $tester->execute(['bus' => 'query_bus'], ['decorated' => false]);
 
-        $this->assertSame(<<<TXT
+        self::assertSame(<<<TXT
 
 Messenger
 =========
@@ -126,9 +124,7 @@ query_bus
  --------------------------------------------------------------------------------------- 
 
 
-TXT
-            , $tester->getDisplay(true)
-        );
+TXT, $tester->getDisplay(true));
     }
 
     public function testOutputWithoutMessages()
@@ -138,7 +134,7 @@ TXT
         $tester = new CommandTester($command);
         $tester->execute([], ['decorated' => false]);
 
-        $this->assertSame(<<<TXT
+        self::assertSame(<<<TXT
 
 Messenger
 =========
@@ -154,15 +150,13 @@ query_bus
  [WARNING] No handled message found in bus "query_bus".                                                                 
 
 
-TXT
-            , $tester->getDisplay(true)
-        );
+TXT, $tester->getDisplay(true));
     }
 
     public function testExceptionOnUnknownBusArgument()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Bus "unknown_bus" does not exist. Known buses are "command_bus", "query_bus".');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Bus "unknown_bus" does not exist. Known buses are "command_bus", "query_bus".');
         $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
 
         $tester = new CommandTester($command);
@@ -175,14 +169,14 @@ TXT
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
         $application = new Application();
         $application->add($command);
         $tester = new CommandCompletionTester($application->get('debug:messenger'));
-        $this->assertSame($expectedSuggestions, $tester->complete($input));
+        self::assertSame($expectedSuggestions, $tester->complete($input));
     }
 
     public function provideCompletionSuggestions(): iterable

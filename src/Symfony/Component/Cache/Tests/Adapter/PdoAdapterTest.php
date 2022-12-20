@@ -52,7 +52,7 @@ class PdoAdapterTest extends AdapterTestCase
             return (int) $pdo->query('SELECT COUNT(*) FROM cache_items')->fetch(\PDO::FETCH_COLUMN);
         };
 
-        $this->assertSame(0, $getCacheItemCount());
+        self::assertSame(0, $getCacheItemCount());
 
         $cache = $this->createCachePool();
 
@@ -61,13 +61,13 @@ class PdoAdapterTest extends AdapterTestCase
         $item->set(1);
 
         $cache->save($item);
-        $this->assertSame(1, $getCacheItemCount());
+        self::assertSame(1, $getCacheItemCount());
 
         sleep(2);
 
         $newItem = $cache->getItem($item->getKey());
-        $this->assertFalse($newItem->isHit());
-        $this->assertSame(0, $getCacheItemCount(), 'PDOAdapter must clean up expired items');
+        self::assertFalse($newItem->isHit());
+        self::assertSame(0, $getCacheItemCount(), 'PDOAdapter must clean up expired items');
     }
 
     /**
@@ -81,7 +81,7 @@ class PdoAdapterTest extends AdapterTestCase
 
             $item = $pool->getItem('key');
             $item->set('value');
-            $this->assertTrue($pool->save($item));
+            self::assertTrue($pool->save($item));
         } finally {
             if (null !== $file) {
                 @unlink($file);

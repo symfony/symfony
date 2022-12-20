@@ -29,51 +29,51 @@ class SemaphoreTest extends TestCase
     public function testAcquireReturnsTrue()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($key, 300.0)
         ;
 
-        $this->assertTrue($semaphore->acquire());
-        $this->assertGreaterThanOrEqual(299.0, $key->getRemainingLifetime());
+        self::assertTrue($semaphore->acquire());
+        self::assertGreaterThanOrEqual(299.0, $key->getRemainingLifetime());
     }
 
     public function testAcquireReturnsFalse()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($key, 300.0)
             ->willThrowException(new SemaphoreAcquiringException($key, 'message'))
         ;
 
-        $this->assertFalse($semaphore->acquire());
-        $this->assertNull($key->getRemainingLifetime());
+        self::assertFalse($semaphore->acquire());
+        self::assertNull($key->getRemainingLifetime());
     }
 
     public function testAcquireThrowException()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($key, 300.0)
             ->willThrowException(new \RuntimeException())
         ;
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Failed to acquire the "key" semaphore.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Failed to acquire the "key" semaphore.');
 
         $semaphore->acquire();
     }
@@ -81,50 +81,50 @@ class SemaphoreTest extends TestCase
     public function testRefresh()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store, 10.0);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
             ->with($key, 10.0)
         ;
 
         $semaphore->refresh();
-        $this->assertGreaterThanOrEqual(9.0, $key->getRemainingLifetime());
+        self::assertGreaterThanOrEqual(9.0, $key->getRemainingLifetime());
     }
 
     public function testRefreshWithCustomTtl()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store, 10.0);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
             ->with($key, 40.0)
         ;
 
         $semaphore->refresh(40.0);
-        $this->assertGreaterThanOrEqual(39.0, $key->getRemainingLifetime());
+        self::assertGreaterThanOrEqual(39.0, $key->getRemainingLifetime());
     }
 
     public function testRefreshWhenItFails()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
             ->with($key, 300.0)
             ->willThrowException(new SemaphoreExpiredException($key, 'message'))
         ;
 
-        $this->expectException(SemaphoreExpiredException::class);
-        $this->expectExceptionMessage('The semaphore "key" has expired: message.');
+        self::expectException(SemaphoreExpiredException::class);
+        self::expectExceptionMessage('The semaphore "key" has expired: message.');
 
         $semaphore->refresh();
     }
@@ -132,18 +132,18 @@ class SemaphoreTest extends TestCase
     public function testRefreshWhenItFailsHard()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('putOffExpiration')
             ->with($key, 300.0)
             ->willThrowException(new \RuntimeException())
         ;
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Failed to define an expiration for the "key" semaphore.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Failed to define an expiration for the "key" semaphore.');
 
         $semaphore->refresh();
     }
@@ -151,11 +151,11 @@ class SemaphoreTest extends TestCase
     public function testRelease()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key)
         ;
@@ -166,18 +166,18 @@ class SemaphoreTest extends TestCase
     public function testReleaseWhenItFails()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key)
             ->willThrowException(new SemaphoreReleasingException($key, 'message'))
         ;
 
-        $this->expectException(SemaphoreReleasingException::class);
-        $this->expectExceptionMessage('The semaphore "key" could not be released: message.');
+        self::expectException(SemaphoreReleasingException::class);
+        self::expectExceptionMessage('The semaphore "key" could not be released: message.');
 
         $semaphore->release();
     }
@@ -185,18 +185,18 @@ class SemaphoreTest extends TestCase
     public function testReleaseWhenItFailsHard()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($key)
             ->willThrowException(new \RuntimeException())
         ;
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Failed to release the "key" semaphore.');
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Failed to release the "key" semaphore.');
 
         $semaphore->release();
     }
@@ -204,7 +204,7 @@ class SemaphoreTest extends TestCase
     public function testReleaseOnDestruction()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -212,7 +212,7 @@ class SemaphoreTest extends TestCase
             ->willReturn(true)
         ;
         $store
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
         ;
 
@@ -223,7 +223,7 @@ class SemaphoreTest extends TestCase
     public function testNoAutoReleaseWhenNotConfigured()
     {
         $key = new Key('key', 1);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store, 10.0, false);
 
         $store
@@ -231,7 +231,7 @@ class SemaphoreTest extends TestCase
             ->willReturn(true)
         ;
         $store
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('delete')
         ;
 
@@ -241,16 +241,16 @@ class SemaphoreTest extends TestCase
 
     public function testExpiration()
     {
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
 
         $key = new Key('key', 1);
         $semaphore = new Semaphore($key, $store);
-        $this->assertFalse($semaphore->isExpired());
+        self::assertFalse($semaphore->isExpired());
 
         $key = new Key('key', 1);
         $key->reduceLifetime(0.0);
         $semaphore = new Semaphore($key, $store);
-        $this->assertTrue($semaphore->isExpired());
+        self::assertTrue($semaphore->isExpired());
     }
 
     /**
@@ -258,18 +258,18 @@ class SemaphoreTest extends TestCase
      */
     public function testExpirationResetAfter()
     {
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = self::createMock(PersistingStoreInterface::class);
 
         $key = new Key('key', 1);
         $semaphore = new Semaphore($key, $store, 1);
 
         $semaphore->acquire();
-        $this->assertFalse($semaphore->isExpired());
+        self::assertFalse($semaphore->isExpired());
         $semaphore->release();
 
         sleep(2);
 
         $semaphore->acquire();
-        $this->assertFalse($semaphore->isExpired());
+        self::assertFalse($semaphore->isExpired());
     }
 }

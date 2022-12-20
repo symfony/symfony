@@ -30,8 +30,8 @@ class TexterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->transport = $this->createMock(TransportInterface::class);
-        $this->bus = $this->createMock(MessageBusInterface::class);
+        $this->transport = self::createMock(TransportInterface::class);
+        $this->bus = self::createMock(MessageBusInterface::class);
     }
 
     public function testSendWithoutBus()
@@ -40,14 +40,14 @@ class TexterTest extends TestCase
         $sentMessage = new SentMessage($message, 'any');
 
         $this->transport
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('send')
             ->with($message)
             ->willReturn($sentMessage);
 
         $texter = new Texter($this->transport);
-        $this->assertSame($sentMessage, $texter->send($message));
-        $this->assertSame($message, $sentMessage->getOriginalMessage());
+        self::assertSame($sentMessage, $texter->send($message));
+        self::assertSame($message, $sentMessage->getOriginalMessage());
     }
 
     public function testSendWithBus()
@@ -55,17 +55,17 @@ class TexterTest extends TestCase
         $message = new DummyMessage();
 
         $this->transport
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('send')
             ->with($message);
 
         $this->bus
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('dispatch')
             ->with($message)
             ->willReturn(new Envelope(new \stdClass()));
 
         $texter = new Texter($this->transport, $this->bus);
-        $this->assertNull($texter->send($message));
+        self::assertNull($texter->send($message));
     }
 }

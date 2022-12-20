@@ -38,7 +38,7 @@ class Rfc2231EncoderTest extends TestCase
         $encoded = $encoder->encodeString($string);
 
         foreach (explode("\r\n", $encoded) as $line) {
-            $this->assertMatchesRegularExpression($this->rfc2045Token, $line, 'Encoder should always return a valid RFC 2045 token.');
+            self::assertMatchesRegularExpression($this->rfc2045Token, $line, 'Encoder should always return a valid RFC 2045 token.');
         }
     }
 
@@ -53,7 +53,7 @@ class Rfc2231EncoderTest extends TestCase
         $encoded = $encoder->encodeString($string);
 
         foreach (explode("\r\n", $encoded) as $line) {
-            $this->assertMatchesRegularExpression($this->rfc2045Token, $line, 'Encoder should always return a valid RFC 2045 token.');
+            self::assertMatchesRegularExpression($this->rfc2045Token, $line, 'Encoder should always return a valid RFC 2045 token.');
         }
     }
 
@@ -68,13 +68,9 @@ class Rfc2231EncoderTest extends TestCase
         $encoded = $encoder->encodeString($string, 'utf-8', 0, 75);
 
         // 72 here and not 75 as we read 4 chars at a time
-        $this->assertEquals(
-            str_repeat('a', 72)."\r\n".
-            str_repeat('a', 72)."\r\n".
-            str_repeat('a', 56),
-            $encoded,
-            'Lines should be wrapped at each 72 characters'
-        );
+        self::assertEquals(str_repeat('a', 72)."\r\n".
+        str_repeat('a', 72)."\r\n".
+        str_repeat('a', 56), $encoded, 'Lines should be wrapped at each 72 characters');
     }
 
     public function testFirstLineCanHaveShorterLength()
@@ -87,14 +83,10 @@ class Rfc2231EncoderTest extends TestCase
         $encoder = new Rfc2231Encoder();
         $encoded = $encoder->encodeString($string, 'utf-8', 24, 72);
 
-        $this->assertEquals(
-            str_repeat('a', 48)."\r\n".
-            str_repeat('a', 72)."\r\n".
-            str_repeat('a', 72)."\r\n".
-            str_repeat('a', 8),
-            $encoded,
-            'First line should be 24 bytes shorter than the others.'
-        );
+        self::assertEquals(str_repeat('a', 48)."\r\n".
+        str_repeat('a', 72)."\r\n".
+        str_repeat('a', 72)."\r\n".
+        str_repeat('a', 8), $encoded, 'First line should be 24 bytes shorter than the others.');
     }
 
     public function testEncodingAndDecodingSamples()
@@ -116,10 +108,7 @@ class Rfc2231EncoderTest extends TestCase
 
                     $text = file_get_contents($dir.'/'.$encoding.'/'.$sampleFile);
                     $encodedText = $encoder->encodeString($text, $encoding);
-                    $this->assertEquals(
-                        urldecode(implode('', explode("\r\n", $encodedText))), $text,
-                        'Encoded string should decode back to original string for sample '.$dir.'/'.$encoding.'/'.$sampleFile
-                    );
+                    self::assertEquals(urldecode(implode('', explode("\r\n", $encodedText))), $text, 'Encoded string should decode back to original string for sample '.$dir.'/'.$encoding.'/'.$sampleFile);
                 }
                 closedir($fileFp);
             }

@@ -30,51 +30,42 @@ final class ConnectionTest extends TestCase
 {
     public function testFromInvalidDsn()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given Beanstalkd DSN "beanstalkd://" is invalid.');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The given Beanstalkd DSN "beanstalkd://" is invalid.');
 
         Connection::fromDsn('beanstalkd://');
     }
 
     public function testFromDsn()
     {
-        $this->assertEquals(
-            $connection = new Connection([], Pheanstalk::create('127.0.0.1', 11300)),
-            Connection::fromDsn('beanstalkd://127.0.0.1')
-        );
+        self::assertEquals($connection = new Connection([], Pheanstalk::create('127.0.0.1', 11300)), Connection::fromDsn('beanstalkd://127.0.0.1'));
 
         $configuration = $connection->getConfiguration();
 
-        $this->assertSame('default', $configuration['tube_name']);
-        $this->assertSame(0, $configuration['timeout']);
-        $this->assertSame(90, $configuration['ttr']);
+        self::assertSame('default', $configuration['tube_name']);
+        self::assertSame(0, $configuration['timeout']);
+        self::assertSame(90, $configuration['ttr']);
 
-        $this->assertEquals(
-            $connection = new Connection([], Pheanstalk::create('foobar', 15555)),
-            Connection::fromDsn('beanstalkd://foobar:15555')
-        );
+        self::assertEquals($connection = new Connection([], Pheanstalk::create('foobar', 15555)), Connection::fromDsn('beanstalkd://foobar:15555'));
 
         $configuration = $connection->getConfiguration();
 
-        $this->assertSame('default', $configuration['tube_name']);
-        $this->assertSame(0, $configuration['timeout']);
-        $this->assertSame(90, $configuration['ttr']);
-        $this->assertSame('default', $connection->getTube());
+        self::assertSame('default', $configuration['tube_name']);
+        self::assertSame(0, $configuration['timeout']);
+        self::assertSame(90, $configuration['ttr']);
+        self::assertSame('default', $connection->getTube());
     }
 
     public function testFromDsnWithOptions()
     {
-        $this->assertEquals(
-            $connection = Connection::fromDsn('beanstalkd://localhost', ['tube_name' => 'foo', 'timeout' => 10, 'ttr' => 5000]),
-            Connection::fromDsn('beanstalkd://localhost?tube_name=foo&timeout=10&ttr=5000')
-        );
+        self::assertEquals($connection = Connection::fromDsn('beanstalkd://localhost', ['tube_name' => 'foo', 'timeout' => 10, 'ttr' => 5000]), Connection::fromDsn('beanstalkd://localhost?tube_name=foo&timeout=10&ttr=5000'));
 
         $configuration = $connection->getConfiguration();
 
-        $this->assertSame('foo', $configuration['tube_name']);
-        $this->assertSame(10, $configuration['timeout']);
-        $this->assertSame(5000, $configuration['ttr']);
-        $this->assertSame('foo', $connection->getTube());
+        self::assertSame('foo', $configuration['tube_name']);
+        self::assertSame(10, $configuration['timeout']);
+        self::assertSame(5000, $configuration['ttr']);
+        self::assertSame('foo', $connection->getTube());
     }
 
     public function testFromDsnOptionsArrayWinsOverOptionsFromDsn()
@@ -85,28 +76,25 @@ final class ConnectionTest extends TestCase
             'ttr' => 6000,
         ];
 
-        $this->assertEquals(
-            $connection = new Connection($options, Pheanstalk::create('localhost', 11333)),
-            Connection::fromDsn('beanstalkd://localhost:11333?tube_name=foo&timeout=10&ttr=5000', $options)
-        );
+        self::assertEquals($connection = new Connection($options, Pheanstalk::create('localhost', 11333)), Connection::fromDsn('beanstalkd://localhost:11333?tube_name=foo&timeout=10&ttr=5000', $options));
 
         $configuration = $connection->getConfiguration();
 
-        $this->assertSame($options['tube_name'], $configuration['tube_name']);
-        $this->assertSame($options['timeout'], $configuration['timeout']);
-        $this->assertSame($options['ttr'], $configuration['ttr']);
-        $this->assertSame($options['tube_name'], $connection->getTube());
+        self::assertSame($options['tube_name'], $configuration['tube_name']);
+        self::assertSame($options['timeout'], $configuration['timeout']);
+        self::assertSame($options['ttr'], $configuration['ttr']);
+        self::assertSame($options['tube_name'], $connection->getTube());
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionIsDefined()
     {
-        $this->expectException(MessengerInvalidArgumentException::class);
+        self::expectException(MessengerInvalidArgumentException::class);
         Connection::fromDsn('beanstalkd://127.0.0.1', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionIsDefinedInDSN()
     {
-        $this->expectException(MessengerInvalidArgumentException::class);
+        self::expectException(MessengerInvalidArgumentException::class);
         Connection::fromDsn('beanstalkd://127.0.0.1?new_option=woops');
     }
 
@@ -123,17 +111,17 @@ final class ConnectionTest extends TestCase
 
         $job = new Job($id, json_encode($beanstalkdEnvelope));
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('watchOnly')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('reserveWithTimeout')->with($timeout)->willReturn($job);
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('watchOnly')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('reserveWithTimeout')->with($timeout)->willReturn($job);
 
         $connection = new Connection(['tube_name' => $tube, 'timeout' => $timeout], $client);
 
         $envelope = $connection->get();
 
-        $this->assertSame((string) $id, $envelope['id']);
-        $this->assertSame($beanstalkdEnvelope['body'], $envelope['body']);
-        $this->assertSame($beanstalkdEnvelope['headers'], $envelope['headers']);
+        self::assertSame((string) $id, $envelope['id']);
+        self::assertSame($beanstalkdEnvelope['body'], $envelope['body']);
+        self::assertSame($beanstalkdEnvelope['headers'], $envelope['headers']);
     }
 
     public function testGetWhenThereIsNoJobInTheTube()
@@ -141,13 +129,13 @@ final class ConnectionTest extends TestCase
         $tube = 'baz';
         $timeout = 44;
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('watchOnly')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('reserveWithTimeout')->with($timeout)->willReturn(null);
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('watchOnly')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('reserveWithTimeout')->with($timeout)->willReturn(null);
 
         $connection = new Connection(['tube_name' => $tube, 'timeout' => $timeout], $client);
 
-        $this->assertNull($connection->get());
+        self::assertNull($connection->get());
     }
 
     public function testGetWhenABeanstalkdExceptionOccurs()
@@ -157,13 +145,13 @@ final class ConnectionTest extends TestCase
 
         $exception = new DeadlineSoonException('foo error');
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('watchOnly')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('reserveWithTimeout')->with($timeout)->willThrowException($exception);
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('watchOnly')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('reserveWithTimeout')->with($timeout)->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube, 'timeout' => $timeout], $client);
 
-        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        self::expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
         $connection->get();
     }
 
@@ -173,9 +161,9 @@ final class ConnectionTest extends TestCase
 
         $tube = 'xyz';
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('delete')->with($this->callback(function (JobId $jobId) use ($id): bool {
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('delete')->with(self::callback(function (JobId $jobId) use ($id): bool {
             return $jobId->getId() === $id;
         }));
 
@@ -192,15 +180,15 @@ final class ConnectionTest extends TestCase
 
         $exception = new ServerException('baz error');
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('delete')->with($this->callback(function (JobId $jobId) use ($id): bool {
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('delete')->with(self::callback(function (JobId $jobId) use ($id): bool {
             return $jobId->getId() === $id;
         }))->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
-        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        self::expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
         $connection->ack((string) $id);
     }
 
@@ -210,9 +198,9 @@ final class ConnectionTest extends TestCase
 
         $tube = 'baz';
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('delete')->with($this->callback(function (JobId $jobId) use ($id): bool {
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('delete')->with(self::callback(function (JobId $jobId) use ($id): bool {
             return $jobId->getId() === $id;
         }));
 
@@ -229,15 +217,15 @@ final class ConnectionTest extends TestCase
 
         $exception = new ServerException('baz error');
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('delete')->with($this->callback(function (JobId $jobId) use ($id): bool {
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('delete')->with(self::callback(function (JobId $jobId) use ($id): bool {
             return $jobId->getId() === $id;
         }))->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
-        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        self::expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
         $connection->reject((string) $id);
     }
 
@@ -249,12 +237,12 @@ final class ConnectionTest extends TestCase
 
         $response = new ArrayResponse('OK', ['current-jobs-ready' => $count]);
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('statsTube')->with($tube)->willReturn($response);
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('statsTube')->with($tube)->willReturn($response);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
-        $this->assertSame($count, $connection->getMessageCount());
+        self::assertSame($count, $connection->getMessageCount());
     }
 
     public function testMessageCountWhenABeanstalkdExceptionOccurs()
@@ -263,12 +251,12 @@ final class ConnectionTest extends TestCase
 
         $exception = new ClientException('foobar error');
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('statsTube')->with($tube)->willThrowException($exception);
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('statsTube')->with($tube)->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
-        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        self::expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
         $connection->getMessageCount();
     }
 
@@ -283,10 +271,10 @@ final class ConnectionTest extends TestCase
 
         $id = 110;
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('put')->with(
-            $this->callback(function (string $data) use ($body, $headers): bool {
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('put')->with(
+            self::callback(function (string $data) use ($body, $headers): bool {
                 $expectedMessage = json_encode([
                     'body' => $body,
                     'headers' => $headers,
@@ -303,7 +291,7 @@ final class ConnectionTest extends TestCase
 
         $returnedId = $connection->send($body, $headers, $delay);
 
-        $this->assertSame($id, (int) $returnedId);
+        self::assertSame($id, (int) $returnedId);
     }
 
     public function testSendWhenABeanstalkdExceptionOccurs()
@@ -317,10 +305,10 @@ final class ConnectionTest extends TestCase
 
         $exception = new Exception('foo bar');
 
-        $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('useTube')->with($tube)->willReturn($client);
-        $client->expects($this->once())->method('put')->with(
-            $this->callback(function (string $data) use ($body, $headers): bool {
+        $client = self::createMock(PheanstalkInterface::class);
+        $client->expects(self::once())->method('useTube')->with($tube)->willReturn($client);
+        $client->expects(self::once())->method('put')->with(
+            self::callback(function (string $data) use ($body, $headers): bool {
                 $expectedMessage = json_encode([
                     'body' => $body,
                     'headers' => $headers,
@@ -335,7 +323,7 @@ final class ConnectionTest extends TestCase
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
-        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        self::expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
 
         $connection->send($body, $headers, $delay);
     }

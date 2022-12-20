@@ -29,7 +29,7 @@ final class SectionTest extends TestCase
         $section = (new Section())
             ->title($value = 'Symfony is great!');
 
-        $this->assertSame($value, $section->toArray()['title']);
+        self::assertSame($value, $section->toArray()['title']);
     }
 
     public function testText()
@@ -37,7 +37,7 @@ final class SectionTest extends TestCase
         $section = (new Section())
             ->text($value = 'Community power is awesome!');
 
-        $this->assertSame($value, $section->toArray()['text']);
+        self::assertSame($value, $section->toArray()['text']);
     }
 
     /**
@@ -48,8 +48,8 @@ final class SectionTest extends TestCase
         $section = (new Section())
             ->action($action);
 
-        $this->assertCount(1, $section->toArray()['potentialAction']);
-        $this->assertSame($expected, $section->toArray()['potentialAction']);
+        self::assertCount(1, $section->toArray()['potentialAction']);
+        self::assertSame($expected, $section->toArray()['potentialAction']);
     }
 
     public function allowedActions(): \Generator
@@ -71,15 +71,12 @@ final class SectionTest extends TestCase
         $section = (new Section())
             ->activity($activity);
 
-        $this->assertSame(
-            [
-                'activityImage' => $imageUrl,
-                'activityTitle' => $title,
-                'activitySubtitle' => $subtitle,
-                'activityText' => $text,
-            ],
-            $section->toArray()
-        );
+        self::assertSame([
+            'activityImage' => $imageUrl,
+            'activityTitle' => $title,
+            'activitySubtitle' => $subtitle,
+            'activityText' => $text,
+        ], $section->toArray());
     }
 
     public function testImage()
@@ -91,13 +88,10 @@ final class SectionTest extends TestCase
         $section = (new Section())
             ->image($image);
 
-        $this->assertCount(1, $section->toArray()['images']);
-        $this->assertSame(
-            [
-                ['image' => $imageUrl, 'title' => $title],
-            ],
-            $section->toArray()['images']
-        );
+        self::assertCount(1, $section->toArray()['images']);
+        self::assertSame([
+            ['image' => $imageUrl, 'title' => $title],
+        ], $section->toArray()['images']);
     }
 
     public function testFact()
@@ -109,13 +103,10 @@ final class SectionTest extends TestCase
         $section = (new Section())
             ->fact($fact);
 
-        $this->assertCount(1, $section->toArray()['facts']);
-        $this->assertSame(
-            [
-                ['name' => $name, 'value' => $value],
-            ],
-            $section->toArray()['facts']
-        );
+        self::assertCount(1, $section->toArray()['facts']);
+        self::assertSame([
+            ['name' => $name, 'value' => $value],
+        ], $section->toArray()['facts']);
     }
 
     public function testMarkdownWithTrue()
@@ -123,7 +114,7 @@ final class SectionTest extends TestCase
         $action = (new Section())
             ->markdown(true);
 
-        $this->assertTrue($action->toArray()['markdown']);
+        self::assertTrue($action->toArray()['markdown']);
     }
 
     public function testMarkdownWithFalse()
@@ -131,6 +122,6 @@ final class SectionTest extends TestCase
         $action = (new Section())
             ->markdown(false);
 
-        $this->assertFalse($action->toArray()['markdown']);
+        self::assertFalse($action->toArray()['markdown']);
     }
 }

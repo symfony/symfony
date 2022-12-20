@@ -25,10 +25,10 @@ class LoginLinkAuthenticationTest extends AbstractWebTestCase
     public function testLoginLinkSuccess()
     {
         if (!class_exists(LoginLinkHandler::class)) {
-            $this->markTestSkipped('Login link auth requires symfony/security-http:^5.2');
+            self::markTestSkipped('Login link auth requires symfony/security-http:^5.2');
         }
 
-        $client = $this->createClient(['test_case' => 'LoginLink', 'root_config' => 'config.yml', 'debug' => true]);
+        $client = self::createClient(['test_case' => 'LoginLink', 'root_config' => 'config.yml', 'debug' => true]);
 
         // we need an active request that is under the firewall to use the linker
         $request = Request::create('/get-login-link');
@@ -38,21 +38,21 @@ class LoginLinkAuthenticationTest extends AbstractWebTestCase
         $loginLinkHandler = self::getContainer()->get(LoginLinkHandlerInterface::class);
         $user = new InMemoryUser('weaverryan', 'foo');
         $loginLink = $loginLinkHandler->createLoginLink($user);
-        $this->assertStringContainsString('user=weaverryan', $loginLink);
-        $this->assertStringContainsString('hash=', $loginLink);
-        $this->assertStringContainsString('expires=', $loginLink);
+        self::assertStringContainsString('user=weaverryan', $loginLink);
+        self::assertStringContainsString('hash=', $loginLink);
+        self::assertStringContainsString('expires=', $loginLink);
         $client->request('GET', $loginLink->getUrl());
         $response = $client->getResponse();
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame(['message' => 'Welcome weaverryan!'], json_decode($response->getContent(), true));
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['message' => 'Welcome weaverryan!'], json_decode($response->getContent(), true));
 
         $client->request('GET', $loginLink->getUrl());
         $response = $client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
 
         $client->request('GET', $loginLink->getUrl());
         $response = $client->getResponse();
-        $this->assertSame(302, $response->getStatusCode(), 'Should redirect with an error because max uses are only 2');
+        self::assertSame(302, $response->getStatusCode(), 'Should redirect with an error because max uses are only 2');
     }
 }

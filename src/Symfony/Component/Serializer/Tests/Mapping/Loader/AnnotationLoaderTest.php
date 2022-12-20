@@ -40,14 +40,14 @@ abstract class AnnotationLoaderTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf(LoaderInterface::class, $this->loader);
+        self::assertInstanceOf(LoaderInterface::class, $this->loader);
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
         $classMetadata = new ClassMetadata($this->getNamespace().'\GroupDummy');
 
-        $this->assertTrue($this->loader->loadClassMetadata($classMetadata));
+        self::assertTrue($this->loader->loadClassMetadata($classMetadata));
     }
 
     public function testLoadGroups()
@@ -55,7 +55,7 @@ abstract class AnnotationLoaderTest extends TestCase
         $classMetadata = new ClassMetadata($this->getNamespace().'\GroupDummy');
         $this->loader->loadClassMetadata($classMetadata);
 
-        $this->assertEquals(TestClassMetadataFactory::createClassMetadata($this->getNamespace()), $classMetadata);
+        self::assertEquals(TestClassMetadataFactory::createClassMetadata($this->getNamespace()), $classMetadata);
     }
 
     public function testLoadDiscriminatorMap()
@@ -72,7 +72,7 @@ abstract class AnnotationLoaderTest extends TestCase
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
         $expected->getReflectionClass();
 
-        $this->assertEquals($expected, $classMetadata);
+        self::assertEquals($expected, $classMetadata);
     }
 
     public function testLoadMaxDepth()
@@ -81,8 +81,8 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertEquals(2, $attributesMetadata['foo']->getMaxDepth());
-        $this->assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
+        self::assertEquals(2, $attributesMetadata['foo']->getMaxDepth());
+        self::assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
     }
 
     public function testLoadSerializedName()
@@ -91,8 +91,8 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
-        $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+        self::assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
+        self::assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
     }
 
     public function testLoadClassMetadataAndMerge()
@@ -105,7 +105,7 @@ abstract class AnnotationLoaderTest extends TestCase
 
         $this->loader->loadClassMetadata($classMetadata);
 
-        $this->assertEquals(TestClassMetadataFactory::createClassMetadata($this->getNamespace(), true), $classMetadata);
+        self::assertEquals(TestClassMetadataFactory::createClassMetadata($this->getNamespace(), true), $classMetadata);
     }
 
     public function testLoadIgnore()
@@ -114,8 +114,8 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-        $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
-        $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
+        self::assertTrue($attributesMetadata['ignored1']->isIgnored());
+        self::assertTrue($attributesMetadata['ignored2']->isIgnored());
     }
 
     public function testLoadContexts()
@@ -127,8 +127,8 @@ abstract class AnnotationLoaderTest extends TestCase
     {
         $class = $this->getNamespace().'\BadMethodContextDummy';
 
-        $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Context on "%s::badMethod()" cannot be added', $class));
+        self::expectException(MappingException::class);
+        self::expectExceptionMessage(sprintf('Context on "%s::badMethod()" cannot be added', $class));
 
         $loader = $this->getLoaderForContextMapping();
 
@@ -141,8 +141,8 @@ abstract class AnnotationLoaderTest extends TestCase
     {
         $class = $this->getNamespace().'\Entity45016';
 
-        $this->expectException(MappingException::class);
-        $this->expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', $class));
+        self::expectException(MappingException::class);
+        self::expectExceptionMessage(sprintf('Ignore on "%s::badIgnore()" cannot be added', $class));
 
         $metadata = new ClassMetadata($class);
         $loader = $this->getLoaderForContextMapping();

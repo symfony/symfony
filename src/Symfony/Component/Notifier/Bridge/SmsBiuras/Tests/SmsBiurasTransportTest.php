@@ -28,7 +28,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null): TransportInterface
     {
-        return new SmsBiurasTransport('uid', 'api_key', 'from', true, $client ?? $this->createMock(HttpClientInterface::class));
+        return new SmsBiurasTransport('uid', 'api_key', 'from', true, $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -44,7 +44,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     /**
@@ -54,26 +54,26 @@ final class SmsBiurasTransportTest extends TransportTestCase
     {
         $message = new SmsMessage('+37012345678', 'Hello World!');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->atLeast(1))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::atLeast(1))
             ->method('getStatusCode')
             ->willReturn(200);
-        $response->expects($this->atLeast(1))
+        $response->expects(self::atLeast(1))
             ->method('getContent')
             ->willReturn('OK: 519545');
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $message, $expected): ResponseInterface {
-            $this->assertSame('GET', $method);
-            $this->assertSame(sprintf(
+            self::assertSame('GET', $method);
+            self::assertSame(sprintf(
                 'https://savitarna.smsbiuras.lt/api?uid=uid&apikey=api_key&message=%s&from=from&test=%s&to=%s',
                 rawurlencode($message->getSubject()),
                 $expected,
                 rawurlencode($message->getPhone())
             ), $url);
-            $this->assertSame($expected, $options['query']['test']);
+            self::assertSame($expected, $options['query']['test']);
 
-            $this->assertSame(200, $response->getStatusCode());
-            $this->assertSame('OK: 519545', $response->getContent());
+            self::assertSame(200, $response->getStatusCode());
+            self::assertSame('OK: 519545', $response->getContent());
 
             return $response;
         });
@@ -82,7 +82,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
 
         $sentMessage = $transport->send($message);
 
-        $this->assertSame('519545', $sentMessage->getMessageId());
+        self::assertSame('519545', $sentMessage->getMessageId());
     }
 
     public static function provideTestMode(): iterable

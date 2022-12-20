@@ -46,7 +46,7 @@ abstract class ProviderTestCase extends TestCase
      */
     public function testToString(ProviderInterface $provider, string $expected)
     {
-        $this->assertSame($expected, (string) $provider);
+        self::assertSame($expected, (string) $provider);
     }
 
     protected function getClient(): MockHttpClient
@@ -56,12 +56,12 @@ abstract class ProviderTestCase extends TestCase
 
     protected function getLoader(): LoaderInterface
     {
-        return $this->loader ?? $this->loader = $this->createMock(LoaderInterface::class);
+        return $this->loader ?? $this->loader = self::createMock(LoaderInterface::class);
     }
 
     protected function getLogger(): LoggerInterface
     {
-        return $this->logger ?? $this->logger = $this->createMock(LoggerInterface::class);
+        return $this->logger ?? $this->logger = self::createMock(LoggerInterface::class);
     }
 
     protected function getDefaultLocale(): string
@@ -71,6 +71,6 @@ abstract class ProviderTestCase extends TestCase
 
     protected function getXliffFileDumper(): XliffFileDumper
     {
-        return $this->xliffFileDumper ?? $this->xliffFileDumper = $this->createMock(XliffFileDumper::class);
+        return $this->xliffFileDumper ?? $this->xliffFileDumper = self::createMock(XliffFileDumper::class);
     }
 }

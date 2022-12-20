@@ -27,7 +27,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     protected function setUp(): void
     {
-        $kernel = static::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
+        $kernel = self::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);
         $this->application->doRun(new ArrayInput([]), new NullOutput());
     }
@@ -36,8 +36,8 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'foo']);
-        $this->assertStringContainsString('foo:', $tester->getDisplay());
-        $this->assertStringContainsString('    bar', $tester->getDisplay());
+        self::assertStringContainsString('foo:', $tester->getDisplay());
+        self::assertStringContainsString('    bar', $tester->getDisplay());
     }
 
     public function testDumpBundleName()
@@ -45,9 +45,9 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'TestBundle']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('test:', $tester->getDisplay());
-        $this->assertStringContainsString('    custom:', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('test:', $tester->getDisplay());
+        self::assertStringContainsString('    custom:', $tester->getDisplay());
     }
 
     public function testDumpExtensionConfigWithoutBundle()
@@ -55,8 +55,8 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'test_dump']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('enabled:              true', $tester->getDisplay());
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('enabled:              true', $tester->getDisplay());
     }
 
     public function testDumpAtPath()
@@ -67,16 +67,15 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
             'path' => 'array',
         ]);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertSame(<<<'EOL'
+        self::assertSame(0, $ret, 'Returns 0 in case of success');
+        self::assertSame(<<<'EOL'
 # Default configuration for extension with alias: "test" at path "array"
 array:
     child1:               ~
     child2:               ~
 
 
-EOL
-            , $tester->getDisplay(true));
+EOL, $tester->getDisplay(true));
     }
 
     public function testDumpAtPathXml()
@@ -88,8 +87,8 @@ EOL
             '--format' => 'xml',
         ]);
 
-        $this->assertSame(1, $ret);
-        $this->assertStringContainsString('[ERROR] The "path" option is only available for the "yaml" format.', $tester->getDisplay());
+        self::assertSame(1, $ret);
+        self::assertStringContainsString('[ERROR] The "path" option is only available for the "yaml" format.', $tester->getDisplay());
     }
 
     /**
@@ -100,7 +99,7 @@ EOL
         $this->application->add(new ConfigDumpReferenceCommand());
         $tester = new CommandCompletionTester($this->application->get('config:dump-reference'));
         $suggestions = $tester->complete($input, 2);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions(): iterable

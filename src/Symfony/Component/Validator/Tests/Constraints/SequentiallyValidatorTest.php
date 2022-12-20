@@ -61,7 +61,7 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate($value, new Sequentially($constraints));
 
-        $this->assertCount(1, $this->context->getViolations());
+        self::assertCount(1, $this->context->getViolations());
     }
 
     public function testNestedConstraintsAreNotExecutedWhenGroupDoesNotMatch()
@@ -83,6 +83,6 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
             'groups' => ['adult', 'senior'],
         ]), 'adult');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 }

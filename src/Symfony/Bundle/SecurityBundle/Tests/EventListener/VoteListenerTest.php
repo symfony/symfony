@@ -21,16 +21,15 @@ class VoteListenerTest extends TestCase
 {
     public function testOnVoterVote()
     {
-        $voter = $this->createMock(VoterInterface::class);
+        $voter = self::createMock(VoterInterface::class);
 
-        $traceableAccessDecisionManager = $this
-            ->getMockBuilder(TraceableAccessDecisionManager::class)
+        $traceableAccessDecisionManager = self::getMockBuilder(TraceableAccessDecisionManager::class)
             ->disableOriginalConstructor()
             ->setMethods(['addVoterVote'])
             ->getMock();
 
         $traceableAccessDecisionManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('addVoterVote')
             ->with($voter, ['myattr1', 'myattr2'], VoterInterface::ACCESS_GRANTED);
 

@@ -47,8 +47,8 @@ class CachingHttpClientTest extends TestCase
         $response = $this->runRequest(new MockResponse($body, ['response_headers' => ['X-Body-Eval' => true]]));
         $headers = $response->getHeaders();
 
-        $this->assertSame($body, $response->getContent());
-        $this->assertArrayNotHasKey('x-body-eval', $headers);
+        self::assertSame($body, $response->getContent());
+        self::assertArrayNotHasKey('x-body-eval', $headers);
     }
 
     public function testDoesNotIncludeFile()
@@ -63,9 +63,9 @@ class CachingHttpClientTest extends TestCase
         ));
         $headers = $response->getHeaders();
 
-        $this->assertSame('test', $response->getContent());
-        $this->assertArrayNotHasKey('x-body-eval', $headers);
-        $this->assertArrayNotHasKey('x-body-file', $headers);
+        self::assertSame('test', $response->getContent());
+        self::assertArrayNotHasKey('x-body-eval', $headers);
+        self::assertArrayNotHasKey('x-body-file', $headers);
     }
 
     public function testDoesNotReadFile()
@@ -79,8 +79,8 @@ class CachingHttpClientTest extends TestCase
         ));
         $headers = $response->getHeaders();
 
-        $this->assertSame('test', $response->getContent());
-        $this->assertArrayNotHasKey('x-body-file', $headers);
+        self::assertSame('test', $response->getContent());
+        self::assertArrayNotHasKey('x-body-file', $headers);
     }
 
     public function testRemovesXContentDigest()
@@ -93,7 +93,7 @@ class CachingHttpClientTest extends TestCase
         ]));
         $headers = $response->getHeaders();
 
-        $this->assertArrayNotHasKey('x-content-digest', $headers);
+        self::assertArrayNotHasKey('x-content-digest', $headers);
     }
 
     private function runRequest(MockResponse $mockResponse): ResponseInterface

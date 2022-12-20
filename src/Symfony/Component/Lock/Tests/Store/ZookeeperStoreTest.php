@@ -43,7 +43,7 @@ class ZookeeperStoreTest extends AbstractStoreTest
      */
     public function testCreateConnection(string $connectionString)
     {
-        $this->assertInstanceOf(\Zookeeper::class, ZookeeperStore::createConnection($connectionString));
+        self::assertInstanceOf(\Zookeeper::class, ZookeeperStore::createConnection($connectionString));
     }
 
     public function provideValidConnectionString(): iterable
@@ -60,10 +60,10 @@ class ZookeeperStoreTest extends AbstractStoreTest
         $key = new Key($resource);
 
         $store->save($key);
-        $this->assertTrue($store->exists($key));
+        self::assertTrue($store->exists($key));
 
         $store->delete($key);
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
     }
 
     public function testSaveSucceedsWhenPathContainsOneNode()
@@ -73,10 +73,10 @@ class ZookeeperStoreTest extends AbstractStoreTest
         $key = new Key($resource);
 
         $store->save($key);
-        $this->assertTrue($store->exists($key));
+        self::assertTrue($store->exists($key));
 
         $store->delete($key);
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
     }
 
     public function testSaveSucceedsWhenPathsContainSameFirstNode()
@@ -86,20 +86,20 @@ class ZookeeperStoreTest extends AbstractStoreTest
         $key = new Key($resource);
 
         $store->save($key);
-        $this->assertTrue($store->exists($key));
+        self::assertTrue($store->exists($key));
 
         $resource2 = 'foo';
         $key2 = new Key($resource2);
 
-        $this->assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key2));
         $store->save($key2);
-        $this->assertTrue($store->exists($key2));
+        self::assertTrue($store->exists($key2));
 
         $store->delete($key2);
-        $this->assertFalse($store->exists($key2));
+        self::assertFalse($store->exists($key2));
 
         $store->delete($key);
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
     }
 
     public function testRootPathIsLockable()
@@ -109,10 +109,10 @@ class ZookeeperStoreTest extends AbstractStoreTest
         $key = new Key($resource);
 
         $store->save($key);
-        $this->assertTrue($store->exists($key));
+        self::assertTrue($store->exists($key));
 
         $store->delete($key);
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
     }
 
     public function testEmptyStringIsLockable()
@@ -122,9 +122,9 @@ class ZookeeperStoreTest extends AbstractStoreTest
         $key = new Key($resource);
 
         $store->save($key);
-        $this->assertTrue($store->exists($key));
+        self::assertTrue($store->exists($key));
 
         $store->delete($key);
-        $this->assertFalse($store->exists($key));
+        self::assertFalse($store->exists($key));
     }
 }

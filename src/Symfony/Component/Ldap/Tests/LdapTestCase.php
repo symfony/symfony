@@ -21,7 +21,7 @@ class LdapTestCase extends TestCase
         @ldap_set_option($h, \LDAP_OPT_PROTOCOL_VERSION, 3);
 
         if (!$h || !@ldap_bind($h)) {
-            $this->markTestSkipped('No server is listening on LDAP_HOST:LDAP_PORT');
+            self::markTestSkipped('No server is listening on LDAP_HOST:LDAP_PORT');
         }
 
         ldap_unbind($h);

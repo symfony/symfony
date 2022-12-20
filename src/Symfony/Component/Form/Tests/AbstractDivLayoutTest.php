@@ -471,7 +471,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testCsrf()
     {
-        $this->csrfTokenManager->expects($this->any())
+        $this->csrfTokenManager->expects(self::any())
             ->method('getToken')
             ->willReturn(new CsrfToken('token_id', 'foo&bar'));
 
@@ -903,7 +903,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         // Rest should only contain field2, but isn't rendered
         $html = $this->renderEnd($view, ['render_rest' => false]);
 
-        $this->assertEquals('</form>', $html);
+        self::assertEquals('</form>', $html);
     }
 
     public function testWidgetContainerAttributes()
@@ -917,7 +917,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertStringContainsString('<div id="form" class="foobar" data-foo="bar">', $html);
+        self::assertStringContainsString('<div id="form" class="foobar" data-foo="bar">', $html);
     }
 
     public function testWidgetContainerAttributeNameRepeatedIfTrue()
@@ -929,6 +929,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertStringContainsString('<div id="form" foo="foo">', $html);
+        self::assertStringContainsString('<div id="form" foo="foo">', $html);
     }
 }

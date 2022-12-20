@@ -30,9 +30,9 @@ class LazyChoiceListTest extends TestCase
             return array_search($choice, $choices);
         });
 
-        $this->assertSame(['RESULT'], $list->getChoices());
-        $this->assertSame(['RESULT'], $list->getChoices());
-        $this->assertSame(2, $calls);
+        self::assertSame(['RESULT'], $list->getChoices());
+        self::assertSame(['RESULT'], $list->getChoices());
+        self::assertSame(2, $calls);
     }
 
     public function testGetValuesLoadsLoadedListOnFirstCall()
@@ -44,9 +44,9 @@ class LazyChoiceListTest extends TestCase
             return $choice;
         });
 
-        $this->assertSame(['RESULT'], $list->getValues());
-        $this->assertSame(['RESULT'], $list->getValues());
-        $this->assertSame(2, $calls);
+        self::assertSame(['RESULT'], $list->getValues());
+        self::assertSame(['RESULT'], $list->getValues());
+        self::assertSame(2, $calls);
     }
 
     public function testGetStructuredValuesLoadsLoadedListOnFirstCall()
@@ -58,9 +58,9 @@ class LazyChoiceListTest extends TestCase
             return $choice;
         });
 
-        $this->assertSame(['RESULT'], $list->getStructuredValues());
-        $this->assertSame(['RESULT'], $list->getStructuredValues());
-        $this->assertSame(2, $calls);
+        self::assertSame(['RESULT'], $list->getStructuredValues());
+        self::assertSame(['RESULT'], $list->getStructuredValues());
+        self::assertSame(2, $calls);
     }
 
     public function testGetOriginalKeysLoadsLoadedListOnFirstCall()
@@ -77,9 +77,9 @@ class LazyChoiceListTest extends TestCase
             return $choice;
         });
 
-        $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $list->getOriginalKeys());
-        $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $list->getOriginalKeys());
-        $this->assertSame(6, $calls);
+        self::assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $list->getOriginalKeys());
+        self::assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $list->getOriginalKeys());
+        self::assertSame(6, $calls);
     }
 
     public function testGetChoicesForValuesForwardsCallIfListNotLoaded()
@@ -96,9 +96,9 @@ class LazyChoiceListTest extends TestCase
             return array_search($choice, $choices);
         });
 
-        $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
-        $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
-        $this->assertSame(6, $calls);
+        self::assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
+        self::assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
+        self::assertSame(6, $calls);
     }
 
     public function testGetChoicesForValuesUsesLoadedList()
@@ -115,8 +115,8 @@ class LazyChoiceListTest extends TestCase
         // load choice list
         $list->getChoices();
 
-        $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
-        $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
+        self::assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
+        self::assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
     }
 
     public function testGetValuesForChoicesUsesLoadedList()
@@ -133,7 +133,7 @@ class LazyChoiceListTest extends TestCase
         // load choice list
         $list->getChoices();
 
-        $this->assertSame(['a', 'b'], $list->getValuesForChoices(['foo', 'bar']));
-        $this->assertSame(['a', 'b'], $list->getValuesForChoices(['foo', 'bar']));
+        self::assertSame(['a', 'b'], $list->getValuesForChoices(['foo', 'bar']));
+        self::assertSame(['a', 'b'], $list->getValuesForChoices(['foo', 'bar']));
     }
 }

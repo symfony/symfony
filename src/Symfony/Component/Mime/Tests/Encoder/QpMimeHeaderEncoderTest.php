@@ -19,7 +19,7 @@ class QpMimeHeaderEncoderTest extends TestCase
     public function testNameIsQ()
     {
         $encoder = new QpMimeHeaderEncoder();
-        $this->assertEquals('Q', $encoder->getName());
+        self::assertEquals('Q', $encoder->getName());
     }
 
     public function testSpaceAndTabNeverAppear()
@@ -31,7 +31,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         */
 
         $encoder = new QpMimeHeaderEncoder();
-        $this->assertDoesNotMatchRegularExpression('~[ \t]~', $encoder->encodeString("a \t b"), 'encoded-words in headers cannot contain LWSP as per RFC 2047.');
+        self::assertDoesNotMatchRegularExpression('~[ \t]~', $encoder->encodeString("a \t b"), 'encoded-words in headers cannot contain LWSP as per RFC 2047.');
     }
 
     public function testSpaceIsRepresentedByUnderscore()
@@ -46,7 +46,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         occupies a different code position in the character set in use.
         */
         $encoder = new QpMimeHeaderEncoder();
-        $this->assertEquals('a_b', $encoder->encodeString('a b'), 'Spaces can be represented by more readable underscores as per RFC 2047.');
+        self::assertEquals('a_b', $encoder->encodeString('a b'), 'Spaces can be represented by more readable underscores as per RFC 2047.');
     }
 
     public function testEqualsAndQuestionAndUnderscoreAreEncoded()
@@ -59,7 +59,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         within encoded words.
         */
         $encoder = new QpMimeHeaderEncoder();
-        $this->assertEquals('=3D=3F=5F', $encoder->encodeString('=?_'), 'Chars =, ? and _ (underscore) may not appear as per RFC 2047.');
+        self::assertEquals('=3D=3F=5F', $encoder->encodeString('=?_'), 'Chars =, ? and _ (underscore) may not appear as per RFC 2047.');
     }
 
     public function testParensAndQuotesAreEncoded()
@@ -70,7 +70,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         */
 
         $encoder = new QpMimeHeaderEncoder();
-        $this->assertEquals('=28=22=29', $encoder->encodeString('(")'), 'Chars (, " (DQUOTE) and ) may not appear as per RFC 2047.');
+        self::assertEquals('=28=22=29', $encoder->encodeString('(")'), 'Chars (, " (DQUOTE) and ) may not appear as per RFC 2047.');
     }
 
     public function testOnlyCharactersAllowedInPhrasesAreUsed()
@@ -100,12 +100,12 @@ class QpMimeHeaderEncoderTest extends TestCase
             $char = pack('C', $byte);
             $encodedChar = $encoder->encodeString($char, 'iso-8859-1');
             if (\in_array($byte, $allowedBytes)) {
-                $this->assertEquals($char, $encodedChar, 'Character '.$char.' should not be encoded.');
+                self::assertEquals($char, $encodedChar, 'Character '.$char.' should not be encoded.');
             } elseif (0x20 == $byte) {
                 // special case
-                $this->assertEquals('_', $encodedChar, 'Space character should be replaced.');
+                self::assertEquals('_', $encodedChar, 'Space character should be replaced.');
             } else {
-                $this->assertEquals(sprintf('=%02X', $byte), $encodedChar, 'Byte '.$byte.' should be encoded.');
+                self::assertEquals(sprintf('=%02X', $byte), $encodedChar, 'Byte '.$byte.' should be encoded.');
             }
         }
     }
@@ -134,6 +134,6 @@ class QpMimeHeaderEncoderTest extends TestCase
         }
 
         $encoder = new QpMimeHeaderEncoder();
-        $this->assertEquals($output, $encoder->encodeString($input));
+        self::assertEquals($output, $encoder->encodeString($input));
     }
 }

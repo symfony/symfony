@@ -27,7 +27,7 @@ abstract class AnnotationClassLoaderTest extends TestCase
      */
     public function testSupportsChecksResource($resource, $expectedSupports)
     {
-        $this->assertSame($expectedSupports, $this->loader->supports($resource), '->supports() returns true if the resource is loadable');
+        self::assertSame($expectedSupports, $this->loader->supports($resource), '->supports() returns true if the resource is loadable');
     }
 
     public function provideTestSupportsChecksResource()
@@ -45,21 +45,21 @@ abstract class AnnotationClassLoaderTest extends TestCase
 
     public function testSupportsChecksTypeIfSpecified()
     {
-        $this->assertTrue($this->loader->supports('class', 'annotation'), '->supports() checks the resource type if specified');
-        $this->assertFalse($this->loader->supports('class', 'foo'), '->supports() checks the resource type if specified');
+        self::assertTrue($this->loader->supports('class', 'annotation'), '->supports() checks the resource type if specified');
+        self::assertFalse($this->loader->supports('class', 'foo'), '->supports() checks the resource type if specified');
     }
 
     public function testSimplePathRoute()
     {
         $routes = $this->loader->load($this->getNamespace().'\ActionPathController');
-        $this->assertCount(1, $routes);
-        $this->assertEquals('/path', $routes->get('action')->getPath());
+        self::assertCount(1, $routes);
+        self::assertEquals('/path', $routes->get('action')->getPath());
     }
 
     public function testRequirementsWithoutPlaceholderName()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"');
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"');
 
         $this->loader->load($this->getNamespace().'\RequirementsWithoutPlaceholderNameController');
     }
@@ -67,115 +67,115 @@ abstract class AnnotationClassLoaderTest extends TestCase
     public function testInvokableControllerLoader()
     {
         $routes = $this->loader->load($this->getNamespace().'\InvokableController');
-        $this->assertCount(1, $routes);
-        $this->assertEquals('/here', $routes->get('lol')->getPath());
-        $this->assertEquals(['GET', 'POST'], $routes->get('lol')->getMethods());
-        $this->assertEquals(['https'], $routes->get('lol')->getSchemes());
+        self::assertCount(1, $routes);
+        self::assertEquals('/here', $routes->get('lol')->getPath());
+        self::assertEquals(['GET', 'POST'], $routes->get('lol')->getMethods());
+        self::assertEquals(['https'], $routes->get('lol')->getSchemes());
     }
 
     public function testInvokableLocalizedControllerLoading()
     {
         $routes = $this->loader->load($this->getNamespace().'\InvokableLocalizedController');
-        $this->assertCount(2, $routes);
-        $this->assertEquals('/here', $routes->get('action.en')->getPath());
-        $this->assertEquals('/hier', $routes->get('action.nl')->getPath());
+        self::assertCount(2, $routes);
+        self::assertEquals('/here', $routes->get('action.en')->getPath());
+        self::assertEquals('/hier', $routes->get('action.nl')->getPath());
     }
 
     public function testLocalizedPathRoutes()
     {
         $routes = $this->loader->load($this->getNamespace().'\LocalizedActionPathController');
-        $this->assertCount(2, $routes);
-        $this->assertEquals('/path', $routes->get('action.en')->getPath());
-        $this->assertEquals('/pad', $routes->get('action.nl')->getPath());
+        self::assertCount(2, $routes);
+        self::assertEquals('/path', $routes->get('action.en')->getPath());
+        self::assertEquals('/pad', $routes->get('action.nl')->getPath());
 
-        $this->assertEquals('nl', $routes->get('action.nl')->getRequirement('_locale'));
-        $this->assertEquals('en', $routes->get('action.en')->getRequirement('_locale'));
+        self::assertEquals('nl', $routes->get('action.nl')->getRequirement('_locale'));
+        self::assertEquals('en', $routes->get('action.en')->getRequirement('_locale'));
     }
 
     public function testLocalizedPathRoutesWithExplicitPathPropety()
     {
         $routes = $this->loader->load($this->getNamespace().'\ExplicitLocalizedActionPathController');
-        $this->assertCount(2, $routes);
-        $this->assertEquals('/path', $routes->get('action.en')->getPath());
-        $this->assertEquals('/pad', $routes->get('action.nl')->getPath());
+        self::assertCount(2, $routes);
+        self::assertEquals('/path', $routes->get('action.en')->getPath());
+        self::assertEquals('/pad', $routes->get('action.nl')->getPath());
     }
 
     public function testDefaultValuesForMethods()
     {
         $routes = $this->loader->load($this->getNamespace().'\DefaultValueController');
-        $this->assertCount(3, $routes);
-        $this->assertEquals('/{default}/path', $routes->get('action')->getPath());
-        $this->assertEquals('value', $routes->get('action')->getDefault('default'));
-        $this->assertEquals('Symfony', $routes->get('hello_with_default')->getDefault('name'));
-        $this->assertEquals('World', $routes->get('hello_without_default')->getDefault('name'));
+        self::assertCount(3, $routes);
+        self::assertEquals('/{default}/path', $routes->get('action')->getPath());
+        self::assertEquals('value', $routes->get('action')->getDefault('default'));
+        self::assertEquals('Symfony', $routes->get('hello_with_default')->getDefault('name'));
+        self::assertEquals('World', $routes->get('hello_without_default')->getDefault('name'));
     }
 
     public function testMethodActionControllers()
     {
         $routes = $this->loader->load($this->getNamespace().'\MethodActionControllers');
-        $this->assertSame(['put', 'post'], array_keys($routes->all()));
-        $this->assertEquals('/the/path', $routes->get('put')->getPath());
-        $this->assertEquals('/the/path', $routes->get('post')->getPath());
+        self::assertSame(['put', 'post'], array_keys($routes->all()));
+        self::assertEquals('/the/path', $routes->get('put')->getPath());
+        self::assertEquals('/the/path', $routes->get('post')->getPath());
     }
 
     public function testInvokableClassRouteLoadWithMethodAnnotation()
     {
         $routes = $this->loader->load($this->getNamespace().'\LocalizedMethodActionControllers');
-        $this->assertCount(4, $routes);
-        $this->assertEquals('/the/path', $routes->get('put.en')->getPath());
-        $this->assertEquals('/the/path', $routes->get('post.en')->getPath());
+        self::assertCount(4, $routes);
+        self::assertEquals('/the/path', $routes->get('put.en')->getPath());
+        self::assertEquals('/the/path', $routes->get('post.en')->getPath());
     }
 
     public function testGlobalDefaultsRoutesLoadWithAnnotation()
     {
         $routes = $this->loader->load($this->getNamespace().'\GlobalDefaultsClass');
-        $this->assertCount(2, $routes);
+        self::assertCount(2, $routes);
 
         $specificLocaleRoute = $routes->get('specific_locale');
 
-        $this->assertSame('/defaults/specific-locale', $specificLocaleRoute->getPath());
-        $this->assertSame('s_locale', $specificLocaleRoute->getDefault('_locale'));
-        $this->assertSame('g_format', $specificLocaleRoute->getDefault('_format'));
+        self::assertSame('/defaults/specific-locale', $specificLocaleRoute->getPath());
+        self::assertSame('s_locale', $specificLocaleRoute->getDefault('_locale'));
+        self::assertSame('g_format', $specificLocaleRoute->getDefault('_format'));
 
         $specificFormatRoute = $routes->get('specific_format');
 
-        $this->assertSame('/defaults/specific-format', $specificFormatRoute->getPath());
-        $this->assertSame('g_locale', $specificFormatRoute->getDefault('_locale'));
-        $this->assertSame('s_format', $specificFormatRoute->getDefault('_format'));
+        self::assertSame('/defaults/specific-format', $specificFormatRoute->getPath());
+        self::assertSame('g_locale', $specificFormatRoute->getDefault('_locale'));
+        self::assertSame('s_format', $specificFormatRoute->getDefault('_format'));
     }
 
     public function testUtf8RoutesLoadWithAnnotation()
     {
         $routes = $this->loader->load($this->getNamespace().'\Utf8ActionControllers');
-        $this->assertSame(['one', 'two'], array_keys($routes->all()));
-        $this->assertTrue($routes->get('one')->getOption('utf8'), 'The route must accept utf8');
-        $this->assertFalse($routes->get('two')->getOption('utf8'), 'The route must not accept utf8');
+        self::assertSame(['one', 'two'], array_keys($routes->all()));
+        self::assertTrue($routes->get('one')->getOption('utf8'), 'The route must accept utf8');
+        self::assertFalse($routes->get('two')->getOption('utf8'), 'The route must not accept utf8');
     }
 
     public function testRouteWithPathWithPrefix()
     {
         $routes = $this->loader->load($this->getNamespace().'\PrefixedActionPathController');
-        $this->assertCount(1, $routes);
+        self::assertCount(1, $routes);
         $route = $routes->get('action');
-        $this->assertEquals('/prefix/path', $route->getPath());
-        $this->assertEquals('lol=fun', $route->getCondition());
-        $this->assertEquals('frankdejonge.nl', $route->getHost());
+        self::assertEquals('/prefix/path', $route->getPath());
+        self::assertEquals('lol=fun', $route->getCondition());
+        self::assertEquals('frankdejonge.nl', $route->getHost());
     }
 
     public function testLocalizedRouteWithPathWithPrefix()
     {
         $routes = $this->loader->load($this->getNamespace().'\PrefixedActionLocalizedRouteController');
-        $this->assertCount(2, $routes);
-        $this->assertEquals('/prefix/path', $routes->get('action.en')->getPath());
-        $this->assertEquals('/prefix/pad', $routes->get('action.nl')->getPath());
+        self::assertCount(2, $routes);
+        self::assertEquals('/prefix/path', $routes->get('action.en')->getPath());
+        self::assertEquals('/prefix/pad', $routes->get('action.nl')->getPath());
     }
 
     public function testLocalizedPrefixLocalizedRoute()
     {
         $routes = $this->loader->load($this->getNamespace().'\LocalizedPrefixLocalizedActionController');
-        $this->assertCount(2, $routes);
-        $this->assertEquals('/nl/actie', $routes->get('action.nl')->getPath());
-        $this->assertEquals('/en/action', $routes->get('action.en')->getPath());
+        self::assertCount(2, $routes);
+        self::assertEquals('/nl/actie', $routes->get('action.nl')->getPath());
+        self::assertEquals('/en/action', $routes->get('action.en')->getPath());
     }
 
     public function testInvokableClassMultipleRouteLoad()
@@ -183,91 +183,91 @@ abstract class AnnotationClassLoaderTest extends TestCase
         $routeCollection = $this->loader->load($this->getNamespace().'\BazClass');
         $route = $routeCollection->get('route1');
 
-        $this->assertSame('/1', $route->getPath(), '->load preserves class route path');
-        $this->assertSame(['https'], $route->getSchemes(), '->load preserves class route schemes');
-        $this->assertSame(['GET'], $route->getMethods(), '->load preserves class route methods');
+        self::assertSame('/1', $route->getPath(), '->load preserves class route path');
+        self::assertSame(['https'], $route->getSchemes(), '->load preserves class route schemes');
+        self::assertSame(['GET'], $route->getMethods(), '->load preserves class route methods');
 
         $route = $routeCollection->get('route2');
 
-        $this->assertSame('/2', $route->getPath(), '->load preserves class route path');
-        $this->assertEquals(['https'], $route->getSchemes(), '->load preserves class route schemes');
-        $this->assertEquals(['GET'], $route->getMethods(), '->load preserves class route methods');
+        self::assertSame('/2', $route->getPath(), '->load preserves class route path');
+        self::assertEquals(['https'], $route->getSchemes(), '->load preserves class route schemes');
+        self::assertEquals(['GET'], $route->getMethods(), '->load preserves class route methods');
     }
 
     public function testMissingPrefixLocale()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $this->loader->load($this->getNamespace().'\LocalizedPrefixMissingLocaleActionController');
     }
 
     public function testMissingRouteLocale()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $this->loader->load($this->getNamespace().'\LocalizedPrefixMissingRouteLocaleActionController');
     }
 
     public function testRouteWithoutName()
     {
         $routes = $this->loader->load($this->getNamespace().'\MissingRouteNameController')->all();
-        $this->assertCount(1, $routes);
-        $this->assertEquals('/path', reset($routes)->getPath());
+        self::assertCount(1, $routes);
+        self::assertEquals('/path', reset($routes)->getPath());
     }
 
     public function testNothingButName()
     {
         $routes = $this->loader->load($this->getNamespace().'\NothingButNameController')->all();
-        $this->assertCount(1, $routes);
-        $this->assertEquals('/', reset($routes)->getPath());
+        self::assertCount(1, $routes);
+        self::assertEquals('/', reset($routes)->getPath());
     }
 
     public function testNonExistingClass()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $this->loader->load('ClassThatDoesNotExist');
     }
 
     public function testLoadingAbstractClass()
     {
-        $this->expectException(\LogicException::class);
+        self::expectException(\LogicException::class);
         $this->loader->load(AbstractClassController::class);
     }
 
     public function testLocalizedPrefixWithoutRouteLocale()
     {
         $routes = $this->loader->load($this->getNamespace().'\LocalizedPrefixWithRouteWithoutLocale');
-        $this->assertCount(2, $routes);
-        $this->assertEquals('/en/suffix', $routes->get('action.en')->getPath());
-        $this->assertEquals('/nl/suffix', $routes->get('action.nl')->getPath());
+        self::assertCount(2, $routes);
+        self::assertEquals('/en/suffix', $routes->get('action.en')->getPath());
+        self::assertEquals('/nl/suffix', $routes->get('action.nl')->getPath());
     }
 
     public function testLoadingRouteWithPrefix()
     {
         $routes = $this->loader->load($this->getNamespace().'\RouteWithPrefixController');
-        $this->assertCount(1, $routes);
-        $this->assertEquals('/prefix/path', $routes->get('action')->getPath());
+        self::assertCount(1, $routes);
+        self::assertEquals('/prefix/path', $routes->get('action')->getPath());
     }
 
     public function testWhenEnv()
     {
         $routes = $this->loader->load($this->getNamespace().'\RouteWithEnv');
-        $this->assertCount(0, $routes);
+        self::assertCount(0, $routes);
 
-        $this->setUp('some-env');
+        self::setUp('some-env');
         $routes = $this->loader->load($this->getNamespace().'\RouteWithEnv');
-        $this->assertCount(1, $routes);
-        $this->assertSame('/path', $routes->get('action')->getPath());
+        self::assertCount(1, $routes);
+        self::assertSame('/path', $routes->get('action')->getPath());
     }
 
     public function testMethodsAndSchemes()
     {
         $routes = $this->loader->load($this->getNamespace().'\MethodsAndSchemes');
 
-        $this->assertSame(['GET', 'POST'], $routes->get('array_many')->getMethods());
-        $this->assertSame(['http', 'https'], $routes->get('array_many')->getSchemes());
-        $this->assertSame(['GET'], $routes->get('array_one')->getMethods());
-        $this->assertSame(['http'], $routes->get('array_one')->getSchemes());
-        $this->assertSame(['POST'], $routes->get('string')->getMethods());
-        $this->assertSame(['https'], $routes->get('string')->getSchemes());
+        self::assertSame(['GET', 'POST'], $routes->get('array_many')->getMethods());
+        self::assertSame(['http', 'https'], $routes->get('array_many')->getSchemes());
+        self::assertSame(['GET'], $routes->get('array_one')->getMethods());
+        self::assertSame(['http'], $routes->get('array_one')->getSchemes());
+        self::assertSame(['POST'], $routes->get('string')->getMethods());
+        self::assertSame(['https'], $routes->get('string')->getSchemes());
     }
 
     abstract protected function getNamespace(): string;

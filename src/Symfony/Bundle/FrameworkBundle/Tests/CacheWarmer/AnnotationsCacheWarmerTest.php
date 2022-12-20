@@ -48,7 +48,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         $reader = new AnnotationReader();
         $warmer = new AnnotationsCacheWarmer($reader, $cacheFile);
         $warmer->warmUp($this->cacheDir);
-        $this->assertFileExists($cacheFile);
+        self::assertFileExists($cacheFile);
 
         // Assert cache is valid
         $reader = new PsrCachedReader(
@@ -68,7 +68,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         $reader = new AnnotationReader();
         $warmer = new AnnotationsCacheWarmer($reader, $cacheFile, null, true);
         $warmer->warmUp($this->cacheDir);
-        $this->assertFileExists($cacheFile);
+        self::assertFileExists($cacheFile);
 
         // Assert cache is valid
         $phpArrayAdapter = new PhpArrayAdapter($cacheFile, new NullAdapter());
@@ -89,7 +89,7 @@ class AnnotationsCacheWarmerTest extends TestCase
      */
     public function testClassAutoloadException()
     {
-        $this->assertFalse(class_exists($annotatedClass = 'C\C\C', false));
+        self::assertFalse(class_exists($annotatedClass = 'C\C\C', false));
 
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([$annotatedClass], true)));
         $warmer = new AnnotationsCacheWarmer(new AnnotationReader(), tempnam($this->cacheDir, __FUNCTION__));
@@ -111,10 +111,10 @@ class AnnotationsCacheWarmerTest extends TestCase
      */
     public function testClassAutoloadExceptionWithUnrelatedException()
     {
-        $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage('This exception should not be caught by the warmer.');
+        self::expectException(\DomainException::class);
+        self::expectExceptionMessage('This exception should not be caught by the warmer.');
 
-        $this->assertFalse(class_exists($annotatedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_AnnotationsCacheWarmerTest', false));
+        self::assertFalse(class_exists($annotatedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_AnnotationsCacheWarmerTest', false));
 
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([$annotatedClass], true)));
         $warmer = new AnnotationsCacheWarmer(new AnnotationReader(), tempnam($this->cacheDir, __FUNCTION__));
@@ -134,7 +134,7 @@ class AnnotationsCacheWarmerTest extends TestCase
     public function testWarmupRemoveCacheMisses()
     {
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
-        $warmer = $this->getMockBuilder(AnnotationsCacheWarmer::class)
+        $warmer = self::getMockBuilder(AnnotationsCacheWarmer::class)
             ->setConstructorArgs([new AnnotationReader(), $cacheFile])
             ->setMethods(['doWarmUp'])
             ->getMock();
@@ -156,8 +156,8 @@ class AnnotationsCacheWarmerTest extends TestCase
         $warmer->warmUp($this->cacheDir);
         $data = include $cacheFile;
 
-        $this->assertCount(1, $data[0]);
-        $this->assertTrue(isset($data[0]['bar_hit']));
+        self::assertCount(1, $data[0]);
+        self::assertTrue(isset($data[0]['bar_hit']));
     }
 
     /**
@@ -165,13 +165,13 @@ class AnnotationsCacheWarmerTest extends TestCase
      */
     private function getReadOnlyReader(): Reader
     {
-        $readerMock = $this->createMock(Reader::class);
-        $readerMock->expects($this->exactly(0))->method('getClassAnnotations');
-        $readerMock->expects($this->exactly(0))->method('getClassAnnotation');
-        $readerMock->expects($this->exactly(0))->method('getMethodAnnotations');
-        $readerMock->expects($this->exactly(0))->method('getMethodAnnotation');
-        $readerMock->expects($this->exactly(0))->method('getPropertyAnnotations');
-        $readerMock->expects($this->exactly(0))->method('getPropertyAnnotation');
+        $readerMock = self::createMock(Reader::class);
+        $readerMock->expects(self::exactly(0))->method('getClassAnnotations');
+        $readerMock->expects(self::exactly(0))->method('getClassAnnotation');
+        $readerMock->expects(self::exactly(0))->method('getMethodAnnotations');
+        $readerMock->expects(self::exactly(0))->method('getMethodAnnotation');
+        $readerMock->expects(self::exactly(0))->method('getPropertyAnnotations');
+        $readerMock->expects(self::exactly(0))->method('getPropertyAnnotation');
 
         return $readerMock;
     }

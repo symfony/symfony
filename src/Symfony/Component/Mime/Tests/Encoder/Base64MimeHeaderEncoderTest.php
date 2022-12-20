@@ -18,6 +18,6 @@ class Base64MimeHeaderEncoderTest extends TestCase
 {
     public function testNameIsB()
     {
-        $this->assertEquals('B', (new Base64MimeHeaderEncoder())->getName());
+        self::assertEquals('B', (new Base64MimeHeaderEncoder())->getName());
     }
 }

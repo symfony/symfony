@@ -30,16 +30,16 @@ END'],
 
     public function testCreateFromStringWithInvalidUtf8Input()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
-        static::createFromString("\xE9");
+        self::createFromString("\xE9");
     }
 
     public function testAscii()
     {
-        $s = static::createFromString('Dieser Wert sollte größer oder gleich');
-        $this->assertSame('Dieser Wert sollte grosser oder gleich', (string) $s->ascii());
-        $this->assertSame('Dieser Wert sollte groesser oder gleich', (string) $s->ascii(['de-ASCII']));
+        $s = self::createFromString('Dieser Wert sollte größer oder gleich');
+        self::assertSame('Dieser Wert sollte grosser oder gleich', (string) $s->ascii());
+        self::assertSame('Dieser Wert sollte groesser oder gleich', (string) $s->ascii(['de-ASCII']));
     }
 
     public function testAsciiClosureRule()
@@ -48,8 +48,8 @@ END'],
             return str_replace('ö', 'OE', $c);
         };
 
-        $s = static::createFromString('Dieser Wert sollte größer oder gleich');
-        $this->assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));
+        $s = self::createFromString('Dieser Wert sollte größer oder gleich');
+        self::assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));
     }
 
     public function provideCreateFromCodePoint(): array
@@ -83,13 +83,13 @@ END'],
     public function testCodePointsAt(array $expected, string $string, int $offset, int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
-            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+            self::markTestSkipped('Skipping due to issue ICU-21661.');
         }
 
-        $instance = static::createFromString($string);
+        $instance = self::createFromString($string);
         $instance = $form ? $instance->normalize($form) : $instance;
 
-        $this->assertSame($expected, $instance->codePointsAt($offset));
+        self::assertSame($expected, $instance->codePointsAt($offset));
     }
 
     public static function provideCodePointsAt(): array
@@ -195,15 +195,15 @@ END'],
                     '會|意|文|字|/|会|意|文|字',
                     '|',
                     [
-                        static::createFromString('會'),
-                        static::createFromString('意'),
-                        static::createFromString('文'),
-                        static::createFromString('字'),
-                        static::createFromString('/'),
-                        static::createFromString('会'),
-                        static::createFromString('意'),
-                        static::createFromString('文'),
-                        static::createFromString('字'),
+                        self::createFromString('會'),
+                        self::createFromString('意'),
+                        self::createFromString('文'),
+                        self::createFromString('字'),
+                        self::createFromString('/'),
+                        self::createFromString('会'),
+                        self::createFromString('意'),
+                        self::createFromString('文'),
+                        self::createFromString('字'),
                     ],
                     null,
                 ],
@@ -211,11 +211,11 @@ END'],
                     '會|意|文|字|/|会|意|文|字',
                     '|',
                     [
-                        static::createFromString('會'),
-                        static::createFromString('意'),
-                        static::createFromString('文'),
-                        static::createFromString('字'),
-                        static::createFromString('/|会|意|文|字'),
+                        self::createFromString('會'),
+                        self::createFromString('意'),
+                        self::createFromString('文'),
+                        self::createFromString('字'),
+                        self::createFromString('/|会|意|文|字'),
                     ],
                     5,
                 ],
@@ -231,18 +231,18 @@ END'],
                 [
                     'déjà',
                     [
-                        static::createFromString('d'),
-                        static::createFromString('é'),
-                        static::createFromString('j'),
-                        static::createFromString('à'),
+                        self::createFromString('d'),
+                        self::createFromString('é'),
+                        self::createFromString('j'),
+                        self::createFromString('à'),
                     ],
                     1,
                 ],
                 [
                     'déjà',
                     [
-                        static::createFromString('dé'),
-                        static::createFromString('jà'),
+                        self::createFromString('dé'),
+                        self::createFromString('jà'),
                     ],
                     2,
                 ],
@@ -252,23 +252,23 @@ END'],
 
     public function testTrimWithInvalidUtf8CharList()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
-        static::createFromString('Symfony')->trim("\xE9");
+        self::createFromString('Symfony')->trim("\xE9");
     }
 
     public function testTrimStartWithInvalidUtf8CharList()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
-        static::createFromString('Symfony')->trimStart("\xE9");
+        self::createFromString('Symfony')->trimStart("\xE9");
     }
 
     public function testTrimEndWithInvalidUtf8CharList()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
-        static::createFromString('Symfony')->trimEnd("\xE9");
+        self::createFromString('Symfony')->trimEnd("\xE9");
     }
 
     public static function provideLower(): array
@@ -383,9 +383,9 @@ END'],
 
     public function testAppendInvalidUtf8String()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
-        static::createFromString('Symfony')->append("\xE9");
+        self::createFromString('Symfony')->append("\xE9");
     }
 
     public static function providePrepend(): array
@@ -407,9 +407,9 @@ END'],
 
     public function testPrependInvalidUtf8String()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
-        static::createFromString('Symfony')->prepend("\xE9");
+        self::createFromString('Symfony')->prepend("\xE9");
     }
 
     public static function provideBeforeAfter(): array
@@ -516,14 +516,14 @@ END'],
 
     public function testReplaceWithInvalidUtf8Pattern()
     {
-        $this->assertEquals('Symfony', static::createFromString('Symfony')->replace("\xE9", 'p'));
+        self::assertEquals('Symfony', self::createFromString('Symfony')->replace("\xE9", 'p'));
     }
 
     public function testReplaceWithInvalidUtf8PatternReplacement()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
-        static::createFromString('Symfony')->replace('f', "\xE9");
+        self::createFromString('Symfony')->replace('f', "\xE9");
     }
 
     public static function provideCamel()

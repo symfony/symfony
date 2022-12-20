@@ -22,18 +22,18 @@ class ResponseHasHeaderTest extends TestCase
     public function testConstraint()
     {
         $constraint = new ResponseHasHeader('Date');
-        $this->assertTrue($constraint->evaluate(new Response(), '', true));
+        self::assertTrue($constraint->evaluate(new Response(), '', true));
         $constraint = new ResponseHasHeader('X-Date');
-        $this->assertFalse($constraint->evaluate(new Response(), '', true));
+        self::assertFalse($constraint->evaluate(new Response(), '', true));
 
         try {
             $constraint->evaluate(new Response());
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Response has header \"X-Date\".\n", TestFailure::exceptionToString($e));
+            self::assertEquals("Failed asserting that the Response has header \"X-Date\".\n", TestFailure::exceptionToString($e));
 
             return;
         }
 
-        $this->fail();
+        self::fail();
     }
 }

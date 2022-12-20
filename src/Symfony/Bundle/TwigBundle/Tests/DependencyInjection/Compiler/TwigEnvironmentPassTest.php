@@ -38,11 +38,11 @@ class TwigEnvironmentPassTest extends TestCase
 
         $pass->process($builder);
         $calls = $twigDefinition->getMethodCalls();
-        $this->assertCount(2, $calls);
-        $this->assertEquals('addExtension', $calls[0][0]);
-        $this->assertEquals('addExtension', $calls[1][0]);
-        $this->assertEquals('test_extension_2', (string) $calls[0][1][0]);
-        $this->assertEquals('test_extension_1', (string) $calls[1][1][0]);
+        self::assertCount(2, $calls);
+        self::assertEquals('addExtension', $calls[0][0]);
+        self::assertEquals('addExtension', $calls[1][0]);
+        self::assertEquals('test_extension_2', (string) $calls[0][1][0]);
+        self::assertEquals('test_extension_1', (string) $calls[1][1][0]);
     }
 
     public function testTwigBridgeExtensionsAreRegisteredFirst()
@@ -58,14 +58,14 @@ class TwigEnvironmentPassTest extends TestCase
         $twigEnvironmentPass->process($container);
 
         $methodCalls = $twigDefinition->getMethodCalls();
-        $this->assertCount(2, $methodCalls);
+        self::assertCount(2, $methodCalls);
 
         $twigBridgeExtensionReference = $methodCalls[0][1][0];
-        $this->assertInstanceOf(Reference::class, $twigBridgeExtensionReference);
-        $this->assertSame('twig_bridge_extension', (string) $twigBridgeExtensionReference);
+        self::assertInstanceOf(Reference::class, $twigBridgeExtensionReference);
+        self::assertSame('twig_bridge_extension', (string) $twigBridgeExtensionReference);
 
         $otherExtensionReference = $methodCalls[1][1][0];
-        $this->assertInstanceOf(Reference::class, $otherExtensionReference);
-        $this->assertSame('other_extension', (string) $otherExtensionReference);
+        self::assertInstanceOf(Reference::class, $otherExtensionReference);
+        self::assertSame('other_extension', (string) $otherExtensionReference);
     }
 }

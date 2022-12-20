@@ -76,7 +76,7 @@ class UnanimousStrategyTest extends TestCase
      */
     public function testMet($success, $failure, $total, $isMet)
     {
-        $this->assertSame($isMet, $this->strategy->isMet($success, $total));
+        self::assertSame($isMet, $this->strategy->isMet($success, $total));
     }
 
     /**
@@ -84,6 +84,6 @@ class UnanimousStrategyTest extends TestCase
      */
     public function testCanBeMet($success, $failure, $total, $isMet)
     {
-        $this->assertSame($isMet, $this->strategy->canBeMet($failure, $total));
+        self::assertSame($isMet, $this->strategy->canBeMet($failure, $total));
     }
 }

@@ -28,14 +28,14 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
      */
     public function testWorkerStopsWhenMemoryLimitExceeded(?int $lastRestartTimeOffset, bool $shouldStop)
     {
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('isHit')->willReturn(true);
-        $cacheItem->expects($this->once())->method('get')->willReturn(null === $lastRestartTimeOffset ? null : time() + $lastRestartTimeOffset);
-        $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
+        $cachePool = self::createMock(CacheItemPoolInterface::class);
+        $cacheItem = self::createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::once())->method('isHit')->willReturn(true);
+        $cacheItem->expects(self::once())->method('get')->willReturn(null === $lastRestartTimeOffset ? null : time() + $lastRestartTimeOffset);
+        $cachePool->expects(self::once())->method('getItem')->willReturn($cacheItem);
 
-        $worker = $this->createMock(Worker::class);
-        $worker->expects($shouldStop ? $this->once() : $this->never())->method('stop');
+        $worker = self::createMock(Worker::class);
+        $worker->expects($shouldStop ? self::once() : self::never())->method('stop');
         $event = new WorkerRunningEvent($worker, false);
 
         $stopOnSignalListener = new StopWorkerOnRestartSignalListener($cachePool);
@@ -52,14 +52,14 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
 
     public function testWorkerDoesNotStopIfRestartNotInCache()
     {
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('isHit')->willReturn(false);
-        $cacheItem->expects($this->never())->method('get');
-        $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
+        $cachePool = self::createMock(CacheItemPoolInterface::class);
+        $cacheItem = self::createMock(CacheItemInterface::class);
+        $cacheItem->expects(self::once())->method('isHit')->willReturn(false);
+        $cacheItem->expects(self::never())->method('get');
+        $cachePool->expects(self::once())->method('getItem')->willReturn($cacheItem);
 
-        $worker = $this->createMock(Worker::class);
-        $worker->expects($this->never())->method('stop');
+        $worker = self::createMock(Worker::class);
+        $worker->expects(self::never())->method('stop');
         $event = new WorkerRunningEvent($worker, false);
 
         $stopOnSignalListener = new StopWorkerOnRestartSignalListener($cachePool);

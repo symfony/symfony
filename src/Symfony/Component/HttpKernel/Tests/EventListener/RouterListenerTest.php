@@ -41,7 +41,7 @@ class RouterListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack = self::createMock(RequestStack::class);
     }
 
     /**
@@ -49,12 +49,12 @@ class RouterListenerTest extends TestCase
      */
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
-        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+        $urlMatcher = self::createMock(UrlMatcherInterface::class);
 
         $context = new RequestContext();
         $context->setHttpPort($defaultHttpPort);
         $context->setHttpsPort($defaultHttpsPort);
-        $urlMatcher->expects($this->any())
+        $urlMatcher->expects(self::any())
             ->method('getContext')
             ->willReturn($context);
 
@@ -62,9 +62,9 @@ class RouterListenerTest extends TestCase
         $event = $this->createRequestEventForUri($uri);
         $listener->onKernelRequest($event);
 
-        $this->assertEquals($expectedHttpPort, $context->getHttpPort());
-        $this->assertEquals($expectedHttpsPort, $context->getHttpsPort());
-        $this->assertEquals(str_starts_with($uri, 'https') ? 'https' : 'http', $context->getScheme());
+        self::assertEquals($expectedHttpPort, $context->getHttpPort());
+        self::assertEquals($expectedHttpsPort, $context->getHttpsPort());
+        self::assertEquals(str_starts_with($uri, 'https') ? 'https' : 'http', $context->getScheme());
     }
 
     public function getPortData()
@@ -79,7 +79,7 @@ class RouterListenerTest extends TestCase
 
     private function createRequestEventForUri(string $uri): RequestEvent
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create($uri);
         $request->attributes->set('_controller', null); // Prevents going in to routing process
 
@@ -88,20 +88,20 @@ class RouterListenerTest extends TestCase
 
     public function testInvalidMatcher()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::expectException(\InvalidArgumentException::class);
         new RouterListener(new \stdClass(), $this->requestStack);
     }
 
     public function testRequestMatcher()
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
-        $requestMatcher->expects($this->once())
+        $requestMatcher = self::createMock(RequestMatcherInterface::class);
+        $requestMatcher->expects(self::once())
                        ->method('matchRequest')
-                       ->with($this->isInstanceOf(Request::class))
+                       ->with(self::isInstanceOf(Request::class))
                        ->willReturn([]);
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
@@ -110,14 +110,14 @@ class RouterListenerTest extends TestCase
 
     public function testSubRequestWithDifferentMethod()
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/', 'post');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
-        $requestMatcher->expects($this->any())
+        $requestMatcher = self::createMock(RequestMatcherInterface::class);
+        $requestMatcher->expects(self::any())
                        ->method('matchRequest')
-                       ->with($this->isInstanceOf(Request::class))
+                       ->with(self::isInstanceOf(Request::class))
                        ->willReturn([]);
 
         $context = new RequestContext();
@@ -126,13 +126,13 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/', 'get');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST);
 
         $listener->onKernelRequest($event);
 
-        $this->assertEquals('GET', $context->getMethod());
+        self::assertEquals('GET', $context->getMethod());
     }
 
     /**
@@ -140,17 +140,17 @@ class RouterListenerTest extends TestCase
      */
     public function testLoggingParameter($parameter, $log, $parameters)
     {
-        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
-        $requestMatcher->expects($this->once())
+        $requestMatcher = self::createMock(RequestMatcherInterface::class);
+        $requestMatcher->expects(self::once())
             ->method('matchRequest')
             ->willReturn($parameter);
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
+        $logger = self::createMock(LoggerInterface::class);
+        $logger->expects(self::once())
             ->method('info')
-            ->with($this->equalTo($log), $this->equalTo($parameters));
+            ->with(self::equalTo($log), self::equalTo($parameters));
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext(), $logger);
@@ -169,8 +169,8 @@ class RouterListenerTest extends TestCase
     {
         $requestStack = new RequestStack();
 
-        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
-        $requestMatcher->expects($this->never())->method('matchRequest');
+        $requestMatcher = self::createMock(RequestMatcherInterface::class);
+        $requestMatcher->expects(self::never())->method('matchRequest');
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new ValidateRequestListener());
@@ -184,16 +184,16 @@ class RouterListenerTest extends TestCase
         $request = Request::create('http://localhost/');
         $request->headers->set('host', '###');
         $response = $kernel->handle($request);
-        $this->assertSame(400, $response->getStatusCode());
+        self::assertSame(400, $response->getStatusCode());
     }
 
     public function testNoRoutingConfigurationResponse()
     {
         $requestStack = new RequestStack();
 
-        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
+        $requestMatcher = self::createMock(RequestMatcherInterface::class);
         $requestMatcher
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('matchRequest')
             ->willThrowException(new NoConfigurationException())
         ;
@@ -205,18 +205,18 @@ class RouterListenerTest extends TestCase
 
         $request = Request::create('http://localhost/');
         $response = $kernel->handle($request);
-        $this->assertSame(404, $response->getStatusCode());
-        $this->assertStringContainsString('Welcome', $response->getContent());
+        self::assertSame(404, $response->getStatusCode());
+        self::assertStringContainsString('Welcome', $response->getContent());
     }
 
     public function testRequestWithBadHost()
     {
-        $this->expectException(BadRequestHttpException::class);
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        self::expectException(BadRequestHttpException::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('http://bad host %22/');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
+        $requestMatcher = self::createMock(RequestMatcherInterface::class);
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
         $listener->onKernelRequest($event);
@@ -224,22 +224,22 @@ class RouterListenerTest extends TestCase
 
     public function testResourceNotFoundException()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('No route found for "GET https://www.symfony.com/path" (from "https://www.google.com")');
+        self::expectException(NotFoundHttpException::class);
+        self::expectExceptionMessage('No route found for "GET https://www.symfony.com/path" (from "https://www.google.com")');
 
         $context = new RequestContext();
 
-        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+        $urlMatcher = self::createMock(UrlMatcherInterface::class);
 
-        $urlMatcher->expects($this->any())
+        $urlMatcher->expects(self::any())
             ->method('getContext')
             ->willReturn($context);
 
-        $urlMatcher->expects($this->any())
+        $urlMatcher->expects(self::any())
             ->method('match')
             ->willThrowException(new ResourceNotFoundException());
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('https://www.symfony.com/path');
         $request->headers->set('referer', 'https://www.google.com');
 
@@ -251,22 +251,22 @@ class RouterListenerTest extends TestCase
 
     public function testMethodNotAllowedException()
     {
-        $this->expectException(MethodNotAllowedHttpException::class);
-        $this->expectExceptionMessage('No route found for "GET https://www.symfony.com/path": Method Not Allowed (Allow: POST)');
+        self::expectException(MethodNotAllowedHttpException::class);
+        self::expectExceptionMessage('No route found for "GET https://www.symfony.com/path": Method Not Allowed (Allow: POST)');
 
         $context = new RequestContext();
 
-        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+        $urlMatcher = self::createMock(UrlMatcherInterface::class);
 
-        $urlMatcher->expects($this->any())
+        $urlMatcher->expects(self::any())
             ->method('getContext')
             ->willReturn($context);
 
-        $urlMatcher->expects($this->any())
+        $urlMatcher->expects(self::any())
             ->method('match')
             ->willThrowException(new MethodNotAllowedException(['POST']));
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = self::createMock(HttpKernelInterface::class);
         $request = Request::create('https://www.symfony.com/path');
 
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);

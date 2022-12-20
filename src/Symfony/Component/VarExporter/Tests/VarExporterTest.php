@@ -28,13 +28,13 @@ class VarExporterTest extends TestCase
 
     public function testPhpIncompleteClassesAreForbidden()
     {
-        $this->expectException(ClassNotFoundException::class);
-        $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
+        self::expectException(ClassNotFoundException::class);
+        self::expectExceptionMessage('Class "SomeNotExistingClass" not found.');
         $unserializeCallback = ini_set('unserialize_callback_func', 'var_dump');
         try {
             Registry::unserialize([], ['O:20:"SomeNotExistingClass":0:{}']);
         } finally {
-            $this->assertSame('var_dump', ini_set('unserialize_callback_func', $unserializeCallback));
+            self::assertSame('var_dump', ini_set('unserialize_callback_func', $unserializeCallback));
         }
     }
 
@@ -43,8 +43,8 @@ class VarExporterTest extends TestCase
      */
     public function testFailingSerialization($value)
     {
-        $this->expectException(NotInstantiableTypeException::class);
-        $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
+        self::expectException(NotInstantiableTypeException::class);
+        self::expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         $expectedDump = $this->getDump($value);
         try {
             VarExporter::export($value);
@@ -88,7 +88,7 @@ class VarExporterTest extends TestCase
         $isStaticValue = true;
         $marshalledValue = VarExporter::export($value, $isStaticValue);
 
-        $this->assertSame($staticValueExpected, $isStaticValue);
+        self::assertSame($staticValueExpected, $isStaticValue);
         if ('var-on-sleep' !== $testName && 'php74-serializable' !== $testName) {
             $this->assertDumpEquals($dumpedValue, $value);
         }
@@ -103,9 +103,9 @@ class VarExporterTest extends TestCase
         } elseif (\PHP_VERSION_ID < 70400) {
             $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
         } else {
-            $this->markTestSkipped('PHP >= 7.4.6 required.');
+            self::markTestSkipped('PHP >= 7.4.6 required.');
         }
-        $this->assertStringEqualsFile($fixtureFile, $dump);
+        self::assertStringEqualsFile($fixtureFile, $dump);
 
         if ('incomplete-class' === $testName || 'external-references' === $testName) {
             return;
@@ -118,7 +118,7 @@ class VarExporterTest extends TestCase
             }
             $this->assertDumpEquals($value, $marshalledValue);
         } else {
-            $this->assertSame($value, $marshalledValue);
+            self::assertSame($value, $marshalledValue);
         }
     }
 
@@ -255,7 +255,7 @@ class VarExporterTest extends TestCase
 
     public function testUnicodeDirectionality()
     {
-        $this->assertSame('"\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"', VarExporter::export("\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"));
+        self::assertSame('"\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"', VarExporter::export("\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"));
     }
 }
 

@@ -56,7 +56,7 @@ class ArrayToPartsTransformerTest extends TestCase
             ],
         ];
 
-        $this->assertSame($output, $this->transformer->transform($input));
+        self::assertSame($output, $this->transformer->transform($input));
     }
 
     public function testTransformEmpty()
@@ -66,12 +66,12 @@ class ArrayToPartsTransformerTest extends TestCase
             'second' => null,
         ];
 
-        $this->assertSame($output, $this->transformer->transform(null));
+        self::assertSame($output, $this->transformer->transform(null));
     }
 
     public function testTransformRequiresArray()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $this->transformer->transform('12345');
     }
 
@@ -99,7 +99,7 @@ class ArrayToPartsTransformerTest extends TestCase
             'f' => '6',
         ];
 
-        $this->assertSame($output, $this->transformer->reverseTransform($input));
+        self::assertSame($output, $this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyEmpty()
@@ -109,7 +109,7 @@ class ArrayToPartsTransformerTest extends TestCase
             'second' => '',
         ];
 
-        $this->assertNull($this->transformer->reverseTransform($input));
+        self::assertNull($this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyNull()
@@ -119,12 +119,12 @@ class ArrayToPartsTransformerTest extends TestCase
             'second' => null,
         ];
 
-        $this->assertNull($this->transformer->reverseTransform($input));
+        self::assertNull($this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformPartiallyNull()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $input = [
             'first' => [
                 'a' => '1',
@@ -139,7 +139,7 @@ class ArrayToPartsTransformerTest extends TestCase
 
     public function testReverseTransformRequiresArray()
     {
-        $this->expectException(TransformationFailedException::class);
+        self::expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform('12345');
     }
 }

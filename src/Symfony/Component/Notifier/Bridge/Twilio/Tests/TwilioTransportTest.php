@@ -29,7 +29,7 @@ final class TwilioTransportTest extends TransportTestCase
      */
     public function createTransport(HttpClientInterface $client = null, string $from = 'from'): TransportInterface
     {
-        return new TwilioTransport('accountSid', 'authToken', $from, $client ?? $this->createMock(HttpClientInterface::class));
+        return new TwilioTransport('accountSid', 'authToken', $from, $client ?? self::createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
@@ -45,7 +45,7 @@ final class TwilioTransportTest extends TransportTestCase
     public function unsupportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
-        yield [$this->createMock(MessageInterface::class)];
+        yield [self::createMock(MessageInterface::class)];
     }
 
     /**
@@ -55,8 +55,8 @@ final class TwilioTransportTest extends TransportTestCase
     {
         $transport = $this->createTransport(null, $from);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage(sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
 
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
@@ -79,11 +79,11 @@ final class TwilioTransportTest extends TransportTestCase
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
+        $response = self::createMock(ResponseInterface::class);
+        $response->expects(self::exactly(2))
             ->method('getStatusCode')
             ->willReturn(201);
-        $response->expects($this->once())
+        $response->expects(self::once())
             ->method('getContent')
             ->willReturn(json_encode([
                 'sid' => '123',
@@ -92,8 +92,8 @@ final class TwilioTransportTest extends TransportTestCase
             ]));
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://api.twilio.com/2010-04-01/Accounts/accountSid/Messages.json', $url);
+            self::assertSame('POST', $method);
+            self::assertSame('https://api.twilio.com/2010-04-01/Accounts/accountSid/Messages.json', $url);
 
             return $response;
         });
@@ -102,7 +102,7 @@ final class TwilioTransportTest extends TransportTestCase
 
         $sentMessage = $transport->send($message);
 
-        $this->assertSame('123', $sentMessage->getMessageId());
+        self::assertSame('123', $sentMessage->getMessageId());
     }
 
     public function validFromProvider(): iterable

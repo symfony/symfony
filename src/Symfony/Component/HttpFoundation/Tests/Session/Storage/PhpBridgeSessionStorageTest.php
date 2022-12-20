@@ -31,8 +31,8 @@ class PhpBridgeSessionStorageTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->iniSet('session.save_handler', 'files');
-        $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sftest');
+        self::iniSet('session.save_handler', 'files');
+        self::iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sftest');
         if (!is_dir($this->savePath)) {
             mkdir($this->savePath);
         }
@@ -61,19 +61,19 @@ class PhpBridgeSessionStorageTest extends TestCase
     {
         $storage = $this->getStorage();
 
-        $this->assertNotSame(\PHP_SESSION_ACTIVE, session_status());
-        $this->assertFalse($storage->isStarted());
+        self::assertNotSame(\PHP_SESSION_ACTIVE, session_status());
+        self::assertFalse($storage->isStarted());
 
         session_start();
-        $this->assertTrue(isset($_SESSION));
-        $this->assertSame(\PHP_SESSION_ACTIVE, session_status());
+        self::assertTrue(isset($_SESSION));
+        self::assertSame(\PHP_SESSION_ACTIVE, session_status());
         // PHP session might have started, but the storage driver has not, so false is correct here
-        $this->assertFalse($storage->isStarted());
+        self::assertFalse($storage->isStarted());
 
         $key = $storage->getMetadataBag()->getStorageKey();
-        $this->assertArrayNotHasKey($key, $_SESSION);
+        self::assertArrayNotHasKey($key, $_SESSION);
         $storage->start();
-        $this->assertArrayHasKey($key, $_SESSION);
+        self::assertArrayHasKey($key, $_SESSION);
     }
 
     public function testClear()
@@ -83,10 +83,10 @@ class PhpBridgeSessionStorageTest extends TestCase
         $_SESSION['drak'] = 'loves symfony';
         $storage->getBag('attributes')->set('symfony', 'greatness');
         $key = $storage->getBag('attributes')->getStorageKey();
-        $this->assertEquals(['symfony' => 'greatness'], $_SESSION[$key]);
-        $this->assertEquals('loves symfony', $_SESSION['drak']);
+        self::assertEquals(['symfony' => 'greatness'], $_SESSION[$key]);
+        self::assertEquals('loves symfony', $_SESSION['drak']);
         $storage->clear();
-        $this->assertEquals([], $_SESSION[$key]);
-        $this->assertEquals('loves symfony', $_SESSION['drak']);
+        self::assertEquals([], $_SESSION[$key]);
+        self::assertEquals('loves symfony', $_SESSION['drak']);
     }
 }

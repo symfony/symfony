@@ -31,12 +31,12 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection = self::createMock(Connection::class);
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = self::createMock(EntityManagerInterface::class);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
 
-        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->managerRegistry = self::createMock(ManagerRegistry::class);
         $this->managerRegistry->method('getManager')->willReturn($this->entityManager);
 
         $this->middleware = new DoctrinePingConnectionMiddleware(
@@ -47,14 +47,14 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewarePingOk()
     {
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('getDatabasePlatform')
-            ->will($this->throwException(new DBALException()));
+            ->will(self::throwException(new DBALException()));
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('close')
         ;
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('connect')
         ;
 
@@ -66,15 +66,15 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewarePingResetEntityManager()
     {
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('getDatabasePlatform')
-            ->will($this->throwException(new DBALException()));
+            ->will(self::throwException(new DBALException()));
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('isOpen')
             ->willReturn(false)
         ;
-        $this->managerRegistry->expects($this->once())
+        $this->managerRegistry->expects(self::once())
             ->method('resetManager')
             ->with($this->entityManagerName)
         ;
@@ -87,15 +87,15 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testInvalidEntityManagerThrowsException()
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = self::createMock(ManagerRegistry::class);
         $managerRegistry
             ->method('getManager')
             ->with('unknown_manager')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->will(self::throwException(new \InvalidArgumentException()));
 
         $middleware = new DoctrinePingConnectionMiddleware($managerRegistry, 'unknown_manager');
 
-        $this->expectException(UnrecoverableMessageHandlingException::class);
+        self::expectException(UnrecoverableMessageHandlingException::class);
 
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
     }
@@ -104,15 +104,15 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
     {
         // This method has been removed in DBAL 3.0
         if (method_exists(Connection::class, 'ping')) {
-            $this->connection->expects($this->never())
+            $this->connection->expects(self::never())
                 ->method('ping')
                 ->willReturn(false);
         }
 
-        $this->connection->expects($this->never())
+        $this->connection->expects(self::never())
             ->method('close')
         ;
-        $this->connection->expects($this->never())
+        $this->connection->expects(self::never())
             ->method('connect')
         ;
 

@@ -27,22 +27,22 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
      */
     public function testRequestRedirections(Request $request, $options, $redirectedUrl)
     {
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $urlGenerator->expects($this->any())->method('generate')->willReturn('http://localhost/login');
+        $urlGenerator = self::createMock(UrlGeneratorInterface::class);
+        $urlGenerator->expects(self::any())->method('generate')->willReturn('http://localhost/login');
         $httpUtils = new HttpUtils($urlGenerator);
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
         $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
         if ($request->hasSession()) {
             $handler->setFirewallName('admin');
         }
-        $this->assertSame('http://localhost'.$redirectedUrl, $handler->onAuthenticationSuccess($request, $token)->getTargetUrl());
+        self::assertSame('http://localhost'.$redirectedUrl, $handler->onAuthenticationSuccess($request, $token)->getTargetUrl());
     }
 
     public function getRequestRedirections()
     {
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())->method('get')->with('_security.admin.target_path')->willReturn('/admin/dashboard');
-        $session->expects($this->once())->method('remove')->with('_security.admin.target_path');
+        $session = self::createMock(SessionInterface::class);
+        $session->expects(self::once())->method('get')->with('_security.admin.target_path')->willReturn('/admin/dashboard');
+        $session->expects(self::once())->method('remove')->with('_security.admin.target_path');
         $requestWithSession = Request::create('/');
         $requestWithSession->setSession($session);
 
@@ -117,17 +117,17 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
     public function testTargetPathFromRequestWithInvalidUrl()
     {
-        $httpUtils = $this->createMock(HttpUtils::class);
+        $httpUtils = self::createMock(HttpUtils::class);
         $options = ['target_path_parameter' => '_my_target_path'];
-        $token = $this->createMock(TokenInterface::class);
+        $token = self::createMock(TokenInterface::class);
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $request = self::createMock(Request::class);
+        $request->expects(self::once())
             ->method('get')->with('_my_target_path')
             ->willReturn('some_route_name');
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
+        $logger = self::createMock(LoggerInterface::class);
+        $logger->expects(self::once())
             ->method('debug')
             ->with('Ignoring query parameter "_my_target_path": not a valid URL.');
 
@@ -140,16 +140,16 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
     {
         $options = ['target_path_parameter' => '_my_target_path'];
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $request = self::createMock(Request::class);
+        $request->expects(self::once())
             ->method('get')->with('_my_target_path')
             ->willReturn('https://localhost/some-path');
 
-        $httpUtils = $this->createMock(HttpUtils::class);
-        $httpUtils->expects($this->once())
+        $httpUtils = self::createMock(HttpUtils::class);
+        $httpUtils->expects(self::once())
             ->method('createRedirectResponse')->with($request, 'https://localhost/some-path');
 
         $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
-        $handler->onAuthenticationSuccess($request, $this->createMock(TokenInterface::class));
+        $handler->onAuthenticationSuccess($request, self::createMock(TokenInterface::class));
     }
 }

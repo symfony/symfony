@@ -25,24 +25,24 @@ class FileTest extends TestCase
     public function testGetMimeTypeUsesMimeTypeGuessers()
     {
         $file = new File(__DIR__.'/Fixtures/test.gif');
-        $this->assertEquals('image/gif', $file->getMimeType());
+        self::assertEquals('image/gif', $file->getMimeType());
     }
 
     public function testGuessExtensionWithoutGuesser()
     {
         $file = new File(__DIR__.'/Fixtures/directory/.empty');
-        $this->assertNull($file->guessExtension());
+        self::assertNull($file->guessExtension());
     }
 
     public function testGuessExtensionIsBasedOnMimeType()
     {
         $file = new File(__DIR__.'/Fixtures/test');
-        $this->assertEquals('gif', $file->guessExtension());
+        self::assertEquals('gif', $file->guessExtension());
     }
 
     public function testConstructWhenFileNotExists()
     {
-        $this->expectException(FileNotFoundException::class);
+        self::expectException(FileNotFoundException::class);
 
         new File(__DIR__.'/Fixtures/not_here');
     }
@@ -58,11 +58,11 @@ class FileTest extends TestCase
 
         $file = new File($path);
         $movedFile = $file->move($targetDir);
-        $this->assertInstanceOf(File::class, $movedFile);
+        self::assertInstanceOf(File::class, $movedFile);
 
-        $this->assertFileExists($targetPath);
-        $this->assertFileDoesNotExist($path);
-        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+        self::assertFileExists($targetPath);
+        self::assertFileDoesNotExist($path);
+        self::assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
     }
@@ -79,9 +79,9 @@ class FileTest extends TestCase
         $file = new File($path);
         $movedFile = $file->move($targetDir, 'test.newname.gif');
 
-        $this->assertFileExists($targetPath);
-        $this->assertFileDoesNotExist($path);
-        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+        self::assertFileExists($targetPath);
+        self::assertFileDoesNotExist($path);
+        self::assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
     }
@@ -90,7 +90,7 @@ class FileTest extends TestCase
     {
         $file = new File(__FILE__);
 
-        $this->assertStringEqualsFile(__FILE__, $file->getContent());
+        self::assertStringEqualsFile(__FILE__, $file->getContent());
     }
 
     public function getFilenameFixtures()
@@ -119,11 +119,11 @@ class FileTest extends TestCase
 
         $file = new File($path);
         $movedFile = $file->move($targetDir, $filename);
-        $this->assertInstanceOf(File::class, $movedFile);
+        self::assertInstanceOf(File::class, $movedFile);
 
-        $this->assertFileExists($targetPath);
-        $this->assertFileDoesNotExist($path);
-        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+        self::assertFileExists($targetPath);
+        self::assertFileDoesNotExist($path);
+        self::assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);
     }
@@ -141,9 +141,9 @@ class FileTest extends TestCase
         $file = new File($sourcePath);
         $movedFile = $file->move($targetDir);
 
-        $this->assertFileExists($targetPath);
-        $this->assertFileDoesNotExist($sourcePath);
-        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+        self::assertFileExists($targetPath);
+        self::assertFileDoesNotExist($sourcePath);
+        self::assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($sourcePath);
         @unlink($targetPath);

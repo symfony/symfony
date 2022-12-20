@@ -30,7 +30,7 @@ class MandrillApiTransportTest extends TestCase
      */
     public function testToString(MandrillApiTransport $transport, string $expected)
     {
-        $this->assertSame($expected, (string) $transport);
+        self::assertSame($expected, (string) $transport);
     }
 
     public function getTransportData()
@@ -62,27 +62,27 @@ class MandrillApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('message', $payload);
-        $this->assertArrayHasKey('headers', $payload['message']);
-        $this->assertCount(1, $payload['message']['headers']);
-        $this->assertEquals('bar', $payload['message']['headers']['foo']);
+        self::assertArrayHasKey('message', $payload);
+        self::assertArrayHasKey('headers', $payload['message']);
+        self::assertCount(1, $payload['message']['headers']);
+        self::assertEquals('bar', $payload['message']['headers']['foo']);
     }
 
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $this->assertSame('POST', $method);
-            $this->assertSame('https://mandrillapp.com/api/1.0/messages/send.json', $url);
+            self::assertSame('POST', $method);
+            self::assertSame('https://mandrillapp.com/api/1.0/messages/send.json', $url);
 
             $body = json_decode($options['body'], true);
             $message = $body['message'];
-            $this->assertSame('KEY', $body['key']);
-            $this->assertSame('Fabien', $message['from_name']);
-            $this->assertSame('fabpot@symfony.com', $message['from_email']);
-            $this->assertSame('Saif Eddin', $message['to'][0]['name']);
-            $this->assertSame('saif.gmati@symfony.com', $message['to'][0]['email']);
-            $this->assertSame('Hello!', $message['subject']);
-            $this->assertSame('Hello There!', $message['text']);
+            self::assertSame('KEY', $body['key']);
+            self::assertSame('Fabien', $message['from_name']);
+            self::assertSame('fabpot@symfony.com', $message['from_email']);
+            self::assertSame('Saif Eddin', $message['to'][0]['name']);
+            self::assertSame('saif.gmati@symfony.com', $message['to'][0]['email']);
+            self::assertSame('Hello!', $message['subject']);
+            self::assertSame('Hello There!', $message['text']);
 
             return new MockResponse(json_encode([['_id' => 'foobar']]), [
                 'http_code' => 200,
@@ -99,7 +99,7 @@ class MandrillApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        self::assertSame('foobar', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()
@@ -118,8 +118,8 @@ class MandrillApiTransportTest extends TestCase
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 
-        $this->expectException(HttpTransportException::class);
-        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        self::expectException(HttpTransportException::class);
+        self::expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
     }
 
@@ -136,12 +136,12 @@ class MandrillApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('message', $payload);
-        $this->assertArrayNotHasKey('headers', $payload['message']);
-        $this->assertArrayHasKey('tags', $payload['message']);
-        $this->assertSame(['password-reset'], $payload['message']['tags']);
-        $this->assertArrayHasKey('metadata', $payload['message']);
-        $this->assertSame(['Color' => 'blue', 'Client-ID' => '12345'], $payload['message']['metadata']);
+        self::assertArrayHasKey('message', $payload);
+        self::assertArrayNotHasKey('headers', $payload['message']);
+        self::assertArrayHasKey('tags', $payload['message']);
+        self::assertSame(['password-reset'], $payload['message']['tags']);
+        self::assertArrayHasKey('metadata', $payload['message']);
+        self::assertSame(['Color' => 'blue', 'Client-ID' => '12345'], $payload['message']['metadata']);
     }
 
     public function testCanHaveMultipleTags()
@@ -156,9 +156,9 @@ class MandrillApiTransportTest extends TestCase
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
-        $this->assertArrayHasKey('message', $payload);
-        $this->assertArrayNotHasKey('headers', $payload['message']);
-        $this->assertArrayHasKey('tags', $payload['message']);
-        $this->assertSame(['password-reset', 'user', 'another'], $payload['message']['tags']);
+        self::assertArrayHasKey('message', $payload);
+        self::assertArrayNotHasKey('headers', $payload['message']);
+        self::assertArrayHasKey('tags', $payload['message']);
+        self::assertSame(['password-reset', 'user', 'another'], $payload['message']['tags']);
     }
 }

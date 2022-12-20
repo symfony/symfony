@@ -254,7 +254,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             'expression' => 'false',
         ]);
 
-        $expressionLanguage = $this->createMock(ExpressionLanguage::class);
+        $expressionLanguage = self::createMock(ExpressionLanguage::class);
 
         $used = false;
 
@@ -269,7 +269,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $validator->initialize($this->createContext());
         $validator->validate(null, $constraint);
 
-        $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
+        self::assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
     }
 
     public function testPassingCustomValues()

@@ -24,16 +24,16 @@ class PackagesTest extends TestCase
     public function testGetterSetters()
     {
         $packages = new Packages();
-        $packages->setDefaultPackage($default = $this->createMock(PackageInterface::class));
-        $packages->addPackage('a', $a = $this->createMock(PackageInterface::class));
+        $packages->setDefaultPackage($default = self::createMock(PackageInterface::class));
+        $packages->addPackage('a', $a = self::createMock(PackageInterface::class));
 
-        $this->assertSame($default, $packages->getPackage());
-        $this->assertSame($a, $packages->getPackage('a'));
+        self::assertSame($default, $packages->getPackage());
+        self::assertSame($a, $packages->getPackage('a'));
 
         $packages = new Packages($default, ['a' => $a]);
 
-        $this->assertSame($default, $packages->getPackage());
-        $this->assertSame($a, $packages->getPackage('a'));
+        self::assertSame($default, $packages->getPackage());
+        self::assertSame($a, $packages->getPackage('a'));
     }
 
     public function testGetVersion()
@@ -43,8 +43,8 @@ class PackagesTest extends TestCase
             ['a' => new Package(new StaticVersionStrategy('a'))]
         );
 
-        $this->assertSame('default', $packages->getVersion('/foo'));
-        $this->assertSame('a', $packages->getVersion('/foo', 'a'));
+        self::assertSame('default', $packages->getVersion('/foo'));
+        self::assertSame('a', $packages->getVersion('/foo', 'a'));
     }
 
     public function testGetUrl()
@@ -54,20 +54,20 @@ class PackagesTest extends TestCase
             new \ArrayIterator(['a' => new Package(new StaticVersionStrategy('a'))])
         );
 
-        $this->assertSame('/foo?default', $packages->getUrl('/foo'));
-        $this->assertSame('/foo?a', $packages->getUrl('/foo', 'a'));
+        self::assertSame('/foo?default', $packages->getUrl('/foo'));
+        self::assertSame('/foo?a', $packages->getUrl('/foo', 'a'));
     }
 
     public function testNoDefaultPackage()
     {
-        $this->expectException(LogicException::class);
+        self::expectException(LogicException::class);
         $packages = new Packages();
         $packages->getPackage();
     }
 
     public function testUndefinedPackage()
     {
-        $this->expectException(InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
         $packages = new Packages();
         $packages->getPackage('a');
     }

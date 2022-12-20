@@ -23,7 +23,7 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
 {
     public function testLoadInvalidResource()
     {
-        $this->expectException(InvalidResourceException::class);
+        self::expectException(InvalidResourceException::class);
         $loader = new IcuDatFileLoader();
         $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted/resources', 'es', 'domain2');
     }
@@ -37,9 +37,9 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
         $resource = __DIR__.'/../fixtures/resourcebundle/dat/resources';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(['symfony' => 'Symfony 2 is great'], $catalogue->all('domain1'));
-        $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource.'.dat')], $catalogue->getResources());
+        self::assertEquals(['symfony' => 'Symfony 2 is great'], $catalogue->all('domain1'));
+        self::assertEquals('en', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource.'.dat')], $catalogue->getResources());
     }
 
     public function testDatFrenchLoad()
@@ -48,14 +48,14 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
         $resource = __DIR__.'/../fixtures/resourcebundle/dat/resources';
         $catalogue = $loader->load($resource, 'fr', 'domain1');
 
-        $this->assertEquals(['symfony' => 'Symfony 2 est génial'], $catalogue->all('domain1'));
-        $this->assertEquals('fr', $catalogue->getLocale());
-        $this->assertEquals([new FileResource($resource.'.dat')], $catalogue->getResources());
+        self::assertEquals(['symfony' => 'Symfony 2 est génial'], $catalogue->all('domain1'));
+        self::assertEquals('fr', $catalogue->getLocale());
+        self::assertEquals([new FileResource($resource.'.dat')], $catalogue->getResources());
     }
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(NotFoundResourceException::class);
+        self::expectException(NotFoundResourceException::class);
         $loader = new IcuDatFileLoader();
         $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');
     }

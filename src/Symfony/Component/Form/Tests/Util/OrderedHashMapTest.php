@@ -24,12 +24,12 @@ class OrderedHashMapTest extends TestCase
         $map = new OrderedHashMap();
         $map['first'] = 1;
 
-        $this->assertSame(1, $map['first']);
+        self::assertSame(1, $map['first']);
     }
 
     public function testGetNonExistingFails()
     {
-        $this->expectException(\OutOfBoundsException::class);
+        self::expectException(\OutOfBoundsException::class);
         $map = new OrderedHashMap();
 
         $map['first'];
@@ -41,7 +41,7 @@ class OrderedHashMapTest extends TestCase
         $map['first'] = 1;
         $map['second'] = 2;
 
-        $this->assertSame(['first' => 1, 'second' => 2], iterator_to_array($map));
+        self::assertSame(['first' => 1, 'second' => 2], iterator_to_array($map));
     }
 
     public function testInsertNullKeys()
@@ -51,7 +51,7 @@ class OrderedHashMapTest extends TestCase
         $map['foo'] = 2;
         $map[] = 3;
 
-        $this->assertSame([0 => 1, 'foo' => 2, 1 => 3], iterator_to_array($map));
+        self::assertSame([0 => 1, 'foo' => 2, 1 => 3], iterator_to_array($map));
     }
 
     public function testInsertLooselyEqualKeys()
@@ -60,7 +60,7 @@ class OrderedHashMapTest extends TestCase
         $map['1 as a string'] = '1 as a string';
         $map[1] = 1;
 
-        $this->assertSame(['1 as a string' => '1 as a string', 1 => 1], iterator_to_array($map));
+        self::assertSame(['1 as a string' => '1 as a string', 1 => 1], iterator_to_array($map));
     }
 
     /**
@@ -81,7 +81,7 @@ class OrderedHashMapTest extends TestCase
         $map['second'] = 2;
         $map['first'] = 1;
 
-        $this->assertSame(['first' => 1, 'second' => 2], iterator_to_array($map));
+        self::assertSame(['first' => 1, 'second' => 2], iterator_to_array($map));
     }
 
     public function testIsset()
@@ -89,14 +89,14 @@ class OrderedHashMapTest extends TestCase
         $map = new OrderedHashMap();
         $map['first'] = 1;
 
-        $this->assertArrayHasKey('first', $map);
+        self::assertArrayHasKey('first', $map);
     }
 
     public function testIssetReturnsFalseForNonExisting()
     {
         $map = new OrderedHashMap();
 
-        $this->assertArrayNotHasKey('first', $map);
+        self::assertArrayNotHasKey('first', $map);
     }
 
     public function testIssetReturnsFalseForNull()
@@ -104,7 +104,7 @@ class OrderedHashMapTest extends TestCase
         $map = new OrderedHashMap();
         $map['first'] = null;
 
-        $this->assertArrayNotHasKey('first', $map);
+        self::assertArrayNotHasKey('first', $map);
     }
 
     public function testUnset()
@@ -115,7 +115,7 @@ class OrderedHashMapTest extends TestCase
 
         unset($map['first']);
 
-        $this->assertSame(['second' => 2], iterator_to_array($map));
+        self::assertSame(['second' => 2], iterator_to_array($map));
     }
 
     public function testUnsetFromLooselyEqualKeysHashMap()
@@ -126,7 +126,7 @@ class OrderedHashMapTest extends TestCase
 
         unset($map[1]);
 
-        $this->assertSame(['1 as a string' => '1 as a string'], iterator_to_array($map));
+        self::assertSame(['1 as a string' => '1 as a string'], iterator_to_array($map));
     }
 
     public function testUnsetNonExistingSucceeds()
@@ -136,7 +136,7 @@ class OrderedHashMapTest extends TestCase
 
         unset($map['first']);
 
-        $this->assertSame(['second' => 2], iterator_to_array($map));
+        self::assertSame(['second' => 2], iterator_to_array($map));
     }
 
     public function testEmptyIteration()
@@ -145,9 +145,9 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationSupportsInsertion()
@@ -156,29 +156,29 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('first', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('first', $it->key());
+        self::assertSame(1, $it->current());
 
         // dynamic modification
         $map['added'] = 2;
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('first', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('first', $it->key());
+        self::assertSame(1, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('added', $it->key());
-        $this->assertSame(2, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('added', $it->key());
+        self::assertSame(2, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationSupportsDeletionAndInsertion()
@@ -187,30 +187,30 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('first', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('first', $it->key());
+        self::assertSame(1, $it->current());
 
         // dynamic modification
         unset($map['removed']);
         $map['added'] = 3;
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('first', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('first', $it->key());
+        self::assertSame(1, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('added', $it->key());
-        $this->assertSame(3, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('added', $it->key());
+        self::assertSame(3, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationSupportsDeletionOfCurrentElement()
@@ -219,28 +219,28 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('removed', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('removed', $it->key());
+        self::assertSame(1, $it->current());
 
         unset($map['removed']);
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('removed', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('removed', $it->key());
+        self::assertSame(1, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('next', $it->key());
-        $this->assertSame(2, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('next', $it->key());
+        self::assertSame(2, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationIgnoresReplacementOfCurrentElement()
@@ -249,28 +249,28 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('replaced', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('replaced', $it->key());
+        self::assertSame(1, $it->current());
 
         $map['replaced'] = 3;
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('replaced', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('replaced', $it->key());
+        self::assertSame(1, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('next', $it->key());
-        $this->assertSame(2, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('next', $it->key());
+        self::assertSame(2, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationSupportsDeletionOfCurrentAndLastElement()
@@ -279,22 +279,22 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('removed', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('removed', $it->key());
+        self::assertSame(1, $it->current());
 
         unset($map['removed']);
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('removed', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('removed', $it->key());
+        self::assertSame(1, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationIgnoresReplacementOfCurrentAndLastElement()
@@ -303,22 +303,22 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('replaced', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('replaced', $it->key());
+        self::assertSame(1, $it->current());
 
         $map['replaced'] = 2;
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('replaced', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('replaced', $it->key());
+        self::assertSame(1, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationSupportsDeletionOfPreviousElement()
@@ -327,34 +327,34 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('removed', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('removed', $it->key());
+        self::assertSame(1, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('next', $it->key());
-        $this->assertSame(2, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('next', $it->key());
+        self::assertSame(2, $it->current());
 
         unset($map['removed']);
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('next', $it->key());
-        $this->assertSame(2, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('next', $it->key());
+        self::assertSame(2, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('onemore', $it->key());
-        $this->assertSame(3, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('onemore', $it->key());
+        self::assertSame(3, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationIgnoresReplacementOfPreviousElement()
@@ -363,34 +363,34 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('replaced', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('replaced', $it->key());
+        self::assertSame(1, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('next', $it->key());
-        $this->assertSame(2, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('next', $it->key());
+        self::assertSame(2, $it->current());
 
         $map['replaced'] = 4;
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('next', $it->key());
-        $this->assertSame(2, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('next', $it->key());
+        self::assertSame(2, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('onemore', $it->key());
-        $this->assertSame(3, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('onemore', $it->key());
+        self::assertSame(3, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testIterationSupportsDeletionOfMultiplePreviousElements()
@@ -399,40 +399,40 @@ class OrderedHashMapTest extends TestCase
         $it = $map->getIterator();
 
         $it->rewind();
-        $this->assertTrue($it->valid());
-        $this->assertSame('removed', $it->key());
-        $this->assertSame(1, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('removed', $it->key());
+        self::assertSame(1, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('alsoremoved', $it->key());
-        $this->assertSame(2, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('alsoremoved', $it->key());
+        self::assertSame(2, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('next', $it->key());
-        $this->assertSame(3, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('next', $it->key());
+        self::assertSame(3, $it->current());
 
         unset($map['removed'], $map['alsoremoved']);
 
         // iterator is unchanged
-        $this->assertTrue($it->valid());
-        $this->assertSame('next', $it->key());
-        $this->assertSame(3, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('next', $it->key());
+        self::assertSame(3, $it->current());
 
         // continue iteration
         $it->next();
-        $this->assertTrue($it->valid());
-        $this->assertSame('onemore', $it->key());
-        $this->assertSame(4, $it->current());
+        self::assertTrue($it->valid());
+        self::assertSame('onemore', $it->key());
+        self::assertSame(4, $it->current());
 
         // end of map
         $it->next();
-        $this->assertFalse($it->valid());
-        $this->assertNull($it->key());
-        $this->assertNull($it->current());
+        self::assertFalse($it->valid());
+        self::assertNull($it->key());
+        self::assertNull($it->current());
     }
 
     public function testParallelIteration()
@@ -442,58 +442,58 @@ class OrderedHashMapTest extends TestCase
         $it2 = $map->getIterator();
 
         $it1->rewind();
-        $this->assertTrue($it1->valid());
-        $this->assertSame('first', $it1->key());
-        $this->assertSame(1, $it1->current());
+        self::assertTrue($it1->valid());
+        self::assertSame('first', $it1->key());
+        self::assertSame(1, $it1->current());
 
         $it2->rewind();
-        $this->assertTrue($it2->valid());
-        $this->assertSame('first', $it2->key());
-        $this->assertSame(1, $it2->current());
+        self::assertTrue($it2->valid());
+        self::assertSame('first', $it2->key());
+        self::assertSame(1, $it2->current());
 
         // 1: continue iteration
         $it1->next();
-        $this->assertTrue($it1->valid());
-        $this->assertSame('second', $it1->key());
-        $this->assertSame(2, $it1->current());
+        self::assertTrue($it1->valid());
+        self::assertSame('second', $it1->key());
+        self::assertSame(2, $it1->current());
 
         // 2: remains unchanged
-        $this->assertTrue($it2->valid());
-        $this->assertSame('first', $it2->key());
-        $this->assertSame(1, $it2->current());
+        self::assertTrue($it2->valid());
+        self::assertSame('first', $it2->key());
+        self::assertSame(1, $it2->current());
 
         // 1: advance to end of map
         $it1->next();
-        $this->assertFalse($it1->valid());
-        $this->assertNull($it1->key());
-        $this->assertNull($it1->current());
+        self::assertFalse($it1->valid());
+        self::assertNull($it1->key());
+        self::assertNull($it1->current());
 
         // 2: remains unchanged
-        $this->assertTrue($it2->valid());
-        $this->assertSame('first', $it2->key());
-        $this->assertSame(1, $it2->current());
+        self::assertTrue($it2->valid());
+        self::assertSame('first', $it2->key());
+        self::assertSame(1, $it2->current());
 
         // 2: continue iteration
         $it2->next();
-        $this->assertTrue($it2->valid());
-        $this->assertSame('second', $it2->key());
-        $this->assertSame(2, $it2->current());
+        self::assertTrue($it2->valid());
+        self::assertSame('second', $it2->key());
+        self::assertSame(2, $it2->current());
 
         // 1: remains unchanged
-        $this->assertFalse($it1->valid());
-        $this->assertNull($it1->key());
-        $this->assertNull($it1->current());
+        self::assertFalse($it1->valid());
+        self::assertNull($it1->key());
+        self::assertNull($it1->current());
 
         // 2: advance to end of map
         $it2->next();
-        $this->assertFalse($it2->valid());
-        $this->assertNull($it2->key());
-        $this->assertNull($it2->current());
+        self::assertFalse($it2->valid());
+        self::assertNull($it2->key());
+        self::assertNull($it2->current());
 
         // 1: remains unchanged
-        $this->assertFalse($it1->valid());
-        $this->assertNull($it1->key());
-        $this->assertNull($it1->current());
+        self::assertFalse($it1->valid());
+        self::assertNull($it1->key());
+        self::assertNull($it1->current());
     }
 
     public function testCount()
@@ -504,6 +504,6 @@ class OrderedHashMapTest extends TestCase
         unset($map[0]);
         $map[] = 3;
 
-        $this->assertCount(2, $map);
+        self::assertCount(2, $map);
     }
 }

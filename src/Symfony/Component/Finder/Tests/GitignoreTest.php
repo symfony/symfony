@@ -28,30 +28,22 @@ class GitignoreTest extends TestCase
         $patterns = implode("\n", $gitignoreLines);
 
         $regex = Gitignore::toRegex($patterns);
-        $this->assertSame($regex, Gitignore::toRegex(implode("\r\n", $gitignoreLines)));
-        $this->assertSame($regex, Gitignore::toRegex(implode("\r", $gitignoreLines)));
+        self::assertSame($regex, Gitignore::toRegex(implode("\r\n", $gitignoreLines)));
+        self::assertSame($regex, Gitignore::toRegex(implode("\r", $gitignoreLines)));
 
         foreach ($matchingCases as $matchingCase) {
-            $this->assertMatchesRegularExpression(
-                $regex,
-                $matchingCase,
-                sprintf(
-                    "Failed asserting path:\n%s\nmatches gitignore patterns:\n%s",
-                    preg_replace('~^~m', '    ', $matchingCase),
-                    preg_replace('~^~m', '    ', $patterns)
-                )
-            );
+            self::assertMatchesRegularExpression($regex, $matchingCase, sprintf(
+                "Failed asserting path:\n%s\nmatches gitignore patterns:\n%s",
+                preg_replace('~^~m', '    ', $matchingCase),
+                preg_replace('~^~m', '    ', $patterns)
+            ));
         }
 
         foreach ($nonMatchingCases as $nonMatchingCase) {
-            $this->assertDoesNotMatchRegularExpression(
-                $regex,
-                $nonMatchingCase,
-                sprintf("Failed asserting path:\n%s\nNOT matching gitignore patterns:\n%s",
-                    preg_replace('~^~m', '    ', $nonMatchingCase),
-                    preg_replace('~^~m', '    ', $patterns)
-                )
-            );
+            self::assertDoesNotMatchRegularExpression($regex, $nonMatchingCase, sprintf("Failed asserting path:\n%s\nNOT matching gitignore patterns:\n%s",
+                preg_replace('~^~m', '    ', $nonMatchingCase),
+                preg_replace('~^~m', '    ', $patterns)
+            ));
         }
     }
 
@@ -452,30 +444,22 @@ class GitignoreTest extends TestCase
         $patterns = implode("\n", $gitignoreLines);
 
         $regex = Gitignore::toRegexMatchingNegatedPatterns($patterns);
-        $this->assertSame($regex, Gitignore::toRegexMatchingNegatedPatterns(implode("\r\n", $gitignoreLines)));
-        $this->assertSame($regex, Gitignore::toRegexMatchingNegatedPatterns(implode("\r", $gitignoreLines)));
+        self::assertSame($regex, Gitignore::toRegexMatchingNegatedPatterns(implode("\r\n", $gitignoreLines)));
+        self::assertSame($regex, Gitignore::toRegexMatchingNegatedPatterns(implode("\r", $gitignoreLines)));
 
         foreach ($matchingCases as $matchingCase) {
-            $this->assertMatchesRegularExpression(
-                $regex,
-                $matchingCase,
-                sprintf(
-                    "Failed asserting path:\n%s\nmatches gitignore negated patterns:\n%s",
-                    preg_replace('~^~m', '    ', $matchingCase),
-                    preg_replace('~^~m', '    ', $patterns)
-                )
-            );
+            self::assertMatchesRegularExpression($regex, $matchingCase, sprintf(
+                "Failed asserting path:\n%s\nmatches gitignore negated patterns:\n%s",
+                preg_replace('~^~m', '    ', $matchingCase),
+                preg_replace('~^~m', '    ', $patterns)
+            ));
         }
 
         foreach ($nonMatchingCases as $nonMatchingCase) {
-            $this->assertDoesNotMatchRegularExpression(
-                $regex,
-                $nonMatchingCase,
-                sprintf("Failed asserting path:\n%s\nNOT matching gitignore negated patterns:\n%s",
-                    preg_replace('~^~m', '    ', $nonMatchingCase),
-                    preg_replace('~^~m', '    ', $patterns)
-                )
-            );
+            self::assertDoesNotMatchRegularExpression($regex, $nonMatchingCase, sprintf("Failed asserting path:\n%s\nNOT matching gitignore negated patterns:\n%s",
+                preg_replace('~^~m', '    ', $nonMatchingCase),
+                preg_replace('~^~m', '    ', $patterns)
+            ));
         }
     }
 

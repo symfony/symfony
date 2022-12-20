@@ -30,48 +30,48 @@ final class GenerateUlidCommandTest extends TestCase
 
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
-        $this->assertSame(0, $commandTester->execute([]));
+        self::assertSame(0, $commandTester->execute([]));
 
         $ulid = Ulid::fromBase32(trim($commandTester->getDisplay()));
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', $time), $ulid->getDateTime());
+        self::assertEquals(\DateTimeImmutable::createFromFormat('U.u', $time), $ulid->getDateTime());
     }
 
     public function testUnparsableTimestamp()
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
-        $this->assertSame(1, $commandTester->execute(['--time' => 'foo']));
-        $this->assertStringContainsString('Invalid timestamp "foo"', $commandTester->getDisplay());
+        self::assertSame(1, $commandTester->execute(['--time' => 'foo']));
+        self::assertStringContainsString('Invalid timestamp "foo"', $commandTester->getDisplay());
     }
 
     public function testTimestampBeforeUnixEpoch()
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
-        $this->assertSame(1, $commandTester->execute(['--time' => '@-42']));
-        $this->assertStringContainsString('The timestamp must be positive', $commandTester->getDisplay());
+        self::assertSame(1, $commandTester->execute(['--time' => '@-42']));
+        self::assertStringContainsString('The timestamp must be positive', $commandTester->getDisplay());
     }
 
     public function testTimestamp()
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['--time' => '2021-02-16 18:09:42.999']));
+        self::assertSame(0, $commandTester->execute(['--time' => '2021-02-16 18:09:42.999']));
 
         $ulid = Ulid::fromBase32(trim($commandTester->getDisplay()));
-        $this->assertEquals(new \DateTimeImmutable('2021-02-16 18:09:42.999'), $ulid->getDateTime());
+        self::assertEquals(new \DateTimeImmutable('2021-02-16 18:09:42.999'), $ulid->getDateTime());
     }
 
     public function testCount()
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['--count' => '10']));
+        self::assertSame(0, $commandTester->execute(['--count' => '10']));
 
         $ulids = explode("\n", trim($commandTester->getDisplay(true)));
-        $this->assertCount(10, $ulids);
+        self::assertCount(10, $ulids);
         foreach ($ulids as $ulid) {
-            $this->assertTrue(Ulid::isValid($ulid));
+            self::assertTrue(Ulid::isValid($ulid));
         }
     }
 
@@ -79,15 +79,15 @@ final class GenerateUlidCommandTest extends TestCase
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
-        $this->assertSame(1, $commandTester->execute(['--format' => 'foo']));
-        $this->assertStringContainsString('Invalid format "foo"', $commandTester->getDisplay());
+        self::assertSame(1, $commandTester->execute(['--format' => 'foo']));
+        self::assertStringContainsString('Invalid format "foo"', $commandTester->getDisplay());
     }
 
     public function testFormat()
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['--format' => 'rfc4122']));
+        self::assertSame(0, $commandTester->execute(['--format' => 'rfc4122']));
 
         Ulid::fromRfc4122(trim($commandTester->getDisplay()));
     }
@@ -96,11 +96,11 @@ final class GenerateUlidCommandTest extends TestCase
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
-        $this->assertSame(0, $commandTester->execute(['--time' => 'now', '--count' => '2']));
+        self::assertSame(0, $commandTester->execute(['--time' => 'now', '--count' => '2']));
 
         $ulids = explode("\n", trim($commandTester->getDisplay(true)));
 
-        $this->assertNotSame($ulids[0], $ulids[1]);
+        self::assertNotSame($ulids[0], $ulids[1]);
     }
 
     /**
@@ -109,14 +109,14 @@ final class GenerateUlidCommandTest extends TestCase
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+            self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $application = new Application();
         $application->add(new GenerateUlidCommand());
         $tester = new CommandCompletionTester($application->get('ulid:generate'));
         $suggestions = $tester->complete($input, 2);
-        $this->assertSame($expectedSuggestions, $suggestions);
+        self::assertSame($expectedSuggestions, $suggestions);
     }
 
     public function provideCompletionSuggestions(): iterable

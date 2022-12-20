@@ -23,7 +23,7 @@ class AllTest extends TestCase
 {
     public function testRejectNonConstraints()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         new All([
             'foo',
         ]);
@@ -31,7 +31,7 @@ class AllTest extends TestCase
 
     public function testRejectValidConstraint()
     {
-        $this->expectException(ConstraintDefinitionException::class);
+        self::expectException(ConstraintDefinitionException::class);
         new All([
             new Valid(),
         ]);

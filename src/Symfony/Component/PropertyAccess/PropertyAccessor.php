@@ -345,6 +345,10 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             $propertyValues[] = $zval;
+
+            if ($isNullSafe && null === $zval[self::VALUE]) {
+                break;
+            }
         }
 
         return $propertyValues;

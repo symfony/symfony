@@ -569,6 +569,11 @@ class PropertyAccessorTest extends TestCase
         yield [(object) [], 'foo?', null];
         yield [(object) ['foo' => (object) ['firstName' => 'Bernhard']], 'foo.bar?', null];
         yield [(object) ['foo' => (object) ['firstName' => 'Bernhard']], 'foo.bar?.baz?', null];
+        yield [(object) ['foo' => null], 'foo?.bar', null];
+        yield [(object) ['foo' => null], 'foo?.bar.baz', null];
+        yield [(object) ['foo' => (object) ['bar' => null]], 'foo?.bar?.baz', null];
+        yield [(object) ['foo' => (object) ['bar' => null]], 'foo.bar?.baz', null];
+        yield [(object) ['foo' => ['bar' => null]], 'foo[bar?].baz', null];
         yield [[], '[foo?]', null];
         yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?]', null];
         yield [['foo' => ['firstName' => 'Bernhard']], '[foo][bar?][baz?]', null];

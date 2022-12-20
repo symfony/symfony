@@ -83,6 +83,24 @@ class AutowirePass extends AbstractRecursivePass
 
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
+        if ($value instanceof Autowire) {
+            return $this->processValue($this->container->getParameterBag()->resolveValue($value->value));
+        }
+
+        if ($value instanceof TaggedIterator) {
+            return new TaggedIteratorArgument($value->tag, $value->indexAttribute, $value->defaultIndexMethod, false, $value->defaultPriorityMethod, (array) $value->exclude);
+        }
+
+        if ($value instanceof TaggedLocator) {
+            return new ServiceLocatorArgument(new TaggedIteratorArgument($value->tag, $value->indexAttribute, $value->defaultIndexMethod, true, $value->defaultPriorityMethod, (array) $value->exclude));
+        }
+
+        if ($value instanceof MapDecorated) {
+            $definition = $this->container->getDefinition($this->currentId);
+
+            return new Reference($definition->innerServiceId ?? $this->currentId.'.inner', $definition->decorationOnInvalid ?? ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        }
+
         try {
             return $this->doProcessValue($value, $isRoot);
         } catch (AutowiringFailedException $e) {
@@ -170,20 +188,14 @@ class AutowirePass extends AbstractRecursivePass
     {
         switch (true) {
             case $attribute instanceof Autowire:
-                $value = $this->container->getParameterBag()->resolveValue($attribute->value);
-
-                return $value instanceof Reference && $isOptional ? new Reference($value, ContainerInterface::NULL_ON_INVALID_REFERENCE) : $value;
-
+                if ($isOptional && $attribute->value instanceof Reference) {
+                    return new Reference($attribute->value, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+                }
+                // no break
             case $attribute instanceof TaggedIterator:
-                return new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, $attribute->defaultIndexMethod, false, $attribute->defaultPriorityMethod, (array) $attribute->exclude);
-
             case $attribute instanceof TaggedLocator:
-                return new ServiceLocatorArgument(new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute, $attribute->defaultIndexMethod, true, $attribute->defaultPriorityMethod, (array) $attribute->exclude));
-
             case $attribute instanceof MapDecorated:
-                $definition = $this->container->getDefinition($this->currentId);
-
-                return new Reference($definition->innerServiceId ?? $this->currentId.'.inner', $definition->decorationOnInvalid ?? ContainerInterface::NULL_ON_INVALID_REFERENCE);
+                return $this->processValue($attribute);
         }
 
         throw new AutowiringFailedException($this->currentId, sprintf('"%s" is an unsupported attribute.', $attribute::class));

@@ -26,7 +26,7 @@ return static function (ContainerConfigurator $container) {
         ->set('annotations.reader', AnnotationReader::class)
             ->call('addGlobalIgnoredName', [
                 'required',
-                service('annotations.dummy_registry'), // dummy arg to register class_exists as annotation loader only when required
+                service('annotations.dummy_registry')->ignoreOnInvalid(), // dummy arg to register class_exists as annotation loader only when required
             ])
 
         ->set('annotations.dummy_registry', AnnotationRegistry::class)

@@ -37,7 +37,7 @@
         "symfony/yaml": "^5.4|^6.0",
         "symfony/framework-bundle": "^5.4|^6.0",
         "symfony/web-link": "^5.4|^6.0",
-        "doctrine/annotations": "^1.10.4"
+        "doctrine/annotations": "^1.10.4|^2"
     },
     "conflict": {
         "symfony/framework-bundle": "<5.4",

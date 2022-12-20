@@ -120,7 +120,7 @@
         "async-aws/sqs": "^1.0",
         "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
-        "doctrine/annotations": "^1.13.1",
+        "doctrine/annotations": "^1.13.1|^2",
         "doctrine/collections": "^1.0|^2.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^2.13.1|^3.0",

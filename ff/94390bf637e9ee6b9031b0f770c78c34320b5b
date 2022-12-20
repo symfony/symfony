@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-12-20T12:05:58Z
+
+* Unfortunately, `egulias/email-validator` blocks the installation of Annotations 2. I'll try to resolve that issue upstream.
+* The failing high-deps tests are caused by PhpUnitBridge 6.3 and will be resolved as soon as this PR has been merged up.

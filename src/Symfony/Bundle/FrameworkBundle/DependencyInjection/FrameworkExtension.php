@@ -1570,8 +1570,12 @@ class FrameworkExtension extends Extension
         $loader->load('annotations.php');
 
         if (!method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
-            $container->getDefinition('annotations.dummy_registry')
-                ->setMethodCalls([['registerLoader', ['class_exists']]]);
+            if (method_exists(AnnotationRegistry::class, 'registerLoader')) {
+                $container->getDefinition('annotations.dummy_registry')
+                    ->setMethodCalls([['registerLoader', ['class_exists']]]);
+            } else {
+                $container->removeDefinition('annotations.dummy_registry');
+            }
         }
 
         if ('none' === $config['cache']) {

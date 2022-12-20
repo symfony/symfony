@@ -24,7 +24,7 @@
         "symfony/yaml": "^5.4|^6.0",
         "symfony/expression-language": "^5.4|^6.0",
         "symfony/dependency-injection": "^5.4|^6.0",
-        "doctrine/annotations": "^1.12",
+        "doctrine/annotations": "^1.12|^2",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-11T08:12:53Z
+
+As this is a behavior change, I would suggest merging it into 6.3 instead.

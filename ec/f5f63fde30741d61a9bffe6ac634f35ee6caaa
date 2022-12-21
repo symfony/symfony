@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-10T12:46:55Z
+
+Hey!
+
+I think @Kocal has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-15T11:37:45Z
+
+Can you add a small test case also?
+
+---------------------------------------------------------------------------
+
+by hellomedia at 2022-12-21T16:55:32Z
+
+@chalasr @nicolas-grekas Thank you both for the feedback.
+I changed the comment as suggested and added a test.
+
+~~Unfortunately, I apparently messed up the PR base branch when trying to rebase it.~~
+
+~~I folllowed these [rebasing instructions](https://symfony.com/doc/current/contributing/code/pull_requests.html#rebase-your-pull-request) :~~
+
+```
+git checkout 6.3
+git fetch upstream
+git merge upstream/6.3
+git checkout BRANCH_NAME
+git rebase 6.3
+git push --force origin BRANCH_NAME
+```
+
+~~but it now looks like my PR includes all latest commits from the 6.3 branch.~~
+
+~~I have tried a few things but no success :( Can you point me to an easy fix or should I submit a new PR ?~~
+
+---------------------------------------------------------------------------
+
+by hellomedia at 2022-12-21T17:29:51Z
+
+Rebasing issue seems kind of fixed now.
+
+Sorry for the noise and the extra review for requests (automated).
+
+---------------------------------------------------------------------------
+
+by hellomedia at 2022-12-21T17:37:53Z
+
+> Can you add an entry in SecurityBundle/CHANGELOG.md?
+
+Sure.
+What is best ?
+
+> Make login redirection logic available to programmatic login
+
+or
+
+> Make programmatic login return authenticator response
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-21T17:41:13Z
+
+I suggest
+> Make `Security::login()` return the authenticator response
+
+---------------------------------------------------------------------------
+
+by hellomedia at 2022-12-21T19:11:21Z
+
+Perfect, thanks. Done.

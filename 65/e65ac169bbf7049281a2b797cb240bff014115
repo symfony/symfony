@@ -1,0 +1,315 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2022-11-29T00:05:57Z
+
+I like the idea but I've some doubts, as you said, this feature is an alternative to implementing `HttpExceptionInterface` and the `framework.exceptions` mapping config, using attributes instead (more suitable for metadata information on declarations in code).
+
+Can you elaborate a bit more about the advantages of using this attribute versus doing this:
+
+```php
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+class OrderNotFound extends HttpException
+{
+    public static function create(string $id): self
+    {
+        return new self(
+            statusCode: Response::HTTP_NOT_FOUND,
+            message: sprintf('The order "%s" could not be found.', $id),
+            headers: ['x-header' => 'foo'],
+        );
+    }
+}
+```
+or this (in case you don't want to couple the Infrastructure/Framework subjects with your Domain layer):
+```php
+use App\Domain\Exception\NotFound;
+
+class OrderNotFound extends NotFound
+{
+    public static function create(string $id): self
+    {
+        return new self(sprintf('The order "%s" could not be found.', $id));
+    }
+}
+```
+```yaml
+framework:
+    exceptions:
+        App\Domain\Exception\NotFound:
+            status_code: 404
+```
+
+Full reflection and attributes go hand in hand, Imo if the use-case is satisfied by inheritance, prefer that.
+
+There are other things to think about:
+ * Does this feature replace the framework.exceptions mapping config?
+ * In case of using both framework.exceptions mapping and attribute for the same exception class, who has priority?
+ * Should we include `log_level` option in this attribute too?
+
+---
+
+About the implementation, the status code must be set before handling the error controller thus we render the exception into a response with the proper status code (e.g. `ProblemNormalizer` includes a `status` field). I think you should add this new feature in `Symfony\Component\HttpKernel\EventListener\ErrorListener` instead (that's the extension point where we currently handle the status code and headers).
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-11-29T15:00:18Z
+
+My two cents:
+
+> Can you elaborate a bit more about the advantages of using this attribute versus doing this
+
+I think this provides a nice _optional_ pattern. Not having to define things in config (outside of your php code) has been a direction Symfony has been moving in for some time.
+
+> Does this feature replace the framework.exceptions mapping config?
+
+No, this is still needed for exception classes you don't own (or if you choose not to use this pattern).
+
+> In case of using both framework.exceptions mapping and attribute for the same exception class, who has priority?
+
+What does DI prioritize if you have a service configured in yaml and using say the `Autowire` tag?
+
+> Should we include log_level option in this attribute too?
+
+Makes sense to include I think - provides feature parity with `framework.exceptions` config.
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-11-29T18:46:39Z
+
+My opinion as well is that this should be just another possible way to configure the status codes, without an intention to replace any of the existing ways.
+
+> Can you elaborate a bit more about the advantages of using this attribute versus doing this:
+
+You've already explained the advantages :) Not having to couple the domain exceptions with infrastructure code.
+
+Using inheritance and extending a base class for the status code is a bit limiting to me, for example for cases where the users would want their exceptions to extend some other base class.
+
+Eg.
+```php
+class PromoCodeExpired extends DiscountException { ... } // UnprocessableEntity
+```
+and
+```php
+class PromoCodeNotFound extends DiscountException { ... } // NotFound
+```
+
+> In case of using both framework.exceptions mapping and attribute for the same exception class, who has priority?
+
+This is discussable, but i think that "framework.exceptions mapping" should have a bigger priority, for the cases when the user may want to change the status code for an exception with already declared attribute they cannot change?
+
+> Should we include log_level option in this attribute too?
+
+To me, it makes more sense if this is configurable by a separate attribute. To be honest, it even feels a bit weird to me that both the status code setting from the config mapping and the logging are happening in a same event listener (`\Symfony\Component\HttpKernel\EventListener\ErrorListener`).
+
+> I think you should add this new feature in Symfony\Component\HttpKernel\EventListener\ErrorListener instead (that's the extension point where we currently handle the status code and headers).
+
+I was under impression that we might need to add the functionality to both places, but I might be wrong. I'll take a deeper look regarding this.
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-12-13T18:12:24Z
+
+I'm reopening this for reviews.
+
+With this PR now, the framework will provide several PHP attributes that can be declared on exception classes in order to set a custom HTTP status code and a list of headers to be used when preparing a response for the client.
+
+For example, if the user wants to return 404 for `SomethingNotFoundException` exceptions, they will be able to declare the `\Symfony\Component\HttpKernel\Attribute\HttpException\NotFound` on the exception class, and optionally provide a list of headers as an argument.
+
+```php
+// ...
+use Symfony\Component\HttpKernel\Attribute\HttpException\NotFound;
+
+#[NotFound(headers: [
+    "resource" => "something"
+])]
+class SomethingNotFound extends ResourceNotFound
+{
+    // ...
+}
+```
+
+For the list of provided attributes, I've taken the list of exception classes under `Symfony\Component\HttpKernel\Exception`.
+
+If the user needs an attribute for another status code not provided by the framework, they can create it themself by extending the `\Symfony\Component\HttpKernel\Attribute\HttpException\HttpException` class.
+
+```php
+use Symfony\Component\HttpFoundation\Response;
+
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class SomethingElse extends HttpException
+{
+    public function getStatusCode(): int
+    {
+        return Response::HTTP_ALREADY_REPORTED;
+    }
+}
+```
+
+Now, this attribute can be declared on exception classes just as in the example above.
+
+When implementing a new attribute, the user can also specify a list of headers which will be applied automatically by overriding the `\Symfony\Component\HttpKernel\Attribute\HttpException\HttpException::getHeaders` method.
+
+Regarding the prioritization, specifying the status code using this way has a lowest priority when used together with another option. As I mentioned above, I think this should be like that in order for the user to be able to set a status code using the configuration even when handling an exception (with an already declared attribute) they have no control over (to change/remove the attribute).
+
+Regarding the `\Symfony\Component\HttpKernel\EventListener\ErrorListener` class, as I understood, any exception with a configured custom status code will be wrapped inside a `\Symfony\Component\HttpKernel\Exception\HttpException` instance, which is already being handled in the HttpKernel.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-12-13T18:27:49Z
+
+Attributes allow to document arbitrary exceptions for Symfony without a hard dependency on the HttpKernel component. This looks pretty useful to me.
+
+However, I don't think we should require to extend the attribute just to change the status code. How about this?
+
+```php
+class HttpException
+{
+    public function __construct(
+        public readonly int $statusCode,
+        public readonly array $headers = [],
+    ) {}
+}
+
+class NotFound extends HttpException
+{
+    public function __construct(
+        array $headers = []
+    ) {
+        parent::__construct(404, $headers);
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-12-13T18:37:38Z
+
+> However, I don't think we should require to extend the attribute just to change the status code. How about this?
+
+@derrabus @kbond I agree as well! I like the suggested approach, and will update the PR.
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-12-13T22:23:23Z
+
+I updated the attributes to include the status code. Now the users have 3 possible ways to use this:
+
+1) Apply some of the attributes provided here, and optionally provide only a headers list
+
+    ```php
+    // ...
+    use Symfony\Component\HttpKernel\Attribute\HttpException\NotFound;
+
+    #[NotFound(headers: [
+        "resource" => "something"
+    ])]
+    class SomethingNotFound extends ResourceNotFound
+    {
+        // ...
+    }
+    ```
+
+2) Use the general `HttpException` attribute and provide the status code (500 will be used by default), and optionally the headers list
+
+    ```php
+    // ...
+    use Symfony\Component\HttpKernel\Attribute\HttpException;
+
+    #[HttpException(
+        statusCode: Response::HTTP_PRECONDITION_FAILED,
+        headers: [
+            'some' => 'thing',
+        ]
+    )]
+    class WithGeneralAttribute extends \Exception
+    {
+    }
+    ```
+
+3) Implement their own attributes for a specific HTTP code which will extend the `HttpException` one
+
+    ```php
+    // ...
+    use Symfony\Component\HttpKernel\Attribute\HttpException;
+
+    #[\Attribute(\Attribute::TARGET_CLASS)]
+    class UserProvidedHttpStatusCodeAttribute extends HttpException
+    {
+        public function __construct(array $headers = [])
+        {
+            parent::__construct(
+                Response::HTTP_ALREADY_REPORTED,
+                $headers
+            );
+        }
+    }
+
+    #[UserProvidedHttpStatusCodeAttribute(headers: [
+        'name' => 'value',
+    ])]
+    class WithCustomUserProvidedAttribute extends \Exception
+    {
+    }
+    ```
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-12-15T20:50:55Z
+
+I moved the logic to the error listener, where the exceptions are now being wrapped inside new HttpException instances, in the same way as when there's a status code set for them in the app's configuration.
+
+This way, the exception will be properly passed to the other places (eg. in the mentioned renderers).
+
+Note that this still has the lowest priority when using it alongside some of the other possible ways for setting the status code.
+The list of priorities is:
+1. Setting the status code in the configuration
+2. Implementing the `HttpExceptionInterface` interface
+3. Declaring an attribute
+
+(Meaning that, for example, if there's an exception with a `NotFound` attribute declared on it, but it is defined in the configuration that the status code for this exception should be 400, 400 will be used as a final status code. The priority of the first two ways is not changed.)
+
+The usage of the attributes is not changed and stays same as explained in https://github.com/symfony/symfony/pull/48352#issuecomment-1349894911.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-19T16:12:43Z
+
+Just one more thing: I don't think it's worth adding attributes for all possible status codes. I would code with only the most common ones, which are NotFound, BadRequest and likely Forbidden to me.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2022-12-19T16:19:55Z
+
+I like this feature a lot, great idea!
+
+My (not strong) opinion is that we don't need the helpers for NotFound, BadRequest, ... at all:
+* defining a custom status for an exception with HttpStatus is already very easy
+* defining a custom status happens only once per exception: the code won't change much once defined, meaning it's not a burden to have a small number of additional characters to type
+* not having helpers means less code to maintain
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-20T07:14:17Z
+
+Let me give you my (strong) opinion here :)
+
+1/ I think it should be all or nothing: we either have attributes for all status codes or none. Why? Because we will have follow-up PRs for years adding one more class for good reasons. Then, it introduces some inconsistencies in how you configure the attribute. Finally, it gives you two ways to do the same thing.
+
+2/ As both possibilities are equally self-descriptive, I don't see a good reason to introduce so many attributes:
+
+```
+#[NotFound()]
+#[HttpStatus(Response::HTTP_NOT_FOUND)]
+```
+
+3/ It will be easy to introduce these classes later on if we think it would be better, instead of deprecating classes. Less work for us, and opt-in for our users.
+
+So, I would vote for removing all these classes.
+
+---------------------------------------------------------------------------
+
+by angelov at 2022-12-21T17:21:34Z
+
+I removed all the attributes except the general one and updated the PR description.
+There wasn't any need for a new namespace so I also moved the attribute one level up.

@@ -9,21 +9,9 @@
         <framework:serializer enabled="true" />
         <framework:messenger>
             <framework:serializer default-serializer="messenger.transport.symfony_serializer" />
-            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage">
-                <framework:sender service="amqp" />
-                <framework:sender service="messenger.transport.audit" />
-            </framework:routing>
-            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\SecondMessage">
-                <framework:sender service="amqp" />
+            <framework:routing message-class="Symfony\*\DummyMessage">
                 <framework:sender service="audit" />
             </framework:routing>
-            <framework:routing message-class="*">
-                <framework:sender service="amqp" />
-            </framework:routing>
-            <framework:routing message-class="Symfony\*">
-                <framework:sender service="amqp" />
-            </framework:routing>
-            <framework:transport name="amqp" dsn="amqp://localhost/%2f/messages" />
             <framework:transport name="audit" dsn="null://" />
         </framework:messenger>
     </framework:config>

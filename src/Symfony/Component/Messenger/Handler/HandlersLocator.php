@@ -68,7 +68,20 @@ class HandlersLocator implements HandlersLocatorInterface
         return [$class => $class]
             + class_parents($class)
             + class_implements($class)
+            + self::listWildcards($class)
             + ['*' => '*'];
+    }
+
+    private static function listWildcards(string $type): array
+    {
+        $type .= '\*';
+        $wildcards = [];
+        while ($i = strrpos($type, '\\', -3)) {
+            $type = substr_replace($type, '\*', $i);
+            $wildcards[$type] = $type;
+        }
+
+        return $wildcards;
     }
 
     private function shouldHandle(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool

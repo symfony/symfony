@@ -52,6 +52,23 @@ class SendersLocatorTest extends TestCase
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 
+    public function testSendersMapWithFallback()
+    {
+        $firstSender = $this->createMock(SenderInterface::class);
+        $secondSender = $this->createMock(SenderInterface::class);
+        $sendersLocator = $this->createContainer([
+            'first' => $firstSender,
+            'second' => $secondSender,
+        ]);
+        $locator = new SendersLocator([
+            DummyMessage::class => ['first'],
+            '*' => ['second'],
+        ], $sendersLocator);
+
+        $this->assertSame(['first' => $firstSender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))), 'Unexpected senders for configured message');
+        $this->assertSame(['second' => $secondSender], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))), 'Unexpected senders for unconfigured message');
+    }
+
     private function createContainer(array $senders): ContainerInterface
     {
         $container = $this->createMock(ContainerInterface::class);

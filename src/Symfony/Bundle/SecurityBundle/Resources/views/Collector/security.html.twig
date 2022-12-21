@@ -177,7 +177,7 @@
                 </div>
             </div>
 
-            <div class="tab {{ collector.firewall.security_enabled is empty ? 'disabled' }}">
+            <div class="tab {{ (not collector.firewall or collector.firewall.security_enabled is empty) ? 'disabled' }}">
                 <h3 class="tab-title">Firewall</h3>
                 <div class="tab-content">
                     {% if collector.firewall %}

@@ -56,8 +56,10 @@ class Security extends LegacySecurity
      * @param UserInterface $user              The user to authenticate
      * @param string|null   $authenticatorName The authenticator name (e.g. "form_login") or service id (e.g. SomeApiKeyAuthenticator::class) - required only if multiple authenticators are configured
      * @param string|null   $firewallName      The firewall name - required only if multiple firewalls are configured
+     *
+     * @return Response|null The authenticator success response if any
      */
-    public function login(UserInterface $user, string $authenticatorName = null, string $firewallName = null): void
+    public function login(UserInterface $user, string $authenticatorName = null, string $firewallName = null): ?Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $firewallName ??= $this->getFirewallConfig($request)?->getName();
@@ -69,7 +71,8 @@ class Security extends LegacySecurity
         $authenticator = $this->getAuthenticator($authenticatorName, $firewallName);
 
         $this->container->get('security.user_checker')->checkPreAuth($user);
-        $this->container->get('security.user_authenticator')->authenticateUser($user, $authenticator, $request);
+
+        return $this->container->get('security.user_authenticator')->authenticateUser($user, $authenticator, $request);
     }
 
     /**

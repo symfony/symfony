@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireAsDecoratorPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
@@ -1253,5 +1255,26 @@ class AutowirePassTest extends TestCase
         } catch (AutowiringFailedException $e) {
             $this->assertSame('Cannot autowire service "a": argument "$k" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotGuessableArgument::__construct()" needs an instance of "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" but this type has been excluded from autowiring.', (string) $e->getMessage());
         }
+    }
+
+    public function testNestedAttributes()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AsDecoratorFoo::class);
+        $container->register(AutowireNestedAttributes::class)->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireAsDecoratorPass())->process($container);
+        (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $expected = [
+            'decorated' => new Reference(AutowireNestedAttributes::class.'.inner'),
+            'iterator' => new TaggedIteratorArgument('foo'),
+            'locator' => new ServiceLocatorArgument(new TaggedIteratorArgument('foo', needsIndexes: true)),
+            'service' => new Reference('bar'),
+        ];
+        $this->assertEquals($expected, $container->getDefinition(AutowireNestedAttributes::class)->getArgument(0));
     }
 }

@@ -5,6 +5,8 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -82,6 +84,20 @@ class AsDecoratorBar20 implements AsDecoratorInterface
 class AsDecoratorBaz implements AsDecoratorInterface
 {
     public function __construct(#[MapDecorated] AsDecoratorInterface $inner = null)
+    {
+    }
+}
+
+#[AsDecorator(decorates: AsDecoratorFoo::class)]
+class AutowireNestedAttributes implements AsDecoratorInterface
+{
+    public function __construct(
+        #[Autowire([
+            'decorated' => new MapDecorated(),
+            'iterator' => new TaggedIterator('foo'),
+            'locator' => new TaggedLocator('foo'),
+            'service' => new Autowire(service: 'bar')
+        ])] array $options)
     {
     }
 }

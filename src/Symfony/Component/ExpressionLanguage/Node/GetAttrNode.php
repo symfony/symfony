@@ -151,6 +151,14 @@ class GetAttrNode extends Node
     }
 
     /**
+     * Provides compatibility with symfony/var-exporter <= 6.2.2
+     */
+    public function __serialize(): array
+    {
+        return (array) $this;
+    }
+
+    /**
      * Provides BC with instances serialized before v6.2
      */
     public function __unserialize(array $data): void

@@ -13,11 +13,13 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\HttpStatus;
+use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -116,6 +118,40 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals(0, $logger->countErrors());
         $this->assertCount(0, $logger->getLogs('critical'));
         $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
+    public function testHandleWithLogLevelAttribute()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WarningWithLogLevelAttribute());
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger);
+
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('critical'));
+        $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
+    public function testHandleWithLogLevelAttributeAndCustomConfiguration()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WarningWithLogLevelAttribute());
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger, false, [
+            WarningWithLogLevelAttribute::class => [
+                'log_level' => 'info',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('warning'));
+        $this->assertCount(1, $logger->getLogs('info'));
     }
 
     /**
@@ -310,5 +346,10 @@ class WithCustomUserProvidedAttribute extends \Exception
     ]
 )]
 class WithGeneralAttribute extends \Exception
+{
+}
+
+#[WithLogLevel(LogLevel::WARNING)]
+class WarningWithLogLevelAttribute extends \Exception
 {
 }

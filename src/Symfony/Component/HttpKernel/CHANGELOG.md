@@ -8,6 +8,7 @@ CHANGELOG
  * `FileProfilerStorage` removes profiles automatically after two days
  * Add `#[HttpStatus]` for defining status codes for exceptions
  * Use an instance of `Psr\Clock\ClockInterface` to generate the current date time in `DateTimeValueResolver`
+ * Add `#[WithLogLevel]` for defining log levels for exceptions
 
 6.2
 ---

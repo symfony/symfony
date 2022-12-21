@@ -147,6 +147,11 @@ class ProxyHelperTest extends TestCase
 
                 return throw new \BadMethodCallException('Cannot forward abstract method "Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2::foo2()".');
             }
+
+            public static function foo3(): string
+            {
+                throw new \BadMethodCallException('Cannot forward abstract method "Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2::foo3()".');
+            }
         }
 
         // Help opcache.preload discover always-needed symbols
@@ -236,6 +241,8 @@ interface TestForProxyHelperInterface1
 interface TestForProxyHelperInterface2
 {
     public function foo2(?Bar $b): self;
+
+    public static function foo3(): string;
 }
 
 class TestSignatureFQ extends \stdClass

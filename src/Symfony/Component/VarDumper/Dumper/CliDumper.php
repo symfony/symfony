@@ -51,6 +51,7 @@ class CliDumper extends AbstractDumper
         "\r" => '\r',
         "\033" => '\e',
     ];
+    protected static $unicodeCharsRx = "/[\u{00A0}\u{00AD}\u{034F}\u{061C}\u{115F}\u{1160}\u{17B4}\u{17B5}\u{180E}\u{2000}-\u{200F}\u{202F}\u{205F}\u{2060}-\u{2064}\u{206A}-\u{206F}\u{3000}\u{2800}\u{3164}\u{FEFF}\u{FFA0}\u{1D159}\u{1D173}-\u{1D17A}]/u";
 
     protected $collapseNextHash = false;
     protected $expandNextHash = false;
@@ -449,6 +450,14 @@ class CliDumper extends AbstractDumper
 
             return $s.$endCchr;
         }, $value, -1, $cchrCount);
+
+        if (!($attr['binary'] ?? false)) {
+            $value = preg_replace_callback(static::$unicodeCharsRx, function ($c) use (&$cchrCount, $startCchr, $endCchr) {
+                ++$cchrCount;
+
+                return $startCchr.'\u{'.strtoupper(dechex(mb_ord($c[0]))).'}'.$endCchr;
+            }, $value);
+        }
 
         if ($this->colors) {
             if ($cchrCount && "\033" === $value[0]) {

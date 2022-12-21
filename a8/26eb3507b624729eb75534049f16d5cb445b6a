@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by javaDeveloperKid at 2022-12-07T22:25:32Z
+
+You could also introduce marker interface like `interface Command {}` in your application.
+
+---------------------------------------------------------------------------
+
+by brzuchal at 2022-12-08T03:57:38Z
+
+@javaDeveloperKid thanks but this feature as stated in description is about avoiding marker interfaces and any inheritance. Introducing a marker interfaces would be additional coupling and changing the code to adjust infrastructure related setup. At this point I believe it's better and cleaner to define wildcard namespace in routing. Considering the fact that such configuration have influence only on senders it is purely infrastructure thing.
+
+---------------------------------------------------------------------------
+
+by brzuchal at 2022-12-12T09:39:53Z
+
+Sorry it looks like I don't know how to use `git rebase` properly

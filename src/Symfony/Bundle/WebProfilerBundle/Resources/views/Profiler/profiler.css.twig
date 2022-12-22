@@ -516,7 +516,6 @@ input[type="radio"], input[type="checkbox"] {
     color: var(--color-link);
     text-decoration: none;
     background-color: transparent;
-    outline: none;
     border: 0;
     padding: 0;
     cursor: pointer;
@@ -1546,23 +1545,26 @@ tr.status-warning td {
     box-shadow: inset 0 0 0 1px var(--tab-border-color), 0 0 0 4px var(--page-background);
     margin: 0 0 10px;
 }
-.tab-navigation li {
+.tab-navigation .tab-control {
+    background: transparent;
+    border: 0;
     box-shadow: none;
     transition: box-shadow .05s ease-in, background-color .05s ease-in;
     cursor: pointer;
+    font-size: 14px;
     font-weight: 500;
-    list-style: none;
+    line-height: 1.4;
     margin: 0;
     padding: 4px 14px;
     position: relative;
     text-align: center;
     z-index: 1;
 }
-.sf-tabs-sm .tab-navigation li {
+.sf-tabs-sm .tab-navigation .tab-control {
     font-size: 13px;
     padding: 2.5px 10px;
 }
-.tab-navigation li:before {
+.tab-navigation .tab-control:before {
     background: var(--tab-border-color);
     bottom: 15%;
     content: "";
@@ -1571,10 +1573,12 @@ tr.status-warning td {
     top: 15%;
     width: 1px;
 }
-.tab-navigation li:first-child:before, .tab-navigation li.active + li:before, .tab-navigation li.active:before {
+.tab-navigation .tab-control:first-child:before,
+.tab-navigation .tab-control.active + .tab-control:before,
+.tab-navigation .tab-control.active:before {
     width: 0;
 }
-.tab-navigation li .badge {
+.tab-navigation .tab-control .badge {
     background: var(--selected-badge-background);
     box-shadow: var(--selected-badge-shadow);
     color: var(--selected-badge-color);
@@ -1588,10 +1592,10 @@ tr.status-warning td {
     text-align: center;
     white-space: nowrap;
 }
-.tab-navigation li.disabled {
+.tab-navigation .tab-control.disabled {
     color: var(--tab-disabled-color);
 }
-.tab-navigation li.active {
+.tab-navigation .tab-control.active {
     background-color: var(--tab-active-background);
     border-radius: 6px;
     box-shadow: inset 0 0 0 1.5px var(--tab-active-border-color);
@@ -1599,18 +1603,18 @@ tr.status-warning td {
     position: relative;
     z-index: 1;
 }
-.theme-dark .tab-navigation li.active {
+.theme-dark .tab-navigation .tab-control.active {
     box-shadow: inset 0 0 0 1px var(--tab-border-color);
 }
 .tab-content > *:first-child {
     margin-top: 0;
 }
-.tab-navigation li .badge.status-warning {
+.tab-navigation .tab-control .badge.status-warning {
     background: var(--selected-badge-warning-background);
     box-shadow: var(--selected-badge-warning-shadow);
     color: var(--selected-badge-warning-color);
 }
-.tab-navigation li .badge.status-error {
+.tab-navigation .tab-control .badge.status-error {
     background: var(--selected-badge-danger-background);
     box-shadow: var(--selected-badge-danger-shadow);
     color: var(--selected-badge-danger-color);
@@ -1784,10 +1788,10 @@ tr.status-warning td {
     font-weight: bold;
     padding: 0 1px;
 }
-.log-filter .tab-navigation li input {
+.log-filter .tab-navigation .tab-control input {
     display: none;
 }
-.log-filter .tab-navigation li label {
+.log-filter .tab-navigation .tab-control label {
     cursor: pointer;
 }
 .log-filters .log-filter .log-filter-content {

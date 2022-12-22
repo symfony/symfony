@@ -458,7 +458,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             // add CSRF provider
             if ($firewall['logout']['enable_csrf']) {
-                $logoutListener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
+                $logoutListener->addArgument(new Reference($firewall['logout']['csrf_token_manager']));
             }
 
             // add session logout listener
@@ -482,7 +482,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     $firewall['logout']['path'],
                     $firewall['logout']['csrf_token_id'],
                     $firewall['logout']['csrf_parameter'],
-                    isset($firewall['logout']['csrf_token_generator']) ? new Reference($firewall['logout']['csrf_token_generator']) : null,
+                    isset($firewall['logout']['csrf_token_manager']) ? new Reference($firewall['logout']['csrf_token_manager']) : null,
                     false === $firewall['stateless'] && isset($firewall['context']) ? $firewall['context'] : null,
                 ])
             ;

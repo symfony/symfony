@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-12-20T19:14:47Z
+
+~~Technically, we could do this on 5.4 already because `AnnotationRegistry::registerLoader('class_exists');` should be a no-op and we already have conflict rules for Annotations < 1.10 in place. Let me know if you think I should backport the change.~~
+
+The low-deps tests showed me that we should not backport. Registering `class_exists` as loader is still necessary, if someone somewhere calls (the also deprecated) `AnnotationRegistry::registerFile()`. Removing our only call to that method required me to bump the ORM to >= 2.12.
+
+We cannot anticipate if a codebase still has that `AnnotationRegistry::registerFile()` call somewhere, so we might as well decide to not merge this change as long as we support Annotations v1.

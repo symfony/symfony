@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-12-19T15:35:42Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by rodmen at 2022-12-20T14:38:14Z
+
+> Thanks for tackling this! Here is my review as a diff. (`TypeReference::getAttributes()` should return a collection of PHP attributes.)
+
+Thanks for the clarification @nicolas-grekas .
+I think of it that way, but I preferred not to modify the Target class on my first try.
+I've apply the suggested changes.
+
+Regarding the `if ($reference->getAttributes())` check in `AutowirePass::getAutowiredReference`, what do you think to pass `$parameter->getAttributes()` ([]ReflectionAttributes) as `TypedReference::$attributes` as create the TypedReference for that method using the object's class in the ID parameter?
+That way, we allow you to use the attributes for other purposes if needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-22T14:17:58Z
+
+> Regarding the if ($reference->getAttributes()) check in AutowirePass::getAutowiredReference
+
+I'm not sure that the situation you anticipate can exist so I wouldn't bother until it does.
+
+BTW, it looks to me that the change near L110 that I proposed previously is needed. Is there a reason why you didn't borrow it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-22T17:56:22Z
+
+(there's one test to fix though)
+
+---------------------------------------------------------------------------
+
+by rodmen at 2022-12-22T18:12:32Z
+
+> (there's one test to fix though)
+
+Sorry @nicolas-grekas , I'm not realized on the approve and just pushed a commit for the test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-22T18:17:35Z
+
+One more change from https://fabbot.io/report/symfony/symfony/48707/9562119c360e8f00379181700559fbd7f053dc9c
+
+Note that I would have happily made those simple changes myself but since I can't push to your fork, I must rely on you do to them.
+It might be great to figure out a way to allow this for future PRs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-22T18:20:35Z
+
+Oh, and one last thing: please squash your PR so that it has only one commit.

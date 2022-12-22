@@ -1,7 +1,5 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
-
 {% block toolbar %}
     {% if collector.handledCount > 0 %}
         {% set icon %}
@@ -89,14 +87,14 @@
             </div>
 
             <div class="sf-tabs">
-                {{ helper.render_serialize_tab(collector.data, true) }}
-                {{ helper.render_serialize_tab(collector.data, false) }}
+                {{ _self.render_serialize_tab(collector.data, true) }}
+                {{ _self.render_serialize_tab(collector.data, false) }}
 
-                {{ helper.render_normalize_tab(collector.data, true) }}
-                {{ helper.render_normalize_tab(collector.data, false) }}
+                {{ _self.render_normalize_tab(collector.data, true) }}
+                {{ _self.render_normalize_tab(collector.data, false) }}
 
-                {{ helper.render_encode_tab(collector.data, true) }}
-                {{ helper.render_encode_tab(collector.data, false) }}
+                {{ _self.render_encode_tab(collector.data, true) }}
+                {{ _self.render_encode_tab(collector.data, false) }}
             </div>
         {% endif %}
     </div>

@@ -151,7 +151,7 @@
                         {% if message.attachments %}
                             <div class="card-block">
                                 {% set num_of_attachments = message.attachments|length %}
-                                {% set total_attachments_size_in_bytes = message.attachments|reduce((total_size, attachment) => total_size + attachment.body|length) %}
+                                {% set total_attachments_size_in_bytes = message.attachments|reduce((total_size, attachment) => total_size + attachment.body|length, 0) %}
                                 <p class="mailer-message-attachments-title">
                                     {{ source('@WebProfiler/Icon/attachment.svg') }}
                                     Attachments <span>({{ num_of_attachments }} file{{ num_of_attachments > 1 ? 's' }} / {{ _self.render_file_size_humanized(total_attachments_size_in_bytes) }})</span>

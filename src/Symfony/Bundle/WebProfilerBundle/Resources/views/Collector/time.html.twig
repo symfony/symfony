@@ -1,7 +1,5 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
-
 {% block toolbar %}
     {% set has_time_events = collector.events|length > 0 %}
     {% set total_time = has_time_events ? '%.0f'|format(collector.duration) : 'n/a' %}
@@ -70,14 +68,9 @@
                     <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }}</span>
                 </div>
 
-                {% if has_time_events %}
-                    {% set subrequests_time = 0 %}
-                    {% for child in profile.children %}
-                        {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
-                    {% endfor %}
-                {% else %}
-                    {% set subrequests_time = 'n/a' %}
-                {% endif %}
+                {% set subrequests_time = has_time_events
+                    ? profile.children|reduce((total, child) => total + child.getcollector('time').events.__section__.duration, 0)
+                    : 'n/a' %}
 
                 <div class="metric">
                     <span class="value">{{ subrequests_time }} <span class="unit">ms</span></span>
@@ -124,7 +117,7 @@
         </h3>
     {% endif %}
 
-    {{ helper.display_timeline(token, collector.events, collector.events.__section__.origin) }}
+    {{ _self.display_timeline(token, collector.events, collector.events.__section__.origin) }}
 
     {% if profile.children|length %}
         <p class="help">Note: sections with a striped background correspond to sub-requests.</p>
@@ -138,7 +131,7 @@
                 <small>{{ events.__section__.duration }} ms</small>
             </h4>
 
-            {{ helper.display_timeline(child.token, events, collector.events.__section__.origin) }}
+            {{ _self.display_timeline(child.token, events, collector.events.__section__.origin) }}
         {% endfor %}
     {% endif %}
 
@@ -159,12 +152,11 @@
 
 {% macro dump_request_data(token, events, origin) %}
 {% autoescape 'js' %}
-{% from _self import dump_events %}
 {
     id: "{{ token }}",
     left: {{ "%F"|format(events.__section__.origin - origin) }},
     end: "{{ '%F'|format(events.__section__.endtime) }}",
-    events: [ {{ dump_events(events) }} ],
+    events: [ {{ _self.dump_events(events) }} ],
 }
 {% endautoescape %}
 {% endmacro %}
@@ -199,7 +191,6 @@
 {% endmacro %}
 
 {% macro display_timeline(token, events, origin) %}
-{% import _self as helper %}
     <div class="sf-profiler-timeline">
         <div id="legend-{{ token }}" class="legends"></div>
         <svg id="timeline-{{ token }}" class="timeline-graph"></svg>
@@ -212,7 +203,7 @@
                     new SvgRenderer(document.getElementById('timeline-{{ token }}')),
                     new Legend(document.getElementById('legend-{{ token }}'), theme),
                     document.getElementById('threshold'),
-                    {{ helper.dump_request_data(token, events, origin) }}
+                    {{ _self.dump_request_data(token, events, origin) }}
                 );
             });
         {% endautoescape %}</script>

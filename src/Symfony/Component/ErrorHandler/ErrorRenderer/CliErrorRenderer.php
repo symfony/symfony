@@ -56,28 +56,56 @@ class CliErrorRenderer implements ErrorRendererInterface
 
         $result = '';
 
-        $result .= $textBold.$textBrightWhite."Exception Trace".$resetStyle."\n";
-        $result .= $traceAsString."\n";
-
-        $result .= $textBold.$textBrightRed.\get_class($exception).$resetStyle."\n";
+        $exceptionFqcn = \get_class($exception);
+        $result .= '👻 '.$textBold.$textBrightRed.$exceptionFqcn.$resetStyle."\n";
         $result .= $exception->getMessage()."\n\n";
 
-        $sourceCode =file($exception->getFile());
+        $sourceCode = file($exception->getFile());
         $sourceCodeExtract = [];
-        for ($i = $exception->getLine() - 5; $i <= $exception->getLine() + 4; ++$i) {
+        for ($i = $exception->getLine() - 3; $i <= $exception->getLine() + 3; ++$i) {
             $sourceCodeExtract[$i] = ($sourceCode[$i] ?? '')."\n";
         }
 
-        $result .= $textGray.sprintf('at %s:%d', $exception->getFile(), $exception->getLine()).$resetStyle."\n";
+        $exceptionLineNumber = $exception->getLine();
+        [$exceptionFilePath, $exceptionFileName] = $this->findExceptionFilePathAndName($exception->getFile());
+        $result .= $textGray.sprintf('at %s%s%s:%d', $exceptionFilePath, $textBrightWhite, $exceptionFileName, $exceptionLineNumber).$resetStyle."\n";
+        $maxLineNumberLengthInDigits =  strlen((string) $exceptionLineNumber + 4);
         foreach ($sourceCodeExtract as $lineNumber => $code) {
-            if ($lineNumber === $exception->getLine()) {
-                $result .= sprintf("%s~~~~>%s %s\n", $textBrightRed, $resetStyle, rtrim($code));
+            if ($lineNumber === $exceptionLineNumber) {
+                $result .= sprintf("%s".str_repeat(' ', $maxLineNumberLengthInDigits - 1)."==> %s %s\n", $textBrightRed, $resetStyle, rtrim($code));
             } else {
-                $result .= sprintf("%s%3d |%s %s\n", $textGray, $lineNumber, $resetStyle, rtrim($code));
+                $result .= sprintf("%s%".$maxLineNumberLengthInDigits."d |%s %s\n", $textGray, $lineNumber, $resetStyle, rtrim($code));
             }
         }
+
+        if ($this->shouldTheExceptionTraceBeIncluded($exceptionFqcn)) {
+            $result .= "\n\n";
+            $result .= $textBold.$textBrightWhite."Exception Trace".$resetStyle."\n";
+            $result .= $traceAsString."\n";
+        }
+
         $result .= "\n\n";
 
         return $result;
+    }
+
+    private function shouldTheExceptionTraceBeIncluded(string $exceptionFqcn): bool
+    {
+        return !in_array($exceptionFqcn, [\ParseError::class], true);
+    }
+
+    private function findExceptionFilePathAndName(string $filepath): array
+    {
+        $dirPath = pathinfo($filepath, PATHINFO_DIRNAME);
+        $fileName = pathinfo($filepath, PATHINFO_BASENAME);
+
+        // if $filepath = /projects/foo/bar.php, $dirPath = /projects/foo and $filename = bar.php
+        // in those cases, append a DIRECTORY_SEPARATOR to the $dirPath so you can concatenate
+        // both variables later to reconstruct the original $filepath
+        if ('' !== $dirPath && '' !== $fileName) {
+            $dirPath .= DIRECTORY_SEPARATOR;
+        }
+
+        return [$dirPath, $fileName];
     }
 }

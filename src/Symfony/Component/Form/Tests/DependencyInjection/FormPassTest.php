@@ -285,15 +285,15 @@ class FormPassTest extends TestCase
                 function (ContainerBuilder $container) {
                     $formTypes = $container->getDefinition('form.extension')->getArgument(0);
 
-                    $this->assertInstanceOf(Reference::class, $formTypes);
+                    self::assertInstanceOf(Reference::class, $formTypes);
 
                     $locator = $container->getDefinition((string) $formTypes);
                     $expectedLocatorMap = [
                         'stdClass' => new ServiceClosureArgument(new Reference('my.type')),
                     ];
 
-                    $this->assertInstanceOf(Definition::class, $locator);
-                    $this->assertEquals($expectedLocatorMap, $locator->getArgument(0));
+                    self::assertInstanceOf(Definition::class, $locator);
+                    self::assertEquals($expectedLocatorMap, $locator->getArgument(0));
                 },
             ],
             [
@@ -301,7 +301,7 @@ class FormPassTest extends TestCase
                 Type1TypeExtension::class,
                 'form.type_extension',
                 function (ContainerBuilder $container) {
-                    $this->assertEquals(
+                    self::assertEquals(
                         ['Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument([new Reference('my.type_extension')])],
                         $container->getDefinition('form.extension')->getArgument(1)
                     );
@@ -309,7 +309,7 @@ class FormPassTest extends TestCase
                 ['extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType'],
             ],
             ['my.guesser', 'stdClass', 'form.type_guesser', function (ContainerBuilder $container) {
-                $this->assertEquals(new IteratorArgument([new Reference('my.guesser')]), $container->getDefinition('form.extension')->getArgument(2));
+                self::assertEquals(new IteratorArgument([new Reference('my.guesser')]), $container->getDefinition('form.extension')->getArgument(2));
             }],
         ];
     }

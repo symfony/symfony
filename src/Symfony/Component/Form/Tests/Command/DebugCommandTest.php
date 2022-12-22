@@ -206,7 +206,7 @@ TXT
 
         yield 'form_type' => [
             [''],
-            $this->getCoreTypes(),
+            self::getCoreTypes(),
         ];
 
         yield 'option for FQCN' => [
@@ -258,7 +258,7 @@ TXT
         ];
     }
 
-    private function getCoreTypes(): array
+    private static function getCoreTypes(): array
     {
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');

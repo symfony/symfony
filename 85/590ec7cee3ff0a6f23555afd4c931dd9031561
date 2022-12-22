@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-21T21:05:28Z
+
+Thanks. Can you please also submit a PR on maker-bundle? It generates such classes that would need the annotation.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2022-12-21T21:34:00Z
+
+> Thanks. Can you please also submit a PR on maker-bundle? It generates such classes that would need the annotation.
+
+Sure, started https://github.com/symfony/maker-bundle/pull/1259

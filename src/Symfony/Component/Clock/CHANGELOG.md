@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `ClockAwareTrait` to help write time-sensitive classes
+ * Add `Clock` class and `now()` function
 
 6.2
 ---

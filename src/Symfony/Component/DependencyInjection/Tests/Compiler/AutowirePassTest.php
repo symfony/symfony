@@ -1142,6 +1142,21 @@ class AutowirePassTest extends TestCase
         $this->assertSame(BarInterface::class.' $imageStorage', (string) $container->getDefinition('with_target')->getArgument(0));
     }
 
+    public function testArgumentWithTypoTarget()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(BarInterface::class, BarInterface::class);
+        $container->register(BarInterface::class.' $iamgeStorage', BarInterface::class);
+        $container->register('with_target', WithTarget::class)
+            ->setAutowired(true);
+
+        $this->expectException(AutowiringFailedException::class);
+        $this->expectExceptionMessage('Cannot autowire service "with_target": "#[Target(\'imageStorage\')" on argument "$bar" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget::__construct()"');
+
+        (new AutowirePass())->process($container);
+    }
+
     public function testDecorationWithServiceAndAliasedInterface()
     {
         $container = new ContainerBuilder();

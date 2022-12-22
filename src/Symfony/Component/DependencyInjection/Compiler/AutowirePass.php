@@ -128,7 +128,7 @@ class AutowirePass extends AbstractRecursivePass
                     return $this->processAttribute($attribute, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior());
                 }
 
-                $value = new TypedReference($value->getType(), $value->getType(), $value->getInvalidBehavior(), $attribute->name);
+                $value = new TypedReference($value->getType(), $value->getType(), $value->getInvalidBehavior(), $attribute->name, [$attribute]);
             }
             if ($ref = $this->getAutowiredReference($value, true)) {
                 return $ref;
@@ -332,7 +332,8 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $getValue = function () use ($type, $parameter, $class, $method) {
-                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, Target::parseName($parameter)), false)) {
+                $name = Target::parseName($parameter, $target);
+                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $name, $target ? [$target] : []), false)) {
                     $failureMessage = $this->createTypeNotFoundMessageCallback($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
 
                     if ($parameter->isDefaultValueAvailable()) {
@@ -419,6 +420,10 @@ class AutowirePass extends AbstractRecursivePass
                         return new TypedReference($name, $type, $reference->getInvalidBehavior());
                     }
                 }
+            }
+
+            if ($reference->getAttributes()) {
+                return null;
             }
         }
 
@@ -544,6 +549,9 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $message = sprintf('has type "%s" but this class %s.', $type, $parentMsg ? sprintf('is missing a parent class (%s)', $parentMsg) : 'was not found');
+        } elseif ($reference->getAttributes()) {
+            $message = $label;
+            $label = sprintf('"#[Target(\'%s\')" on', $reference->getName());
         } else {
             $alternatives = $this->createTypeAlternatives($this->container, $reference);
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';

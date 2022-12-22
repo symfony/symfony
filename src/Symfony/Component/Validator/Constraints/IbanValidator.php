@@ -102,7 +102,7 @@ class IbanValidator extends ConstraintValidator
         'MK' => 'MK\d{2}\d{3}[\dA-Z]{10}\d{2}', // Macedonia, Former Yugoslav Republic of
         'ML' => 'ML\d{2}[A-Z]{1}\d{23}', // Mali
         'MQ' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // Martinique
-        'MR' => 'MR13\d{5}\d{5}\d{11}\d{2}', // Mauritania
+        'MR' => 'MR\d{2}\d{5}\d{5}\d{11}\d{2}', // Mauritania
         'MT' => 'MT\d{2}[A-Z]{4}\d{5}[\dA-Z]{18}', // Malta
         'MU' => 'MU\d{2}[A-Z]{4}\d{2}\d{2}\d{12}\d{3}[A-Z]{3}', // Mauritius
         'MZ' => 'MZ\d{2}\d{21}', // Mozambique
@@ -127,7 +127,7 @@ class IbanValidator extends ConstraintValidator
         'SN' => 'SN\d{2}[A-Z]{1}\d{23}', // Senegal
         'TF' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // French Southern Territories
         'TL' => 'TL\d{2}\d{3}\d{14}\d{2}', // Timor-Leste
-        'TN' => 'TN59\d{2}\d{3}\d{13}\d{2}', // Tunisia
+        'TN' => 'TN\d{2}\d{2}\d{3}\d{13}\d{2}', // Tunisia
         'TR' => 'TR\d{2}\d{5}[\dA-Z]{1}[\dA-Z]{16}', // Turkey
         'UA' => 'UA\d{2}\d{6}[\dA-Z]{19}', // Ukraine
         'VA' => 'VA\d{2}\d{3}\d{15}', // Vatican City State

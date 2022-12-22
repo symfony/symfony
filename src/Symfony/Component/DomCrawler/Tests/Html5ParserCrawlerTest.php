@@ -13,7 +13,7 @@ namespace Symfony\Component\DomCrawler\Tests;
 
 class Html5ParserCrawlerTest extends AbstractCrawlerTest
 {
-    public function getDoctype(): string
+    public static function getDoctype(): string
     {
         return '<!DOCTYPE html>';
     }

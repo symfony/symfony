@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-14T16:55:48Z
+
+Less boilerplate FTW (+ newInstanceWithoutConstructor won't allow bypassing ;) )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-14T17:47:21Z
+
+Thanks to various comments, I figured out a better API for this global clock.
+
+~There is no setter anymore.~
+
+~To use a custom clock, one now has to call `Clock::with($clock, $callable, ...$arguments)`. This ensures the previous clock is restored after `$callable` has completed.~
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-12-14T19:12:17Z
+
+Do not add it to the API, please! I'm begging you! :pray: It is easy to achieve by simple wrapper when it is **really** needed.
+
+Static calls to some global state can be useful in some code, but most of the time it leads to maintenance problems and bugs. People would use it without reason if that was in the API.
+
+The feature looks like [Laravels Facades](https://laravel.com/docs/9.x/facades). Every time I've seen them used, they are used wrong. Not because the Facades are something bad, but because developers (especially not very experienced) do bad things with them. Facades are constantly overused/abused just because it is convenient, they are described in guides, and "they all do that, why I shouldn't?"
+
+The good answer to how to inject time (and other dependencies) into Doctrines' entities is repository. Repositories are the best place to provide entities, including new ones. If it's difficult in your case or doesn't suit your needs, there are many other options https://github.com/symfony/symfony/issues/48564#issuecomment-1350856072 But... **Please, do not add static calls to the API.**
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-14T21:23:55Z
+
+I plead guilty to having a `Clock` singleton class on my project. It is indeed the simplest way to replace the `new DateTime()`; even if a dependency injection properly done would be clearer.
+
+With this implementation, I don't see how I could override the current time for functional testing. I can redefine the `clock` service, but how do I override `Clock::now()`? Encapsulate the transaction like this?
+
+```php
+$client = static::createClient();
+$crawler = Clock::with($mockClock, fn() => $client->request('GET', '/'));
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-14T21:26:03Z
+
+@GromNaN you nailed it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-15T08:01:40Z
+
+~I added `Clock::get([$newClock]): ClockInterface` back since I realized that forcing a closure around might not fit all styles - eg a pre+post event listener.~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-15T08:25:16Z
+
+@upyx thanks for the feedback. I'm thinking hard about this one. At the moment, I don't really see the true downsides. Here are my thoughts:
+- I try to think about this topic in insulation from any general pattern. You mention Laravel facades, but this is not at all what we're introducing here. We're talking about something very specific: a static accessor to deal with the time. And the time is something with unique properties: it is ambient, and it cannot exist in many concurrent incarnations at the same ... time. That makes it a good candidate for something global.
+- if people have the choice between using `new DateTimeImmutable()` vs `Clock::now()`, I think some adoption is possible because there is some benefits in doing that, and the drawbacks are slim. But adding an injection point for a clock + wire it as the other designs require is very much more costly. It won't happen except in niche use cases IMHO.
+- creating a DomainClock as it was mentioned in the issue requires advanced knowledge so it will also see little adoption.
+
+A clock abstraction is supposed to help solve the time-mockability topic, and we cannot solve this topic if very few parts of time-consuming logic use the abstraction. That's why I think providing easy ways to get the clock is desired. I'm in the "let's merge" boat at the moment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-15T08:53:07Z
+
+> perhaps expect a PSR clock here
+
+I rejected this in https://github.com/symfony/symfony/pull/48642#discussion_r1048489987, but I'm now reconsidering as I realized that by adopting the PSR interface, we'd make it possible to use `Clock::now()` in low level code (think other Symfony components). Yes, symfony/clock would remain a dep in vendor/, but the clock implementation would be swappable with third parties. ~This also means that use cases that need the Symfony ClockInterface won't be able to rely on the static method.~ I suppose that can be seen as an advantage, as in: "if you need more than just now(), use proper DI."
+
+---------------------------------------------------------------------------
+
+by upyx at 2022-12-15T10:30:25Z
+
+> @upyx thanks for the feedback. I'm thinking hard about this one. At the moment, I don't really see the true downsides.
+
+@nicolas-grekas thank _you_ :slightly_smiling_face: I believe you are wise and thought twice.
+
+> A clock abstraction is supposed to help solve the time-mockability topic, and we cannot solve this topic if very few parts of time-consuming logic use the abstraction. That's why I think providing easy ways to get the clock is desired. I'm in the "let's merge" boat at the moment.
+
+Well, from that point of view, you are right. What I'm afraid of is the herd of juniors who (ab)use the static component everywhere, even if the injection is required. Just because the component exists. And I will have to deal with them. What about adding a comment in code to prefer using `ClockInterface` instead of `Clock` if it is possible?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-15T10:46:25Z
+
+@upyx good idea, note added:
+
+> Note that you should prefer injecting a ClockInterface or using
+> ClockAwareTrait when possible instead of using this class.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-19T14:00:34Z
+
+Thanks for the feedback. PR updated. It now provides integration with services + phpunit.
+
+PR description updated.

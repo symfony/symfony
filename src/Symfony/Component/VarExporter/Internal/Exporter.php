@@ -151,6 +151,7 @@ class Exporter
                 }
                 if (null !== $sleep) {
                     if (!isset($sleep[$n]) || ($i && $c !== $class)) {
+                        unset($arrayValue[$name]);
                         continue;
                     }
                     $sleep[$n] = false;
@@ -165,6 +166,9 @@ class Exporter
                         trigger_error(sprintf('serialize(): "%s" returned as member variable from __sleep() but does not exist', $n), \E_USER_NOTICE);
                     }
                 }
+            }
+            if (method_exists($class, '__unserialize')) {
+                $properties = $arrayValue;
             }
 
             prepare_value:

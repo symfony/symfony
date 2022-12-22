@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2022-11-30T14:59:41Z
+
+I like this feature (and I've needed it myself more than once ... I agree with what you said about regexes).
+
+What I don't like is "hacking" this feature as a special non-real locale. This is a convention that developers must learn, so it makes it a bit more difficult. I wonder if we could add a `removeEmojis()` method in `String` component or any other method somewhere. Thanks.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-12-18T11:03:32Z
+
+i'd still be in favor of String integration, `u($s)->stripEmoji()->toString()`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-18T13:26:11Z
+
+> i'd still be in favor of String integration, u($s)->stripEmoji()->toString()
+
+That'd be :-1: on my side. I don't see why this specific translit rule would deserve such an important place.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-12-18T14:03:28Z
+
+i assumed our removeEmoji() removed emoji, but in fact it transliterates them to codes :facepalm:  (based on https://github.com/aaronpk/emoji-detector-php)
+
+nevertheless i still think controlling the emoji at String level is nice to have

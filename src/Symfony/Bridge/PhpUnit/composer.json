@@ -28,6 +28,7 @@
         "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
     },
     "conflict": {
+        "doctrine/annotations": "<1.10",
         "phpunit/phpunit": "<7.5|9.1.2"
     },
     "autoload": {

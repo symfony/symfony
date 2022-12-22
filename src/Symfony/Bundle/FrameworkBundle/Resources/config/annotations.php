@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
@@ -23,13 +22,7 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('annotations.reader', AnnotationReader::class)
-            ->call('addGlobalIgnoredName', [
-                'required',
-                service('annotations.dummy_registry')->ignoreOnInvalid(), // dummy arg to register class_exists as annotation loader only when required
-            ])
-
-        ->set('annotations.dummy_registry', AnnotationRegistry::class)
-            ->call('registerUniqueLoader', ['class_exists'])
+            ->call('addGlobalIgnoredName', ['required'])
 
         ->set('annotations.cached_reader', PsrCachedReader::class)
             ->args([

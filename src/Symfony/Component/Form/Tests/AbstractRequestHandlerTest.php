@@ -65,7 +65,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $this->request = null;
     }
 
-    public function methodExceptGetProvider()
+    public static function methodExceptGetProvider()
     {
         return [
             ['POST'],
@@ -79,7 +79,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     {
         return array_merge([
             ['GET'],
-        ], $this->methodExceptGetProvider());
+        ], self::methodExceptGetProvider());
     }
 
     /**

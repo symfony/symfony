@@ -41,7 +41,7 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [[new NumberComparator('< 1K'), new NumberComparator('> 0.5K')], $this->toAbsolute($lessThan1KGreaterThan05K)],
+            [[new NumberComparator('< 1K'), new NumberComparator('> 0.5K')], self::toAbsolute($lessThan1KGreaterThan05K)],
         ];
     }
 }

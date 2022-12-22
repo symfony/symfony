@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-11-03T15:28:31Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.2" but it seems your PR description refers to branch "6.3".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-11-03T22:43:36Z
+
+From [php doc](https://www.php.net/manual/en/datetimeimmutable.createfromformat.php):
+> If `format` does not contain the character `!` then portions of the generated date/time which are not specified in format will be set to the current system time.
+
+It looks like we cannot change the reference date when using `DateTime::createFromFormat`. This means we cannot use the clock when `format` is specified.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-05T23:23:03Z
+
+I tried to use the new `ClockAwareTrait` from https://github.com/symfony/symfony/pull/48362, but I think we should not have `symfony/clock` as a required dependency to use this class.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-22T10:59:00Z
+
+Now that #48642 is merged, what about leveraging `Clock::get()->now()`?
+Making clock a required dep might be legit. Because this static class is just a wrapper around PSR-20, it doesn't create any strong coupling to the clock implementations in the package so it might be fine.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-22T11:16:28Z
+
+Dependency injection is simpler here since this is already a service, and this is easy to test. I don't see the benefit of the global object: that adds a required dependency to `symfony/clock` and the tests would required a call to `mockTime`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-22T14:41:04Z
+
+(tests fail)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2022-12-22T14:48:38Z
+
+Yes sorry, that's fixed.

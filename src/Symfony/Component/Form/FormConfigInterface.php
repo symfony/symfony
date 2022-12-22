@@ -66,7 +66,7 @@ interface FormConfigInterface
     /**
      * Returns the resolved form type used to construct the form.
      */
-    public function getType(): ResolvedFormTypeInterface;
+    public function getType(): ?ResolvedFormTypeInterface;
 
     /**
      * Returns the view transformers of the form.

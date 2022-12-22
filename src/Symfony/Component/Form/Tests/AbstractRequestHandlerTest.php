@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -63,6 +66,92 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $this->requestHandler = $this->getRequestHandler();
         $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
+    }
+
+    /**
+     * @dataProvider methodExceptPatchProvider
+     */
+    public function testSubmitCheckboxInCollectionFormWithEmptyData($method)
+    {
+        $form = $this->factory->create(CollectionType::class, [true, false, true], [
+            'entry_type' => CheckboxType::class,
+            'method' => $method,
+        ]);
+
+        $this->setRequestData($method, []);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertEqualsCanonicalizing([false, false, false], $form->getData());
+    }
+
+    /**
+     * @dataProvider methodExceptPatchProvider
+     */
+    public function testSubmitCheckboxInCollectionFormWithPartialData($method)
+    {
+        $form = $this->factory->create(CollectionType::class, [true, false, true], [
+            'entry_type' => CheckboxType::class,
+            'method' => $method,
+        ]);
+
+        $this->setRequestData($method, [
+            'collection' => [
+                1 => true,
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertEqualsCanonicalizing([false, true, false], $form->getData());
+    }
+
+    /**
+     * @dataProvider methodExceptPatchProvider
+     */
+    public function testSubmitCheckboxFormWithEmptyData($method)
+    {
+        $form = $this->factory->create(FormType::class, ['subform' => ['checkbox' => true]], [
+            'method' => $method,
+        ])
+            ->add('subform', FormType::class, [
+                'compound' => true,
+            ]);
+
+        $form->get('subform')
+            ->add('checkbox', CheckboxType::class);
+
+        $this->setRequestData($method, []);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertEquals(['subform' => ['checkbox' => false]], $form->getData());
+    }
+
+    /**
+     * @dataProvider methodExceptPatchProvider
+     */
+    public function testSubmitSimpleCheckboxFormWithEmptyData($method)
+    {
+        $form = $this->factory->createNamed('checkbox', CheckboxType::class, true, [
+            'method' => $method,
+        ]);
+
+        $this->setRequestData($method, []);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertFalse($form->getData());
+    }
+
+    public function methodExceptPatchProvider()
+    {
+        return [
+            ['POST'],
+            ['PUT'],
+            ['DELETE'],
+            ['GET'],
+        ];
     }
 
     public function methodExceptGetProvider()

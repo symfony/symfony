@@ -41,7 +41,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private bool $byReference = true;
     private bool $inheritData = false;
     private bool $compound = false;
-    private ResolvedFormTypeInterface $type;
+    private ?ResolvedFormTypeInterface $type = null;
     private array $viewTransformers = [];
     private array $modelTransformers = [];
     private ?DataMapperInterface $dataMapper = null;
@@ -197,7 +197,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this->compound;
     }
 
-    public function getType(): ResolvedFormTypeInterface
+    public function getType(): ?ResolvedFormTypeInterface
     {
         return $this->type;
     }

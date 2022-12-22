@@ -29,7 +29,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     protected $locked = false;
 
     private bool $disabled = false;
-    private ResolvedFormTypeInterface $type;
+    private ?ResolvedFormTypeInterface $type = null;
     private string $name;
     private array $attributes = [];
     private array $options;
@@ -453,7 +453,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Returns the form type used to construct the button.
      */
-    public function getType(): ResolvedFormTypeInterface
+    public function getType(): ?ResolvedFormTypeInterface
     {
         return $this->type;
     }

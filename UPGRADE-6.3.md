@@ -55,3 +55,9 @@ SecurityBundle
 --------------
 
  * Deprecate enabling bundle and not configuring it
+
+
+Validator
+--------------
+
+* Implementing the `ConstraintViolationInterface` without implementing the `getConstraint()` method is deprecated

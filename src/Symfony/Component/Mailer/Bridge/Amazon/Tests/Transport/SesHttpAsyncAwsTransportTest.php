@@ -112,6 +112,8 @@ class SesHttpAsyncAwsTransportTest extends TestCase
         $message = $transport->send($mail);
 
         $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getOriginalMessage()->getHeaders()->get('X-Message-ID')->getBody());
+        $this->assertSame('foobar', $message->getOriginalMessage()->getHeaders()->get('X-SES-Message-ID')->getBody());
     }
 
     public function testSendThrowsForErrorResponse()

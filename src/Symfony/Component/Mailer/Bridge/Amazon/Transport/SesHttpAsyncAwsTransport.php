@@ -65,6 +65,11 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
 
             throw $exception;
         }
+
+        if ($message->getOriginalMessage() instanceof Message) {
+            $message->getOriginalMessage()->getHeaders()->addHeader('X-Message-ID', $result->getMessageId());
+            $message->getOriginalMessage()->getHeaders()->addHeader('X-SES-Message-ID', $result->getMessageId());
+        }
     }
 
     protected function getRequest(SentMessage $message): SendEmailRequest

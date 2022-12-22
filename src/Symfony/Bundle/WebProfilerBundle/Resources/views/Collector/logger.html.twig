@@ -1,7 +1,5 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
-
 {% block toolbar %}
     {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
         {% set icon %}
@@ -163,7 +161,7 @@
                         </td>
 
                         <td class="font-normal">
-                            {{ helper.render_log_message('debug', loop.index, log) }}
+                            {{ _self.render_log_message('debug', loop.index, log) }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -177,11 +175,7 @@
         <script>Sfjs.initializeLogsTable();</script>
     {% endif %}
 
-    {% set compilerLogTotal = 0 %}
-    {% for logs in collector.compilerLogs %}
-        {% set compilerLogTotal = compilerLogTotal + logs|length %}
-    {% endfor %}
-
+    {% set compilerLogTotal = collector.compilerLogs|reduce((total, logs) => total + logs|length, 0) %}
     <details class="container-compilation-logs">
         <summary>
             <h4>Container Compilation Logs <span class="text-muted">({{ compilerLogTotal }})</span></h4>

@@ -6,8 +6,6 @@
     {%- endif -%}
 {% endmacro %}
 
-{% import _self as helper %}
-
 {% block summary %}
     <div class="status">
         <h2>Profile Search</h2>
@@ -41,14 +39,14 @@
                             <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
                         </td>
                         <td>
-                            <span class="nowrap">{{ result.ip }} {{ helper.profile_search_filter(request, result, 'ip') }}</span>
+                            <span class="nowrap">{{ result.ip }} {{ _self.profile_search_filter(request, result, 'ip') }}</span>
                         </td>
                         <td>
-                            <span class="nowrap">{{ result.method }} {{ helper.profile_search_filter(request, result, 'method') }}</span>
+                            <span class="nowrap">{{ result.method }} {{ _self.profile_search_filter(request, result, 'method') }}</span>
                         </td>
                         <td class="break-long-words">
                             {{ result.url }}
-                            {{ helper.profile_search_filter(request, result, 'url') }}
+                            {{ _self.profile_search_filter(request, result, 'url') }}
                         </td>
                         <td class="text-small">
                             <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>

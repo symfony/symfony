@@ -1,7 +1,5 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% from _self import form_tree_entry, form_tree_details %}
-
 {% block toolbar %}
     {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
         {% set status_color = collector.data.nb_errors ? 'red' %}
@@ -180,14 +178,14 @@
         <div id="tree-menu" class="tree">
             <ul>
             {% for formName, formData in collector.data.forms %}
-                {{ form_tree_entry(formName, formData, true) }}
+                {{ _self.form_tree_entry(formName, formData, true) }}
             {% endfor %}
             </ul>
         </div>
 
         <div id="tree-details-container">
             {% for formName, formData in collector.data.forms %}
-                {{ form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first) }}
+                {{ _self.form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first) }}
             {% endfor %}
         </div>
     {% else %}
@@ -416,7 +414,6 @@
 {% endblock %}
 
 {% macro form_tree_entry(name, data, is_root) %}
-    {% import _self as tree %}
     {% set has_error = data.errors is defined and data.errors|length > 0 %}
     <li>
         <div class="tree-inner" data-tab-target-id="{{ data.id }}-details" title="{{ name|default('(no name)') }}">
@@ -438,7 +435,7 @@
         {% if data.children is not empty %}
             <ul id="{{ data.id }}-children" {% if not is_root and not data.has_children_error|default(false) %}class="hidden"{% endif %}>
                 {% for childName, childData in data.children %}
-                    {{ tree.form_tree_entry(childName, childData, false) }}
+                    {{ _self.form_tree_entry(childName, childData, false) }}
                 {% endfor %}
             </ul>
         {% endif %}
@@ -446,7 +443,6 @@
 {% endmacro %}
 
 {% macro form_tree_details(name, data, forms_by_hash, show) %}
-    {% import _self as tree %}
     <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
         <h2>{{ name|default('(no name)') }}</h2>
         {% if data.type_class is defined %}
@@ -509,7 +505,7 @@
     </div>
 
     {% for childName, childData in data.children %}
-        {{ tree.form_tree_details(childName, childData, forms_by_hash) }}
+        {{ _self.form_tree_details(childName, childData, forms_by_hash) }}
     {% endfor %}
 {% endmacro %}
 

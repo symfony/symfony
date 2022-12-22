@@ -1,7 +1,5 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
-
 {% block toolbar %}
     {% if collector.messages|length > 0 %}
         {% set status_color = collector.exceptionsCount ? 'red' %}
@@ -61,8 +59,6 @@
 {% endblock %}
 
 {% block panel %}
-    {% import _self as helper %}
-
     <h2>Messages</h2>
 
     {% if collector.messages is empty %}
@@ -71,7 +67,7 @@
         </div>
     {% elseif 1 == collector.buses|length %}
         <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
-        {{ helper.render_bus_messages(collector.messages, true) }}
+        {{ _self.render_bus_messages(collector.messages, true) }}
     {% else %}
         <div class="sf-tabs message-bus">
             <div class="tab">
@@ -81,7 +77,7 @@
 
                 <div class="tab-content">
                     <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
-                    {{ helper.render_bus_messages(messages, true) }}
+                    {{ _self.render_bus_messages(messages, true) }}
                 </div>
             </div>
 
@@ -93,7 +89,7 @@
 
                     <div class="tab-content">
                         <p class="text-muted">Ordered list of messages dispatched on the <code>{{ bus }}</code> bus</p>
-                        {{ helper.render_bus_messages(messages) }}
+                        {{ _self.render_bus_messages(messages) }}
                     </div>
                 </div>
             {% endfor %}

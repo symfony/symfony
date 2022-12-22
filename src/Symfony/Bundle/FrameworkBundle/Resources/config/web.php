@@ -55,6 +55,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('controller.argument_value_resolver', ['priority' => 100])
 
         ->set('argument_resolver.datetime', DateTimeValueResolver::class)
+            ->args([
+                service('clock')->nullOnInvalid(),
+            ])
             ->tag('controller.argument_value_resolver', ['priority' => 100])
 
         ->set('argument_resolver.request_attribute', RequestAttributeValueResolver::class)

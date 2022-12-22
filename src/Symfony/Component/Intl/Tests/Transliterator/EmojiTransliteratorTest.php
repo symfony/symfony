@@ -64,6 +64,22 @@ class EmojiTransliteratorTest extends TestCase
             $specialArrowInput,
             '↔ - :left_right_arrow:',
         ];
+
+        yield [
+            'strip',
+            'un 😺, 🐈‍⬛, et a 🦁 vont au 🏞️ étoile',
+            'un , , et a  vont au  étoile',
+        ];
+        yield [
+            'strip',
+            'a 😺, 🐈‍⬛, and a 🦁 go to 🏞️... 😍 🎉 💛',
+            'a , , and a  go to ...   ',
+        ];
+        yield [
+            'strip',
+            $specialArrowInput,
+            ' - ',
+        ];
     }
 
     /**
@@ -81,6 +97,7 @@ class EmojiTransliteratorTest extends TestCase
         $file = (new Finder())
             ->in(__DIR__.'/../../Resources/data/transliterator/emoji')
             ->name('*.php')
+            ->notName('emoji-strip.php')
             ->files()
         ;
 

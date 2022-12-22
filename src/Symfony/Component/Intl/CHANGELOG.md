@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add the special `strip` locale to `EmojiTransliterator` to strip all emojis from a string
+
 6.2
 ---
 

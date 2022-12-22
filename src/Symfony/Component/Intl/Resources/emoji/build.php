@@ -21,6 +21,7 @@ $emojisCodePoints = Builder::getEmojisCodePoints();
 Builder::saveRules(Builder::buildRules($emojisCodePoints));
 Builder::saveRules(Builder::buildGitHubRules($emojisCodePoints));
 Builder::saveRules(Builder::buildSlackRules($emojisCodePoints));
+Builder::saveRules(Builder::buildStripRules($emojisCodePoints));
 
 final class Builder
 {
@@ -159,6 +160,18 @@ final class Builder
         return ['slack' => self::createRules($maps)];
     }
 
+    public static function buildStripRules(array $emojisCodePoints): iterable
+    {
+        $maps = [];
+        foreach ($emojisCodePoints as $emoji) {
+            self::testEmoji($emoji, 'strip');
+            $codePointsCount = mb_strlen($emoji);
+            $maps[$codePointsCount][$emoji] = '';
+        }
+
+        return ['strip' => self::createRules($maps)];
+    }
+
     public static function cleanTarget(): void
     {
         $fs = new Filesystem();
@@ -181,7 +194,7 @@ final class Builder
                 $firstChars[$c] = $c;
             }
 
-            if (':' === $v[0]) {
+            if (':' === ($v[0] ?? null)) {
                 file_put_contents(self::TARGET_DIR."/$locale-emoji.php", "<?php\n\nreturn ".VarExporter::export(array_flip($rules)).";\n");
             }
         }

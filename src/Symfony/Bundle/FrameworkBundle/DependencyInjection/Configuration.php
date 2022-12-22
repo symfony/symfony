@@ -1202,6 +1202,8 @@ class Configuration implements ConfigurationInterface
                                 return $v;
                             }
 
+                            trigger_deprecation('symfony/framework-bundle', '6.3', '"framework:exceptions" tag is deprecated. Unwrap it and replace your "framework:exception" tags\' "name" attribute by "class".');
+
                             $v = $v['exception'];
                             unset($v['exception']);
 

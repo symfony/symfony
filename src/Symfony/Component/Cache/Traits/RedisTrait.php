@@ -198,7 +198,7 @@ trait RedisTrait
                         break;
                     }
 
-                    $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout']);
+                    $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...\defined('Redis::OPT_NULL_MULTIBULK_AS_NULL') ? [$params['auth'] ?? ''] : []);
 
                     if ($address = $sentinel->getMasterAddrByName($params['redis_sentinel'])) {
                         [$host, $port] = $address;
@@ -210,7 +210,10 @@ trait RedisTrait
                 }
 
                 try {
-                    @$redis->{$connect}($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...\defined('Redis::SCAN_PREFIX') ? [['stream' => $params['ssl'] ?? null]] : []);
+                    @$redis->{$connect}($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...\defined('Redis::SCAN_PREFIX') ? [[
+                        'auth' => $params['auth'] ?? '',
+                        'stream' => $params['ssl'] ?? null,
+                    ]] : []);
 
                     set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
                     try {

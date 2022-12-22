@@ -235,6 +235,8 @@ class VarExporterTest extends TestCase
 
         yield ['php74-serializable', new Php74Serializable()];
 
+        yield ['__unserialize-but-no-__serialize', new __UnserializeButNo__Serialize()];
+
         if (\PHP_VERSION_ID < 80100) {
             return;
         }
@@ -442,4 +444,19 @@ class Php74Serializable implements \Serializable
 #[\AllowDynamicProperties]
 class ArrayObject extends \ArrayObject
 {
+}
+
+class __UnserializeButNo__Serialize
+{
+    public $foo;
+
+    public function __construct()
+    {
+        $this->foo = 'ccc';
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->foo = $data['foo'];
+    }
 }

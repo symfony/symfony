@@ -19,7 +19,7 @@ use Symfony\Component\DomCrawler\Link;
 
 abstract class AbstractCrawlerTest extends TestCase
 {
-    abstract public function getDoctype(): string;
+    abstract public static function getDoctype(): string;
 
     protected function createCrawler($node = null, string $uri = null, string $baseHref = null)
     {

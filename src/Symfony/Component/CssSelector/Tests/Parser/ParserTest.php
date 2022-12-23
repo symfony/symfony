@@ -138,6 +138,16 @@ class ParserTest extends TestCase
             ['div:not(div.foo)', ['Negation[Element[div]:not(Class[Element[div].foo])]']],
             ['td ~ th', ['CombinedSelector[Element[td] ~ Element[th]]']],
             ['.foo[data-bar][data-baz=0]', ["Attribute[Attribute[Class[Element[*].foo][data-bar]][data-baz = '0']]"]],
+            ['div#foo\.bar', ['Hash[Element[div]#foo.bar]']],
+            ['div.w-1\/3', ['Class[Element[div].w-1/3]']],
+            ['#test\:colon', ['Hash[Element[*]#test:colon]']],
+            [".a\xc1b", ["Class[Element[*].a\xc1b]"]],
+            // unicode escape: \22 == "
+            ['*[aval="\'\22\'"]', ['Attribute[Element[*][aval = \'\'"\'\']]']],
+            ['*[aval="\'\22 2\'"]', ['Attribute[Element[*][aval = \'\'"2\'\']]']],
+            // unicode escape: \20 ==  (space)
+            ['*[aval="\'\20  \'"]', ['Attribute[Element[*][aval = \'\'  \'\']]']],
+            ["*[aval=\"'\\20\r\n '\"]", ['Attribute[Element[*][aval = \'\'  \'\']]']],
         ];
     }
 

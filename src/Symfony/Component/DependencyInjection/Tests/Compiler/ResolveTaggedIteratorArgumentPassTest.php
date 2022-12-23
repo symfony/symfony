@@ -54,4 +54,36 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
         $expected->setValues(['1' => new TypedReference('service_a', 'stdClass'), '2' => new TypedReference('service_b', 'stdClass')]);
         $this->assertEquals($expected, $properties['foos']);
     }
+
+    public function testProcesWithAutoExcludeReferencingService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service_a', 'stdClass')->addTag('foo', ['key' => '1']);
+        $container->register('service_b', 'stdClass')->addTag('foo', ['key' => '2']);
+        $container->register('service_c', 'stdClass')->addTag('foo', ['key' => '3'])->setProperty('foos', new TaggedIteratorArgument('foo', 'key'));
+
+        (new ResolveTaggedIteratorArgumentPass())->process($container);
+
+        $properties = $container->getDefinition('service_c')->getProperties();
+
+        $expected = new TaggedIteratorArgument('foo', 'key');
+        $expected->setValues(['1' => new TypedReference('service_a', 'stdClass'), '2' => new TypedReference('service_b', 'stdClass')]);
+        $this->assertEquals($expected, $properties['foos']);
+    }
+
+    public function testProcesWithoutAutoExcludeReferencingService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service_a', 'stdClass')->addTag('foo', ['key' => '1']);
+        $container->register('service_b', 'stdClass')->addTag('foo', ['key' => '2']);
+        $container->register('service_c', 'stdClass')->addTag('foo', ['key' => '3'])->setProperty('foos', new TaggedIteratorArgument(tag: 'foo', indexAttribute: 'key', excludeSelf: false));
+
+        (new ResolveTaggedIteratorArgumentPass())->process($container);
+
+        $properties = $container->getDefinition('service_c')->getProperties();
+
+        $expected = new TaggedIteratorArgument(tag: 'foo', indexAttribute: 'key', excludeSelf: false);
+        $expected->setValues(['1' => new TypedReference('service_a', 'stdClass'), '2' => new TypedReference('service_b', 'stdClass'),  '3' => new TypedReference('service_c', 'stdClass')]);
+        $this->assertEquals($expected, $properties['foos']);
+    }
 }

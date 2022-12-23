@@ -88,11 +88,11 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if ($value instanceof TaggedIterator) {
-            return new TaggedIteratorArgument($value->tag, $value->indexAttribute, $value->defaultIndexMethod, false, $value->defaultPriorityMethod, (array) $value->exclude);
+            return new TaggedIteratorArgument($value->tag, $value->indexAttribute, $value->defaultIndexMethod, false, $value->defaultPriorityMethod, (array) $value->exclude, $value->excludeSelf);
         }
 
         if ($value instanceof TaggedLocator) {
-            return new ServiceLocatorArgument(new TaggedIteratorArgument($value->tag, $value->indexAttribute, $value->defaultIndexMethod, true, $value->defaultPriorityMethod, (array) $value->exclude));
+            return new ServiceLocatorArgument(new TaggedIteratorArgument($value->tag, $value->indexAttribute, $value->defaultIndexMethod, true, $value->defaultPriorityMethod, (array) $value->exclude, $value->excludeSelf));
         }
 
         if ($value instanceof MapDecorated) {

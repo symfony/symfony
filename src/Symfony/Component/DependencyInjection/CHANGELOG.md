@@ -24,6 +24,8 @@ CHANGELOG
  * Deprecate using numeric parameter names
  * Add support for tagged iterators/locators `exclude` option to the xml and yaml loaders/dumpers
  * Allow injecting `string $env` into php config closures
+ * Add `excludeSelf` parameter to `TaggedIteratorArgument` with default value to `true`
+   to control whether the referencing service should be automatically excluded from the iterator
 
 6.1
 ---

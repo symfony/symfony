@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+6.3
+---
+
+* Added supporting raw data for `cafile`, `localCert` and `localPk` options
 
 6.2
 ---

@@ -121,6 +121,21 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_CERTINFO => $options['capture_peer_cert_chain'],
         ];
 
+        if (null !== $options['cafile'] && false === is_file($options['cafile']) && \defined('CURLOPT_CAINFO_BLOB')) {
+            $curlopts[\CURLOPT_CAINFO] = null;
+            $curlopts[\CURLOPT_CAINFO_BLOB] = $options['cafile'];
+        }
+
+        if (null !== $options['local_cert'] && false === is_file($options['local_cert'])) {
+            $curlopts[\CURLOPT_SSLCERT] = null;
+            $curlopts[\CURLOPT_SSLCERT_BLOB] = $options['local_cert'];
+        }
+
+        if (null !== $options['local_pk'] && false === is_file($options['local_pk'])) {
+            $curlopts[\CURLOPT_SSLKEY] = null;
+            $curlopts[\CURLOPT_SSLKEY_BLOB] = $options['local_pk'];
+        }
+
         if (1.0 === (float) $options['http_version']) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_0;
         } elseif (1.1 === (float) $options['http_version']) {
@@ -467,7 +482,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_CAPATH => 'capath',
             \CURLOPT_SSL_CIPHER_LIST => 'ciphers',
             \CURLOPT_SSLCERT => 'local_cert',
+            \CURLOPT_SSLCERT_BLOB => 'local_cert',
             \CURLOPT_SSLKEY => 'local_pk',
+            \CURLOPT_SSLKEY_BLOB => 'local_pk',
             \CURLOPT_KEYPASSWD => 'passphrase',
             \CURLOPT_CERTINFO => 'capture_peer_cert_chain',
             \CURLOPT_USERAGENT => 'normalized_headers',

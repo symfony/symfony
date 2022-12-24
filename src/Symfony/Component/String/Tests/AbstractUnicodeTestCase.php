@@ -546,6 +546,16 @@ END'],
         );
     }
 
+    public static function provideKebab()
+    {
+        return array_merge(
+            parent::provideKebab(),
+            [
+                ['symfony-ist-äußerst-cool', 'symfonyIstÄußerstCool'],
+            ]
+        );
+    }
+
     public static function provideEqualsTo()
     {
         return array_merge(

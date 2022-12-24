@@ -214,6 +214,14 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
+    public function kebab(): static
+    {
+        $str = $this->camel();
+        $str->string = mb_strtolower(preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1-\2', $str->string), 'UTF-8');
+
+        return $str;
+    }
+
     public function lower(): static
     {
         $str = clone $this;

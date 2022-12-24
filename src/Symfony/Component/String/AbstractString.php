@@ -390,6 +390,8 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $this->string;
     }
 
+    abstract public function kebab(): static;
+
     abstract public function length(): int;
 
     abstract public function lower(): static;

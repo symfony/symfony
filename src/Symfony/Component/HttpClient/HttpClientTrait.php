@@ -151,9 +151,9 @@ trait HttpClientTrait
         $optionsWithRawVersion = ['cafile', 'local_cert', 'local_pk'];
 
         foreach ($optionsWithRawVersion as $option) {
-            $rawVersion = \sprintf('%s_raw', $option);
+            $rawVersion = sprintf('%s_raw', $option);
             if (isset($options[$option], $options[$rawVersion])) {
-                throw new InvalidArgumentException(\sprintf('Define either the "%s" or the "%s" option, setting both is not supported.', $option, $rawVersion));
+                throw new InvalidArgumentException(sprintf('Define either the "%s" or the "%s" option, setting both is not supported.', $option, $rawVersion));
             }
         }
 

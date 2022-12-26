@@ -54,15 +54,15 @@ class HttpClientTraitTest extends TestCase
         $defaults = [
             'base_uri' => 'http://example.com?c=c',
             'query' => ['a' => 1, 'b' => 'b'],
-            'body' => []
+            'body' => [],
         ];
         [, $defaults] = self::prepareRequest(null, null, $defaults);
 
         [,$options] = self::prepareRequest(null, 'http://example.com', [
             'body' => [1, 2],
             'headers' => [
-                'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8'
-            ]
+                'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8',
+            ],
         ], $defaults);
 
         $this->assertContains('Content-Type: application/x-www-form-urlencoded; charset=utf-8', $options['headers']);
@@ -236,7 +236,6 @@ class HttpClientTraitTest extends TestCase
         yield 'Set both "local_pk" and "local_pk_raw"' => [['local_pk' => 'foo', 'local_pk_raw' => 'bar']];
         yield 'Set both "json" and "body"' => [['json' => ['foo' => 'bar'], 'body' => '<html/>']];
         yield 'Set both "auth_basic" and "auth_bearer"' => [['auth_basic' => 'foo:bar', 'auth_bearer' => 'foo']];
-
     }
 
     /**
@@ -245,7 +244,7 @@ class HttpClientTraitTest extends TestCase
     public function testSetMutualExclusiveOptions(array $options)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('Define either the "%s" or the "%s" option, setting both is not supported.', ...\array_keys($options)));
+        $this->expectExceptionMessage(sprintf('Define either the "%s" or the "%s" option, setting both is not supported.', ...array_keys($options)));
         self::prepareRequest('POST', 'http://example.com', $options, HttpClientInterface::OPTIONS_DEFAULTS);
     }
 

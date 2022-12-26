@@ -285,11 +285,16 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getDoctrine_EntityManagerService()
     {
-        $a = new \stdClass();
-        $a->resolver = ($this->services['doctrine.entity_listener_resolver'] ?? $this->getDoctrine_EntityListenerResolverService());
-        $a->flag = 'ok';
+        $a = ($this->services['doctrine.entity_listener_resolver'] ?? $this->getDoctrine_EntityListenerResolverService());
 
-        return $this->services['doctrine.entity_manager'] = \FactoryChecker::create($a);
+        if (isset($this->services['doctrine.entity_manager'])) {
+            return $this->services['doctrine.entity_manager'];
+        }
+        $b = new \stdClass();
+        $b->resolver = $a;
+        $b->flag = 'ok';
+
+        return $this->services['doctrine.entity_manager'] = \FactoryChecker::create($b);
     }
 
     /**
@@ -299,7 +304,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getDoctrine_ListenerService()
     {
-        return $this->services['doctrine.listener'] = new \stdClass(($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService()));
+        $a = ($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService());
+
+        if (isset($this->services['doctrine.listener'])) {
+            return $this->services['doctrine.listener'];
+        }
+
+        return $this->services['doctrine.listener'] = new \stdClass($a);
     }
 
     /**
@@ -495,7 +506,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getMailer_TransportService()
     {
-        return $this->services['mailer.transport'] = ($this->services['mailer.transport_factory'] ?? $this->getMailer_TransportFactoryService())->create();
+        $a = ($this->services['mailer.transport_factory'] ?? $this->getMailer_TransportFactoryService());
+
+        if (isset($this->services['mailer.transport'])) {
+            return $this->services['mailer.transport'];
+        }
+
+        return $this->services['mailer.transport'] = $a->create();
     }
 
     /**
@@ -518,7 +535,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getMailer_TransportFactory_AmazonService()
     {
-        return $this->services['mailer.transport_factory.amazon'] = new \stdClass(($this->services['monolog.logger_2'] ?? $this->getMonolog_Logger2Service()));
+        $a = ($this->services['monolog.logger_2'] ?? $this->getMonolog_Logger2Service());
+
+        if (isset($this->services['mailer.transport_factory.amazon'])) {
+            return $this->services['mailer.transport_factory.amazon'];
+        }
+
+        return $this->services['mailer.transport_factory.amazon'] = new \stdClass($a);
     }
 
     /**

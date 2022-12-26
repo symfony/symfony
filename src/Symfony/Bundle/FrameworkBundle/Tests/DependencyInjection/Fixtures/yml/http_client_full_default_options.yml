@@ -14,9 +14,12 @@ framework:
             verify_peer: true
             verify_host: true
             cafile: /etc/ssl/cafile
+            cafile_raw: null
             capath: /etc/ssl
             local_cert: /etc/ssl/cert.pem
+            local_cert_raw: null
             local_pk: /etc/ssl/private_key.pem
+            local_pk_raw: null
             passphrase: password123456
             ciphers: 'RC4-SHA:TLS13-AES-128-GCM-SHA256'
             peer_fingerprint:

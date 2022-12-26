@@ -631,9 +631,12 @@
         <xsd:attribute name="verify-peer" type="xsd:boolean" />
         <xsd:attribute name="verify-host" type="xsd:boolean" />
         <xsd:attribute name="cafile" type="xsd:string" />
+        <xsd:attribute name="cafile-raw" type="xsd:string" />
         <xsd:attribute name="capath" type="xsd:string" />
         <xsd:attribute name="local-cert" type="xsd:string" />
+        <xsd:attribute name="local-cert-raw" type="xsd:string" />
         <xsd:attribute name="local-pk" type="xsd:string" />
+        <xsd:attribute name="local-pk-raw" type="xsd:string" />
         <xsd:attribute name="passphrase" type="xsd:string" />
         <xsd:attribute name="ciphers" type="xsd:string" />
     </xsd:complexType>

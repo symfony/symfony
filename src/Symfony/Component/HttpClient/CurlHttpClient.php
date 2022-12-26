@@ -128,7 +128,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         ];
 
         foreach ($optionsWithRawVersion as $option => $curlopt) {
-            if (null !== $options[$option] && \defined($curlopt)) {
+            if (isset($options[$option]) && \defined($curlopt)) {
                 $curlopts[\constant($curlopt)] = $options[$option];
             }
         }

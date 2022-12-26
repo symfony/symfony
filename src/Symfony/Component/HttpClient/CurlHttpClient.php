@@ -121,19 +121,16 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_CERTINFO => $options['capture_peer_cert_chain'],
         ];
 
-        if (null !== $options['cafile'] && false === is_file($options['cafile']) && \defined('CURLOPT_CAINFO_BLOB')) {
-            $curlopts[\CURLOPT_CAINFO] = null;
-            $curlopts[\CURLOPT_CAINFO_BLOB] = $options['cafile'];
-        }
+        $optionsWithRawVersion = [
+            'cafile_raw' => 'CURLOPT_CAINFO_BLOB',
+            'local_cert_raw' => 'CURLOPT_SSLCERT_BLOB',
+            'local_pk_raw' => 'CURLOPT_SSLKEY_BLOB',
+        ];
 
-        if (null !== $options['local_cert'] && false === is_file($options['local_cert'])) {
-            $curlopts[\CURLOPT_SSLCERT] = null;
-            $curlopts[\CURLOPT_SSLCERT_BLOB] = $options['local_cert'];
-        }
-
-        if (null !== $options['local_pk'] && false === is_file($options['local_pk'])) {
-            $curlopts[\CURLOPT_SSLKEY] = null;
-            $curlopts[\CURLOPT_SSLKEY_BLOB] = $options['local_pk'];
+        foreach ($optionsWithRawVersion as $option => $curlopt) {
+            if (null !== $options[$option] && \defined($curlopt)) {
+                $curlopts[\constant($curlopt)] = $options[$option];
+            }
         }
 
         if (1.0 === (float) $options['http_version']) {
@@ -482,9 +479,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_CAPATH => 'capath',
             \CURLOPT_SSL_CIPHER_LIST => 'ciphers',
             \CURLOPT_SSLCERT => 'local_cert',
-            \CURLOPT_SSLCERT_BLOB => 'local_cert',
             \CURLOPT_SSLKEY => 'local_pk',
-            \CURLOPT_SSLKEY_BLOB => 'local_pk',
             \CURLOPT_KEYPASSWD => 'passphrase',
             \CURLOPT_CERTINFO => 'capture_peer_cert_chain',
             \CURLOPT_USERAGENT => 'normalized_headers',
@@ -494,12 +489,18 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_PROGRESSFUNCTION => 'on_progress',
         ];
 
-        if (\defined('CURLOPT_UNIX_SOCKET_PATH')) {
-            $curloptsToConfig[\CURLOPT_UNIX_SOCKET_PATH] = 'bindto';
-        }
+        $versionDependentCurloptsToOptionsMap = [
+            'CURLOPT_CAINFO_RAW' => 'cafile_raw',
+            'CURLOPT_PINNEDPUBLICKEY' => 'peer_fingerprint',
+            'CURLOPT_SSLCERT_BLOB' => 'local_cert_raw',
+            'CURLOPT_SSLKEY_BLOB' => 'local_pk_raw',
+            'CURLOPT_UNIX_SOCKET_PATH' => 'bindto',
+        ];
 
-        if (\defined('CURLOPT_PINNEDPUBLICKEY')) {
-            $curloptsToConfig[\CURLOPT_PINNEDPUBLICKEY] = 'peer_fingerprint';
+        foreach ($versionDependentCurloptsToOptionsMap as $versionDependentCurlopt => $option) {
+            if (\defined($versionDependentCurlopt)) {
+                $curloptsToConfig[\constant($versionDependentCurlopt)] = $option;
+            }
         }
 
         $curloptsToCheck = [

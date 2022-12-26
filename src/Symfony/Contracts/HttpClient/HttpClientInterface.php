@@ -59,9 +59,12 @@ interface HttpClientInterface
         'verify_peer' => true,  // see https://php.net/context.ssl for the following options
         'verify_host' => true,
         'cafile' => null,
+        'cafile_raw' => null,
         'capath' => null,
         'local_cert' => null,
+        'local_cert_raw' => null,
         'local_pk' => null,
+        'local_pk_raw' => null,
         'passphrase' => null,
         'ciphers' => null,
         'peer_fingerprint' => null,

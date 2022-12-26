@@ -148,6 +148,15 @@ trait HttpClientTrait
             throw new InvalidArgumentException('Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.');
         }
 
+        $optionsWithRawVersion = ['cafile', 'local_cert', 'local_pk'];
+
+        foreach ($optionsWithRawVersion as $option) {
+            $rawVersion = \sprintf('%s_raw', $option);
+            if (isset($options[$option], $options[$rawVersion])) {
+                throw new InvalidArgumentException(\sprintf('Define either the "%s" or the "%s" option, setting both is not supported.', $option, $rawVersion));
+            }
+        }
+
         if (null !== $url) {
             // Merge auth with headers
             if (($options['auth_basic'] ?? false) && !($options['normalized_headers']['authorization'] ?? false)) {

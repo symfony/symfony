@@ -229,18 +229,24 @@ class HttpClientTraitTest extends TestCase
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => "a\nb"], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    public function testSetAuthBasicAndBearerOptions()
+    public function provideMutualExclusiveOptions(): iterable
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.');
-        self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
+        yield 'Set both "cafile" and "cafile_raw"' => [['cafile' => 'foo', 'cafile_raw' => 'bar']];
+        yield 'Set both "local_cert" and "local_cert_raw"' => [['local_cert' => 'foo', 'local_cert_raw' => 'bar']];
+        yield 'Set both "local_pk" and "local_pk_raw"' => [['local_pk' => 'foo', 'local_pk_raw' => 'bar']];
+        yield 'Set both "json" and "body"' => [['json' => ['foo' => 'bar'], 'body' => '<html/>']];
+        yield 'Set both "auth_basic" and "auth_bearer"' => [['auth_basic' => 'foo:bar', 'auth_bearer' => 'foo']];
+
     }
 
-    public function testSetJSONAndBodyOptions()
+    /**
+     * @dataProvider provideMutualExclusiveOptions
+     */
+    public function testSetMutualExclusiveOptions(array $options)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Define either the "json" or the "body" option, setting both is not supported');
-        self::prepareRequest('POST', 'http://example.com', ['json' => ['foo' => 'bar'], 'body' => '<html/>'], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->expectExceptionMessage(\sprintf('Define either the "%s" or the "%s" option, setting both is not supported.', ...\array_keys($options)));
+        self::prepareRequest('POST', 'http://example.com', $options, HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
     public function providePrepareAuthBasic()

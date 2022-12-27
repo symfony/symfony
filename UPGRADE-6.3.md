@@ -107,6 +107,13 @@ SecurityBundle
  * Deprecate enabling bundle and not configuring it
  * Deprecate the `security.firewalls.logout.csrf_token_generator` config option, use `security.firewalls.logout.csrf_token_manager` instead
 
+Serializer
+----------
+
+* Deprecate datetime constructor as a fallback whenever the `DateTimeNormalizer`
+  default format mismatches. Use the `DateTimeNormalizer::FORMAT_AUTO` when
+  denormalizing to explicitly rely on the PHP datetime constructor instead.
+
 Validator
 ---------
 

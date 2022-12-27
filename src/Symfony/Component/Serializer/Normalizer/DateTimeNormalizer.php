@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 /**
@@ -26,6 +27,10 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     public const FORMAT_KEY = 'datetime_format';
+    /**
+     * Use this value as the `datetime_format` to use the datetime constructor when denormalizing.
+     */
+    public const FORMAT_AUTO = 'auto';
     public const TIMEZONE_KEY = 'datetime_timezone';
 
     private $defaultContext = [
@@ -46,6 +51,10 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     public function setDefaultContext(array $defaultContext): void
     {
+        if (($defaultContext[self::FORMAT_KEY] ?? null) === self::FORMAT_AUTO) {
+            throw new LogicException(sprintf('The "%s" format cannot is not supported in the default "%s" context key. Use this format on specific context when denormalizing.', self::FORMAT_AUTO, self::FORMAT_KEY));
+        }
+
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
@@ -70,6 +79,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
 
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY];
+
+        if (self::FORMAT_AUTO === $dateTimeFormat) {
+            throw new LogicException(sprintf('The "%s" format cannot is not supported in the "%s" context key when normalizing. Use this format on specific context when denormalizing.', self::FORMAT_AUTO, self::FORMAT_KEY));
+        }
+
         $timezone = $this->getTimezone($context);
 
         if (null !== $timezone) {
@@ -101,6 +115,17 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
 
         if (null !== $dateTimeFormat) {
+            // If we specifically asked for the auto format on denormalization context:
+            if (self::FORMAT_AUTO === $dateTimeFormat) {
+                try {
+                    // use the constructor to create the DateTime object:
+                    return \DateTime::class === $type ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
+                } catch (\Exception $e) {
+                    throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
+                }
+            }
+
+            // Otherwise, use the provided format:
             $object = \DateTime::class === $type ? \DateTime::createFromFormat($dateTimeFormat, $data, $timezone) : \DateTimeImmutable::createFromFormat($dateTimeFormat, $data, $timezone);
 
             if (false !== $object) {
@@ -121,7 +146,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
                 return $object;
             }
 
-            trigger_deprecation('symfony/serializer', '6.2', 'Relying on a datetime constructor as a fallback when using a specific default date format (`datetime_format`) for the DateTimeNormalizer is deprecated. Respect the "%s" default format.', $defaultDateTimeFormat);
+            // TODO: Throw a NotNormalizableValueException exception in Symfony 7.0+ instead of the deprecation:
+            // $dateTimeErrors = \DateTime::class === $type ? \DateTime::getLastErrors() : \DateTimeImmutable::getLastErrors();
+            // throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Parsing datetime string "%s" using format "%s" resulted in %d errors: ', $data, $defaultDateTimeFormat, $dateTimeErrors['error_count'])."\n".implode("\n", $this->formatDateTimeErrors($dateTimeErrors['errors'])), $data, [Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+
+            trigger_deprecation('symfony/serializer', '6.3', 'Relying on a datetime constructor as a fallback when using a specific default date format (`datetime_format`) for the DateTimeNormalizer is deprecated. Respect the "%s" default format or use the "auto" format in denormalization context.', $defaultDateTimeFormat);
         }
 
         try {

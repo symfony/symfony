@@ -57,6 +57,11 @@ class DateTimeNormalizerContextBuilderTest extends TestCase
             DateTimeNormalizer::FORMAT_KEY => null,
             DateTimeNormalizer::TIMEZONE_KEY => null,
         ]];
+
+        yield 'With auto format' => [[
+            DateTimeNormalizer::FORMAT_KEY => DateTimeNormalizer::FORMAT_KEY,
+            DateTimeNormalizer::TIMEZONE_KEY => null,
+        ]];
     }
 
     public function testCastTimezoneStringToTimezone()

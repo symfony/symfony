@@ -36,6 +36,16 @@ final class DateTimeNormalizerContextBuilder implements ContextBuilderInterface
     }
 
     /**
+     * Configures the denormalization format of the date to use PHP datetime construct.
+     *
+     * @see https://www.php.net/manual/en/datetime.construct.php
+     */
+    public function withAutoDenormalizationFormat(): static
+    {
+        return $this->with(DateTimeNormalizer::FORMAT_KEY, DateTimeNormalizer::FORMAT_AUTO);
+    }
+
+    /**
      * Configures the timezone of the date.
      *
      * It could be either a \DateTimeZone or a string

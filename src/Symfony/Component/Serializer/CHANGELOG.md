@@ -23,6 +23,7 @@ CHANGELOG
    * `ObjectNormalizer`
    * `PropertyNormalizer`
  * Deprecate datetime constructor as a fallback whenever the `DateTimeNormalizer` default format mismatches
+ * Add `DateTimeNormalizer::FORMAT_AUTO` to denormalize datetime objects using the PHP datetime constructor
 
 6.2
 ---

@@ -4,6 +4,7 @@ CHANGELOG
 6.3
 ---
 
+ * Add `extra` option for `http_client.default_options` and `http_client.scoped_client`
  * Add `DomCrawlerAssertionsTrait::assertSelectorCount(int $count, string $selector)`
  * Allow to avoid `limit` definition in a RateLimiter configuration when using the `no_limit` policy
  * Add `--format` option to the `debug:config` command

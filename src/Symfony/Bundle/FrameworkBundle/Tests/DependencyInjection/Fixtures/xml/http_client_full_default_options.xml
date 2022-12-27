@@ -30,6 +30,11 @@
                     <framework:pin-sha256>jsda84hjtyd4821bgfesd215bsfg5412=</framework:pin-sha256>
                     <framework:md5>sdhtb481248721thbr=</framework:md5>
                 </framework:peer-fingerprint>
+                <framework:extra>
+                    <framework:foo>
+                        <framework:bar>baz</framework:bar>
+                    </framework:foo>
+                </framework:extra>
             </framework:default-options>
         </framework:http-client>
     </framework:config>

@@ -200,7 +200,7 @@ class DeprecationErrorHandler
         // store failing status
         $isFailing = !$configuration->tolerates($this->deprecationGroups);
 
-        $this->displayDeprecations($groups, $configuration, $isFailing);
+        $this->displayDeprecations($groups, $configuration);
 
         $this->resetDeprecationGroups();
 
@@ -213,7 +213,7 @@ class DeprecationErrorHandler
             }
 
             $isFailingAtShutdown = !$configuration->tolerates($this->deprecationGroups);
-            $this->displayDeprecations($groups, $configuration, $isFailingAtShutdown);
+            $this->displayDeprecations($groups, $configuration);
 
             if ($configuration->isGeneratingBaseline()) {
                 $configuration->writeBaseline();
@@ -289,11 +289,10 @@ class DeprecationErrorHandler
     /**
      * @param string[]      $groups
      * @param Configuration $configuration
-     * @param bool          $isFailing
      *
      * @throws \InvalidArgumentException
      */
-    private function displayDeprecations($groups, $configuration, $isFailing)
+    private function displayDeprecations($groups, $configuration)
     {
         $cmp = function ($a, $b) {
             return $b->count() - $a->count();
@@ -320,7 +319,8 @@ class DeprecationErrorHandler
                     fwrite($handle, "\n".self::colorize($deprecationGroupMessage, 'legacy' !== $group && 'indirect' !== $group)."\n");
                 }
 
-                if ('legacy' !== $group && !$configuration->verboseOutput($group) && !$isFailing) {
+                // Skip the verbose output if the group is quiet and not failing according to its threshold:
+                if ('legacy' !== $group && !$configuration->verboseOutput($group) && $configuration->toleratesForGroup($group, $this->deprecationGroups)) {
                     continue;
                 }
                 $notices = $this->deprecationGroups[$group]->notices();

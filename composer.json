@@ -128,7 +128,7 @@
         "doctrine/collections": "^1.0|^2.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^2.13.1|^3.0",
-        "doctrine/orm": "^2.7.4",
+        "doctrine/orm": "^2.12",
         "egulias/email-validator": "^2.1.10|^3.1",
         "guzzlehttp/promises": "^1.4",
         "league/html-to-markdown": "^5.0",

@@ -304,6 +304,16 @@ class Wither
     }
 }
 
+final class WitherConsumer
+{
+    public $wither;
+
+    public function __construct(Wither $wither)
+    {
+        $this->wither = $wither;
+    }
+}
+
 class SetterInjectionParent
 {
     /** @required*/

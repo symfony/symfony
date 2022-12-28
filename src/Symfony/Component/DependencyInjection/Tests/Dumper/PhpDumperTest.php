@@ -42,6 +42,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
+use Symfony\Component\DependencyInjection\Tests\Compiler\WitherConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
@@ -1456,6 +1457,34 @@ PHP
 
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
+    }
+
+    public function testWitherPrivate()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', Wither::class)
+            ->setPublic(false)
+            ->setAutowired(true)
+        ;
+
+        $container
+            ->register('wither_consumer', WitherConsumer::class)
+            ->setPublic(true)
+            ->addArgument(new Reference('wither'));
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_WitherPrivate']);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_wither_private.php', $dump);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Service_WitherPrivate();
+
+        $witherConsumer = $container->get('wither_consumer');
+        $this->assertInstanceOf(Foo::class, $witherConsumer->wither->foo);
     }
 
     /**

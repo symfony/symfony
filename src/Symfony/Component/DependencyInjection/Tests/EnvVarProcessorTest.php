@@ -744,12 +744,15 @@ CSV;
 
     public function testEnvLoader()
     {
+        $_ENV['BAZ_ENV_LOADER'] = '';
+
         $loaders = function () {
             yield new class() implements EnvVarLoaderInterface {
                 public function loadEnvVars(): array
                 {
                     return [
                         'FOO_ENV_LOADER' => '123',
+                        'BAZ_ENV_LOADER' => '',
                     ];
                 }
             };
@@ -760,6 +763,7 @@ CSV;
                     return [
                         'FOO_ENV_LOADER' => '234',
                         'BAR_ENV_LOADER' => '456',
+                        'BAZ_ENV_LOADER' => '567',
                     ];
                 }
             };
@@ -773,8 +777,13 @@ CSV;
         $result = $processor->getEnv('string', 'BAR_ENV_LOADER', function () {});
         $this->assertSame('456', $result);
 
+        $result = $processor->getEnv('string', 'BAZ_ENV_LOADER', function () {});
+        $this->assertSame('567', $result);
+
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
         $this->assertSame('123', $result); // check twice
+
+        unset($_ENV['BAZ_ENV_LOADER']);
     }
 
     public function testCircularEnvLoader()

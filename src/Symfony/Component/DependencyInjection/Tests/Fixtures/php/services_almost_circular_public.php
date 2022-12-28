@@ -289,7 +289,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getDoctrine_EntityManagerService($container)
     {
-        $a = ($container->services['doctrine.entity_listener_resolver'] ?? $container->getDoctrine_EntityListenerResolverService());
+        $a = ($container->services['doctrine.entity_listener_resolver'] ?? self::getDoctrine_EntityListenerResolverService());
 
         if (isset($container->services['doctrine.entity_manager'])) {
             return $container->services['doctrine.entity_manager'];
@@ -308,7 +308,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getDoctrine_ListenerService($container)
     {
-        $a = ($container->services['doctrine.entity_manager'] ?? $container->getDoctrine_EntityManagerService());
+        $a = ($container->services['doctrine.entity_manager'] ?? self::getDoctrine_EntityManagerService());
 
         if (isset($container->services['doctrine.listener'])) {
             return $container->services['doctrine.listener'];
@@ -510,7 +510,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMailer_TransportService($container)
     {
-        $a = ($container->services['mailer.transport_factory'] ?? $container->getMailer_TransportFactoryService());
+        $a = ($container->services['mailer.transport_factory'] ?? self::getMailer_TransportFactoryService());
 
         if (isset($container->services['mailer.transport'])) {
             return $container->services['mailer.transport'];
@@ -543,7 +543,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMailer_TransportFactory_AmazonService($container)
     {
-        $a = ($container->services['monolog.logger_2'] ?? $container->getMonolog_Logger2Service());
+        $a = ($container->services['monolog.logger_2'] ?? self::getMonolog_Logger2Service());
 
         if (isset($container->services['mailer.transport_factory.amazon'])) {
             return $container->services['mailer.transport_factory.amazon'];

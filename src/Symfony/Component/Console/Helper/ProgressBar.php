@@ -54,7 +54,6 @@ final class ProgressBar
     private int $startTime;
     private int $stepWidth;
     private float $percent = 0.0;
-    private int $formatLineCount;
     private array $messages = [];
     private bool $overwrite = true;
     private Terminal $terminal;
@@ -442,8 +441,6 @@ final class ProgressBar
         } else {
             $this->format = $format;
         }
-
-        $this->formatLineCount = substr_count($this->format, "\n");
     }
 
     /**
@@ -460,7 +457,7 @@ final class ProgressBar
         if ($this->overwrite) {
             if (null !== $this->previousMessage) {
                 if ($this->output instanceof ConsoleSectionOutput) {
-                    $messageLines = explode("\n", $message);
+                    $messageLines = explode("\n", $this->previousMessage);
                     $lineCount = \count($messageLines);
                     foreach ($messageLines as $messageLine) {
                         $messageLineLength = Helper::width(Helper::removeDecoration($this->output->getFormatter(), $messageLine));
@@ -470,13 +467,11 @@ final class ProgressBar
                     }
                     $this->output->clear($lineCount);
                 } else {
-                    if ('' !== $this->previousMessage) {
-                        // only clear upper lines when last call was not a clear
-                        for ($i = 0; $i < $this->formatLineCount; ++$i) {
-                            $this->cursor->moveToColumn(1);
-                            $this->cursor->clearLine();
-                            $this->cursor->moveUp();
-                        }
+                    $lineCount = substr_count($this->previousMessage, "\n");
+                    for ($i = 0; $i < $lineCount; ++$i) {
+                        $this->cursor->moveToColumn(1);
+                        $this->cursor->clearLine();
+                        $this->cursor->moveUp();
                     }
 
                     $this->cursor->moveToColumn(1);

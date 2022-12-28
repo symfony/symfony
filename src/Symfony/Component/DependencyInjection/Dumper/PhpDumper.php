@@ -30,7 +30,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
-use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
@@ -90,7 +90,8 @@ class PhpDumper extends Dumper
     private array $exportedVariables = [];
     private string $baseClass;
     private string $class;
-    private ProxyDumper $proxyDumper;
+    private DumperInterface $proxyDumper;
+    private bool $hasProxyDumper = true;
 
     public function __construct(ContainerBuilder $container)
     {
@@ -104,9 +105,10 @@ class PhpDumper extends Dumper
     /**
      * Sets the dumper to be used when dumping proxies in the generated container.
      */
-    public function setProxyDumper(ProxyDumper $proxyDumper)
+    public function setProxyDumper(DumperInterface $proxyDumper)
     {
         $this->proxyDumper = $proxyDumper;
+        $this->hasProxyDumper = !$proxyDumper instanceof NullDumper;
     }
 
     /**
@@ -165,7 +167,7 @@ class PhpDumper extends Dumper
 
         $this->initializeMethodNamesMap('Container' === $baseClass ? Container::class : $baseClass);
 
-        if ($this->getProxyDumper() instanceof NullDumper) {
+        if (!$this->hasProxyDumper) {
             (new AnalyzeServiceReferencesPass(true, false))->process($this->container);
             (new CheckCircularReferencesPass())->process($this->container);
         }
@@ -390,14 +392,14 @@ EOF;
     /**
      * Retrieves the currently set proxy dumper or instantiates one.
      */
-    private function getProxyDumper(): ProxyDumper
+    private function getProxyDumper(): DumperInterface
     {
         return $this->proxyDumper ??= new LazyServiceDumper($this->class);
     }
 
     private function analyzeReferences()
     {
-        (new AnalyzeServiceReferencesPass(false, !$this->getProxyDumper() instanceof NullDumper))->process($this->container);
+        (new AnalyzeServiceReferencesPass(false, $this->hasProxyDumper))->process($this->container);
         $checkedNodes = [];
         $this->circularReferences = [];
         $this->singleUsePrivateIds = [];
@@ -424,13 +426,13 @@ EOF;
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
             $id = $node->getId();
-            if ($sourceId === $id || !$node->getValue() instanceof Definition || $edge->isLazy() || $edge->isWeak()) {
+            if ($sourceId === $id || !$node->getValue() instanceof Definition || $edge->isWeak()) {
                 continue;
             }
 
             if (isset($path[$id])) {
                 $loop = null;
-                $loopByConstructor = $edge->isReferencedByConstructor();
+                $loopByConstructor = $edge->isReferencedByConstructor() && !$edge->isLazy();
                 $pathInLoop = [$id, []];
                 foreach ($path as $k => $pathByConstructor) {
                     if (null !== $loop) {
@@ -444,7 +446,7 @@ EOF;
                 }
                 $this->addCircularReferences($id, $loop, $loopByConstructor);
             } elseif (!isset($checkedNodes[$id])) {
-                $this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $loops, $path, $edge->isReferencedByConstructor());
+                $this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $loops, $path, $edge->isReferencedByConstructor() && !$edge->isLazy());
             } elseif (isset($loops[$id])) {
                 // we already had detected loops for this edge
                 // let's check if we have a common ancestor in one of the detected loops
@@ -465,7 +467,7 @@ EOF;
 
                     // we can now build the loop
                     $loop = null;
-                    $loopByConstructor = $edge->isReferencedByConstructor();
+                    $loopByConstructor = $edge->isReferencedByConstructor() && !$edge->isLazy();
                     foreach ($fillPath as $k => $pathByConstructor) {
                         if (null !== $loop) {
                             $loop[] = $k;
@@ -968,7 +970,7 @@ EOF;
             return '';
         }
 
-        $hasSelfRef = isset($this->circularReferences[$id][$targetId]) && !isset($this->definitionVariables[$definition]);
+        $hasSelfRef = isset($this->circularReferences[$id][$targetId]) && !isset($this->definitionVariables[$definition]) && !($this->hasProxyDumper && $definition->isLazy());
 
         if ($hasSelfRef && !$forConstructor && !$forConstructor = !$this->circularReferences[$id][$targetId]) {
             $code = $this->addInlineService($id, $definition, $definition);
@@ -1011,7 +1013,7 @@ EOTXT
 
         if ($isSimpleInstance = $isRootInstance = null === $inlineDef) {
             foreach ($this->serviceCalls as $targetId => [$callCount, $behavior, $byConstructor]) {
-                if ($byConstructor && isset($this->circularReferences[$id][$targetId]) && !$this->circularReferences[$id][$targetId]) {
+                if ($byConstructor && isset($this->circularReferences[$id][$targetId]) && !$this->circularReferences[$id][$targetId] && !($this->hasProxyDumper && $definition->isLazy())) {
                     $code .= $this->addInlineReference($id, $definition, $targetId, $forConstructor);
                 }
             }
@@ -1291,7 +1293,7 @@ EOF;
         }
 
         foreach ($this->container->getDefinitions() as $definition) {
-            if (!$definition->isLazy() || $this->getProxyDumper() instanceof NullDumper) {
+            if (!$definition->isLazy() || !$this->hasProxyDumper) {
                 continue;
             }
 
@@ -1469,7 +1471,7 @@ EOF;
         foreach ($hotPathServices as $id => $tags) {
             $definition = $this->container->getDefinition($id);
 
-            if ($definition->isLazy() && !$this->getProxyDumper() instanceof NullDumper) {
+            if ($definition->isLazy() && $this->hasProxyDumper) {
                 continue;
             }
 
@@ -2259,7 +2261,7 @@ EOF;
     {
         $asGhostObject = false;
 
-        if (!$definition->isLazy() || ($proxyDumper = $this->getProxyDumper()) instanceof NullDumper) {
+        if (!$definition->isLazy() || !$this->hasProxyDumper) {
             return null;
         }
 
@@ -2268,6 +2270,6 @@ EOF;
             ->setClass($bag->resolveValue($definition->getClass()))
             ->setTags(($definition->hasTag('proxy') ? ['proxy' => $bag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags());
 
-        return $proxyDumper->isProxyCandidate($definition, $asGhostObject, $id) ? $definition : null;
+        return $this->getProxyDumper()->isProxyCandidate($definition, $asGhostObject, $id) ? $definition : null;
     }
 }

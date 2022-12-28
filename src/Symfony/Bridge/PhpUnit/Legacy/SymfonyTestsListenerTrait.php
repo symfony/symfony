@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\RiskyTestError;
 use PHPUnit\Framework\TestCase;
@@ -128,6 +129,14 @@ class SymfonyTestsListenerTrait
         if (-1 === $this->state) {
             echo "Testing $suiteName\n";
             $this->state = 0;
+
+            if (!class_exists(AnnotationRegistry::class, false) && class_exists(AnnotationRegistry::class)) {
+                if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
+                    AnnotationRegistry::registerUniqueLoader('class_exists');
+                } elseif (method_exists(AnnotationRegistry::class, 'registerLoader')) {
+                    AnnotationRegistry::registerLoader('class_exists');
+                }
+            }
 
             if ($this->skippedFile = getenv('SYMFONY_PHPUNIT_SKIPPED_TESTS')) {
                 $this->state = 1;

@@ -7,6 +7,26 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.3 (2022-12-28)
+
+ * bug #48805 [DependencyInjection] Fix resolving parameters when dumping lazy proxies (nicolas-grekas)
+ * bug #48787 [PhpUnitBridge] Use verbose deprecation output for quiet types only when it reaches the threshold (ogizanagi)
+ * bug #48784 [Console] Correctly overwrite progressbars with different line count per step (ncharalampidis)
+ * bug #48801 [Form] Make `ButtonType` handle `form_attr` option (MatTheCat)
+ * bug #48791 [DependencyInjection] Fix deduplicating service instances in circular graphs (nicolas-grekas)
+ * bug #48790 [WebProfilerBundle] fix Mailer detail on click (Jean-Beru)
+ * bug #48771 [CssSelector] Fix escape patterns (fancyweb)
+ * bug #48774 [Translation] Fix undefined variable messages in ConstraintVisitor (alamirault)
+ * bug #48727 [PropertyAccess] Fix nullsafe chain like x?.y (Vincz)
+ * bug #48711 [Cache] RedisTrait::createConnection does not pass auth value from redis sentinel cluster DSN (evgkord)
+ * bug #48724 [VarExporter] Fix exporting classes with __unserialize() but not __serialize() (fancyweb)
+ * bug #48746 [Validator] Fix IBAN format for Tunisia and Mauritania (smelesh)
+ * bug #48738 [Workflow] Allow spaces in place names so the PUML dump doesn't break (Kamil Musial)
+ * bug #48742 [VarExporter] Generate proxies for static abstract methods (nicolas-grekas)
+ * bug #48735 [SecurityBundle] Prevent RuntimeException on profiler (marphi)
+ * bug #48718 Compatibility with doctrine/annotations 2 (derrabus)
+ * bug #48688 [FrameworkBundle] Add MailPace definition (skmedix)
+
 * 6.2.2 (2022-12-16)
 
  * bug #48661 [Serializer] fix context attribute with serializedName (nikophil)

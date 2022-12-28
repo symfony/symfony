@@ -221,6 +221,8 @@ HTML
             ['div#container p', "div[@id = 'container']/descendant-or-self::*/p"],
             [':scope > div[dataimg="<testmessage>"]', "*[1]/div[@dataimg = '<testmessage>']"],
             [':scope', '*[1]'],
+            ['e:is(section, article) h1', "e[(name() = 'section') or (name() = 'article')]/descendant-or-self::*/h1"],
+            ['e:where(section, article) h1', "e[(name() = 'section') or (name() = 'article')]/descendant-or-self::*/h1"],
         ];
     }
 
@@ -355,6 +357,17 @@ HTML
             [':not(*)', []],
             ['a:not([href])', ['name-anchor']],
             ['ol :Not(li[class])', ['first-li', 'second-li', 'li-div', 'fifth-li', 'sixth-li', 'seventh-li']],
+            [':is(#first-li, #second-li)', ['first-li', 'second-li']],
+            ['a:is(#name-anchor, #tag-anchor)', ['name-anchor', 'tag-anchor']],
+            [':is(.c)', ['first-ol', 'third-li', 'fourth-li']],
+            ['a:is(:not(#name-anchor))', ['tag-anchor', 'nofollow-anchor']],
+            ['a:not(:is(#name-anchor))', ['tag-anchor', 'nofollow-anchor']],
+            [':where(#first-li, #second-li)', ['first-li', 'second-li']],
+            ['a:where(#name-anchor, #tag-anchor)', ['name-anchor', 'tag-anchor']],
+            [':where(.c)', ['first-ol', 'third-li', 'fourth-li']],
+            ['a:where(:not(#name-anchor))', ['tag-anchor', 'nofollow-anchor']],
+            ['a:not(:where(#name-anchor))', ['tag-anchor', 'nofollow-anchor']],
+            ['a:where(:is(#name-anchor), :where(#tag-anchor))', ['name-anchor', 'tag-anchor']],
             // HTML-specific
             [':link', ['link-href', 'tag-anchor', 'nofollow-anchor', 'area-href']],
             [':visited', []],
@@ -416,6 +429,7 @@ HTML
             [':scope > div', 1],
             [':scope > div > div[class=dialog]', 1],
             [':scope > div div', 242],
+            ['div:is(div#test .dialog) .direction', 4],
         ];
     }
 }

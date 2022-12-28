@@ -281,9 +281,8 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('container.dumper.inline_factories', true);
         $container->setParameter('container.dumper.inline_class_loader', true);
-        $container->setParameter('lazy_foo_class', \Bar\FooClass::class);
 
-        $container->register('lazy_foo', '%lazy_foo_class%')
+        $container->register('lazy_foo', \Bar\FooClass::class)
             ->addArgument(new Definition(\Bar\FooLazyClass::class))
             ->setPublic(true)
             ->setLazy(true);

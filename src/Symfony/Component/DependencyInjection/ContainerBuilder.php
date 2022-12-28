@@ -115,6 +115,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private array $vendors;
 
     /**
+     * @var string[] the list of paths in vendor directories
+     */
+    private array $pathsInVendor = [];
+
+    /**
      * @var array<string, ChildDefinition>
      */
     private array $autoconfiguredInstanceof = [];
@@ -1610,17 +1615,27 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private function inVendors(string $path): bool
     {
+        $path = is_file($path) ? \dirname($path) : $path;
+
+        if (isset($this->pathsInVendor[$path])) {
+            return $this->pathsInVendor[$path];
+        }
+
         $this->vendors ??= (new ComposerResource())->getVendors();
         $path = realpath($path) ?: $path;
+
+        if (isset($this->pathsInVendor[$path])) {
+            return $this->pathsInVendor[$path];
+        }
 
         foreach ($this->vendors as $vendor) {
             if (str_starts_with($path, $vendor) && false !== strpbrk(substr($path, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                 $this->addResource(new FileResource($vendor.'/composer/installed.json'));
 
-                return true;
+                return $this->pathsInVendor[$path] = true;
             }
         }
 
-        return false;
+        return $this->pathsInVendor[$path] = false;
     }
 }

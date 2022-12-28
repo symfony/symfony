@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-12-26T15:54:32Z
+
+Friendly ping @greg0ire, as I know you were involved in this stuff
+
+---------------------------------------------------------------------------
+
+by kbond at 2022-12-26T16:31:16Z
+
+Related to https://github.com/symfony/symfony/pull/43371?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-12-26T18:05:32Z
+
+> Related to #43371?
+
+It seems to be the same indeed
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2022-12-27T08:21:53Z
+
+@kbond : I added your test case to this PR

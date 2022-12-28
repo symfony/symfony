@@ -839,13 +839,11 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
 
                 emailRows.forEach((emailRow) => {
                     emailRow.addEventListener('click', () => {
-                        emailRow.addEventListener('click', () => {
-                            emailRows.forEach((row) => row.classList.remove('active'));
-                            emailRow.classList.add('active');
+                        emailRows.forEach((row) => row.classList.remove('active'));
+                        emailRow.classList.add('active');
 
-                            document.querySelectorAll('.mailer-email-details').forEach((emailDetails) => emailDetails.style.display = 'none');
-                            document.querySelector(emailRow.getAttribute('data-target')).style.display = 'block';
-                        });
+                        document.querySelectorAll('.mailer-email-details').forEach((emailDetails) => emailDetails.style.display = 'none');
+                        document.querySelector(emailRow.getAttribute('data-target')).style.display = 'block';
                     });
                 });
             },

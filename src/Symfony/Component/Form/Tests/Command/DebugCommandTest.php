@@ -225,6 +225,7 @@ TXT
                 'translation_domain',
                 'auto_initialize',
                 'priority',
+                'form_attr',
             ],
         ];
 
@@ -244,6 +245,7 @@ TXT
                 'translation_domain',
                 'auto_initialize',
                 'priority',
+                'form_attr',
             ],
         ];
 

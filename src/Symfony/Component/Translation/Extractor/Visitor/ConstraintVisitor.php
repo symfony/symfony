@@ -72,6 +72,7 @@ final class ConstraintVisitor extends AbstractVisitor implements NodeVisitor
                 return null;
             }
 
+            $messages = [];
             $options = $arg->value;
 
             /** @var Node\Expr\ArrayItem $item */

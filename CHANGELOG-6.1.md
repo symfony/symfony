@@ -7,6 +7,11 @@ in 6.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.1.0...v6.1.1
 
+* 6.1.10 (2022-12-29)
+
+ * bug #48823 [Cache] Fix possibly null value passed to preg_match() in RedisTrait (chalasr)
+ * bug #48816 [Cache] Fix for RedisAdapter without auth parameter (rikvdh)
+
 * 6.1.9 (2022-12-28)
 
  * bug #48787 [PhpUnitBridge] Use verbose deprecation output for quiet types only when it reaches the threshold (ogizanagi)

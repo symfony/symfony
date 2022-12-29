@@ -226,4 +226,39 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->getBoolean('string_false'), '->getBoolean() gets the string false as boolean false');
         $this->assertFalse($bag->getBoolean('unknown'), '->getBoolean() returns false if a parameter is not defined');
     }
+
+    public function testGetEnum()
+    {
+        $bag = new ParameterBag(['valid-value' => 1]);
+
+        $this->assertSame(Foo::Bar, $bag->getEnum('valid-value', Foo::class));
+
+        $this->assertNull($bag->getEnum('invalid-key', Foo::class));
+        $this->assertSame(Foo::Bar, $bag->getEnum('invalid-key', Foo::class, Foo::Bar));
+    }
+
+    public function testGetEnumThrowsExceptionWithNotBackingValue()
+    {
+        $bag = new ParameterBag(['invalid-value' => 2]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum "Symfony\Component\HttpFoundation\Tests\Foo".');
+
+        $this->assertNull($bag->getEnum('invalid-value', Foo::class));
+    }
+
+    public function testGetEnumThrowsExceptionWithInvalidValueType()
+    {
+        $bag = new ParameterBag(['invalid-value' => ['foo']]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: Symfony\Component\HttpFoundation\Tests\Foo::from(): Argument #1 ($value) must be of type int, array given.');
+
+        $this->assertNull($bag->getEnum('invalid-value', Foo::class));
+    }
+}
+
+enum Foo: int
+{
+    case Bar = 1;
 }

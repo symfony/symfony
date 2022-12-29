@@ -142,6 +142,31 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns the parameter value converted to an enum.
+     *
+     * @template T of \BackedEnum
+     *
+     * @param class-string<T> $class
+     * @param ?T              $default
+     *
+     * @return ?T
+     */
+    public function getEnum(string $key, string $class, \BackedEnum $default = null): ?\BackedEnum
+    {
+        $value = $this->get($key);
+
+        if (null === $value) {
+            return $default;
+        }
+
+        try {
+            return $class::from($value);
+        } catch (\ValueError|\TypeError $e) {
+            throw new \UnexpectedValueException(sprintf('Parameter "%s" cannot be converted to enum: %s.', $key, $e->getMessage()), $e->getCode(), $e);
+        }
+    }
+
+    /**
      * Filter key.
      *
      * @param int $filter FILTER_* constant

@@ -7,8 +7,10 @@ button,hr,input{overflow:visible}progress,sub,sup{vertical-align:baseline}[type=
 
 :root {
     --font-family-system: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --font-family-monospace: "Ubuntu Mono", "JetBrains Mono", ui-monospace, "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono", "Courier New", monospace;
-
+    --font-family-monospace: "JetBrains Mono", ui-monospace, "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono", "Courier New", monospace;
+    --font-size-body: 14px;
+    --font-size-monospace: 13px;
+    --font-variant-ligatures-monospace: none;
     --summary-status-border-width: 6px;
 
     --white: #fff;
@@ -353,7 +355,7 @@ body {
     background-size: 15px 15px;
     color: var(--page-color);
     font-family: var(--font-family-system);
-    font-size: 14px;
+    font-size: var(--font-size-body);
     line-height: 1.4;
 }
 
@@ -438,7 +440,8 @@ abbr {
 
 code, pre {
     font-family: var(--font-family-monospace);
-    font-size: 14px;
+    font-size: var(--font-size-monospace);
+    font-variant-ligatures: var(--font-variant-ligatures-monospace);
 }
 h1 code, h2 code, h3 code, h4 code, h5 code, h6 code {
     color: inherit;
@@ -486,7 +489,7 @@ input[type="radio"], input[type="checkbox"] {
     color: var(--button-color);
     cursor: pointer;
     display: inline-block;
-    font-size: 14px;
+    font-size: var(--font-size-body);
     font-weight: 500;
     line-height: 20px;
     padding: 5px 15px;
@@ -570,10 +573,12 @@ table tbody td {
     border: 1px solid var(--table-border-color);
     border-width: 1px 0;
     font-family: var(--font-family-monospace);
+    font-size: var(--font-size-monospace);
+    font-variant-ligatures: var(--font-variant-ligatures-monospace);
 }
 table tbody th.font-normal,
 table tbody td.font-normal {
-    font-size: 13px;
+    font-size: var(--font-size-body);
 }
 table tbody tr:last-of-type th,
 table tbody tr:last-of-type td {
@@ -641,11 +646,11 @@ table tbody td.num-col {
 }
 .font-normal {
     font-family: var(--font-family-system);
-    font-size: 14px;
+    font-size: var(--font-size-body);
 }
 .help {
     color: var(--color-muted);
-    font-size: 14px;
+    font-size: var(--font-size-body);
     margin: .5em 0;
 }
 .empty {
@@ -662,7 +667,7 @@ table tbody td.num-col {
     background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23737373' stroke-width='4' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
 }
 .empty p {
-    font-size: 14px;
+    font-size: var(--font-size-body);
     max-width: 60ch;
     margin-left: auto;
     margin-right: auto;
@@ -1391,7 +1396,7 @@ tr.status-warning td {
 }
 #menu-profiler li a .label strong {
     flex: 1;
-    font-size: 14px;
+    font-size: var(--font-size-body);
     font-weight: 500;
 }
 #menu-profiler li a .label.disabled {
@@ -1671,7 +1676,7 @@ tr.status-warning td {
 {# Twig panel
    ========================================================================= #}
 #twig-dump pre {
-    font-size: 14px;
+    font-size: var(--font-size-monospace);
     line-height: 1.7;
     background-color: var(--base-0);
     border: var(--border);
@@ -1995,7 +2000,7 @@ tr.log-status-silenced > td:first-child:before {
 .mailer-transport-information {
     border-bottom: 1px solid var(--form-input-border-color);
     padding-bottom: 5px;
-    font-size: 14px;
+    font-size: var(--font-size-body);
     margin: 5px 0 10px 5px;
 }
 .mailer-transport-information .badge {
@@ -2011,7 +2016,7 @@ tr.log-status-silenced > td:first-child:before {
     margin-bottom: 10px;
 }
 .mailer-message-headers p {
-    font-size: 14px;
+    font-size: var(--font-size-body);
     margin: 2px 5px;
 }
 .mailer-message-header-secondary {
@@ -2020,7 +2025,7 @@ tr.log-status-silenced > td:first-child:before {
 .mailer-message-attachments-title {
     align-items: center;
     display: flex;
-    font-size: 14px;
+    font-size: var(--font-size-body);
     font-weight: 600;
     margin-bottom: 10px;
 }
@@ -2201,7 +2206,8 @@ pre.sf-dump, pre.sf-dump .sf-dump-default {
 #collector-content .sf-dump code,
 #collector-content .sf-dump samp {
     font-family: var(--font-family-monospace);
-    font-size: 13px;
+    font-size: var(--font-size-monospace);
+    font-variant-ligatures: var(--font-variant-ligatures-monospace);
 }
 #collector-content .sf-dump a {
     cursor: pointer;
@@ -2229,7 +2235,7 @@ pre.sf-dump, pre.sf-dump .sf-dump-default {
 #collector-content .dump-inline .sf-dump {
     display: inline;
     white-space: normal;
-    font-size: 14px;
+    font-size: var(--font-size-monospace);
     line-height: inherit;
 }
 #collector-content .dump-inline .sf-dump:after {
@@ -2247,7 +2253,7 @@ pre.sf-dump, pre.sf-dump .sf-dump-default {
 {# Forms panel
    ========================================================================= #}
 .form-type-class {
-    font-size: 14px;
+    font-size: var(--font-size-body);
     display: flex;
     margin: 0 0 15px;
 }
@@ -2256,7 +2262,7 @@ pre.sf-dump, pre.sf-dump .sf-dump-default {
 }
 .form-type-class pre.sf-dump {
     font-family: var(--font-family-system) !important;
-    font-size: 14px !important;
+    font-size: var(--font-size-body) !important;
     margin-left: 5px;
 }
 .form-type-class .sf-dump .sf-dump-str {
@@ -2407,7 +2413,7 @@ body.width-full .container {
 {# VarDumper dumps
    ========================================================================= #}
 #collector-content pre.sf-dump, #collector-content .sf-dump code, #collector-content .sf-dump samp {
-    font-size: 14px;
+    font-size: var(--font-size-monospace);
     font-weight: normal;
 }
 

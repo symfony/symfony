@@ -22,6 +22,11 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  */
 final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
+    /**
+     * If true, will denormalize any invalid value into null.
+     */
+    public const ALLOW_INVALID_VALUES = 'allow_invalid_values';
+
     public function normalize(mixed $object, string $format = null, array $context = []): int|string
     {
         if (!$object instanceof \BackedEnum) {
@@ -43,6 +48,18 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
     {
         if (!is_subclass_of($type, \BackedEnum::class)) {
             throw new InvalidArgumentException('The data must belong to a backed enumeration.');
+        }
+
+        if ($context[self::ALLOW_INVALID_VALUES] ?? false) {
+            if (null === $data || (!\is_int($data) && !\is_string($data))) {
+                return null;
+            }
+
+            try {
+                return $type::tryFrom($data);
+            } catch (\TypeError) {
+                return null;
+            }
         }
 
         if (!\is_int($data) && !\is_string($data)) {

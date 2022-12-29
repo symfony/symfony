@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `XmlEncoder::SAVE_OPTIONS` context option
+ * Add `BackedEnumNormalizer::ALLOW_INVALID_VALUES` context option
  * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`
 
 6.2

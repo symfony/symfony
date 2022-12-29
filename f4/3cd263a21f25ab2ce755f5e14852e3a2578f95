@@ -1,0 +1,203 @@
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-09-27T21:02:20Z
+
+The error in the tests of `Stopwatch` is unrelated to the pull request.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-09-29T09:58:27Z
+
+would it be reasonable to consider a "compute json inline" approach, rather than end-users taking care of unique identifiers
+
+```php
+$lazyJson = ['key' => fn() => yield from $heavy];
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-29T10:36:41Z
+
+@ro0NL this would force to re-implement the whole json encoding in userland
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-09-29T10:43:19Z
+
+we could array walk the structure first, thus keeping the unique placeholders an implementation detail.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-29T10:44:12Z
+
+@ro0NL if you do that, you are not streaming json anymore, defeating the whole purpose of this PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2022-09-29T10:49:54Z
+
+the idea is to split the generators from the structure, preserving remaining logic. But this is an extra step yes, thus less ideal perhaps.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-09-29T11:10:30Z
+
+@ro0NL interesting input. As I think the structure array is mostly small it could be possible. But we would need to have a look at what difference this would be in the performance.
+
+I hacked something together using `array_walk_recursive`: https://3v4l.org/tndhO. Will have a deeper look at it at the evening or next days.
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-29T11:19:52Z
+
+@alexander-schranz be careful when implementing this. `is_callable` would turn some strings into placeholders instead of outputting them.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-09-29T11:27:46Z
+
+@stof great hint think `$item instanceof Closure` should then do the job?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-09-29T11:43:35Z
+
+now that we have first class callables, I would say yes. You can convert any callable to a closure using this feature.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-09-29T17:50:47Z
+
+Okay I don't need to check for `closures` or callables. I just need to check on `\Generators` because the Closures are already called. Which is very important, as example when Database connection is not available the exception need to be thrown in the Controller and should not be thrown when Status Code 200 is already returned:
+
+```php
+return new StreamedJsonResponse(
+    [
+        '_embedded' => [
+            'articles' => $this->findArticles('Article'), // returns a \Generator which will generate a list of data
+        ],
+    ],
+);
+```
+
+The diff between old and new implementation is not big it just takes about `0.0000128s` todo the array_walk_recursive and replace it. It also did not have any visible changes on the memory usage. The tested arrays are really small but that will mostly be the case I think in this kind of responses.
+
+I also update the example repository using the new class under `/symfony-articles.json`: [https://github.com/alexander-schranz/efficient-json-streaming-with-symfony-doctrine ](https://github.com/alexander-schranz/efficient-json-streaming-with-symfony-doctrine) if somebody want to experiment with it.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-10-20T17:39:42Z
+
+Anything required to change for something?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-10-23T10:28:19Z
+
+@alexander-schranz Can you squash the commits?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-10-23T10:45:34Z
+
+@fabpot done!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-10-23T15:49:20Z
+
+Can you add a CHANGELOG entry?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-10-24T07:51:23Z
+
+@chalasr CHANGELOG entry added!
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-10-24T08:18:06Z
+
+@nicolas-grekas I would keep a default flush, mostly the Generator will come from a Repository or other service and for a good DX we should not force them to create then additional function to wrap that generator just to add `flush` to it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-24T08:24:34Z
+
+Wrapping a generator is quite easy. How does that play with ob-handlers for example? What if flushing should happen every 4k bytes instead of every n-th items? etc.
+
+Why do we need any flush control at all? We don't anywhere else and StreamedResponse even mentions that calling flush() is userland's responsibility.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-10-24T09:41:40Z
+
+@nicolas-grekas I would prefer to have some default flush handling implemented and make it possible to overwrite it. Think with a flush the class does not make a lot more sense when not  PHP keeps lot of things in memory. But if you think we should not do that I'm fine to adjust the code, just think a default flush handling would be good if we provide such a class in the framework.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-10-24T10:05:15Z
+
+I think we should remove flush control for now. If needed, we could add it later, and take time to do it properly. Ok for you @alexander-schranz, @nicolas-grekas?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-10-24T10:23:27Z
+
+@welcoMattic okay will adjust the PR at evening. Added a `TODO` for the docs PR so the docs will show a correct example and usage with flush for it.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-10-24T18:45:03Z
+
+@nicolas-grekas @jderusse review comments fixed. The [Prototype](https://github.com/alexander-schranz/efficient-json-streaming-with-symfony-doctrine) is also updated using the new class under `/symfony-articles.json`: [https://github.com/alexander-schranz/efficient-json-streaming-with-symfony-doctrine](https://github.com/alexander-schranz/efficient-json-streaming-with-symfony-doctrine).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-10-25T03:34:58Z
+
+I propose to add the content from the README of your prototype application to the PR header 👍🏻
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-11-03T00:16:15Z
+
+@OskarStark added.
+
+Think PR is blocked until 6.3 branch is created?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-11-03T10:03:14Z
+
+> @OskarStark added.
+
+thanks
+
+> Think PR is blocked until 6.3 branch is created?
+
+Yes
+
+---------------------------------------------------------------------------
+
+by dunglas at 2022-11-25T11:11:38Z
+
+For the record, @mtarld @soyuka and I are working on a new component that will be an alternative to `json_encode/json_decode` and to the Symfony Serializer that will natively support JSON streaming (for encoding and decoding). Maybe will it be possible to use this component in this PR.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-11-25T15:02:47Z
+
+@dunglas that sounds very interesting. I think currently I would stay with the implementation how it is for now, this gives a very low resource solution without the need that the http foundation package has additional requirements to any kind of serializer and so on. Still a serializer/normalizer is possible be used inside the Generator already, which will be they current implementation of this class also be very low on resources usage as it don't try to serialize all objects at once just one after the other and so don't need to keep more then one object in the memory aslong as the ORM loading allows that.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-29T13:32:12Z
+
+Shall we move forward on this one?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2022-12-29T13:36:38Z
+
+@chalasr rebased. Not sure what is open or required to get this merged :)

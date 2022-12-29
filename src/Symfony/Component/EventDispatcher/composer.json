@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.1",
-        "symfony/event-dispatcher-contracts": "^2|^3"
+        "symfony/event-dispatcher-contracts": "^2.5|^3"
     },
     "require-dev": {
         "symfony/dependency-injection": "^5.4|^6.0",
@@ -25,12 +25,13 @@
         "symfony/config": "^5.4|^6.0",
         "symfony/error-handler": "^5.4|^6.0",
         "symfony/http-foundation": "^5.4|^6.0",
-        "symfony/service-contracts": "^1.1|^2|^3",
+        "symfony/service-contracts": "^2.5|^3",
         "symfony/stopwatch": "^5.4|^6.0",
         "psr/log": "^1|^2|^3"
     },
     "conflict": {
-        "symfony/dependency-injection": "<5.4"
+        "symfony/dependency-injection": "<5.4",
+        "symfony/service-contracts": "<2.5"
     },
     "provide": {
         "psr/event-dispatcher-implementation": "1.0",

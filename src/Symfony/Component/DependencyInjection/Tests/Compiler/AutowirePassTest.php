@@ -34,7 +34,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
@@ -705,10 +704,6 @@ class AutowirePassTest extends TestCase
 
     public function testSetterInjectionWithAttribute()
     {
-        if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
-        }
-
         $container = new ContainerBuilder();
         $container->register(Foo::class);
 

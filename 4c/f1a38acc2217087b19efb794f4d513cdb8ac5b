@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-29T16:09:53Z
+
+On branches 6.2+:
+```diff
+- $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error ?? '', $error) ? sprintf(' (%s)', $error[1]) : '';
++ $error = preg_match('/^Redis::p?connect\(\): (.*)/', $error ?? $redis->getLastError() ?? '', $error) ? sprintf(' (%s)', $error[1]) : '';
+```

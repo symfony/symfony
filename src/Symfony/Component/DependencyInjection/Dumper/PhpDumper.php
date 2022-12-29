@@ -2288,11 +2288,6 @@ EOF;
             return null;
         }
 
-        $bag = $this->container->getParameterBag();
-        $definition = (clone $definition)
-            ->setClass($bag->resolveValue($definition->getClass()))
-            ->setTags(($definition->hasTag('proxy') ? ['proxy' => $bag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags());
-
         return $this->getProxyDumper()->isProxyCandidate($definition, $asGhostObject, $id) ? $definition : null;
     }
 }

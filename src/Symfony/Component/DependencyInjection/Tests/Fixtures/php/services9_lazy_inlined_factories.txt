@@ -75,7 +75,7 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the public 'lazy_foo' shared service.
      *
-     * @return object A %lazy_foo_class% instance
+     * @return \Bar\FooClass
      */
     protected static function getLazyFooService($container, $lazyLoad = true)
     {
@@ -148,6 +148,8 @@ class ProjectServiceContainer extends Container
     {
         return [
             'lazy_foo_class' => 'Bar\\FooClass',
+            'container.dumper.inline_factories' => true,
+            'container.dumper.inline_class_loader' => true,
         ];
     }
 }

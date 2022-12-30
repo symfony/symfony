@@ -136,7 +136,7 @@ class Uuid extends AbstractUid
             return true;
         }
 
-        if (self::MAX === strtr($uuid, 'F', 'f')  && (\in_array(static::class, [__CLASS__, MaxUuid::class], true))) {
+        if (self::MAX === strtr($uuid, 'F', 'f')  && \in_array(static::class, [__CLASS__, MaxUuid::class], true)) {
             return true;
         }
 

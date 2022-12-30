@@ -7,6 +7,12 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.4 (2022-12-29)
+
+ * bug #48822 [WebProfilerBundle] Fix the usage of web fonts (javiereguiluz)
+ * bug #48823 [Cache] Fix possibly null value passed to preg_match() in RedisTrait (chalasr)
+ * bug #48816 [Cache] Fix for RedisAdapter without auth parameter (rikvdh)
+
 * 6.2.3 (2022-12-28)
 
  * bug #48805 [DependencyInjection] Fix resolving parameters when dumping lazy proxies (nicolas-grekas)

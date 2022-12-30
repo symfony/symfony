@@ -170,6 +170,25 @@ class UuidTest extends TestCase
         $this->assertTrue(UuidV4::isValid(self::A_UUID_V4));
     }
 
+    public function testIsValidWithNilUuid()
+    {
+        $this->assertTrue(Uuid::isValid('00000000-0000-0000-0000-000000000000'));
+        $this->assertTrue(NilUuid::isValid('00000000-0000-0000-0000-000000000000'));
+
+        $this->assertFalse(UuidV1::isValid('00000000-0000-0000-0000-000000000000'));
+        $this->assertFalse(UuidV4::isValid('00000000-0000-0000-0000-000000000000'));
+    }
+
+    public function testIsValidWithMaxUuid()
+    {
+        $this->assertTrue(Uuid::isValid('ffffffff-ffff-ffff-ffff-ffffffffffff'));
+        $this->assertTrue(Uuid::isValid('FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'));
+        $this->assertTrue(Uuid::isValid('fFFFFFFF-ffff-FFFF-FFFF-FFFFffFFFFFF'));
+
+        $this->assertFalse(UuidV5::isValid('ffffffff-ffff-ffff-ffff-ffffffffffff'));
+        $this->assertFalse(UuidV6::isValid('ffffffff-ffff-ffff-ffff-ffffffffffff'));
+    }
+
     public function testEquals()
     {
         $uuid1 = new UuidV1(self::A_UUID_V1);

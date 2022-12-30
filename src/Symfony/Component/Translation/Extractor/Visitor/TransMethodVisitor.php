@@ -37,12 +37,13 @@ final class TransMethodVisitor extends AbstractVisitor implements NodeVisitor
         $name = (string) $node->name;
 
         if ('trans' === $name || 't' === $name) {
-            $nodeHasNamedArguments = $this->hasNodeNamedArguments($node);
-            if (!$messages = $this->getStringArguments($node, $nodeHasNamedArguments ? 'message' : 0)) {
+            $firstNamedArgumentIndex = $this->nodeFirstNamedArgumentIndex($node);
+
+            if (!$messages = $this->getStringArguments($node, 0 < $firstNamedArgumentIndex ? 0 : 'message')) {
                 return null;
             }
 
-            $domain = $this->getStringArguments($node, $nodeHasNamedArguments ? 'domain' : 2)[0] ?? null;
+            $domain = $this->getStringArguments($node, 2 < $firstNamedArgumentIndex ? 2 : 'domain')[0] ?? null;
 
             foreach ($messages as $message) {
                 $this->addMessageToCatalogue($message, $domain, $node->getStartLine());

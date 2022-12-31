@@ -56,6 +56,10 @@ final class Mailer implements MailerInterface
             $event = new MessageEvent($clonedMessage, $clonedEnvelope, (string) $this->transport, true);
             $this->dispatcher->dispatch($event);
             $stamps = $event->getStamps();
+
+            if ($event->isRejected()) {
+                return;
+            }
         }
 
         try {

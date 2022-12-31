@@ -79,6 +79,7 @@ final class MessageEvent extends Event
     public function reject(): void
     {
         $this->rejected = true;
+        $this->stopPropagation();
     }
 
     public function addStamp(StampInterface $stamp): void

@@ -721,10 +721,11 @@ class AbstractBrowserTest extends TestCase
 
     public function testRestart()
     {
-        $client = $this->getBrowser();
+        $client = $this->getBrowser(['HTTP_FOO' => 'bar']);
         $client->request('GET', 'http://www.example.com/foo/foobar');
         $client->restart();
 
+        $this->assertSame(['HTTP_USER_AGENT' => 'Symfony BrowserKit'], $client->getServerParameters(), '->restart() clears the server parameters');
         $this->assertTrue($client->getHistory()->isEmpty(), '->restart() clears the history');
         $this->assertSame([], $client->getCookieJar()->all(), '->restart() clears the cookies');
     }

@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2022-12-27T08:59:51Z
+
+Hi @y4roc, do you have time to handle the request change ? I'm really interested by this feature. :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-29T11:06:08Z
+
+@VincentLanglet Feel free to take over if you have time to finish this PR.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2022-12-29T11:29:01Z
+
+> @VincentLanglet Feel free to take over if you have time to finish this PR.
+
+Hi @fabpot, sure I'll be happy to do it.
+But I took a new look and what is missing in this PR ?
+
+I think your review (https://github.com/symfony/symfony/pull/48409#discussion_r1037882775) is incorrect, since the method need to return a `SentMessage` so we need to add the check
+```
+if ($event->isRejected()) {
+```
+after the line
+```
+$sentMessage = new SentMessage($message, $envelope);
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-31T10:20:54Z
+
+> > @VincentLanglet Feel free to take over if you have time to finish this PR.
+>
+> Hi @fabpot, sure I'll be happy to do it. But I took a new look and what is missing in this PR ?
+>
+> I think your review ([#48409 (comment)](https://github.com/symfony/symfony/pull/48409#discussion_r1037882775)) is incorrect, since the method need to return a `SentMessage` so we need to add the check
+>
+> ```
+> if ($event->isRejected()) {
+> ```
+>
+> after the line
+>
+> ```
+> $sentMessage = new SentMessage($message, $envelope);
+> ```
+
+You're right, so we are only missing some tests.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-31T10:23:55Z
+
+@VincentLanglet I'm going to take over.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-12-31T11:34:38Z
+
+Should rejecting the mail stop the propagation of the `MessageEvent`? Currently, it doesn't and I thought we should at least have talked about it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-31T11:35:44Z
+
+> Should rejecting the mail stop the propagation of the `MessageEvent`? Currently, it doesn't and I thought we should at least have talked about it.
+
+That's a good question. My take here is that you might have another listener interested in knowing the fact that the email has been rejected. It looks more flexible that way.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-12-31T11:49:34Z
+
+Right, but that listener would need to operate on a lower priority than any listener that might potentially reject messages. 🤔
+
+Does rejecting the mail trigger a `FailedMessageEvent`?
+
+* If yes, I'd probably attach my listener there or I might already have one here.
+* If no: should it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-31T11:54:17Z
+
+I would not trigger a `FailedMessageEvent` as the message didn't fail, it was just rejected from being sent.
+
+As you don't necessarily know all listeners that can be registered in advance, maybe stopping the propagation is the more flexible way after all :) I've added another commit for that change. Let me know what you think.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2022-12-31T12:12:53Z
+
+I would let the listener do the logging when it makes sense. I tend to avoid logging whenever possible.

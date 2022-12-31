@@ -14,10 +14,14 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
 /**
  * @requires extension redis
+ *
  * @group time-sensitive
  * @group integration
  */
@@ -316,6 +320,30 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertNotNull($connection->get());
 
         $redis->del('messenger-rejectthenget');
+    }
+
+    public function testItProperlyHandlesEmptyMessages()
+    {
+        $redisReceiver = new RedisReceiver($this->connection, new Serializer());
+
+        $this->connection->add('{"message": "Hi1"}', ['type' => DummyMessage::class]);
+        $this->connection->add('{"message": "Hi2"}', ['type' => DummyMessage::class]);
+
+        $redisReceiver->get();
+        $this->redis->xtrim('messages', 1);
+
+        // The consumer died during handling a message while performing xtrim in parallel process
+        $this->redis = new \Redis();
+        $this->connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['delete_after_ack' => true], $this->redis);
+        $redisReceiver = new RedisReceiver($this->connection, new Serializer());
+
+        /** @var Envelope[] $envelope */
+        $envelope = $redisReceiver->get();
+        $this->assertCount(1, $envelope);
+
+        $message = $envelope[0]->getMessage();
+        $this->assertInstanceOf(DummyMessage::class, $message);
+        $this->assertEquals('Hi2', $message->getMessage());
     }
 
     private function getConnectionGroup(Connection $connection): string

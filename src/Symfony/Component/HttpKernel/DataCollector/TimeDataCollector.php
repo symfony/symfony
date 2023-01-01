@@ -51,7 +51,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
 
     public function reset()
     {
-        $this->data = [];
+        $this->data = ['events' => [], 'stopwatch_installed' => false, 'start_time' => 0];
 
         $this->stopwatch?->reset();
     }

@@ -18,12 +18,10 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
-use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
 use Symfony\Component\Validator\Constraints\LengthValidator;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotBlankValidator;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Constraints\TimeValidator;
 
 class TranslatorPassTest extends TestCase
 {
@@ -140,10 +138,13 @@ class TranslatorPassTest extends TestCase
             ->addTag('validator.constraint_validator');
         $container->register('validator.length', LengthValidator::class)
             ->addTag('validator.constraint_validator');
+        $container->register('validator.time', '%foo.time.validator.class%')
+            ->addTag('validator.constraint_validator');
+        $container->setParameter('foo.time.validator.class', TimeValidator::class);
 
         $pass = new TranslatorPass();
         $pass->process($container);
 
-        $this->assertSame(['NotBlank', 'Isbn', 'Length'], $constraintVisitor->getArgument(0));
+        $this->assertSame(['NotBlank', 'Isbn', 'Length', 'Time'], $constraintVisitor->getArgument(0));
     }
 }

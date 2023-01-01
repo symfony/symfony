@@ -5,6 +5,7 @@ $container->loadFromExtension('framework', [
     'html_sanitizer' => [
         'sanitizers' => [
             'custom' => [
+                'block_body_elements' => true,
                 'allow_safe_elements' => true,
                 'allow_static_elements' => true,
                 'allow_elements' => [

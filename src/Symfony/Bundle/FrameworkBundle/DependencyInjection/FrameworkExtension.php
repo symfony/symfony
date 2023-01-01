@@ -2931,6 +2931,10 @@ class FrameworkExtension extends Extension
                 $def->addMethodCall('allowStaticElements', [], true);
             }
 
+            if ($sanitizerConfig['block_body_elements']) {
+                $def->addMethodCall('blockBodyElements', [], true);
+            }
+
             // Configures elements
             foreach ($sanitizerConfig['allow_elements'] as $element => $attributes) {
                 $def->addMethodCall('allowElement', [$element, $attributes], true);

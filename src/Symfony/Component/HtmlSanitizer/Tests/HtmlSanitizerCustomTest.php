@@ -393,6 +393,18 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
+    public function testBlockBodyElements()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->blockBodyElements()
+        ;
+
+        $this->assertSame(
+            'If you need help : Visit Symfony',
+            $this->sanitize($config, '<head><title>Hello World</title></head><body><p><span class="red" data-info="info">If you need help : </span><a href="https://symfony.com"/>Visit Symfony</a></p><script>prompt("test");</script></body>')
+        );
+    }
+
     public function testCustomAttributeSanitizer()
     {
         $config = (new HtmlSanitizerConfig())

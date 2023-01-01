@@ -51,9 +51,7 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getStatusCode')
             ->willReturn(500);
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 
@@ -73,9 +71,7 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['errors' => [['code' => 'accountreference_invalid', 'description' => 'Invalid Account Reference EX0000000']]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 
@@ -96,9 +92,7 @@ final class EsendexTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 

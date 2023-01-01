@@ -39,9 +39,7 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
-                return 'Alert: WARNING message' === $email->getSubject() && null === $email->getHtmlBody();
-            }))
+            ->with($this->callback(fn (Email $email) => 'Alert: WARNING message' === $email->getSubject() && null === $email->getHtmlBody()))
         ;
         $handler->handle($this->getRecord(Logger::WARNING, 'message'));
     }
@@ -53,9 +51,7 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
-                return 'Alert: ERROR error' === $email->getSubject() && null === $email->getHtmlBody();
-            }))
+            ->with($this->callback(fn (Email $email) => 'Alert: ERROR error' === $email->getSubject() && null === $email->getHtmlBody()))
         ;
         $handler->handleBatch($this->getMultipleRecords());
     }
@@ -86,9 +82,7 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(function (Email $email) {
-                return 'Alert: WARNING message' === $email->getSubject() && null === $email->getTextBody();
-            }))
+            ->with($this->callback(fn (Email $email) => 'Alert: WARNING message' === $email->getSubject() && null === $email->getTextBody()))
         ;
         $handler->handle($this->getRecord(Logger::WARNING, 'message'));
     }

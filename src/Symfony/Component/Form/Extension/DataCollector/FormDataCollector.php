@@ -229,20 +229,16 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
                 return $a;
             },
-            FormInterface::class => function (FormInterface $f, array $a) {
-                return [
-                    Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub($f->getConfig()->getType()->getInnerType()::class),
-                ];
-            },
+            FormInterface::class => fn (FormInterface $f, array $a) => [
+                Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
+                Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub($f->getConfig()->getType()->getInnerType()::class),
+            ],
             FormView::class => StubCaster::cutInternals(...),
-            ConstraintViolationInterface::class => function (ConstraintViolationInterface $v, array $a) {
-                return [
-                    Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
-                    Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
-                    Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),
-                ];
-            },
+            ConstraintViolationInterface::class => fn (ConstraintViolationInterface $v, array $a) => [
+                Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
+                Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
+                Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),
+            ],
         ];
     }
 

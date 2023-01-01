@@ -67,9 +67,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             $request->setHeader('Accept-Encoding', 'gzip');
         }
 
-        $this->initializer = static function (self $response) {
-            return null !== $response->options;
-        };
+        $this->initializer = static fn (self $response) => null !== $response->options;
 
         $info = &$this->info;
         $headers = &$this->headers;

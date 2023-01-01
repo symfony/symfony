@@ -127,9 +127,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         // when there are errors in sub-requests, the parent and/or children tokens
         // may equal the profile token, resulting in infinite loops
         $parentToken = $profile->getParentToken() !== $profileToken ? $profile->getParentToken() : null;
-        $childrenToken = array_filter(array_map(function (Profile $p) use ($profileToken) {
-            return $profileToken !== $p->getToken() ? $p->getToken() : null;
-        }, $profile->getChildren()));
+        $childrenToken = array_filter(array_map(fn (Profile $p) => $profileToken !== $p->getToken() ? $p->getToken() : null, $profile->getChildren()));
 
         // Store profile
         $data = [

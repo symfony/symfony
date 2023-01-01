@@ -111,9 +111,7 @@ class TimezoneValidator extends ConstraintValidator
                 continue;
             }
 
-            $filtered[] = array_filter($timezones, static function ($id) use ($const) {
-                return 0 === stripos($id, $const.'/');
-            });
+            $filtered[] = array_filter($timezones, static fn ($id) => 0 === stripos($id, $const.'/'));
         }
 
         return $filtered ? array_merge(...$filtered) : [];

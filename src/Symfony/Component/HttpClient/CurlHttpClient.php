@@ -382,14 +382,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         if (0 < $options['max_redirects']) {
             $redirectHeaders['host'] = $host;
             $redirectHeaders['port'] = $port;
-            $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
-                return 0 !== stripos($h, 'Host:');
-            });
+            $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static fn ($h) => 0 !== stripos($h, 'Host:'));
 
             if (isset($options['normalized_headers']['authorization'][0]) || isset($options['normalized_headers']['cookie'][0])) {
-                $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
-                    return 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:');
-                });
+                $redirectHeaders['no_auth'] = array_filter($options['headers'], static fn ($h) => 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:'));
             }
         }
 
@@ -401,9 +397,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
 
             if ($noContent && $redirectHeaders) {
-                $filterContentHeaders = static function ($h) {
-                    return 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:') && 0 !== stripos($h, 'Transfer-Encoding:');
-                };
+                $filterContentHeaders = static fn ($h) => 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:') && 0 !== stripos($h, 'Transfer-Encoding:');
                 $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], $filterContentHeaders);
                 $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
             }
@@ -431,9 +425,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     private function findConstantName(int $opt): ?string
     {
-        $constants = array_filter(get_defined_constants(), static function ($v, $k) use ($opt) {
-            return $v === $opt && 'C' === $k[0] && (str_starts_with($k, 'CURLOPT_') || str_starts_with($k, 'CURLINFO_'));
-        }, \ARRAY_FILTER_USE_BOTH);
+        $constants = array_filter(get_defined_constants(), static fn ($v, $k) => $v === $opt && 'C' === $k[0] && (str_starts_with($k, 'CURLOPT_') || str_starts_with($k, 'CURLINFO_')), \ARRAY_FILTER_USE_BOTH);
 
         return key($constants);
     }

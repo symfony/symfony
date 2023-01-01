@@ -51,9 +51,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->table(['Pool name'], array_map(function ($pool) {
-            return [$pool];
-        }, $this->poolNames));
+        $io->table(['Pool name'], array_map(fn ($pool) => [$pool], $this->poolNames));
 
         return 0;
     }

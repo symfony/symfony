@@ -77,9 +77,7 @@ EOF
         if ($search = $input->getArgument('search')) {
             $searchNormalized = preg_replace('/[^a-zA-Z0-9\x7f-\xff $]++/', '', $search);
 
-            $serviceIds = array_filter($serviceIds, function ($serviceId) use ($searchNormalized) {
-                return false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && !str_starts_with($serviceId, '.');
-            });
+            $serviceIds = array_filter($serviceIds, fn ($serviceId) => false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && !str_starts_with($serviceId, '.'));
 
             if (!$serviceIds) {
                 $errorIo->error(sprintf('No autowirable classes or interfaces found matching "%s"', $search));

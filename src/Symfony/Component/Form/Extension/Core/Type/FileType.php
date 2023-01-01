@@ -104,14 +104,10 @@ class FileType extends AbstractType
     {
         $dataClass = null;
         if (class_exists(File::class)) {
-            $dataClass = function (Options $options) {
-                return $options['multiple'] ? null : File::class;
-            };
+            $dataClass = fn (Options $options) => $options['multiple'] ? null : File::class;
         }
 
-        $emptyData = function (Options $options) {
-            return $options['multiple'] ? [] : null;
-        };
+        $emptyData = fn (Options $options) => $options['multiple'] ? [] : null;
 
         $resolver->setDefaults([
             'compound' => false,

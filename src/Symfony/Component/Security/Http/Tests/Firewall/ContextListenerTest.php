@@ -359,7 +359,7 @@ class ContextListenerTest extends TestCase
             $session->set('_security_session', $original);
         }
 
-        $factories = ['request_stack' => function () use ($requestStack) { return $requestStack; }];
+        $factories = ['request_stack' => fn () => $requestStack];
         $tokenStorage = new UsageTrackingTokenStorage(new TokenStorage(), new class($factories) implements ContainerInterface {
             use ServiceLocatorTrait;
         });
@@ -405,7 +405,7 @@ class ContextListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $usageIndex = $session->getUsageIndex();
 
-        $factories = ['request_stack' => function () use ($requestStack) { return $requestStack; }];
+        $factories = ['request_stack' => fn () => $requestStack];
         $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class($factories) implements ContainerInterface {
             use ServiceLocatorTrait;
         });

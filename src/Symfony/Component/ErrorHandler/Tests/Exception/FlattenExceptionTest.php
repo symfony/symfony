@@ -272,9 +272,7 @@ class FlattenExceptionTest extends TestCase
 
     public function testToString()
     {
-        $test = function ($a, $b, $c, $d) {
-            return new \RuntimeException('This is a test message');
-        };
+        $test = fn ($a, $b, $c, $d) => new \RuntimeException('This is a test message');
 
         $exception = $test('foo123', 1, null, 1.5);
 

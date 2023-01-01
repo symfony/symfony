@@ -30,6 +30,4 @@ class TestKernel implements HttpKernelInterface
     }
 }
 
-return function (array $context) {
-    return new TestKernel($context['SOME_VAR']);
-};
+return fn (array $context) => new TestKernel($context['SOME_VAR']);

@@ -124,9 +124,7 @@ HTML;
         ;
         $email->textTemplate('text');
         $email->context([
-            'foo' => static function () {
-                return 'bar';
-            },
+            'foo' => static fn () => 'bar',
         ]);
 
         $renderer->render($email);

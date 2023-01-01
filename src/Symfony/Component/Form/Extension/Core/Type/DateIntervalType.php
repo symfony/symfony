@@ -159,16 +159,10 @@ class DateIntervalType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $compound = function (Options $options) {
-            return 'single_text' !== $options['widget'];
-        };
-        $emptyData = function (Options $options) {
-            return 'single_text' === $options['widget'] ? '' : [];
-        };
+        $compound = fn (Options $options) => 'single_text' !== $options['widget'];
+        $emptyData = fn (Options $options) => 'single_text' === $options['widget'] ? '' : [];
 
-        $placeholderDefault = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
+        $placeholderDefault = fn (Options $options) => $options['required'] ? null : '';
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
             if (\is_array($placeholder)) {
@@ -180,20 +174,16 @@ class DateIntervalType extends AbstractType
             return array_fill_keys(self::TIME_PARTS, $placeholder);
         };
 
-        $labelsNormalizer = function (Options $options, array $labels) {
-            return array_replace([
-                'years' => null,
-                'months' => null,
-                'days' => null,
-                'weeks' => null,
-                'hours' => null,
-                'minutes' => null,
-                'seconds' => null,
-                'invert' => 'Negative interval',
-            ], array_filter($labels, function ($label) {
-                return null !== $label;
-            }));
-        };
+        $labelsNormalizer = fn (Options $options, array $labels) => array_replace([
+            'years' => null,
+            'months' => null,
+            'days' => null,
+            'weeks' => null,
+            'hours' => null,
+            'minutes' => null,
+            'seconds' => null,
+            'invert' => 'Negative interval',
+        ], array_filter($labels, fn ($label) => null !== $label));
 
         $resolver->setDefaults([
             'with_years' => true,

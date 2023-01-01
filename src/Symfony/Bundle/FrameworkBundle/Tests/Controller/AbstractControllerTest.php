@@ -110,9 +110,7 @@ class AbstractControllerTest extends TestCase
         $requestStack->push($request);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
-            return new Response($request->getRequestFormat().'--'.$request->getLocale());
-        });
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(fn (Request $request) => new Response($request->getRequestFormat().'--'.$request->getLocale()));
 
         $container = new Container();
         $container->set('request_stack', $requestStack);

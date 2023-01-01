@@ -347,7 +347,7 @@ class EventDispatcherTest extends TestCase
     public function testRemoveFindsLazyListeners()
     {
         $test = new TestWithDispatcher();
-        $factory = function () use ($test) { return $test; };
+        $factory = fn () => $test;
 
         $this->dispatcher->addListener('foo', [$factory, 'foo']);
         $this->assertTrue($this->dispatcher->hasListeners('foo'));
@@ -363,7 +363,7 @@ class EventDispatcherTest extends TestCase
     public function testPriorityFindsLazyListeners()
     {
         $test = new TestWithDispatcher();
-        $factory = function () use ($test) { return $test; };
+        $factory = fn () => $test;
 
         $this->dispatcher->addListener('foo', [$factory, 'foo'], 3);
         $this->assertSame(3, $this->dispatcher->getListenerPriority('foo', [$test, 'foo']));
@@ -376,7 +376,7 @@ class EventDispatcherTest extends TestCase
     public function testGetLazyListeners()
     {
         $test = new TestWithDispatcher();
-        $factory = function () use ($test) { return $test; };
+        $factory = fn () => $test;
 
         $this->dispatcher->addListener('foo', [$factory, 'foo'], 3);
         $this->assertSame([[$test, 'foo']], $this->dispatcher->getListeners('foo'));

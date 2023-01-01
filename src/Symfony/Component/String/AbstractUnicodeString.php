@@ -360,9 +360,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
         $limit = $allWords ? -1 : 1;
 
-        $str->string = preg_replace_callback('/\b./u', static function (array $m): string {
-            return mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8');
-        }, $str->string, $limit);
+        $str->string = preg_replace_callback('/\b./u', static fn (array $m): string => mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8'), $str->string, $limit);
 
         return $str;
     }

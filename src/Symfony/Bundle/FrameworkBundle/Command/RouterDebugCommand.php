@@ -80,9 +80,7 @@ EOF
         $routes = $this->router->getRouteCollection();
         $container = null;
         if ($this->fileLinkFormatter) {
-            $container = function () {
-                return $this->getContainerBuilder($this->getApplication()->getKernel());
-            };
+            $container = fn () => $this->getContainerBuilder($this->getApplication()->getKernel());
         }
 
         if ($name) {

@@ -59,9 +59,7 @@ final class TelegramTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['description' => 'testDescription', 'error_code' => 400]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client, 'testChannel');
 
@@ -81,9 +79,7 @@ final class TelegramTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['description' => 'testDescription', 'error_code' => 404]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client, 'testChannel');
 

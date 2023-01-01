@@ -1037,9 +1037,7 @@ class ContainerBuilderTest extends TestCase
 
         $matchingResources = array_filter(
             $container->getResources(),
-            function (ResourceInterface $resource) {
-                return 'reflection.BarClass' === (string) $resource;
-            }
+            fn (ResourceInterface $resource) => 'reflection.BarClass' === (string) $resource
         );
 
         $this->assertNotEmpty($matchingResources);

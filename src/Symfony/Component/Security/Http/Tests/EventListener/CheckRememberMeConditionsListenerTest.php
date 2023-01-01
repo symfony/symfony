@@ -96,6 +96,6 @@ class CheckRememberMeConditionsListenerTest extends TestCase
 
     private function createPassport(array $badges = null)
     {
-        return new SelfValidatingPassport(new UserBadge('test', function ($username) { return new InMemoryUser($username, null); }), $badges ?? [new RememberMeBadge()]);
+        return new SelfValidatingPassport(new UserBadge('test', fn ($username) => new InMemoryUser($username, null)), $badges ?? [new RememberMeBadge()]);
     }
 }

@@ -169,9 +169,7 @@ class ErrorListenerTest extends TestCase
         $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
 
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
-            return new Response($request->getRequestFormat());
-        });
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(fn (Request $request) => new Response($request->getRequestFormat()));
 
         $request = Request::create('/');
         $request->setRequestFormat('xml');
@@ -187,9 +185,7 @@ class ErrorListenerTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
-            return new Response($request->getRequestFormat());
-        });
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(fn (Request $request) => new Response($request->getRequestFormat()));
 
         $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class), true);
 
@@ -233,9 +229,7 @@ class ErrorListenerTest extends TestCase
 
     public function controllerProvider()
     {
-        yield [function (FlattenException $exception) {
-            return new Response('OK: '.$exception->getMessage());
-        }];
+        yield [fn (FlattenException $exception) => new Response('OK: '.$exception->getMessage())];
 
         yield [function ($exception) {
             $this->assertInstanceOf(FlattenException::class, $exception);
@@ -243,9 +237,7 @@ class ErrorListenerTest extends TestCase
             return new Response('OK: '.$exception->getMessage());
         }];
 
-        yield [function (\Throwable $exception) {
-            return new Response('OK: '.$exception->getMessage());
-        }];
+        yield [fn (\Throwable $exception) => new Response('OK: '.$exception->getMessage())];
     }
 
     public static function exceptionWithAttributeProvider()

@@ -46,9 +46,7 @@ class LocaleScanner
         array_walk($locales, function (&$locale) { $locale = basename($locale, '.txt'); });
 
         // Remove non-locales
-        $locales = array_filter($locales, function ($locale) {
-            return preg_match('/^[a-z]{2}(_.+)?$/', $locale);
-        });
+        $locales = array_filter($locales, fn ($locale) => preg_match('/^[a-z]{2}(_.+)?$/', $locale));
 
         sort($locales);
 

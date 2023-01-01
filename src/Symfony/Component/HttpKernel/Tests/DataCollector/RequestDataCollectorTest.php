@@ -113,7 +113,7 @@ class RequestDataCollectorTest extends TestCase
 
             [
                 'Closure',
-                function () { return 'foo'; },
+                fn () => 'foo',
                 [
                     'class' => __NAMESPACE__.'\{closure}',
                     'method' => null,

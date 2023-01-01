@@ -124,9 +124,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->any())
             ->method('validate')
-            ->willReturnCallback(function () {
-                return $this->expectedViolations[$this->call++] ?? new ConstraintViolationList();
-            });
+            ->willReturnCallback(fn () => $this->expectedViolations[$this->call++] ?? new ConstraintViolationList());
 
         $context = new ExecutionContext($validator, $this->root, $translator);
         $context->setGroup($this->group);
@@ -145,29 +143,19 @@ abstract class ConstraintValidatorTestCase extends TestCase
             ->getMock();
         $contextualValidator->expects($this->any())
             ->method('atPath')
-            ->willReturnCallback(function ($path) use ($contextualValidator) {
-                return $contextualValidator->doAtPath($path);
-            });
+            ->willReturnCallback(fn ($path) => $contextualValidator->doAtPath($path));
         $contextualValidator->expects($this->any())
             ->method('validate')
-            ->willReturnCallback(function ($value, $constraints = null, $groups = null) use ($contextualValidator) {
-                return $contextualValidator->doValidate($value, $constraints, $groups);
-            });
+            ->willReturnCallback(fn ($value, $constraints = null, $groups = null) => $contextualValidator->doValidate($value, $constraints, $groups));
         $contextualValidator->expects($this->any())
             ->method('validateProperty')
-            ->willReturnCallback(function ($object, $propertyName, $groups = null) use ($contextualValidator) {
-                return $contextualValidator->validateProperty($object, $propertyName, $groups);
-            });
+            ->willReturnCallback(fn ($object, $propertyName, $groups = null) => $contextualValidator->validateProperty($object, $propertyName, $groups));
         $contextualValidator->expects($this->any())
             ->method('validatePropertyValue')
-            ->willReturnCallback(function ($objectOrClass, $propertyName, $value, $groups = null) use ($contextualValidator) {
-                return $contextualValidator->doValidatePropertyValue($objectOrClass, $propertyName, $value, $groups);
-            });
+            ->willReturnCallback(fn ($objectOrClass, $propertyName, $value, $groups = null) => $contextualValidator->doValidatePropertyValue($objectOrClass, $propertyName, $value, $groups));
         $contextualValidator->expects($this->any())
             ->method('getViolations')
-            ->willReturnCallback(function () use ($contextualValidator) {
-                return $contextualValidator->doGetViolations();
-            });
+            ->willReturnCallback(fn () => $contextualValidator->doGetViolations());
         $validator->expects($this->any())
             ->method('inContext')
             ->with($context)

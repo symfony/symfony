@@ -39,9 +39,7 @@ class StackMiddlewareTest extends TestCase
         $middleware2
             ->expects($this->exactly(2))
             ->method('handle')
-            ->willReturnCallback(function (Envelope $envelope, StackInterface $stack): Envelope {
-                return $envelope;
-            })
+            ->willReturnCallback(fn (Envelope $envelope, StackInterface $stack): Envelope => $envelope)
         ;
 
         $bus = new MessageBus([$middleware1, $middleware2]);

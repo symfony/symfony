@@ -87,9 +87,7 @@ class Connection
 
         if (\is_array($host) || $redis instanceof \RedisCluster) {
             $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
-            $this->redis = static function () use ($redis, $hosts, $auth, $options) {
-                return self::initializeRedisCluster($redis, $hosts, $auth, $options);
-            };
+            $this->redis = static fn () => self::initializeRedisCluster($redis, $hosts, $auth, $options);
         } else {
             if (null !== $sentinelMaster) {
                 $sentinelClient = new \RedisSentinel($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
@@ -101,9 +99,7 @@ class Connection
                 [$host, $port] = $address;
             }
 
-            $this->redis = static function () use ($redis, $host, $port, $auth, $options) {
-                return self::initializeRedis($redis ?? new \Redis(), $host, $port, $auth, $options);
-            };
+            $this->redis = static fn () => self::initializeRedis($redis ?? new \Redis(), $host, $port, $auth, $options);
         }
 
         if (!$options['lazy']) {

@@ -29,6 +29,21 @@ class LazyStringTest extends TestCase
         $this->assertSame(1, $count);
     }
 
+    /**
+     * @runInSeparateProcess
+     */
+    public function testReturnTypeError()
+    {
+        ErrorHandler::register();
+
+        $s = LazyString::fromCallable(fn () => []);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Return value of '.__NAMESPACE__.'\{closure}() passed to '.LazyString::class.'::fromCallable() must be of the type string, array returned.');
+
+        (string) $s;
+    }
+
     public function testLazyCallable()
     {
         $count = 0;
@@ -53,21 +68,6 @@ class LazyStringTest extends TestCase
         $this->assertSame(1, $count);
         $this->assertSame('1', (string) $s); // ensure the value is memoized
         $this->assertSame(1, $count);
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function testReturnTypeError()
-    {
-        ErrorHandler::register();
-
-        $s = LazyString::fromCallable(function () { return []; });
-
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Return value of '.__NAMESPACE__.'\{closure}() passed to '.LazyString::class.'::fromCallable() must be of the type string, array returned.');
-
-        (string) $s;
     }
 
     public function testFromStringable()

@@ -176,18 +176,14 @@ class LazyProxyTraitTest extends TestCase
 
     public function testStringMagicGet()
     {
-        $proxy = $this->createLazyProxy(StringMagicGetClass::class, function () {
-            return new StringMagicGetClass();
-        });
+        $proxy = $this->createLazyProxy(StringMagicGetClass::class, fn () => new StringMagicGetClass());
 
         $this->assertSame('abc', $proxy->abc);
     }
 
     public function testFinalPublicClass()
     {
-        $proxy = $this->createLazyProxy(FinalPublicClass::class, function () {
-            return new FinalPublicClass();
-        });
+        $proxy = $this->createLazyProxy(FinalPublicClass::class, fn () => new FinalPublicClass());
 
         $this->assertSame(1, $proxy->increment());
         $this->assertSame(2, $proxy->increment());

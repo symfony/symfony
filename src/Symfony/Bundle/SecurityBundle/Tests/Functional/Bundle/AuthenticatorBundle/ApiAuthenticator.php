@@ -46,7 +46,7 @@ class ApiAuthenticator extends AbstractAuthenticator
 
         $userLoader = null;
         if ($this->selfLoadingUser) {
-            $userLoader = function ($username) { return new InMemoryUser($username, 'test', ['ROLE_USER']); };
+            $userLoader = fn ($username) => new InMemoryUser($username, 'test', ['ROLE_USER']);
         }
 
         return new SelfValidatingPassport(new UserBadge($email, $userLoader));

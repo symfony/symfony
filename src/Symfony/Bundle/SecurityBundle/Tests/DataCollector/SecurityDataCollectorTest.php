@@ -342,7 +342,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertEquals($dataCollector->getAccessDecisionLog(), $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
 
         $this->assertSame(
-            array_map(function ($classStub) { return (string) $classStub; }, $dataCollector->getVoters()),
+            array_map(fn ($classStub) => (string) $classStub, $dataCollector->getVoters()),
             $expectedVoterClasses,
             'Wrong value returned by getVoters'
         );

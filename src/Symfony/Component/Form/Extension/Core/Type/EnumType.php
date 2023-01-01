@@ -28,12 +28,8 @@ final class EnumType extends AbstractType
             ->setRequired(['class'])
             ->setAllowedTypes('class', 'string')
             ->setAllowedValues('class', enum_exists(...))
-            ->setDefault('choices', static function (Options $options): array {
-                return $options['class']::cases();
-            })
-            ->setDefault('choice_label', static function (\UnitEnum $choice): string {
-                return $choice->name;
-            })
+            ->setDefault('choices', static fn (Options $options): array => $options['class']::cases())
+            ->setDefault('choice_label', static fn (\UnitEnum $choice): string => $choice->name)
             ->setDefault('choice_value', static function (Options $options): ?\Closure {
                 if (!is_a($options['class'], \BackedEnum::class, true)) {
                     return null;

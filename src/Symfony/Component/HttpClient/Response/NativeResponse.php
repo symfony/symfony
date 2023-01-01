@@ -71,9 +71,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         $info['max_duration'] = $options['max_duration'];
         ++$multi->responseCount;
 
-        $this->initializer = static function (self $response) {
-            return null === $response->remaining;
-        };
+        $this->initializer = static fn (self $response) => null === $response->remaining;
 
         $pauseExpiry = &$this->pauseExpiry;
         $info['pause_handler'] = static function (float $duration) use (&$pauseExpiry) {

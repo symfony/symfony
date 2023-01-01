@@ -58,9 +58,7 @@ class HandlerFailedException extends RuntimeException
         return array_values(
             array_filter(
                 $this->exceptions,
-                function ($exception) use ($exceptionClassName) {
-                    return is_a($exception, $exceptionClassName);
-                }
+                fn ($exception) => is_a($exception, $exceptionClassName)
             )
         );
     }

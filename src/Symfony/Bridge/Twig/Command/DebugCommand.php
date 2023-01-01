@@ -162,9 +162,7 @@ EOF
                 [$namespace, $shortname] = $this->parseTemplateName($name);
                 $alternatives = $this->findAlternatives($shortname, $shortnames);
                 if (FilesystemLoader::MAIN_NAMESPACE !== $namespace) {
-                    $alternatives = array_map(function ($shortname) use ($namespace) {
-                        return '@'.$namespace.'/'.$shortname;
-                    }, $alternatives);
+                    $alternatives = array_map(fn ($shortname) => '@'.$namespace.'/'.$shortname, $alternatives);
                 }
             }
 
@@ -543,7 +541,7 @@ EOF
         }
 
         $threshold = 1e3;
-        $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
+        $alternatives = array_filter($alternatives, fn ($lev) => $lev < 2 * $threshold);
         ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);

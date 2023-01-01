@@ -46,7 +46,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 ->fixXmlConfig('token_extractors')
                 ->beforeNormalization()
                     ->ifString()
-                    ->then(static function (string $v): array { return [$v]; })
+                    ->then(static fn (string $v): array => [$v])
                 ->end()
                 ->cannotBeEmpty()
                 ->defaultValue([
@@ -97,9 +97,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             'request_body' => 'security.access_token_extractor.request_body',
             'header' => 'security.access_token_extractor.header',
         ];
-        $extractors = array_map(static function (string $extractor) use ($aliases): string {
-            return $aliases[$extractor] ?? $extractor;
-        }, $extractors);
+        $extractors = array_map(static fn (string $extractor): string => $aliases[$extractor] ?? $extractor, $extractors);
 
         if (1 === \count($extractors)) {
             return current($extractors);
@@ -107,7 +105,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $extractorId = sprintf('security.authenticator.access_token.chain_extractor.%s', $firewallName);
         $container
             ->setDefinition($extractorId, new ChildDefinition('security.authenticator.access_token.chain_extractor'))
-            ->replaceArgument(0, array_map(function (string $extractorId): Reference {return new Reference($extractorId); }, $extractors))
+            ->replaceArgument(0, array_map(fn (string $extractorId): Reference => new Reference($extractorId), $extractors))
         ;
 
         return $extractorId;

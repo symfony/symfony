@@ -1020,9 +1020,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             } elseif (!\is_string($factory)) {
                 throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory.', $id));
             } elseif (str_starts_with($factory, '@=')) {
-                $factory = function (ServiceLocator $arguments) use ($factory) {
-                    return $this->getExpressionLanguage()->evaluate(substr($factory, 2), ['container' => $this, 'args' => $arguments]);
-                };
+                $factory = fn (ServiceLocator $arguments) => $this->getExpressionLanguage()->evaluate(substr($factory, 2), ['container' => $this, 'args' => $arguments]);
                 $arguments = [new ServiceLocatorArgument($arguments)];
             }
         }
@@ -1127,9 +1125,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         } elseif ($value instanceof ServiceClosureArgument) {
             $reference = $value->getValues()[0];
-            $value = function () use ($reference) {
-                return $this->resolveServices($reference);
-            };
+            $value = fn () => $this->resolveServices($reference);
         } elseif ($value instanceof IteratorArgument) {
             $value = new RewindableGenerator(function () use ($value, &$inlineServices) {
                 foreach ($value->getValues() as $k => $v) {

@@ -69,14 +69,10 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
         $locator = $this->createMock(ContainerInterface::class);
         $locator->expects($this->any())
             ->method('has')
-            ->willReturnCallback(function ($firewallName) use ($linkers) {
-                return isset($linkers[$firewallName]);
-            });
+            ->willReturnCallback(fn ($firewallName) => isset($linkers[$firewallName]));
         $locator->expects($this->any())
             ->method('get')
-            ->willReturnCallback(function ($firewallName) use ($linkers) {
-                return $linkers[$firewallName];
-            });
+            ->willReturnCallback(fn ($firewallName) => $linkers[$firewallName]);
 
         return $locator;
     }

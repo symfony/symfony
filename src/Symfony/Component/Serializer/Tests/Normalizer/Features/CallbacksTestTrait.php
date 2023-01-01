@@ -180,9 +180,7 @@ trait CallbacksTestTrait
             ],
             'Count a property' => [
                 [
-                    'bar' => function (array $bars) {
-                        return \count($bars);
-                    },
+                    'bar' => fn (array $bars) => \count($bars),
                 ],
                 [new CallbacksObject(), new CallbacksObject()],
                 ['bar' => 2, 'foo' => null],
@@ -244,9 +242,7 @@ trait CallbacksTestTrait
             ],
             'Count a property' => [
                 [
-                    'bar' => function (array $bars) {
-                        return \count($bars);
-                    },
+                    'bar' => fn (array $bars) => \count($bars),
                 ],
                 [new CallbacksObject(), new CallbacksObject()],
                 new CallbacksObject(2),

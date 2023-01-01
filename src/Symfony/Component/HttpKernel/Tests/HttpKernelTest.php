@@ -295,7 +295,7 @@ class HttpKernelTest extends TestCase
     {
         $response = new Response('foo');
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getHttpKernel($dispatcher, function () use ($response) { return $response; });
+        $kernel = $this->getHttpKernel($dispatcher, fn () => $response);
 
         $this->assertSame($response, $kernel->handle(new Request()));
     }
@@ -357,7 +357,7 @@ class HttpKernelTest extends TestCase
             $event->setResponse(new Response($event->getControllerResult()));
         });
 
-        $kernel = $this->getHttpKernel($dispatcher, function () { return 'foo'; });
+        $kernel = $this->getHttpKernel($dispatcher, fn () => 'foo');
 
         $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
     }
@@ -380,7 +380,7 @@ class HttpKernelTest extends TestCase
             $event->setArguments(['foo']);
         });
 
-        $kernel = $this->getHttpKernel($dispatcher, function ($content) { return new Response($content); });
+        $kernel = $this->getHttpKernel($dispatcher, fn ($content) => new Response($content));
 
         $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
@@ -404,7 +404,7 @@ class HttpKernelTest extends TestCase
             $event->setArguments(['bar']);
         });
 
-        $kernel = $this->getHttpKernel($dispatcher, function ($content) { return new Response($content); }, null, ['foo']);
+        $kernel = $this->getHttpKernel($dispatcher, fn ($content) => new Response($content), null, ['foo']);
 
         $this->assertResponseEquals(new Response('foo', 200, ['X-Id' => 'bar']), $kernel->handle(new Request()));
     }
@@ -479,7 +479,7 @@ class HttpKernelTest extends TestCase
 
     private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false)
     {
-        $controller ??= function () { return new Response('Hello'); };
+        $controller ??= fn () => new Response('Hello');
 
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
         $controllerResolver

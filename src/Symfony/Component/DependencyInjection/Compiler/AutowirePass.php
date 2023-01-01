@@ -518,9 +518,7 @@ class AutowirePass extends AbstractRecursivePass
         }
         $currentId = $this->currentId;
 
-        return (function () use ($reference, $label, $currentId) {
-            return $this->createTypeNotFoundMessage($reference, $label, $currentId);
-        })->bindTo($this->typesClone);
+        return (fn () => $this->createTypeNotFoundMessage($reference, $label, $currentId))->bindTo($this->typesClone);
     }
 
     private function createTypeNotFoundMessage(TypedReference $reference, string $label, string $currentId): string

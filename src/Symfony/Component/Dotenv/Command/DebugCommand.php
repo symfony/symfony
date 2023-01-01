@@ -81,9 +81,7 @@ EOT
         }
 
         $envFiles = $this->getEnvFiles();
-        $availableFiles = array_filter($envFiles, function (string $file) {
-            return is_file($this->getFilePath($file));
-        });
+        $availableFiles = array_filter($envFiles, fn (string $file) => is_file($this->getFilePath($file)));
 
         if (\in_array('.env.local.php', $availableFiles, true)) {
             $io->warning('Due to existing dump file (.env.local.php) all other dotenv files are skipped.');
@@ -94,11 +92,9 @@ EOT
         }
 
         $io->section('Scanned Files (in descending priority)');
-        $io->listing(array_map(static function (string $envFile) use ($availableFiles) {
-            return \in_array($envFile, $availableFiles, true)
-                ? sprintf('<fg=green>✓</> %s', $envFile)
-                : sprintf('<fg=red>⨯</> %s', $envFile);
-        }, $envFiles));
+        $io->listing(array_map(static fn (string $envFile) => \in_array($envFile, $availableFiles, true)
+            ? sprintf('<fg=green>✓</> %s', $envFile)
+            : sprintf('<fg=red>⨯</> %s', $envFile), $envFiles));
 
         $nameFilter = $input->getArgument('filter');
         $variables = $this->getVariables($availableFiles, $nameFilter);

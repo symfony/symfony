@@ -57,9 +57,7 @@ final class LineNotifyTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['message' => 'testDescription', 'code' => 'testErrorCode', 'status' => 'testStatus']));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 

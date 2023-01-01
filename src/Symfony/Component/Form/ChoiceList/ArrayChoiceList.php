@@ -64,9 +64,7 @@ class ArrayChoiceList implements ChoiceListInterface
         }
 
         if (null === $value && $this->castableToString($choices)) {
-            $value = function ($choice) {
-                return false === $choice ? '0' : (string) $choice;
-            };
+            $value = fn ($choice) => false === $choice ? '0' : (string) $choice;
         }
 
         if (null !== $value) {

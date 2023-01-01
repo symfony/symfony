@@ -826,9 +826,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testObjectClassResolver()
     {
-        $classResolver = function ($object) {
-            return ObjectDummy::class;
-        };
+        $classResolver = fn ($object) => ObjectDummy::class;
 
         $normalizer = new ObjectNormalizer(null, null, null, null, null, $classResolver);
 

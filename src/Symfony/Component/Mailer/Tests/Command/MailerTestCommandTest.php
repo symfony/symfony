@@ -30,14 +30,10 @@ class MailerTestCommandTest extends TestCase
         $mailer
             ->expects($this->once())
             ->method('send')
-            ->with(self::callback(static function (Email $message) use ($from, $to, $subject, $body): bool {
-                return
-                    $message->getFrom()[0]->getAddress() === $from &&
-                    $message->getTo()[0]->getAddress() === $to &&
-                    $message->getSubject() === $subject &&
-                    $message->getTextBody() === $body
-                ;
-            }))
+            ->with(self::callback(static fn (Email $message): bool => $message->getFrom()[0]->getAddress() === $from &&
+            $message->getTo()[0]->getAddress() === $to &&
+            $message->getSubject() === $subject &&
+            $message->getTextBody() === $body))
         ;
 
         $tester = new CommandTester(new MailerTestCommand($mailer));
@@ -57,9 +53,7 @@ class MailerTestCommandTest extends TestCase
         $mailer
             ->expects($this->once())
             ->method('send')
-            ->with(self::callback(static function (Email $message) use ($transport): bool {
-                return $message->getHeaders()->getHeaderBody('X-Transport') === $transport;
-            }))
+            ->with(self::callback(static fn (Email $message): bool => $message->getHeaders()->getHeaderBody('X-Transport') === $transport))
         ;
 
         $tester = new CommandTester(new MailerTestCommand($mailer));

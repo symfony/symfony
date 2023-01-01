@@ -115,9 +115,7 @@ class AcceptHeader
      */
     public function filter(string $pattern): self
     {
-        return new self(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
-            return preg_match($pattern, $item->getValue());
-        }));
+        return new self(array_filter($this->items, fn (AcceptHeaderItem $item) => preg_match($pattern, $item->getValue())));
     }
 
     /**

@@ -60,10 +60,10 @@ class PasswordMigratingListenerTest extends TestCase
     public function provideUnsupportedEvents()
     {
         // no password upgrade badge
-        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(UserInterface::class); })))];
+        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->createMock(UserInterface::class))))];
 
         // blank password
-        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(TestPasswordAuthenticatedUser::class); }), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
+        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->createMock(TestPasswordAuthenticatedUser::class)), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
     }
 
     public function testUpgradeWithUpgrader()
@@ -74,7 +74,7 @@ class PasswordMigratingListenerTest extends TestCase
             ->with($this->user, 'new-hash')
         ;
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PasswordUpgradeBadge('pa$$word', $passwordUpgrader)]));
         $this->listener->onLoginSuccess($event);
     }
 
@@ -101,7 +101,7 @@ class PasswordMigratingListenerTest extends TestCase
 
         $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word')]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
     }
 

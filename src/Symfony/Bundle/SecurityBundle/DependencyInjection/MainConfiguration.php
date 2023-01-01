@@ -78,15 +78,15 @@ class MainConfiguration implements ConfigurationInterface
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['service']); })
+                        ->ifTrue(fn ($v) => isset($v['strategy'], $v['service']))
                         ->thenInvalid('"strategy" and "service" cannot be used together.')
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['strategy'], $v['strategy_service']); })
+                        ->ifTrue(fn ($v) => isset($v['strategy'], $v['strategy_service']))
                         ->thenInvalid('"strategy" and "strategy_service" cannot be used together.')
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['service'], $v['strategy_service']); })
+                        ->ifTrue(fn ($v) => isset($v['service'], $v['strategy_service']))
                         ->thenInvalid('"service" and "strategy_service" cannot be used together.')
                     ->end()
                 ->end()
@@ -111,10 +111,10 @@ class MainConfiguration implements ConfigurationInterface
                     ->useAttributeAsKey('id')
                     ->prototype('array')
                         ->performNoDeepMerging()
-                        ->beforeNormalization()->ifString()->then(function ($v) { return ['value' => $v]; })->end()
+                        ->beforeNormalization()->ifString()->then(fn ($v) => ['value' => $v])->end()
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return \is_array($v) && isset($v['value']); })
-                            ->then(function ($v) { return preg_split('/\s*,\s*/', $v['value']); })
+                            ->ifTrue(fn ($v) => \is_array($v) && isset($v['value']))
+                            ->then(fn ($v) => preg_split('/\s*,\s*/', $v['value']))
                         ->end()
                         ->prototype('scalar')->end()
                     ->end()
@@ -324,9 +324,7 @@ class MainConfiguration implements ConfigurationInterface
         $firewallNodeBuilder
             ->end()
             ->validate()
-                ->ifTrue(function ($v) {
-                    return true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']);
-                })
+                ->ifTrue(fn ($v) => true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']))
                 ->then(function ($firewall) use ($abstractFactoryKeys) {
                     foreach ($abstractFactoryKeys as $k) {
                         if (!isset($firewall[$k]['check_path'])) {
@@ -375,7 +373,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->arrayNode('providers')
                             ->beforeNormalization()
                                 ->ifString()
-                                ->then(function ($v) { return preg_split('/\s*,\s*/', $v); })
+                                ->then(fn ($v) => preg_split('/\s*,\s*/', $v))
                             ->end()
                             ->prototype('scalar')->end()
                         ->end()
@@ -393,11 +391,11 @@ class MainConfiguration implements ConfigurationInterface
 
         $providerNodeBuilder
             ->validate()
-                ->ifTrue(function ($v) { return \count($v) > 1; })
+                ->ifTrue(fn ($v) => \count($v) > 1)
                 ->thenInvalid('You cannot set multiple provider types for the same provider')
             ->end()
             ->validate()
-                ->ifTrue(function ($v) { return 0 === \count($v); })
+                ->ifTrue(fn ($v) => 0 === \count($v))
                 ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;

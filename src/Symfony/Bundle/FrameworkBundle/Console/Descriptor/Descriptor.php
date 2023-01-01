@@ -241,9 +241,7 @@ abstract class Descriptor implements DescriptorInterface
                 }
             }
         }
-        uasort($maxPriority, function ($a, $b) {
-            return $b <=> $a;
-        });
+        uasort($maxPriority, fn ($a, $b) => $b <=> $a);
 
         return array_keys($maxPriority);
     }
@@ -260,9 +258,7 @@ abstract class Descriptor implements DescriptorInterface
 
     protected function sortByPriority(array $tag): array
     {
-        usort($tag, function ($a, $b) {
-            return ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0);
-        });
+        usort($tag, fn ($a, $b) => ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0));
 
         return $tag;
     }
@@ -305,9 +301,7 @@ abstract class Descriptor implements DescriptorInterface
         $envVars = array_unique($envVars[1]);
 
         $bag = $container->getParameterBag();
-        $getDefaultParameter = function (string $name) {
-            return parent::get($name);
-        };
+        $getDefaultParameter = fn (string $name) => parent::get($name);
         $getDefaultParameter = $getDefaultParameter->bindTo($bag, $bag::class);
 
         $getEnvReflection = new \ReflectionMethod($container, 'getEnv');
@@ -343,9 +337,7 @@ abstract class Descriptor implements DescriptorInterface
     protected function getServiceEdges(ContainerBuilder $builder, string $serviceId): array
     {
         try {
-            return array_map(function (ServiceReferenceGraphEdge $edge) {
-                return $edge->getSourceNode()->getId();
-            }, $builder->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges());
+            return array_map(fn (ServiceReferenceGraphEdge $edge) => $edge->getSourceNode()->getId(), $builder->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges());
         } catch (InvalidArgumentException $exception) {
             return [];
         }

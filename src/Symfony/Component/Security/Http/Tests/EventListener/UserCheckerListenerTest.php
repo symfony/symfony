@@ -47,7 +47,7 @@ class UserCheckerListenerTest extends TestCase
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
 
-        $this->listener->preCheckCredentials($this->createCheckPassportEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PreAuthenticatedUserBadge()])));
+        $this->listener->preCheckCredentials($this->createCheckPassportEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PreAuthenticatedUserBadge()])));
     }
 
     public function testPostAuthValidCredentials()
@@ -59,7 +59,7 @@ class UserCheckerListenerTest extends TestCase
 
     private function createCheckPassportEvent($passport = null)
     {
-        $passport ??= new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }));
+        $passport ??= new SelfValidatingPassport(new UserBadge('test', fn () => $this->user));
 
         return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
     }

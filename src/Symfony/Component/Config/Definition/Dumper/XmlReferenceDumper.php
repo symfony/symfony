@@ -53,9 +53,7 @@ class XmlReferenceDumper
 
         // xml remapping
         if ($node->getParent()) {
-            $remapping = array_filter($node->getParent()->getXmlRemappings(), function (array $mapping) use ($rootName) {
-                return $rootName === $mapping[1];
-            });
+            $remapping = array_filter($node->getParent()->getXmlRemappings(), fn (array $mapping) => $rootName === $mapping[1]);
 
             if (\count($remapping)) {
                 [$singular] = current($remapping);

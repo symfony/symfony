@@ -45,9 +45,7 @@ class CachePruneCommandTest extends TestCase
 
     private function getEmptyRewindableGenerator(): RewindableGenerator
     {
-        return new RewindableGenerator(function () {
-            return new \ArrayIterator([]);
-        }, 0);
+        return new RewindableGenerator(fn () => new \ArrayIterator([]), 0);
     }
 
     private function getKernel(): MockObject&KernelInterface

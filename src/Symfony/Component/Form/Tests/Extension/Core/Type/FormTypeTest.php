@@ -439,9 +439,8 @@ class FormTypeTest extends BaseTypeTest
         $builder->add('referenceCopy', static::TESTED_TYPE);
         $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
-            function ($value) { // reverseTransform
-                return 'foobar';
-            }
+            fn ($value) => // reverseTransform
+'foobar'
         ));
         $form = $builder->getForm();
 
@@ -464,9 +463,8 @@ class FormTypeTest extends BaseTypeTest
         $builder->add('referenceCopy', static::TESTED_TYPE);
         $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
-            function ($value) use ($ref2) { // reverseTransform
-                return $ref2;
-            }
+            fn ($value) => // reverseTransform
+$ref2
         ));
         $form = $builder->getForm();
 

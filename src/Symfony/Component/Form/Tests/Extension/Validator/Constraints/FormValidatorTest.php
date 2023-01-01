@@ -272,7 +272,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                function ($data) { return $data; },
+                fn ($data) => $data,
                 function () { throw new TransformationFailedException(); }
             ))
             ->getForm();
@@ -309,7 +309,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                function ($data) { return $data; },
+                fn ($data) => $data,
                 function () { throw new TransformationFailedException(); }
             ))
             ->getForm();
@@ -344,7 +344,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                function ($data) { return $data; },
+                fn ($data) => $data,
                 function () { throw new TransformationFailedException(); }
             ))
             ->getForm();
@@ -375,7 +375,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ])
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
-                function ($data) { return $data; },
+                fn ($data) => $data,
                 function () {
                     $failure = new TransformationFailedException();
                     $failure->setInvalidMessage('safe message to be used', ['{{ bar }}' => 'bar']);
@@ -451,9 +451,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testHandleClosureValidationGroups()
     {
         $object = new \stdClass();
-        $options = ['validation_groups' => function (FormInterface $form) {
-            return ['group1', 'group2'];
-        }];
+        $options = ['validation_groups' => fn (FormInterface $form) => ['group1', 'group2']];
         $form = $this->getCompoundForm($object, $options);
         $form->submit([]);
 
@@ -565,9 +563,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $parentOptions = [
-            'validation_groups' => function () {
-                return ['group1', 'group2'];
-            },
+            'validation_groups' => fn () => ['group1', 'group2'],
         ];
         $parent = $this->getBuilder('parent', null, $parentOptions)
             ->setCompound(true)

@@ -91,13 +91,9 @@ class WeekType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $compound = function (Options $options) {
-            return 'single_text' !== $options['widget'];
-        };
+        $compound = fn (Options $options) => 'single_text' !== $options['widget'];
 
-        $placeholderDefault = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
+        $placeholderDefault = fn (Options $options) => $options['required'] ? null : '';
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
             if (\is_array($placeholder)) {
@@ -137,13 +133,9 @@ class WeekType extends AbstractType
             'widget' => 'single_text',
             'input' => 'array',
             'placeholder' => $placeholderDefault,
-            'html5' => static function (Options $options) {
-                return 'single_text' === $options['widget'];
-            },
+            'html5' => static fn (Options $options) => 'single_text' === $options['widget'],
             'error_bubbling' => false,
-            'empty_data' => function (Options $options) {
-                return $options['compound'] ? [] : '';
-            },
+            'empty_data' => fn (Options $options) => $options['compound'] ? [] : '',
             'compound' => $compound,
             'choice_translation_domain' => false,
             'invalid_message' => 'Please enter a valid week.',

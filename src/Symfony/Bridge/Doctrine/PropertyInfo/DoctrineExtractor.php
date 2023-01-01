@@ -47,9 +47,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         $properties = array_merge($metadata->getFieldNames(), $metadata->getAssociationNames());
 
         if ($metadata instanceof ClassMetadataInfo && class_exists(Embedded::class) && $metadata->embeddedClasses) {
-            $properties = array_filter($properties, function ($property) {
-                return !str_contains($property, '.');
-            });
+            $properties = array_filter($properties, fn ($property) => !str_contains($property, '.'));
 
             $properties = array_merge($properties, array_keys($metadata->embeddedClasses));
         }

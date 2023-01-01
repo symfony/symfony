@@ -169,9 +169,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
     private function generateAlpha3Codes(array $languageCodes, ArrayAccessibleResourceBundle $metadataBundle): array
     {
-        $alpha3Codes = array_flip(array_filter($languageCodes, static function (string $language): bool {
-            return 3 === \strlen($language);
-        }));
+        $alpha3Codes = array_flip(array_filter($languageCodes, static fn (string $language): bool => 3 === \strlen($language)));
 
         foreach ($metadataBundle['alias']['language'] as $alias => $data) {
             if (3 === \strlen($alias) && 'overlong' === $data['reason']) {

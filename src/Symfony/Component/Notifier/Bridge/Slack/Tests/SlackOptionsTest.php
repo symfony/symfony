@@ -179,7 +179,7 @@ final class SlackOptionsTest extends TestCase
 
     public function testConstructWithMaximumBlocks()
     {
-        $options = new SlackOptions(['blocks' => array_map(static function () { return ['type' => 'divider']; }, range(0, 49))]);
+        $options = new SlackOptions(['blocks' => array_map(static fn () => ['type' => 'divider'], range(0, 49))]);
 
         $this->assertCount(50, $options->toArray()['blocks']);
     }
@@ -189,7 +189,7 @@ final class SlackOptionsTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Maximum number of "blocks" has been reached (50).');
 
-        new SlackOptions(['blocks' => array_map(static function () { return ['type' => 'divider']; }, range(0, 50))]);
+        new SlackOptions(['blocks' => array_map(static fn () => ['type' => 'divider'], range(0, 50))]);
     }
 
     public function testAddMaximumBlocks()

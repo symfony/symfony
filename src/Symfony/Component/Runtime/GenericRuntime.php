@@ -113,7 +113,7 @@ class GenericRuntime implements RuntimeInterface
 
     public function getRunner(?object $application): RunnerInterface
     {
-        $application ??= static function () { return 0; };
+        $application ??= static fn () => 0;
 
         if ($application instanceof RunnerInterface) {
             return $application;

@@ -930,9 +930,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             return;
         }
 
-        uksort($children, static function ($a, $b) use ($c): int {
-            return [$c[$b]['p'], $c[$a]['i']] <=> [$c[$a]['p'], $c[$b]['i']];
-        });
+        uksort($children, static fn ($a, $b): int => [$c[$b]['p'], $c[$a]['i']] <=> [$c[$a]['p'], $c[$b]['i']]);
     }
 
     /**

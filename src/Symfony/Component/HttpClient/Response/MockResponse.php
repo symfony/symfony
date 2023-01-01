@@ -121,9 +121,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $response->requestOptions = $options;
         $response->id = ++self::$idSequence;
         $response->shouldBuffer = $options['buffer'] ?? true;
-        $response->initializer = static function (self $response) {
-            return \is_array($response->body[0] ?? null);
-        };
+        $response->initializer = static fn (self $response) => \is_array($response->body[0] ?? null);
 
         $response->info['redirect_count'] = 0;
         $response->info['redirect_url'] = null;

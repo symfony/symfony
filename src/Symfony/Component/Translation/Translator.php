@@ -178,9 +178,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
             }
         }
 
-        $parameters = array_map(function ($parameter) use ($locale) {
-            return $parameter instanceof TranslatableInterface ? $parameter->trans($this, $locale) : $parameter;
-        }, $parameters);
+        $parameters = array_map(fn ($parameter) => $parameter instanceof TranslatableInterface ? $parameter->trans($this, $locale) : $parameter, $parameters);
 
         $len = \strlen(MessageCatalogue::INTL_DOMAIN_SUFFIX);
         if ($this->hasIntlFormatter

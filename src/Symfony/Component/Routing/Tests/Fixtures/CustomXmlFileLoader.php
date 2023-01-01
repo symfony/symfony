@@ -21,6 +21,6 @@ class CustomXmlFileLoader extends XmlFileLoader
 {
     protected function loadFile(string $file): \DOMDocument
     {
-        return XmlUtils::loadFile($file, function () { return true; });
+        return XmlUtils::loadFile($file, fn () => true);
     }
 }

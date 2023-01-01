@@ -51,9 +51,7 @@ final class IsendproTransportTest extends TransportTestCase
             ->method('getStatusCode')
             ->willReturn(500);
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 
@@ -73,9 +71,7 @@ final class IsendproTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['etat' => ['etat' => [['code' => '3', 'message' => 'Your credentials are incorrect']]]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 
@@ -95,9 +91,7 @@ final class IsendproTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['etat' => ['etat' => [['code' => 0]]]]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 

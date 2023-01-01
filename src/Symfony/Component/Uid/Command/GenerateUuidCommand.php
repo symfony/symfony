@@ -132,9 +132,7 @@ EOF
                     return 1;
                 }
 
-                $create = function () use ($node, $time): Uuid {
-                    return $this->factory->timeBased($node)->create(new \DateTimeImmutable($time));
-                };
+                $create = fn (): Uuid => $this->factory->timeBased($node)->create(new \DateTimeImmutable($time));
                 break;
 
             case null !== $name:

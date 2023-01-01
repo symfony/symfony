@@ -145,15 +145,13 @@ class ConfigurationTest extends TestCase
     public function provideInvalidAssetConfigurationTests()
     {
         // helper to turn config into embedded package config
-        $createPackageConfig = function (array $packageConfig) {
-            return [
-                'base_urls' => '//example.com',
-                'version' => 1,
-                'packages' => [
-                    'foo' => $packageConfig,
-                ],
-            ];
-        };
+        $createPackageConfig = fn (array $packageConfig) => [
+            'base_urls' => '//example.com',
+            'version' => 1,
+            'packages' => [
+                'foo' => $packageConfig,
+            ],
+        ];
 
         $config = [
             'version' => 1,

@@ -164,7 +164,7 @@ class ApplicationTest extends TestCase
         $this->assertCount(1, $commands, '->all() takes a namespace as its first argument');
 
         $application->setCommandLoader(new FactoryCommandLoader([
-            'foo:bar1' => function () { return new \Foo1Command(); },
+            'foo:bar1' => fn () => new \Foo1Command(),
         ]));
         $commands = $application->all('foo');
         $this->assertCount(2, $commands, '->all() takes a namespace as its first argument');
@@ -255,7 +255,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals($foo, $application->get('afoobar'), '->get() returns a command by alias');
 
         $application->setCommandLoader(new FactoryCommandLoader([
-            'foo:bar1' => function () { return new \Foo1Command(); },
+            'foo:bar1' => fn () => new \Foo1Command(),
         ]));
 
         $this->assertTrue($application->has('afoobar'), '->has() returns true if an instance is registered for an alias even with command loader');
@@ -405,7 +405,7 @@ class ApplicationTest extends TestCase
     {
         $application = new Application();
         $application->setCommandLoader(new FactoryCommandLoader([
-            'foo:bar' => $f = function () { return new \FooCommand(); },
+            'foo:bar' => $f = fn () => new \FooCommand(),
         ]));
 
         $this->assertInstanceOf(\FooCommand::class, $application->find('foo:bar'), '->find() returns a command if its name exists');
@@ -654,7 +654,7 @@ class ApplicationTest extends TestCase
 
         $application = new Application();
         $application->setCommandLoader(new FactoryCommandLoader([
-            'foo3' => static function () use ($fooCommand) { return $fooCommand; },
+            'foo3' => static fn () => $fooCommand,
         ]));
         $application->add($fooCommand);
 
@@ -1769,21 +1769,21 @@ class ApplicationTest extends TestCase
     {
         $this->expectException(CommandNotFoundException::class);
         $application = new Application();
-        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => function () { return new DisabledCommand(); }]));
+        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => fn () => new DisabledCommand()]));
         $application->get('disabled');
     }
 
     public function testHasReturnsFalseForDisabledLazyCommand()
     {
         $application = new Application();
-        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => function () { return new DisabledCommand(); }]));
+        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => fn () => new DisabledCommand()]));
         $this->assertFalse($application->has('disabled'));
     }
 
     public function testAllExcludesDisabledLazyCommand()
     {
         $application = new Application();
-        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => function () { return new DisabledCommand(); }]));
+        $application->setCommandLoader(new FactoryCommandLoader(['disabled' => fn () => new DisabledCommand()]));
         $this->assertArrayNotHasKey('disabled', $application->all());
     }
 
@@ -1891,7 +1891,7 @@ class ApplicationTest extends TestCase
 
         $app = new Application();
         $loader = new FactoryCommandLoader([
-            'test' => static function () { return new Command('test-command'); },
+            'test' => static fn () => new Command('test-command'),
         ]);
 
         $app->setCommandLoader($loader);
@@ -2095,7 +2095,7 @@ class ApplicationTest extends TestCase
         if ($dispatcher) {
             $application->setDispatcher($dispatcher);
         }
-        $application->add(new LazyCommand('signal', [], '', false, function () use ($command) { return $command; }, true));
+        $application->add(new LazyCommand('signal', [], '', false, fn () => $command, true));
 
         return $application;
     }

@@ -44,9 +44,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
 
-        $this->objectClassResolver = $objectClassResolver ?? function ($class) {
-            return \is_object($class) ? $class::class : $class;
-        };
+        $this->objectClassResolver = $objectClassResolver ?? fn ($class) => \is_object($class) ? $class::class : $class;
     }
 
     public function hasCacheableSupportsMethod(): bool

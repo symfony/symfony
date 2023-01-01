@@ -155,7 +155,7 @@ class ProcessTest extends TestCase
     {
         $p = $this->getProcess('echo foo');
         $p->start();
-        $this->assertFalse($p->waitUntil(function () { return false; }));
+        $this->assertFalse($p->waitUntil(fn () => false));
     }
 
     public function testAllOutputIsActuallyReadOnTermination()

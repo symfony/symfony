@@ -285,9 +285,7 @@ class ResizeFormListenerTest extends TestCase
             $this->form->get($child)->submit($dat);
         }
         $event = new FormEvent($this->form, $data);
-        $callback = function ($data) {
-            return null === $data['name'];
-        };
+        $callback = fn ($data) => null === $data['name'];
         $listener = new ResizeFormListener('text', [], false, true, $callback);
         $listener->onSubmit($event);
 

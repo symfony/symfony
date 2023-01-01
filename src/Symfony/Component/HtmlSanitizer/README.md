@@ -14,6 +14,10 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 // By default, an element not added to the allowed or blocked elements
 // will be dropped, including its children
 $config = (new HtmlSanitizerConfig())
+    // Blocks all static body elements and remove attributes.
+    // All scripts will be removed.
+    ->blockBodyElements()
+
     // Allow "safe" elements and attributes. All scripts will be removed
     // as well as other dangerous behaviors like CSS injection
     ->allowSafeElements()

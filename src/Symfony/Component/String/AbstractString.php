@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\String;
 
+use Symfony\Component\Intl\Transliterator\EmojiTransliterator;
 use Symfony\Component\String\Exception\ExceptionInterface;
 use Symfony\Component\String\Exception\InvalidArgumentException;
 use Symfony\Component\String\Exception\RuntimeException;
@@ -41,6 +42,8 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     protected $string = '';
     protected $ignoreCase = false;
+
+    private static ?EmojiTransliterator $emojiTransliterator = null;
 
     abstract public function __construct(string $string = '');
 
@@ -491,6 +494,22 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         }
 
         return false;
+    }
+
+    public function stripEmojis(): static
+    {
+        if (!self::$emojiTransliterator) {
+            if (!class_exists(EmojiTransliterator::class)) {
+                throw new \LogicException(sprintf('You cannot use the "%s()" method as the "symfony/intl" package is not installed. Try running "composer require symfony/intl".', __METHOD__));
+            }
+
+            self::$emojiTransliterator = EmojiTransliterator::create('emoji-strip');
+        }
+
+        $str = clone $this;
+        $str->string = self::$emojiTransliterator->transliterate($str->string);
+
+        return $str;
     }
 
     abstract public function title(bool $allWords = false): static;

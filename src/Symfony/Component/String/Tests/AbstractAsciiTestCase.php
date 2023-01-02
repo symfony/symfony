@@ -1583,4 +1583,23 @@ abstract class AbstractAsciiTestCase extends TestCase
             [17, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1", false], // f[0moobarcccïfcy1
         ];
     }
+
+    /**
+     * @dataProvider provideStripEmojis
+     */
+    public function testStripEmojis(string $expected, string $origin)
+    {
+        $this->assertSame($expected, (string) static::createFromString($origin)->stripEmojis());
+    }
+
+    public static function provideStripEmojis(): array
+    {
+        return [
+            ['', ''],
+            ['foo bar CcC', 'foo bar CcC'],
+            ['', '😅'],
+            ['', '😅😱🇦🇺'],
+            [' Lorem ipsum  dolor sit amet ', '😺 Lorem ipsum 🐈‍⬛ dolor sit amet 🦁'],
+        ];
+    }
 }

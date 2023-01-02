@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add the `stripEmojis()` method
+
 6.2
 ---
 

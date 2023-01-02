@@ -163,6 +163,7 @@ use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OrangeSms\OrangeSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
+use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
@@ -2604,6 +2605,7 @@ class FrameworkExtension extends Extension
             OneSignalTransportFactory::class => 'notifier.transport_factory.one-signal',
             OrangeSmsTransportFactory::class => 'notifier.transport_factory.orange-sms',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovh-cloud',
+            PagerDutyTransportFactory::class => 'notifier.transport_factory.pager-duty',
             PlivoTransportFactory::class => 'notifier.transport_factory.plivo',
             RingCentralTransportFactory::class => 'notifier.transport_factory.ring-central',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocket-chat',

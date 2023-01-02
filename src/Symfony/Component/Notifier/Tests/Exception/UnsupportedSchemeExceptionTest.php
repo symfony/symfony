@@ -45,6 +45,7 @@ use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
+use Symfony\Component\Notifier\Bridge\PagerDuty\PagerDutyTransportFactory;
 use Symfony\Component\Notifier\Bridge\Plivo\PlivoTransportFactory;
 use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
@@ -112,6 +113,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             OctopushTransportFactory::class => false,
             OneSignalTransportFactory::class => false,
             OvhCloudTransportFactory::class => false,
+            PagerDutyTransportFactory::class => false,
             PlivoTransportFactory::class => false,
             RingCentralTransportFactory::class => false,
             RocketChatTransportFactory::class => false,

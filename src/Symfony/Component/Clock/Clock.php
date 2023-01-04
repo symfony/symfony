@@ -46,14 +46,14 @@ final class Clock implements ClockInterface
 
     public function now(): \DateTimeImmutable
     {
-        $now = ($this->clock ?? self::$globalClock)->now();
+        $now = ($this->clock ?? self::get())->now();
 
         return isset($this->timezone) ? $now->setTimezone($this->timezone) : $now;
     }
 
     public function sleep(float|int $seconds): void
     {
-        $clock = $this->clock ?? self::$globalClock;
+        $clock = $this->clock ?? self::get();
 
         if ($clock instanceof ClockInterface) {
             $clock->sleep($seconds);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
@@ -53,6 +54,10 @@ use Twig\Environment;
  * Provides shortcuts for HTTP-related features in controllers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * The following annotation is necessary for compatibility with doctrine/annotations:^2.
+ *
+ * @IgnoreAnnotation("required")
  */
 abstract class AbstractController implements ServiceSubscriberInterface
 {
@@ -411,7 +416,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             return null;
         }
 
-        // @deprecated since 5.4, $user will always be a UserInterface instance
+        // @deprecated since Symfony 5.4, $user will always be a UserInterface instance
         if (!\is_object($user = $token->getUser())) {
             // e.g. anonymous authentication
             return null;

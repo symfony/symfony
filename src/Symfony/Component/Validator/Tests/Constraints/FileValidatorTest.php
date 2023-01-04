@@ -556,6 +556,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         yield ['test.gif'];
         yield ['test.png.gif'];
         yield ['ccc.txt'];
+        yield ['uppercased-extension.TXT'];
     }
 
     /**

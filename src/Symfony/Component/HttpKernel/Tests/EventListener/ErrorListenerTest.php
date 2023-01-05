@@ -16,6 +16,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
@@ -161,7 +163,7 @@ class ErrorListenerTest extends TestCase
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
-        $l = new ErrorListener('not used');
+        $l = new ErrorListener('not used', expressionLanguage: new ExpressionLanguage());
         $l->logKernelException($event);
         $l->onKernelException($event);
 
@@ -288,6 +290,7 @@ class ErrorListenerTest extends TestCase
     {
         yield [new WithCustomUserProvidedAttribute(), 208, ['name' => 'value']];
         yield [new WithGeneralAttribute(), 412, ['some' => 'thing']];
+        yield [new WithDynamicHeader('Example'), 404, ['name' => 'The name is Example.']];
     }
 }
 
@@ -352,4 +355,17 @@ class WithGeneralAttribute extends \Exception
 #[WithLogLevel(LogLevel::WARNING)]
 class WarningWithLogLevelAttribute extends \Exception
 {
+}
+
+#[HttpStatus(
+    statusCode: 404,
+    headers: [
+        'name' => new Expression('"The name is " ~ this.name ~ "."'),
+    ]
+)]
+class WithDynamicHeader extends \Exception
+{
+    public function __construct(public readonly string $name)
+    {
+    }
 }

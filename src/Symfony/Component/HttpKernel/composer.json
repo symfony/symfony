@@ -69,7 +69,8 @@
         "symfony/browser-kit": "",
         "symfony/config": "",
         "symfony/console": "",
-        "symfony/dependency-injection": ""
+        "symfony/dependency-injection": "",
+        "symfony/expression-language": "For setting dynamic header values within the WithHttpStatus attribute"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpKernel\\": "" },

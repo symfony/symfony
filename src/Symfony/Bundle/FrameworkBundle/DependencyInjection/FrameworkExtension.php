@@ -280,6 +280,10 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('argument_resolver.backed_enum_resolver');
         }
 
+        if (!class_exists(ExpressionLanguage::class)) {
+            $container->removeDefinition('exception_listener.expression_language');
+        }
+
         $loader->load('services.php');
         $loader->load('fragment_renderer.php');
         $loader->load('error_renderer.php');

@@ -15,6 +15,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
 use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
@@ -39,16 +41,18 @@ class ErrorListener implements EventSubscriberInterface
      * @var array<class-string, array{log_level: string|null, status_code: int<100,599>|null}>
      */
     protected $exceptionsMapping;
+    protected $expressionLanguage;
 
     /**
      * @param array<class-string, array{log_level: string|null, status_code: int<100,599>|null}> $exceptionsMapping
      */
-    public function __construct(string|object|array|null $controller, LoggerInterface $logger = null, bool $debug = false, array $exceptionsMapping = [])
+    public function __construct(string|object|array|null $controller, LoggerInterface $logger = null, bool $debug = false, array $exceptionsMapping = [], ExpressionLanguage $expressionLanguage = null)
     {
         $this->controller = $controller;
         $this->logger = $logger;
         $this->debug = $debug;
         $this->exceptionsMapping = $exceptionsMapping;
+        $this->expressionLanguage = $expressionLanguage;
     }
 
     public function logKernelException(ExceptionEvent $event)
@@ -76,8 +80,13 @@ class ErrorListener implements EventSubscriberInterface
             if ($attributes) {
                 /** @var WithHttpStatus $instance */
                 $instance = $attributes[0]->newInstance();
+                $headers = $instance->headers;
 
-                $throwable = new HttpException($instance->statusCode, $throwable->getMessage(), $throwable, $instance->headers);
+                foreach ($headers as $header => $value) {
+                    $headers[$header] = $value instanceof Expression ? $this->expressionLanguage->evaluate($value, ['this' => $throwable]) : $value;
+                }
+
+                $throwable = new HttpException($instance->statusCode, $throwable->getMessage(), $throwable, $headers);
                 $event->setThrowable($throwable);
             }
         }

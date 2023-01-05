@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
@@ -118,9 +119,17 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
                 param('kernel.debug'),
                 abstract_arg('an exceptions to log & status code mapping'),
+                service('exception_listener.expression_language')->nullOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'request'])
+
+        ->set('exception_listener.expression_language', ExpressionLanguage::class)
+            ->args([service('cache.exception_listener_expression_language')->nullOnInvalid()])
+
+        ->set('cache.exception_listener_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
 
         ->set('controller.cache_attribute_listener', CacheAttributeListener::class)
             ->tag('kernel.event_subscriber')

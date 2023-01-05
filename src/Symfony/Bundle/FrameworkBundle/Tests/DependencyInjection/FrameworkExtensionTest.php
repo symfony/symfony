@@ -1852,6 +1852,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $defaultOptions = [
             'headers' => [],
             'resolve' => [],
+            'extra' => [],
         ];
         $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client')->getArguments());
 
@@ -1872,6 +1873,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('http_client_override_default_options');
 
         $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['headers']);
+        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['extra']);
         $this->assertSame(4, $container->getDefinition('http_client')->getArgument(1));
         $this->assertSame('http://example.com', $container->getDefinition('foo')->getArgument(1));
 
@@ -1879,10 +1881,13 @@ abstract class FrameworkExtensionTest extends TestCase
             'headers' => [
                 'bar' => 'baz',
             ],
+            'extra' => [
+                'bar' => 'baz',
+            ],
             'query' => [],
             'resolve' => [],
         ];
-        $this->assertSame($expected, $container->getDefinition('foo')->getArgument(2));
+        $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(2));
     }
 
     public function testHttpClientRetry()
@@ -1944,6 +1949,7 @@ abstract class FrameworkExtensionTest extends TestCase
             'pin-sha256' => ['14s5erg62v1v8471g2revg48r7==', 'jsda84hjtyd4821bgfesd215bsfg5412='],
             'md5' => 'sdhtb481248721thbr=',
         ], $defaultOptions['peer_fingerprint']);
+        $this->assertSame(['foo' => ['bar' => 'baz']], $defaultOptions['extra']);
     }
 
     public function provideMailer(): array

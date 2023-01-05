@@ -620,6 +620,7 @@
             <xsd:element name="header" type="http_header" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="peer-fingerprint" type="fingerprint" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="retry-failed" type="http_client_retry_failed" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="extra" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute name="max-redirects" type="xsd:integer" />
         <xsd:attribute name="http-version" type="xsd:string" />
@@ -645,6 +646,7 @@
             <xsd:element name="header" type="http_header" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="peer-fingerprint" type="fingerprint" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="retry-failed" type="http_client_retry_failed" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="extra" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="scope" type="xsd:string" />

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-01T13:37:51Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "6.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-01-01T15:57:53Z
+
+Is this bug present in Symfony 6.2 only or is 5.4 affected as well?
+
+---------------------------------------------------------------------------
+
+by gassan at 2023-01-01T21:43:37Z
+
+> Is this bug present in Symfony 6.2 only or is 5.4 affected as well?
+
+I think it is an S6.2 enhancement for extracting `/.*message/i` from Entity Attributes.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-01-01T21:48:28Z
+
+Right, this piece of code has been introduced with #46161.

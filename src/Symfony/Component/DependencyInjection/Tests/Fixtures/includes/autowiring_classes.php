@@ -262,8 +262,7 @@ class SetterInjection extends SetterInjectionParent
         // should be called only when explicitly specified
     }
 
-    /**
-     * @required*/
+    /** @required */
     public function setChildMethodWithoutDocBlock(A $a)
     {
     }
@@ -306,7 +305,7 @@ class Wither
 
 class SetterInjectionParent
 {
-    /** @required*/
+    /** @required */
     public function setDependencies(Foo $foo, A $a)
     {
         // should be called

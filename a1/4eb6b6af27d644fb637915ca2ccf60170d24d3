@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2022-12-16T17:59:03Z
+
+Friendly ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-16T18:03:30Z
+
+> this does not add support when creating such iterator arguments from Yaml or XML configs
+
+`ResolveTaggedIteratorArgumentPass` covers any `TaggedIteratorArgument` no matter if it's wired by the yaml/xml/attribute file loader, isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2022-12-16T18:05:37Z
+
+@chalasr the missing part is not the resolution. It is the support for the new argument added in the constructor (`$autoExcludeReferencingService`) where Yaml and XML files are currently unable to control it.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-16T18:17:33Z
+
+Got it, thanks. Support added
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-22T17:57:49Z
+
+Rebased. Reviews welcome
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-22T18:05:04Z
+
+So, this changes the current behavior, but we're confident this won't break anyone, right?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-22T18:36:15Z
+
+Yes, at least I am :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-28T14:49:35Z
+
+Anything else? :)

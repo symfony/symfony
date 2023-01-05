@@ -171,7 +171,7 @@ class FileValidator extends ConstraintValidator
         $mimeTypes = (array) $constraint->mimeTypes;
 
         if ($constraint->extensions) {
-            $fileExtension = pathinfo($basename, \PATHINFO_EXTENSION);
+            $fileExtension = strtolower(pathinfo($basename, \PATHINFO_EXTENSION));
 
             $found = false;
             $normalizedExtensions = [];

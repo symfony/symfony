@@ -4,6 +4,7 @@ CHANGELOG
 6.3
 ---
 
+ * Add `ParameterBag::getEnum()`
  * Create migration for session table when pdo handler is used
 
 6.2

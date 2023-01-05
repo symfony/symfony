@@ -73,6 +73,25 @@ final class InputBag extends ParameterBag
         $this->parameters[$key] = $value;
     }
 
+    /**
+     * Returns the parameter value converted to an enum.
+     *
+     * @template T of \BackedEnum
+     *
+     * @param class-string<T> $class
+     * @param ?T              $default
+     *
+     * @return ?T
+     */
+    public function getEnum(string $key, string $class, \BackedEnum $default = null): ?\BackedEnum
+    {
+        try {
+            return parent::getEnum($key, $class, $default);
+        } catch (\UnexpectedValueException $e) {
+            throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
     public function filter(string $key, mixed $default = null, int $filter = \FILTER_DEFAULT, mixed $options = []): mixed
     {
         $value = $this->has($key) ? $this->all()[$key] : $default;

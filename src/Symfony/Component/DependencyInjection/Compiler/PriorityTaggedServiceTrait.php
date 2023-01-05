@@ -37,9 +37,8 @@ trait PriorityTaggedServiceTrait
      *
      * @return Reference[]
      */
-    private function findAndSortTaggedServices(string|TaggedIteratorArgument $tagName, ContainerBuilder $container): array
+    private function findAndSortTaggedServices(string|TaggedIteratorArgument $tagName, ContainerBuilder $container, array $exclude = []): array
     {
-        $exclude = [];
         $indexAttribute = $defaultIndexMethod = $needsIndexes = $defaultPriorityMethod = null;
 
         if ($tagName instanceof TaggedIteratorArgument) {
@@ -47,7 +46,7 @@ trait PriorityTaggedServiceTrait
             $defaultIndexMethod = $tagName->getDefaultIndexMethod();
             $needsIndexes = $tagName->needsIndexes();
             $defaultPriorityMethod = $tagName->getDefaultPriorityMethod() ?? 'getDefaultPriority';
-            $exclude = $tagName->getExclude();
+            $exclude = array_merge($exclude, $tagName->getExclude());
             $tagName = $tagName->getTag();
         }
 

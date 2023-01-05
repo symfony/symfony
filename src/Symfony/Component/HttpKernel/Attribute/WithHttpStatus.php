@@ -15,7 +15,7 @@ namespace Symfony\Component\HttpKernel\Attribute;
  * @author Dejan Angelov <angelovdejan@protonmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class HttpStatus
+class WithHttpStatus
 {
     /**
      * @param array<string, string> $headers

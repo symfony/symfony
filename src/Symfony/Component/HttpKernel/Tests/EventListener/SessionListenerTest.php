@@ -590,6 +590,30 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
+    public function testPrivateResponseMaxAgeIsRespectedIfSessionStarted()
+    {
+        $kernel = $this->createMock(HttpKernelInterface::class);
+
+        $session = $this->createMock(Session::class);
+        $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
+        $request = new Request([], [], [], [], [], ['SERVER_PROTOCOL' => 'HTTP/1.0']);
+        $request->setSession($session);
+
+        $response = new Response();
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->prepare($request);
+
+        $listener = new SessionListener(new Container());
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $this->assertSame(0, $response->getMaxAge());
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertLessThanOrEqual(new \DateTimeImmutable('now', new \DateTimeZone('UTC')), new \DateTimeImmutable($response->headers->get('Expires')));
+        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+    }
+
     public function testSurrogateMainRequestIsPublic()
     {
         $session = $this->createMock(Session::class);

@@ -68,6 +68,19 @@ abstract class AbstractVisitor
         return false;
     }
 
+    protected function nodeFirstNamedArgumentIndex(Node\Expr\CallLike|Node\Attribute|Node\Expr\New_ $node): int
+    {
+        $args = $node instanceof Node\Expr\CallLike ? $node->getRawArgs() : $node->args;
+
+        foreach ($args as $i => $arg) {
+            if ($arg instanceof Node\Arg && null !== $arg->name) {
+                return $i;
+            }
+        }
+
+        return \PHP_INT_MAX;
+    }
+
     private function getStringNamedArguments(Node\Expr\CallLike|Node\Attribute $node, string $argumentName = null, bool $isArgumentNamePattern = false): array
     {
         $args = $node instanceof Node\Expr\CallLike ? $node->getArgs() : $node->args;

@@ -91,6 +91,9 @@ EOF;
                 $expectedNowdoc => 'prefix'.$expectedNowdoc,
                 'concatenated message with heredoc and nowdoc' => 'prefixconcatenated message with heredoc and nowdoc',
                 'default domain' => 'prefixdefault domain',
+                'mix-named-arguments' => 'prefixmix-named-arguments',
+                'mix-named-arguments-locale' => 'prefixmix-named-arguments-locale',
+                'mix-named-arguments-without-domain' => 'prefixmix-named-arguments-without-domain',
             ],
             'not_messages' => [
                 'translatable other-domain-test-no-params-short-array' => 'prefixtranslatable other-domain-test-no-params-short-array',
@@ -119,6 +122,8 @@ EOF;
                 'variable-assignation-inlined-in-trans-method-call2' => 'prefixvariable-assignation-inlined-in-trans-method-call2',
                 'variable-assignation-inlined-in-trans-method-call3' => 'prefixvariable-assignation-inlined-in-trans-method-call3',
                 'variable-assignation-inlined-with-named-arguments-in-trans-method' => 'prefixvariable-assignation-inlined-with-named-arguments-in-trans-method',
+                'mix-named-arguments-without-parameters' => 'prefixmix-named-arguments-without-parameters',
+                'mix-named-arguments-disordered' => 'prefixmix-named-arguments-disordered',
             ],
             'validators' => [
                 'message-in-constraint-attribute' => 'prefixmessage-in-constraint-attribute',

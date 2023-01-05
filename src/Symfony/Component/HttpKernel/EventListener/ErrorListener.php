@@ -12,10 +12,12 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\HttpStatus;
+use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -52,14 +54,7 @@ class ErrorListener implements EventSubscriberInterface
     public function logKernelException(ExceptionEvent $event)
     {
         $throwable = $event->getThrowable();
-        $logLevel = null;
-
-        foreach ($this->exceptionsMapping as $class => $config) {
-            if ($throwable instanceof $class && $config['log_level']) {
-                $logLevel = $config['log_level'];
-                break;
-            }
-        }
+        $logLevel = $this->resolveLogLevel($throwable);
 
         foreach ($this->exceptionsMapping as $class => $config) {
             if (!$throwable instanceof $class || !$config['status_code']) {
@@ -170,15 +165,40 @@ class ErrorListener implements EventSubscriberInterface
      */
     protected function logException(\Throwable $exception, string $message, string $logLevel = null): void
     {
-        if (null !== $this->logger) {
-            if (null !== $logLevel) {
-                $this->logger->log($logLevel, $message, ['exception' => $exception]);
-            } elseif (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
-                $this->logger->critical($message, ['exception' => $exception]);
-            } else {
-                $this->logger->error($message, ['exception' => $exception]);
+        if (null === $this->logger) {
+            return;
+        }
+
+        $logLevel ??= $this->resolveLogLevel($exception);
+
+        $this->logger->log($logLevel, $message, ['exception' => $exception]);
+    }
+
+    /**
+     * Resolves the level to be used when logging the exception.
+     */
+    private function resolveLogLevel(\Throwable $throwable): string
+    {
+        foreach ($this->exceptionsMapping as $class => $config) {
+            if ($throwable instanceof $class && $config['log_level']) {
+                return $config['log_level'];
             }
         }
+
+        $attributes = (new \ReflectionClass($throwable))->getAttributes(WithLogLevel::class);
+
+        if ($attributes) {
+            /** @var WithLogLevel $instance */
+            $instance = $attributes[0]->newInstance();
+
+            return $instance->level;
+        }
+
+        if (!$throwable instanceof HttpExceptionInterface || $throwable->getStatusCode() >= 500) {
+            return LogLevel::CRITICAL;
+        }
+
+        return LogLevel::ERROR;
     }
 
     /**

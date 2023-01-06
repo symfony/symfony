@@ -318,8 +318,8 @@ abstract class AbstractDoctrineExtension extends Extension
                 break;
             }
             if (
-                preg_match('/^ \* @.*'.$quotedMappingObjectName.'\b/m', $content) ||
-                preg_match('/^ \* @.*Embeddable\b/m', $content)
+                preg_match('/^(?: \*|\/\*\*) @.*'.$quotedMappingObjectName.'\b/m', $content) ||
+                preg_match('/^(?: \*|\/\*\*) @.*Embeddable\b/m', $content)
             ) {
                 $type = 'annotation';
                 break;

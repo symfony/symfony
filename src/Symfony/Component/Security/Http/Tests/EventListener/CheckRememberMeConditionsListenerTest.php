@@ -33,15 +33,24 @@ class CheckRememberMeConditionsListenerTest extends TestCase
     protected function setUp(): void
     {
         $this->listener = new CheckRememberMeConditionsListener();
-        $this->request = Request::create('/login');
-        $this->request->request->set('_remember_me', true);
-        $this->response = new Response();
     }
 
-    public function testSuccessfulLoginWithoutSupportingAuthenticator()
+    public function testSuccessfulHttpLoginWithoutSupportingAuthenticator()
     {
+        $this->createHttpRequest();
+
         $passport = $this->createPassport([]);
 
+        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
+
+        $this->assertFalse($passport->hasBadge(RememberMeBadge::class));
+    }
+
+    public function testSuccessfulJsonLoginWithoutSupportingAuthenticator()
+    {
+        $this->createJsonRequest();
+
+        $passport = $this->createPassport([]);
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
         $this->assertFalse($passport->hasBadge(RememberMeBadge::class));
@@ -57,10 +66,22 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->assertFalse($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
-    public function testSuccessfulLoginWhenRememberMeAlwaysIsTrue()
+    public function testSuccessfulHttpLoginWhenRememberMeAlwaysIsTrue()
     {
+        $this->createHttpRequest();
+
         $passport = $this->createPassport();
-        $listener = new CheckRememberMeConditionsListener(['always_remember_me' => true]);
+
+        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
+
+        $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
+    }
+
+    public function testSuccessfulJsonLoginWhenRememberMeAlwaysIsTrue()
+    {
+        $this->createJsonRequest();
+
+        $passport = $this->createPassport();
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
@@ -70,9 +91,25 @@ class CheckRememberMeConditionsListenerTest extends TestCase
     /**
      * @dataProvider provideRememberMeOptInValues
      */
-    public function testSuccessfulLoginWithOptInRequestParameter($optInValue)
+    public function testSuccessfulHttpLoginWithOptInRequestParameter($optInValue)
     {
+        $this->createHttpRequest();
+
         $this->request->request->set('_remember_me', $optInValue);
+        $passport = $this->createPassport();
+
+        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
+
+        $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
+    }
+
+    /**
+     * @dataProvider provideRememberMeOptInValues
+     */
+    public function testSuccessfulJsonLoginWithOptInRequestParameter($optInValue)
+    {
+        $this->createJsonRequest(['_remember_me' => $optInValue]);
+
         $passport = $this->createPassport();
 
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
@@ -87,6 +124,20 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         yield ['on'];
         yield ['yes'];
         yield [true];
+    }
+
+    private function createHttpRequest(): void
+    {
+        $this->request = Request::create('/login');
+        $this->request->request->set('_remember_me', true);
+        $this->response = new Response();
+    }
+
+    private function createJsonRequest(mixed $content = ['_remember_me' => true]): void
+    {
+        $this->request = Request::create('/login', 'POST', [], [], [], [], json_encode($content));
+        $this->request->headers->add(['Content-Type' => 'application/json']);
+        $this->response = new Response();
     }
 
     private function createLoginSuccessfulEvent(Passport $passport)

@@ -18,7 +18,7 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\HttpStatus;
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
 use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -321,7 +321,7 @@ class TestKernelThatThrowsException implements HttpKernelInterface
 }
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class UserProvidedHttpStatusCodeAttribute extends HttpStatus
+class UserProvidedHttpStatusCodeAttribute extends WithHttpStatus
 {
     public function __construct(array $headers = [])
     {
@@ -339,7 +339,7 @@ class WithCustomUserProvidedAttribute extends \Exception
 {
 }
 
-#[HttpStatus(
+#[WithHttpStatus(
     statusCode: Response::HTTP_PRECONDITION_FAILED,
     headers: [
         'some' => 'thing',

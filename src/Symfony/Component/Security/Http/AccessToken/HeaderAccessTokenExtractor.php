@@ -22,12 +22,17 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class HeaderAccessTokenExtractor implements AccessTokenExtractorInterface
 {
-    private string $regex;
+    private readonly string $headerParameter;
+    private readonly string $tokenType;
+    private readonly string $regex;
 
     public function __construct(
-        private readonly string $headerParameter = 'Authorization',
-        private readonly string $tokenType = 'Bearer'
+        ?string $headerParameter = null,
+        ?string $tokenType = null
     ) {
+        $this->headerParameter = $headerParameter ?? 'Authorization';
+        $this->tokenType = $tokenType ?? 'Bearer';
+
         $this->regex = sprintf(
             '/^%s([a-zA-Z0-9\-_\+~\/\.]+)$/',
             '' === $this->tokenType ? '' : preg_quote($this->tokenType).'\s+'

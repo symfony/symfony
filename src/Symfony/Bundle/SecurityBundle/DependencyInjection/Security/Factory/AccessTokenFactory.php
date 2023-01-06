@@ -12,9 +12,14 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
+use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
+use Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor;
 
 /**
  * AccessTokenFactory creates services for Access Token authentication.
@@ -46,13 +51,47 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 ->fixXmlConfig('token_extractors')
                 ->beforeNormalization()
                     ->ifString()
-                    ->then(static function (string $v): array { return [$v]; })
+                    ->then(static function (string $v) {
+                        return [
+                            ['service' => $v]
+                        ];
+                    })
+                ->end()
+                ->beforeNormalization()
+                    // define array key as service
+                    ->always(static function (array $value) {
+                        foreach ($value as $k => &$item) {
+                            if (!is_int($k) && is_string($item)) { // parameters for default header extractor
+                                throw new InvalidConfigurationException(
+                                    sprintf('Please define extractor as "service_id" string or ["header|query_string|request_body" => ["%s" => "%s", ...].', $k, $item)
+                                );
+                            } if (!isset($item['service']) && is_string($k)) {
+                                $item['service'] = $k;
+                            }
+                        }
+
+                        return $value;
+                    })
                 ->end()
                 ->cannotBeEmpty()
                 ->defaultValue([
-                    'security.access_token_extractor.header',
+                     ['service' => 'security.access_token_extractor.header'],
                 ])
-                ->scalarPrototype()->end()
+                ->arrayPrototype()
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(static function ($v) {
+                            return ['service' => (string) $v];
+                        })
+                    ->end()
+                    ->children()
+                        // here we define acceptable constructor parameter for all predefined extractors
+                        ->scalarNode('service')->isRequired()->end()
+                        ->scalarNode('parameter')->end()
+                        ->scalarNode('headerParameter')->end()
+                        ->scalarNode('tokenType')->end()
+                    ->end()
+                ->end()
             ->end()
         ;
     }
@@ -88,26 +127,77 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
     }
 
     /**
-     * @param array<string> $extractors
+     * @param array<array<string>> $extractors
      */
     private function createExtractor(ContainerBuilder $container, string $firewallName, array $extractors): string
     {
-        $aliases = [
+        $arguments = [
+            'query_string' => ['parameter'],
+            'request_body' => ['parameter'],
+            'header' => ['headerParameter', 'tokenType'],
+        ];
+
+        /**
+         * @psalm-var array<string, class-string> $classes
+         */
+        $classes = [
+            'query_string' => QueryAccessTokenExtractor::class,
+            'request_body' => FormEncodedBodyExtractor::class,
+            'header' => HeaderAccessTokenExtractor::class,
+        ];
+
+        $predefinedExtractors = [
             'query_string' => 'security.access_token_extractor.query_string',
             'request_body' => 'security.access_token_extractor.request_body',
             'header' => 'security.access_token_extractor.header',
         ];
-        $extractors = array_map(static function (string $extractor) use ($aliases): string {
-            return $aliases[$extractor] ?? $extractor;
-        }, $extractors);
 
-        if (1 === \count($extractors)) {
-            return current($extractors);
+        $extractorIds = [];
+        $extractorIndex = -1;
+        foreach ($extractors as $key => $config) {
+            $service = $config['service'];
+            unset($config['service']);
+
+            if (!isset($predefinedExtractors[$service])) {
+                // its exists predefined service
+                $extractorIds[$key] = $service;
+
+                continue;
+            }
+
+            $predefinedExtractor = $predefinedExtractors[$service];
+
+            $availableParameters = $arguments[$service];
+            $configuredParameters = array_intersect($availableParameters, array_keys($config));
+            if (!$configuredParameters) {
+                // without deviating parameters it can also be exists predefined service
+                $extractorIds[$key] = $predefinedExtractor;
+
+                continue;
+            };
+
+            // create concrete extractor
+            $extractorId = sprintf('security.authenticator.access_token.%s_extractor.%s.%d', $service, $firewallName, ++$extractorIndex);
+            $definition = new Definition($classes[$service]);
+            $container
+                ->setDefinition($extractorId, $definition);
+
+            foreach ($availableParameters as $i => $parameterName) {
+                $definition->setArgument($i, $config[$parameterName] ?? null);
+            }
+
+            $extractorIds[$key] = $extractorId;
+        };
+
+        if (1 === \count($extractorIds)) {
+            return current($extractorIds);
         }
         $extractorId = sprintf('security.authenticator.access_token.chain_extractor.%s', $firewallName);
         $container
             ->setDefinition($extractorId, new ChildDefinition('security.authenticator.access_token.chain_extractor'))
-            ->replaceArgument(0, array_map(function (string $extractorId): Reference {return new Reference($extractorId); }, $extractors))
+            ->replaceArgument(0, array_map(function (string $extractorId): Reference {
+                return new Reference($extractorId);
+            }, $extractorIds))
         ;
 
         return $extractorId;

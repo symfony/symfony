@@ -357,7 +357,7 @@ class WarningWithLogLevelAttribute extends \Exception
 {
 }
 
-#[HttpStatus(
+#[WithHttpStatus(
     statusCode: 404,
     headers: [
         'name' => new Expression('"The name is " ~ this.name ~ "."'),

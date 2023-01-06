@@ -12,13 +12,14 @@
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Translation\Loader\ArrayLoader;
@@ -26,13 +27,15 @@ use Symfony\Component\Translation\Translator;
 
 class JsonLoginAuthenticatorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private $userProvider;
     /** @var JsonLoginAuthenticator */
     private $authenticator;
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->userProvider = new InMemoryUserProvider();
     }
 
     /**
@@ -121,9 +124,28 @@ class JsonLoginAuthenticatorTest extends TestCase
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": 1}');
         yield [$request, 'The key "password" must be a string.'];
 
-        $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
-        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": 1}', $username));
-        yield [$request, 'Invalid username.', BadCredentialsException::class];
+        $username = str_repeat('x', UserBadge::MAX_USERNAME_LENGTH + 1);
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], sprintf('{"username": "%s", "password": "foo"}', $username));
+        yield [$request, 'Username too long.', BadCredentialsException::class];
+    }
+
+    /**
+     * @dataProvider provideEmptyAuthenticateData
+     *
+     * @group legacy
+     */
+    public function testAuthenticationForEmptyCredentialDeprecation($request)
+    {
+        $this->expectDeprecation('Since symfony/security 6.2: Passing an empty string as username or password parameter is deprecated.');
+        $this->setUpAuthenticator();
+
+        $this->authenticator->authenticate($request);
+    }
+
+    public function provideEmptyAuthenticateData()
+    {
+        $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "", "password": "notempty"}');
+        yield [$request];
     }
 
     public function testAuthenticationFailureWithoutTranslator()
@@ -145,6 +167,25 @@ class JsonLoginAuthenticatorTest extends TestCase
 
         $response = $this->authenticator->onAuthenticationFailure(new Request(), new AuthenticationException());
         $this->assertSame(['error' => 'foo'], json_decode($response->getContent(), true));
+    }
+
+    public function testOnFailureReplacesMessageDataWithoutTranslator()
+    {
+        $this->setUpAuthenticator();
+
+        $response = $this->authenticator->onAuthenticationFailure(new Request(), new class() extends AuthenticationException {
+            public function getMessageData(): array
+            {
+                return ['%failed_attempts%' => 3];
+            }
+
+            public function getMessageKey(): string
+            {
+                return 'Session locked after %failed_attempts% failed attempts.';
+            }
+        });
+
+        $this->assertSame(['error' => 'Session locked after 3 failed attempts.'], json_decode($response->getContent(), true));
     }
 
     private function setUpAuthenticator(array $options = [])

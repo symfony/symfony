@@ -38,6 +38,21 @@ class Psr16CacheTest extends SimpleCacheTest
         if (!$pool instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
         }
+
+        try {
+            \assert(false === true, new \Exception());
+            $this->skippedTests['testGetInvalidKeys'] =
+            $this->skippedTests['testGetMultipleInvalidKeys'] =
+            $this->skippedTests['testGetMultipleNoIterable'] =
+            $this->skippedTests['testSetInvalidKeys'] =
+            $this->skippedTests['testSetMultipleInvalidKeys'] =
+            $this->skippedTests['testSetMultipleNoIterable'] =
+            $this->skippedTests['testHasInvalidKeys'] =
+            $this->skippedTests['testDeleteInvalidKeys'] =
+            $this->skippedTests['testDeleteMultipleInvalidKeys'] =
+            $this->skippedTests['testDeleteMultipleNoIterable'] = 'Keys are checked only when assert() is enabled.';
+        } catch (\Exception $e) {
+        }
     }
 
     public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
@@ -148,13 +163,12 @@ class Psr16CacheTest extends SimpleCacheTest
 
     protected function isPruned(CacheInterface $cache, string $name): bool
     {
-        if (Psr16Cache::class !== \get_class($cache)) {
+        if (Psr16Cache::class !== $cache::class) {
             $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 
         $pool = ((array) $cache)[sprintf("\0%s\0pool", Psr16Cache::class)];
         $getFileMethod = (new \ReflectionObject($pool))->getMethod('getFile');
-        $getFileMethod->setAccessible(true);
 
         return !file_exists($getFileMethod->invoke($pool, $name));
     }

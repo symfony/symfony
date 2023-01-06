@@ -1,0 +1,11 @@
+framework:
+    http_method_override: false
+    messenger:
+        reset_on_message: false
+        routing:
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage': ['sender.bar', 'sender.biz']
+            'Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage': 'sender.foo'
+        transports:
+            sender.biz: 'null://'
+            sender.bar: 'null://'
+            sender.foo: 'null://'

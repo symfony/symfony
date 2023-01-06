@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -37,8 +46,6 @@ trait IgnoredAttributesTestTrait
             ],
             $normalizer->normalize($objectOuter, null, $context)
         );
-
-        $this->markTestIncomplete('AbstractObjectNormalizer::getAttributes caches attributes by class instead of by class+context, reusing the normalizer with different config therefore fails. This is being fixed in https://github.com/symfony/symfony/pull/30907');
 
         $context = ['ignored_attributes' => ['foo', 'inner']];
         $this->assertEquals(

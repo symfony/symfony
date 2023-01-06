@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 
-class DateTimeToStringTransformerTest extends TestCase
+class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTest
 {
-    public function dataProvider()
+    public function dataProvider(): array
     {
-        $data = [
+        return [
             ['Y-m-d H:i:s', '2010-02-03 16:05:06', '2010-02-03 16:05:06 UTC'],
             ['Y-m-d H:i:00', '2010-02-03 16:05:00', '2010-02-03 16:05:00 UTC'],
             ['Y-m-d H:i', '2010-02-03 16:05', '2010-02-03 16:05:00 UTC'],
@@ -35,14 +36,13 @@ class DateTimeToStringTransformerTest extends TestCase
 
             // different day representations
             ['Y-m-j', '2010-02-3', '2010-02-03 00:00:00 UTC'],
-            ['z', '33', '1970-02-03 00:00:00 UTC'],
 
             // not bijective
             // this will not work as PHP will use actual date to replace missing info
             // and after change of date will lookup for closest Wednesday
             // i.e. value: 2010-02, PHP value: 2010-02-(today i.e. 20), parsed date: 2010-02-24
-            //['Y-m-D', '2010-02-Wed', '2010-02-03 00:00:00 UTC'],
-            //['Y-m-l', '2010-02-Wednesday', '2010-02-03 00:00:00 UTC'],
+            // ['Y-m-D', '2010-02-Wed', '2010-02-03 00:00:00 UTC'],
+            // ['Y-m-l', '2010-02-Wednesday', '2010-02-03 00:00:00 UTC'],
 
             // different month representations
             ['Y-n-d', '2010-2-03', '2010-02-03 00:00:00 UTC'],
@@ -62,8 +62,6 @@ class DateTimeToStringTransformerTest extends TestCase
 
             ['Y-z', '2010-33', '2010-02-03 00:00:00 UTC'],
         ];
-
-        return $data;
     }
 
     /**
@@ -111,7 +109,7 @@ class DateTimeToStringTransformerTest extends TestCase
     {
         $transformer = new DateTimeToStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
 
         $transformer->transform('1234');
     }
@@ -150,7 +148,7 @@ class DateTimeToStringTransformerTest extends TestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform(1234);
     }
@@ -159,7 +157,7 @@ class DateTimeToStringTransformerTest extends TestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
     }
@@ -168,8 +166,13 @@ class DateTimeToStringTransformerTest extends TestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('2010-04-31');
+    }
+
+    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    {
+        return new DateTimeToStringTransformer($inputTimezone, $outputTimezone);
     }
 }

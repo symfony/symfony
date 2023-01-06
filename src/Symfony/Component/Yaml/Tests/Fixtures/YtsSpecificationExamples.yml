@@ -913,7 +913,7 @@ yaml: |
    no int: ! 12
    string: !!str 12
 php: |
-   [ 'integer' => 12, 'no int' => '12', 'string' => '12' ]
+   [ 'integer' => 12, 'no int' => 12, 'string' => '12' ]
 ---
 test: Private types
 todo: true

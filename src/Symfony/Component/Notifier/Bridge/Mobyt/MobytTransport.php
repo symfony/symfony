@@ -13,32 +13,36 @@ namespace Symfony\Component\Notifier\Bridge\Mobyt;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Basien Durand <bdurand-dev@outlook.com>
- *
- * @experimental in 5.2
  */
 final class MobytTransport extends AbstractTransport
 {
     protected const HOST = 'app.mobyt.fr';
 
-    private $accountSid;
-    private $authToken;
-    private $from;
-    private $typeQuality;
+    private string $accountSid;
+    private string $authToken;
+    private string $from;
+    private string $typeQuality;
 
-    public function __construct(string $accountSid, string $authToken, $from, string $typeQuality, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accountSid, #[\SensitiveParameter] string $authToken, string $from, string $typeQuality = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accountSid = $accountSid;
         $this->authToken = $authToken;
         $this->from = $from;
+
+        $typeQuality ??= MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
+        MobytOptions::validateMessageType($typeQuality);
+
         $this->typeQuality = $typeQuality;
 
         parent::__construct($client, $dispatcher);
@@ -57,7 +61,7 @@ final class MobytTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         if ($message->getOptions() && !$message->getOptions() instanceof MobytOptions) {
@@ -65,12 +69,16 @@ final class MobytTransport extends AbstractTransport
         }
 
         $options = $message->getOptions() ? $message->getOptions()->toArray() : [];
-        $options['message_type'] = $options['message_type'] ?? $this->typeQuality;
+        $options['message_type'] ??= $this->typeQuality;
 
-        $options['message'] = $options['message'] ?? $message->getSubject();
+        $options['message'] ??= $message->getSubject();
         $options['recipient'] = [$message->getPhone()];
 
-        $options['sender'] = $options['sender'] ?? $this->from;
+        if ('' !== $message->getFrom()) {
+            $options['sender'] = $message->getFrom();
+        } else {
+            $options['sender'] ??= $this->from;
+        }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/API/v1.0/REST/sms', [
             'headers' => [
@@ -78,14 +86,20 @@ final class MobytTransport extends AbstractTransport
                 'user_key: '.$this->accountSid,
                 'Access_token: '.$this->authToken,
             ],
-            'body' => json_encode(array_filter($options)),
+            'json' => array_filter($options),
         ]);
 
-        if (401 === $response->getStatusCode() || 404 === $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Mobyt server.', $response, 0, $e);
+        }
+
+        if (401 === $statusCode || 404 === $statusCode) {
             throw new TransportException(sprintf('Unable to send the SMS: "%s". Check your credentials.', $message->getSubject()), $response);
         }
 
-        if (201 !== $response->getStatusCode()) {
+        if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['result']), $response);
@@ -93,9 +107,9 @@ final class MobytTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['order_id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['order_id']);
 
-        return $message;
+        return $sentMessage;
     }
 }

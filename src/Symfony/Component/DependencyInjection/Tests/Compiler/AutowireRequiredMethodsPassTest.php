@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
-use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
@@ -55,15 +54,8 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertEquals([], $methodCalls[1][1]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testSetterInjectionWithAttribute()
     {
-        if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
-        }
-
         $container = new ContainerBuilder();
         $container->register(Foo::class);
 
@@ -125,9 +117,6 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertSame($expected, $methodCalls);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWitherWithStaticReturnTypeInjection()
     {
         $container = new ContainerBuilder();
@@ -149,15 +138,8 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertSame($expected, $methodCalls);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWitherInjectionWithAttribute()
     {
-        if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
-        }
-
         $container = new ContainerBuilder();
         $container->register(Foo::class);
 

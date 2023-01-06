@@ -20,6 +20,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class TraceableValueResolverTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testTimingsInSupports()
     {
         $stopwatch = new Stopwatch();

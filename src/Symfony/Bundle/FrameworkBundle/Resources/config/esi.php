@@ -21,5 +21,5 @@ return static function (ContainerConfigurator $container) {
         ->set('esi_listener', SurrogateListener::class)
             ->args([service('esi')->ignoreOnInvalid()])
             ->tag('kernel.event_subscriber')
-        ;
+    ;
 };

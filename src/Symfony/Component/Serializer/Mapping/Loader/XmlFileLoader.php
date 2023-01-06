@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -31,16 +33,9 @@ class XmlFileLoader extends FileLoader
      */
     private $classes;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
-        if (null === $this->classes) {
-            $this->classes = $this->getClassesFromXml();
-        }
-
-        if (!$this->classes) {
+        if (!$this->classes ??= $this->getClassesFromXml()) {
             return false;
         }
 
@@ -71,8 +66,35 @@ class XmlFileLoader extends FileLoader
                     $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
                 }
 
+                if (isset($attribute['serialized-path'])) {
+                    try {
+                        $attributeMetadata->setSerializedPath(new PropertyPath((string) $attribute['serialized-path']));
+                    } catch (InvalidPropertyPathException) {
+                        throw new MappingException(sprintf('The "serialized-path" value must be a valid property path for the attribute "%s" of the class "%s".', $attributeName, $classMetadata->getName()));
+                    }
+                }
+
                 if (isset($attribute['ignore'])) {
-                    $attributeMetadata->setIgnore((bool) $attribute['ignore']);
+                    $attributeMetadata->setIgnore(XmlUtils::phpize($attribute['ignore']));
+                }
+
+                foreach ($attribute->context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                    $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
+                }
+
+                foreach ($attribute->normalization_context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                }
+
+                foreach ($attribute->denormalization_context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
                 }
             }
 
@@ -98,19 +120,15 @@ class XmlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[] The classes names
+     * @return string[]
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
-        if (null === $this->classes) {
-            $this->classes = $this->getClassesFromXml();
-        }
-
-        return array_keys($this->classes);
+        return array_keys($this->classes ??= $this->getClassesFromXml());
     }
 
     /**
-     * Parses a XML File.
+     * Parses an XML File.
      *
      * @throws MappingException
      */
@@ -135,5 +153,30 @@ class XmlFileLoader extends FileLoader
         }
 
         return $classes;
+    }
+
+    private function parseContext(\SimpleXMLElement $nodes): array
+    {
+        $context = [];
+
+        foreach ($nodes as $node) {
+            if (\count($node) > 0) {
+                if (\count($node->entry) > 0) {
+                    $value = $this->parseContext($node->entry);
+                } else {
+                    $value = [];
+                }
+            } else {
+                $value = XmlUtils::phpize($node);
+            }
+
+            if (isset($node['name'])) {
+                $context[(string) $node['name']] = $value;
+            } else {
+                $context[] = $value;
+            }
+        }
+
+        return $context;
     }
 }

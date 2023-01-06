@@ -12,15 +12,17 @@
 namespace Symfony\Bridge\Monolog\Tests\Formatter;
 
 use Monolog\Logger;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 
 class ConsoleFormatterTest extends TestCase
 {
     /**
      * @dataProvider providerFormatTests
      */
-    public function testFormat(array $record, $expectedMessage)
+    public function testFormat(array|LogRecord $record, $expectedMessage)
     {
         $formatter = new ConsoleFormatter();
         self::assertSame($expectedMessage, $formatter->format($record));
@@ -28,25 +30,20 @@ class ConsoleFormatterTest extends TestCase
 
     public function providerFormatTests(): array
     {
-        $currentDateTime = new \DateTime();
+        $currentDateTime = new \DateTimeImmutable();
 
-        return [
+        $tests = [
             'record with DateTime object in datetime field' => [
-                'record' => [
-                    'message' => 'test',
-                    'context' => [],
-                    'level' => Logger::WARNING,
-                    'level_name' => Logger::getLevelName(Logger::WARNING),
-                    'channel' => 'test',
-                    'datetime' => $currentDateTime,
-                    'extra' => [],
-                ],
+                'record' => RecordFactory::create(datetime: $currentDateTime),
                 'expectedMessage' => sprintf(
                     "%s <fg=cyan>WARNING  </> <comment>[test]</> test\n",
                     $currentDateTime->format(ConsoleFormatter::SIMPLE_DATE)
                 ),
             ],
-            'record with string in datetime field' => [
+        ];
+
+        if (Logger::API < 3) {
+            $tests['record with string in datetime field'] = [
                 'record' => [
                     'message' => 'test',
                     'context' => [],
@@ -57,7 +54,9 @@ class ConsoleFormatterTest extends TestCase
                     'extra' => [],
                 ],
                 'expectedMessage' => "2019-01-01T00:42:00+00:00 <fg=cyan>WARNING  </> <comment>[test]</> test\n",
-            ],
-        ];
+            ];
+        }
+
+        return $tests;
     }
 }

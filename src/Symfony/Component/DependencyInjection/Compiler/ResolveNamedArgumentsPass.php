@@ -14,8 +14,8 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\VarExporter\ProxyHelper;
 
 /**
  * Resolves named arguments to their corresponding numeric index.
@@ -24,10 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResolveNamedArgumentsPass extends AbstractRecursivePass
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof AbstractArgument && $value->getText().'.' === $value->getTextWithContext()) {
             $value->setContext(sprintf('A value found in service "%s"', $this->currentId));
@@ -41,7 +38,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
         $calls[] = ['__construct', $value->getArguments()];
 
         foreach ($calls as $i => $call) {
-            list($method, $arguments) = $call;
+            [$method, $arguments] = $call;
             $parameters = null;
             $resolvedArguments = [];
 
@@ -90,7 +87,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
                 $typeFound = false;
                 foreach ($parameters as $j => $p) {
-                    if (!\array_key_exists($j, $resolvedArguments) && ProxyHelper::getTypeHint($r, $p, true) === $key) {
+                    if (!\array_key_exists($j, $resolvedArguments) && ProxyHelper::exportType($p, true) === $key) {
                         $resolvedArguments[$j] = $argument;
                         $typeFound = true;
                     }
@@ -107,7 +104,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
             }
         }
 
-        list(, $arguments) = array_pop($calls);
+        [, $arguments] = array_pop($calls);
 
         if ($arguments !== $value->getArguments()) {
             $value->setArguments($arguments);

@@ -16,11 +16,20 @@ use Symfony\Component\Form\Util\StringUtil;
 
 class StringUtilTest extends TestCase
 {
-    public function testTrim()
+    public function trimProvider()
     {
-        $data = ' Foo! ';
+        return [
+            [' Foo! ', 'Foo!'],
+            ["\u{1F92E}", "\u{1F92E}"], // unassigned character in PCRE versions of <PHP 7.3
+        ];
+    }
 
-        $this->assertEquals('Foo!', StringUtil::trim($data));
+    /**
+     * @dataProvider trimProvider
+     */
+    public function testTrim($data, $expectedData)
+    {
+        $this->assertSame($expectedData, StringUtil::trim($data));
     }
 
     /**
@@ -72,7 +81,9 @@ class StringUtilTest extends TestCase
             ['000D'],
             ['0085'],
             // zero width space
-//            ['200B'],
+            ['200B'],
+            // soft hyphen
+            ['00AD'],
         ];
     }
 

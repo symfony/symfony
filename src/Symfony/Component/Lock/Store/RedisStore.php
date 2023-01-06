@@ -12,9 +12,6 @@
 namespace Symfony\Component\Lock\Store;
 
 use Predis\Response\ServerException;
-use Symfony\Component\Cache\Traits\RedisClusterProxy;
-use Symfony\Component\Cache\Traits\RedisProxy;
-use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockStorageException;
@@ -32,31 +29,20 @@ class RedisStore implements SharedLockStoreInterface
 {
     use ExpiringStoreTrait;
 
-    private $redis;
-    private $initialTtl;
-    private $supportTime;
+    private bool $supportTime;
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|RedisProxy|RedisClusterProxy|\Predis\ClientInterface $redisClient
-     * @param float                                                                                 $initialTtl  the expiration delay of locks in seconds
+     * @param float $initialTtl The expiration delay of locks in seconds
      */
-    public function __construct($redisClient, float $initialTtl = 300.0)
-    {
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\ClientInterface && !$redisClient instanceof RedisProxy && !$redisClient instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster, RedisProxy, RedisClusterProxy or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redisClient)));
-        }
-
+    public function __construct(
+        private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
+        private float $initialTtl = 300.0,
+    ) {
         if ($initialTtl <= 0) {
             throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL. Got %d.', __METHOD__, $initialTtl));
         }
-
-        $this->redis = $redisClient;
-        $this->initialTtl = $initialTtl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         $script = '
@@ -102,9 +88,6 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveRead(Key $key)
     {
         $script = '
@@ -145,9 +128,6 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         $script = '
@@ -188,9 +168,6 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         $script = '
@@ -221,10 +198,7 @@ class RedisStore implements SharedLockStoreInterface
         $this->evaluate($script, (string) $key, [$this->getUniqueToken($key)]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         $script = '
             local key = KEYS[1]
@@ -250,19 +224,9 @@ class RedisStore implements SharedLockStoreInterface
         return (bool) $this->evaluate($script, (string) $key, [microtime(true), $this->getUniqueToken($key)]);
     }
 
-    /**
-     * Evaluates a script in the corresponding redis client.
-     *
-     * @return mixed
-     */
-    private function evaluate(string $script, string $resource, array $args)
+    private function evaluate(string $script, string $resource, array $args): mixed
     {
-        if (
-            $this->redis instanceof \Redis ||
-            $this->redis instanceof \RedisCluster ||
-            $this->redis instanceof RedisProxy ||
-            $this->redis instanceof RedisClusterProxy
-        ) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof \RedisCluster) {
             $this->redis->clearLastError();
             $result = $this->redis->eval($script, array_merge([$resource], $args), 1);
             if (null !== $err = $this->redis->getLastError()) {
@@ -281,19 +245,15 @@ class RedisStore implements SharedLockStoreInterface
             }
 
             return $result;
-
-            return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge([$resource], $args), 1);
         }
 
-        if ($this->redis instanceof \Predis\ClientInterface) {
-            try {
-                return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
-            } catch (ServerException $e) {
-                throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
-            }
-        }
+        \assert($this->redis instanceof \Predis\ClientInterface);
 
-        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
+        try {
+            return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
+        } catch (ServerException $e) {
+            throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     private function getUniqueToken(Key $key): string
@@ -308,7 +268,7 @@ class RedisStore implements SharedLockStoreInterface
 
     private function getNowCode(): string
     {
-        if (null === $this->supportTime) {
+        if (!isset($this->supportTime)) {
             // Redis < 5.0 does not support TIME (not deterministic) in script.
             // https://redis.io/commands/eval#replicating-commands-instead-of-scripts
             // This code asserts TIME can be use, otherwise will fallback to a timestamp generated by the PHP process.
@@ -321,7 +281,7 @@ class RedisStore implements SharedLockStoreInterface
             try {
                 $this->supportTime = 1 === $this->evaluate($script, 'symfony_check_support_time', []);
             } catch (LockStorageException $e) {
-                if (false === strpos($e->getMessage(), 'commands not allowed after non deterministic')) {
+                if (!str_contains($e->getMessage(), 'commands not allowed after non deterministic')) {
                     throw $e;
                 }
                 $this->supportTime = false;

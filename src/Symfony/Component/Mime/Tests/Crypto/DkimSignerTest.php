@@ -16,6 +16,7 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Message;
 
 /**
  * @group time-sensitive
@@ -90,6 +91,21 @@ EOF;
         ];
     }
 
+    public function testSignWithUnsupportedAlgorithm()
+    {
+        $message = $this->createMock(Message::class);
+
+        $signer = new DkimSigner(self::$pk, 'testdkim.symfony.net', 'sf', [
+            'algorithm' => 'unsupported-value',
+        ]);
+
+        $this->expectExceptionObject(
+            new \LogicException('Invalid DKIM signing algorithm "unsupported-value".')
+        );
+
+        $signer->sign($message, []);
+    }
+
     /**
      * @dataProvider getCanonicalizeHeaderData
      */
@@ -122,14 +138,14 @@ EOF;
             DkimSigner::CANON_SIMPLE, "\r\n", '', \PHP_INT_MAX,
         ];
         yield 'relaxed_empty' => [
-            DkimSigner::CANON_RELAXED, "\r\n", '', \PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, '', '', \PHP_INT_MAX,
         ];
 
         yield 'simple_empty_single_ending_CLRF' => [
             DkimSigner::CANON_SIMPLE, "\r\n", "\r\n", \PHP_INT_MAX,
         ];
         yield 'relaxed_empty_single_ending_CLRF' => [
-            DkimSigner::CANON_RELAXED, "\r\n", "\r\n", \PHP_INT_MAX,
+            DkimSigner::CANON_RELAXED, '', "\r\n", \PHP_INT_MAX,
         ];
 
         yield 'simple_multiple_ending_CLRF' => [

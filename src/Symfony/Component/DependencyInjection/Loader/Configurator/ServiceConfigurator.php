@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class ServiceConfigurator extends AbstractServiceConfigurator
 {
-    const FACTORY = 'services';
-
     use Traits\AbstractTrait;
     use Traits\ArgumentTrait;
     use Traits\AutoconfigureTrait;
@@ -41,12 +39,15 @@ class ServiceConfigurator extends AbstractServiceConfigurator
     use Traits\SyntheticTrait;
     use Traits\TagTrait;
 
-    private $container;
-    private $instanceof;
-    private $allowParent;
-    private $path;
+    public const FACTORY = 'services';
 
-    public function __construct(ContainerBuilder $container, array $instanceof, bool $allowParent, ServicesConfigurator $parent, Definition $definition, $id, array $defaultTags, string $path = null)
+    private ContainerBuilder $container;
+    private array $instanceof;
+    private bool $allowParent;
+    private ?string $path;
+    private bool $destructed = false;
+
+    public function __construct(ContainerBuilder $container, array $instanceof, bool $allowParent, ServicesConfigurator $parent, Definition $definition, ?string $id, array $defaultTags, string $path = null)
     {
         $this->container = $container;
         $this->instanceof = $instanceof;
@@ -58,6 +59,11 @@ class ServiceConfigurator extends AbstractServiceConfigurator
 
     public function __destruct()
     {
+        if ($this->destructed) {
+            return;
+        }
+        $this->destructed = true;
+
         parent::__destruct();
 
         $this->container->removeBindings($this->id);

@@ -20,10 +20,10 @@ use Symfony\Component\Lock\Exception\UnserializableKeyException;
  */
 final class Key
 {
-    private $resource;
-    private $expiringTime;
-    private $state = [];
-    private $serializable = true;
+    private string $resource;
+    private ?float $expiringTime = null;
+    private array $state = [];
+    private bool $serializable = true;
 
     public function __construct(string $resource)
     {
@@ -40,7 +40,7 @@ final class Key
         return isset($this->state[$stateKey]);
     }
 
-    public function setState(string $stateKey, $state): void
+    public function setState(string $stateKey, mixed $state): void
     {
         $this->state[$stateKey] = $state;
     }
@@ -50,7 +50,7 @@ final class Key
         unset($this->state[$stateKey]);
     }
 
-    public function getState(string $stateKey)
+    public function getState(string $stateKey): mixed
     {
         return $this->state[$stateKey];
     }
@@ -78,9 +78,7 @@ final class Key
     }
 
     /**
-     * Returns the remaining lifetime.
-     *
-     * @return float|null Remaining lifetime in seconds. Null when the key won't expire.
+     * Returns the remaining lifetime in seconds.
      */
     public function getRemainingLifetime(): ?float
     {
@@ -95,7 +93,7 @@ final class Key
     public function __sleep(): array
     {
         if (!$this->serializable) {
-            throw new UnserializableKeyException('The key can not be serialized.');
+            throw new UnserializableKeyException('The key cannot be serialized.');
         }
 
         return ['resource', 'expiringTime', 'state'];

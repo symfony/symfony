@@ -10,7 +10,9 @@ return function (RoutingConfigurator $routes) {
             ->options(['utf8' => true])
         ->add('buz', 'zub')
             ->controller('foo:act')
-            ->stateless(true);
+            ->stateless(true)
+        ->add('controller_class', '/controller')
+            ->controller(['Acme\MyApp\MyController', 'myAction']);
 
     $routes->import('php_dsl_sub.php')
         ->prefix('/sub')

@@ -1,0 +1,9 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    baz:
+        class: Symfony\Component\DependencyInjection\Loader\Configurator\BazService
+        public: true

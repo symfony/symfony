@@ -3,6 +3,7 @@
 require_once __DIR__.'/../includes/classes.php';
 require_once __DIR__.'/../includes/foo.php';
 
+use Bar\FooClass;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,9 +14,10 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 $container = new ContainerBuilder();
 $container
-    ->register('foo', '\Bar\FooClass')
+    ->register('foo', FooClass::class)
     ->addTag('foo', ['foo' => 'foo'])
     ->addTag('foo', ['bar' => 'bar', 'baz' => 'baz'])
+    ->addTag('nullable', ['bar' => 'bar', 'baz' => null])
     ->addTag('foo', ['name' => 'bar', 'baz' => 'baz'])
     ->setFactory(['Bar\\FooClass', 'getInstance'])
     ->setArguments(['foo', new Reference('foo.baz'), ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'], true, new Reference('service_container')])
@@ -186,5 +188,13 @@ $container->register('preload_sidekick', 'stdClass')
     ->setPublic(true)
     ->addTag('container.preload', ['class' => 'Some\Sidekick1'])
     ->addTag('container.preload', ['class' => 'Some\Sidekick2']);
+
+$container->register('a_factory', 'Bar');
+$container->register('a_service', 'Bar')
+    ->setFactory([new Reference('a_factory'), 'getBar'])
+    ->setPublic(true);
+$container->register('b_service', 'Bar')
+    ->setFactory([new Reference('a_factory'), 'getBar'])
+    ->setPublic(true);
 
 return $container;

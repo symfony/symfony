@@ -19,9 +19,9 @@ use Twig\Node\Node;
  */
 final class DumpNode extends Node
 {
-    private $varPrefix;
+    private string $varPrefix;
 
-    public function __construct($varPrefix, ?Node $values, int $lineno, string $tag = null)
+    public function __construct(string $varPrefix, ?Node $values, int $lineno, string $tag = null)
     {
         $nodes = [];
         if (null !== $values) {

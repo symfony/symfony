@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity;
@@ -29,24 +29,29 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
+use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\RuntimeException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class EntityTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Bridge\Doctrine\Form\Type\EntityType';
+    public const TESTED_TYPE = 'Symfony\Bridge\Doctrine\Form\Type\EntityType';
 
-    const ITEM_GROUP_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity';
-    const SINGLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
-    const SINGLE_IDENT_NO_TO_STRING_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity';
-    const SINGLE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity';
-    const SINGLE_ASSOC_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity';
-    const SINGLE_STRING_CASTABLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity';
-    const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity';
-    const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity';
+    private const ITEM_GROUP_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity';
+    private const SINGLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
+    private const SINGLE_IDENT_NO_TO_STRING_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity';
+    private const SINGLE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity';
+    private const SINGLE_ASSOC_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity';
+    private const SINGLE_STRING_CASTABLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity';
+    private const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity';
+    private const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity';
 
     /**
      * @var EntityManager
@@ -54,18 +59,9 @@ class EntityTypeTest extends BaseTypeTest
     private $em;
 
     /**
-     * @var MockObject|ManagerRegistry
+     * @var MockObject&ManagerRegistry
      */
     private $emRegistry;
-
-    protected static $supportedFeatureSetVersion = 404;
-
-    public static function setUpBeforeClass(): void
-    {
-        if (\PHP_VERSION_ID >= 80000) {
-            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
-        }
-    }
 
     protected function setUp(): void
     {
@@ -125,13 +121,13 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testClassOptionIsRequired()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
+        $this->expectException(MissingOptionsException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE);
     }
 
     public function testInvalidClassOption()
     {
-        $this->expectException('Symfony\Component\Form\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'class' => 'foo',
         ]);
@@ -226,7 +222,7 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -236,7 +232,7 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException(UnexpectedTypeException::class);
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -1249,7 +1245,7 @@ class EntityTypeTest extends BaseTypeTest
         $choiceList2 = $form->get('property2')->getConfig()->getAttribute('choice_list');
         $choiceList3 = $form->get('property3')->getConfig()->getAttribute('choice_list');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\LazyChoiceList', $choiceList1);
+        $this->assertInstanceOf(LazyChoiceList::class, $choiceList1);
         $this->assertSame($choiceList1, $choiceList2);
         $this->assertSame($choiceList1, $choiceList3);
     }
@@ -1309,14 +1305,14 @@ class EntityTypeTest extends BaseTypeTest
         $choiceList2 = $form->get('property2')->getConfig()->getAttribute('choice_list');
         $choiceList3 = $form->get('property3')->getConfig()->getAttribute('choice_list');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\LazyChoiceList', $choiceList1);
+        $this->assertInstanceOf(LazyChoiceList::class, $choiceList1);
         $this->assertSame($choiceList1, $choiceList2);
         $this->assertSame($choiceList1, $choiceList3);
     }
 
-    protected function createRegistryMock($name, $em)
+    protected function createRegistryMock($name, $em): MockObject&ManagerRegistry
     {
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))
@@ -1779,5 +1775,33 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame($emptyData, $form->getViewData());
         $this->assertEquals($collection, $form->getNormData());
         $this->assertEquals($collection, $form->getData());
+    }
+
+    public function testWithSameLoaderAndDifferentChoiceValueCallbacks()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $this->persist([$entity1, $entity2]);
+
+        $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
+            ->add('entity_one', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->add('entity_two', self::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+                'choice_value' => function ($choice) {
+                    return $choice ? $choice->name : '';
+                },
+            ])
+            ->createView()
+        ;
+
+        $this->assertSame('1', $view['entity_one']->vars['choices'][1]->value);
+        $this->assertSame('2', $view['entity_one']->vars['choices'][2]->value);
+
+        $this->assertSame('Foo', $view['entity_two']->vars['choices']['Foo']->value);
+        $this->assertSame('Bar', $view['entity_two']->vars['choices']['Bar']->value);
     }
 }

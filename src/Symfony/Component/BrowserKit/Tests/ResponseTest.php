@@ -12,6 +12,7 @@
 namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\BrowserKit\Exception\JsonException;
 use Symfony\Component\BrowserKit\Response;
 
 class ResponseTest extends TestCase
@@ -73,5 +74,49 @@ class ResponseTest extends TestCase
         $response = new Response('foo', 304, $headers);
 
         $this->assertEquals($expected, $response->__toString(), '->__toString() returns the headers and the content as a string');
+    }
+
+    public function testToArray()
+    {
+        $response = new Response('{"foo":"foo","bar":{"baz":"baz","qux":33,"quux":12345678901234567890}}');
+
+        $this->assertSame([
+            'foo' => 'foo',
+            'bar' => [
+                'baz' => 'baz',
+                'qux' => 33,
+                'quux' => '12345678901234567890',
+            ],
+        ], $response->toArray(), '->toArray returns an array representation of json content');
+    }
+
+    /**
+     * @dataProvider provideInvalidJson
+     */
+    public function testToArrayThrowsErrorOnInvalidJson(string $data)
+    {
+        $response = new Response($data);
+
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('Syntax error');
+
+        $response->toArray();
+    }
+
+    public function provideInvalidJson(): iterable
+    {
+        yield 'Empty string' => [''];
+        yield 'Not json' => ['freferfrefer'];
+        yield 'Malformed json' => ['{"foo", "bar", "baz"}'];
+    }
+
+    public function testToArrayThrowsErrorOnNonArray()
+    {
+        $response = new Response('"foo"');
+
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage('JSON content was expected to decode to an array');
+
+        $response->toArray();
     }
 }

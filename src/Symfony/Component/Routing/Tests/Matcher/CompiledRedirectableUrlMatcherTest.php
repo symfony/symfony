@@ -25,7 +25,7 @@ class CompiledRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
         $compiledRoutes = $dumper->getCompiledRoutes();
 
         return $this->getMockBuilder(TestCompiledRedirectableUrlMatcher::class)
-            ->setConstructorArgs([$compiledRoutes, $context ?: new RequestContext()])
+            ->setConstructorArgs([$compiledRoutes, $context ?? new RequestContext()])
             ->setMethods(['redirect'])
             ->getMock();
     }

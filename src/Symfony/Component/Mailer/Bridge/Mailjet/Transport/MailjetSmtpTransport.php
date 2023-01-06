@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailjet\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class MailjetSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $username, string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $username, #[\SensitiveParameter] string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct('in-v3.mailjet.com', 465, true, $dispatcher, $logger);
 

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\PhpUnit\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -14,7 +23,7 @@ class CoverageListenerTest extends TestCase
 
         exec('type phpdbg 2> /dev/null', $output, $returnCode);
 
-        if (\PHP_VERSION_ID >= 70000 && 0 === $returnCode) {
+        if (0 === $returnCode) {
             $php = 'phpdbg -qrr';
         } else {
             exec('php --ri xdebug -d zend_extension=xdebug.so 2> /dev/null', $output, $returnCode);

@@ -1,7 +1,7 @@
 {
     "name": "symfony/proxy-manager-bridge",
     "type": "symfony-bridge",
-    "description": "Symfony ProxyManager Bridge",
+    "description": "Provides integration for ProxyManager with various Symfony components",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -16,15 +16,13 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/dependency-injection": "^5.0",
-        "ocramius/proxy-manager": "~2.1"
+        "php": ">=8.1",
+        "friendsofphp/proxy-manager-lts": "^1.0.2",
+        "symfony/dependency-injection": "^6.3",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "symfony/config": "^4.4|^5.0"
-    },
-    "conflict": {
-        "zendframework/zend-eventmanager": "2.6.0"
+        "symfony/config": "^6.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" },
@@ -32,6 +30,5 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "version": "5.2.x-dev"
+    "minimum-stability": "dev"
 }

@@ -19,10 +19,11 @@ use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorAttributeValueSa
 
 class CrawlerSelectorAttributeValueSameTest extends TestCase
 {
-    public function testConstraint(): void
+    public function testConstraint()
     {
         $constraint = new CrawlerSelectorAttributeValueSame('input[name="username"]', 'value', 'Fabien');
         $this->assertTrue($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username" value="Fabien">'), '', true));
+        $this->assertFalse($constraint->evaluate(new Crawler('<html><body><form><input type="text" name="username">'), '', true));
         $this->assertFalse($constraint->evaluate(new Crawler('<html><head><title>Bar'), '', true));
 
         try {

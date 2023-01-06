@@ -21,7 +21,7 @@ abstract class ResourceBundleTestCase extends TestCase
     // not loaded, because it is NOT possible to skip the execution of data
     // providers.
 
-    private static $locales = [
+    private const LOCALES = [
         'af',
         'af_NA',
         'af_ZA',
@@ -95,6 +95,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'ce_RU',
         'cs',
         'cs_CZ',
+        'cv',
+        'cv_RU',
         'cy',
         'cy_GB',
         'da',
@@ -178,6 +180,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'en_MS',
         'en_MT',
         'en_MU',
+        'en_MV',
         'en_MW',
         'en_MY',
         'en_NA',
@@ -367,6 +370,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'he_IL',
         'hi',
         'hi_IN',
+        'hi_Latn',
+        'hi_Latn_IN',
         'hr',
         'hr_BA',
         'hr_HR',
@@ -416,6 +421,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'ks',
         'ks_Arab',
         'ks_Arab_IN',
+        'ks_Deva',
+        'ks_Deva_IN',
         'ks_IN',
         'ku',
         'ku_TR',
@@ -536,11 +543,16 @@ abstract class ResourceBundleTestCase extends TestCase
         'ru_UA',
         'rw',
         'rw_RW',
+        'sa',
+        'sa_IN',
+        'sc',
+        'sc_IT',
         'sd',
         'sd_Arab',
         'sd_Arab_PK',
         'sd_Deva',
         'sd_Deva_IN',
+        'sd_IN',
         'sd_PK',
         'se',
         'se_FI',
@@ -675,7 +687,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'zu_ZA',
     ];
 
-    private static $localeAliases = [
+    private const LOCALE_ALIASES = [
         'az_AZ' => 'az_Latn_AZ',
         'bs_BA' => 'bs_Latn_BA',
         'en_NH' => 'en_VU',
@@ -690,18 +702,18 @@ abstract class ResourceBundleTestCase extends TestCase
         'iw_IL' => 'he_IL',
         'ks_IN' => 'ks_Arab_IN',
         'mo' => 'ro',
-        'no' => 'nb',
-        'no_NO' => 'nb_NO',
+        'no_NO' => 'no',
         'no_NO_NY' => 'nn_NO',
         'pa_IN' => 'pa_Guru_IN',
         'pa_PK' => 'pa_Arab_PK',
+        'sd_IN' => 'sd_Deva_IN',
         'sd_PK' => 'sd_Arab_PK',
         'sh' => 'sr_Latn',
         'sh_BA' => 'sr_Latn_BA',
         'sh_CS' => 'sr_Latn_RS',
         'sh_YU' => 'sr_Latn_RS',
         'sr_BA' => 'sr_Cyrl_BA',
-        'sr_CS' => 'sr_Cyrl_RS',
+        'sr_CS' => 'sr_RS',
         'sr_Cyrl_CS' => 'sr_Cyrl_RS',
         'sr_Cyrl_YU' => 'sr_Cyrl_RS',
         'sr_Latn_CS' => 'sr_Latn_RS',
@@ -709,7 +721,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'sr_ME' => 'sr_Latn_ME',
         'sr_RS' => 'sr_Cyrl_RS',
         'sr_XK' => 'sr_Cyrl_XK',
-        'sr_YU' => 'sr_Cyrl_RS',
+        'sr_YU' => 'sr_RS',
         'su_ID' => 'su_Latn_ID',
         'tl' => 'fil',
         'tl_PH' => 'fil_PH',
@@ -723,11 +735,18 @@ abstract class ResourceBundleTestCase extends TestCase
     ];
 
     private static $rootLocales;
+    private $defaultLocale;
 
     protected function setUp(): void
     {
+        $this->defaultLocale = \Locale::getDefault();
         Locale::setDefault('en');
         Locale::setDefaultFallback('en');
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function provideLocales()
@@ -757,12 +776,12 @@ abstract class ResourceBundleTestCase extends TestCase
 
     protected function getLocales()
     {
-        return self::$locales;
+        return self::LOCALES;
     }
 
     protected function getLocaleAliases()
     {
-        return self::$localeAliases;
+        return self::LOCALE_ALIASES;
     }
 
     protected function getRootLocales()
@@ -770,7 +789,7 @@ abstract class ResourceBundleTestCase extends TestCase
         if (null === self::$rootLocales) {
             self::$rootLocales = array_filter($this->getLocales(), function ($locale) {
                 // no locales for which fallback is possible (e.g "en_GB")
-                return false === strpos($locale, '_');
+                return !str_contains($locale, '_');
             });
         }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config http-method-override="false">
+        <framework:messenger reset-on-message="true">
+            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage">
+                <framework:sender service="sender.bar" />
+                <framework:sender service="sender.biz" />
+            </framework:routing>
+            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage">
+                <framework:sender service="sender.foo" />
+            </framework:routing>
+            <framework:transport name="sender.bar" dsn="null://" />
+            <framework:transport name="sender.biz" dsn="null://" />
+            <framework:transport name="sender.foo" dsn="null://" />
+        </framework:messenger>
+    </framework:config>
+</container>

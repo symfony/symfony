@@ -19,7 +19,7 @@ class Psr6CacheClearerTest extends TestCase
 {
     public function testClearPoolsInjectedInConstructor()
     {
-        $pool = $this->getMockBuilder(CacheItemPoolInterface::class)->getMock();
+        $pool = $this->createMock(CacheItemPoolInterface::class);
         $pool
             ->expects($this->once())
             ->method('clear');
@@ -29,17 +29,19 @@ class Psr6CacheClearerTest extends TestCase
 
     public function testClearPool()
     {
-        $pool = $this->getMockBuilder(CacheItemPoolInterface::class)->getMock();
+        $pool = $this->createMock(CacheItemPoolInterface::class);
         $pool
             ->expects($this->once())
-            ->method('clear');
+            ->method('clear')
+            ->willReturn(true)
+        ;
 
-        (new Psr6CacheClearer(['pool' => $pool]))->clearPool('pool');
+        $this->assertTrue((new Psr6CacheClearer(['pool' => $pool]))->clearPool('pool'));
     }
 
     public function testClearPoolThrowsExceptionOnUnreferencedPool()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache pool not found: "unknown"');
         (new Psr6CacheClearer())->clearPool('unknown');
     }

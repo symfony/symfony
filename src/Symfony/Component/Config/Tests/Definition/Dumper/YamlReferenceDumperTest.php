@@ -26,7 +26,7 @@ class YamlReferenceDumperTest extends TestCase
         $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 
-    public function provideDumpAtPath()
+    public function provideDumpAtPath(): array
     {
         return [
             'Regular node' => ['scalar_true', <<<EOL
@@ -42,7 +42,7 @@ array:
     # this is a long
     # multi-line info text
     # which should be indented
-    child3:               ~ # Example: example setting
+    child3:               ~ # Example: 'example setting'
 EOL
             ],
             'Regular nested' => ['array.child2', <<<EOL
@@ -72,7 +72,7 @@ EOL
     /**
      * @dataProvider provideDumpAtPath
      */
-    public function testDumpAtPath($path, $expected)
+    public function testDumpAtPath(string $path, string $expected)
     {
         $configuration = new ExampleConfiguration();
 
@@ -81,7 +81,7 @@ EOL
         $this->assertSame(trim($expected), trim($dumper->dumpAtPath($configuration, $path)));
     }
 
-    private function getConfigurationAsString()
+    private function getConfigurationAsString(): string
     {
         return <<<'EOL'
 acme_root:
@@ -112,7 +112,7 @@ acme_root:
         # this is a long
         # multi-line info text
         # which should be indented
-        child3:               ~ # Example: example setting
+        child3:               ~ # Example: 'example setting'
     scalar_prototyped:    []
     parameters:
 
@@ -137,6 +137,7 @@ acme_root:
 
         # Prototype
         name:                 []
+    custom_node:          true
 
 EOL;
     }

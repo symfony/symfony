@@ -34,8 +34,8 @@ class MarshallingSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->marshaller = $this->getMockBuilder(MarshallerInterface::class)->getMock();
-        $this->handler = $this->getMockBuilder(AbstractSessionHandler::class)->getMock();
+        $this->marshaller = $this->createMock(MarshallerInterface::class);
+        $this->handler = $this->createMock(AbstractSessionHandler::class);
     }
 
     public function testOpen()
@@ -72,7 +72,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
 
         $this->handler->expects($this->once())->method('gc')
-            ->with(4711)->willReturn(true);
+            ->with(4711)->willReturn(1);
 
         $marshallingSessionHandler->gc(4711);
     }

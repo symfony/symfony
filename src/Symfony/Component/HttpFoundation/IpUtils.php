@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class IpUtils
 {
-    private static $checkedIps = [];
+    private static array $checkedIps = [];
 
     /**
      * This class should not be instantiated.
@@ -31,10 +31,8 @@ class IpUtils
      * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets.
      *
      * @param string|array $ips List of IPs or subnets (can be a string if only a single one)
-     *
-     * @return bool Whether the IP is valid
      */
-    public static function checkIp(?string $requestIp, $ips)
+    public static function checkIp(string $requestIp, string|array $ips): bool
     {
         if (!\is_array($ips)) {
             $ips = [$ips];
@@ -59,7 +57,7 @@ class IpUtils
      *
      * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet
      */
-    public static function checkIp4(?string $requestIp, string $ip)
+    public static function checkIp4(string $requestIp, string $ip): bool
     {
         $cacheKey = $requestIp.'-'.$ip;
         if (isset(self::$checkedIps[$cacheKey])) {
@@ -70,8 +68,8 @@ class IpUtils
             return self::$checkedIps[$cacheKey] = false;
         }
 
-        if (false !== strpos($ip, '/')) {
-            list($address, $netmask) = explode('/', $ip, 2);
+        if (str_contains($ip, '/')) {
+            [$address, $netmask] = explode('/', $ip, 2);
 
             if ('0' === $netmask) {
                 return self::$checkedIps[$cacheKey] = filter_var($address, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4);
@@ -102,11 +100,9 @@ class IpUtils
      *
      * @param string $ip IPv6 address or subnet in CIDR notation
      *
-     * @return bool Whether the IP is valid
-     *
      * @throws \RuntimeException When IPV6 support is not enabled
      */
-    public static function checkIp6(?string $requestIp, string $ip)
+    public static function checkIp6(string $requestIp, string $ip): bool
     {
         $cacheKey = $requestIp.'-'.$ip;
         if (isset(self::$checkedIps[$cacheKey])) {
@@ -117,8 +113,17 @@ class IpUtils
             throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');
         }
 
-        if (false !== strpos($ip, '/')) {
-            list($address, $netmask) = explode('/', $ip, 2);
+        // Check to see if we were given a IP4 $requestIp or $ip by mistake
+        if (!filter_var($requestIp, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
+            return self::$checkedIps[$cacheKey] = false;
+        }
+
+        if (str_contains($ip, '/')) {
+            [$address, $netmask] = explode('/', $ip, 2);
+
+            if (!filter_var($address, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
+                return self::$checkedIps[$cacheKey] = false;
+            }
 
             if ('0' === $netmask) {
                 return (bool) unpack('n*', @inet_pton($address));
@@ -128,6 +133,10 @@ class IpUtils
                 return self::$checkedIps[$cacheKey] = false;
             }
         } else {
+            if (!filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
+                return self::$checkedIps[$cacheKey] = false;
+            }
+
             $address = $ip;
             $netmask = 128;
         }
@@ -142,7 +151,7 @@ class IpUtils
         for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; ++$i) {
             $left = $netmask - 16 * ($i - 1);
             $left = ($left <= 16) ? $left : 16;
-            $mask = ~(0xffff >> $left) & 0xffff;
+            $mask = ~(0xFFFF >> $left) & 0xFFFF;
             if (($bytesAddr[$i] & $mask) != ($bytesTest[$i] & $mask)) {
                 return self::$checkedIps[$cacheKey] = false;
             }
@@ -159,7 +168,7 @@ class IpUtils
     public static function anonymize(string $ip): string
     {
         $wrappedIPv6 = false;
-        if ('[' === substr($ip, 0, 1) && ']' === substr($ip, -1, 1)) {
+        if (str_starts_with($ip, '[') && str_ends_with($ip, ']')) {
             $wrappedIPv6 = true;
             $ip = substr($ip, 1, -1);
         }

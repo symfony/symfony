@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
  */
 final class MetadataHeader extends UnstructuredHeader
 {
-    private $key;
+    private string $key;
 
     public function __construct(string $key, string $value)
     {

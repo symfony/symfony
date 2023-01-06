@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\LanguageValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LanguageValidatorTest extends ConstraintValidatorTestCase
@@ -34,7 +35,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    protected function createValidator()
+    protected function createValidator(): LanguageValidator
     {
         return new LanguageValidator();
     }
@@ -55,7 +56,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Language());
     }
 
@@ -149,6 +150,19 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
             ['ZZZ'],
             ['zzz'],
         ];
+    }
+
+    public function testInvalidAlpha3LanguageNamed()
+    {
+        $this->validator->validate(
+            'DE',
+            new Language(alpha3: true, message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"DE"')
+            ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
+            ->assertRaised();
     }
 
     public function testValidateUsingCountrySpecificLocale()

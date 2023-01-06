@@ -22,23 +22,14 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddConstraintValidatorsPass implements CompilerPassInterface
 {
-    private $validatorFactoryServiceId;
-    private $constraintValidatorTag;
-
-    public function __construct(string $validatorFactoryServiceId = 'validator.validator_factory', string $constraintValidatorTag = 'validator.constraint_validator')
-    {
-        $this->validatorFactoryServiceId = $validatorFactoryServiceId;
-        $this->constraintValidatorTag = $constraintValidatorTag;
-    }
-
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->validatorFactoryServiceId)) {
+        if (!$container->hasDefinition('validator.validator_factory')) {
             return;
         }
 
         $validators = [];
-        foreach ($container->findTaggedServiceIds($this->constraintValidatorTag, true) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds('validator.constraint_validator', true) as $id => $attributes) {
             $definition = $container->getDefinition($id);
 
             if (isset($attributes[0]['alias'])) {
@@ -49,7 +40,7 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
         }
 
         $container
-            ->getDefinition($this->validatorFactoryServiceId)
+            ->getDefinition('validator.validator_factory')
             ->replaceArgument(0, ServiceLocatorTagPass::register($container, $validators))
         ;
     }

@@ -16,8 +16,6 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
- *
- * @experimental in 5.1
  */
 class Recipient implements EmailRecipientInterface, SmsRecipientInterface
 {
@@ -37,7 +35,7 @@ class Recipient implements EmailRecipientInterface, SmsRecipientInterface
     /**
      * @return $this
      */
-    public function email(string $email): self
+    public function email(string $email): static
     {
         $this->email = $email;
 
@@ -49,7 +47,7 @@ class Recipient implements EmailRecipientInterface, SmsRecipientInterface
      *
      * @return $this
      */
-    public function phone(string $phone): self
+    public function phone(string $phone): static
     {
         $this->phone = $phone;
 

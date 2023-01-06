@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Constraints\Composite;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\GroupDefinitionException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
@@ -30,10 +32,10 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class ClassMetadataTest extends TestCase
 {
-    const CLASSNAME = Entity::class;
-    const PARENTCLASS = EntityParent::class;
-    const PROVIDERCLASS = GroupSequenceProviderEntity::class;
-    const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
+    private const CLASSNAME = Entity::class;
+    private const PARENTCLASS = EntityParent::class;
+    private const PROVIDERCLASS = GroupSequenceProviderEntity::class;
+    private const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
 
     protected $metadata;
 
@@ -49,14 +51,14 @@ class ClassMetadataTest extends TestCase
 
     public function testAddConstraintDoesNotAcceptValid()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
 
         $this->metadata->addConstraint(new Valid());
     }
 
     public function testAddConstraintRequiresClassConstraints()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
 
         $this->metadata->addConstraint(new PropertyConstraint());
     }
@@ -270,24 +272,24 @@ class ClassMetadataTest extends TestCase
     {
         $this->metadata->setGroupSequence(['Foo', $this->metadata->getDefaultGroup()]);
 
-        $this->assertInstanceOf('Symfony\Component\Validator\Constraints\GroupSequence', $this->metadata->getGroupSequence());
+        $this->assertInstanceOf(GroupSequence::class, $this->metadata->getGroupSequence());
     }
 
     public function testGroupSequencesFailIfNotContainingDefaultGroup()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+        $this->expectException(GroupDefinitionException::class);
         $this->metadata->setGroupSequence(['Foo', 'Bar']);
     }
 
     public function testGroupSequencesFailIfContainingDefault()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+        $this->expectException(GroupDefinitionException::class);
         $this->metadata->setGroupSequence(['Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP]);
     }
 
     public function testGroupSequenceFailsIfGroupSequenceProviderIsSet()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
         $metadata->setGroupSequence(['GroupSequenceProviderEntity', 'Foo']);
@@ -295,7 +297,7 @@ class ClassMetadataTest extends TestCase
 
     public function testGroupSequenceProviderFailsIfGroupSequenceIsSet()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequence(['GroupSequenceProviderEntity', 'Foo']);
         $metadata->setGroupSequenceProvider(true);
@@ -303,7 +305,7 @@ class ClassMetadataTest extends TestCase
 
     public function testGroupSequenceProviderFailsIfDomainClassIsInvalid()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+        $this->expectException(GroupDefinitionException::class);
         $metadata = new ClassMetadata('stdClass');
         $metadata->setGroupSequenceProvider(true);
     }
@@ -334,22 +336,6 @@ class ClassMetadataTest extends TestCase
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
 
-    /**
-     * @requires PHP < 7.4
-     */
-    public function testCascadeConstraintIsNotAvailable()
-    {
-        $metadata = new ClassMetadata(CascadingEntity::class);
-
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('The constraint "Symfony\Component\Validator\Constraints\Cascade" requires PHP 7.4.');
-
-        $metadata->addConstraint(new Cascade());
-    }
-
-    /**
-     * @requires PHP 7.4
-     */
     public function testCascadeConstraint()
     {
         $metadata = new ClassMetadata(CascadingEntity::class);
@@ -371,17 +357,17 @@ class ClassCompositeConstraint extends Composite
 {
     public $nested;
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return $this->getCompositeOption();
     }
 
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'nested';
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT];
     }

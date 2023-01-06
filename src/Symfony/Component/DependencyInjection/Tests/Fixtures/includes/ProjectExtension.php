@@ -17,15 +17,15 @@ class ProjectExtension implements ExtensionInterface
         }
 
         $configuration->register('project.service.bar', 'FooClass')->setPublic(true);
-        $configuration->setParameter('project.parameter.bar', isset($config['foo']) ? $config['foo'] : 'foobar');
+        $configuration->setParameter('project.parameter.bar', $config['foo'] ?? 'foobar');
 
         $configuration->register('project.service.foo', 'FooClass')->setPublic(true);
-        $configuration->setParameter('project.parameter.foo', isset($config['foo']) ? $config['foo'] : 'foobar');
+        $configuration->setParameter('project.parameter.foo', $config['foo'] ?? 'foobar');
 
         return $configuration;
     }
 
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return false;
     }

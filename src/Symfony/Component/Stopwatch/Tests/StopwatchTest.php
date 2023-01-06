@@ -12,7 +12,9 @@
 namespace Symfony\Component\Stopwatch\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Stopwatch\Section;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
  * StopwatchTest.
@@ -23,14 +25,14 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class StopwatchTest extends TestCase
 {
-    const DELTA = 20;
+    private const DELTA = 20;
 
     public function testStart()
     {
         $stopwatch = new Stopwatch();
         $event = $stopwatch->start('foo', 'cat');
 
-        $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
+        $this->assertInstanceOf(StopwatchEvent::class, $event);
         $this->assertEquals('cat', $event->getCategory());
         $this->assertSame($event, $stopwatch->getEvent('foo'));
     }
@@ -62,19 +64,12 @@ class StopwatchTest extends TestCase
     {
         $stopwatch = new Stopwatch();
 
-        $sections = new \ReflectionProperty('Symfony\Component\Stopwatch\Stopwatch', 'sections');
-        $sections->setAccessible(true);
+        $sections = new \ReflectionProperty(Stopwatch::class, 'sections');
         $section = $sections->getValue($stopwatch);
 
-        $events = new \ReflectionProperty('Symfony\Component\Stopwatch\Section', 'events');
-        $events->setAccessible(true);
+        $events = new \ReflectionProperty(Section::class, 'events');
 
-        $stopwatchMockEvent = $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
-            ->setConstructorArgs([microtime(true) * 1000])
-            ->getMock()
-        ;
-
-        $events->setValue(end($section), ['foo' => $stopwatchMockEvent]);
+        $events->setValue(end($section), ['foo' => new StopwatchEvent(microtime(true) * 1000)]);
 
         $this->assertFalse($stopwatch->isStarted('foo'));
     }
@@ -86,20 +81,20 @@ class StopwatchTest extends TestCase
         usleep(200000);
         $event = $stopwatch->stop('foo');
 
-        $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
+        $this->assertInstanceOf(StopwatchEvent::class, $event);
         $this->assertEqualsWithDelta(200, $event->getDuration(), self::DELTA);
     }
 
     public function testUnknownEvent()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->getEvent('foo');
     }
 
     public function testStopWithoutStart()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->stop('foo');
     }
@@ -163,7 +158,7 @@ class StopwatchTest extends TestCase
 
     public function testReopenANewSectionShouldThrowAnException()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $stopwatch = new Stopwatch();
         $stopwatch->openSection('section');
     }

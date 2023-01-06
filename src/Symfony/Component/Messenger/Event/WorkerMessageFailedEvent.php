@@ -20,8 +20,8 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class WorkerMessageFailedEvent extends AbstractWorkerMessageEvent
 {
-    private $throwable;
-    private $willRetry = false;
+    private \Throwable $throwable;
+    private bool $willRetry = false;
 
     public function __construct(Envelope $envelope, string $receiverName, \Throwable $error)
     {

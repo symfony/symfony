@@ -16,12 +16,10 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.2
  */
 class CacheStorage implements StorageInterface
 {
-    private $pool;
+    private CacheItemPoolInterface $pool;
 
     public function __construct(CacheItemPoolInterface $pool)
     {
@@ -42,15 +40,16 @@ class CacheStorage implements StorageInterface
     public function fetch(string $limiterStateId): ?LimiterStateInterface
     {
         $cacheItem = $this->pool->getItem(sha1($limiterStateId));
-        if (!$cacheItem->isHit()) {
-            return null;
+        $value = $cacheItem->get();
+        if ($value instanceof LimiterStateInterface) {
+            return $value;
         }
 
-        return $cacheItem->get();
+        return null;
     }
 
     public function delete(string $limiterStateId): void
     {
-        $this->pool->deleteItem($limiterStateId);
+        $this->pool->deleteItem(sha1($limiterStateId));
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\NodeVisitor;
 
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
+use Twig\Node\Expression\Binary\ConcatBinary;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
 use Twig\Node\Expression\FunctionExpression;
@@ -26,10 +27,10 @@ use Twig\NodeVisitor\AbstractNodeVisitor;
  */
 final class TranslationNodeVisitor extends AbstractNodeVisitor
 {
-    const UNDEFINED_DOMAIN = '_undefined';
+    public const UNDEFINED_DOMAIN = '_undefined';
 
-    private $enabled = false;
-    private $messages = [];
+    private bool $enabled = false;
+    private array $messages = [];
 
     public function enable(): void
     {
@@ -48,9 +49,6 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         return $this->messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doEnterNode(Node $node, Environment $env): Node
     {
         if (!$this->enabled) {
@@ -68,12 +66,10 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
             ];
         } elseif (
-            $node instanceof FilterExpression &&
-            'trans' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof FunctionExpression &&
-            't' === $node->getNode('node')->getAttribute('name')
+            $node instanceof FunctionExpression &&
+            't' === $node->getAttribute('name')
         ) {
-            $nodeArguments = $node->getNode('node')->getNode('arguments');
+            $nodeArguments = $node->getNode('arguments');
 
             if ($nodeArguments->getIterator()->current() instanceof ConstantExpression) {
                 $this->messages[] = [
@@ -81,38 +77,32 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
                     $this->getReadDomainFromArguments($nodeArguments, 2),
                 ];
             }
-        } elseif (
-            $node instanceof FilterExpression &&
-            'transchoice' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof ConstantExpression
-        ) {
-            // extract constant nodes with a trans filter
-            $this->messages[] = [
-                $node->getNode('node')->getAttribute('value'),
-                $this->getReadDomainFromArguments($node->getNode('arguments'), 2),
-            ];
         } elseif ($node instanceof TransNode) {
             // extract trans nodes
             $this->messages[] = [
                 $node->getNode('body')->getAttribute('data'),
                 $node->hasNode('domain') ? $this->getReadDomainFromNode($node->getNode('domain')) : null,
             ];
+        } elseif (
+            $node instanceof FilterExpression &&
+            'trans' === $node->getNode('filter')->getAttribute('value') &&
+            $node->getNode('node') instanceof ConcatBinary &&
+            $message = $this->getConcatValueFromNode($node->getNode('node'), null)
+        ) {
+            $this->messages[] = [
+                $message,
+                $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
+            ];
         }
 
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doLeaveNode(Node $node, Environment $env): ?Node
     {
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return 0;
@@ -160,5 +150,29 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         }
 
         return self::UNDEFINED_DOMAIN;
+    }
+
+    private function getConcatValueFromNode(Node $node, ?string $value): ?string
+    {
+        if ($node instanceof ConcatBinary) {
+            foreach ($node as $nextNode) {
+                if ($nextNode instanceof ConcatBinary) {
+                    $nextValue = $this->getConcatValueFromNode($nextNode, $value);
+                    if (null === $nextValue) {
+                        return null;
+                    }
+                    $value .= $nextValue;
+                } elseif ($nextNode instanceof ConstantExpression) {
+                    $value .= $nextNode->getAttribute('value');
+                } else {
+                    // this is a node we cannot process (variable, or translation in translation)
+                    return null;
+                }
+            }
+        } elseif ($node instanceof ConstantExpression) {
+            $value .= $node->getAttribute('value');
+        }
+
+        return $value;
     }
 }

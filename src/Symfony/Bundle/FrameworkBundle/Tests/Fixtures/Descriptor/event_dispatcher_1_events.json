@@ -2,7 +2,7 @@
     "event1": [
         {
             "type": "function",
-            "name": "global_function",
+            "name": "var_dump",
             "priority": 255
         },
         {

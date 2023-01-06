@@ -57,7 +57,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->markTestSkipped('Guesser is not supported');
         }
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/directory');
     }
 
@@ -94,7 +94,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->markTestSkipped('Guesser is not supported');
         }
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/not_here');
     }
 
@@ -105,7 +105,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
         }
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Can not verify chmod operations on Windows');
+            $this->markTestSkipped('Cannot verify chmod operations on Windows');
         }
 
         if (!getenv('USER') || 'root' === getenv('USER')) {
@@ -116,11 +116,11 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
         touch($path);
         @chmod($path, 0333);
 
-        if ('0333' == substr(sprintf('%o', fileperms($path)), -4)) {
-            $this->expectException('\InvalidArgumentException');
+        if (str_ends_with(sprintf('%o', fileperms($path)), '0333')) {
+            $this->expectException(\InvalidArgumentException::class);
             $this->getGuesser()->guessMimeType($path);
         } else {
-            $this->markTestSkipped('Can not verify chmod operations, change of file permissions failed');
+            $this->markTestSkipped('Cannot verify chmod operations, change of file permissions failed');
         }
     }
 }

@@ -21,7 +21,7 @@ class QpEncoder implements EncoderInterface
     /**
      * Pre-computed QP for HUGE optimization.
      */
-    private static $qpMap = [
+    private const QP_MAP = [
         0 => '=00', 1 => '=01', 2 => '=02', 3 => '=03', 4 => '=04',
         5 => '=05', 6 => '=06', 7 => '=07', 8 => '=08', 9 => '=09',
         10 => '=0A', 11 => '=0B', 12 => '=0C', 13 => '=0D', 14 => '=0E',
@@ -76,7 +76,7 @@ class QpEncoder implements EncoderInterface
         255 => '=FF',
     ];
 
-    private static $safeMapShare = [];
+    private static array $safeMapShare = [];
 
     /**
      * A map of non-encoded ascii characters.
@@ -85,7 +85,7 @@ class QpEncoder implements EncoderInterface
      *
      * @internal
      */
-    protected $safeMap = [];
+    protected array $safeMap = [];
 
     public function __construct()
     {
@@ -106,8 +106,6 @@ class QpEncoder implements EncoderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Takes an unencoded string and produces a QP encoded string from it.
      *
      * QP encoded strings have a maximum line length of 76 characters.
@@ -170,7 +168,7 @@ class QpEncoder implements EncoderInterface
                 $ret .= $this->safeMap[$b];
                 ++$size;
             } else {
-                $ret .= self::$qpMap[$b];
+                $ret .= self::QP_MAP[$b];
                 $size += 3;
             }
         }
@@ -184,12 +182,11 @@ class QpEncoder implements EncoderInterface
     private function standardize(string $string): string
     {
         $string = str_replace(["\t=0D=0A", ' =0D=0A', '=0D=0A'], ["=09\r\n", "=20\r\n", "\r\n"], $string);
-        switch ($end = \ord(substr($string, -1))) {
-            case 0x09:
-            case 0x20:
-                $string = substr_replace($string, self::$qpMap[$end], -1);
-        }
 
-        return $string;
+        return match ($end = \ord(substr($string, -1))) {
+            0x09,
+            0x20 => substr_replace($string, self::QP_MAP[$end], -1),
+            default => $string,
+        };
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
@@ -60,10 +61,21 @@ class RoundRobinTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
         $t = new RoundRobinTransport([$t1, $t2]);
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('All transports failed.');
-        $t->send(new RawMessage(''));
-        $this->assertTransports($t, 1, [$t1, $t2]);
+        $p = new \ReflectionProperty($t, 'cursor');
+        $p->setAccessible(true);
+        $p->setValue($t, 0);
+
+        try {
+            $t->send(new RawMessage(''));
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(TransportException::class, $e);
+            $this->assertStringContainsString('All transports failed.', $e->getMessage());
+            $this->assertTransports($t, 0, [$t1, $t2]);
+
+            return;
+        }
+
+        $this->fail('The expected exception was not thrown.');
     }
 
     public function testSendOneDead()
@@ -74,7 +86,6 @@ class RoundRobinTransportTest extends TestCase
         $t2->expects($this->exactly(3))->method('send');
         $t = new RoundRobinTransport([$t1, $t2]);
         $p = new \ReflectionProperty($t, 'cursor');
-        $p->setAccessible(true);
         $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 0, [$t1]);
@@ -92,7 +103,6 @@ class RoundRobinTransportTest extends TestCase
         $t2->expects($this->once())->method('send')->will($this->throwException(new TransportException()));
         $t = new RoundRobinTransport([$t1, $t2], 60);
         $p = new \ReflectionProperty($t, 'cursor');
-        $p->setAccessible(true);
         $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, []);
@@ -114,7 +124,6 @@ class RoundRobinTransportTest extends TestCase
             ->willReturnOnConsecutiveCalls($this->throwException(new TransportException()));
         $t = new RoundRobinTransport([$t1, $t2], 3);
         $p = new \ReflectionProperty($t, 'cursor');
-        $p->setAccessible(true);
         $p->setValue($t, 0);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, []);
@@ -127,17 +136,43 @@ class RoundRobinTransportTest extends TestCase
         $this->assertTransports($t, 1, []);
     }
 
+    public function testFailureDebugInformation()
+    {
+        $t1 = $this->createMock(TransportInterface::class);
+        $e1 = new TransportException();
+        $e1->appendDebug('Debug message 1');
+        $t1->expects($this->once())->method('send')->will($this->throwException($e1));
+        $t1->expects($this->once())->method('__toString')->willReturn('t1');
+
+        $t2 = $this->createMock(TransportInterface::class);
+        $e2 = new TransportException();
+        $e2->appendDebug('Debug message 2');
+        $t2->expects($this->once())->method('send')->will($this->throwException($e2));
+        $t2->expects($this->once())->method('__toString')->willReturn('t2');
+
+        $t = new RoundRobinTransport([$t1, $t2]);
+
+        try {
+            $t->send(new RawMessage(''));
+        } catch (TransportExceptionInterface $e) {
+            $this->assertStringContainsString('Transport "t1": Debug message 1', $e->getDebug());
+            $this->assertStringContainsString('Transport "t2": Debug message 2', $e->getDebug());
+
+            return;
+        }
+
+        $this->fail('Expected exception was not thrown!');
+    }
+
     private function assertTransports(RoundRobinTransport $transport, int $cursor, array $deadTransports)
     {
         $p = new \ReflectionProperty($transport, 'cursor');
-        $p->setAccessible(true);
         if (-1 !== $cursor) {
             $this->assertSame($cursor, $p->getValue($transport));
         }
         $cursor = $p->getValue($transport);
 
         $p = new \ReflectionProperty($transport, 'deadTransports');
-        $p->setAccessible(true);
         $this->assertSame($deadTransports, iterator_to_array($p->getValue($transport)));
 
         return $cursor;

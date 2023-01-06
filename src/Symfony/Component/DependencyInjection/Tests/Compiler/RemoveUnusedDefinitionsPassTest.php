@@ -133,7 +133,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
             ->addArgument(new Reference('not.defined'))
             ->setPublic(true);
 
-        $container->set('not.defined', new \StdClass());
+        $container->set('not.defined', new \stdClass());
 
         $this->process($container);
 

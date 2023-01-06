@@ -44,12 +44,22 @@ class DoctrineDummy
     /**
      * @ManyToMany(targetEntity="DoctrineRelation", indexBy="rguid")
      */
+    protected $indexedRguid;
+
+    /**
+     * @ManyToMany(targetEntity="DoctrineRelation", indexBy="rguid_column")
+     */
     protected $indexedBar;
 
     /**
      * @OneToMany(targetEntity="DoctrineRelation", mappedBy="foo", indexBy="foo")
      */
     protected $indexedFoo;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="baz", indexBy="baz_id")
+     */
+    protected $indexedBaz;
 
     /**
      * @Column(type="guid")
@@ -124,7 +134,17 @@ class DoctrineDummy
     private $indexedByCustomType;
 
     /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="buzField", indexBy="buzField")
+     */
+    protected $indexedBuz;
+
+    /**
      * @Column(type="json", nullable=true)
      */
     private $json;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="dummyRelation", indexBy="gen_value_col_id", orphanRemoval=true)
+     */
+    protected $dummyGeneratedValueList;
 }

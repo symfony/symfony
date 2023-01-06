@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Currency;
 use Symfony\Component\Validator\Constraints\CurrencyValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CurrencyValidatorTest extends ConstraintValidatorTestCase
@@ -34,7 +35,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    protected function createValidator()
+    protected function createValidator(): CurrencyValidator
     {
         return new CurrencyValidator();
     }
@@ -55,7 +56,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Currency());
     }
 
@@ -102,6 +103,21 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Currency([
             'message' => 'myMessage',
         ]);
+
+        $this->validator->validate($currency, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$currency.'"')
+            ->setCode(Currency::NO_SUCH_CURRENCY_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getInvalidCurrencies
+     */
+    public function testInvalidCurrenciesNamed($currency)
+    {
+        $constraint = new Currency(message: 'myMessage');
 
         $this->validator->validate($currency, $constraint);
 

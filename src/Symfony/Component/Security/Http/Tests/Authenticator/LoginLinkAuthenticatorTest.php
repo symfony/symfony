@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\LoginLinkAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -37,6 +38,24 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
         $this->successHandler = $this->createMock(AuthenticationSuccessHandlerInterface::class);
         $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
+    }
+
+    /**
+     * @dataProvider provideSupportData
+     */
+    public function testSupport(array $options, $request, bool $supported)
+    {
+        $this->setUpAuthenticator($options);
+
+        $this->assertEquals($supported, $this->authenticator->supports($request));
+    }
+
+    public function provideSupportData()
+    {
+        yield [['check_route' => '/validate_link'], Request::create('/validate_link?hash=abc123'), true];
+        yield [['check_route' => '/validate_link'], Request::create('/login?hash=abc123'), false];
+        yield [['check_route' => '/validate_link', 'check_post_only' => true], Request::create('/validate_link?hash=abc123'), false];
+        yield [['check_route' => '/validate_link', 'check_post_only' => true], Request::create('/validate_link?hash=abc123', 'POST'), true];
     }
 
     public function testSuccessfulAuthenticate()
@@ -85,6 +104,17 @@ class LoginLinkAuthenticatorTest extends TestCase
             ->method('consumeLoginLink');
 
         $this->authenticator->authenticate($request);
+    }
+
+    public function testPassportBadges()
+    {
+        $this->setUpAuthenticator();
+
+        $request = Request::create('/login/link/check?stuff=1&user=weaverryan');
+
+        $passport = $this->authenticator->authenticate($request);
+
+        $this->assertTrue($passport->hasBadge(RememberMeBadge::class));
     }
 
     private function setUpAuthenticator(array $options = [])

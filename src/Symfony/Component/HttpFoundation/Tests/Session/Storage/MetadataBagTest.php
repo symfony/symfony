@@ -136,4 +136,14 @@ class MetadataBagTest extends TestCase
 
         $this->assertEquals($timeStamp, $sessionMetadata[MetadataBag::UPDATED]);
     }
+
+    public function testLifetimeIsInt()
+    {
+        $sessionMetadata = [];
+
+        $bag = new MetadataBag();
+        $bag->initialize($sessionMetadata);
+
+        $this->assertIsInt($bag->getLifetime());
+    }
 }

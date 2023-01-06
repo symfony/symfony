@@ -1,0 +1,6 @@
+test_bundle:
+    prefix:   /annotated
+    resource:
+        path: "@TestBundle/Controller"
+        namespace: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller
+    type:     attribute

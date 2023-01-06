@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -22,11 +23,10 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
+#[AsCommand(name: 'messenger:stop-workers', description: 'Stop workers after their current message')]
 class StopWorkersCommand extends Command
 {
-    protected static $defaultName = 'messenger:stop-workers';
-
-    private $restartSignalCachePool;
+    private CacheItemPoolInterface $restartSignalCachePool;
 
     public function __construct(CacheItemPoolInterface $restartSignalCachePool)
     {
@@ -35,14 +35,10 @@ class StopWorkersCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
             ->setDefinition([])
-            ->setDescription('Stops workers after their current message')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
 
@@ -50,16 +46,13 @@ The <info>%command.name%</info> command sends a signal to stop any <info>messeng
 
 Each worker command will finish the message they are currently processing
 and then exit. Worker commands are *not* automatically restarted: that
-should be handled by something like supervisord.
+should be handled by a process control system.
 EOF
             )
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 

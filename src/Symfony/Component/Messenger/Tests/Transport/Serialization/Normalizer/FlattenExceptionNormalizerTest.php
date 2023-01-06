@@ -60,6 +60,7 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->assertSame($previous, $normalized['previous']);
         $this->assertSame($exception->getTrace(), $normalized['trace']);
         $this->assertSame($exception->getTraceAsString(), $normalized['trace_as_string']);
+        $this->assertSame($exception->getStatusText(), $normalized['status_text']);
     }
 
     public function provideFlattenException(): array
@@ -95,6 +96,7 @@ class FlattenExceptionNormalizerTest extends TestCase
                 'file' => 'foo.php',
                 'line' => 123,
                 'headers' => ['Content-Type' => 'application/json'],
+                'status_text' => 'Whoops, looks like something went wrong.',
                 'trace' => [
                     [
                         'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '', 'file' => 'foo.php', 'line' => 123, 'args' => [],
@@ -108,6 +110,7 @@ class FlattenExceptionNormalizerTest extends TestCase
                 ],
             ],
             'trace_as_string' => '#0 foo.php(123): foo()'.\PHP_EOL.'#1 bar.php(456): bar()',
+            'status_text' => 'Whoops, looks like something went wrong.',
         ];
         $exception = $this->normalizer->denormalize($normalized, FlattenException::class);
 
@@ -121,10 +124,12 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->assertSame($normalized['line'], $exception->getLine());
         $this->assertSame($normalized['trace'], $exception->getTrace());
         $this->assertSame($normalized['trace_as_string'], $exception->getTraceAsString());
+        $this->assertSame($normalized['status_text'], $exception->getStatusText());
 
         $this->assertInstanceOf(FlattenException::class, $previous = $exception->getPrevious());
         $this->assertSame($normalized['previous']['message'], $previous->getMessage());
         $this->assertSame($normalized['previous']['code'], $previous->getCode());
+        $this->assertSame($normalized['previous']['status_text'], $previous->getStatusText());
     }
 
     private function getMessengerContext(): array

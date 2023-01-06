@@ -12,13 +12,18 @@
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Instantiator;
 
 use PHPUnit\Framework\TestCase;
+use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManager\Proxy\ValueHolderInterface;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @group legacy
  */
 class RuntimeInstantiatorTest extends TestCase
 {
@@ -27,9 +32,6 @@ class RuntimeInstantiatorTest extends TestCase
      */
     protected $instantiator;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->instantiator = new RuntimeInstantiator();
@@ -38,17 +40,17 @@ class RuntimeInstantiatorTest extends TestCase
     public function testInstantiateProxy()
     {
         $instance = new \stdClass();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = $this->createMock(ContainerInterface::class);
         $definition = new Definition('stdClass');
         $instantiator = function () use ($instance) {
             return $instance;
         };
 
-        /* @var $proxy \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface */
+        /* @var $proxy LazyLoadingInterface|ValueHolderInterface */
         $proxy = $this->instantiator->instantiateProxy($container, $definition, 'foo', $instantiator);
 
-        $this->assertInstanceOf('ProxyManager\Proxy\LazyLoadingInterface', $proxy);
-        $this->assertInstanceOf('ProxyManager\Proxy\ValueHolderInterface', $proxy);
+        $this->assertInstanceOf(LazyLoadingInterface::class, $proxy);
+        $this->assertInstanceOf(ValueHolderInterface::class, $proxy);
         $this->assertFalse($proxy->isProxyInitialized());
 
         $proxy->initializeProxy();

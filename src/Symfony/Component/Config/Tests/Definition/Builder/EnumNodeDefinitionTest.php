@@ -36,7 +36,7 @@ class EnumNodeDefinitionTest extends TestCase
 
     public function testNoValuesPassed()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('You must call ->values() on enum nodes.');
         $def = new EnumNodeDefinition('foo');
         $def->getNode();
@@ -44,7 +44,7 @@ class EnumNodeDefinitionTest extends TestCase
 
     public function testWithNoValues()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('->values() must be called with at least one value.');
         $def = new EnumNodeDefinition('foo');
         $def->values([]);

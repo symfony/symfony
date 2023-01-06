@@ -20,10 +20,8 @@ class SubmitButtonBuilder extends ButtonBuilder
 {
     /**
      * Creates the button.
-     *
-     * @return SubmitButton The button
      */
-    public function getForm()
+    public function getForm(): SubmitButton
     {
         return new SubmitButton($this->getFormConfig());
     }

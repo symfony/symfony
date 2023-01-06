@@ -7,10 +7,14 @@ return new class
 
     public function getFooService($lazyLoad = true)
     {
-        if ($lazyLoad) {
-            return $this->privates['foo'] = $this->createProxy('SunnyInterface_1eff735', function () {
-                return \SunnyInterface_1eff735::staticProxyConstructor(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
-                    $wrappedInstance = $this->getFooService(false);
+        $container = $this;
+        $containerRef = \WeakReference::create($this);
+
+        if (true === $lazyLoad) {
+            return $container->privates['foo'] = $container->createProxy('SunnyInterface_1eff735', static function () use ($containerRef) {
+                return \SunnyInterface_1eff735::staticProxyConstructor(static function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($containerRef) {
+                    $container = $containerRef->get();
+                    $wrappedInstance = $container->getFooService(false);
 
                     $proxy->setProxyInitializer(null);
 

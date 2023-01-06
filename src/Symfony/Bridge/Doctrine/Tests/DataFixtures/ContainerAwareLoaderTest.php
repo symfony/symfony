@@ -14,12 +14,13 @@ namespace Symfony\Bridge\Doctrine\Tests\DataFixtures;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\ContainerAwareFixture;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContainerAwareLoaderTest extends TestCase
 {
     public function testShouldSetContainerOnContainerAwareFixture()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = $this->createMock(ContainerInterface::class);
         $loader = new ContainerAwareLoader($container);
         $fixture = new ContainerAwareFixture();
 

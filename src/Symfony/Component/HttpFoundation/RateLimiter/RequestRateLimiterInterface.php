@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\RateLimiter;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\RateLimiter\Limit;
+use Symfony\Component\RateLimiter\RateLimit;
 
 /**
  * A special type of limiter that deals with requests.
@@ -21,12 +21,10 @@ use Symfony\Component\RateLimiter\Limit;
  * from the requests.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in Symfony 5.2
  */
 interface RequestRateLimiterInterface
 {
-    public function consume(Request $request): Limit;
+    public function consume(Request $request): RateLimit;
 
-    public function reset(): void;
+    public function reset(Request $request): void;
 }

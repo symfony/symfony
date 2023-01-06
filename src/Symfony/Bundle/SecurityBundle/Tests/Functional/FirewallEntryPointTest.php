@@ -15,28 +15,9 @@ use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBund
 
 class FirewallEntryPointTest extends AbstractWebTestCase
 {
-    public function testItUsesTheConfiguredEntryPointWhenUsingUnknownCredentials()
+    public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials()
     {
-        $client = $this->createClient(['test_case' => 'FirewallEntryPoint']);
-
-        $client->request('GET', '/secure/resource', [], [], [
-            'PHP_AUTH_USER' => 'unknown',
-            'PHP_AUTH_PW' => 'credentials',
-        ]);
-
-        $this->assertEquals(
-            EntryPointStub::RESPONSE_TEXT,
-            $client->getResponse()->getContent(),
-            "Custom entry point wasn't started"
-        );
-    }
-
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials(array $options)
-    {
-        $client = $this->createClient($options + ['test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml']);
+        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml']);
 
         $client->request('GET', '/secure/resource');
 

@@ -57,7 +57,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
             'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing method "setTestCase" of service "c2" from controller candidates: the method is called at instantiation, thus cannot be an action.',
         ];
 
-        $this->assertSame($expectedLog, $container->getCompiler()->getLog());
+        $this->assertEqualsCanonicalizing($expectedLog, $container->getCompiler()->getLog());
     }
 
     public function testInvoke()

@@ -34,7 +34,7 @@ class GlobResourceTest extends TestCase
 
         $file = $dir.'/Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
         $this->assertEquals([$file => new \SplFileInfo($file)], $paths);
-        $this->assertInstanceOf('SplFileInfo', current($paths));
+        $this->assertInstanceOf(\SplFileInfo::class, current($paths));
         $this->assertSame($dir, $resource->getPrefix());
 
         $resource = new GlobResource($dir, '/**/Resource', true);
@@ -43,7 +43,7 @@ class GlobResourceTest extends TestCase
 
         $file = $dir.\DIRECTORY_SEPARATOR.'Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
         $this->assertEquals([$file => $file], $paths);
-        $this->assertInstanceOf('SplFileInfo', current($paths));
+        $this->assertInstanceOf(\SplFileInfo::class, current($paths));
         $this->assertSame($dir, $resource->getPrefix());
     }
 
@@ -172,11 +172,11 @@ class GlobResourceTest extends TestCase
         $resource = new GlobResource($dir, '/*{/*/*.txt,.x{m,n}l}', true);
 
         $p = new \ReflectionProperty($resource, 'globBrace');
-        $p->setAccessible(true);
         $p->setValue($resource, 0);
 
         $expected = [
             $dir.'/Exclude/ExcludeToo/AnotheExcludedFile.txt',
+            $dir.'/ExcludeTrailingSlash/exclude/baz.txt',
             $dir.'/foo.xml',
         ];
 
@@ -189,9 +189,45 @@ class GlobResourceTest extends TestCase
         $resource = new GlobResource($dir, '/*{/*/*.txt,.x{m,nl}', true);
 
         $p = new \ReflectionProperty($resource, 'globBrace');
-        $p->setAccessible(true);
         $p->setValue($resource, 0);
 
         $this->assertSame([], array_keys(iterator_to_array($resource)));
+    }
+
+    public function testSerializeUnserialize()
+    {
+        $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
+        $resource = new GlobResource($dir, '/Resource', true);
+
+        $newResource = unserialize(serialize($resource));
+
+        $p = new \ReflectionProperty($resource, 'globBrace');
+
+        $this->assertEquals($p->getValue($resource), $p->getValue($newResource));
+    }
+
+    public function testPhar()
+    {
+        $s = \DIRECTORY_SEPARATOR;
+        $cwd = getcwd();
+        chdir(\dirname(__DIR__).'/Fixtures');
+        try {
+            $resource = new GlobResource('phar://some.phar', '*', true);
+            $files = array_keys(iterator_to_array($resource));
+            $this->assertSame(["phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php", "phar://some.phar{$s}schema{$s}project-1.0.xsd"], $files);
+
+            $resource = new GlobResource("phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php", '', true);
+            $files = array_keys(iterator_to_array($resource));
+            $this->assertSame(["phar://some.phar{$s}ProjectWithXsdExtensionInPhar.php"], $files);
+        } finally {
+            chdir($cwd);
+        }
+    }
+
+    public function testFilePrefix()
+    {
+        $resource = new GlobResource(__FILE__, '/**/', true);
+        $files = array_keys(iterator_to_array($resource));
+        $this->assertSame([], $files);
     }
 }

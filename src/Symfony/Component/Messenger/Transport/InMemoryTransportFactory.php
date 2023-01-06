@@ -11,33 +11,13 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory as BaseInMemoryTransportFactory;
+
+trigger_deprecation('symfony/messenger', '6.3', 'The "%s" class is deprecated, use "%s" instead. ', InMemoryTransportFactory::class, BaseInMemoryTransportFactory::class);
 
 /**
- * @author Gary PEGEOT <garypegeot@gmail.com>
+ * @deprecated since Symfony 6.3, use {@link BaseInMemoryTransportFactory} instead
  */
-class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterface
+class InMemoryTransportFactory extends BaseInMemoryTransportFactory
 {
-    /**
-     * @var InMemoryTransport[]
-     */
-    private $createdTransports = [];
-
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
-    {
-        return $this->createdTransports[] = new InMemoryTransport();
-    }
-
-    public function supports(string $dsn, array $options): bool
-    {
-        return 0 === strpos($dsn, 'in-memory://');
-    }
-
-    public function reset()
-    {
-        foreach ($this->createdTransports as $transport) {
-            $transport->reset();
-        }
-    }
 }

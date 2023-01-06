@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
@@ -10,14 +19,14 @@ use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 
 final class AddErrorDetailsStampListenerTest extends TestCase
 {
-    public function testExceptionDetailsAreAdded(): void
+    public function testExceptionDetailsAreAdded()
     {
         $listener = new AddErrorDetailsStampListener();
 
         $envelope = new Envelope(new \stdClass());
         $exception = new \Exception('It failed!');
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
-        $expectedStamp = new ErrorDetailsStamp($exception);
+        $expectedStamp = ErrorDetailsStamp::create($exception);
 
         $listener->onMessageFailed($event);
 
@@ -29,12 +38,12 @@ final class AddErrorDetailsStampListenerTest extends TestCase
         $listener = new AddErrorDetailsStampListener();
 
         $envelope = new Envelope(new \stdClass(), [
-            new ErrorDetailsStamp(new \InvalidArgumentException('First error!')),
+            ErrorDetailsStamp::create(new \InvalidArgumentException('First error!')),
         ]);
 
         $exception = new \Exception('Second error!');
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
-        $expectedStamp = new ErrorDetailsStamp($exception);
+        $expectedStamp = ErrorDetailsStamp::create($exception);
 
         $listener->onMessageFailed($event);
 

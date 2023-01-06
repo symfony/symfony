@@ -1,0 +1,10 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute
+        public: true
+        arguments: [!php/const 'Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum::BAZ']

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use PHPUnit\Framework\TestCase;
@@ -16,7 +25,7 @@ class StaticPrefixCollectionTest extends TestCase
         $collection = new StaticPrefixCollection('/');
 
         foreach ($routes as $route) {
-            list($path, $name) = $route;
+            [$path, $name] = $route;
             $staticPrefix = (new Route($path))->compile()->getStaticPrefix();
             $collection->addRoute($staticPrefix, [$name]);
         }

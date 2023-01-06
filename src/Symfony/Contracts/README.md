@@ -11,7 +11,7 @@ Design Principles
 
  * contracts are split by domain, each into their own sub-namespaces;
  * contracts are small and consistent sets of PHP interfaces, traits, normative
-   docblocks and reference test suites when applicable, ...;
+   docblocks and reference test suites when applicable;
  * all contracts must have a proven implementation to enter this repository;
  * they must be backward compatible with existing Symfony components.
 
@@ -47,8 +47,8 @@ the declared contracts will directly or indirectly contribute to the PHP-FIG.
 Resources
 ---------
 
-  * [Documentation](https://symfony.com/doc/current/components/contracts.html)
-  * [Contributing](https://symfony.com/doc/current/contributing/index.html)
-  * [Report issues](https://github.com/symfony/symfony/issues) and
-    [send Pull Requests](https://github.com/symfony/symfony/pulls)
-    in the [main Symfony repository](https://github.com/symfony/symfony)
+ * [Documentation](https://symfony.com/doc/current/components/contracts.html)
+ * [Contributing](https://symfony.com/doc/current/contributing/index.html)
+ * [Report issues](https://github.com/symfony/symfony/issues) and
+   [send Pull Requests](https://github.com/symfony/symfony/pulls)
+   in the [main Symfony repository](https://github.com/symfony/symfony)

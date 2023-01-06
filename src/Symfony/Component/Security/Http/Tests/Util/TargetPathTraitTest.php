@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Http\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
@@ -12,9 +21,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')
-                    ->getMock();
-
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
             ->method('set')
             ->with('_security.firewall_name.target_path', '/foo');
@@ -26,9 +33,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')
-                    ->getMock();
-
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
             ->method('get')
             ->with('_security.cool_firewall.target_path')
@@ -45,9 +50,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')
-                    ->getMock();
-
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
             ->method('remove')
             ->with('_security.best_firewall.target_path');

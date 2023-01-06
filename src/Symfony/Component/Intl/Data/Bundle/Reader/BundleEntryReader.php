@@ -28,12 +28,12 @@ use Symfony\Component\Intl\Locale;
  */
 class BundleEntryReader implements BundleEntryReaderInterface
 {
-    private $reader;
+    private BundleReaderInterface $reader;
 
     /**
      * A mapping of locale aliases to locales.
      */
-    private $localeAliases = [];
+    private array $localeAliases = [];
 
     /**
      * Creates an entry reader based on the given resource bundle reader.
@@ -58,18 +58,12 @@ class BundleEntryReader implements BundleEntryReaderInterface
         $this->localeAliases = $localeAliases;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function read(string $path, string $locale)
+    public function read(string $path, string $locale): mixed
     {
         return $this->reader->read($path, $locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function readEntry(string $path, string $locale, array $indices, bool $fallback = true)
+    public function readEntry(string $path, string $locale, array $indices, bool $fallback = true): mixed
     {
         $entry = null;
         $isMultiValued = false;

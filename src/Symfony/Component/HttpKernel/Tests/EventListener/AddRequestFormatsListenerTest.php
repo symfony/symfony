@@ -12,14 +12,14 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Test AddRequestFormatsListener class.
- *
  * @author Gildas Quemener <gildas.quemener@gmail.com>
  */
 class AddRequestFormatsListenerTest extends TestCase
@@ -41,12 +41,12 @@ class AddRequestFormatsListenerTest extends TestCase
 
     public function testIsAnEventSubscriber()
     {
-        $this->assertInstanceOf('Symfony\Component\EventDispatcher\EventSubscriberInterface', $this->listener);
+        $this->assertInstanceOf(EventSubscriberInterface::class, $this->listener);
     }
 
     public function testRegisteredEvent()
     {
-        $this->assertEquals(
+        $this->assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 100]],
             AddRequestFormatsListener::getSubscribedEvents()
         );
@@ -54,32 +54,13 @@ class AddRequestFormatsListenerTest extends TestCase
 
     public function testSetAdditionalFormats()
     {
-        $request = $this->getRequestMock();
-        $event = $this->getRequestEventMock($request);
+        $request = $this->createMock(Request::class);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $request->expects($this->once())
             ->method('setFormat')
             ->with('csv', ['text/csv', 'text/plain']);
 
         $this->listener->onKernelRequest($event);
-    }
-
-    protected function getRequestMock()
-    {
-        return $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-    }
-
-    protected function getRequestEventMock(Request $request)
-    {
-        $event = $this
-            ->getMockBuilder(RequestEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request);
-
-        return $event;
     }
 }

@@ -30,16 +30,13 @@ use Twig\NodeVisitor\AbstractNodeVisitor;
  */
 final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 {
-    private $scope;
+    private Scope $scope;
 
     public function __construct()
     {
         $this->scope = new Scope();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doEnterNode(Node $node, Environment $env): Node
     {
         if ($node instanceof BlockNode || $node instanceof ModuleNode) {
@@ -64,21 +61,18 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
             return $node;
         }
 
-        if ($node instanceof FilterExpression && \in_array($node->getNode('filter')->getAttribute('value'), ['trans', 'transchoice'])) {
+        if ($node instanceof FilterExpression && 'trans' === $node->getNode('filter')->getAttribute('value')) {
             $arguments = $node->getNode('arguments');
-            $ind = 'trans' === $node->getNode('filter')->getAttribute('value') ? 1 : 2;
             if ($this->isNamedArguments($arguments)) {
-                if (!$arguments->hasNode('domain') && !$arguments->hasNode($ind)) {
+                if (!$arguments->hasNode('domain') && !$arguments->hasNode(1)) {
                     $arguments->setNode('domain', $this->scope->get('domain'));
                 }
-            } else {
-                if (!$arguments->hasNode($ind)) {
-                    if (!$arguments->hasNode($ind - 1)) {
-                        $arguments->setNode($ind - 1, new ArrayExpression([], $node->getTemplateLine()));
-                    }
-
-                    $arguments->setNode($ind, $this->scope->get('domain'));
+            } elseif (!$arguments->hasNode(1)) {
+                if (!$arguments->hasNode(0)) {
+                    $arguments->setNode(0, new ArrayExpression([], $node->getTemplateLine()));
                 }
+
+                $arguments->setNode(1, $this->scope->get('domain'));
             }
         } elseif ($node instanceof TransNode) {
             if (!$node->hasNode('domain')) {
@@ -89,9 +83,6 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doLeaveNode(Node $node, Environment $env): ?Node
     {
         if ($node instanceof TransDefaultDomainNode) {
@@ -105,9 +96,6 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return -10;

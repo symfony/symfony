@@ -28,6 +28,8 @@ use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
+use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
 
 class XmlFileLoaderTest extends TestCase
 {
@@ -98,6 +100,19 @@ class XmlFileLoaderTest extends TestCase
         $this->assertFalse($constraints[0]->match);
     }
 
+    public function testLoadClassMetadataWithRequiredArguments()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping-required-arg.xml');
+        $metadata = new ClassMetadata(Entity_81::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(Entity_81::class);
+        $expected->addPropertyConstraint('title', new ConstraintWithRequiredArgument('X'));
+
+        $this->assertEquals($expected, $metadata);
+    }
+
     public function testLoadGroupSequenceProvider()
     {
         $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
@@ -116,7 +131,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(__DIR__.'/withdoctype.xml');
         $metadata = new ClassMetadata(Entity::class);
 
-        $this->expectException('\Symfony\Component\Validator\Exception\MappingException');
+        $this->expectException(MappingException::class);
         $loader->loadClassMetadata($metadata);
     }
 
@@ -131,7 +146,7 @@ class XmlFileLoaderTest extends TestCase
         try {
             $loader->loadClassMetadata($metadata);
         } catch (MappingException $e) {
-            $this->expectException('\Symfony\Component\Validator\Exception\MappingException');
+            $this->expectException(MappingException::class);
             $loader->loadClassMetadata($metadata);
         }
     }

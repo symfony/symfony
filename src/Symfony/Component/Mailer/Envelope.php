@@ -21,8 +21,8 @@ use Symfony\Component\Mime\RawMessage;
  */
 class Envelope
 {
-    private $sender;
-    private $recipients = [];
+    private Address $sender;
+    private array $recipients = [];
 
     /**
      * @param Address[] $recipients
@@ -35,7 +35,7 @@ class Envelope
 
     public static function create(RawMessage $message): self
     {
-        if (RawMessage::class === \get_class($message)) {
+        if (RawMessage::class === $message::class) {
             throw new LogicException('Cannot send a RawMessage instance without an explicit Envelope.');
         }
 

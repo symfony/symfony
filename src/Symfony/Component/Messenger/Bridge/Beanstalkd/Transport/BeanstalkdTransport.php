@@ -22,64 +22,49 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class BeanstalkdTransport implements TransportInterface, MessageCountAwareInterface
 {
-    private $connection;
-    private $serializer;
-    private $receiver;
-    private $sender;
+    private Connection $connection;
+    private SerializerInterface $serializer;
+    private BeanstalkdReceiver $receiver;
+    private BeanstalkdSender $sender;
 
-    public function __construct(Connection $connection, ?SerializerInterface $serializer = null)
+    public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
         $this->connection = $connection;
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
-        return ($this->receiver ?? $this->getReceiver())->get();
+        return $this->getReceiver()->get();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->ack($envelope);
+        $this->getReceiver()->ack($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->reject($envelope);
+        $this->getReceiver()->reject($envelope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
-        return ($this->receiver ?? $this->getReceiver())->getMessageCount();
+        return $this->getReceiver()->getMessageCount();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
-        return ($this->sender ?? $this->getSender())->send($envelope);
+        return $this->getSender()->send($envelope);
     }
 
     private function getReceiver(): BeanstalkdReceiver
     {
-        return $this->receiver = new BeanstalkdReceiver($this->connection, $this->serializer);
+        return $this->receiver ??= new BeanstalkdReceiver($this->connection, $this->serializer);
     }
 
     private function getSender(): BeanstalkdSender
     {
-        return $this->sender = new BeanstalkdSender($this->connection, $this->serializer);
+        return $this->sender ??= new BeanstalkdSender($this->connection, $this->serializer);
     }
 }

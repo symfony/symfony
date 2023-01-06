@@ -17,25 +17,23 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  * @author Jeroen Spee <https://github.com/Jeroeny>
  *
  * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html
- *
- * @experimental in 5.1
  */
 abstract class FirebaseOptions implements MessageOptionsInterface
 {
-    /** @var string the recipient */
-    private $to;
+    private string $to;
 
     /**
-     * @var array
-     *
      * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html#notification-payload-support
      */
     protected $options;
 
-    public function __construct(string $to, array $options)
+    private array $data;
+
+    public function __construct(string $to, array $options, array $data = [])
     {
         $this->to = $to;
         $this->options = $options;
+        $this->data = $data;
     }
 
     public function toArray(): array
@@ -43,6 +41,7 @@ abstract class FirebaseOptions implements MessageOptionsInterface
         return [
             'to' => $this->to,
             'notification' => $this->options,
+            'data' => $this->data,
         ];
     }
 
@@ -51,16 +50,32 @@ abstract class FirebaseOptions implements MessageOptionsInterface
         return $this->to;
     }
 
-    public function title(string $title): self
+    /**
+     * @return $this
+     */
+    public function title(string $title): static
     {
         $this->options['title'] = $title;
 
         return $this;
     }
 
-    public function body(string $body): self
+    /**
+     * @return $this
+     */
+    public function body(string $body): static
     {
         $this->options['body'] = $body;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function data(array $data): static
+    {
+        $this->data = $data;
 
         return $this;
     }

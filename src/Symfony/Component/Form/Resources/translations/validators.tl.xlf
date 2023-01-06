@@ -114,6 +114,26 @@
                 <source>Please provide a valid phone number.</source>
                 <target>Pakilagay ang balidong numero ng telepono.</target>
             </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>Ang checkbox ay mayroon hindi balidong halaga.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>Pakilagay ang balidong email address.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>Pakipiliin ang balidong pagpipilian.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>Pakipilian ang balidong layo.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>Pakilagay ang balidong linggo.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

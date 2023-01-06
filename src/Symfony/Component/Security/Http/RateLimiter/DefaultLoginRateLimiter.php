@@ -13,8 +13,8 @@ namespace Symfony\Component\Security\Http\RateLimiter;
 
 use Symfony\Component\HttpFoundation\RateLimiter\AbstractRequestRateLimiter;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\RateLimiter\Limiter;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * A default login throttling limiter.
@@ -23,25 +23,26 @@ use Symfony\Component\Security\Core\Security;
  * a limit on username+IP and a (higher) limit on IP.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in Symfony 5.2
  */
 final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 {
-    private $globalLimiter;
-    private $localLimiter;
+    private RateLimiterFactory $globalFactory;
+    private RateLimiterFactory $localFactory;
 
-    public function __construct(Limiter $globalLimiter, Limiter $localLimiter)
+    public function __construct(RateLimiterFactory $globalFactory, RateLimiterFactory $localFactory)
     {
-        $this->globalLimiter = $globalLimiter;
-        $this->localLimiter = $localLimiter;
+        $this->globalFactory = $globalFactory;
+        $this->localFactory = $localFactory;
     }
 
     protected function getLimiters(Request $request): array
     {
+        $username = $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME, '');
+        $username = preg_match('//u', $username) ? mb_strtolower($username, 'UTF-8') : strtolower($username);
+
         return [
-            $this->globalLimiter->create($request->getClientIp()),
-            $this->localLimiter->create($request->attributes->get(Security::LAST_USERNAME).$request->getClientIp()),
+            $this->globalFactory->create($request->getClientIp()),
+            $this->localFactory->create($username.'-'.$request->getClientIp()),
         ];
     }
 }

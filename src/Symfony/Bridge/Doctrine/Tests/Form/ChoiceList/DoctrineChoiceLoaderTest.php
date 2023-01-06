@@ -22,6 +22,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\Exception\LogicException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -31,17 +32,17 @@ class DoctrineChoiceLoaderTest extends TestCase
     use ExpectDeprecationTrait;
 
     /**
-     * @var ChoiceListFactoryInterface|MockObject
+     * @var MockObject&ChoiceListFactoryInterface
      */
     private $factory;
 
     /**
-     * @var ObjectManager|MockObject
+     * @var MockObject&ObjectManager
      */
     private $om;
 
     /**
-     * @var ObjectRepository|MockObject
+     * @var MockObject&ObjectRepository
      */
     private $repository;
 
@@ -51,12 +52,12 @@ class DoctrineChoiceLoaderTest extends TestCase
     private $class;
 
     /**
-     * @var IdReader|MockObject
+     * @var MockObject&IdReader
      */
     private $idReader;
 
     /**
-     * @var EntityLoaderInterface|MockObject
+     * @var MockObject&EntityLoaderInterface
      */
     private $objectLoader;
 
@@ -77,19 +78,17 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
-        $this->om = $this->getMockBuilder(ObjectManager::class)->getMock();
-        $this->repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $this->factory = $this->createMock(ChoiceListFactoryInterface::class);
+        $this->om = $this->createMock(ObjectManager::class);
+        $this->repository = $this->createMock(ObjectRepository::class);
         $this->class = 'stdClass';
-        $this->idReader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->idReader = $this->createMock(IdReader::class);
         $this->idReader->expects($this->any())
             ->method('isSingleId')
             ->willReturn(true)
         ;
 
-        $this->objectLoader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface')->getMock();
+        $this->objectLoader = $this->createMock(EntityLoaderInterface::class);
         $this->obj1 = (object) ['name' => 'A'];
         $this->obj2 = (object) ['name' => 'B'];
         $this->obj3 = (object) ['name' => 'C'];
@@ -154,8 +153,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertEquals($choiceList, $loaded = $loader->loadChoiceList());
 
         // no further loads on subsequent calls
-
-        $this->assertSame($loaded, $loader->loadChoiceList());
+        $this->assertEquals($loaded, $loader->loadChoiceList());
     }
 
     public function testLoadValuesForChoices()
@@ -193,12 +191,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadValuesForChoices([]));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId()
     {
-        $this->expectDeprecation('Since symfony/doctrine-bridge 5.1: Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the "choice_value" option instead.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
+
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
@@ -295,12 +292,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadChoicesForValues([]));
     }
 
-    /**
-     * @group legacy
-     */
-    public function legacyTestLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
+    public function testLegacyLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
     {
-        $this->expectDeprecation('Not defining explicitly the IdReader as value callback when query can be optimized has been deprecated in 5.1. Don\'t pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the choice_value instead.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
+
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
@@ -317,22 +313,13 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->repository->expects($this->never())
             ->method('findAll');
 
-        $this->objectLoader->expects($this->once())
-            ->method('getEntitiesByIds')
-            ->with('idField', [4 => '3', 7 => '2'])
-            ->willReturn($choices);
-
-        $this->idReader->expects($this->any())
-            ->method('getIdValue')
-            ->willReturnMap([
-                [$this->obj2, '2'],
-                [$this->obj3, '3'],
-            ]);
+        $this->objectLoader->expects($this->never())
+            ->method('getEntitiesByIds');
 
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2']
-        ));
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'])
+        );
     }
 
     public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
@@ -367,8 +354,8 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue']
-        ));
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue'])
+        );
     }
 
     public function testLoadChoicesForValuesLoadsAllIfSingleIntIdAndValueGiven()

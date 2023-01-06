@@ -1,0 +1,15 @@
+framework:
+    http_method_override: false
+    exceptions:
+        Symfony\Component\HttpKernel\Exception\BadRequestHttpException:
+            log_level: info
+            status_code: 422
+        Symfony\Component\HttpKernel\Exception\NotFoundHttpException:
+            log_level: info
+            status_code: null
+        Symfony\Component\HttpKernel\Exception\ConflictHttpException:
+            log_level: info
+            status_code: 0
+        Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException:
+            log_level: null
+            status_code: 500

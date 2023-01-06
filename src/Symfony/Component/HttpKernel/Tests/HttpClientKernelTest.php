@@ -24,10 +24,10 @@ class HttpClientKernelTest extends TestCase
         $request = new Request();
         $request->attributes->set('http_client_options', ['max_redirects' => 50]);
 
-        $response = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->once())->method('getStatusCode')->willReturn(200);
 
-        $client = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $client = $this->createMock(HttpClientInterface::class);
         $client
             ->expects($this->once())
             ->method('request')

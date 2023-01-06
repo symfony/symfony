@@ -90,110 +90,6 @@ class JsonResponseTest extends TestCase
         $this->assertEquals('true', $response->getContent());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = JsonResponse::create(['foo' => 'bar'], 204);
-
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertEquals('{"foo":"bar"}', $response->getContent());
-        $this->assertEquals(204, $response->getStatusCode());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticCreateEmptyJsonObject()
-    {
-        $response = JsonResponse::create();
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertSame('{}', $response->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticCreateJsonArray()
-    {
-        $response = JsonResponse::create([0, 1, 2, 3]);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertSame('[0,1,2,3]', $response->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticCreateJsonObject()
-    {
-        $response = JsonResponse::create(['foo' => 'bar']);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertSame('{"foo":"bar"}', $response->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticCreateWithSimpleTypes()
-    {
-        $response = JsonResponse::create('foo');
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertSame('"foo"', $response->getContent());
-
-        $response = JsonResponse::create(0);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertSame('0', $response->getContent());
-
-        $response = JsonResponse::create(0.1);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertEquals(0.1, $response->getContent());
-        $this->assertIsString($response->getContent());
-
-        $response = JsonResponse::create(true);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertSame('true', $response->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticCreateWithCustomStatus()
-    {
-        $response = JsonResponse::create([], 202);
-        $this->assertSame(202, $response->getStatusCode());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticCreateAddsContentTypeHeader()
-    {
-        $response = JsonResponse::create();
-        $this->assertSame('application/json', $response->headers->get('Content-Type'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticCreateWithCustomHeaders()
-    {
-        $response = JsonResponse::create([], 200, ['ETag' => 'foo']);
-        $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertSame('foo', $response->headers->get('ETag'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStaticCreateWithCustomContentType()
-    {
-        $headers = ['Content-Type' => 'application/vnd.acme.blog-v1+json'];
-
-        $response = JsonResponse::create([], 200, $headers);
-        $this->assertSame('application/vnd.acme.blog-v1+json', $response->headers->get('Content-Type'));
-    }
-
     public function testSetCallback()
     {
         $response = (new JsonResponse(['foo' => 'bar']))->setCallback('callback');
@@ -236,24 +132,21 @@ class JsonResponseTest extends TestCase
 
     public function testSetCallbackInvalidIdentifier()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $response = new JsonResponse('foo');
         $response->setCallback('+invalid');
     }
 
     public function testSetContent()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new JsonResponse("\xB1\x31");
     }
 
     public function testSetContentJsonSerializeError()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('This error is expected');
-        if (!interface_exists('JsonSerializable', false)) {
-            $this->markTestSkipped('JsonSerializable is required.');
-        }
 
         $serializable = new JsonSerializableObject();
 
@@ -267,14 +160,42 @@ class JsonResponseTest extends TestCase
 
         $this->assertEquals('/**/ಠ_ಠ["foo"].bar[0]({"foo":"bar"});', $response->getContent());
     }
+
+    public function testConstructorWithNullAsDataThrowsAnUnexpectedValueException()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "null" given.');
+
+        new JsonResponse(null, 200, [], true);
+    }
+
+    public function testConstructorWithObjectWithToStringMethod()
+    {
+        $class = new class() {
+            public function __toString(): string
+            {
+                return '{}';
+            }
+        };
+
+        $response = new JsonResponse($class, 200, [], true);
+
+        $this->assertSame('{}', $response->getContent());
+    }
+
+    public function testConstructorWithObjectWithoutToStringMethodThrowsAnException()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "stdClass" given.');
+
+        new JsonResponse(new \stdClass(), 200, [], true);
+    }
 }
 
-if (interface_exists('JsonSerializable', false)) {
-    class JsonSerializableObject implements \JsonSerializable
+class JsonSerializableObject implements \JsonSerializable
+{
+    public function jsonSerialize(): array
     {
-        public function jsonSerialize()
-        {
-            throw new \Exception('This error is expected');
-        }
+        throw new \Exception('This error is expected');
     }
 }

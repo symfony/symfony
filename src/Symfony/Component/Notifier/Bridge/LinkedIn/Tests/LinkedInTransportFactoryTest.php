@@ -1,50 +1,47 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Bridge\LinkedIn\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
-final class LinkedInTransportFactoryTest extends TestCase
+final class LinkedInTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn(): void
+    public function createFactory(): LinkedInTransportFactory
     {
-        $factory = new LinkedInTransportFactory();
-
-        $dsn = 'linkedin://login:pass@default';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('testHost');
-
-        $this->assertSame('linkedin://testHost', (string) $transport);
+        return new LinkedInTransportFactory();
     }
 
-    public function testSupportsLinkedinScheme(): void
+    public function createProvider(): iterable
     {
-        $factory = new LinkedInTransportFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('linkedin://host/path')));
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
+        yield [
+            'linkedin://host.test',
+            'linkedin://accessToken:UserId@host.test',
+        ];
     }
 
-    public function testNonLinkedinSchemeThrows(): void
+    public function supportsProvider(): iterable
     {
-        $factory = new LinkedInTransportFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $dsn = 'foo://login:pass@default';
-        $factory->create(Dsn::fromString($dsn));
+        yield [true, 'linkedin://host'];
+        yield [false, 'somethingElse://host'];
     }
 
-    public function testIncompleteDsnMissingUserThrows(): void
+    public function incompleteDsnProvider(): iterable
     {
-        $factory = new LinkedInTransportFactory();
+        yield 'missing account or user_id' => ['linkedin://AccessTokenOrUserId@default'];
+    }
 
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://host/path'));
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://accessToken:UserId@default'];
     }
 }

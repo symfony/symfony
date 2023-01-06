@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
@@ -102,14 +111,14 @@ class ProgressIndicatorTest extends TestCase
 
     public function testCannotSetInvalidIndicatorCharacters()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Must have at least 2 indicator value characters.');
         new ProgressIndicator($this->getOutputStream(), null, 100, ['1']);
     }
 
     public function testCannotStartAlreadyStartedIndicator()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Progress indicator already started.');
         $bar = new ProgressIndicator($this->getOutputStream());
         $bar->start('Starting...');
@@ -118,7 +127,7 @@ class ProgressIndicatorTest extends TestCase
 
     public function testCannotAdvanceUnstartedIndicator()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Progress indicator has not yet been started.');
         $bar = new ProgressIndicator($this->getOutputStream());
         $bar->advance();
@@ -126,7 +135,7 @@ class ProgressIndicatorTest extends TestCase
 
     public function testCannotFinishUnstartedIndicator()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Progress indicator has not yet been started.');
         $bar = new ProgressIndicator($this->getOutputStream());
         $bar->finish('Finished');

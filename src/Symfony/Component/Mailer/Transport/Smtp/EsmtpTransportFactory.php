@@ -29,7 +29,7 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
 
         $transport = new EsmtpTransport($host, $port, $tls, $this->dispatcher, $this->logger);
 
-        if ('' !== $dsn->getOption('verify_peer') && !filter_var($dsn->getOption('verify_peer', true), \FILTER_VALIDATE_BOOLEAN)) {
+        if ('' !== $dsn->getOption('verify_peer') && !filter_var($dsn->getOption('verify_peer', true), \FILTER_VALIDATE_BOOL)) {
             /** @var SocketStream $stream */
             $stream = $transport->getStream();
             $streamOptions = $stream->getStreamOptions();
@@ -50,6 +50,10 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
 
         if (null !== ($localDomain = $dsn->getOption('local_domain'))) {
             $transport->setLocalDomain($localDomain);
+        }
+
+        if (null !== ($maxPerSecond = $dsn->getOption('max_per_second'))) {
+            $transport->setMaxPerSecond((float) $maxPerSecond);
         }
 
         if (null !== ($restartThreshold = $dsn->getOption('restart_threshold'))) {

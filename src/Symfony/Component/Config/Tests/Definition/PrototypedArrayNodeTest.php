@@ -264,7 +264,7 @@ class PrototypedArrayNodeTest extends TestCase
      *
      * @dataProvider getDataForKeyRemovedLeftValueOnly
      */
-    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, $children, $expected)
+    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, array $children, array $expected)
     {
         $node = new PrototypedArrayNode('root');
         $node->setKeyAttribute('id', true);
@@ -280,7 +280,7 @@ class PrototypedArrayNodeTest extends TestCase
         $this->assertEquals($expected, $normalized);
     }
 
-    public function getDataForKeyRemovedLeftValueOnly()
+    public function getDataForKeyRemovedLeftValueOnly(): array
     {
         $scalarValue = new ScalarNode('value');
 
@@ -336,6 +336,58 @@ class PrototypedArrayNodeTest extends TestCase
                    'option2' => 'value2',
                ],
            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getPrototypedArrayNodeDataToMerge
+     */
+    public function testPrototypedArrayNodeMerge(array $left, array $right, array $expected)
+    {
+        $node = new PrototypedArrayNode('options');
+        $node->setNormalizeKeys(false);
+        $node->setPrototype(new VariableNode('value'));
+        $node->setDefaultValue([]);
+
+        $result = $node->merge($left, $right);
+
+        self::assertSame($result, $expected);
+    }
+
+    public function getPrototypedArrayNodeDataToMerge(): array
+    {
+        return [
+            // data to merged is a plain array
+            [
+                ['foo', 'bar'],
+                ['foo', 'baz', 'qux'],
+                ['foo', 'bar', 'foo', 'baz', 'qux'],
+            ],
+            // data to be merged is an associative array
+            [
+                ['option1' => true, 'option2' => 'foo'],
+                [
+                    'option2' => 'bar',
+                    'option3' => 42,
+                    'option4' => [
+                        'option41' => 'baz',
+                        'option42' => [
+                            'option423' => 'qux',
+                        ],
+                    ],
+                ],
+                [
+                    'option1' => true,
+                    'option2' => 'bar',
+                    'option3' => 42,
+                    'option4' => [
+                        'option41' => 'baz',
+                        'option42' => [
+                            'option423' => 'qux',
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }

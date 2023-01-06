@@ -18,21 +18,16 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 class NotificationLoggerListener implements EventSubscriberInterface, ResetInterface
 {
-    private $events;
+    private NotificationEvents $events;
 
     public function __construct()
     {
         $this->events = new NotificationEvents();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->events = new NotificationEvents();
@@ -48,7 +43,7 @@ class NotificationLoggerListener implements EventSubscriberInterface, ResetInter
         return $this->events;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             MessageEvent::class => ['onNotification', -255],

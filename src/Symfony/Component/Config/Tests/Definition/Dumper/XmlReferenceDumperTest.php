@@ -57,6 +57,7 @@ class XmlReferenceDumperTest extends TestCase
     node-with-a-looong-name=""
     enum-with-default="this"
     enum=""
+    custom-node="true"
 >
 
     <!-- some info -->

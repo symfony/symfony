@@ -30,7 +30,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  */
 class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 {
-    private $lockPath;
+    private ?string $lockPath;
 
     /**
      * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory
@@ -39,43 +39,32 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
      */
     public function __construct(string $lockPath = null)
     {
-        if (null === $lockPath) {
-            $lockPath = sys_get_temp_dir();
-        }
-        if (!is_dir($lockPath) || !is_writable($lockPath)) {
-            throw new InvalidArgumentException(sprintf('The directory "%s" is not writable.', $lockPath));
+        if (!is_dir($lockPath ??= sys_get_temp_dir())) {
+            if (false === @mkdir($lockPath, 0777, true) && !is_dir($lockPath)) {
+                throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
+            }
+        } elseif (!is_writable($lockPath)) {
+            throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" is not writable.', $lockPath));
         }
 
         $this->lockPath = $lockPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(Key $key)
     {
         $this->lock($key, false, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveRead(Key $key)
     {
         $this->lock($key, true, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function waitAndSave(Key $key)
     {
         $this->lock($key, false, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function waitAndSaveRead(Key $key)
     {
         $this->lock($key, true, true);
@@ -96,21 +85,24 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         if (!$handle) {
             $fileName = sprintf('%s/sf.%s.%s.lock',
                 $this->lockPath,
-                preg_replace('/[^a-z0-9\._-]+/i', '-', $key),
+                substr(preg_replace('/[^a-z0-9\._-]+/i', '-', $key), 0, 50),
                 strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
             );
 
             // Silence error reporting
             set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
-            if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
-                if ($handle = fopen($fileName, 'x')) {
-                    chmod($fileName, 0666);
-                } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
-                    usleep(100); // Give some time for chmod() to complete
-                    $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
+            try {
+                if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
+                    if ($handle = fopen($fileName, 'x')) {
+                        chmod($fileName, 0666);
+                    } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
+                        usleep(100); // Give some time for chmod() to complete
+                        $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
+                    }
                 }
+            } finally {
+                restore_error_handler();
             }
-            restore_error_handler();
         }
 
         if (!$handle) {
@@ -128,17 +120,11 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $key->markUnserializable();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, the flock locks forever.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(Key $key)
     {
         // The lock is maybe not acquired.
@@ -154,10 +140,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         $key->removeState(__CLASS__);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function exists(Key $key)
+    public function exists(Key $key): bool
     {
         return $key->hasState(__CLASS__);
     }

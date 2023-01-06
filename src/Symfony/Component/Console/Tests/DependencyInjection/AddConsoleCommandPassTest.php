@@ -12,7 +12,9 @@
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -20,6 +22,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 class AddConsoleCommandPassTest extends TestCase
@@ -118,9 +121,69 @@ class AddConsoleCommandPassTest extends TestCase
         ];
     }
 
+    public function testProcessFallsBackToDefaultDescription()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('with-defaults', DescribedCommand::class)
+            ->addTag('console.command')
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $commandLoader = $container->getDefinition('console.command_loader');
+        $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
+
+        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        $this->assertSame(['cmdname' => 'with-defaults', 'cmdalias' => 'with-defaults'], $commandLoader->getArgument(1));
+        $this->assertEquals([['with-defaults' => new ServiceClosureArgument(new Reference('.with-defaults.lazy'))]], $commandLocator->getArguments());
+        $this->assertSame([], $container->getParameter('console.command.ids'));
+
+        $initCounter = DescribedCommand::$initCounter;
+        $command = $container->get('console.command_loader')->get('cmdname');
+
+        $this->assertInstanceOf(LazyCommand::class, $command);
+        $this->assertSame(['cmdalias'], $command->getAliases());
+        $this->assertSame('Just testing', $command->getDescription());
+        $this->assertTrue($command->isHidden());
+        $this->assertTrue($command->isEnabled());
+        $this->assertSame($initCounter, DescribedCommand::$initCounter);
+
+        $this->assertSame('', $command->getHelp());
+        $this->assertSame(1 + $initCounter, DescribedCommand::$initCounter);
+    }
+
+    public function testEscapesDefaultFromPhp()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('to-escape', EscapedDefaultsFromPhpCommand::class)
+            ->addTag('console.command')
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $commandLoader = $container->getDefinition('console.command_loader');
+        $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
+
+        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        $this->assertSame(['%%cmd%%' => 'to-escape', '%%cmdalias%%' => 'to-escape'], $commandLoader->getArgument(1));
+        $this->assertEquals([['to-escape' => new ServiceClosureArgument(new Reference('.to-escape.lazy'))]], $commandLocator->getArguments());
+        $this->assertSame([], $container->getParameter('console.command.ids'));
+
+        $command = $container->get('console.command_loader')->get('%%cmd%%');
+
+        $this->assertInstanceOf(LazyCommand::class, $command);
+        $this->assertSame('%cmd%', $command->getName());
+        $this->assertSame(['%cmdalias%'], $command->getAliases());
+        $this->assertSame('Creates a 80% discount', $command->getDescription());
+    }
+
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The service "my-command" tagged "console.command" must not be abstract.');
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -136,7 +199,7 @@ class AddConsoleCommandPassTest extends TestCase
 
     public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".');
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -221,7 +284,7 @@ class AddConsoleCommandPassTest extends TestCase
 
     public function testProcessOnChildDefinitionWithoutClass()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The definition for "my-child-command" has no class.');
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -246,7 +309,25 @@ class MyCommand extends Command
 {
 }
 
+#[AsCommand(name: 'default')]
 class NamedCommand extends Command
 {
-    protected static $defaultName = 'default';
+}
+
+#[AsCommand(name: '%cmd%|%cmdalias%', description: 'Creates a 80% discount')]
+class EscapedDefaultsFromPhpCommand extends Command
+{
+}
+
+#[AsCommand(name: '|cmdname|cmdalias', description: 'Just testing')]
+class DescribedCommand extends Command
+{
+    public static $initCounter = 0;
+
+    public function __construct()
+    {
+        ++self::$initCounter;
+
+        parent::__construct();
+    }
 }

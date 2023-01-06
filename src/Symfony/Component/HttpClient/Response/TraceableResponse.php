@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
+use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\TraceableHttpClient;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -29,55 +31,108 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class TraceableResponse implements ResponseInterface, StreamableInterface
 {
-    private $client;
-    private $response;
-    private $content;
+    private HttpClientInterface $client;
+    private ResponseInterface $response;
+    private mixed $content;
+    private ?StopwatchEvent $event;
 
-    public function __construct(HttpClientInterface $client, ResponseInterface $response, &$content)
+    public function __construct(HttpClientInterface $client, ResponseInterface $response, &$content, StopwatchEvent $event = null)
     {
         $this->client = $client;
         $this->response = $response;
         $this->content = &$content;
+        $this->event = $event;
+    }
+
+    public function __sleep(): array
+    {
+        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+    }
+
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+    }
+
+    public function __destruct()
+    {
+        try {
+            $this->response->__destruct();
+        } finally {
+            if ($this->event?->isStarted()) {
+                $this->event->stop();
+            }
+        }
     }
 
     public function getStatusCode(): int
     {
-        return $this->response->getStatusCode();
+        try {
+            return $this->response->getStatusCode();
+        } finally {
+            if ($this->event?->isStarted()) {
+                $this->event->lap();
+            }
+        }
     }
 
     public function getHeaders(bool $throw = true): array
     {
-        return $this->response->getHeaders($throw);
+        try {
+            return $this->response->getHeaders($throw);
+        } finally {
+            if ($this->event?->isStarted()) {
+                $this->event->lap();
+            }
+        }
     }
 
     public function getContent(bool $throw = true): string
     {
-        $this->content = $this->response->getContent(false);
+        try {
+            if (false === $this->content) {
+                return $this->response->getContent($throw);
+            }
 
-        if ($throw) {
-            $this->checkStatusCode($this->response->getStatusCode());
+            return $this->content = $this->response->getContent(false);
+        } finally {
+            if ($this->event?->isStarted()) {
+                $this->event->stop();
+            }
+            if ($throw) {
+                $this->checkStatusCode($this->response->getStatusCode());
+            }
         }
-
-        return $this->content;
     }
 
     public function toArray(bool $throw = true): array
     {
-        $this->content = $this->response->toArray(false);
+        try {
+            if (false === $this->content) {
+                return $this->response->toArray($throw);
+            }
 
-        if ($throw) {
-            $this->checkStatusCode($this->response->getStatusCode());
+            return $this->content = $this->response->toArray(false);
+        } finally {
+            if ($this->event?->isStarted()) {
+                $this->event->stop();
+            }
+            if ($throw) {
+                $this->checkStatusCode($this->response->getStatusCode());
+            }
         }
-
-        return $this->content;
     }
 
     public function cancel(): void
     {
         $this->response->cancel();
+
+        if ($this->event?->isStarted()) {
+            $this->event->stop();
+        }
     }
 
-    public function getInfo(string $type = null)
+    public function getInfo(string $type = null): mixed
     {
         return $this->response->getInfo($type);
     }
@@ -121,14 +176,33 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
 
             $traceableMap[$r->response] = $r;
             $wrappedResponses[] = $r->response;
+            if ($r->event && !$r->event->isStarted()) {
+                $r->event->start();
+            }
         }
 
         foreach ($client->stream($wrappedResponses, $timeout) as $r => $chunk) {
+            if ($traceableMap[$r]->event && $traceableMap[$r]->event->isStarted()) {
+                try {
+                    if ($chunk->isTimeout() || !$chunk->isLast()) {
+                        $traceableMap[$r]->event->lap();
+                    } else {
+                        $traceableMap[$r]->event->stop();
+                    }
+                } catch (TransportExceptionInterface $e) {
+                    $traceableMap[$r]->event->stop();
+                    if ($chunk instanceof ErrorChunk) {
+                        $chunk->didThrow(false);
+                    } else {
+                        $chunk = new ErrorChunk($chunk->getOffset(), $e);
+                    }
+                }
+            }
             yield $traceableMap[$r] => $chunk;
         }
     }
 
-    private function checkStatusCode($code)
+    private function checkStatusCode(int $code): void
     {
         if (500 <= $code) {
             throw new ServerException($this);

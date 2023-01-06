@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Mailer\Bridge\Google\Tests\Transport;
 
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailSmtpTransport;
@@ -12,7 +21,7 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
 {
     public function getFactory(): TransportFactoryInterface
     {
-        return new GmailTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
+        return new GmailTransportFactory($this->getDispatcher(), null, $this->getLogger());
     }
 
     public function supportsProvider(): iterable

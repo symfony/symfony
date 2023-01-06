@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Issn;
 use Symfony\Component\Validator\Constraints\IssnValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class IssnValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IssnValidator
     {
         return new IssnValidator();
     }
@@ -108,7 +109,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $constraint = new Issn();
         $this->validator->validate(new \stdClass(), $constraint);
     }
@@ -175,6 +176,19 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$issn.'"')
             ->setCode($code)
+            ->assertRaised();
+    }
+
+    public function testNamedArguments()
+    {
+        $this->validator->validate(
+            '2162321x',
+            new Issn(message: 'myMessage', caseSensitive: true, requireHyphen: true)
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2162321x"')
+            ->setCode(Issn::MISSING_HYPHEN_ERROR)
             ->assertRaised();
     }
 }

@@ -36,7 +36,7 @@ class DebugHandlersListenerTest extends TestCase
 {
     public function testConfigure()
     {
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $userHandler = function () {};
         $listener = new DebugHandlersListener($userHandler, $logger);
         $eHandler = new ErrorHandler();
@@ -47,9 +47,10 @@ class DebugHandlersListenerTest extends TestCase
         try {
             $listener->configure();
         } catch (\Exception $exception) {
+        } finally {
+            restore_exception_handler();
+            restore_error_handler();
         }
-        restore_exception_handler();
-        restore_error_handler();
 
         if (null !== $exception) {
             throw $exception;
@@ -68,9 +69,9 @@ class DebugHandlersListenerTest extends TestCase
         $listener = new DebugHandlersListener(null);
         $eHandler = new ErrorHandler();
         $event = new KernelEvent(
-            $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(),
+            $this->createMock(HttpKernelInterface::class),
             Request::create('/'),
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
 
         $exception = null;
@@ -92,7 +93,7 @@ class DebugHandlersListenerTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $listener = new DebugHandlersListener(null);
-        $app = $this->getMockBuilder('Symfony\Component\Console\Application')->getMock();
+        $app = $this->createMock(Application::class);
         $app->expects($this->once())->method('getHelperSet')->willReturn(new HelperSet());
         $command = new Command(__FUNCTION__);
         $command->setApplication($app);
@@ -113,16 +114,17 @@ class DebugHandlersListenerTest extends TestCase
         try {
             $dispatcher->dispatch($event, ConsoleEvents::COMMAND);
         } catch (\Exception $exception) {
+        } finally {
+            restore_exception_handler();
+            restore_error_handler();
         }
-        restore_exception_handler();
-        restore_error_handler();
 
         if (null !== $exception) {
             throw $exception;
         }
 
         $xHandler = $eHandler->setExceptionHandler('var_dump');
-        $this->assertInstanceOf('Closure', $xHandler);
+        $this->assertInstanceOf(\Closure::class, $xHandler);
 
         $app->expects($this->once())
             ->method(method_exists(Application::class, 'renderThrowable') ? 'renderThrowable' : 'renderException');
@@ -190,10 +192,6 @@ class DebugHandlersListenerTest extends TestCase
      */
     public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, $levels, $expectedLoggerLevels, $expectedDeprecationLoggerLevels)
     {
-        if (!class_exists(ErrorHandler::class)) {
-            $this->markTestSkipped('ErrorHandler component is required to run this test.');
-        }
-
         $handler = $this->createMock(ErrorHandler::class);
 
         $expectedCalls = [];
@@ -219,7 +217,7 @@ class DebugHandlersListenerTest extends TestCase
             ->method('setDefaultLogger')
             ->withConsecutive(...$expectedCalls);
 
-        $sut = new DebugHandlersListener(null, $logger, $levels, null, true, null, true, $deprecationLogger);
+        $sut = new DebugHandlersListener(null, $logger, $levels, null, true, true, $deprecationLogger);
         $prevHander = set_exception_handler([$handler, 'handleError']);
 
         try {

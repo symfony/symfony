@@ -83,7 +83,7 @@ class AbstractProxyTest extends TestCase
      */
     public function testNameException()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         session_start();
         $this->proxy->setName('foo');
     }
@@ -106,7 +106,7 @@ class AbstractProxyTest extends TestCase
      */
     public function testIdException()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         session_start();
         $this->proxy->setId('foo');
     }

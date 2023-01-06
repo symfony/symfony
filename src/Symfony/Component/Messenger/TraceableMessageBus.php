@@ -16,18 +16,15 @@ namespace Symfony\Component\Messenger;
  */
 class TraceableMessageBus implements MessageBusInterface
 {
-    private $decoratedBus;
-    private $dispatchedMessages = [];
+    private MessageBusInterface $decoratedBus;
+    private array $dispatchedMessages = [];
 
     public function __construct(MessageBusInterface $decoratedBus)
     {
         $this->decoratedBus = $decoratedBus;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dispatch($message, array $stamps = []): Envelope
+    public function dispatch(object $message, array $stamps = []): Envelope
     {
         $envelope = Envelope::wrap($message, $stamps);
         $context = [
@@ -62,8 +59,8 @@ class TraceableMessageBus implements MessageBusInterface
     {
         $trace = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 8);
 
-        $file = $trace[1]['file'];
-        $line = $trace[1]['line'];
+        $file = $trace[1]['file'] ?? null;
+        $line = $trace[1]['line'] ?? null;
 
         $handleTraitFile = (new \ReflectionClass(HandleTrait::class))->getFileName();
         $found = false;
@@ -86,7 +83,7 @@ class TraceableMessageBus implements MessageBusInterface
                 $line = $trace[$i]['line'];
 
                 while (++$i < 8) {
-                    if (isset($trace[$i]['function'], $trace[$i]['file']) && empty($trace[$i]['class']) && 0 !== strpos($trace[$i]['function'], 'call_user_func')) {
+                    if (isset($trace[$i]['function'], $trace[$i]['file']) && empty($trace[$i]['class']) && !str_starts_with($trace[$i]['function'], 'call_user_func')) {
                         $file = $trace[$i]['file'];
                         $line = $trace[$i]['line'];
 
@@ -97,9 +94,12 @@ class TraceableMessageBus implements MessageBusInterface
             }
         }
 
-        $name = str_replace('\\', '/', $file);
-        $name = substr($name, strrpos($name, '/') + 1);
+        $name = str_replace('\\', '/', (string) $file);
 
-        return compact('name', 'file', 'line');
+        return [
+            'name' => substr($name, strrpos($name, '/') + 1),
+            'file' => $file,
+            'line' => $line,
+        ];
     }
 }

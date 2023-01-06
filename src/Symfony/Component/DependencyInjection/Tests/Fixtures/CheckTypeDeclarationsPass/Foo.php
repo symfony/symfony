@@ -16,11 +16,16 @@ class Foo
 
     public static function createCallable(): callable
     {
-        return function() {};
+        return function () {};
     }
 
     public static function createArray(): array
     {
         return [];
+    }
+
+    public static function createStdClass(): \stdClass
+    {
+        return new \stdClass();
     }
 }

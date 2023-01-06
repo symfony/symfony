@@ -16,11 +16,14 @@ namespace Symfony\Component\Uid;
  *
  * Use Uuid::v3() to compute one.
  *
- * @experimental in 5.1
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class UuidV3 extends Uuid
 {
-    protected const TYPE = \UUID_TYPE_MD5;
+    protected const TYPE = 3;
+
+    public function __construct(string $uuid)
+    {
+        parent::__construct($uuid, true);
+    }
 }

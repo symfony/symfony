@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>The host could not be resolved.</target>
+                <target>Palvelimeen ei saatu yhteyttä.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -336,7 +336,7 @@
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Tämä ryhmä tulisi sisältää vain yksilöllisiä arvoja.</target>
+                <target>Tämän ryhmän tulisi sisältää vain yksilöllisiä arvoja.</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
@@ -365,6 +365,42 @@
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>Arvon tulisi olla välillä {{ min }} - {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Arvo ei ole kelvollinen laitenimi (hostname).</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Ryhmässä olevien elementtien määrän pitää olla monikerta luvulle {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Tämän arvon tulee läpäistä vähintään yksi seuraavista tarkistuksista:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Ryhmän jokaisen elementin tulee läpäistä omat tarkistuksensa.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Tämä arvo ei ole kelvollinen ISIN-koodi (International Securities Identification Number).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Tämän arvon on oltava kelvollinen lauseke.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Tämä arvo ei ole kelvollinen CSS-värimääritys.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Tämä arvo ei ole kelvollinen CIDR-merkintä.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Verkkomaskille annetun arvon tulisi olla {{ min }} ja {{ max }} välillä.</target>
             </trans-unit>
         </body>
     </file>

@@ -13,68 +13,86 @@ namespace Symfony\Bridge\Doctrine\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\GuidType;
+use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Uid\AbstractUid;
 
-abstract class AbstractUidType extends GuidType
+abstract class AbstractUidType extends Type
 {
+    /**
+     * @return class-string<AbstractUid>
+     */
     abstract protected function getUidClass(): string;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ConversionException
-     */
-    public function convertToPHPValue($value, AbstractPlatform $platform): ?AbstractUid
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        if (null === $value || '' === $value) {
-            return null;
+        if ($this->hasNativeGuidType($platform)) {
+            return $platform->getGuidTypeDeclarationSQL($column);
         }
 
-        if ($value instanceof AbstractUid) {
-            return $value;
-        }
-
-        try {
-            $uuid = $this->getUidClass()::fromString($value);
-        } catch (\InvalidArgumentException $e) {
-            throw ConversionException::conversionFailed($value, $this->getName());
-        }
-
-        return $uuid;
+        return $platform->getBinaryTypeDeclarationSQL([
+            'length' => '16',
+            'fixed' => true,
+        ]);
     }
 
     /**
-     * {@inheritdoc}
-     *
+     * @throws ConversionException
+     */
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?AbstractUid
+    {
+        if ($value instanceof AbstractUid || null === $value) {
+            return $value;
+        }
+
+        if (!\is_string($value)) {
+            throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'string', AbstractUid::class]);
+        }
+
+        try {
+            return $this->getUidClass()::fromString($value);
+        } catch (\InvalidArgumentException $e) {
+            throw ConversionException::conversionFailed($value, $this->getName(), $e);
+        }
+    }
+
+    /**
      * @throws ConversionException
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
+        $toString = $this->hasNativeGuidType($platform) ? 'toRfc4122' : 'toBinary';
+
+        if ($value instanceof AbstractUid) {
+            return $value->$toString();
+        }
+
         if (null === $value || '' === $value) {
             return null;
         }
 
-        if ($value instanceof AbstractUid) {
-            return (string) $value;
+        if (!\is_string($value)) {
+            throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'string', AbstractUid::class]);
         }
 
-        if (!\is_string($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-            return null;
+        try {
+            return $this->getUidClass()::fromString($value)->$toString();
+        } catch (\InvalidArgumentException) {
+            throw ConversionException::conversionFailed($value, $this->getName());
         }
-
-        if ($this->getUidClass()::isValid((string) $value)) {
-            return (string) $value;
-        }
-
-        throw ConversionException::conversionFailed($value, $this->getName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
+    }
+
+    private function hasNativeGuidType(AbstractPlatform $platform): bool
+    {
+        // Compatibility with DBAL < 3.4
+        $method = method_exists($platform, 'getStringTypeDeclarationSQL')
+            ? 'getStringTypeDeclarationSQL'
+            : 'getVarcharTypeDeclarationSQL';
+
+        return $platform->getGuidTypeDeclarationSQL([]) !== $platform->$method(['fixed' => true, 'length' => 36]);
     }
 }

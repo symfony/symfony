@@ -23,10 +23,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class JsonBundleReader implements BundleReaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function read(string $path, string $locale)
+    public function read(string $path, string $locale): mixed
     {
         $fileName = $path.'/'.$locale.'.json';
 
@@ -35,12 +32,8 @@ class JsonBundleReader implements BundleReaderInterface
             throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
-        if (!file_exists($fileName)) {
-            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
-        }
-
         if (!is_file($fileName)) {
-            throw new RuntimeException(sprintf('The resource bundle "%s" is not a file.', $fileName));
+            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
         $data = json_decode(file_get_contents($fileName), true);

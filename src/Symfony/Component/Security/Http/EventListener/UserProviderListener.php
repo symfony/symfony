@@ -16,14 +16,16 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
+ * Configures the user provider as user loader, if no user load
+ * has been explicitly set.
+ *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.2
  */
 class UserProviderListener
 {
-    private $userProvider;
+    private UserProviderInterface $userProvider;
 
     public function __construct(UserProviderInterface $userProvider)
     {
@@ -43,6 +45,6 @@ class UserProviderListener
             return;
         }
 
-        $badge->setUserLoader([$this->userProvider, 'loadUserByUsername']);
+        $badge->setUserLoader($this->userProvider->loadUserByIdentifier(...));
     }
 }

@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Transport\Transports;
 
 class TransportsTest extends TestCase
 {
-    public function testSendToTransportDefinedByMessage(): void
+    public function testSendToTransportDefinedByMessage()
     {
         $transports = new Transports([
             'one' => $one = $this->createMock(TransportInterface::class),
@@ -39,7 +39,7 @@ class TransportsTest extends TestCase
         $this->assertSame('one', $sentMessage->getTransport());
     }
 
-    public function testSendToFirstSupportedTransportIfMessageDoesNotDefineATransport(): void
+    public function testSendToFirstSupportedTransportIfMessageDoesNotDefineATransport()
     {
         $transports = new Transports([
             'one' => $one = $this->createMock(TransportInterface::class),
@@ -63,7 +63,7 @@ class TransportsTest extends TestCase
         $this->assertSame('two', $sentMessage->getTransport());
     }
 
-    public function testThrowExceptionIfNoSupportedTransportWasFound(): void
+    public function testThrowExceptionIfNoSupportedTransportWasFound()
     {
         $transports = new Transports([
             'one' => $one = $this->createMock(TransportInterface::class),
@@ -79,7 +79,7 @@ class TransportsTest extends TestCase
         $transports->send($message);
     }
 
-    public function testThrowExceptionIfTransportDefinedByMessageIsNotSupported(): void
+    public function testThrowExceptionIfTransportDefinedByMessageIsNotSupported()
     {
         $transports = new Transports([
             'one' => $one = $this->createMock(TransportInterface::class),

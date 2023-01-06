@@ -1,7 +1,7 @@
 {
     "name": "symfony/phpunit-bridge",
     "type": "symfony-bridge",
-    "description": "Symfony PHPUnit Bridge",
+    "description": "Provides utilities for PHPUnit, especially user deprecation notices management",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -16,18 +16,19 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9 EVEN ON LATEST SYMFONY VERSIONS TO ALLOW USING",
+        "php": ">=7.1.3 EVEN ON LATEST SYMFONY VERSIONS TO ALLOW USING",
         "php": "THIS BRIDGE WHEN TESTING LOWEST SYMFONY VERSIONS.",
-        "php": ">=5.5.9"
+        "php": ">=7.1.3"
     },
     "require-dev": {
-        "symfony/deprecation-contracts": "^2.1"
+        "symfony/deprecation-contracts": "^2.5|^3.0",
+        "symfony/error-handler": "^5.4|^6.0"
     },
     "suggest": {
         "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
     },
     "conflict": {
-        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0|<6.4,>=6.0|9.1.2"
+        "phpunit/phpunit": "<7.5|9.1.2"
     },
     "autoload": {
         "files": [ "bootstrap.php" ],
@@ -45,6 +46,5 @@
             "name": "phpunit/phpunit",
             "url": "https://github.com/sebastianbergmann/phpunit"
         }
-    },
-    "version": "5.2.x-dev"
+    }
 }

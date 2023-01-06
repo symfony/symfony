@@ -16,19 +16,20 @@ use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Languages;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LanguageType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
+                if (!class_exists(Intl::class)) {
+                    throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s". Try running "composer require symfony/intl".', static::class));
+                }
                 $choiceTranslationLocale = $options['choice_translation_locale'];
                 $useAlpha3Codes = $options['alpha3'];
                 $choiceSelfTranslation = $options['choice_self_translation'];
@@ -39,7 +40,7 @@ class LanguageType extends AbstractType
                             try {
                                 $languageCode = $useAlpha3Codes ? Languages::getAlpha3Code($alpha2Code) : $alpha2Code;
                                 $languagesList[$languageCode] = Languages::getName($alpha2Code, $alpha2Code);
-                            } catch (MissingResourceException $e) {
+                            } catch (MissingResourceException) {
                                 // ignore errors like "Couldn't read the indices for the locale 'meta'"
                             }
                         }
@@ -54,11 +55,7 @@ class LanguageType extends AbstractType
             'choice_translation_locale' => null,
             'alpha3' => false,
             'choice_self_translation' => false,
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid language.';
-            },
+            'invalid_message' => 'Please select a valid language.',
         ]);
 
         $resolver->setAllowedTypes('choice_self_translation', ['bool']);
@@ -74,18 +71,12 @@ class LanguageType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'language';
     }

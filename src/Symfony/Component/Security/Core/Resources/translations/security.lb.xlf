@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" target-language="lb" datatype="plaintext" original="security.en.xlf">
+    <file source-language="en" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
@@ -61,6 +61,14 @@
             <trans-unit id="16">
                 <source>Account is locked.</source>
                 <target>De Konto ass gespaart.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Ze vill mësslonge Login-Versich, w.e.g. méi spéit nach emol probéieren.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Ongëltegen oder ofgelafene Login-Link.</target>
             </trans-unit>
         </body>
     </file>

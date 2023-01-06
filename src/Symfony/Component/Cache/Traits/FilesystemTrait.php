@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -23,18 +24,15 @@ trait FilesystemTrait
 {
     use FilesystemCommonTrait;
 
-    private $marshaller;
+    private MarshallerInterface $marshaller;
 
-    /**
-     * @return bool
-     */
-    public function prune()
+    public function prune(): bool
     {
         $time = time();
         $pruned = true;
 
         foreach ($this->scanHashDir($this->directory) as $file) {
-            if (!$h = @fopen($file, 'rb')) {
+            if (!$h = @fopen($file, 'r')) {
                 continue;
             }
 
@@ -49,17 +47,14 @@ trait FilesystemTrait
         return $pruned;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doFetch(array $ids)
+    protected function doFetch(array $ids): iterable
     {
         $values = [];
         $now = time();
 
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            if (!is_file($file) || !$h = @fopen($file, 'rb')) {
+            if (!is_file($file) || !$h = @fopen($file, 'r')) {
                 continue;
             }
             if (($expiresAt = (int) fgets($h)) && $now >= $expiresAt) {
@@ -78,20 +73,14 @@ trait FilesystemTrait
         return $values;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doHave(string $id)
+    protected function doHave(string $id): bool
     {
         $file = $this->getFile($id);
 
         return is_file($file) && (@filemtime($file) > time() || $this->doFetch([$id]));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doSave(array $values, int $lifetime)
+    protected function doSave(array $values, int $lifetime): array|bool
     {
         $expiresAt = $lifetime ? (time() + $lifetime) : 0;
         $values = $this->marshaller->marshall($values, $failed);
@@ -111,7 +100,7 @@ trait FilesystemTrait
 
     private function getFileKey(string $file): string
     {
-        if (!$h = @fopen($file, 'rb')) {
+        if (!$h = @fopen($file, 'r')) {
             return '';
         }
 

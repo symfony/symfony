@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class Category
 {
-    const NAME_PATTERN = '/\w+/';
+    public const NAME_PATTERN = '/\w+/';
 
     public $id;
 

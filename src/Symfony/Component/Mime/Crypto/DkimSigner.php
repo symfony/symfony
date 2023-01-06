@@ -30,10 +30,10 @@ final class DkimSigner
     public const ALGO_SHA256 = 'rsa-sha256';
     public const ALGO_ED25519 = 'ed25519-sha256'; // RFC 8463
 
-    private $key;
-    private $domainName;
-    private $selector;
-    private $defaultOptions;
+    private \OpenSSLAsymmetricKey $key;
+    private string $domainName;
+    private string $selector;
+    private array $defaultOptions;
 
     /**
      * @param string $pk         The private key as a string or the path to the file containing the private key, should be prefixed with file:// (in PEM format)
@@ -44,10 +44,7 @@ final class DkimSigner
         if (!\extension_loaded('openssl')) {
             throw new \LogicException('PHP extension "openssl" is required to use DKIM.');
         }
-        if (!$this->key = openssl_pkey_get_private($pk, $passphrase)) {
-            throw new InvalidArgumentException('Unable to load DKIM private key: '.openssl_error_string());
-        }
-
+        $this->key = openssl_pkey_get_private($pk, $passphrase) ?: throw new InvalidArgumentException('Unable to load DKIM private key: '.openssl_error_string());
         $this->domainName = $domainName;
         $this->selector = $selector;
         $this->defaultOptions = $defaultOptions + [
@@ -65,9 +62,10 @@ final class DkimSigner
     {
         $options += $this->defaultOptions;
         if (!\in_array($options['algorithm'], [self::ALGO_SHA256, self::ALGO_ED25519], true)) {
-            throw new InvalidArgumentException('Invalid DKIM signing algorithm "%s".', $options['algorithm']);
+            throw new InvalidArgumentException(sprintf('Invalid DKIM signing algorithm "%s".', $options['algorithm']));
         }
         $headersToIgnore['return-path'] = true;
+        $headersToIgnore['x-transport'] = true;
         foreach ($options['headers_to_ignore'] as $name) {
             $headersToIgnore[strtolower($name)] = true;
         }
@@ -203,7 +201,13 @@ final class DkimSigner
             hash_update($hash, $canon);
         }
 
-        if (0 === $length) {
+        // Add trailing Line return if last line is non empty
+        if ('' !== $currentLine) {
+            hash_update($hash, "\r\n");
+            $length += \strlen("\r\n");
+        }
+
+        if (!$relaxed && 0 === $length) {
             hash_update($hash, "\r\n");
             $length = 2;
         }

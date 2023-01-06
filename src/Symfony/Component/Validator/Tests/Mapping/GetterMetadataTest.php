@@ -12,25 +12,23 @@
 namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\GetterMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 
 class GetterMetadataTest extends TestCase
 {
-    const CLASSNAME = Entity::class;
+    private const CLASSNAME = Entity::class;
 
     public function testInvalidPropertyName()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ValidatorException');
+        $this->expectException(ValidatorException::class);
 
         new GetterMetadata(self::CLASSNAME, 'foobar');
     }
 
     public function testGetPropertyValueFromPublicGetter()
     {
-        // private getters don't work yet because ReflectionMethod::setAccessible()
-        // does not exist yet in a stable PHP release
-
         $entity = new Entity('foobar');
         $metadata = new GetterMetadata(self::CLASSNAME, 'internal');
 
@@ -63,7 +61,7 @@ class GetterMetadataTest extends TestCase
 
     public function testUndefinedMethodNameThrowsException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ValidatorException');
+        $this->expectException(ValidatorException::class);
         $this->expectExceptionMessage('The "hasLastName()" method does not exist in class "Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity".');
         new GetterMetadata(self::CLASSNAME, 'lastName', 'hasLastName');
     }

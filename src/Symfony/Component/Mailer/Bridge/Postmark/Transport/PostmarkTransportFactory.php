@@ -23,6 +23,7 @@ final class PostmarkTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
+        $transport = null;
         $scheme = $dsn->getScheme();
         $user = $this->getUser($dsn);
 
@@ -30,11 +31,21 @@ final class PostmarkTransportFactory extends AbstractTransportFactory
             $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
             $port = $dsn->getPort();
 
-            return (new PostmarkApiTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
+            $transport = (new PostmarkApiTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
         if ('postmark+smtp' === $scheme || 'postmark+smtps' === $scheme || 'postmark' === $scheme) {
-            return new PostmarkSmtpTransport($user, $this->dispatcher, $this->logger);
+            $transport = new PostmarkSmtpTransport($user, $this->dispatcher, $this->logger);
+        }
+
+        if (null !== $transport) {
+            $messageStream = $dsn->getOption('message_stream');
+
+            if (null !== $messageStream) {
+                $transport->setMessageStream($messageStream);
+            }
+
+            return $transport;
         }
 
         throw new UnsupportedSchemeException($dsn, 'postmark', $this->getSupportedSchemes());

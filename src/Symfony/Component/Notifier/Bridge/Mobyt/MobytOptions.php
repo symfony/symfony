@@ -11,44 +11,39 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mobyt;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
  * @author Bastien Durand <bdurand-dev@outlook.com>
- *
- * @experimental in 5.2
  */
 final class MobytOptions implements MessageOptionsInterface
 {
-    const MESSAGE_TYPE_QUALITY_HIGH = 'N';
-    const MESSAGE_TYPE_QUALITY_MEDIUM = 'L';
-    const MESSAGE_TYPE_QUALITY_LOW = 'LL';
+    public const MESSAGE_TYPE_QUALITY_HIGH = 'N';
+    public const MESSAGE_TYPE_QUALITY_MEDIUM = 'L';
+    public const MESSAGE_TYPE_QUALITY_LOW = 'LL';
 
-    private $options = [];
+    private array $options;
 
     public function __construct(array $options = [])
     {
+        if (isset($options['message_type'])) {
+            self::validateMessageType($options['message_type']);
+        }
+
         $this->options = $options;
     }
 
     public static function fromNotification(Notification $notification): self
     {
         $options = new self();
-        switch ($notification->getImportance()) {
-            case Notification::IMPORTANCE_HIGH:
-            case Notification::IMPORTANCE_URGENT:
-                $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH);
-                break;
-            case Notification::IMPORTANCE_MEDIUM:
-                $options->messageType(self::MESSAGE_TYPE_QUALITY_MEDIUM);
-                break;
-            case Notification::IMPORTANCE_LOW:
-                $options->messageType(self::MESSAGE_TYPE_QUALITY_LOW);
-                break;
-            default:
-                $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH);
-        }
+        match ($notification->getImportance()) {
+            Notification::IMPORTANCE_HIGH, Notification::IMPORTANCE_URGENT => $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH),
+            Notification::IMPORTANCE_MEDIUM => $options->messageType(self::MESSAGE_TYPE_QUALITY_MEDIUM),
+            Notification::IMPORTANCE_LOW => $options->messageType(self::MESSAGE_TYPE_QUALITY_LOW),
+            default => $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH),
+        };
 
         return $options;
     }
@@ -68,6 +63,17 @@ final class MobytOptions implements MessageOptionsInterface
 
     public function messageType(string $type)
     {
+        self::validateMessageType($type);
+
         $this->options['message_type'] = $type;
+    }
+
+    public static function validateMessageType(string $type): string
+    {
+        if (!\in_array($type, $supported = [self::MESSAGE_TYPE_QUALITY_HIGH, self::MESSAGE_TYPE_QUALITY_MEDIUM, self::MESSAGE_TYPE_QUALITY_LOW], true)) {
+            throw new InvalidArgumentException(sprintf('The message type "%s" is not supported; supported message types are: "%s"', $type, implode('", "', $supported)));
+        }
+
+        return $type;
     }
 }

@@ -27,7 +27,7 @@ class ErrorControllerTest extends TestCase
      */
     public function testInvokeController(Request $request, \Exception $exception, int $statusCode, string $content)
     {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $errorRenderer = new HtmlErrorRenderer();
         $controller = new ErrorController($kernel, null, $errorRenderer);
         $response = $controller($exception);
@@ -67,7 +67,7 @@ class ErrorControllerTest extends TestCase
         $_controller = 'error_controller';
         $code = 404;
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel
             ->expects($this->once())
             ->method('handle')

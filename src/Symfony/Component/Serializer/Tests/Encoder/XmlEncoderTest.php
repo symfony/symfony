@@ -15,10 +15,15 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopedMessage;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopedMessageNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopeNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopeObject;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
@@ -71,7 +76,7 @@ class XmlEncoderTest extends TestCase
 
     public function testDocTypeIsNotAllowed()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Document types are not allowed.');
         $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE foo><foo></foo>', 'foo');
     }
@@ -91,6 +96,13 @@ class XmlEncoderTest extends TestCase
             'föo_bär' => 'a',
             'Bar' => [1, 2, 3],
             'a' => 'b',
+            'scalars' => [
+                '@bool-true' => true,
+                '@bool-false' => false,
+                '@int' => 3,
+                '@float' => 3.4,
+                '@sring' => 'a',
+            ],
         ];
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>'.
@@ -101,6 +113,7 @@ class XmlEncoderTest extends TestCase
             '<Bar>2</Bar>'.
             '<Bar>3</Bar>'.
             '<a>b</a>'.
+            '<scalars bool-true="1" bool-false="0" int="3" float="3.4" sring="a"/>'.
             '</response>'."\n";
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
@@ -176,12 +189,13 @@ class XmlEncoderTest extends TestCase
 
     public function testContext()
     {
-        $array = ['person' => ['name' => 'George Abitbol']];
+        $array = ['person' => ['name' => 'George Abitbol', 'age' => null]];
         $expected = <<<'XML'
 <?xml version="1.0"?>
 <response>
   <person>
     <name>George Abitbol</name>
+    <age></age>
   </person>
 </response>
 
@@ -189,6 +203,7 @@ XML;
 
         $context = [
             'xml_format_output' => true,
+            'save_options' => \LIBXML_NOEMPTYTAG,
         ];
 
         $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
@@ -276,10 +291,10 @@ XML;
     {
         $source = <<<XML
 <?xml version="1.0"?>
-<document index="-12.11">Name</document>
+<document index="12.11">Name</document>
 XML;
 
-        $this->assertSame(['@index' => -12.11, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
+        $this->assertSame(['@index' => 12.11, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
     public function testDecodeNegativeFloatAttribute()
@@ -290,6 +305,16 @@ XML;
 XML;
 
         $this->assertSame(['@index' => -12.11, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testDecodeFloatAttributeWithZeroWholeNumber()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<document index="0.123">Name</document>
+XML;
+
+        $this->assertSame(['@index' => 0.123, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
     public function testNoTypeCastAttribute()
@@ -561,6 +586,33 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeIgnoreDocumentType()
+    {
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<!DOCTYPE people>
+<people>
+    <person>
+        <firstname>Benjamin</firstname>
+        <lastname>Alexandre</lastname>
+    </person>
+    <person>
+        <firstname>Damien</firstname>
+        <lastname>Clay</lastname>
+    </person>
+</people>
+XML;
+        $expected = ['person' => [
+          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
+          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+        ]];
+        $this->assertEquals($expected, $this->encoder->decode(
+            $source,
+            'xml',
+            [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_DOCUMENT_TYPE_NODE]]
+        ));
+    }
+
     public function testDecodePreserveComments()
     {
         $source = <<<'XML'
@@ -655,20 +707,20 @@ XML;
 
     public function testDecodeInvalidXml()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->encoder->decode('<?xml version="1.0"?><invalid><xml>', 'xml');
     }
 
     public function testPreventsComplexExternalEntities()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE scan[<!ENTITY test SYSTEM "php://filter/read=convert.base64-encode/resource=XmlEncoderTest.php">]><scan>&test;</scan>', 'xml');
     }
 
     public function testDecodeEmptyXml()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
-        $this->expectExceptionMessage('Invalid XML data, it can not be empty.');
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Invalid XML data, it cannot be empty.');
         $this->encoder->decode(' ', 'xml');
     }
 
@@ -796,6 +848,23 @@ XML;
         (new XmlEncoder())->encode(tmpfile(), 'xml');
     }
 
+    public function testReentrantXmlEncoder()
+    {
+        $envelope = new EnvelopeObject();
+        $message = new EnvelopedMessage();
+        $message->text = 'Symfony is great';
+        $envelope->message = $message;
+
+        $encoder = $this->createXmlEncoderWithEnvelopeNormalizer();
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response><message>PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxyZXNwb25zZT48dGV4dD5TeW1mb255IGlzIGdyZWF0PC90ZXh0PjwvcmVzcG9uc2U+Cg==</message></response>
+
+XML;
+
+        $this->assertSame($expected, $encoder->encode($envelope, 'xml'));
+    }
+
     public function testEncodeComment()
     {
         $expected = <<<'XML'
@@ -839,6 +908,21 @@ XML;
         $this->assertEquals($expected, $encoder->encode($data, 'xml'));
     }
 
+    private function createXmlEncoderWithEnvelopeNormalizer(): XmlEncoder
+    {
+        $normalizers = [
+            $envelopeNormalizer = new EnvelopeNormalizer(),
+            new EnvelopedMessageNormalizer(),
+        ];
+
+        $encoder = new XmlEncoder();
+        $serializer = new Serializer($normalizers, ['xml' => $encoder]);
+        $encoder->setSerializer($serializer);
+        $envelopeNormalizer->setSerializer($serializer);
+
+        return $encoder;
+    }
+
     private function createXmlEncoderWithDateTimeNormalizer(): XmlEncoder
     {
         $encoder = new XmlEncoder();
@@ -848,12 +932,9 @@ XML;
         return $encoder;
     }
 
-    /**
-     * @return MockObject|NormalizerInterface
-     */
-    private function createMockDateTimeNormalizer(): object
+    private function createMockDateTimeNormalizer(): MockObject&NormalizerInterface
     {
-        $mock = $this->getMockBuilder('\Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock();
+        $mock = $this->createMock(CustomNormalizer::class);
 
         $mock
             ->expects($this->once())

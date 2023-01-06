@@ -24,6 +24,7 @@ return static function (ContainerConfigurator $container) {
                 service('router')->ignoreOnInvalid(),
                 abstract_arg('paths that should be excluded from the AJAX requests shown in the toolbar'),
                 service('web_profiler.csp.handler'),
+                service('data_collector.dump')->ignoreOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
     ;

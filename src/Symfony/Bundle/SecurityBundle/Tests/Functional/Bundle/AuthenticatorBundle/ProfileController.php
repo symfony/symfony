@@ -19,6 +19,6 @@ class ProfileController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
-        return $this->json(['email' => $this->getUser()->getUsername()]);
+        return $this->json(['email' => $this->getUser()->getUserIdentifier()]);
     }
 }

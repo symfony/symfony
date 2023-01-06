@@ -15,8 +15,8 @@ use Symfony\Component\Messenger\Envelope;
 
 class HandlerFailedException extends RuntimeException
 {
-    private $exceptions;
-    private $envelope;
+    private array $exceptions;
+    private Envelope $envelope;
 
     /**
      * @param \Throwable[] $exceptions
@@ -25,10 +25,13 @@ class HandlerFailedException extends RuntimeException
     {
         $firstFailure = current($exceptions);
 
+        $message = sprintf('Handling "%s" failed: ', $envelope->getMessage()::class);
+
         parent::__construct(
-            1 === \count($exceptions)
+            $message.(1 === \count($exceptions)
                 ? $firstFailure->getMessage()
-                : sprintf('%d handlers failed. First failure is: "%s"', \count($exceptions), $firstFailure->getMessage()),
+                : sprintf('%d handlers failed. First failure is: %s', \count($exceptions), $firstFailure->getMessage())
+            ),
             (int) $firstFailure->getCode(),
             $firstFailure
         );

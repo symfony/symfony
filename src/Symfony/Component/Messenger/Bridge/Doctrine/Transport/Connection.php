@@ -12,14 +12,19 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Connection as DBALConnection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Driver\Result as DriverResult;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -28,7 +33,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @internal since Symfony 5.1
+ * @internal
  *
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -58,8 +63,8 @@ class Connection implements ResetInterface
     protected $configuration = [];
     protected $driverConnection;
     protected $queueEmptiedAt;
-    private $schemaSynchronizer;
-    private $autoSetup;
+    private ?SchemaSynchronizer $schemaSynchronizer;
+    private bool $autoSetup;
 
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
@@ -93,7 +98,7 @@ class Connection implements ResetInterface
         $configuration = ['connection' => $components['host']];
         $configuration += $query + $options + static::DEFAULT_OPTIONS;
 
-        $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
+        $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOL);
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
@@ -115,13 +120,12 @@ class Connection implements ResetInterface
      *
      * @return string The inserted id
      *
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws DBALException
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
-        $now = new \DateTime();
-        $availableAt = (clone $now)->modify(sprintf('+%d seconds', $delay / 1000));
+        $now = new \DateTimeImmutable();
+        $availableAt = $now->modify(sprintf('+%d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])
@@ -152,6 +156,14 @@ class Connection implements ResetInterface
 
     public function get(): ?array
     {
+        if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+            try {
+                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59']);
+            } catch (DriverException $e) {
+                // Ignore the exception
+            }
+        }
+
         get:
         $this->driverConnection->beginTransaction();
         try {
@@ -159,9 +171,39 @@ class Connection implements ResetInterface
                 ->orderBy('available_at', 'ASC')
                 ->setMaxResults(1);
 
+            // Append pessimistic write lock to FROM clause if db platform supports it
+            $sql = $query->getSQL();
+            if (($fromPart = $query->getQueryPart('from')) &&
+                ($table = $fromPart[0]['table'] ?? null) &&
+                ($alias = $fromPart[0]['alias'] ?? null)
+            ) {
+                $fromClause = sprintf('%s %s', $table, $alias);
+                $sql = str_replace(
+                    sprintf('FROM %s WHERE', $fromClause),
+                    sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
+                    $sql
+                );
+            }
+
+            // Wrap the rownum query in a sub-query to allow writelocks without ORA-02014 error
+            if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+                $sql = str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql);
+
+                $wrappedQuery = $this->driverConnection->createQueryBuilder()
+                    ->select(
+                        'w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", '.
+                        'w.created_at AS "created_at", w.available_at AS "available_at", '.
+                        'w.delivered_at AS "delivered_at"'
+                    )
+                    ->from($this->configuration['table_name'], 'w')
+                    ->where('w.id IN('.$sql.')');
+
+                $sql = $wrappedQuery->getSQL();
+            }
+
             // use SELECT ... FOR UPDATE to lock table
             $stmt = $this->executeQuery(
-                $query->getSQL().' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
+                $sql.' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
                 $query->getParameters(),
                 $query->getParameterTypes()
             );
@@ -183,7 +225,7 @@ class Connection implements ResetInterface
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', '?')
                 ->where('id = ?');
-            $now = new \DateTime();
+            $now = new \DateTimeImmutable();
             $this->executeStatement($queryBuilder->getSQL(), [
                 $now,
                 $doctrineEnvelope['id'],
@@ -209,8 +251,12 @@ class Connection implements ResetInterface
     public function ack(string $id): bool
     {
         try {
+            if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
+            }
+
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
@@ -218,8 +264,12 @@ class Connection implements ResetInterface
     public function reject(string $id): bool
     {
         try {
+            if ($this->driverConnection->getDatabasePlatform() instanceof MySQLPlatform) {
+                return $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0;
+            }
+
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
-        } catch (DBALException | Exception $exception) {
+        } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
@@ -260,12 +310,12 @@ class Connection implements ResetInterface
         }, $data);
     }
 
-    public function find($id): ?array
+    public function find(mixed $id): ?array
     {
         $queryBuilder = $this->createQueryBuilder()
-            ->where('m.id = ?');
+            ->where('m.id = ? and m.queue_name = ?');
 
-        $stmt = $this->executeQuery($queryBuilder->getSQL(), [$id]);
+        $stmt = $this->executeQuery($queryBuilder->getSQL(), [$id, $this->configuration['queue_name']]);
         $data = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAssociative() : $stmt->fetch();
 
         return false === $data ? null : $this->decodeEnvelopeHeaders($data);
@@ -274,14 +324,13 @@ class Connection implements ResetInterface
     /**
      * @internal
      */
-    public function configureSchema(Schema $schema, DBALConnection $forConnection): void
+    public function configureSchema(Schema $schema, DBALConnection $forConnection, \Closure $isSameDatabase): void
     {
-        // only update the schema for this connection
-        if ($forConnection !== $this->driverConnection) {
+        if ($schema->hasTable($this->configuration['table_name'])) {
             return;
         }
 
-        if ($schema->hasTable($this->configuration['table_name'])) {
+        if ($forConnection !== $this->driverConnection && !$isSameDatabase($this->executeStatement(...))) {
             return;
         }
 
@@ -298,8 +347,8 @@ class Connection implements ResetInterface
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
-        $now = new \DateTime();
-        $redeliverLimit = (clone $now)->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+        $now = new \DateTimeImmutable();
+        $redeliverLimit = $now->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()
             ->where('m.delivered_at is null OR m.delivered_at < ?')
@@ -341,7 +390,7 @@ class Connection implements ResetInterface
         return $stmt;
     }
 
-    private function executeStatement(string $sql, array $parameters = [], array $types = [])
+    protected function executeStatement(string $sql, array $parameters = [], array $types = [])
     {
         try {
             if (method_exists($this->driverConnection, 'executeStatement')) {
@@ -370,7 +419,7 @@ class Connection implements ResetInterface
 
     private function getSchema(): Schema
     {
-        $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
+        $schema = new Schema([], [], $this->createSchemaManager()->createSchemaConfig());
         $this->addTableToSchema($schema);
 
         return $schema;
@@ -418,8 +467,9 @@ class Connection implements ResetInterface
             return;
         }
 
-        $comparator = new Comparator();
-        $schemaDiff = $comparator->compare($this->driverConnection->getSchemaManager()->createSchema(), $this->getSchema());
+        $schemaManager = $this->createSchemaManager();
+        $comparator = $this->createComparator($schemaManager);
+        $schemaDiff = $this->compareSchemas($comparator, $schemaManager->createSchema(), $this->getSchema());
 
         foreach ($schemaDiff->toSaveSql($this->driverConnection->getDatabasePlatform()) as $sql) {
             if (method_exists($this->driverConnection, 'executeStatement')) {
@@ -429,5 +479,25 @@ class Connection implements ResetInterface
             }
         }
     }
+
+    private function createSchemaManager(): AbstractSchemaManager
+    {
+        return method_exists($this->driverConnection, 'createSchemaManager')
+            ? $this->driverConnection->createSchemaManager()
+            : $this->driverConnection->getSchemaManager();
+    }
+
+    private function createComparator(AbstractSchemaManager $schemaManager): Comparator
+    {
+        return method_exists($schemaManager, 'createComparator')
+            ? $schemaManager->createComparator()
+            : new Comparator();
+    }
+
+    private function compareSchemas(Comparator $comparator, Schema $from, Schema $to): SchemaDiff
+    {
+        return method_exists($comparator, 'compareSchemas')
+            ? $comparator->compareSchemas($from, $to)
+            : $comparator->compare($from, $to);
+    }
 }
-class_alias(Connection::class, \Symfony\Component\Messenger\Transport\Doctrine\Connection::class);

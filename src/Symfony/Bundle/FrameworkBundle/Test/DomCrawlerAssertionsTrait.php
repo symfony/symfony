@@ -35,6 +35,11 @@ trait DomCrawlerAssertionsTrait
         self::assertThat(self::getCrawler(), new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorExists($selector)), $message);
     }
 
+    public static function assertSelectorCount(int $expectedCount, string $selector, string $message = ''): void
+    {
+        self::assertThat(self::getCrawler(), new DomCrawlerConstraint\CrawlerSelectorCount($expectedCount, $selector), $message);
+    }
+
     public static function assertSelectorTextContains(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(

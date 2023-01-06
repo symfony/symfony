@@ -29,48 +29,24 @@ class JsonResponse extends Response
 
     // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
     // 15 === JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
-    const DEFAULT_ENCODING_OPTIONS = 15;
+    public const DEFAULT_ENCODING_OPTIONS = 15;
 
     protected $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
 
     /**
-     * @param mixed $data    The response data
-     * @param int   $status  The response status code
-     * @param array $headers An array of response headers
-     * @param bool  $json    If the data is already a JSON string
+     * @param bool $json If the data is already a JSON string
      */
-    public function __construct($data = null, int $status = 200, array $headers = [], bool $json = false)
+    public function __construct(mixed $data = null, int $status = 200, array $headers = [], bool $json = false)
     {
         parent::__construct('', $status, $headers);
 
-        if (null === $data) {
-            $data = new \ArrayObject();
+        if ($json && !\is_string($data) && !is_numeric($data) && !\is_callable([$data, '__toString'])) {
+            throw new \TypeError(sprintf('"%s": If $json is set to true, argument $data must be a string or object implementing __toString(), "%s" given.', __METHOD__, get_debug_type($data)));
         }
 
+        $data ??= new \ArrayObject();
+
         $json ? $this->setJson($data) : $this->setData($data);
-    }
-
-    /**
-     * Factory method for chainability.
-     *
-     * Example:
-     *
-     *     return JsonResponse::create(['key' => 'value'])
-     *         ->setSharedMaxAge(300);
-     *
-     * @param mixed $data    The JSON response data
-     * @param int   $status  The response status code
-     * @param array $headers An array of response headers
-     *
-     * @return static
-     *
-     * @deprecated since Symfony 5.1, use __construct() instead.
-     */
-    public static function create($data = null, int $status = 200, array $headers = [])
-    {
-        trigger_deprecation('symfony/http-foundation', '5.1', 'The "%s()" method is deprecated, use "new %s()" instead.', __METHOD__, \get_called_class());
-
-        return new static($data, $status, $headers);
     }
 
     /**
@@ -81,13 +57,11 @@ class JsonResponse extends Response
      *     return JsonResponse::fromJsonString('{"key": "value"}')
      *         ->setSharedMaxAge(300);
      *
-     * @param string|null $data    The JSON response string
-     * @param int         $status  The response status code
-     * @param array       $headers An array of response headers
-     *
-     * @return static
+     * @param string $data    The JSON response string
+     * @param int    $status  The response status code (200 "OK" by default)
+     * @param array  $headers An array of response headers
      */
-    public static function fromJsonString(string $data = null, int $status = 200, array $headers = [])
+    public static function fromJsonString(string $data, int $status = 200, array $headers = []): static
     {
         return new static($data, $status, $headers, true);
     }
@@ -101,8 +75,11 @@ class JsonResponse extends Response
      *
      * @throws \InvalidArgumentException When the callback name is not valid
      */
-    public function setCallback(string $callback = null)
+    public function setCallback(string $callback = null): static
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/http-foundation', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         if (null !== $callback) {
             // partially taken from https://geekality.net/2011/08/03/valid-javascript-identifier/
             // partially taken from https://github.com/willdurand/JsonpCallbackValidator
@@ -131,10 +108,8 @@ class JsonResponse extends Response
      * Sets a raw string containing a JSON document to be sent.
      *
      * @return $this
-     *
-     * @throws \InvalidArgumentException
      */
-    public function setJson(string $json)
+    public function setJson(string $json): static
     {
         $this->data = $json;
 
@@ -144,24 +119,22 @@ class JsonResponse extends Response
     /**
      * Sets the data to be sent as JSON.
      *
-     * @param mixed $data
-     *
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function setData($data = [])
+    public function setData(mixed $data = []): static
     {
         try {
             $data = json_encode($data, $this->encodingOptions);
         } catch (\Exception $e) {
-            if ('Exception' === \get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+            if ('Exception' === $e::class && str_starts_with($e->getMessage(), 'Failed calling ')) {
                 throw $e->getPrevious() ?: $e;
             }
             throw $e;
         }
 
-        if (\PHP_VERSION_ID >= 70300 && (\JSON_THROW_ON_ERROR & $this->encodingOptions)) {
+        if (\JSON_THROW_ON_ERROR & $this->encodingOptions) {
             return $this->setJson($data);
         }
 
@@ -174,10 +147,8 @@ class JsonResponse extends Response
 
     /**
      * Returns options used while encoding data to JSON.
-     *
-     * @return int
      */
-    public function getEncodingOptions()
+    public function getEncodingOptions(): int
     {
         return $this->encodingOptions;
     }
@@ -187,7 +158,7 @@ class JsonResponse extends Response
      *
      * @return $this
      */
-    public function setEncodingOptions(int $encodingOptions)
+    public function setEncodingOptions(int $encodingOptions): static
     {
         $this->encodingOptions = $encodingOptions;
 
@@ -199,7 +170,7 @@ class JsonResponse extends Response
      *
      * @return $this
      */
-    protected function update()
+    protected function update(): static
     {
         if (null !== $this->callback) {
             // Not using application/javascript for compatibility reasons with older browsers.

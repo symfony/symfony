@@ -24,19 +24,15 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {
-    private $headers = [];
-
-    /**
-     * @var Response
-     */
-    private $response;
+    private array $headers = [];
+    private ?Response $response = null;
 
     /**
      * Adds the headers to the response once it's created.
      */
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -56,16 +52,13 @@ class FirePHPHandler extends BaseFirePHPHandler
         $this->headers = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function sendHeader($header, $content): void
     {
         if (!self::$sendHeaders) {
             return;
         }
 
-        if ($this->response) {
+        if (null !== $this->response) {
             $this->response->headers->set($header, $content);
         } else {
             $this->headers[$header] = $content;

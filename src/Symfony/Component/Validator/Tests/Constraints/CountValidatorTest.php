@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\CountValidator;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -21,7 +22,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 abstract class CountValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): CountValidator
     {
         return new CountValidator();
     }
@@ -37,7 +38,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsCountableType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Count(5));
     }
 
@@ -80,11 +81,33 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @dataProvider getThreeOrLessElements
+     */
+    public function testValidValuesMaxNamed($value)
+    {
+        $constraint = new Count(max: 3);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @dataProvider getFiveOrMoreElements
      */
     public function testValidValuesMin($value)
     {
         $constraint = new Count(['min' => 5]);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getFiveOrMoreElements
+     */
+    public function testValidValuesMinNamed($value)
+    {
+        $constraint = new Count(min: 5);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -102,6 +125,17 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @dataProvider getFourElements
+     */
+    public function testValidValuesExactNamed($value)
+    {
+        $constraint = new Count(exactly: 4);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @dataProvider getFiveOrMoreElements
      */
     public function testTooManyValues($value)
@@ -110,6 +144,24 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
             'max' => 4,
             'maxMessage' => 'myMessage',
         ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ count }}', \count($value))
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->setCode(Count::TOO_MANY_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getFiveOrMoreElements
+     */
+    public function testTooManyValuesNamed($value)
+    {
+        $constraint = new Count(max: 4, maxMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -144,6 +196,24 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @dataProvider getThreeOrLessElements
+     */
+    public function testTooFewValuesNamed($value)
+    {
+        $constraint = new Count(min: 4, minMessage: 'myMessage');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ count }}', \count($value))
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->setCode(Count::TOO_FEW_ERROR)
+            ->assertRaised();
+    }
+
+    /**
      * @dataProvider getFiveOrMoreElements
      */
     public function testTooManyValuesExact($value)
@@ -161,7 +231,25 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
-            ->setCode(Count::TOO_MANY_ERROR)
+            ->setCode(Count::NOT_EQUAL_COUNT_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getFiveOrMoreElements
+     */
+    public function testTooManyValuesExactNamed($value)
+    {
+        $constraint = new Count(exactly: 4, exactMessage: 'myMessage');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ count }}', \count($value))
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->setCode(Count::NOT_EQUAL_COUNT_ERROR)
             ->assertRaised();
     }
 
@@ -183,7 +271,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
-            ->setCode(Count::TOO_FEW_ERROR)
+            ->setCode(Count::NOT_EQUAL_COUNT_ERROR)
             ->assertRaised();
     }
 

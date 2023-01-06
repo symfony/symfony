@@ -36,12 +36,12 @@ class CascadingStrategy
     /**
      * Specifies that a node should not be cascaded.
      */
-    const NONE = 1;
+    public const NONE = 1;
 
     /**
      * Specifies that a node should be cascaded.
      */
-    const CASCADE = 2;
+    public const CASCADE = 2;
 
     /**
      * Not instantiable.

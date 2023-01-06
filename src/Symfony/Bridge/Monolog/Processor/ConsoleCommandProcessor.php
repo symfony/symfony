@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Processor;
 
+use Monolog\LogRecord;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,12 +21,16 @@ use Symfony\Contracts\Service\ResetInterface;
  * Adds the current console command information to the log entry.
  *
  * @author Piotr Stankowski <git@trakos.pl>
+ *
+ * @final since Symfony 6.1
  */
 class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
 {
-    private $commandData;
-    private $includeArguments;
-    private $includeOptions;
+    use CompatibilityProcessor;
+
+    private array $commandData;
+    private bool $includeArguments;
+    private bool $includeOptions;
 
     public function __construct(bool $includeArguments = true, bool $includeOptions = false)
     {
@@ -33,18 +38,18 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
         $this->includeOptions = $includeOptions;
     }
 
-    public function __invoke(array $records)
+    private function doInvoke(array|LogRecord $record): array|LogRecord
     {
-        if (null !== $this->commandData && !isset($records['extra']['command'])) {
-            $records['extra']['command'] = $this->commandData;
+        if (isset($this->commandData) && !isset($record['extra']['command'])) {
+            $record['extra']['command'] = $this->commandData;
         }
 
-        return $records;
+        return $record;
     }
 
     public function reset()
     {
-        $this->commandData = null;
+        unset($this->commandData);
     }
 
     public function addCommandData(ConsoleEvent $event)
@@ -60,7 +65,7 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConsoleEvents::COMMAND => ['addCommandData', 1],

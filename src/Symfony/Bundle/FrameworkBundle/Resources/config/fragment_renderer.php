@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler;
 use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
+use Symfony\Component\HttpKernel\Fragment\FragmentUriGenerator;
+use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
 use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
 use Symfony\Component\HttpKernel\Fragment\SsiFragmentRenderer;
@@ -30,6 +32,10 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 param('kernel.debug'),
             ])
+
+        ->set('fragment.uri_generator', FragmentUriGenerator::class)
+            ->args([param('fragment.path'), service('uri_signer'), service('request_stack')])
+        ->alias(FragmentUriGeneratorInterface::class, 'fragment.uri_generator')
 
         ->set('fragment.renderer.inline', InlineFragmentRenderer::class)
             ->args([service('http_kernel'), service('event_dispatcher')])

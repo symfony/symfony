@@ -1,0 +1,30 @@
+{
+    "name": "symfony/chatwork-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Provides Chatwork integration for Symfony Notifier.",
+    "keywords": ["chatwork", "notifier", "chat", "sms"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ippei Sumida",
+            "email": "ippey.s@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/notifier": "^6.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Chatwork\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

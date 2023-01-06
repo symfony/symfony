@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
  */
 class AmazonSqsIntegrationTest extends TestCase
 {
-    public function testConnectionSendToFifoQueueAndGet(): void
+    public function testConnectionSendToFifoQueueAndGet()
     {
         if (!getenv('MESSENGER_SQS_FIFO_QUEUE_DSN')) {
             $this->markTestSkipped('The "MESSENGER_SQS_FIFO_QUEUE_DSN" environment variable is required.');
@@ -30,7 +30,7 @@ class AmazonSqsIntegrationTest extends TestCase
         $this->execute(getenv('MESSENGER_SQS_FIFO_QUEUE_DSN'));
     }
 
-    public function testConnectionSendAndGet(): void
+    public function testConnectionSendAndGet()
     {
         if (!getenv('MESSENGER_SQS_DSN')) {
             $this->markTestSkipped('The "MESSENGER_SQS_DSN" environment variable is required.');

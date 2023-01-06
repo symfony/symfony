@@ -22,8 +22,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -42,12 +44,12 @@ class RequestDataCollectorTest extends TestCase
         $attributes = $c->getRequestAttributes();
 
         $this->assertSame('request', $c->getName());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestHeaders());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestServer());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestCookies());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $attributes);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestRequest());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestQuery());
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestHeaders());
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestServer());
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestCookies());
+        $this->assertInstanceOf(ParameterBag::class, $attributes);
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestRequest());
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestQuery());
         $this->assertInstanceOf(ParameterBag::class, $c->getResponseCookies());
         $this->assertSame('html', $c->getFormat());
         $this->assertEquals('foobar', $c->getRoute());
@@ -57,7 +59,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertContainsEquals(__FILE__, $attributes->get('resource'));
         $this->assertSame('stdClass', $attributes->get('object')->getType());
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getResponseHeaders());
+        $this->assertInstanceOf(ParameterBag::class, $c->getResponseHeaders());
         $this->assertSame('OK', $c->getStatusText());
         $this->assertSame(200, $c->getStatusCode());
         $this->assertSame('application/json', $c->getContentType());
@@ -117,6 +119,17 @@ class RequestDataCollectorTest extends TestCase
                     'method' => null,
                     'file' => __FILE__,
                     'line' => __LINE__ - 5,
+                ],
+            ],
+
+            [
+                'First-class callable closure',
+                $this->testControllerInspection(...),
+                [
+                    'class' => self::class,
+                    'method' => 'testControllerInspection',
+                    'file' => __FILE__,
+                    'line' => $r1->getStartLine(),
                 ],
             ],
 
@@ -206,10 +219,10 @@ class RequestDataCollectorTest extends TestCase
             'sf_redirect' => '{}',
         ]);
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $c = new RequestDataCollector();
-        $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $this->createResponse()));
+        $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $this->createResponse()));
 
         $this->assertTrue($request->attributes->get('_redirected'));
     }
@@ -267,6 +280,8 @@ class RequestDataCollectorTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $session->method('getMetadataBag')->willReturnCallback(static function () use ($collector) {
             $collector->collectSessionUsage();
+
+            return new MetadataBag();
         });
         $session->getMetadataBag();
 
@@ -308,6 +323,15 @@ class RequestDataCollectorTest extends TestCase
         $collector->lateCollect();
 
         $this->assertTrue($collector->getStatelessCheck());
+
+        $requestStack = new RequestStack();
+        $request = $this->createRequest();
+
+        $collector = new RequestDataCollector($requestStack);
+        $collector->collect($request, $response = $this->createResponse());
+        $collector->lateCollect();
+
+        $this->assertFalse($collector->getStatelessCheck());
     }
 
     public function testItHidesPassword()
@@ -360,7 +384,7 @@ class RequestDataCollectorTest extends TestCase
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('X-Foo-Bar', null);
         $response->headers->setCookie(new Cookie('foo', 'bar', 1, '/foo', 'localhost', true, true, false, null));
-        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTime('@946684800'), '/', null, false, true, false, null));
+        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTimeImmutable('@946684800'), '/', null, false, true, false, null));
         $response->headers->setCookie(new Cookie('bazz', 'foo', '2000-12-12', '/', null, false, true, false, null));
 
         return $response;
@@ -371,9 +395,9 @@ class RequestDataCollectorTest extends TestCase
      */
     protected function injectController($collector, $controller, $request)
     {
-        $resolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface')->getMock();
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->getMockBuilder(ArgumentResolverInterface::class)->getMock());
-        $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
+        $resolver = $this->createMock(ControllerResolverInterface::class);
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class));
+        $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MAIN_REQUEST);
         $collector->onKernelController($event);
     }
 

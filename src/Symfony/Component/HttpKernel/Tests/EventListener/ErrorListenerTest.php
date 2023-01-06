@@ -13,15 +13,19 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
+use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -39,10 +43,8 @@ class ErrorListenerTest extends TestCase
         $logger = new TestLogger();
         $l = new ErrorListener('foo', $logger);
 
-        $_logger = new \ReflectionProperty(\get_class($l), 'logger');
-        $_logger->setAccessible(true);
-        $_controller = new \ReflectionProperty(\get_class($l), 'controller');
-        $_controller->setAccessible(true);
+        $_logger = new \ReflectionProperty($l::class, 'logger');
+        $_controller = new \ReflectionProperty($l::class, 'controller');
 
         $this->assertSame($logger, $_logger->getValue($l));
         $this->assertSame('foo', $_controller->getValue($l));
@@ -97,16 +99,101 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(3, $logger->getLogs('critical'));
     }
 
+    public function testHandleWithLoggerAndCustomConfiguration()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger, false, [
+            \RuntimeException::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', 401), $event->getResponse());
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('critical'));
+        $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
+    public function testHandleWithLogLevelAttribute()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WarningWithLogLevelAttribute());
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger);
+
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('critical'));
+        $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
+    public function testHandleWithLogLevelAttributeAndCustomConfiguration()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WarningWithLogLevelAttribute());
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger, false, [
+            WarningWithLogLevelAttribute::class => [
+                'log_level' => 'info',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(0, $logger->countErrors());
+        $this->assertCount(0, $logger->getLogs('warning'));
+        $this->assertCount(1, $logger->getLogs('info'));
+    }
+
+    /**
+     * @dataProvider exceptionWithAttributeProvider
+     */
+    public function testHandleHttpAttribute(\Throwable $exception, int $expectedStatusCode, array $expectedHeaders)
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
+        $l = new ErrorListener('not used');
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', $expectedStatusCode, $expectedHeaders), $event->getResponse());
+    }
+
+    public function testHandleCustomConfigurationAndHttpAttribute()
+    {
+        $request = new Request();
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WithGeneralAttribute());
+        $l = new ErrorListener('not used', null, false, [
+            WithGeneralAttribute::class => [
+                'log_level' => 'warning',
+                'status_code' => 401,
+            ],
+        ]);
+        $l->logKernelException($event);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo', 401), $event->getResponse());
+    }
+
     public function provider()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+        if (!class_exists(Request::class)) {
             return [[null, null]];
         }
 
         $request = new Request();
         $exception = new \Exception('foo');
-        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
-        $event2 = new ExceptionEvent(new TestKernelThatThrowsException(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
+        $event2 = new ExceptionEvent(new TestKernelThatThrowsException(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
 
         return [
             [$event, $event2],
@@ -115,9 +202,9 @@ class ErrorListenerTest extends TestCase
 
     public function testSubRequestFormat()
     {
-        $listener = new ErrorListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
+        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
 
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
@@ -125,7 +212,7 @@ class ErrorListenerTest extends TestCase
         $request = Request::create('/');
         $request->setRequestFormat('xml');
 
-        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'));
         $listener->onKernelException($event);
 
         $response = $event->getResponse();
@@ -135,23 +222,23 @@ class ErrorListenerTest extends TestCase
     public function testCSPHeaderIsRemoved()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
 
-        $listener = new ErrorListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock(), true);
+        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class), true);
 
         $dispatcher->addSubscriber($listener);
 
         $request = Request::create('/');
-        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'));
         $dispatcher->dispatch($event, KernelEvents::EXCEPTION);
 
         $response = new Response('', 200, ['content-security-policy' => "style-src 'self'"]);
         $this->assertTrue($response->headers->has('content-security-policy'));
 
-        $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
@@ -174,7 +261,7 @@ class ErrorListenerTest extends TestCase
             return $controller(...$event->getArguments());
         });
 
-        $event = new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+        $event = new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'));
         $listener->onKernelException($event);
 
         $this->assertSame('OK: foo', $event->getResponse()->getContent());
@@ -196,6 +283,12 @@ class ErrorListenerTest extends TestCase
             return new Response('OK: '.$exception->getMessage());
         }];
     }
+
+    public static function exceptionWithAttributeProvider()
+    {
+        yield [new WithCustomUserProvidedAttribute(), 208, ['name' => 'value']];
+        yield [new WithGeneralAttribute(), 412, ['some' => 'thing']];
+    }
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface
@@ -208,16 +301,55 @@ class TestLogger extends Logger implements DebugLoggerInterface
 
 class TestKernel implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
+        $e = $request->attributes->get('exception');
+        if ($e instanceof HttpExceptionInterface) {
+            return new Response('foo', $e->getStatusCode(), $e->getHeaders());
+        }
+
         return new Response('foo');
     }
 }
 
 class TestKernelThatThrowsException implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         throw new \RuntimeException('bar');
     }
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class UserProvidedHttpStatusCodeAttribute extends WithHttpStatus
+{
+    public function __construct(array $headers = [])
+    {
+        parent::__construct(
+            Response::HTTP_ALREADY_REPORTED,
+            $headers
+        );
+    }
+}
+
+#[UserProvidedHttpStatusCodeAttribute(headers: [
+    'name' => 'value',
+])]
+class WithCustomUserProvidedAttribute extends \Exception
+{
+}
+
+#[WithHttpStatus(
+    statusCode: Response::HTTP_PRECONDITION_FAILED,
+    headers: [
+        'some' => 'thing',
+    ]
+)]
+class WithGeneralAttribute extends \Exception
+{
+}
+
+#[WithLogLevel(LogLevel::WARNING)]
+class WarningWithLogLevelAttribute extends \Exception
+{
 }

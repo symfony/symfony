@@ -21,8 +21,8 @@ use Symfony\Component\Intl\Locale;
  */
 trait FallbackTrait
 {
-    private $fallbackCache = [];
-    private $generatingFallback = false;
+    private array $fallbackCache = [];
+    private bool $generatingFallback = false;
 
     /**
      * @see AbstractDataGenerator::generateDataForLocale()

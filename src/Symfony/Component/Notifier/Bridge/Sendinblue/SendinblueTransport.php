@@ -11,28 +11,27 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sendinblue;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Pierre Tondereau <pierre.tondereau@gmail.com>
- *
- * @experimental in 5.2
  */
 final class SendinblueTransport extends AbstractTransport
 {
     protected const HOST = 'api.sendinblue.com';
 
-    private $apiKey;
-    private $sender;
+    private string $apiKey;
+    private string $sender;
 
-    public function __construct(string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $apiKey, string $sender, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->sender = $sender;
@@ -53,12 +52,14 @@ final class SendinblueTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
+
+        $sender = $message->getFrom() ?: $this->sender;
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/sms', [
             'json' => [
-                'sender' => $this->sender,
+                'sender' => $sender,
                 'recipient' => $message->getPhone(),
                 'content' => $message->getSubject(),
             ],
@@ -67,7 +68,13 @@ final class SendinblueTransport extends AbstractTransport
             ],
         ]);
 
-        if (201 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Sendinblue server.', $response, 0, $e);
+        }
+
+        if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException('Unable to send the SMS: '.$error['message'], $response);
@@ -75,9 +82,9 @@ final class SendinblueTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['messageId']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['messageId']);
 
-        return $message;
+        return $sentMessage;
     }
 }

@@ -20,6 +20,7 @@ class NormalizationBuilder
 {
     protected $node;
     public $before = [];
+    public $declaredTypes = [];
     public $remappings = [];
 
     public function __construct(NodeDefinition $node)
@@ -35,7 +36,7 @@ class NormalizationBuilder
      *
      * @return $this
      */
-    public function remap(string $key, string $plural = null)
+    public function remap(string $key, string $plural = null): static
     {
         $this->remappings[] = [$key, null === $plural ? $key.'s' : $plural];
 
@@ -47,7 +48,7 @@ class NormalizationBuilder
      *
      * @return ExprBuilder|$this
      */
-    public function before(\Closure $closure = null)
+    public function before(\Closure $closure = null): ExprBuilder|static
     {
         if (null !== $closure) {
             $this->before[] = $closure;

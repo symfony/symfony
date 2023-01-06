@@ -20,7 +20,7 @@ class ControllerResolverTest extends TestCase
 {
     public function testGetControllerWithoutControllerParameter()
     {
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing.');
         $resolver = $this->createControllerResolver($logger);
 
@@ -94,7 +94,7 @@ class ControllerResolverTest extends TestCase
 
     public function testGetControllerOnObjectWithoutInvokeMethod()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
@@ -170,9 +170,9 @@ class ControllerResolverTest extends TestCase
         $controller = new ControllerTest();
 
         return [
-            ['foo', \Error::class, \PHP_VERSION_ID < 80000 ? 'Class \'foo\' not found' : 'Class "foo" not found'],
-            ['oof::bar', \Error::class, \PHP_VERSION_ID < 80000 ? 'Class \'oof\' not found' : 'Class "oof" not found'],
-            [['oof', 'bar'], \Error::class, \PHP_VERSION_ID < 80000 ? 'Class \'oof\' not found' : 'Class "oof" not found'],
+            ['foo', \Error::class, 'Class "foo" not found'],
+            ['oof::bar', \Error::class, 'Class "oof" not found'],
+            [['oof', 'bar'], \Error::class, 'Class "oof" not found'],
             ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::staticsAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable: Expected method "staticsAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest", did you mean "staticAction"?'],
             ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::privateAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable: Method "privateAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
             ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::protectedAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable: Method "protectedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],

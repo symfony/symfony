@@ -38,6 +38,8 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
             '.foo/bar',
             'foo bar',
             'qux/baz_100_1.py',
+            'zebulon.php',
+            'Zephire.php',
             'qux/baz_1_2.py',
             'qux_0_1.php',
             'qux_1000_1.php',
@@ -65,17 +67,17 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
 
 class InnerTypeIterator extends \ArrayIterator
 {
-    public function current()
+    public function current(): \SplFileInfo
     {
         return new \SplFileInfo(parent::current());
     }
 
-    public function isFile()
+    public function isFile(): bool
     {
         return $this->current()->isFile();
     }
 
-    public function isDir()
+    public function isDir(): bool
     {
         return $this->current()->isDir();
     }

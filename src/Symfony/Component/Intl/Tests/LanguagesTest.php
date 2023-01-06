@@ -21,7 +21,7 @@ class LanguagesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    private static $languages = [
+    private const LANGUAGES = [
         'aa',
         'ab',
         'ace',
@@ -43,6 +43,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'am',
         'an',
         'ang',
+        'ann',
         'anp',
         'ar',
         'arc',
@@ -58,6 +59,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'asa',
         'ase',
         'ast',
+        'atj',
         'av',
         'avk',
         'awa',
@@ -79,6 +81,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'bfd',
         'bfq',
         'bg',
+        'bgc',
         'bgn',
         'bho',
         'bi',
@@ -87,6 +90,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'bjn',
         'bkm',
         'bla',
+        'blt',
         'bm',
         'bn',
         'bo',
@@ -124,16 +128,25 @@ class LanguagesTest extends ResourceBundleTestCase
         'chy',
         'cic',
         'ckb',
+        'clc',
         'co',
         'cop',
         'cps',
         'cr',
+        'crg',
         'crh',
+        'crj',
+        'crk',
+        'crl',
+        'crm',
+        'crr',
         'crs',
         'cs',
         'csb',
+        'csw',
         'cu',
         'cv',
+        'cwd',
         'cy',
         'da',
         'dak',
@@ -223,12 +236,15 @@ class LanguagesTest extends ResourceBundleTestCase
         'hai',
         'hak',
         'haw',
+        'hax',
+        'hdn',
         'he',
         'hi',
         'hif',
         'hil',
         'hit',
         'hmn',
+        'hnj',
         'ho',
         'hr',
         'hsb',
@@ -236,6 +252,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'ht',
         'hu',
         'hup',
+        'hur',
         'hy',
         'hz',
         'ia',
@@ -246,6 +263,8 @@ class LanguagesTest extends ResourceBundleTestCase
         'ig',
         'ii',
         'ik',
+        'ike',
+        'ikt',
         'ilo',
         'inh',
         'io',
@@ -312,6 +331,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'kut',
         'kv',
         'kw',
+        'kwk',
         'ky',
         'la',
         'lad',
@@ -324,6 +344,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'lg',
         'li',
         'lij',
+        'lil',
         'liv',
         'lkt',
         'lmo',
@@ -333,6 +354,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'lou',
         'loz',
         'lrc',
+        'lsm',
         'lt',
         'ltg',
         'lu',
@@ -371,6 +393,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'mn',
         'mnc',
         'mni',
+        'moe',
         'moh',
         'mos',
         'mr',
@@ -420,6 +443,12 @@ class LanguagesTest extends ResourceBundleTestCase
         'nzi',
         'oc',
         'oj',
+        'ojb',
+        'ojc',
+        'ojg',
+        'ojs',
+        'ojw',
+        'oka',
         'om',
         'or',
         'os',
@@ -439,10 +468,12 @@ class LanguagesTest extends ResourceBundleTestCase
         'pfl',
         'phn',
         'pi',
+        'pis',
         'pl',
         'pms',
         'pnt',
         'pon',
+        'pqm',
         'prg',
         'pro',
         'ps',
@@ -454,6 +485,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'rap',
         'rar',
         'rgn',
+        'rhg',
         'rif',
         'rm',
         'rn',
@@ -500,6 +532,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'sid',
         'sk',
         'sl',
+        'slh',
         'sli',
         'sly',
         'sm',
@@ -519,6 +552,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'ssy',
         'st',
         'stq',
+        'str',
         'su',
         'suk',
         'sus',
@@ -530,6 +564,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'syr',
         'szl',
         'ta',
+        'tce',
         'tcy',
         'te',
         'tem',
@@ -537,7 +572,9 @@ class LanguagesTest extends ResourceBundleTestCase
         'ter',
         'tet',
         'tg',
+        'tgx',
         'th',
+        'tht',
         'ti',
         'tig',
         'tiv',
@@ -552,14 +589,17 @@ class LanguagesTest extends ResourceBundleTestCase
         'tn',
         'to',
         'tog',
+        'tok',
         'tpi',
         'tr',
         'tru',
         'trv',
+        'trw',
         'ts',
         'tsd',
         'tsi',
         'tt',
+        'ttm',
         'ttt',
         'tum',
         'tvl',
@@ -618,7 +658,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'zza',
     ];
 
-    private static $alpha3Codes = [
+    private const ALPHA3_CODES = [
         'aar',
         'abk',
         'ace',
@@ -638,6 +678,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'alt',
         'amh',
         'ang',
+        'ann',
         'anp',
         'ara',
         'arc',
@@ -654,6 +695,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'ase',
         'asm',
         'ast',
+        'atj',
         'ava',
         'ave',
         'avk',
@@ -677,6 +719,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'bez',
         'bfd',
         'bfq',
+        'bgc',
         'bgn',
         'bho',
         'bih',
@@ -686,6 +729,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'bjn',
         'bkm',
         'bla',
+        'blt',
         'bod',
         'bos',
         'bpy',
@@ -725,14 +769,23 @@ class LanguagesTest extends ResourceBundleTestCase
         'chy',
         'cic',
         'ckb',
+        'clc',
         'cop',
         'cor',
         'cos',
         'cps',
         'cre',
+        'crg',
         'crh',
+        'crj',
+        'crk',
+        'crl',
+        'crm',
+        'crr',
         'crs',
         'csb',
+        'csw',
+        'cwd',
         'cym',
         'dak',
         'dan',
@@ -822,7 +875,9 @@ class LanguagesTest extends ResourceBundleTestCase
         'hat',
         'hau',
         'haw',
+        'hax',
         'hbs',
+        'hdn',
         'heb',
         'her',
         'hif',
@@ -831,17 +886,21 @@ class LanguagesTest extends ResourceBundleTestCase
         'hit',
         'hmn',
         'hmo',
+        'hnj',
         'hrv',
         'hsb',
         'hsn',
         'hun',
         'hup',
+        'hur',
         'hye',
         'iba',
         'ibb',
         'ibo',
         'ido',
         'iii',
+        'ike',
+        'ikt',
         'iku',
         'ile',
         'ilo',
@@ -912,6 +971,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'kum',
         'kur',
         'kut',
+        'kwk',
         'lad',
         'lag',
         'lah',
@@ -922,6 +982,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'lez',
         'lfn',
         'lij',
+        'lil',
         'lim',
         'lin',
         'lit',
@@ -932,6 +993,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'lou',
         'loz',
         'lrc',
+        'lsm',
         'ltg',
         'ltz',
         'lua',
@@ -970,6 +1032,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'mlt',
         'mnc',
         'mni',
+        'moe',
         'moh',
         'mol',
         'mon',
@@ -1019,7 +1082,13 @@ class LanguagesTest extends ResourceBundleTestCase
         'nyo',
         'nzi',
         'oci',
+        'ojb',
+        'ojc',
+        'ojg',
         'oji',
+        'ojs',
+        'ojw',
+        'oka',
         'ori',
         'orm',
         'osa',
@@ -1038,12 +1107,14 @@ class LanguagesTest extends ResourceBundleTestCase
         'peo',
         'pfl',
         'phn',
+        'pis',
         'pli',
         'pms',
         'pnt',
         'pol',
         'pon',
         'por',
+        'pqm',
         'prg',
         'pro',
         'prs',
@@ -1055,6 +1126,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'rap',
         'rar',
         'rgn',
+        'rhg',
         'rif',
         'rof',
         'roh',
@@ -1094,6 +1166,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'shu',
         'sid',
         'sin',
+        'slh',
         'sli',
         'slk',
         'slv',
@@ -1119,6 +1192,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'ssw',
         'ssy',
         'stq',
+        'str',
         'suk',
         'sun',
         'sus',
@@ -1133,6 +1207,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'tah',
         'tam',
         'tat',
+        'tce',
         'tcy',
         'tel',
         'tem',
@@ -1141,7 +1216,9 @@ class LanguagesTest extends ResourceBundleTestCase
         'tet',
         'tgk',
         'tgl',
+        'tgx',
         'tha',
+        'tht',
         'tig',
         'tir',
         'tiv',
@@ -1152,14 +1229,17 @@ class LanguagesTest extends ResourceBundleTestCase
         'tly',
         'tmh',
         'tog',
+        'tok',
         'ton',
         'tpi',
         'tru',
         'trv',
+        'trw',
         'tsd',
         'tsi',
         'tsn',
         'tso',
+        'ttm',
         'ttt',
         'tuk',
         'tum',
@@ -1219,7 +1299,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'zza',
     ];
 
-    private static $alpha2ToAlpha3 = [
+    private const ALPHA2_TO_ALPHA3 = [
         'aa' => 'aar',
         'ab' => 'abk',
         'af' => 'afr',
@@ -1338,6 +1418,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'nl' => 'nld',
         'nn' => 'nno',
         'nb' => 'nob',
+        'no' => 'nor',
         'ny' => 'nya',
         'oc' => 'oci',
         'oj' => 'oji',
@@ -1402,7 +1483,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'zu' => 'zul',
     ];
 
-    private static $alpha3ToAlpha2 = [
+    private const ALPHA3_TO_ALPHA2 = [
         'aar' => 'aa',
         'abk' => 'ab',
         'ave' => 'ae',
@@ -1515,7 +1596,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'mya' => 'my',
         'nau' => 'na',
         'nob' => 'nb',
-        'nor' => 'nb',
+        'nor' => 'no',
         'nde' => 'nd',
         'nep' => 'ne',
         'ndo' => 'ng',
@@ -1590,7 +1671,7 @@ class LanguagesTest extends ResourceBundleTestCase
 
     public function testGetLanguageCodes()
     {
-        $this->assertEquals(self::$languages, Languages::getLanguageCodes());
+        $this->assertEquals(self::LANGUAGES, Languages::getLanguageCodes());
     }
 
     /**
@@ -1603,10 +1684,10 @@ class LanguagesTest extends ResourceBundleTestCase
         sort($languages);
 
         $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::$languages));
+        $this->assertEmpty(array_diff($languages, self::LANGUAGES));
 
         foreach (Languages::getAlpha3Names($displayLocale) as $alpha3Code => $name) {
-            $alpha2Code = self::$alpha3ToAlpha2[$alpha3Code] ?? null;
+            $alpha2Code = self::ALPHA3_TO_ALPHA2[$alpha3Code] ?? null;
             if (null !== $alpha2Code) {
                 $this->assertSame($name, $names[$alpha2Code]);
             }
@@ -1665,7 +1746,7 @@ class LanguagesTest extends ResourceBundleTestCase
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_keys(self::$alpha2ToAlpha3)
+            array_keys(self::ALPHA2_TO_ALPHA3)
         );
     }
 
@@ -1674,14 +1755,14 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha3Code($language)
     {
-        $this->assertSame(self::$alpha2ToAlpha3[$language], Languages::getAlpha3Code($language));
+        $this->assertSame(self::ALPHA2_TO_ALPHA3[$language], Languages::getAlpha3Code($language));
     }
 
     public function provideLanguagesWithoutAlpha3Equivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_diff(self::$languages, array_keys(self::$alpha2ToAlpha3))
+            array_diff(self::LANGUAGES, array_keys(self::ALPHA2_TO_ALPHA3))
         );
     }
 
@@ -1690,13 +1771,13 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($language)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Languages::getAlpha3Code($language);
     }
 
     public function testGetNameWithInvalidLanguageCode()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Languages::getName('foo');
     }
 
@@ -1708,14 +1789,14 @@ class LanguagesTest extends ResourceBundleTestCase
 
     public function testGetAlpha3Codes()
     {
-        $this->assertSame(self::$alpha3Codes, Languages::getAlpha3Codes());
+        $this->assertSame(self::ALPHA3_CODES, Languages::getAlpha3Codes());
     }
 
     public function provideLanguagesWithAlpha2Equivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_keys(self::$alpha3ToAlpha2)
+            array_keys(self::ALPHA3_TO_ALPHA2)
         );
     }
 
@@ -1724,14 +1805,14 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha2Code($language)
     {
-        $this->assertSame(self::$alpha3ToAlpha2[$language], Languages::getAlpha2Code($language));
+        $this->assertSame(self::ALPHA3_TO_ALPHA2[$language], Languages::getAlpha2Code($language));
     }
 
     public function provideLanguagesWithoutAlpha2Equivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_diff(self::$alpha3Codes, array_keys(self::$alpha3ToAlpha2))
+            array_diff(self::ALPHA3_CODES, array_keys(self::ALPHA3_TO_ALPHA2))
         );
     }
 
@@ -1740,7 +1821,7 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha2CodeFailsIfNoAlpha2Equivalent($language)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Languages::getAlpha2Code($language);
     }
 
@@ -1786,10 +1867,10 @@ class LanguagesTest extends ResourceBundleTestCase
         sort($languages);
 
         $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::$alpha3Codes));
+        $this->assertEmpty(array_diff($languages, self::ALPHA3_CODES));
 
         foreach (Languages::getNames($displayLocale) as $alpha2Code => $name) {
-            $alpha3Code = self::$alpha2ToAlpha3[$alpha2Code] ?? (3 === \strlen($alpha2Code) ? $alpha2Code : null);
+            $alpha3Code = self::ALPHA2_TO_ALPHA3[$alpha2Code] ?? (3 === \strlen($alpha2Code) ? $alpha2Code : null);
             if (null !== $alpha3Code) {
                 $this->assertSame($name, $names[$alpha3Code]);
             }

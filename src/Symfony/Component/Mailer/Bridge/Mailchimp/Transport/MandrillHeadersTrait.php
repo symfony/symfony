@@ -36,15 +36,20 @@ trait MandrillHeadersTrait
     {
         $headers = $message->getHeaders();
         $metadata = [];
+        $tags = [];
 
         foreach ($headers->all() as $name => $header) {
             if ($header instanceof TagHeader) {
-                $headers->addTextHeader('X-MC-Tags', $header->getValue());
+                $tags[] = $header->getValue();
                 $headers->remove($name);
             } elseif ($header instanceof MetadataHeader) {
                 $metadata[$header->getKey()] = $header->getValue();
                 $headers->remove($name);
             }
+        }
+
+        if ($tags) {
+            $headers->addTextHeader('X-MC-Tags', implode(',', $tags));
         }
 
         if ($metadata) {

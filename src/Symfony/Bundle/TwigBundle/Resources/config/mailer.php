@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Component\Mailer\EventListener\MessageListener;
+use Symfony\Component\Mime\BodyRendererInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -22,5 +23,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.mime_body_renderer', BodyRenderer::class)
             ->args([service('twig')])
+        ->alias(BodyRendererInterface::class, 'twig.mime_body_renderer')
     ;
 };

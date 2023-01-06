@@ -20,21 +20,17 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
  */
 final class ConstructorExtractor implements PropertyTypeExtractorInterface
 {
-    /** @var iterable|ConstructorArgumentTypeExtractorInterface[] */
     private $extractors;
 
     /**
-     * @param iterable|ConstructorArgumentTypeExtractorInterface[] $extractors
+     * @param iterable<int, ConstructorArgumentTypeExtractorInterface> $extractors
      */
     public function __construct(iterable $extractors = [])
     {
         $this->extractors = $extractors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypes($class, $property, array $context = [])
+    public function getTypes(string $class, string $property, array $context = []): ?array
     {
         foreach ($this->extractors as $extractor) {
             $value = $extractor->getTypesFromConstructor($class, $property);

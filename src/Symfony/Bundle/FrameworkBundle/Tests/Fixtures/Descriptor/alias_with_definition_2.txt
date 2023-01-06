@@ -8,9 +8,9 @@
  ----------------- --------------------------------- 
   Service ID        .service_2                       
   Class             Full\Qualified\Class2            
-[39;49m  Tags              tag1 ([39;49m[32mattr1[39m[39;49m: val1, [39;49m[32mattr2[39m[39;49m: val2)[39;49m[39;49m  [39;49m
-[39;49m                    [39;49m[39;49mtag1 ([39;49m[32mattr3[39m[39;49m: val3)[39;49m[39;49m               [39;49m
-[39;49m                    [39;49mtag2                             
+  Tags              tag1 ([32mattr1[39m: val1, [32mattr2[39m: val2)  
+                    tag1 ([32mattr3[39m: val3)               
+                    tag2                             
   Calls             setMailer                        
   Public            no                               
   Synthetic         yes                              
@@ -22,4 +22,5 @@
   Required File     /path/to/file                    
   Factory Service   factory.service                  
   Factory Method    get                              
+  Usages            .alias_2                         
  ----------------- ---------------------------------

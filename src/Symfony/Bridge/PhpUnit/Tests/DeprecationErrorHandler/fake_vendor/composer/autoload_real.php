@@ -13,23 +13,33 @@ class ComposerLoaderFake
             'App\\Services\\' => [__DIR__.'/../../fake_app/'],
             'acme\\lib\\' => [__DIR__.'/../acme/lib/'],
             'bar\\lib\\' => [__DIR__.'/../bar/lib/'],
+            'fcy\\lib\\' => [__DIR__.'/../fcy/lib/'],
         ];
     }
 
     public function loadClass($className)
     {
+        if ($file = $this->findFile($className)) {
+            require $file;
+        }
+    }
+
+    public function findFile($class)
+    {
         foreach ($this->getPrefixesPsr4() as $prefix => $baseDirs) {
-            if (strpos($className, $prefix) !== 0) {
+            if (0 !== strpos($class, $prefix)) {
                 continue;
             }
 
             foreach ($baseDirs as $baseDir) {
-                $file = str_replace([$prefix, '\\'], [$baseDir, '/'], $className.'.php');
+                $file = str_replace([$prefix, '\\'], [$baseDir, '/'], $class.'.php');
                 if (file_exists($file)) {
-                    require $file;
+                    return $file;
                 }
             }
         }
+
+        return false;
     }
 }
 

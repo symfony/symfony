@@ -12,9 +12,14 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Abstraction\Result as AbstractionResult;
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Connection as DBALConnection;
+use Doctrine\DBAL\Driver\Result as DriverResult;
+use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -24,6 +29,8 @@ use Doctrine\DBAL\Statement;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 class ConnectionTest extends TestCase
 {
@@ -88,14 +95,9 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
+        $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
-
-        if (class_exists(Exception::class)) {
-            $driverConnection->method('delete')->willThrowException(new Exception());
-        } else {
-            $driverConnection->method('delete')->willThrowException(new DBALException());
-        }
+        $driverConnection->method('delete')->willThrowException(new DBALException());
 
         $connection = new Connection([], $driverConnection);
         $connection->ack('dummy_id');
@@ -103,14 +105,9 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
+        $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
-
-        if (class_exists(Exception::class)) {
-            $driverConnection->method('delete')->willThrowException(new Exception());
-        } else {
-            $driverConnection->method('delete')->willThrowException(new DBALException());
-        }
+        $driverConnection->method('delete')->willThrowException(new DBALException());
 
         $connection = new Connection([], $driverConnection);
         $connection->reject('dummy_id');
@@ -118,7 +115,7 @@ class ConnectionTest extends TestCase
 
     private function getDBALConnectionMock()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = $this->createMock(DBALConnection::class);
         $platform = $this->createMock(AbstractPlatform::class);
         $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE');
         $configuration = $this->createMock(\Doctrine\DBAL\Configuration::class);
@@ -130,7 +127,11 @@ class ConnectionTest extends TestCase
         $schemaConfig->method('getMaxIdentifierLength')->willReturn(63);
         $schemaConfig->method('getDefaultTableOptions')->willReturn([]);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
-        $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        if (method_exists(DBALConnection::class, 'createSchemaManager')) {
+            $driverConnection->method('createSchemaManager')->willReturn($schemaManager);
+        } else {
+            $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        }
 
         return $driverConnection;
     }
@@ -189,7 +190,7 @@ class ConnectionTest extends TestCase
             'expectedAutoSetup' => true,
         ];
 
-        yield  'test options array' => [
+        yield 'test options array' => [
             'dsn' => 'doctrine://default',
             'options' => [
                 'table_name' => 'name_from_options',
@@ -252,14 +253,14 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
@@ -280,6 +281,7 @@ class ConnectionTest extends TestCase
             ->willReturn($queryBuilder);
         $queryBuilder
             ->method('where')
+            ->with('m.id = ? and m.queue_name = ?')
             ->willReturn($queryBuilder);
         $queryBuilder
             ->method('getSQL')
@@ -349,13 +351,67 @@ class ConnectionTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[1]['headers']);
     }
 
+    /**
+     * @dataProvider providePlatformSql
+     */
+    public function testGeneratedSql(AbstractPlatform $platform, string $expectedSql)
+    {
+        $driverConnection = $this->createMock(DBALConnection::class);
+        $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('createQueryBuilder')->willReturnCallback(function () use ($driverConnection) {
+            return new QueryBuilder($driverConnection);
+        });
+
+        if (interface_exists(DriverResult::class)) {
+            $result = $this->createMock(DriverResult::class);
+            $result->method('fetchAssociative')->willReturn(false);
+
+            if (class_exists(Result::class)) {
+                $result = new Result($result, $driverConnection);
+            }
+        } else {
+            $result = $this->createMock(ResultStatement::class);
+            $result->method('fetch')->willReturn(false);
+        }
+
+        $driverConnection->expects($this->once())->method('beginTransaction');
+        $driverConnection
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with($expectedSql)
+            ->willReturn($result)
+        ;
+        $driverConnection->expects($this->once())->method('commit');
+
+        $connection = new Connection([], $driverConnection);
+        $connection->get();
+    }
+
+    public function providePlatformSql(): iterable
+    {
+        yield 'MySQL' => [
+            new MySQL57Platform(),
+            'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+        ];
+
+        yield 'SQL Server' => [
+            new SQLServer2012Platform(),
+            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+        ];
+
+        yield 'Oracle' => [
+            new OraclePlatform(),
+            'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN(SELECT a.id FROM (SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC) a WHERE ROWNUM <= 1) FOR UPDATE',
+        ];
+    }
+
     public function testConfigureSchema()
     {
         $driverConnection = $this->getDBALConnectionMock();
         $schema = new Schema();
 
         $connection = new Connection(['table_name' => 'queue_table'], $driverConnection);
-        $connection->configureSchema($schema, $driverConnection);
+        $connection->configureSchema($schema, $driverConnection, fn() => true);
         $this->assertTrue($schema->hasTable('queue_table'));
     }
 
@@ -366,7 +422,7 @@ class ConnectionTest extends TestCase
         $schema = new Schema();
 
         $connection = new Connection([], $driverConnection);
-        $connection->configureSchema($schema, $driverConnection2);
+        $connection->configureSchema($schema, $driverConnection2, fn() => false);
         $this->assertFalse($schema->hasTable('messenger_messages'));
     }
 
@@ -377,7 +433,7 @@ class ConnectionTest extends TestCase
         $schema->createTable('messenger_messages');
 
         $connection = new Connection([], $driverConnection);
-        $connection->configureSchema($schema, $driverConnection);
+        $connection->configureSchema($schema, $driverConnection, fn() => true);
         $table = $schema->getTable('messenger_messages');
         $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
     }

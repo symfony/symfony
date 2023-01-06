@@ -13,11 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Locale;
 use Symfony\Component\Validator\Constraints\LocaleValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LocaleValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): LocaleValidator
     {
         return new LocaleValidator();
     }
@@ -38,7 +39,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Locale());
     }
 
@@ -102,6 +103,52 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($locale, $constraint);
 
         $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getValidLocales
+     */
+    public function testValidLocalesWithoutCanonicalization(string $locale)
+    {
+        $constraint = new Locale([
+            'message' => 'myMessage',
+            'canonicalize' => false,
+        ]);
+
+        $this->validator->validate($locale, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getUncanonicalizedLocales
+     */
+    public function testInvalidLocalesWithoutCanonicalization(string $locale)
+    {
+        $constraint = new Locale([
+            'message' => 'myMessage',
+            'canonicalize' => false,
+        ]);
+
+        $this->validator->validate($locale, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$locale.'"')
+            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testInvalidLocaleWithoutCanonicalizationNamed()
+    {
+        $this->validator->validate(
+            'en-US',
+            new Locale(message: 'myMessage', canonicalize: false)
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"en-US"')
+            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
+            ->assertRaised();
     }
 
     public function getUncanonicalizedLocales(): iterable

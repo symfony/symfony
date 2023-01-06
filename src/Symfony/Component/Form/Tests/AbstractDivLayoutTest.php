@@ -24,7 +24,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[@for="name"]
         /following-sibling::ul
@@ -46,7 +46,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[@for="name"][@class="my&label&class required"][.="[trans]foo&bar[/trans]"]
         /following-sibling::input[@id="name"][@class="my&class"]
@@ -68,7 +68,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         // (see RepeatedTypeValidatorExtension)
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[@for="name_first"]
         /following-sibling::input[@id="name_first"]
@@ -89,7 +89,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./button[@type="button"][@name="name"]
     ]
@@ -119,7 +119,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[@for="name_field1"]
         /following-sibling::input[@type="text"][@id="name_field1"]
@@ -165,7 +165,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[not(@for)]
         /following-sibling::div[@id="parent_child1"]
@@ -210,7 +210,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[@for="name_first"]
         /following-sibling::input[@type="text"][@id="name_first"]
@@ -237,7 +237,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[@for="name_first"]
         /following-sibling::input[@type="text"][@id="name_first"]
@@ -267,7 +267,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRest($view);
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[@for="name_first"]
         /following-sibling::input[@type="text"][@id="name_first"]
@@ -288,7 +288,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div[./input[@type="text"][@value="a"]]
         /following-sibling::div[./input[@type="text"][@value="b"]]
@@ -310,7 +310,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div[./div/div/input[@type="text"][@value="a"]]
         /following-sibling::div[./div/div/textarea[.="b"]]
@@ -328,7 +328,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [./input[@type="hidden"][@id="names__token"]]
     [count(./div)=0]
 '
@@ -349,7 +349,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div
             [
@@ -391,7 +391,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertMatchesXpath($html,
-'/form
+            '/form
     [
         ./input[@type="hidden"][@name="_method"][@value="PUT"]
         /following-sibling::div
@@ -427,7 +427,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div
             [
@@ -459,7 +459,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $form->get('child')->addError(new FormError('[trans]Error![/trans]'));
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div/label
         /following-sibling::ul[./li[.="[trans]Error![/trans]"]]
@@ -484,7 +484,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div
         /following-sibling::input[@type="hidden"][@id="name__token"][@value="foo&bar"]
@@ -501,7 +501,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div
             [
@@ -529,7 +529,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div
             [
@@ -555,7 +555,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div
             [
@@ -575,7 +575,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./label[@for="name"][not(@id)]
         /following-sibling::input[@id="name"]
@@ -592,7 +592,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
-'/div
+            '/div
     [
         ./input[@id="name"]
     ]
@@ -638,7 +638,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->setTheme($view['child'], $childTheme);
 
         $this->assertWidgetMatchesXpath($view, [],
-'/div
+            '/div
     [
         ./div
             [
@@ -674,7 +674,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./div[./label[.="Custom label: [trans]0[/trans]"]]
         /following-sibling::div[./label[.="Custom label: [trans]1[/trans]"]]
@@ -697,7 +697,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./label[.="Custom name label: [trans]ChoiceA[/trans]"]
         /following-sibling::label[.="Custom name label: [trans]ChoiceB[/trans]"]
@@ -793,7 +793,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@value="&a"][@checked]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][@value="&b"][not(@checked)]
@@ -821,7 +821,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@value="&a"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]label.&a[/trans]"]
@@ -848,7 +848,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
-'/div
+            '/div
     [
         ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@value="&a"][@checked]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][@value="&b"][not(@checked)]
@@ -875,7 +875,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         // Insert the start tag, the end tag should be rendered by the helper
         $this->assertMatchesXpath('<form>'.$html,
-'/form
+            '/form
     [
         ./div
             [

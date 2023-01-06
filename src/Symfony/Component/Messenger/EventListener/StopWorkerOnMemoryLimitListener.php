@@ -21,17 +21,16 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
  */
 class StopWorkerOnMemoryLimitListener implements EventSubscriberInterface
 {
-    private $memoryLimit;
-    private $logger;
-    private $memoryResolver;
+    private int $memoryLimit;
+    private ?LoggerInterface $logger;
+    private \Closure $memoryResolver;
 
     public function __construct(int $memoryLimit, LoggerInterface $logger = null, callable $memoryResolver = null)
     {
         $this->memoryLimit = $memoryLimit;
         $this->logger = $logger;
-        $this->memoryResolver = $memoryResolver ?: static function () {
-            return memory_get_usage(true);
-        };
+        $memoryResolver ??= static fn () => memory_get_usage(true);
+        $this->memoryResolver = $memoryResolver(...);
     }
 
     public function onWorkerRunning(WorkerRunningEvent $event): void
@@ -40,13 +39,11 @@ class StopWorkerOnMemoryLimitListener implements EventSubscriberInterface
         $usedMemory = $memoryResolver();
         if ($usedMemory > $this->memoryLimit) {
             $event->getWorker()->stop();
-            if (null !== $this->logger) {
-                $this->logger->info('Worker stopped due to memory limit of {limit} bytes exceeded ({memory} bytes used)', ['limit' => $this->memoryLimit, 'memory' => $usedMemory]);
-            }
+            $this->logger?->info('Worker stopped due to memory limit of {limit} bytes exceeded ({memory} bytes used)', ['limit' => $this->memoryLimit, 'memory' => $usedMemory]);
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WorkerRunningEvent::class => 'onWorkerRunning',

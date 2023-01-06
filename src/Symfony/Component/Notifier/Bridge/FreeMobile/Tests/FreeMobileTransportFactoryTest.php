@@ -11,58 +11,38 @@
 
 namespace Symfony\Component\Notifier\Bridge\FreeMobile\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
-final class FreeMobileTransportFactoryTest extends TestCase
+final class FreeMobileTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn(): void
-    {
-        $factory = $this->initFactory();
-
-        $dsn = 'freemobile://login:pass@default?phone=0611223344';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
-
-        $this->assertSame('freemobile://host.test?phone=0611223344', (string) $transport);
-    }
-
-    public function testCreateWithNoPhoneThrowsMalformed(): void
-    {
-        $factory = $this->initFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $dsnIncomplete = 'freemobile://login:pass@default';
-        $factory->create(Dsn::fromString($dsnIncomplete));
-    }
-
-    public function testSupportsFreeMobileScheme(): void
-    {
-        $factory = $this->initFactory();
-
-        $dsn = 'freemobile://login:pass@default?phone=0611223344';
-        $dsnUnsupported = 'foobarmobile://login:pass@default?phone=0611223344';
-
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
-    }
-
-    public function testNonFreeMobileSchemeThrows(): void
-    {
-        $factory = $this->initFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $dsnUnsupported = 'foobarmobile://login:pass@default?phone=0611223344';
-        $factory->create(Dsn::fromString($dsnUnsupported));
-    }
-
-    private function initFactory(): FreeMobileTransportFactory
+    public function createFactory(): FreeMobileTransportFactory
     {
         return new FreeMobileTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'freemobile://host.test?phone=0611223344',
+            'freemobile://login:pass@host.test?phone=0611223344',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'freemobile://login:pass@default?phone=0611223344'];
+        yield [false, 'somethingElse://login:pass@default?phone=0611223344'];
+    }
+
+    public function missingRequiredOptionProvider(): iterable
+    {
+        yield 'missing option: phone' => ['freemobile://login:pass@default'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://login:pass@default?phone=0611223344'];
+        yield ['somethingElse://login:pass@default']; // missing "phone" option
     }
 }

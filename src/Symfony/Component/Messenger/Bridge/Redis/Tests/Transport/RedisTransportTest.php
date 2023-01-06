@@ -31,16 +31,20 @@ class RedisTransportTest extends TestCase
     public function testReceivesMessages()
     {
         $transport = $this->getTransport(
-            $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock(),
-            $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock()
+            $serializer = $this->createMock(SerializerInterface::class),
+            $connection = $this->createMock(Connection::class)
         );
 
         $decodedMessage = new DummyMessage('Decoded.');
 
         $redisEnvelope = [
             'id' => '5',
-            'body' => 'body',
-            'headers' => ['my' => 'header'],
+            'data' => [
+                'message' => json_encode([
+                    'body' => 'body',
+                    'headers' => ['my' => 'header'],
+                ]),
+            ],
         ];
 
         $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
@@ -52,8 +56,8 @@ class RedisTransportTest extends TestCase
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): RedisTransport
     {
-        $serializer = $serializer ?: $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $connection = $connection ?: $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $serializer ??= $this->createMock(SerializerInterface::class);
+        $connection ??= $this->createMock(Connection::class);
 
         return new RedisTransport($connection, $serializer);
     }

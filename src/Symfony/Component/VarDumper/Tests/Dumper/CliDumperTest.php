@@ -198,28 +198,6 @@ EOTXT;
         yield [$expected, CliDumper::DUMP_TRAILING_COMMA];
     }
 
-    /**
-     * @requires extension xml
-     * @requires PHP < 8.0
-     */
-    public function testXmlResource()
-    {
-        $var = xml_parser_create();
-
-        $this->assertDumpMatchesFormat(
-            <<<'EOTXT'
-xml resource {
-  current_byte_index: %i
-  current_column_number: %i
-  current_line_number: 1
-  error_code: XML_ERROR_NONE
-}
-EOTXT
-            ,
-            $var
-        );
-    }
-
     public function testJsonCast()
     {
         $var = (array) json_decode('{"0":{},"1":null}');
@@ -315,12 +293,9 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=');
     }
 
-    /**
-     * @requires function Twig\Template::getSourceContext
-     */
     public function testThrowingCaster()
     {
-        $out = fopen('php://memory', 'r+b');
+        $out = fopen('php://memory', 'r+');
 
         require_once __DIR__.'/../Fixtures/Twig.php';
         $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new Environment(new FilesystemLoader()));
@@ -401,73 +376,6 @@ EOTXT
   +"foo": &1 "foo"
   +"bar": &1 "foo"
 }
-
-EOTXT
-            ,
-            $out
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function testSpecialVars56()
-    {
-        $var = $this->getSpecialVars();
-
-        $this->assertDumpEquals(
-            <<<'EOTXT'
-array:3 [
-  0 => array:1 [
-    0 => &1 array:1 [
-      0 => &1 array:1 [&1]
-    ]
-  ]
-  1 => array:1 [
-    "GLOBALS" => &2 array:1 [
-      "GLOBALS" => &2 array:1 [&2]
-    ]
-  ]
-  2 => &2 array:1 [&2]
-]
-EOTXT
-            ,
-            $var
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function testGlobals()
-    {
-        $var = $this->getSpecialVars();
-        unset($var[0]);
-        $out = '';
-
-        $dumper = new CliDumper(function ($line, $depth) use (&$out) {
-            if ($depth >= 0) {
-                $out .= str_repeat('  ', $depth).$line."\n";
-            }
-        });
-        $dumper->setColors(false);
-        $cloner = new VarCloner();
-
-        $data = $cloner->cloneVar($var);
-        $dumper->dump($data);
-
-        $this->assertSame(
-            <<<'EOTXT'
-array:2 [
-  1 => array:1 [
-    "GLOBALS" => &1 array:1 [
-      "GLOBALS" => &1 array:1 [&1]
-    ]
-  ]
-  2 => &1 array:1 [&1]
-]
 
 EOTXT
             ,
@@ -556,6 +464,6 @@ EOTXT
             return $var;
         };
 
-        return [$var(), $GLOBALS, &$GLOBALS];
+        return eval('return [$var(), $GLOBALS, &$GLOBALS];');
     }
 }

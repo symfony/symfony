@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -21,10 +22,10 @@ class DiscriminatorMapTest extends TestCase
 {
     public function testGetTypePropertyAndMapping()
     {
-        $annotation = new DiscriminatorMap(['typeProperty' => 'type', 'mapping' => [
+        $annotation = new DiscriminatorMap(typeProperty: 'type', mapping: [
             'foo' => 'FooClass',
             'bar' => 'BarClass',
-        ]]);
+        ]);
 
         $this->assertEquals('type', $annotation->getTypeProperty());
         $this->assertEquals([
@@ -33,27 +34,15 @@ class DiscriminatorMapTest extends TestCase
         ], $annotation->getMapping());
     }
 
-    public function testExceptionWithoutTypeProperty()
-    {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
-        new DiscriminatorMap(['mapping' => ['foo' => 'FooClass']]);
-    }
-
     public function testExceptionWithEmptyTypeProperty()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
-        new DiscriminatorMap(['typeProperty' => '', 'mapping' => ['foo' => 'FooClass']]);
-    }
-
-    public function testExceptionWithoutMappingProperty()
-    {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
-        new DiscriminatorMap(['typeProperty' => 'type']);
+        $this->expectException(InvalidArgumentException::class);
+        new DiscriminatorMap(typeProperty: '', mapping: ['foo' => 'FooClass']);
     }
 
     public function testExceptionWitEmptyMappingProperty()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
-        new DiscriminatorMap(['typeProperty' => 'type', 'mapping' => []]);
+        $this->expectException(InvalidArgumentException::class);
+        new DiscriminatorMap(typeProperty: 'type', mapping: []);
     }
 }

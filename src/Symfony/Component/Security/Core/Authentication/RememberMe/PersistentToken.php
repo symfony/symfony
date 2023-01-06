@@ -18,19 +18,19 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
  */
 final class PersistentToken implements PersistentTokenInterface
 {
-    private $class;
-    private $username;
-    private $series;
-    private $tokenValue;
-    private $lastUsed;
+    private string $class;
+    private string $userIdentifier;
+    private string $series;
+    private string $tokenValue;
+    private \DateTime $lastUsed;
 
-    public function __construct(string $class, string $username, string $series, string $tokenValue, \DateTime $lastUsed)
+    public function __construct(string $class, string $userIdentifier, string $series, #[\SensitiveParameter] string $tokenValue, \DateTime $lastUsed)
     {
         if (empty($class)) {
             throw new \InvalidArgumentException('$class must not be empty.');
         }
-        if ('' === $username) {
-            throw new \InvalidArgumentException('$username must not be empty.');
+        if ('' === $userIdentifier) {
+            throw new \InvalidArgumentException('$userIdentifier must not be empty.');
         }
         if (empty($series)) {
             throw new \InvalidArgumentException('$series must not be empty.');
@@ -40,47 +40,32 @@ final class PersistentToken implements PersistentTokenInterface
         }
 
         $this->class = $class;
-        $this->username = $username;
+        $this->userIdentifier = $userIdentifier;
         $this->series = $series;
         $this->tokenValue = $tokenValue;
         $this->lastUsed = $lastUsed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): string
     {
         return $this->class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsername(): string
+    public function getUserIdentifier(): string
     {
-        return $this->username;
+        return $this->userIdentifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSeries(): string
     {
         return $this->series;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTokenValue(): string
     {
         return $this->tokenValue;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLastUsed(): \DateTime
     {
         return $this->lastUsed;

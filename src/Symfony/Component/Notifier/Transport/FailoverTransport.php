@@ -17,12 +17,10 @@ use Symfony\Component\Notifier\Message\MessageInterface;
  * Uses several Transports using a failover algorithm.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 class FailoverTransport extends RoundRobinTransport
 {
-    private $currentTransport;
+    private ?TransportInterface $currentTransport = null;
 
     protected function getNextTransport(MessageInterface $message): ?TransportInterface
     {
@@ -31,6 +29,11 @@ class FailoverTransport extends RoundRobinTransport
         }
 
         return $this->currentTransport;
+    }
+
+    protected function getInitialCursor(): int
+    {
+        return 0;
     }
 
     protected function getNameSymbol(): string

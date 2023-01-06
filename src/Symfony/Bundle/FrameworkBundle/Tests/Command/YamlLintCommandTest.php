@@ -40,7 +40,7 @@ class YamlLintCommandTest extends TestCase
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $this->assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
@@ -60,7 +60,7 @@ bar';
 
     public function testLintFileNotReadable()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
         unlink($filename);
@@ -88,7 +88,7 @@ EOF;
             ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
-        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $tester->assertCommandIsSuccessful('Returns 0 in case of success');
         $this->assertStringContainsString('[OK] All 0 YAML files contain valid syntax', trim($tester->getDisplay()));
     }
 
@@ -120,20 +120,14 @@ EOF;
 
     private function getKernelAwareApplicationMock()
     {
-        $kernel = $this->getMockBuilder(KernelInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->once())
             ->method('locateResource')
             ->with('@AppBundle/Resources')
             ->willReturn(sys_get_temp_dir().'/yml-lint-test');
 
-        $application = $this->getMockBuilder(Application::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $application = $this->createMock(Application::class);
         $application
             ->expects($this->once())
             ->method('getKernel')
@@ -168,9 +162,9 @@ EOF;
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {
-                unlink($file);
+                @unlink($file);
             }
         }
-        rmdir(sys_get_temp_dir().'/yml-lint-test');
+        @rmdir(sys_get_temp_dir().'/yml-lint-test');
     }
 }

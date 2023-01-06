@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+* `UrlPackage` accepts empty strings as `base_url`, in order to simplify local dev configuration
+
+6.0
+---
+
+* Remove `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead
+
+5.3
+---
+
+ * deprecated `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead.
+
 5.1.0
 -----
 

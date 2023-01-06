@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 class CsrfValidationListenerTest extends TestCase
@@ -75,22 +76,18 @@ class CsrfValidationListenerTest extends TestCase
 
     public function testMaxPostSizeExceeded()
     {
-        $serverParams = $this
-            ->getMockBuilder('\Symfony\Component\Form\Util\ServerParams')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
-        $serverParams
-            ->expects($this->once())
-            ->method('hasPostMaxSizeBeenExceeded')
-            ->willReturn(true)
-        ;
-
         $event = new FormEvent($this->form, ['csrf' => 'token']);
-        $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, $serverParams);
+        $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, new ServerParamsPostMaxSizeExceeded());
 
         $validation->preSubmit($event);
         $this->assertEmpty($this->form->getErrors());
+    }
+}
+
+class ServerParamsPostMaxSizeExceeded extends ServerParams
+{
+    public function hasPostMaxSizeBeenExceeded(): bool
+    {
+        return true;
     }
 }

@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add a new `filter` argument to `debug:dotenv` command to filter variable names
+
+5.4
+---
+
+ * Add `dotenv:dump` command to compile the contents of the .env files into a PHP-optimized file called `.env.local.php`
+ * Add `debug:dotenv` command to list all dotenv files with variables and values
+ * Add `$overrideExistingVars` on `Dotenv::bootEnv()` and `Dotenv::loadEnv()`
+
 5.1.0
 -----
 

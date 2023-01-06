@@ -1,10 +1,8 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as helper %}
-
 {% block menu %}
 <span class="label">
-    <span class="icon">{{ include('@WebProfiler/Icon/event.svg') }}</span>
+    <span class="icon">{{ source('@WebProfiler/Icon/event.svg') }}</span>
     <strong>Events</strong>
 </span>
 {% endblock %}
@@ -13,7 +11,7 @@
     <h2>Event Dispatcher</h2>
 
     {% if collector.calledlisteners is empty %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
         </div>
     {% else %}
@@ -22,7 +20,7 @@
                 <h3 class="tab-title">Called Listeners <span class="badge">{{ collector.calledlisteners|length }}</span></h3>
 
                 <div class="tab-content">
-                    {{ helper.render_table(collector.calledlisteners) }}
+                    {{ _self.render_table(collector.calledlisteners) }}
                 </div>
             </div>
 
@@ -41,7 +39,7 @@
                             </p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(collector.notcalledlisteners) }}
+                        {{ _self.render_table(collector.notcalledlisteners) }}
                     {% endif %}
                 </div>
             </div>

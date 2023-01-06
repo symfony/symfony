@@ -104,7 +104,7 @@ class CookieTest extends TestCase
 
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         Cookie::fromString('foo');
     }
 
@@ -117,7 +117,7 @@ class CookieTest extends TestCase
 
     public function testFromStringThrowsAnExceptionIfUrlIsNotValid()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         Cookie::fromString('foo=bar', 'foobar');
     }
 
@@ -200,7 +200,7 @@ class CookieTest extends TestCase
 
     public function testConstructException()
     {
-        $this->expectException('UnexpectedValueException');
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('The cookie expiration time "string" is not valid.');
         new Cookie('foo', 'bar', 'string');
     }

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * Resolves all parameter placeholders "%somevalue%" to their real values.
@@ -22,19 +23,15 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
  */
 class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
 {
-    private $bag;
-    private $resolveArrays;
-    private $throwOnResolveException;
+    private ParameterBagInterface $bag;
 
-    public function __construct($resolveArrays = true, $throwOnResolveException = true)
-    {
-        $this->resolveArrays = $resolveArrays;
-        $this->throwOnResolveException = $throwOnResolveException;
+    public function __construct(
+        private bool $resolveArrays = true,
+        private bool $throwOnResolveException = true,
+    ) {
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws ParameterNotFoundException
      */
     public function process(ContainerBuilder $container)
@@ -57,10 +54,10 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
         }
 
         $this->bag->resolve();
-        $this->bag = null;
+        unset($this->bag);
     }
 
-    protected function processValue($value, bool $isRoot = false)
+    protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if (\is_string($value)) {
             try {
@@ -84,6 +81,11 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
             }
             if (isset($changes['file'])) {
                 $value->setFile($this->bag->resolveValue($value->getFile()));
+            }
+            $tags = $value->getTags();
+            if (isset($tags['proxy'])) {
+                $tags['proxy'] = $this->bag->resolveValue($tags['proxy']);
+                $value->setTags($tags);
             }
         }
 

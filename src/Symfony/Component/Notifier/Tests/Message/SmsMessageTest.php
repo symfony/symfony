@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Tests\Message;
 
 use PHPUnit\Framework\TestCase;
@@ -16,6 +25,16 @@ class SmsMessageTest extends TestCase
 
         $this->assertSame('subject', $message->getSubject());
         $this->assertSame('+3312345678', $message->getPhone());
+        $this->assertSame('', $message->getFrom());
+    }
+
+    public function testCanBeConstructedWithFrom()
+    {
+        $message = new SmsMessage('+3312345678', 'subject', 'foo');
+
+        $this->assertSame('subject', $message->getSubject());
+        $this->assertSame('+3312345678', $message->getPhone());
+        $this->assertSame('foo', $message->getFrom());
     }
 
     public function testEnsureNonEmptyPhoneOnConstruction()
@@ -47,5 +66,16 @@ class SmsMessageTest extends TestCase
         $this->assertSame('+3312345678', $message->getPhone());
 
         $message->phone('');
+    }
+
+    public function testSetFrom()
+    {
+        $message = new SmsMessage('+3312345678', 'subject');
+
+        $this->assertSame('', $message->getFrom());
+
+        $message->from('foo');
+
+        $this->assertSame('foo', $message->getFrom());
     }
 }

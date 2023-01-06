@@ -57,7 +57,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
     public function testValidationGroupsCanBeSetToCallback()
     {
         $form = $this->createForm([
-            'validation_groups' => [$this, 'testValidationGroupsCanBeSetToCallback'],
+            'validation_groups' => $this->testValidationGroupsCanBeSetToCallback(...),
         ]);
 
         $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));
@@ -78,7 +78,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => new GroupSequence(['group1', 'group2']),
         ]);
 
-        $this->assertInstanceOf('Symfony\Component\Validator\Constraints\GroupSequence', $form->getConfig()->getOption('validation_groups'));
+        $this->assertInstanceOf(GroupSequence::class, $form->getConfig()->getOption('validation_groups'));
     }
 
     abstract protected function createForm(array $options = []);

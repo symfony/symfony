@@ -18,8 +18,8 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class TableCell
 {
-    private $value;
-    private $options = [
+    private string $value;
+    private array $options = [
         'rowspan' => 1,
         'colspan' => 1,
         'style' => null,
@@ -43,30 +43,24 @@ class TableCell
 
     /**
      * Returns the cell value.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->value;
     }
 
     /**
      * Gets number of colspan.
-     *
-     * @return int
      */
-    public function getColspan()
+    public function getColspan(): int
     {
         return (int) $this->options['colspan'];
     }
 
     /**
      * Gets number of rowspan.
-     *
-     * @return int
      */
-    public function getRowspan()
+    public function getRowspan(): int
     {
         return (int) $this->options['rowspan'];
     }

@@ -19,7 +19,7 @@ final class AddErrorDetailsStampListener implements EventSubscriberInterface
 {
     public function onMessageFailed(WorkerMessageFailedEvent $event): void
     {
-        $stamp = new ErrorDetailsStamp($event->getThrowable());
+        $stamp = ErrorDetailsStamp::create($event->getThrowable());
         $previousStamp = $event->getEnvelope()->last(ErrorDetailsStamp::class);
 
         // Do not append duplicate information

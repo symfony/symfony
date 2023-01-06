@@ -3,5 +3,5 @@
   The "--foo" option does not exist.  
                                       
 
-list [--raw] [--format FORMAT] [--] [<namespace>]
+list [--raw] [--format FORMAT] [--short] [--] [<namespace>]
 

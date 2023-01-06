@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
-
 /*
  * This file is part of the Symfony package.
  *

@@ -73,4 +73,13 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
         $this->assertContains('text/baz', $mt->getMimeTypes('foo'));
         $this->assertSame(['foo', 'moof'], $mt->getExtensions('text/baz'));
     }
+
+    public function testCsvExtension()
+    {
+        $mt = new MimeTypes();
+
+        $mime = $mt->guessMimeType(__DIR__.'/Fixtures/mimetypes/abc.csv');
+        $this->assertContains($mime, ['application/csv', 'text/csv']);
+        $this->assertSame(['csv'], $mt->getExtensions($mime));
+    }
 }

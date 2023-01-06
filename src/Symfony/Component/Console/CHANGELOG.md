@@ -1,6 +1,59 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Remove `exit` call in `Application` signal handlers. Commands will no longer be automatically interrupted after receiving signal other than `SIGUSR1` or `SIGUSR2`
+ * Add `ProgressBar::setPlaceholderFormatter` to set a placeholder attached to a instance, instead of being global.
+
+6.2
+---
+
+ * Improve truecolor terminal detection in some cases
+ * Add support for 256 color terminals (conversion from Ansi24 to Ansi8 if terminal is capable of it)
+ * Deprecate calling `*Command::setApplication()`, `*FormatterStyle::setForeground/setBackground()`, `Helper::setHelpSet()`, `Input*::setDefault()`, `Question::setAutocompleterCallback/setValidator()`without any arguments
+ * Change the signature of `OutputFormatterStyleInterface::setForeground/setBackground()` to `setForeground/setBackground(?string)`
+ * Change the signature of `HelperInterface::setHelperSet()` to `setHelperSet(?HelperSet)`
+
+6.1
+---
+
+ * Add support to display table vertically when calling setVertical()
+ * Add method `__toString()` to `InputInterface`
+ * Added `OutputWrapper` to prevent truncated URL in `SymfonyStyle::createBlock`.
+ * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
+ * Add suggested values for arguments and options in input definition, for input completion
+ * Add `$resumeAt` parameter to `ProgressBar#start()`, so that one can easily 'resume' progress on longer tasks, and still get accurate `getEstimate()` and `getRemaining()` results.
+
+6.0
+---
+
+ * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter and is final
+ * Remove `Helper::strlen()`, use `Helper::width()` instead
+ * Remove `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead
+ * `AddConsoleCommandPass` can not be configured anymore
+ * Remove `HelperSet::setCommand()` and `getCommand()` without replacement
+
+5.4
+---
+
+ * Add `TesterTrait::assertCommandIsSuccessful()` to test command
+ * Deprecate `HelperSet::setCommand()` and `getCommand()` without replacement
+
+5.3
+---
+
+ * Add `GithubActionReporter` to render annotations in a Github Action
+ * Add `InputOption::VALUE_NEGATABLE` flag to handle `--foo`/`--no-foo` options
+ * Add the `Command::$defaultDescription` static property and the `description` attribute
+   on the `console.command` tag to allow the `list` command to instantiate commands lazily
+ * Add option `--short` to the `list` command
+ * Add support for bright colors
+ * Add `#[AsCommand]` attribute for declaring commands on PHP 8
+ * Add `Helper::width()` and `Helper::length()`
+ * The `--ansi` and `--no-ansi` options now default to `null`.
+
 5.2.0
 -----
 
@@ -83,9 +136,9 @@ CHANGELOG
  * `OutputFormatter` throws an exception when unknown options are used
  * removed `QuestionHelper::setInputStream()/getInputStream()`
  * removed `Application::getTerminalWidth()/getTerminalHeight()` and
-  `Application::setTerminalDimensions()/getTerminalDimensions()`
-* removed `ConsoleExceptionEvent`
-* removed `ConsoleEvents::EXCEPTION`
+   `Application::setTerminalDimensions()/getTerminalDimensions()`
+ * removed `ConsoleExceptionEvent`
+ * removed `ConsoleEvents::EXCEPTION`
 
 3.4.0
 -----
@@ -102,23 +155,23 @@ CHANGELOG
 3.3.0
 -----
 
-* added `ExceptionListener`
-* added `AddConsoleCommandPass` (originally in FrameworkBundle)
-* [BC BREAK] `Input::getOption()` no longer returns the default value for options
-  with value optional explicitly passed empty
-* added console.error event to catch exceptions thrown by other listeners
-* deprecated console.exception event in favor of console.error
-* added ability to handle `CommandNotFoundException` through the
- `console.error` event
-* deprecated default validation in `SymfonyQuestionHelper::ask`
+ * added `ExceptionListener`
+ * added `AddConsoleCommandPass` (originally in FrameworkBundle)
+ * [BC BREAK] `Input::getOption()` no longer returns the default value for options
+   with value optional explicitly passed empty
+ * added console.error event to catch exceptions thrown by other listeners
+ * deprecated console.exception event in favor of console.error
+ * added ability to handle `CommandNotFoundException` through the
+   `console.error` event
+ * deprecated default validation in `SymfonyQuestionHelper::ask`
 
 3.2.0
 ------
 
-* added `setInputs()` method to CommandTester for ease testing of commands expecting inputs
-* added `setStream()` and `getStream()` methods to Input (implement StreamableInputInterface)
-* added StreamableInputInterface
-* added LockableTrait
+ * added `setInputs()` method to CommandTester for ease testing of commands expecting inputs
+ * added `setStream()` and `getStream()` methods to Input (implement StreamableInputInterface)
+ * added StreamableInputInterface
+ * added LockableTrait
 
 3.1.0
 -----

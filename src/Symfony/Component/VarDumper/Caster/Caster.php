@@ -22,34 +22,32 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class Caster
 {
-    const EXCLUDE_VERBOSE = 1;
-    const EXCLUDE_VIRTUAL = 2;
-    const EXCLUDE_DYNAMIC = 4;
-    const EXCLUDE_PUBLIC = 8;
-    const EXCLUDE_PROTECTED = 16;
-    const EXCLUDE_PRIVATE = 32;
-    const EXCLUDE_NULL = 64;
-    const EXCLUDE_EMPTY = 128;
-    const EXCLUDE_NOT_IMPORTANT = 256;
-    const EXCLUDE_STRICT = 512;
+    public const EXCLUDE_VERBOSE = 1;
+    public const EXCLUDE_VIRTUAL = 2;
+    public const EXCLUDE_DYNAMIC = 4;
+    public const EXCLUDE_PUBLIC = 8;
+    public const EXCLUDE_PROTECTED = 16;
+    public const EXCLUDE_PRIVATE = 32;
+    public const EXCLUDE_NULL = 64;
+    public const EXCLUDE_EMPTY = 128;
+    public const EXCLUDE_NOT_IMPORTANT = 256;
+    public const EXCLUDE_STRICT = 512;
 
-    const PREFIX_VIRTUAL = "\0~\0";
-    const PREFIX_DYNAMIC = "\0+\0";
-    const PREFIX_PROTECTED = "\0*\0";
+    public const PREFIX_VIRTUAL = "\0~\0";
+    public const PREFIX_DYNAMIC = "\0+\0";
+    public const PREFIX_PROTECTED = "\0*\0";
 
     /**
      * Casts objects to arrays and adds the dynamic property prefix.
      *
      * @param bool $hasDebugInfo Whether the __debugInfo method exists on $obj or not
-     *
-     * @return array The array-cast of the object, with prefixed dynamic properties
      */
     public static function castObject(object $obj, string $class, bool $hasDebugInfo = false, string $debugClass = null): array
     {
         if ($hasDebugInfo) {
             try {
                 $debugInfo = $obj->__debugInfo();
-            } catch (\Exception $e) {
+            } catch (\Throwable) {
                 // ignore failing __debugInfo()
                 $hasDebugInfo = false;
             }
@@ -63,7 +61,7 @@ class Caster
 
         if ($a) {
             static $publicProperties = [];
-            $debugClass = $debugClass ?? get_debug_type($obj);
+            $debugClass ??= get_debug_type($obj);
 
             $i = 0;
             $prefixedKeys = [];
@@ -118,8 +116,6 @@ class Caster
      * @param int      $filter           A bit field of Caster::EXCLUDE_* constants specifying which properties to filter out
      * @param string[] $listedProperties List of properties to exclude when Caster::EXCLUDE_VERBOSE is set, and to preserve when Caster::EXCLUDE_NOT_IMPORTANT is set
      * @param int      &$count           Set to the number of removed properties
-     *
-     * @return array The filtered array
      */
     public static function filter(array $a, int $filter, array $listedProperties = [], ?int &$count = 0): array
     {

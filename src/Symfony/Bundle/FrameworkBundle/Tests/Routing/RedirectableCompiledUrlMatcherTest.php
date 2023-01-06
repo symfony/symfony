@@ -18,9 +18,6 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * @requires function \Symfony\Component\Routing\Matcher\CompiledUrlMatcher::match
- */
 class RedirectableCompiledUrlMatcherTest extends TestCase
 {
     public function testRedirectWhenNoSlash()

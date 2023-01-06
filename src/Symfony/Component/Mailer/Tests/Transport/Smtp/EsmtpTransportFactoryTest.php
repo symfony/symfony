@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
 use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
@@ -104,6 +113,14 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('smtps', 'example.com', '', '', 465, ['local_domain' => 'example.com']),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, $eventDispatcher, $logger);
+        $transport->setMaxPerSecond(2.0);
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['max_per_second' => '2']),
             $transport,
         ];
 

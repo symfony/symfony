@@ -30,7 +30,7 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('isHIt')->willReturn(true);
+        $cacheItem->expects($this->once())->method('isHit')->willReturn(true);
         $cacheItem->expects($this->once())->method('get')->willReturn(null === $lastRestartTimeOffset ? null : time() + $lastRestartTimeOffset);
         $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
 
@@ -54,7 +54,7 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('isHIt')->willReturn(false);
+        $cacheItem->expects($this->once())->method('isHit')->willReturn(false);
         $cacheItem->expects($this->never())->method('get');
         $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
 

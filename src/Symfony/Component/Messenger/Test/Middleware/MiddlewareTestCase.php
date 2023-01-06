@@ -34,7 +34,7 @@ abstract class MiddlewareTestCase extends TestCase
             return $stack;
         }
 
-        $nextMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
+        $nextMiddleware = $this->createMock(MiddlewareInterface::class);
         $nextMiddleware
             ->expects($this->once())
             ->method('handle')
@@ -48,7 +48,7 @@ abstract class MiddlewareTestCase extends TestCase
 
     protected function getThrowingStackMock(\Throwable $throwable = null)
     {
-        $nextMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
+        $nextMiddleware = $this->createMock(MiddlewareInterface::class);
         $nextMiddleware
             ->expects($this->once())
             ->method('handle')

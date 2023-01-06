@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add caster for `WeakMap`
+ * Add support of named arguments to `dd()` and `dump()` to display the argument name
+
+6.2
+---
+
+ * Add support for `FFI\CData` and `FFI\CType`
+ * Deprecate calling `VarDumper::setHandler()` without arguments
+
+5.4
+---
+
+ * Add ability to style integer and double values independently
+ * Add casters for Symfony's UUIDs and ULIDs
+ * Add support for `Fiber`
+
 5.2.0
 -----
 

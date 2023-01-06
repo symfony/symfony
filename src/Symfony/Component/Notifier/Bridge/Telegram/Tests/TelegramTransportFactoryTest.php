@@ -11,55 +11,38 @@
 
 namespace Symfony\Component\Notifier\Bridge\Telegram\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
-final class TelegramTransportFactoryTest extends TestCase
+final class TelegramTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn(): void
+    public function createFactory(): TelegramTransportFactory
     {
-        $factory = new TelegramTransportFactory();
-
-        $host = 'testHost';
-        $channel = 'testChannel';
-
-        $transport = $factory->create(Dsn::fromString(sprintf('telegram://%s@%s/?channel=%s', 'testUser:testPassword', $host, $channel)));
-
-        $this->assertSame(sprintf('telegram://%s?channel=%s', $host, $channel), (string) $transport);
+        return new TelegramTransportFactory();
     }
 
-    public function testCreateWithNoPasswordThrowsMalformed(): void
+    public function createProvider(): iterable
     {
-        $factory = new TelegramTransportFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('telegram://%s@%s/?channel=%s', 'simpleToken', 'testHost', 'testChannel')));
+        yield [
+            'telegram://host.test?channel=testChannel',
+            'telegram://user:password@host.test?channel=testChannel',
+        ];
     }
 
-    public function testCreateWithNoTokenThrowsMalformed(): void
+    public function supportsProvider(): iterable
     {
-        $factory = new TelegramTransportFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('telegram://%s/?channel=%s', 'testHost', 'testChannel')));
+        yield [true, 'telegram://host?channel=testChannel'];
+        yield [false, 'somethingElse://host?channel=testChannel'];
     }
 
-    public function testSupportsTelegramScheme(): void
+    public function incompleteDsnProvider(): iterable
     {
-        $factory = new TelegramTransportFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('telegram://host/?channel=testChannel')));
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?channel=testChannel')));
+        yield 'missing password' => ['telegram://token@host.test?channel=testChannel'];
+        yield 'missing token' => ['telegram://host.test?channel=testChannel'];
     }
 
-    public function testNonTelegramSchemeThrows(): void
+    public function unsupportedSchemeProvider(): iterable
     {
-        $factory = new TelegramTransportFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-        $factory->create(Dsn::fromString('somethingElse://user:pwd@host/?channel=testChannel'));
+        yield ['somethingElse://user:pwd@host'];
     }
 }

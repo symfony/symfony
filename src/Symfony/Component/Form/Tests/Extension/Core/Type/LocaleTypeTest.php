@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LocaleTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LocaleType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LocaleType';
 
     protected function setUp(): void
     {
@@ -49,7 +49,7 @@ class LocaleTypeTest extends BaseTypeTest
         // Don't check objects for identity
         $this->assertContainsEquals(new ChoiceView('en', 'en', 'англійська'), $choices);
         $this->assertContainsEquals(new ChoiceView('en_GB', 'en_GB', 'англійська (Велика Британія)'), $choices);
-        $this->assertContainsEquals(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'китайська (традиційна, Макао, О.А.Р Китаю)'), $choices);
+        $this->assertContainsEquals(new ChoiceView('zh_Hant_TW', 'zh_Hant_TW', 'китайська (традиційна, Тайвань)'), $choices);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

@@ -93,6 +93,7 @@ class ExampleConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->append(new CustomNodeDefinition('acme'))
             ->end()
         ;
 

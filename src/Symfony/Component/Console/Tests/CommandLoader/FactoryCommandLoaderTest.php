@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\CommandLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 class FactoryCommandLoaderTest extends TestCase
 {
@@ -42,7 +43,7 @@ class FactoryCommandLoaderTest extends TestCase
 
     public function testGetUnknownCommandThrows()
     {
-        $this->expectException('Symfony\Component\Console\Exception\CommandNotFoundException');
+        $this->expectException(CommandNotFoundException::class);
         (new FactoryCommandLoader([]))->get('unknown');
     }
 

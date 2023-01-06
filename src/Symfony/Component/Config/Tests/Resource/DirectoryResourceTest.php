@@ -35,7 +35,7 @@ class DirectoryResourceTest extends TestCase
         $this->removeDirectory($this->directory);
     }
 
-    protected function removeDirectory($directory)
+    protected function removeDirectory(string $directory): void
     {
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory), \RecursiveIteratorIterator::CHILD_FIRST);
         foreach ($iterator as $path) {
@@ -65,7 +65,7 @@ class DirectoryResourceTest extends TestCase
 
     public function testResourceDoesNotExist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The directory ".*" does not exist./');
         new DirectoryResource('/____foo/foobar'.mt_rand(1, 999999));
     }
@@ -110,7 +110,7 @@ class DirectoryResourceTest extends TestCase
     {
         $resource = new DirectoryResource($this->directory);
         $time = time();
-        sleep(1);
+        usleep(1500000);
         unlink($this->directory.'/tmp.xml');
         $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if an existing file is removed');
     }

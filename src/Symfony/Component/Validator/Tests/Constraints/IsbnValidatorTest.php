@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class IsbnValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IsbnValidator
     {
         return new IsbnValidator();
     }
@@ -138,7 +139,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $constraint = new Isbn(true);
 
         $this->validator->validate(new \stdClass(), $constraint);
@@ -176,6 +177,19 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testInvalidIsbn10Named()
+    {
+        $this->validator->validate(
+            '978-2723442282',
+            new Isbn(type: Isbn::ISBN_10, isbn10Message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"978-2723442282"')
+            ->setCode(Isbn::TOO_LONG_ERROR)
+            ->assertRaised();
+    }
+
     /**
      * @dataProvider getValidIsbn13
      */
@@ -203,6 +217,19 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$isbn.'"')
             ->setCode($code)
+            ->assertRaised();
+    }
+
+    public function testInvalidIsbn13Named()
+    {
+        $this->validator->validate(
+            '2723442284',
+            new Isbn(type: Isbn::ISBN_13, isbn13Message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2723442284"')
+            ->setCode(Isbn::TOO_SHORT_ERROR)
             ->assertRaised();
     }
 

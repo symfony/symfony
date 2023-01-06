@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Timezone;
 use Symfony\Component\Validator\Constraints\TimezoneValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -42,7 +43,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Timezone());
     }
 
@@ -177,6 +178,18 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN | \DateTimeZone::ANTARCTICA];
         yield ['UTC', \DateTimeZone::EUROPE];
         yield ['Etc/UTC', \DateTimeZone::EUROPE];
+    }
+
+    public function testInvalidGroupedTimezoneNamed()
+    {
+        $constraint = new Timezone(zone: \DateTimeZone::AMERICA, message: 'myMessage');
+
+        $this->validator->validate('Europe/Berlin', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"Europe/Berlin"')
+            ->setCode(Timezone::TIMEZONE_IDENTIFIER_IN_ZONE_ERROR)
+            ->assertRaised();
     }
 
     /**

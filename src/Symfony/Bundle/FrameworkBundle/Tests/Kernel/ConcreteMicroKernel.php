@@ -79,10 +79,11 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $routes->add('danger', '/danger')->controller('kernel::dangerousAction');
     }
 
-    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->register('logger', NullLogger::class);
         $c->loadFromExtension('framework', [
+            'http_method_override' => false,
             'secret' => '$ecret',
             'router' => ['utf8' => true],
         ]);
@@ -91,9 +92,6 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $c->register('halloween', 'stdClass')->setPublic(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

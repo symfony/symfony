@@ -10,16 +10,15 @@
     <config>
         <provider name="default">
             <memory>
-                <user name="foo" password="foo" roles="ROLE_USER" />
+                <user identifier="foo" password="foo" roles="ROLE_USER" />
             </memory>
         </provider>
 
         <firewall name="simple" pattern="/login" security="false" />
 
-        <firewall name="secure" stateless="true">
+        <firewall name="secure" stateless="true" entry-point="form-login">
             <http-basic />
             <form-login />
-            <anonymous />
             <switch-user />
             <x509 />
             <remote-user />

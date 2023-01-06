@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\FormEvent;
 
@@ -33,7 +34,7 @@ abstract class MergeCollectionListenerTest extends TestCase
 
     protected function getForm($name = 'name', $propertyPath = null)
     {
-        $propertyPath = $propertyPath ?: $name;
+        $propertyPath ??= $name;
 
         return $this->getBuilder($name)->setAttribute('property_path', $propertyPath)->getForm();
     }
@@ -185,7 +186,7 @@ abstract class MergeCollectionListenerTest extends TestCase
      */
     public function testRequireArrayOrTraversable($allowAdd, $allowDelete)
     {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException(UnexpectedTypeException::class);
         $newData = 'no array or traversable';
         $event = new FormEvent($this->form, $newData);
         $listener = new MergeCollectionListener($allowAdd, $allowDelete);

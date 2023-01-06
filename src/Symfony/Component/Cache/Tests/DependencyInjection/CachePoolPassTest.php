@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -116,6 +117,23 @@ class CachePoolPassTest extends TestCase
         $this->assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
     }
 
+    public function testNamespaceArgumentIsNotReplacedIfNullAdapterIsUsed()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
+
+        $container->register('cache.adapter.null', NullAdapter::class);
+
+        $cachePool = new ChildDefinition('cache.adapter.null');
+        $cachePool->addTag('cache.pool');
+        $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->cachePoolPass->process($container);
+
+        $this->assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
+    }
+
     public function testArgsAreReplaced()
     {
         $container = new ContainerBuilder();
@@ -161,7 +179,7 @@ class CachePoolPassTest extends TestCase
 
     public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are');
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');

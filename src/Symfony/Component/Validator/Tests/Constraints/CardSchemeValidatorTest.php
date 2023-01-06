@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CardSchemeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): CardSchemeValidator
     {
         return new CardSchemeValidator();
     }
@@ -46,6 +46,16 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValidNumberWithOrderedArguments()
+    {
+        $this->validator->validate(
+            '5555555555554444',
+            new CardScheme([CardScheme::MASTERCARD, CardScheme::VISA])
+        );
+
+        $this->assertNoViolation();
+    }
+
     /**
      * @dataProvider getInvalidNumbers
      */
@@ -61,6 +71,19 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', \is_string($number) ? '"'.$number.'"' : $number)
             ->setCode($code)
+            ->assertRaised();
+    }
+
+    public function testInvalidNumberNamedArguments()
+    {
+        $this->validator->validate(
+            '2721001234567890',
+            eval('use Symfony\Component\Validator\Constraints\CardScheme; return new CardScheme(schemes: [CardScheme::MASTERCARD, CardScheme::VISA], message: "myMessage");')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2721001234567890"')
+            ->setCode(CardScheme::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }
 
@@ -104,6 +127,9 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ['MASTERCARD', '2709999999999999'],
             ['MASTERCARD', '2720995105105100'],
             ['MIR', '2200381427330082'],
+            ['MIR', '22003814273300821'],
+            ['MIR', '220038142733008212'],
+            ['MIR', '2200381427330082123'],
             ['UATP', '110165309696173'],
             ['VISA', '4111111111111111'],
             ['VISA', '4012888888881881'],
@@ -136,7 +162,8 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ['MASTERCARD', '2721001234567890', CardScheme::INVALID_FORMAT_ERROR], // Not assigned yet
             ['MASTERCARD', '2220991234567890', CardScheme::INVALID_FORMAT_ERROR], // Not assigned yet
             ['UATP', '11016530969617', CardScheme::INVALID_FORMAT_ERROR], // invalid length
-            ['MIR', '22003814273300821', CardScheme::INVALID_FORMAT_ERROR], // invalid length
+            ['MIR', '220038142733008', CardScheme::INVALID_FORMAT_ERROR], // invalid length
+            ['MIR', '22003814273300821234', CardScheme::INVALID_FORMAT_ERROR], // invalid length
         ];
     }
 }

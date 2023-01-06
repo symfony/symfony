@@ -23,9 +23,9 @@ use Symfony\Component\Mime\Message;
  */
 final class DelayedEnvelope extends Envelope
 {
-    private $senderSet = false;
-    private $recipientsSet = false;
-    private $message;
+    private bool $senderSet = false;
+    private bool $recipientsSet = false;
+    private Message $message;
 
     public function __construct(Message $message)
     {
@@ -52,7 +52,7 @@ final class DelayedEnvelope extends Envelope
     {
         parent::setRecipients($recipients);
 
-        $this->recipientsSet = parent::getRecipients();
+        $this->recipientsSet = (bool) parent::getRecipients();
     }
 
     /**
@@ -86,11 +86,11 @@ final class DelayedEnvelope extends Envelope
         if ($sender = $headers->get('Sender')) {
             return $sender->getAddress();
         }
-        if ($from = $headers->get('From')) {
-            return $from->getAddresses()[0];
-        }
         if ($return = $headers->get('Return-Path')) {
             return $return->getAddress();
+        }
+        if ($from = $headers->get('From')) {
+            return $from->getAddresses()[0];
         }
 
         throw new LogicException('Unable to determine the sender of the message.');

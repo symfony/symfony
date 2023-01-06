@@ -13,10 +13,13 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\MissingInputException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -676,7 +679,7 @@ EOD;
 
     public function testAmbiguousChoiceFromChoicelist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of "env_2" or "env_3".');
         $possibleChoices = [
             'env_1' => 'My first environment',
@@ -711,9 +714,6 @@ EOD;
         $this->assertEquals('not yet', $dialog->ask($this->createStreamableInputInterfaceMock(null, false), $this->createOutputInterface(), $question));
     }
 
-    /**
-     * @requires function mb_strwidth
-     */
     public function testChoiceOutputFormattingQuestionForUtf8Keys()
     {
         $question = 'Lorem ipsum?';
@@ -728,7 +728,7 @@ EOD;
             '  [<info>żółw  </info>] bar',
             '  [<info>łabądź</info>] baz',
         ];
-        $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
+        $output = $this->createMock(OutputInterface::class);
         $output->method('getFormatter')->willReturn(new OutputFormatter());
 
         $dialog = new QuestionHelper();
@@ -743,7 +743,7 @@ EOD;
 
     public function testAskThrowsExceptionOnMissingInput()
     {
-        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
+        $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -751,7 +751,7 @@ EOD;
 
     public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
     {
-        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
+        $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
@@ -759,7 +759,7 @@ EOD;
 
     public function testAskThrowsExceptionOnMissingInputWithValidator()
     {
-        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
+        $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
 
@@ -807,7 +807,7 @@ EOD;
 
     public function testEmptyChoices()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Choice question must have at least 1 choice available.');
         new ChoiceQuestion('Question', [], 'irrelevant');
     }
@@ -869,13 +869,16 @@ EOD;
             $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
         } finally {
             $reflection = new \ReflectionProperty(QuestionHelper::class, 'stty');
-            $reflection->setAccessible(true);
             $reflection->setValue(null, true);
         }
     }
 
     public function testTraversableMultiselectAutocomplete()
     {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
         // <NEWLINE>
         // F<TAB><NEWLINE>
         // A<3x UP ARROW><TAB>,F<TAB><NEWLINE>
@@ -940,7 +943,7 @@ EOD;
 
     protected function createInputInterfaceMock($interactive = true)
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
+        $mock = $this->createMock(InputInterface::class);
         $mock->expects($this->any())
             ->method('isInteractive')
             ->willReturn($interactive);

@@ -37,7 +37,7 @@ class DateHeaderTest extends TestCase
     {
         $dateTime = new \DateTime();
         $header = new DateHeader('Date', $dateTime);
-        $this->assertInstanceOf('DateTimeImmutable', $header->getDateTime());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $header->getDateTime());
         $this->assertEquals($dateTime->getTimestamp(), $header->getDateTime()->getTimestamp());
         $this->assertEquals($dateTime->getTimezone(), $header->getDateTime()->getTimezone());
     }

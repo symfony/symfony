@@ -4,15 +4,135 @@
         <body>
             <trans-unit id="28">
                 <source>This form should not contain extra fields.</source>
-                <target>Este formulário não deveria conter campos extra.</target>
+                <target>Este formulário não deveria possuir mais campos.</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>O arquivo enviado é muito grande. Por favor, tente enviar um ficheiro mais pequeno.</target>
+                <target>O ficheiro enviado é muito grande. Por favor, tente enviar um ficheiro menor.</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>O token CSRF é inválido. Por favor submeta o formulário novamente.</target>
+                <target>O token CSRF está inválido. Por favor, tente enviar o formulário novamente.</target>
+            </trans-unit>
+             <trans-unit id="99">
+                <source>This value is not a valid HTML5 color.</source>
+                <target>Este valor não é uma cor HTML5 válida.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>Please enter a valid birthdate.</source>
+                <target>Por favor, informe uma data de nascimento válida.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>The selected choice is invalid.</source>
+                <target>A escolha seleccionada é inválida.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>The collection is invalid.</source>
+                <target>A coleção é inválida.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>Please select a valid color.</source>
+                <target>Por favor, selecione uma cor válida.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>Please select a valid country.</source>
+                <target>Por favor, selecione um país válido.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>Please select a valid currency.</source>
+                <target>Por favor, selecione uma moeda válida.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>Please choose a valid date interval.</source>
+                <target>Por favor, escolha um intervalo de datas válido.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Please enter a valid date and time.</source>
+                <target>Por favor, informe uma data e horário válidos.</target>
+            </trans-unit>
+             <trans-unit id="108">
+                <source>Please enter a valid date.</source>
+                <target>Por favor, informe uma data válida.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Please select a valid file.</source>
+                <target>Por favor, selecione um ficheiro válido.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The hidden field is invalid.</source>
+                <target>O campo oculto é inválido.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>Please enter an integer.</source>
+                <target>Por favor, informe um inteiro.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>Please select a valid language.</source>
+                <target>Por favor selecione um idioma válido.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>Please select a valid locale.</source>
+                <target>Por favor, selecione um locale válido.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>Please enter a valid money amount.</source>
+                <target>Por favor, informe um valor monetário válido.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>Please enter a number.</source>
+                <target>Por favor, informe um número.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>The password is invalid.</source>
+                <target>A palavra-passe é inválida.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>Please enter a percentage value.</source>
+                <target>Por favor, informe um valor percentual.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>The values do not match.</source>
+                <target>Os valores não correspondem.</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>Please enter a valid time.</source>
+                <target>Por favor, informe uma hora válida.</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>Please select a valid timezone.</source>
+                <target>Por favor, selecione um fuso horário válido.</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>Please enter a valid URL.</source>
+                <target>Por favor, informe uma URL válida.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>Please enter a valid search term.</source>
+                <target>Por favor, informe um termo de busca válido.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>Please provide a valid phone number.</source>
+                <target>Por favor, infome um número de telefone válido.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>O checkbox possui um valor inválido.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>Por favor, informe um endereço de email válido.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>Por favor, selecione uma opção válida.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>Por favor, selecione um intervalo válido.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>Por favor, selecione uma semana válida.</target>
             </trans-unit>
         </body>
     </file>

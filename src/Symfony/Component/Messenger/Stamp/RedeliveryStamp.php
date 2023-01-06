@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 
 /**
@@ -19,25 +18,13 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class RedeliveryStamp implements StampInterface
 {
-    private $retryCount;
-    private $redeliveredAt;
-    private $exceptionMessage;
-    private $flattenException;
+    private int $retryCount;
+    private \DateTimeInterface $redeliveredAt;
 
-    public function __construct(int $retryCount, string $exceptionMessage = null, FlattenException $flattenException = null, \DateTimeInterface $redeliveredAt = null)
+    public function __construct(int $retryCount, \DateTimeInterface $redeliveredAt = null)
     {
         $this->retryCount = $retryCount;
         $this->redeliveredAt = $redeliveredAt ?? new \DateTimeImmutable();
-
-        if (null !== $exceptionMessage) {
-            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$exceptionMessage" parameter in the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));
-        }
-        $this->exceptionMessage = $exceptionMessage;
-
-        if (null !== $flattenException) {
-            trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "$flattenException" parameter in the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));
-        }
-        $this->flattenException = $flattenException;
     }
 
     public static function getRetryCountFromEnvelope(Envelope $envelope): int
@@ -51,26 +38,6 @@ final class RedeliveryStamp implements StampInterface
     public function getRetryCount(): int
     {
         return $this->retryCount;
-    }
-
-    /**
-     * @deprecated since Symfony 5.2, use ErrorDetailsStamp instead.
-     */
-    public function getExceptionMessage(): ?string
-    {
-        trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "getExceptionMessage()" method of the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));
-
-        return $this->exceptionMessage;
-    }
-
-    /**
-     * @deprecated since Symfony 5.2, use ErrorDetailsStamp instead.
-     */
-    public function getFlattenException(): ?FlattenException
-    {
-        trigger_deprecation('symfony/messenger', '5.2', sprintf('Using the "getFlattenException()" method of the "%s" class is deprecated, use the "%s" class instead.', self::class, ErrorDetailsStamp::class));
-
-        return $this->flattenException;
     }
 
     public function getRedeliveredAt(): \DateTimeInterface

@@ -23,10 +23,10 @@ class CollectionConfigurator
     use Traits\HostTrait;
     use Traits\RouteTrait;
 
-    private $parent;
-    private $parentConfigurator;
-    private $parentPrefixes;
-    private $host;
+    private RouteCollection $parent;
+    private ?CollectionConfigurator $parentConfigurator;
+    private ?array $parentPrefixes;
+    private string|array|null $host = null;
 
     public function __construct(RouteCollection $parent, string $name, self $parentConfigurator = null, array $parentPrefixes = null)
     {
@@ -36,6 +36,16 @@ class CollectionConfigurator
         $this->route = new Route('');
         $this->parentConfigurator = $parentConfigurator; // for GC control
         $this->parentPrefixes = $parentPrefixes;
+    }
+
+    public function __sleep(): array
+    {
+        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+    }
+
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
 
     public function __destruct()
@@ -65,7 +75,7 @@ class CollectionConfigurator
      *
      * @return $this
      */
-    final public function prefix($prefix): self
+    final public function prefix(string|array $prefix): static
     {
         if (\is_array($prefix)) {
             if (null === $this->parentPrefixes) {
@@ -98,7 +108,7 @@ class CollectionConfigurator
      *
      * @return $this
      */
-    final public function host($host): self
+    final public function host(string|array $host): static
     {
         $this->host = $host;
 

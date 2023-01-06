@@ -14,8 +14,11 @@ namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -105,7 +108,7 @@ class SendgridApiTransportTest extends TestCase
         $email->from('foo@example.com')
             ->to('bar@example.com')
             // even if content doesn't include new lines, the base64 encoding performed later may add them
-            ->attach('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod', 'lorem.txt');
+            ->addPart(new DataPart('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod', 'lorem.txt'));
 
         $response = $this->createMock(ResponseInterface::class);
 
@@ -159,7 +162,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('headers', $payload);
@@ -181,7 +183,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('from', $payload);
@@ -209,7 +210,6 @@ class SendgridApiTransportTest extends TestCase
 
         $transport = new SendgridApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
-        $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
 
         $this->assertArrayHasKey('from', $payload);
@@ -221,5 +221,28 @@ class SendgridApiTransportTest extends TestCase
         $this->assertArrayHasKey('email', $payload['personalizations'][0]['to'][0]);
         $this->assertCount(1, $payload['personalizations'][0]['to']);
         $this->assertSame($envelopeTo, $payload['personalizations'][0]['to'][0]['email']);
+    }
+
+    public function testTagAndMetadataHeaders()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TagHeader('category-one'));
+        $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
+        $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('categories', $payload);
+        $this->assertArrayHasKey('custom_args', $payload['personalizations'][0]);
+
+        $this->assertCount(1, $payload['categories']);
+        $this->assertCount(2, $payload['personalizations'][0]['custom_args']);
+
+        $this->assertSame(['category-one'], $payload['categories']);
+        $this->assertSame('blue', $payload['personalizations'][0]['custom_args']['Color']);
+        $this->assertSame('12345', $payload['personalizations'][0]['custom_args']['Client-ID']);
     }
 }

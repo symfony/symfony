@@ -1,0 +1,12 @@
+when@some-env:
+    parameters:
+        foo: 234
+        bar: 345
+
+when@some-other-env:
+    parameters:
+        foo: 456
+        baz: 567
+
+parameters:
+    foo: 123

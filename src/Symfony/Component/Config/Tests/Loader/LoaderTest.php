@@ -12,13 +12,16 @@
 namespace Symfony\Component\Config\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
 class LoaderTest extends TestCase
 {
     public function testGetSetResolver()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
+        $resolver = $this->createMock(LoaderResolverInterface::class);
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
@@ -28,9 +31,9 @@ class LoaderTest extends TestCase
 
     public function testResolve()
     {
-        $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $resolvedLoader = $this->createMock(LoaderInterface::class);
 
-        $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
+        $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('foo.xml')
@@ -45,8 +48,8 @@ class LoaderTest extends TestCase
 
     public function testResolveWhenResolverCannotFindLoader()
     {
-        $this->expectException('Symfony\Component\Config\Exception\LoaderLoadException');
-        $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
+        $this->expectException(LoaderLoadException::class);
+        $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('FOOBAR')
@@ -60,13 +63,13 @@ class LoaderTest extends TestCase
 
     public function testImport()
     {
-        $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $resolvedLoader = $this->createMock(LoaderInterface::class);
         $resolvedLoader->expects($this->once())
             ->method('load')
             ->with('foo')
             ->willReturn('yes');
 
-        $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
+        $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('foo')
@@ -80,13 +83,13 @@ class LoaderTest extends TestCase
 
     public function testImportWithType()
     {
-        $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $resolvedLoader = $this->createMock(LoaderInterface::class);
         $resolvedLoader->expects($this->once())
             ->method('load')
             ->with('foo', 'bar')
             ->willReturn('yes');
 
-        $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
+        $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('foo', 'bar')
@@ -101,11 +104,11 @@ class LoaderTest extends TestCase
 
 class ProjectLoader1 extends Loader
 {
-    public function load($resource, string $type = null)
+    public function load(mixed $resource, string $type = null): mixed
     {
     }
 
-    public function supports($resource, string $type = null): bool
+    public function supports(mixed $resource, string $type = null): bool
     {
         return \is_string($resource) && 'foo' === pathinfo($resource, \PATHINFO_EXTENSION);
     }

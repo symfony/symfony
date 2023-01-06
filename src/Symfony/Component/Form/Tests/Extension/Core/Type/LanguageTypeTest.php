@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LanguageTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LanguageType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LanguageType';
 
     protected function setUp(): void
     {

@@ -52,7 +52,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getServer(), '->getServer() returns the server parameters of the request');
     }
 
-    public function testAllParameterValuesAreConvertedToString(): void
+    public function testAllParameterValuesAreConvertedToString()
     {
         $parameters = [
             'foo' => 1,

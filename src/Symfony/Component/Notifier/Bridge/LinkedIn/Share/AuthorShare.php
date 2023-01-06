@@ -13,14 +13,12 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn\Share;
 
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
- *
- * @experimental in 5.2
  */
 final class AuthorShare extends AbstractLinkedInShare
 {
     public const PERSON = 'person';
 
-    private $author;
+    private string $author;
 
     public function __construct(string $value, string $organisation = self::PERSON)
     {

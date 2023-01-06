@@ -17,8 +17,8 @@ skinparam agent {
 }
 state "a" <<initial>>
 state "b" <<marked>>
-state "c" <<DeepSkyBlue>> as c
-c : My custom place description
+state "c" <<DeepSkyBlue>>
+"c" : My custom place description
 agent "t1"
 agent "t2"
 "a" -[#Purple]-> "t1": "<font color=Grey>My custom transition label 2</font>"

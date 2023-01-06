@@ -12,7 +12,14 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
+use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router;
 
@@ -26,7 +33,7 @@ class RouterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $this->loader = $this->createMock(LoaderInterface::class);
         $this->router = new Router($this->loader, 'routing.yml');
 
         $this->cacheDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('router_', true);
@@ -36,7 +43,7 @@ class RouterTest extends TestCase
     {
         if (is_dir($this->cacheDir)) {
             array_map('unlink', glob($this->cacheDir.\DIRECTORY_SEPARATOR.'*'));
-            rmdir($this->cacheDir);
+            @rmdir($this->cacheDir);
         }
 
         $this->loader = null;
@@ -59,7 +66,7 @@ class RouterTest extends TestCase
 
     public function testSetOptionsWithUnsupportedOptions()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Router does not support the following options: "option_foo", "option_bar"');
         $this->router->setOptions([
             'cache_dir' => './cache',
@@ -78,14 +85,14 @@ class RouterTest extends TestCase
 
     public function testSetOptionWithUnsupportedOption()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Router does not support the "option_foo" option');
         $this->router->setOption('option_foo', true);
     }
 
     public function testGetOptionWithUnsupportedOption()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Router does not support the "option_foo" option');
         $this->router->getOption('option_foo', true);
     }
@@ -111,7 +118,7 @@ class RouterTest extends TestCase
             ->method('load')->with('routing.yml', null)
             ->willReturn(new RouteCollection());
 
-        $this->assertInstanceOf('Symfony\\Component\\Routing\\Matcher\\UrlMatcher', $this->router->getMatcher());
+        $this->assertInstanceOf(UrlMatcher::class, $this->router->getMatcher());
     }
 
     public function testGeneratorIsCreatedIfCacheIsNotConfigured()
@@ -122,16 +129,28 @@ class RouterTest extends TestCase
             ->method('load')->with('routing.yml', null)
             ->willReturn(new RouteCollection());
 
-        $this->assertInstanceOf('Symfony\\Component\\Routing\\Generator\\UrlGenerator', $this->router->getGenerator());
+        $this->assertInstanceOf(CompiledUrlGenerator::class, $this->router->getGenerator());
+    }
+
+    public function testGeneratorIsCreatedIfCacheIsNotConfiguredNotCompiled()
+    {
+        $this->router->setOption('cache_dir', null);
+        $this->router->setOption('generator_class', UrlGenerator::class);
+
+        $this->loader->expects($this->once())
+            ->method('load')->with('routing.yml', null)
+            ->willReturn(new RouteCollection());
+
+        $this->assertInstanceOf(UrlGenerator::class, $this->router->getGenerator());
+        $this->assertNotInstanceOf(CompiledUrlGenerator::class, $this->router->getGenerator());
     }
 
     public function testMatchRequestWithUrlMatcherInterface()
     {
-        $matcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
+        $matcher = $this->createMock(UrlMatcherInterface::class);
         $matcher->expects($this->once())->method('match');
 
         $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setAccessible(true);
         $p->setValue($this->router, $matcher);
 
         $this->router->matchRequest(Request::create('/'));
@@ -139,11 +158,10 @@ class RouterTest extends TestCase
 
     public function testMatchRequestWithRequestMatcherInterface()
     {
-        $matcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $matcher = $this->createMock(RequestMatcherInterface::class);
         $matcher->expects($this->once())->method('matchRequest');
 
         $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setAccessible(true);
         $p->setValue($this->router, $matcher);
 
         $this->router->matchRequest(Request::create('/'));
@@ -161,10 +179,9 @@ class RouterTest extends TestCase
 
         $generator = $router->getGenerator();
 
-        $this->assertInstanceOf('Symfony\Component\Routing\Generator\UrlGeneratorInterface', $generator);
+        $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
 
         $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
 
         $this->assertSame('hr', $p->getValue($generator));
     }
@@ -181,10 +198,9 @@ class RouterTest extends TestCase
 
         $generator = $router->getGenerator();
 
-        $this->assertInstanceOf('Symfony\Component\Routing\Generator\UrlGeneratorInterface', $generator);
+        $this->assertInstanceOf(UrlGeneratorInterface::class, $generator);
 
         $p = new \ReflectionProperty($generator, 'defaultLocale');
-        $p->setAccessible(true);
 
         $this->assertSame('hr', $p->getValue($generator));
     }

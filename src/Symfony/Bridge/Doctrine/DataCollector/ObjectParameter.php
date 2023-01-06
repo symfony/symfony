@@ -13,26 +13,20 @@ namespace Symfony\Bridge\Doctrine\DataCollector;
 
 final class ObjectParameter
 {
-    private $object;
-    private $error;
-    private $stringable;
-    private $class;
+    private object $object;
+    private ?\Throwable $error;
+    private bool $stringable;
+    private string $class;
 
-    /**
-     * @param object $object
-     */
-    public function __construct($object, ?\Throwable $error)
+    public function __construct(object $object, ?\Throwable $error)
     {
         $this->object = $object;
         $this->error = $error;
         $this->stringable = \is_callable([$object, '__toString']);
-        $this->class = \get_class($object);
+        $this->class = $object::class;
     }
 
-    /**
-     * @return object
-     */
-    public function getObject()
+    public function getObject(): object
     {
         return $this->object;
     }

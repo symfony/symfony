@@ -22,6 +22,6 @@ class CompiledUrlMatcherTest extends UrlMatcherTest
     {
         $dumper = new CompiledUrlMatcherDumper($routes);
 
-        return new CompiledUrlMatcher($dumper->getCompiledRoutes(), $context ?: new RequestContext());
+        return new CompiledUrlMatcher($dumper->getCompiledRoutes(), $context ?? new RequestContext());
     }
 }

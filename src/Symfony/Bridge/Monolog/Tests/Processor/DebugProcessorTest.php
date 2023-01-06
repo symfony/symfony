@@ -12,42 +12,42 @@
 namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use Monolog\Logger;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class DebugProcessorTest extends TestCase
 {
-    /**
-     * @dataProvider providerDatetimeFormatTests
-     */
-    public function testDatetimeFormat(array $record, $expectedTimestamp)
+    public function testDatetimeFormat()
     {
+        $record = RecordFactory::create(datetime: new \DateTimeImmutable('2019-01-01T00:01:00+00:00'));
         $processor = new DebugProcessor();
         $processor($record);
 
         $records = $processor->getLogs();
         self::assertCount(1, $records);
-        self::assertSame($expectedTimestamp, $records[0]['timestamp']);
+        self::assertSame(1546300860, $records[0]['timestamp']);
     }
 
-    public function providerDatetimeFormatTests(): array
+    public function testDatetimeRfc3339Format()
     {
-        $record = $this->getRecord();
+        $record = RecordFactory::create(datetime: new \DateTimeImmutable('2019-01-01T00:01:00+00:00'));
+        $processor = new DebugProcessor();
+        $processor($record);
 
-        return [
-            [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), 1546300860],
-            [array_merge($record, ['datetime' => '2019-01-01T00:01:00+00:00']), 1546300860],
-            [array_merge($record, ['datetime' => 'foo']), false],
-        ];
+        $records = $processor->getLogs();
+        self::assertCount(1, $records);
+        self::assertSame('2019-01-01T00:01:00.000+00:00', $records[0]['timestamp_rfc3339']);
     }
 
     public function testDebugProcessor()
     {
         $processor = new DebugProcessor();
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(2, $processor->getLogs());
         $this->assertSame(1, $processor->countErrors());
@@ -65,8 +65,8 @@ class DebugProcessorTest extends TestCase
     {
         $stack = new RequestStack();
         $processor = new DebugProcessor($stack);
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(2, $processor->getLogs());
         $this->assertSame(1, $processor->countErrors());
@@ -74,8 +74,8 @@ class DebugProcessorTest extends TestCase
         $request = new Request();
         $stack->push($request);
 
-        $processor($this->getRecord());
-        $processor($this->getRecord(Logger::ERROR));
+        $processor(self::getRecord());
+        $processor(self::getRecord(Logger::ERROR));
 
         $this->assertCount(4, $processor->getLogs());
         $this->assertSame(2, $processor->countErrors());
@@ -99,16 +99,8 @@ class DebugProcessorTest extends TestCase
         $this->assertEquals(0, $debugProcessorChild->countErrors());
     }
 
-    private function getRecord($level = Logger::WARNING, $message = 'test'): array
+    private static function getRecord($level = Logger::WARNING, $message = 'test'): array|LogRecord
     {
-        return [
-            'message' => $message,
-            'context' => [],
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => 'test',
-            'datetime' => new \DateTime(),
-            'extra' => [],
-        ];
+        return RecordFactory::create($level, $message);
     }
 }

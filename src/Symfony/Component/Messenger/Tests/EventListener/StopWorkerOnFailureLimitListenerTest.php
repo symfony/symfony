@@ -26,7 +26,7 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
     /**
      * @dataProvider countProvider
      */
-    public function testWorkerStopsWhenMaximumCountReached(int $max, bool $shouldStop): void
+    public function testWorkerStopsWhenMaximumCountReached(int $max, bool $shouldStop)
     {
         $worker = $this->createMock(Worker::class);
         $worker->expects($shouldStop ? $this->atLeastOnce() : $this->never())->method('stop');
@@ -53,7 +53,7 @@ class StopWorkerOnFailureLimitListenerTest extends TestCase
         yield [4, false];
     }
 
-    public function testWorkerLogsMaximumCountReachedWhenLoggerIsGiven(): void
+    public function testWorkerLogsMaximumCountReachedWhenLoggerIsGiven()
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('info')

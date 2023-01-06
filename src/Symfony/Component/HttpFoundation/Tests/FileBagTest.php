@@ -25,7 +25,7 @@ class FileBagTest extends TestCase
 {
     public function testFileMustBeAnArrayOrUploadedFile()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new FileBag(['file' => 'foo']);
     }
 
@@ -36,6 +36,23 @@ class FileBagTest extends TestCase
 
         $bag = new FileBag(['file' => [
             'name' => basename($tmpFile),
+            'type' => 'text/plain',
+            'tmp_name' => $tmpFile,
+            'error' => 0,
+            'size' => null,
+        ]]);
+
+        $this->assertEquals($file, $bag->get('file'));
+    }
+
+    public function testShouldConvertsUploadedFilesPhp81()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
+
+        $bag = new FileBag(['file' => [
+            'name' => basename($tmpFile),
+            'full_path' => basename($tmpFile),
             'type' => 'text/plain',
             'tmp_name' => $tmpFile,
             'error' => 0,
@@ -168,9 +185,9 @@ class FileBagTest extends TestCase
     protected function tearDown(): void
     {
         foreach (glob(sys_get_temp_dir().'/form_test/*') as $file) {
-            unlink($file);
+            @unlink($file);
         }
 
-        rmdir(sys_get_temp_dir().'/form_test');
+        @rmdir(sys_get_temp_dir().'/form_test');
     }
 }

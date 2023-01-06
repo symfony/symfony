@@ -22,7 +22,7 @@ class TimezonesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    private static $zones = [
+    private const ZONES = [
         'Africa/Abidjan',
         'Africa/Accra',
         'Africa/Addis_Ababa',
@@ -458,7 +458,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Pacific/Wake',
         'Pacific/Wallis',
     ];
-    private static $zonesNoCountry = [
+    private const ZONES_NO_COUNTRY = [
         'Antarctica/Troll',
         'CST6CDT',
         'EST5EDT',
@@ -470,7 +470,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetIds()
     {
-        $this->assertEquals(self::$zones, Timezones::getIds());
+        $this->assertEquals(self::ZONES, Timezones::getIds());
     }
 
     /**
@@ -483,7 +483,7 @@ class TimezonesTest extends ResourceBundleTestCase
         sort($zones);
 
         $this->assertNotEmpty($zones);
-        $this->assertEmpty(array_diff($zones, self::$zones));
+        $this->assertEmpty(array_diff($zones, self::ZONES));
     }
 
     public function testGetNamesDefaultLocale()
@@ -529,13 +529,13 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetNameWithInvalidTimezone()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Timezones::getName('foo');
     }
 
     public function testGetNameWithAliasTimezone()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Timezones::getName('US/Pacific'); // alias in icu (not compiled), name unavailable in php
     }
 
@@ -559,7 +559,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetRawOffsetWithUnknownTimezone()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Unknown or bad timezone (foobar)');
         Timezones::getRawOffset('foobar');
     }
@@ -591,20 +591,20 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testForCountryCodeWithUnknownCountry()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Timezones::forCountryCode('foobar');
     }
 
     public function testForCountryCodeWithWrongCountryCode()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         $this->expectExceptionMessage('Country codes must be in uppercase, but "nl" was passed. Try with "NL" country code instead.');
         Timezones::forCountryCode('nl');
     }
 
     public function testGetCountryCodeWithUnknownTimezone()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Timezones::getCountryCode('foobar');
     }
 
@@ -631,7 +631,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
             $this->addToAssertionCount(1);
         } catch (MissingResourceException $e) {
-            if (\in_array($timezone, self::$zonesNoCountry, true)) {
+            if (\in_array($timezone, self::ZONES_NO_COUNTRY, true)) {
                 $this->markTestSkipped();
             } else {
                 $this->fail();
@@ -643,7 +643,7 @@ class TimezonesTest extends ResourceBundleTestCase
     {
         return array_map(function ($timezone) {
             return [$timezone];
-        }, self::$zones);
+        }, self::ZONES);
     }
 
     /**
@@ -662,5 +662,11 @@ class TimezonesTest extends ResourceBundleTestCase
         return array_map(function ($country) {
             return [$country];
         }, Countries::getCountryCodes());
+    }
+
+    public function testGetRawOffsetChangeTimeCountry()
+    {
+        $this->assertSame(7200, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-07-16 00:00:00+00:00'))->getTimestamp()));
+        $this->assertSame(3600, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-02-16 00:00:00+00:00'))->getTimestamp()));
     }
 }

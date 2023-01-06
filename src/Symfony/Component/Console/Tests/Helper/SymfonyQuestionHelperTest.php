@@ -1,10 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Tests\Helper;
 
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -124,7 +135,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInput()
     {
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new SymfonyQuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -149,9 +160,9 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
   [foo   ] foo
   [żółw  ] bar
   [łabądź] baz
- > 
+ >
 EOT
-        , $output, true);
+            , $output, true);
     }
 
     public function testChoiceQuestionCustomPrompt()
@@ -168,9 +179,9 @@ EOT
         $this->assertOutputContains(<<<EOT
  qqq:
   [0] foo
- >ccc> 
+ >ccc>
 EOT
-        , $output, true);
+            , $output, true);
     }
 
     protected function getInputStream($input)
@@ -192,7 +203,7 @@ EOT
 
     protected function createInputInterfaceMock($interactive = true)
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
+        $mock = $this->createMock(InputInterface::class);
         $mock->expects($this->any())
             ->method('isInteractive')
             ->willReturn($interactive);
@@ -216,7 +227,7 @@ EOT
     {
         $expected = 'Write an essay (press Ctrl+D to continue)';
 
-        if (false !== strpos(\PHP_OS, 'WIN')) {
+        if ('Windows' === \PHP_OS_FAMILY) {
             $expected = 'Write an essay (press Ctrl+Z then Enter to continue)';
         }
 

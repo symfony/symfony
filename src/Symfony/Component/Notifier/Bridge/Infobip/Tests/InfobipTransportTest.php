@@ -11,45 +11,33 @@
 
 namespace Symfony\Component\Notifier\Bridge\Infobip\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class InfobipTransportTest extends TestCase
+final class InfobipTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties(): void
+    public function createTransport(HttpClientInterface $client = null): InfobipTransport
     {
-        $transport = $this->getTransport();
-
-        $this->assertSame('infobip://host.test?from=0611223344', (string) $transport);
+        return (new InfobipTransport('authtoken', '0611223344', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
-    public function testSupportsMessageInterface(): void
+    public function toStringProvider(): iterable
     {
-        $transport = $this->getTransport();
-
-        $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class), 'Hello!'));
+        yield ['infobip://host.test?from=0611223344', $this->createTransport()];
     }
 
-    public function testSendNonSmsMessageThrowsException(): void
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->getTransport();
-
-        $this->expectException(LogicException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    private function getTransport(): InfobipTransport
+    public function unsupportedMessagesProvider(): iterable
     {
-        return (new InfobipTransport(
-            'authtoken',
-            '0611223344',
-            $this->createMock(HttpClientInterface::class)
-        ))->setHost('host.test');
+        yield [new ChatMessage('Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 }

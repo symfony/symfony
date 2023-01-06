@@ -50,12 +50,36 @@ class PhpExecutableFinderTest extends TestCase
     public function testNotExitsBinaryFile()
     {
         $f = new PhpExecutableFinder();
-        $phpBinaryEnv = \PHP_BINARY;
-        putenv('PHP_BINARY=/usr/local/php/bin/php-invalid');
 
-        $this->assertFalse($f->find(), '::find() returns false because of not exist file');
-        $this->assertFalse($f->find(false), '::find(false) returns false because of not exist file');
+        $originalPhpBinary = getenv('PHP_BINARY');
 
-        putenv('PHP_BINARY='.$phpBinaryEnv);
+        try {
+            putenv('PHP_BINARY=/usr/local/php/bin/php-invalid');
+
+            $this->assertFalse($f->find(), '::find() returns false because of not exist file');
+            $this->assertFalse($f->find(false), '::find(false) returns false because of not exist file');
+        } finally {
+            putenv('PHP_BINARY='.$originalPhpBinary);
+        }
+    }
+
+    public function testFindWithExecutableDirectory()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Directories are not executable on Windows');
+        }
+
+        $originalPhpBinary = getenv('PHP_BINARY');
+
+        try {
+            $executableDirectoryPath = sys_get_temp_dir().'/PhpExecutableFinderTest_testFindWithExecutableDirectory';
+            @mkdir($executableDirectoryPath);
+            $this->assertTrue(is_executable($executableDirectoryPath));
+            putenv('PHP_BINARY='.$executableDirectoryPath);
+
+            $this->assertFalse((new PhpExecutableFinder())->find());
+        } finally {
+            putenv('PHP_BINARY='.$originalPhpBinary);
+        }
     }
 }

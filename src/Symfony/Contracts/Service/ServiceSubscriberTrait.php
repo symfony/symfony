@@ -12,10 +12,12 @@
 namespace Symfony\Contracts\Service;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 
 /**
  * Implementation of ServiceSubscriberInterface that determines subscribed services from
- * private method return types. Service ids are available as "ClassName::methodName".
+ * method return types. Service ids are available as "ClassName::methodName".
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -26,35 +28,47 @@ trait ServiceSubscriberTrait
 
     public static function getSubscribedServices(): array
     {
-        static $services;
-
-        if (null !== $services) {
-            return $services;
-        }
-
-        $services = \is_callable(['parent', __FUNCTION__]) ? parent::getSubscribedServices() : [];
+        $services = method_exists(get_parent_class(self::class) ?: '', __FUNCTION__) ? parent::getSubscribedServices() : [];
 
         foreach ((new \ReflectionClass(self::class))->getMethods() as $method) {
-            if ($method->isStatic() || $method->isAbstract() || $method->isGenerator() || $method->isInternal() || $method->getNumberOfRequiredParameters()) {
+            if (self::class !== $method->getDeclaringClass()->name) {
                 continue;
             }
 
-            if (self::class === $method->getDeclaringClass()->name && ($returnType = $method->getReturnType()) && !$returnType->isBuiltin()) {
-                $services[self::class.'::'.$method->name] = '?'.($returnType instanceof \ReflectionNamedType ? $returnType->getName() : $type);
+            if (!$attribute = $method->getAttributes(SubscribedService::class)[0] ?? null) {
+                continue;
+            }
+
+            if ($method->isStatic() || $method->isAbstract() || $method->isGenerator() || $method->isInternal() || $method->getNumberOfRequiredParameters()) {
+                throw new \LogicException(sprintf('Cannot use "%s" on method "%s::%s()" (can only be used on non-static, non-abstract methods with no parameters).', SubscribedService::class, self::class, $method->name));
+            }
+
+            if (!$returnType = $method->getReturnType()) {
+                throw new \LogicException(sprintf('Cannot use "%s" on methods without a return type in "%s::%s()".', SubscribedService::class, $method->name, self::class));
+            }
+
+            /* @var SubscribedService $attribute */
+            $attribute = $attribute->newInstance();
+            $attribute->key ??= self::class.'::'.$method->name;
+            $attribute->type ??= $returnType instanceof \ReflectionNamedType ? $returnType->getName() : (string) $returnType;
+            $attribute->nullable = $returnType->allowsNull();
+
+            if ($attribute->attributes) {
+                $services[] = $attribute;
+            } else {
+                $services[$attribute->key] = ($attribute->nullable ? '?' : '').$attribute->type;
             }
         }
 
         return $services;
     }
 
-    /**
-     * @required
-     */
-    public function setContainer(ContainerInterface $container)
+    #[Required]
+    public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
         $this->container = $container;
 
-        if (\is_callable(['parent', __FUNCTION__])) {
+        if (method_exists(get_parent_class(self::class) ?: '', __FUNCTION__)) {
             return parent::setContainer($container);
         }
 

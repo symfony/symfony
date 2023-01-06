@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Deprecate calling `PropertyAccessorBuilder::setCacheItemPool()` without arguments
+ * Added method `isNullSafe()` to `PropertyPathInterface`, implementing the interface without implementing this method
+   is deprecated
+ * Add support for the null-coalesce operator in property paths
+
+6.0
+---
+
+ * make `PropertyAccessor::__construct()` accept a combination of bitwise flags as first and second arguments
+
+5.3.0
+-----
+
+ * deprecate passing a boolean as the second argument of `PropertyAccessor::__construct()`, expecting a combination of bitwise flags instead
+
 5.2.0
 -----
 
@@ -10,8 +28,8 @@ CHANGELOG
 5.1.0
 -----
 
-* Added an `UninitializedPropertyException`
-* Linking to PropertyInfo extractor to remove a lot of duplicate code
+ * Added an `UninitializedPropertyException`
+ * Linking to PropertyInfo extractor to remove a lot of duplicate code
 
 4.4.0
 -----
@@ -22,9 +40,9 @@ CHANGELOG
 4.3.0
 -----
 
-* added a `$throwExceptionOnInvalidPropertyPath` argument to the PropertyAccessor constructor.
-* added `enableExceptionOnInvalidPropertyPath()`, `disableExceptionOnInvalidPropertyPath()` and
-  `isExceptionOnInvalidPropertyPath()` methods to `PropertyAccessorBuilder`
+ * added a `$throwExceptionOnInvalidPropertyPath` argument to the PropertyAccessor constructor.
+ * added `enableExceptionOnInvalidPropertyPath()`, `disableExceptionOnInvalidPropertyPath()` and
+   `isExceptionOnInvalidPropertyPath()` methods to `PropertyAccessorBuilder`
 
 4.0.0
 -----

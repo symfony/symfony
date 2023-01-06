@@ -1,7 +1,8 @@
 imports:
-    - { resource: ./config.yml }
+    - { resource: ./base_config.yml }
 
 framework:
+    http_method_override: false
     lock: ~
     rate_limiter: ~
 
@@ -10,3 +11,4 @@ security:
         default:
             login_throttling:
                 max_attempts: 1
+                interval: '8 minutes'

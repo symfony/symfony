@@ -16,6 +16,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\Validator\ConstraintViolation;
 
 class FormErrorIteratorTest extends TestCase
@@ -25,15 +28,11 @@ class FormErrorIteratorTest extends TestCase
      */
     public function testFindByCodes($code, $violationsCount)
     {
-        if (!class_exists(ConstraintViolation::class)) {
-            $this->markTestSkipped('Validator component required.');
-        }
-
         $formBuilder = new FormBuilder(
             'form',
             null,
             new EventDispatcher(),
-            $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock(),
+            new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory())),
             []
         );
 

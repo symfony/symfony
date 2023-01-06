@@ -14,33 +14,28 @@ namespace Symfony\Component\Notifier\Bridge\Mobyt;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Bastien Durand <bdurand-dev@outlook.com>
- *
- * @experimental in 5.2
  */
 final class MobytTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return MobytTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MobytTransport
     {
         $scheme = $dsn->getScheme();
+
+        if ('mobyt' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'mobyt', $this->getSupportedSchemes());
+        }
+
         $accountSid = $this->getUser($dsn);
         $authToken = $this->getPassword($dsn);
-        $from = $dsn->getOption('from');
-        $typeQuality = $dsn->getOption('type_quality', MobytOptions::MESSAGE_TYPE_QUALITY_LOW);
+        $from = $dsn->getRequiredOption('from');
+        $typeQuality = $dsn->getOption('type_quality');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('mobyt' === $scheme) {
-            return (new MobytTransport($accountSid, $authToken, $from, $typeQuality, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'mobyt', $this->getSupportedSchemes());
+        return (new MobytTransport($accountSid, $authToken, $from, $typeQuality, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

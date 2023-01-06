@@ -27,7 +27,7 @@ class TransportTest extends TestCase
     /**
      * @dataProvider fromStringProvider
      */
-    public function testFromString(string $dsn, TransportInterface $transport): void
+    public function testFromString(string $dsn, TransportInterface $transport)
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
 
@@ -63,7 +63,7 @@ class TransportTest extends TestCase
     /**
      * @dataProvider fromDsnProvider
      */
-    public function testFromDsn(string $dsn, TransportInterface $transport): void
+    public function testFromDsn(string $dsn, TransportInterface $transport)
     {
         $this->assertEquals($transport, Transport::fromDsn($dsn));
     }
@@ -79,7 +79,7 @@ class TransportTest extends TestCase
     /**
      * @dataProvider fromWrongStringProvider
      */
-    public function testFromWrongString(string $dsn, string $error): void
+    public function testFromWrongString(string $dsn, string $error)
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
 
@@ -116,7 +116,7 @@ class DummyTransport implements Transport\TransportInterface
 
     public function __toString(): string
     {
-        return sprintf('dummy://local');
+        return 'dummy://local';
     }
 }
 

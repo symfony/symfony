@@ -14,31 +14,24 @@ namespace Symfony\Component\Notifier\Bridge\Slack;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 final class SlackTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return SlackTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): SlackTransport
     {
-        $scheme = $dsn->getScheme();
+        if ('slack' !== $dsn->getScheme()) {
+            throw new UnsupportedSchemeException($dsn, 'slack', $this->getSupportedSchemes());
+        }
+
         $accessToken = $this->getUser($dsn);
         $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('slack' === $scheme) {
-            return (new SlackTransport($accessToken, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'slack', $this->getSupportedSchemes());
+        return (new SlackTransport($accessToken, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

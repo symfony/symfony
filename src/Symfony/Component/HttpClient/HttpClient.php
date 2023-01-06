@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient;
 
 use Amp\Http\Client\Connection\ConnectionLimitingPool;
+use Amp\Promise;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -30,27 +31,27 @@ final class HttpClient
      */
     public static function create(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50): HttpClientInterface
     {
-        if ($amp = class_exists(ConnectionLimitingPool::class)) {
+        if ($amp = class_exists(ConnectionLimitingPool::class) && interface_exists(Promise::class)) {
             if (!\extension_loaded('curl')) {
                 return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
             }
 
             // Skip curl when HTTP/2 push is unsupported or buggy, see https://bugs.php.net/77535
-            if (\PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304) || !\defined('CURLMOPT_PUSHFUNCTION')) {
+            if (!\defined('CURLMOPT_PUSHFUNCTION')) {
                 return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
             }
 
             static $curlVersion = null;
-            $curlVersion = $curlVersion ?? curl_version();
+            $curlVersion ??= curl_version();
 
             // HTTP/2 push crashes before curl 7.61
-            if (0x073d00 > $curlVersion['version_number'] || !(\CURL_VERSION_HTTP2 & $curlVersion['features'])) {
+            if (0x073D00 > $curlVersion['version_number'] || !(\CURL_VERSION_HTTP2 & $curlVersion['features'])) {
                 return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
             }
         }
 
         if (\extension_loaded('curl')) {
-            if ('\\' !== \DIRECTORY_SEPARATOR || ini_get('curl.cainfo') || ini_get('openssl.cafile') || ini_get('openssl.capath')) {
+            if ('\\' !== \DIRECTORY_SEPARATOR || isset($defaultOptions['cafile']) || isset($defaultOptions['capath']) || \ini_get('curl.cainfo') || \ini_get('openssl.cafile') || \ini_get('openssl.capath')) {
                 return new CurlHttpClient($defaultOptions, $maxHostConnections, $maxPendingPushes);
             }
 
@@ -61,7 +62,7 @@ final class HttpClient
             return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
         }
 
-        @trigger_error((\extension_loaded('curl') ? 'Upgrade' : 'Install').' the curl extension or run "composer require amphp/http-client" to perform async HTTP operations, including full HTTP/2 support', \E_USER_NOTICE);
+        @trigger_error((\extension_loaded('curl') ? 'Upgrade' : 'Install').' the curl extension or run "composer require amphp/http-client:^4.2.1" to perform async HTTP operations, including full HTTP/2 support', \E_USER_NOTICE);
 
         return new NativeHttpClient($defaultOptions, $maxHostConnections);
     }

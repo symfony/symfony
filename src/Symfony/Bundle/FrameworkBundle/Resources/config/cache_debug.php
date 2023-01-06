@@ -35,5 +35,5 @@ return static function (ContainerConfigurator $container) {
                 ],
             ])
             ->tag('kernel.cache_warmer', ['priority' => 64])
-        ;
+    ;
 };

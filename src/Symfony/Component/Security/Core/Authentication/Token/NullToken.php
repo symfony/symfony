@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
@@ -26,41 +28,26 @@ class NullToken implements TokenInterface
         return [];
     }
 
-    public function getCredentials()
-    {
-        return '';
-    }
-
-    public function getUser()
+    public function getUser(): ?UserInterface
     {
         return null;
     }
 
-    public function setUser($user)
+    public function setUser(UserInterface $user)
     {
         throw new \BadMethodCallException('Cannot set user on a NullToken.');
     }
 
-    public function getUsername()
+    public function getUserIdentifier(): string
     {
         return '';
-    }
-
-    public function isAuthenticated()
-    {
-        return true;
-    }
-
-    public function setAuthenticated(bool $isAuthenticated)
-    {
-        throw new \BadMethodCallException('Cannot change authentication state of NullToken.');
     }
 
     public function eraseCredentials()
     {
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return [];
     }
@@ -70,17 +57,17 @@ class NullToken implements TokenInterface
         throw new \BadMethodCallException('Cannot set attributes of NullToken.');
     }
 
-    public function hasAttribute(string $name)
+    public function hasAttribute(string $name): bool
     {
         return false;
     }
 
-    public function getAttribute(string $name)
+    public function getAttribute(string $name): mixed
     {
         return null;
     }
 
-    public function setAttribute(string $name, $value)
+    public function setAttribute(string $name, mixed $value)
     {
         throw new \BadMethodCallException('Cannot add attribute to NullToken.');
     }
@@ -91,15 +78,6 @@ class NullToken implements TokenInterface
     }
 
     public function __unserialize(array $data): void
-    {
-    }
-
-    public function serialize()
-    {
-        return '';
-    }
-
-    public function unserialize($serialized)
     {
     }
 }

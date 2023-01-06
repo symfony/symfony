@@ -75,6 +75,16 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects('https://example.com/', 301);
     }
 
+    public function testAssertResponseFormat()
+    {
+        $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/vnd.myformat']))->assertResponseFormatSame('custom');
+        $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/ld+json']))->assertResponseFormatSame('jsonld');
+        $this->getResponseTester(new Response())->assertResponseFormatSame(null);
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Failed asserting that the Response format is jsonld.\nHTTP/1.0 200 OK");
+        $this->getResponseTester(new Response())->assertResponseFormatSame('jsonld');
+    }
+
     public function testAssertResponseHasHeader()
     {
         $this->getResponseTester(new Response())->assertResponseHasHeader('Date');
@@ -180,11 +190,21 @@ class WebTestCaseTest extends TestCase
         $this->getCrawlerTester(new Crawler('<html><body><h1>'))->assertSelectorNotExists('body > h1');
     }
 
+    public function testAssertSelectorCount()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(1, 'p');
+        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p><p>Foo</p></body></html>'))->assertSelectorCount(2, 'p');
+        $this->getCrawlerTester(new Crawler('<html><body><h1>This is not a paragraph.</h1></body></html>'))->assertSelectorCount(0, 'p');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Crawler selector "p" was expected to be found 0 time(s) but was found 1 time(s).');
+        $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(0, 'p');
+    }
+
     public function testAssertSelectorTextNotContains()
     {
         $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Bar');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "body > h1" and does not have a node matching selector "body > h1" with content containing "Foo".');
+        $this->expectExceptionMessage('matches selector "body > h1" and the text "Foo" of the node matching selector "body > h1" does not contain "Foo".');
         $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Foo');
     }
 
@@ -200,7 +220,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<html><head><title>Foobar'))->assertPageTitleContains('Foo');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "title" and has a node matching selector "title" with content containing "Bar".');
+        $this->expectExceptionMessage('matches selector "title" and the text "Foo" of the node matching selector "title" contains "Bar".');
         $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleContains('Bar');
     }
 
@@ -283,6 +303,10 @@ class WebTestCaseTest extends TestCase
     {
         $client = $this->createMock(KernelBrowser::class);
         $client->expects($this->any())->method('getResponse')->willReturn($response);
+
+        $request = new Request();
+        $request->setFormat('custom', ['application/vnd.myformat']);
+        $client->expects($this->any())->method('getRequest')->willReturn($request);
 
         return $this->getTester($client);
     }

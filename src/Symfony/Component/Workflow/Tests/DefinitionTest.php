@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Transition;
 
 class DefinitionTest extends TestCase
@@ -36,7 +46,7 @@ class DefinitionTest extends TestCase
 
     public function testSetInitialPlaceAndPlaceIsNotDefined()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Place "d" cannot be the initial place as it does not exist.');
         new Definition([], [], 'd');
     }
@@ -54,7 +64,7 @@ class DefinitionTest extends TestCase
 
     public function testAddTransitionAndFromPlaceIsNotDefined()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
         $places = range('a', 'b');
 
@@ -63,7 +73,7 @@ class DefinitionTest extends TestCase
 
     public function testAddTransitionAndToPlaceIsNotDefined()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
         $places = range('a', 'b');
 

@@ -21,16 +21,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class DoctrineValidationPass implements CompilerPassInterface
 {
-    private $managerType;
+    private string $managerType;
 
     public function __construct(string $managerType)
     {
         $this->managerType = $managerType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         $this->updateValidatorMappingFiles($container, 'xml', 'xml');

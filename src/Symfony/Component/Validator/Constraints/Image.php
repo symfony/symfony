@@ -21,23 +21,23 @@ namespace Symfony\Component\Validator\Constraints;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Image extends File
 {
-    const SIZE_NOT_DETECTED_ERROR = '6d55c3f4-e58e-4fe3-91ee-74b492199956';
-    const TOO_WIDE_ERROR = '7f87163d-878f-47f5-99ba-a8eb723a1ab2';
-    const TOO_NARROW_ERROR = '9afbd561-4f90-4a27-be62-1780fc43604a';
-    const TOO_HIGH_ERROR = '7efae81c-4877-47ba-aa65-d01ccb0d4645';
-    const TOO_LOW_ERROR = 'aef0cb6a-c07f-4894-bc08-1781420d7b4c';
-    const TOO_FEW_PIXEL_ERROR = '1b06b97d-ae48-474e-978f-038a74854c43';
-    const TOO_MANY_PIXEL_ERROR = 'ee0804e8-44db-4eac-9775-be91aaf72ce1';
-    const RATIO_TOO_BIG_ERROR = '70cafca6-168f-41c9-8c8c-4e47a52be643';
-    const RATIO_TOO_SMALL_ERROR = '59b8c6ef-bcf2-4ceb-afff-4642ed92f12e';
-    const SQUARE_NOT_ALLOWED_ERROR = '5d41425b-facb-47f7-a55a-de9fbe45cb46';
-    const LANDSCAPE_NOT_ALLOWED_ERROR = '6f895685-7cf2-4d65-b3da-9029c5581d88';
-    const PORTRAIT_NOT_ALLOWED_ERROR = '65608156-77da-4c79-a88c-02ef6d18c782';
-    const CORRUPTED_IMAGE_ERROR = '5d4163f3-648f-4e39-87fd-cc5ea7aad2d1';
+    public const SIZE_NOT_DETECTED_ERROR = '6d55c3f4-e58e-4fe3-91ee-74b492199956';
+    public const TOO_WIDE_ERROR = '7f87163d-878f-47f5-99ba-a8eb723a1ab2';
+    public const TOO_NARROW_ERROR = '9afbd561-4f90-4a27-be62-1780fc43604a';
+    public const TOO_HIGH_ERROR = '7efae81c-4877-47ba-aa65-d01ccb0d4645';
+    public const TOO_LOW_ERROR = 'aef0cb6a-c07f-4894-bc08-1781420d7b4c';
+    public const TOO_FEW_PIXEL_ERROR = '1b06b97d-ae48-474e-978f-038a74854c43';
+    public const TOO_MANY_PIXEL_ERROR = 'ee0804e8-44db-4eac-9775-be91aaf72ce1';
+    public const RATIO_TOO_BIG_ERROR = '70cafca6-168f-41c9-8c8c-4e47a52be643';
+    public const RATIO_TOO_SMALL_ERROR = '59b8c6ef-bcf2-4ceb-afff-4642ed92f12e';
+    public const SQUARE_NOT_ALLOWED_ERROR = '5d41425b-facb-47f7-a55a-de9fbe45cb46';
+    public const LANDSCAPE_NOT_ALLOWED_ERROR = '6f895685-7cf2-4d65-b3da-9029c5581d88';
+    public const PORTRAIT_NOT_ALLOWED_ERROR = '65608156-77da-4c79-a88c-02ef6d18c782';
+    public const CORRUPTED_IMAGE_ERROR = '5d4163f3-648f-4e39-87fd-cc5ea7aad2d1';
 
     // Include the mapping from the base class
 
-    protected static $errorNames = [
+    protected const ERROR_NAMES = [
         self::NOT_FOUND_ERROR => 'NOT_FOUND_ERROR',
         self::NOT_READABLE_ERROR => 'NOT_READABLE_ERROR',
         self::EMPTY_ERROR => 'EMPTY_ERROR',
@@ -57,6 +57,11 @@ class Image extends File
         self::PORTRAIT_NOT_ALLOWED_ERROR => 'PORTRAIT_NOT_ALLOWED_ERROR',
         self::CORRUPTED_IMAGE_ERROR => 'CORRUPTED_IMAGE_ERROR',
     ];
+
+    /**
+     * @deprecated since Symfony 6.1, use const ERROR_NAMES instead
+     */
+    protected static $errorNames = self::ERROR_NAMES;
 
     public $mimeTypes = 'image/*';
     public $minWidth;
@@ -88,27 +93,19 @@ class Image extends File
     public $allowPortraitMessage = 'The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.';
     public $corruptedMessage = 'The image file is corrupted.';
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param int|float $maxRatio
-     * @param int|float $minRatio
-     * @param int|float $minPixels
-     * @param int|float $maxPixels
-     */
     public function __construct(
         array $options = null,
-        $maxSize = null,
+        int|string $maxSize = null,
         bool $binaryFormat = null,
         array $mimeTypes = null,
         int $minWidth = null,
         int $maxWidth = null,
         int $maxHeight = null,
         int $minHeight = null,
-        $maxRatio = null,
-        $minRatio = null,
-        $minPixels = null,
-        $maxPixels = null,
+        int|float $maxRatio = null,
+        int|float $minRatio = null,
+        int|float $minPixels = null,
+        int|float $maxPixels = null,
         bool $allowSquare = null,
         bool $allowLandscape = null,
         bool $allowPortrait = null,
@@ -140,7 +137,7 @@ class Image extends File
         string $allowPortraitMessage = null,
         string $corruptedMessage = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         parent::__construct(
             $options,
@@ -189,5 +186,9 @@ class Image extends File
         $this->allowLandscapeMessage = $allowLandscapeMessage ?? $this->allowLandscapeMessage;
         $this->allowPortraitMessage = $allowPortraitMessage ?? $this->allowPortraitMessage;
         $this->corruptedMessage = $corruptedMessage ?? $this->corruptedMessage;
+
+        if (!\in_array('image/*', (array) $this->mimeTypes, true) && !\array_key_exists('mimeTypesMessage', $options ?? []) && null === $mimeTypesMessage) {
+            $this->mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
+        }
     }
 }

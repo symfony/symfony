@@ -60,7 +60,7 @@ trait ExpiringStoreTestTrait
      */
     public function testAbortAfterExpiration()
     {
-        $this->expectException('\Symfony\Component\Lock\Exception\LockExpiredException');
+        $this->expectException(LockExpiredException::class);
         $key = new Key(uniqid(__METHOD__, true));
 
         /** @var PersistingStoreInterface $store */

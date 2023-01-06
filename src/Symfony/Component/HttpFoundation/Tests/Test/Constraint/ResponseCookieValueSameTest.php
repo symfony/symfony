@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseCookieValueSame;
 
 class ResponseCookieValueSameTest extends TestCase
 {
-    public function testConstraint(): void
+    public function testConstraint()
     {
         $response = new Response();
         $response->headers->setCookie(Cookie::create('foo', 'bar', 0, '/path'));
@@ -40,5 +40,13 @@ class ResponseCookieValueSameTest extends TestCase
         }
 
         $this->fail();
+    }
+
+    public function testCookieWithNullValueIsComparedAsEmptyString()
+    {
+        $response = new Response();
+        $response->headers->setCookie(Cookie::create('foo', null, 0, '/path'));
+
+        $this->assertTrue((new ResponseCookieValueSame('foo', '', '/path'))->evaluate($response, '', true));
     }
 }

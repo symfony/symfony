@@ -12,18 +12,16 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Tests\Fixtures\DummyFormRendererEngine;
 
 class FormRendererTest extends TestCase
 {
     public function testHumanize()
     {
-        $renderer = $this->getMockBuilder('Symfony\Component\Form\FormRenderer')
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        $renderer = new FormRenderer(new DummyFormRendererEngine());
 
         $this->assertEquals('Is active', $renderer->humanize('is_active'));
         $this->assertEquals('Is active', $renderer->humanize('isActive'));
@@ -31,15 +29,14 @@ class FormRendererTest extends TestCase
 
     public function testRenderARenderedField()
     {
-        $this->expectException('Symfony\Component\Form\Exception\BadMethodCallException');
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Field "foo" has already been rendered, save the result of previous render call to a variable and output that instead.');
 
         $formView = new FormView();
         $formView->vars['name'] = 'foo';
         $formView->setRendered();
 
-        $engine = $this->getMockBuilder('Symfony\Component\Form\FormRendererEngineInterface')->getMock();
-        $renderer = new FormRenderer($engine);
+        $renderer = new FormRenderer(new DummyFormRendererEngine());
         $renderer->searchAndRenderBlock($formView, 'row');
     }
 }

@@ -44,7 +44,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Το Username δε βρέθηκε.</target>
+                <target>Το όνομα χρήστη δε βρέθηκε.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
@@ -61,6 +61,22 @@
             <trans-unit id="16">
                 <source>Account is locked.</source>
                 <target>Ο λογαριασμός είναι κλειδωμένος.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Πολλαπλές αποτυχημένες απόπειρες σύνδεσης, παρακαλούμε ξαναδοκιμάστε αργότερα.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Μη έγκυρος ή ληγμένος σύνδεσμος σύνδεσης.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Πολλαπλές αποτυχημένες απόπειρες σύνδεσης, παρακαλούμε ξαναδοκιμάστε σε %minutes% λεπτό.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Πολλαπλές αποτυχημένες απόπειρες σύνδεσης, παρακαλούμε ξαναδοκιμάστε σε %minutes% λεπτά.</target>
             </trans-unit>
         </body>
     </file>

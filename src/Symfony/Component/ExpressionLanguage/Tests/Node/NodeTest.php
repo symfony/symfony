@@ -26,7 +26,7 @@ Node(
     ConstantNode(value: 'foo')
 )
 EOF
-        , (string) $node);
+            , (string) $node);
     }
 
     public function testSerialization()

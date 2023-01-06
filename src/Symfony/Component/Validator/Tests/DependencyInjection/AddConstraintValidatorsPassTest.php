@@ -47,7 +47,7 @@ class AddConstraintValidatorsPassTest extends TestCase
 
     public function testAbstractConstraintValidator()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.');
         $container = new ContainerBuilder();
         $container->register('validator.validator_factory')

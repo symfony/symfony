@@ -62,6 +62,22 @@
                 <source>Account is locked.</source>
                 <target>A conta está bloqueada.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Demasiados intentos de inicio de sesión fallados. Téntao de novo máis tarde.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Ligazón de inicio de sesión non válida ou caducada.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Demasiados intentos de inicio de sesión errados, por favor, ténteo de novo en %minutes% minuto.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Demasiados intentos de inicio de sesión errados, por favor, ténteo de novo en %minutes% minutos.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\FragmentListener;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\UriSigner;
 
@@ -52,7 +53,7 @@ class FragmentListenerTest extends TestCase
 
     public function testAccessDeniedWithNonSafeMethods()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException');
+        $this->expectException(AccessDeniedHttpException::class);
         $request = Request::create('http://example.com/_fragment', 'POST');
 
         $listener = new FragmentListener(new UriSigner('foo'));
@@ -63,7 +64,7 @@ class FragmentListenerTest extends TestCase
 
     public function testAccessDeniedWithWrongSignature()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException');
+        $this->expectException(AccessDeniedHttpException::class);
         $request = Request::create('http://example.com/_fragment', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
 
         $listener = new FragmentListener(new UriSigner('foo'));
@@ -111,8 +112,8 @@ class FragmentListenerTest extends TestCase
         $this->assertFalse($request->query->has('_path'));
     }
 
-    private function createRequestEvent(Request $request, $requestType = HttpKernelInterface::MASTER_REQUEST)
+    private function createRequestEvent(Request $request, int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
-        return new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, $requestType);
+        return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, $requestType);
     }
 }

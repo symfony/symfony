@@ -13,11 +13,13 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Ip;
 use Symfony\Component\Validator\Constraints\IpValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IpValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): IpValidator
     {
         return new IpValidator();
     }
@@ -38,13 +40,13 @@ class IpValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Ip());
     }
 
     public function testInvalidValidatorVersion()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         new Ip([
             'version' => 666,
         ]);
@@ -85,6 +87,16 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             'version' => Ip::V4,
             'normalizer' => 'trim',
         ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidIpV6WithWhitespacesNamed()
+    {
+        $this->validator->validate(
+            "\n\t2001:0db8:85a3:0000:0000:8a2e:0370:7334\r\n",
+            new Ip(version: \Symfony\Component\Validator\Constraints\Ip::V6, normalizer: 'trim')
+        );
 
         $this->assertNoViolation();
     }

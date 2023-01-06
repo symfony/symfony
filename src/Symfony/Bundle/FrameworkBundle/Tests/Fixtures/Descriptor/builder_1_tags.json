@@ -9,12 +9,14 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
             "calls": [
                 "setMailer"
-            ]
+            ],
+            "usages": []
         }
     ],
     "tag2": [
@@ -27,12 +29,14 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
             "calls": [
                 "setMailer"
-            ]
+            ],
+            "usages": []
         }
     ]
 }

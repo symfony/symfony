@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
-use Symfony\Component\Yaml\Dumper;
-use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -58,9 +56,20 @@ class YamlEncoderTest extends TestCase
         $this->assertFalse($encoder->supportsDecoding('json'));
     }
 
+    public function testIndentation()
+    {
+        $encoder = new YamlEncoder(null, null, [YamlEncoder::YAML_INLINE => 100, YamlEncoder::YAML_INDENTATION => 7]);
+
+        $expected = <<<'END'
+foo:
+       bar: baz
+END;
+        $this->assertSame($expected."\n", $encoder->encode(['foo' => ['bar' => 'baz']], 'yaml'));
+    }
+
     public function testContext()
     {
-        $encoder = new YamlEncoder(new Dumper(), new Parser(), ['yaml_inline' => 1, 'yaml_indent' => 4, 'yaml_flags' => Yaml::DUMP_OBJECT | Yaml::PARSE_OBJECT]);
+        $encoder = new YamlEncoder(null, null, [YamlEncoder::YAML_INLINE => 1, YamlEncoder::YAML_INDENT => 4, YamlEncoder::YAML_FLAGS => Yaml::DUMP_OBJECT | Yaml::PARSE_OBJECT]);
 
         $obj = new \stdClass();
         $obj->bar = 2;
@@ -68,8 +77,8 @@ class YamlEncoderTest extends TestCase
         $legacyTag = "    foo: !php/object:O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}\n";
         $spacedTag = "    foo: !php/object 'O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}'\n";
         $this->assertThat($encoder->encode(['foo' => $obj], 'yaml'), $this->logicalOr($this->equalTo($legacyTag), $this->equalTo($spacedTag)));
-        $this->assertEquals('  { foo: null }', $encoder->encode(['foo' => $obj], 'yaml', ['yaml_inline' => 0, 'yaml_indent' => 2, 'yaml_flags' => 0]));
+        $this->assertEquals('  { foo: null }', $encoder->encode(['foo' => $obj], 'yaml', [YamlEncoder::YAML_INLINE => 0, YamlEncoder::YAML_INDENT => 2, YamlEncoder::YAML_FLAGS => 0]));
         $this->assertEquals(['foo' => $obj], $encoder->decode("foo: !php/object 'O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}'", 'yaml'));
-        $this->assertEquals(['foo' => null], $encoder->decode("foo: !php/object 'O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}'", 'yaml', ['yaml_flags' => 0]));
+        $this->assertEquals(['foo' => null], $encoder->decode("foo: !php/object 'O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}'", 'yaml', [YamlEncoder::YAML_FLAGS => 0]));
     }
 }

@@ -330,6 +330,78 @@
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Aquest Codi d'identificació bancari (BIC) no està associat amb l'IBAN {{ iban }}.</target>
             </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Aquest valor hauria de ser un JSON vàlid.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Aquesta col·lecció només hauria de contenir elements únics.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Aquest valor hauria de ser positiu.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Aquest valor ha de ser positiu o zero.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Aquest valor ha de ser negatiu.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Aquest valor ha de ser negatiu o zero.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Aquest valor no és una zona horària vàlida.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Aquesta contrasenya s'ha filtrat en cas de violació de dades, no s'ha d'utilitzar. Utilitzeu una altra contrasenya.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Aquest valor ha d'estar entre {{ min }} i {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Aquest valor no és un nom d'amfitrió vàlid.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>El nombre d'elements d'aquesta col·lecció ha de ser múltiple de {{compared_value}}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Aquest valor ha de satisfer almenys una de les restriccions següents:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Cada element d'aquesta col·lecció hauria de satisfer el seu propi conjunt de restriccions.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Aquest valor no és un número d'identificació de valors internacionals (ISIN) vàlid.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Aquest valor hauria de ser una expressió vàlida.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Aquest valor no és un color CSS vàlid.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Aquest valor no és una notació CIDR vàlida.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>El valor de la màscara de xarxa hauria d'estar entre {{ min }} i {{ max }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

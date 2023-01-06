@@ -12,28 +12,26 @@
 namespace Symfony\Component\Notifier\Bridge\Firebase;
 
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
- *
- * @experimental in 5.1
  */
 final class FirebaseTransport extends AbstractTransport
 {
     protected const HOST = 'fcm.googleapis.com/fcm/send';
 
-    /** @var string */
-    private $token;
+    private string $token;
 
-    public function __construct(string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->client = $client;
@@ -54,7 +52,7 @@ final class FirebaseTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
         $endpoint = sprintf('https://%s', $this->getEndpoint());
@@ -65,8 +63,10 @@ final class FirebaseTransport extends AbstractTransport
         if (null === $options['to']) {
             throw new InvalidArgumentException(sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
-        $options['notification'] = $options['notification'] ?? [];
+        $options['notification'] ??= [];
         $options['notification']['body'] = $message->getSubject();
+        $options['data'] ??= [];
+
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Authorization' => sprintf('key=%s', $this->token),
@@ -74,23 +74,31 @@ final class FirebaseTransport extends AbstractTransport
             'json' => array_filter($options),
         ]);
 
-        $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-        $jsonContents = 0 === strpos($contentType, 'application/json') ? $response->toArray(false) : null;
-
-        if (200 !== $response->getStatusCode()) {
-            $errorMessage = $jsonContents ? $jsonContents['results']['error'] : $response->getContent(false);
-
-            throw new TransportException(sprintf('Unable to post the Firebase message: %s.', $errorMessage), $response);
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Firebase server.', $response, 0, $e);
         }
-        if ($jsonContents && isset($jsonContents['results']['error'])) {
-            throw new TransportException(sprintf('Unable to post the Firebase message: %s.', $jsonContents['error']), $response);
+
+        $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
+        $jsonContents = str_starts_with($contentType, 'application/json') ? $response->toArray(false) : null;
+        $errorMessage = null;
+
+        if ($jsonContents && isset($jsonContents['results'][0]['error'])) {
+            $errorMessage = $jsonContents['results'][0]['error'];
+        } elseif (200 !== $statusCode) {
+            $errorMessage = $response->getContent(false);
+        }
+
+        if (null !== $errorMessage) {
+            throw new TransportException('Unable to post the Firebase message: '.$errorMessage, $response);
         }
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['results'][0]['message_id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['results'][0]['message_id'] ?? '');
 
-        return $message;
+        return $sentMessage;
     }
 }

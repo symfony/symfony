@@ -35,17 +35,12 @@ class CachePoolsTest extends AbstractWebTestCase
         try {
             $this->doTestCachePools(['root_config' => 'redis_config.yml', 'environment' => 'redis_cache'], RedisAdapter::class);
         } catch (\PHPUnit\Framework\Error\Warning $e) {
-            if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
-                throw $e;
-            }
-            $this->markTestSkipped($e->getMessage());
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
-            if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
+            if (!str_starts_with($e->getMessage(), 'unable to connect to')) {
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());
         } catch (InvalidArgumentException $e) {
-            if (0 !== strpos($e->getMessage(), 'Redis connection ')) {
+            if (!str_starts_with($e->getMessage(), 'Redis connection ')) {
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());
@@ -63,12 +58,7 @@ class CachePoolsTest extends AbstractWebTestCase
         try {
             $this->doTestCachePools(['root_config' => 'redis_custom_config.yml', 'environment' => 'custom_redis_cache'], RedisAdapter::class);
         } catch (\PHPUnit\Framework\Error\Warning $e) {
-            if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
-                throw $e;
-            }
-            $this->markTestSkipped($e->getMessage());
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
-            if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
+            if (!str_starts_with($e->getMessage(), 'unable to connect to')) {
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());
@@ -78,7 +68,7 @@ class CachePoolsTest extends AbstractWebTestCase
     private function doTestCachePools($options, $adapterClass)
     {
         static::bootKernel($options);
-        $container = static::$container;
+        $container = static::getContainer();
 
         $pool1 = $container->get('cache.pool1');
         $this->assertInstanceOf($adapterClass, $pool1);
@@ -131,7 +121,7 @@ class CachePoolsTest extends AbstractWebTestCase
     private function skipIfRedisUnavailable()
     {
         try {
-            (new \Redis())->connect(getenv('REDIS_HOST'));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }

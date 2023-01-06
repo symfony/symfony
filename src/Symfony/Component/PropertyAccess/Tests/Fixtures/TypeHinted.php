@@ -23,7 +23,7 @@ class TypeHinted
      */
     private $countable;
 
-    public function setDate(\DateTime $date)
+    public function setDate(\DateTimeImmutable $date)
     {
         $this->date = $date;
     }

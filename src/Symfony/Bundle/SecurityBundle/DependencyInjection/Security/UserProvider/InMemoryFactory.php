@@ -48,7 +48,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
             ->fixXmlConfig('user')
             ->children()
                 ->arrayNode('users')
-                    ->useAttributeAsKey('name')
+                    ->useAttributeAsKey('identifier')
                     ->normalizeKeys(false)
                     ->prototype('array')
                         ->children()

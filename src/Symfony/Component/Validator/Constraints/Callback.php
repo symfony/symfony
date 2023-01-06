@@ -27,12 +27,7 @@ class Callback extends Constraint
      */
     public $callback;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param array|string|callable $callback The callback or a set of options
-     */
-    public function __construct($callback = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct(array|string|callable $callback = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         // Invocation through annotations with an array parameter only
         if (\is_array($callback) && 1 === \count($callback) && isset($callback['value'])) {
@@ -48,18 +43,12 @@ class Callback extends Constraint
         parent::__construct($options, $groups, $payload);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'callback';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];
     }

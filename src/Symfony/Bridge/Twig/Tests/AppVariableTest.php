@@ -1,12 +1,25 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Twig\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class AppVariableTest extends TestCase
 {
@@ -50,7 +63,7 @@ class AppVariableTest extends TestCase
      */
     public function testGetSession()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->createMock(Request::class);
         $request->method('hasSession')->willReturn(true);
         $request->method('getSession')->willReturn($session = new Session());
 
@@ -75,10 +88,10 @@ class AppVariableTest extends TestCase
 
     public function testGetToken()
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 
         $this->assertEquals($token, $this->appVariable->getToken());
@@ -86,21 +99,14 @@ class AppVariableTest extends TestCase
 
     public function testGetUser()
     {
-        $this->setTokenStorage($user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock());
+        $this->setTokenStorage($user = $this->createMock(UserInterface::class));
 
         $this->assertEquals($user, $this->appVariable->getUser());
     }
 
-    public function testGetUserWithUsernameAsTokenUser()
-    {
-        $this->setTokenStorage($user = 'username');
-
-        $this->assertNull($this->appVariable->getUser());
-    }
-
     public function testGetTokenWithNoToken()
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
 
         $this->assertNull($this->appVariable->getToken());
@@ -108,7 +114,7 @@ class AppVariableTest extends TestCase
 
     public function testGetUserWithNoToken()
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
 
         $this->assertNull($this->appVariable->getUser());
@@ -116,37 +122,37 @@ class AppVariableTest extends TestCase
 
     public function testEnvironmentNotSet()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->appVariable->getEnvironment();
     }
 
     public function testDebugNotSet()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->appVariable->getDebug();
     }
 
     public function testGetTokenWithTokenStorageNotSet()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->appVariable->getToken();
     }
 
     public function testGetUserWithTokenStorageNotSet()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->appVariable->getUser();
     }
 
     public function testGetRequestWithRequestStackNotSet()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->appVariable->getRequest();
     }
 
     public function testGetSessionWithRequestStackNotSet()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->appVariable->getSession();
     }
 
@@ -222,9 +228,43 @@ class AppVariableTest extends TestCase
         );
     }
 
+    public function testGetCurrentRoute()
+    {
+        $this->setRequestStack(new Request(attributes: ['_route' => 'some_route']));
+
+        $this->assertSame('some_route', $this->appVariable->getCurrent_route());
+    }
+
+    public function testGetCurrentRouteWithRequestStackNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->appVariable->getCurrent_route();
+    }
+
+    public function testGetCurrentRouteParameters()
+    {
+        $routeParams = ['some_param' => true];
+        $this->setRequestStack(new Request(attributes: ['_route_params' => $routeParams]));
+
+        $this->assertSame($routeParams, $this->appVariable->getCurrent_route_parameters());
+    }
+
+    public function testGetCurrentRouteParametersWithoutAttribute()
+    {
+        $this->setRequestStack(new Request());
+
+        $this->assertSame([], $this->appVariable->getCurrent_route_parameters());
+    }
+
+    public function testGetCurrentRouteParametersWithRequestStackNotSet()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->appVariable->getCurrent_route_parameters();
+    }
+
     protected function setRequestStack($request)
     {
-        $requestStackMock = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
+        $requestStackMock = $this->createMock(RequestStack::class);
         $requestStackMock->method('getCurrentRequest')->willReturn($request);
 
         $this->appVariable->setRequestStack($requestStackMock);
@@ -232,10 +272,10 @@ class AppVariableTest extends TestCase
 
     protected function setTokenStorage($user)
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->appVariable->setTokenStorage($tokenStorage);
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 
         $token->method('getUser')->willReturn($user);
@@ -251,11 +291,11 @@ class AppVariableTest extends TestCase
         $flashBag = new FlashBag();
         $flashBag->initialize($flashMessages);
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn($sessionHasStarted);
         $session->method('getFlashBag')->willReturn($flashBag);
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->createMock(Request::class);
         $request->method('hasSession')->willReturn(true);
         $request->method('getSession')->willReturn($session);
         $this->setRequestStack($request);

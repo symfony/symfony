@@ -14,7 +14,11 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group legacy
+ */
 class RequestMatcherTest extends TestCase
 {
     /**
@@ -46,8 +50,8 @@ class RequestMatcherTest extends TestCase
 
     public function testScheme()
     {
-        $httpRequest = $request = $request = Request::create('');
-        $httpsRequest = $request = $request = Request::create('', 'get', [], [], [], ['HTTPS' => 'on']);
+        $httpRequest = Request::create('');
+        $httpsRequest = Request::create('', 'get', [], [], [], ['HTTPS' => 'on']);
 
         $matcher = new RequestMatcher();
         $matcher->matchScheme('https');
@@ -161,6 +165,19 @@ class RequestMatcherTest extends TestCase
         $this->assertTrue($matcher->matches($request));
 
         $matcher->matchAttribute('foo', 'babar');
+        $this->assertFalse($matcher->matches($request));
+    }
+
+    public function testAttributesWithClosure()
+    {
+        $matcher = new RequestMatcher();
+
+        $request = Request::create('/admin/foo');
+        $request->attributes->set('_controller', function () {
+            return new Response('foo');
+        });
+
+        $matcher->matchAttribute('_controller', 'babar');
         $this->assertFalse($matcher->matches($request));
     }
 

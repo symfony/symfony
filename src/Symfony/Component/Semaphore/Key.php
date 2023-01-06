@@ -16,8 +16,6 @@ use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 /**
  * Key is a container for the state of the semaphores in stores.
  *
- * @experimental in 5.2
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
@@ -65,7 +63,7 @@ final class Key
         return isset($this->state[$stateKey]);
     }
 
-    public function setState(string $stateKey, $state): void
+    public function setState(string $stateKey, mixed $state): void
     {
         $this->state[$stateKey] = $state;
     }
@@ -75,9 +73,14 @@ final class Key
         unset($this->state[$stateKey]);
     }
 
-    public function getState(string $stateKey)
+    public function getState(string $stateKey): mixed
     {
         return $this->state[$stateKey];
+    }
+
+    public function resetLifetime(): void
+    {
+        $this->expiringTime = null;
     }
 
     public function reduceLifetime(float $ttlInSeconds)

@@ -23,7 +23,7 @@ class HIncludeFragmentRendererTest extends TestCase
 {
     public function testRenderExceptionWhenControllerAndNoSigner()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $strategy = new HIncludeFragmentRenderer();
         $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'));
     }

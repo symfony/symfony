@@ -20,14 +20,14 @@ class ObjectLoaderTest extends TestCase
 {
     public function testLoadCallsServiceAndReturnsCollection()
     {
-        $loader = new TestObjectLoader();
+        $loader = new TestObjectLoader('some-env');
 
         // create a basic collection that will be returned
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
 
         $loader->loaderMap = [
-            'my_route_provider_service' => new TestObjectLoaderRouteService($collection),
+            'my_route_provider_service' => new TestObjectLoaderRouteService($collection, 'some-env'),
         ];
 
         $actualRoutes = $loader->load(
@@ -43,9 +43,9 @@ class ObjectLoaderTest extends TestCase
     /**
      * @dataProvider getBadResourceStrings
      */
-    public function testExceptionWithoutSyntax(string $resourceString): void
+    public function testExceptionWithoutSyntax(string $resourceString)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $loader = new TestObjectLoader();
         $loader->load($resourceString);
     }
@@ -72,7 +72,7 @@ class ObjectLoaderTest extends TestCase
 
     public function testExceptionOnBadMethod()
     {
-        $this->expectException('BadMethodCallException');
+        $this->expectException(\BadMethodCallException::class);
         $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => new \stdClass()];
         $loader->load('my_service::method');
@@ -80,8 +80,8 @@ class ObjectLoaderTest extends TestCase
 
     public function testExceptionOnMethodNotReturningCollection()
     {
-        $this->expectException('LogicException');
-        $service = $this->getMockBuilder('stdClass')
+        $this->expectException(\LogicException::class);
+        $service = $this->getMockBuilder(\stdClass::class)
             ->setMethods(['loadRoutes'])
             ->getMock();
         $service->expects($this->once())
@@ -98,12 +98,12 @@ class TestObjectLoader extends ObjectLoader
 {
     public $loaderMap = [];
 
-    public function supports($resource, string $type = null): bool
+    public function supports(mixed $resource, string $type = null): bool
     {
         return 'service';
     }
 
-    protected function getObject(string $id)
+    protected function getObject(string $id): object
     {
         return $this->loaderMap[$id] ?? null;
     }
@@ -112,14 +112,20 @@ class TestObjectLoader extends ObjectLoader
 class TestObjectLoaderRouteService
 {
     private $collection;
+    private $env;
 
-    public function __construct($collection)
+    public function __construct($collection, string $env = null)
     {
         $this->collection = $collection;
+        $this->env = $env;
     }
 
-    public function loadRoutes()
+    public function loadRoutes(TestObjectLoader $loader, string $env = null)
     {
+        if ($this->env !== $env) {
+            throw new \InvalidArgumentException(sprintf('Expected env "%s", "%s" given.', $this->env, $env));
+        }
+
         return $this->collection;
     }
 }

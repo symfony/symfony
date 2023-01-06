@@ -30,11 +30,9 @@ class FileResourceTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (!file_exists($this->file)) {
-            return;
+        if (file_exists($this->file)) {
+            @unlink($this->file);
         }
-
-        unlink($this->file);
     }
 
     public function testGetResource()
@@ -55,7 +53,7 @@ class FileResourceTest extends TestCase
 
     public function testResourceDoesNotExist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The file ".*" does not exist./');
         new FileResource('/____foo/foobar'.mt_rand(1, 999999));
     }

@@ -1,7 +1,7 @@
 {
     "name": "symfony/ldap",
     "type": "library",
-    "description": "An abstraction in front of PHP's LDAP functions, compatible with PHP 5.3.9 onwards.",
+    "description": "Provides a LDAP client for PHP on top of PHP's ldap extension",
     "keywords": ["ldap", "active directory"],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -16,17 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/options-resolver": "^4.4|^5.0",
-        "symfony/polyfill-php80": "^1.15",
-        "ext-ldap": "*"
+        "php": ">=8.1",
+        "ext-ldap": "*",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/options-resolver": "^5.4|^6.0"
     },
     "require-dev": {
-        "symfony/security-core": "^5.0"
+        "symfony/security-core": "^5.4|^6.0",
+        "symfony/security-http": "^5.4|^6.0"
     },
     "conflict": {
-        "symfony/options-resolver": "<4.4",
-        "symfony/security-core": "<5"
+        "symfony/options-resolver": "<5.4",
+        "symfony/security-core": "<5.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },
@@ -34,6 +35,5 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "version": "5.2.x-dev"
+    "minimum-stability": "dev"
 }

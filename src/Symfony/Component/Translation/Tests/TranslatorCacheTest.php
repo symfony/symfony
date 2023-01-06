@@ -104,8 +104,8 @@ class TranslatorCacheTest extends TestCase
         $catalogue = new MessageCatalogue($locale, []);
         $catalogue->addResource(new StaleResource()); // better use a helper class than a mock, because it gets serialized in the cache and re-loaded
 
-        /** @var LoaderInterface|MockObject $loader */
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        /** @var MockObject&LoaderInterface $loader */
+        $loader = $this->createMock(LoaderInterface::class);
         $loader
             ->expects($this->exactly(2))
             ->method('load')
@@ -252,8 +252,8 @@ class TranslatorCacheTest extends TestCase
 
     public function testRefreshCacheWhenResourcesAreNoLongerFresh()
     {
-        $resource = $this->getMockBuilder('Symfony\Component\Config\Resource\SelfCheckingResourceInterface')->getMock();
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $resource = $this->createMock(SelfCheckingResourceInterface::class);
+        $loader = $this->createMock(LoaderInterface::class);
         $resource->method('isFresh')->willReturn(false);
         $loader
             ->expects($this->exactly(2))
@@ -309,7 +309,7 @@ class TranslatorCacheTest extends TestCase
 
     private function createFailingLoader(): LoaderInterface
     {
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
         $loader
             ->expects($this->never())
             ->method('load');
@@ -320,7 +320,7 @@ class TranslatorCacheTest extends TestCase
 
 class StaleResource implements SelfCheckingResourceInterface
 {
-    public function isFresh($timestamp): bool
+    public function isFresh(int $timestamp): bool
     {
         return false;
     }

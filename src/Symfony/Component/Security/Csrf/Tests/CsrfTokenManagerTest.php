@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -42,9 +44,9 @@ class CsrfTokenManagerTest extends TestCase
 
         $token = $manager->getToken('token_id');
 
-        $this->assertInstanceOf('Symfony\Component\Security\Csrf\CsrfToken', $token);
+        $this->assertInstanceOf(CsrfToken::class, $token);
         $this->assertSame('token_id', $token->getId());
-        $this->assertSame('TOKEN', $token->getValue());
+        $this->assertNotSame('TOKEN', $token->getValue());
     }
 
     /**
@@ -64,9 +66,36 @@ class CsrfTokenManagerTest extends TestCase
 
         $token = $manager->getToken('token_id');
 
-        $this->assertInstanceOf('Symfony\Component\Security\Csrf\CsrfToken', $token);
+        $this->assertInstanceOf(CsrfToken::class, $token);
         $this->assertSame('token_id', $token->getId());
-        $this->assertSame('TOKEN', $token->getValue());
+        $this->assertNotSame('TOKEN', $token->getValue());
+    }
+
+    /**
+     * @dataProvider getManagerGeneratorAndStorage
+     */
+    public function testRandomizeTheToken($namespace, $manager, $storage)
+    {
+        $storage->expects($this->any())
+            ->method('hasToken')
+            ->with($namespace.'token_id')
+            ->willReturn(true);
+
+        $storage->expects($this->any())
+            ->method('getToken')
+            ->with($namespace.'token_id')
+            ->willReturn('TOKEN');
+
+        $values = [];
+        $lengths = [];
+        for ($i = 0; $i < 10; ++$i) {
+            $token = $manager->getToken('token_id');
+            $values[] = $token->getValue();
+            $lengths[] = \strlen($token->getValue());
+        }
+
+        $this->assertCount(10, array_unique($values));
+        $this->assertGreaterThan(2, \count(array_unique($lengths)));
     }
 
     /**
@@ -87,15 +116,35 @@ class CsrfTokenManagerTest extends TestCase
 
         $token = $manager->refreshToken('token_id');
 
-        $this->assertInstanceOf('Symfony\Component\Security\Csrf\CsrfToken', $token);
+        $this->assertInstanceOf(CsrfToken::class, $token);
         $this->assertSame('token_id', $token->getId());
-        $this->assertSame('TOKEN', $token->getValue());
+        $this->assertNotSame('TOKEN', $token->getValue());
     }
 
     /**
      * @dataProvider getManagerGeneratorAndStorage
      */
     public function testMatchingTokenIsValid($namespace, $manager, $storage)
+    {
+        $storage->expects($this->exactly(2))
+            ->method('hasToken')
+            ->with($namespace.'token_id')
+            ->willReturn(true);
+
+        $storage->expects($this->exactly(2))
+            ->method('getToken')
+            ->with($namespace.'token_id')
+            ->willReturn('TOKEN');
+
+        $token = $manager->getToken('token_id');
+        $this->assertNotSame('TOKEN', $token->getValue());
+        $this->assertTrue($manager->isTokenValid($token));
+    }
+
+    /**
+     * @dataProvider getManagerGeneratorAndStorage
+     */
+    public function testMatchingTokenIsValidWithLegacyToken($namespace, $manager, $storage)
     {
         $storage->expects($this->once())
             ->method('hasToken')
@@ -144,6 +193,26 @@ class CsrfTokenManagerTest extends TestCase
         $this->assertFalse($manager->isTokenValid(new CsrfToken('token_id', 'FOOBAR')));
     }
 
+    public function testTokenShouldNotTriggerDivisionByZero()
+    {
+        [$generator, $storage] = $this->getGeneratorAndStorage();
+        $manager = new CsrfTokenManager($generator, $storage);
+
+        // Scenario: the token that was returned is abc.def.ghi, and gets modified in the browser to abc..ghi
+
+        $storage->expects($this->once())
+            ->method('hasToken')
+            ->with('https-token_id')
+            ->willReturn(true);
+
+        $storage->expects($this->once())
+            ->method('getToken')
+            ->with('https-token_id')
+            ->willReturn('def');
+
+        $this->assertFalse($manager->isTokenValid(new CsrfToken('token_id', 'abc..ghi')));
+    }
+
     /**
      * @dataProvider getManagerGeneratorAndStorage
      */
@@ -159,9 +228,9 @@ class CsrfTokenManagerTest extends TestCase
 
     public function testNamespaced()
     {
-        $generator = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface')->getMock();
+        $generator = $this->createMock(TokenGeneratorInterface::class);
         $generator->expects($this->once())->method('generateToken')->willReturn('random');
-        $storage = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface')->getMock();
+        $storage = $this->createMock(TokenStorageInterface::class);
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [], [], [], [], ['HTTPS' => 'on']));
@@ -170,35 +239,34 @@ class CsrfTokenManagerTest extends TestCase
 
         $token = $manager->getToken('foo');
         $this->assertSame('foo', $token->getId());
-        $this->assertSame('random', $token->getValue());
     }
 
     public function getManagerGeneratorAndStorage()
     {
         $data = [];
 
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['', new CsrfTokenManager($generator, $storage, ''), $storage, $generator];
 
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['https-', new CsrfTokenManager($generator, $storage), $storage, $generator];
 
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['aNamespace-', new CsrfTokenManager($generator, $storage, 'aNamespace-'), $storage, $generator];
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [], [], [], [], ['HTTPS' => 'on']));
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['https-', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator];
 
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['generated-', new CsrfTokenManager($generator, $storage, function () {
             return 'generated-';
         }), $storage, $generator];
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator];
 
         return $data;
@@ -207,8 +275,8 @@ class CsrfTokenManagerTest extends TestCase
     private function getGeneratorAndStorage(): array
     {
         return [
-            $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface')->getMock(),
-            $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface')->getMock(),
+            $this->createMock(TokenGeneratorInterface::class),
+            $this->createMock(TokenStorageInterface::class),
         ];
     }
 

@@ -1,3 +1,4 @@
 <?php
 
-$container->loadFromExtension('framework', []);
+$container->loadFromExtension('framework', [
+    'http_method_override' => false,]);

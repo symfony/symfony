@@ -221,10 +221,10 @@ class ContentSecurityPolicyHandler
     private function hasHashOrNonce(array $directives): bool
     {
         foreach ($directives as $directive) {
-            if ('\'' !== substr($directive, -1)) {
+            if (!str_ends_with($directive, '\'')) {
                 continue;
             }
-            if ('\'nonce-' === substr($directive, 0, 7)) {
+            if (str_starts_with($directive, '\'nonce-')) {
                 return true;
             }
             if (\in_array(substr($directive, 0, 8), ['\'sha256-', '\'sha384-', '\'sha512-'], true)) {
@@ -235,7 +235,7 @@ class ContentSecurityPolicyHandler
         return false;
     }
 
-    private function getDirectiveFallback(array $directiveSet, $type)
+    private function getDirectiveFallback(array $directiveSet, string $type)
     {
         if (\in_array($type, ['script-src-elem', 'style-src-elem'], true) || !isset($directiveSet['default-src'])) {
             // Let the browser fallback on it's own

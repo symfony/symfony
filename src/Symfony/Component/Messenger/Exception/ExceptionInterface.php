@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Exception;
 
 /**
- * Base Message component's exception.
+ * Base Messenger component's exception.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */

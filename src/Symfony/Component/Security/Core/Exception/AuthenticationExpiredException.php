@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Exception;
 
 /**
- * AuthenticationExpiredException is thrown when an authenticated token becomes un-authenticated between requests.
+ * AuthenticationExpiredException is thrown when an authentication token becomes un-authenticated between requests.
  *
  * In practice, this is due to the User changing between requests (e.g. password changes),
  * causes the token to become un-authenticated.
@@ -21,10 +21,7 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class AuthenticationExpiredException extends AccountStatusException
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Authentication expired because your account information has changed.';
     }

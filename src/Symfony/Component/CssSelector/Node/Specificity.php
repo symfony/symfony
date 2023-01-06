@@ -25,13 +25,13 @@ namespace Symfony\Component\CssSelector\Node;
  */
 class Specificity
 {
-    const A_FACTOR = 100;
-    const B_FACTOR = 10;
-    const C_FACTOR = 1;
+    public const A_FACTOR = 100;
+    public const B_FACTOR = 10;
+    public const C_FACTOR = 1;
 
-    private $a;
-    private $b;
-    private $c;
+    private int $a;
+    private int $b;
+    private int $c;
 
     public function __construct(int $a, int $b, int $c)
     {

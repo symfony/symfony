@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Factory;
 
 use Symfony\Component\Validator\Exception\LogicException;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 
 /**
  * Metadata factory that does not store metadata.
@@ -24,18 +25,12 @@ use Symfony\Component\Validator\Exception\LogicException;
  */
 class BlackHoleMetadataFactory implements MetadataFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadataFor($value)
+    public function getMetadataFor(mixed $value): MetadataInterface
     {
         throw new LogicException('This class does not support metadata.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMetadataFor($value)
+    public function hasMetadataFor(mixed $value): bool
     {
         return false;
     }

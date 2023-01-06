@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Doctrine\DBAL\Version;
+use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PdoStore;
@@ -20,6 +20,7 @@ use Symfony\Component\Lock\Store\PdoStore;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @requires extension pdo_sqlite
+ * @group integration
  */
 class PdoStoreTest extends AbstractStoreTest
 {
@@ -31,10 +32,6 @@ class PdoStoreTest extends AbstractStoreTest
     {
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
-        if (\PHP_VERSION_ID >= 80000 && class_exists(Version::class)) {
-            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
-        }
-
         $store = new PdoStore('sqlite:'.self::$dbFile);
         $store->createTable();
     }
@@ -44,17 +41,11 @@ class PdoStoreTest extends AbstractStoreTest
         @unlink(self::$dbFile);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClockDelay()
     {
         return 1000000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStore(): PersistingStoreInterface
     {
         return new PdoStore('sqlite:'.self::$dbFile);
@@ -67,16 +58,16 @@ class PdoStoreTest extends AbstractStoreTest
 
     public function testInvalidTtl()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
+        $this->expectException(InvalidTtlException::class);
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }
 
     public function testInvalidTtlConstruct()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
+        $this->expectException(InvalidTtlException::class);
 
-        return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0.1);
+        return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0);
     }
 
     /**
@@ -88,7 +79,6 @@ class PdoStoreTest extends AbstractStoreTest
 
         try {
             $store = new PdoStore($dsn);
-            $store->createTable();
 
             $store->save($key);
             $this->assertTrue($store->exists($key));
@@ -102,10 +92,7 @@ class PdoStoreTest extends AbstractStoreTest
     public function provideDsn()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
         yield ['sqlite:'.$dbFile.'2', $dbFile.'2'];
-        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
-        yield ['sqlite://localhost/:memory:'];
         yield ['sqlite::memory:'];
     }
 }

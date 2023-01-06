@@ -17,7 +17,7 @@ class CustomFilterIteratorTest extends IteratorTestCase
 {
     public function testWithInvalidFilter()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new CustomFilterIterator(new Iterator(), ['foo']);
     }
 
@@ -37,7 +37,7 @@ class CustomFilterIteratorTest extends IteratorTestCase
     {
         return [
             [[function (\SplFileInfo $fileinfo) { return false; }], []],
-            [[function (\SplFileInfo $fileinfo) { return 0 === strpos($fileinfo, 'test'); }], ['test.php', 'test.py']],
+            [[function (\SplFileInfo $fileinfo) { return str_starts_with($fileinfo, 'test'); }], ['test.php', 'test.py']],
             [['is_dir'], []],
         ];
     }

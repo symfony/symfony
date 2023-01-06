@@ -13,7 +13,6 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
-use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
 
 /**
  * @group time-sensitive

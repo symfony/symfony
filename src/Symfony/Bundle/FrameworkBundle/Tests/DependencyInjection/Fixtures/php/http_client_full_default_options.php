@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'http_client' => [
         'default_options' => [
             'headers' => ['X-powered' => 'PHP'],
@@ -23,6 +24,7 @@ $container->loadFromExtension('framework', [
                 'pin-sha256' => ['14s5erg62v1v8471g2revg48r7==', 'jsda84hjtyd4821bgfesd215bsfg5412='],
                 'md5' => 'sdhtb481248721thbr=',
             ],
+            'extra' => ['foo' => ['bar' => 'baz']],
         ],
     ],
 ]);

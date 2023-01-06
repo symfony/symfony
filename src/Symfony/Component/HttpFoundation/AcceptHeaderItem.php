@@ -18,10 +18,10 @@ namespace Symfony\Component\HttpFoundation;
  */
 class AcceptHeaderItem
 {
-    private $value;
-    private $quality = 1.0;
-    private $index = 0;
-    private $attributes = [];
+    private string $value;
+    private float $quality = 1.0;
+    private int $index = 0;
+    private array $attributes = [];
 
     public function __construct(string $value, array $attributes = [])
     {
@@ -33,10 +33,8 @@ class AcceptHeaderItem
 
     /**
      * Builds an AcceptHeaderInstance instance from a string.
-     *
-     * @return self
      */
-    public static function fromString(?string $itemValue)
+    public static function fromString(?string $itemValue): self
     {
         $parts = HeaderUtils::split($itemValue ?? '', ';=');
 
@@ -48,10 +46,8 @@ class AcceptHeaderItem
 
     /**
      * Returns header value's string representation.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = $this->value.($this->quality < 1 ? ';q='.$this->quality : '');
         if (\count($this->attributes) > 0) {
@@ -66,7 +62,7 @@ class AcceptHeaderItem
      *
      * @return $this
      */
-    public function setValue(string $value)
+    public function setValue(string $value): static
     {
         $this->value = $value;
 
@@ -75,10 +71,8 @@ class AcceptHeaderItem
 
     /**
      * Returns the item value.
-     *
-     * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -88,7 +82,7 @@ class AcceptHeaderItem
      *
      * @return $this
      */
-    public function setQuality(float $quality)
+    public function setQuality(float $quality): static
     {
         $this->quality = $quality;
 
@@ -97,10 +91,8 @@ class AcceptHeaderItem
 
     /**
      * Returns the item quality.
-     *
-     * @return float
      */
-    public function getQuality()
+    public function getQuality(): float
     {
         return $this->quality;
     }
@@ -110,7 +102,7 @@ class AcceptHeaderItem
      *
      * @return $this
      */
-    public function setIndex(int $index)
+    public function setIndex(int $index): static
     {
         $this->index = $index;
 
@@ -119,42 +111,32 @@ class AcceptHeaderItem
 
     /**
      * Returns the item index.
-     *
-     * @return int
      */
-    public function getIndex()
+    public function getIndex(): int
     {
         return $this->index;
     }
 
     /**
      * Tests if an attribute exists.
-     *
-     * @return bool
      */
-    public function hasAttribute(string $name)
+    public function hasAttribute(string $name): bool
     {
         return isset($this->attributes[$name]);
     }
 
     /**
      * Returns an attribute by its name.
-     *
-     * @param mixed $default
-     *
-     * @return mixed
      */
-    public function getAttribute(string $name, $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
+        return $this->attributes[$name] ?? $default;
     }
 
     /**
      * Returns all attributes.
-     *
-     * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -164,7 +146,7 @@ class AcceptHeaderItem
      *
      * @return $this
      */
-    public function setAttribute(string $name, string $value)
+    public function setAttribute(string $name, string $value): static
     {
         if ('q' === $name) {
             $this->quality = (float) $value;

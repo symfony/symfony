@@ -19,12 +19,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-abstract class Voter implements VoterInterface
+abstract class Voter implements VoterInterface, CacheableVoterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         // abstain vote by default in case none of the attributes are supported
         $vote = self::ACCESS_ABSTAIN;
@@ -35,12 +32,7 @@ abstract class Voter implements VoterInterface
                     continue;
                 }
             } catch (\TypeError $e) {
-                if (\PHP_VERSION_ID < 80000) {
-                    if (0 === strpos($e->getMessage(), 'Argument 1 passed to')
-                        && false !== strpos($e->getMessage(), '::supports() must be of the type string')) {
-                        continue;
-                    }
-                } elseif (false !== strpos($e->getMessage(), 'supports(): Argument #1')) {
+                if (str_contains($e->getMessage(), 'supports(): Argument #1')) {
                     continue;
                 }
 
@@ -60,22 +52,35 @@ abstract class Voter implements VoterInterface
     }
 
     /**
+     * Return false if your voter doesn't support the given attribute. Symfony will cache
+     * that decision and won't call your voter again for that attribute.
+     */
+    public function supportsAttribute(string $attribute): bool
+    {
+        return true;
+    }
+
+    /**
+     * Return false if your voter doesn't support the given subject type. Symfony will cache
+     * that decision and won't call your voter again for that subject type.
+     *
+     * @param string $subjectType The type of the subject inferred by `get_class()` or `get_debug_type()`
+     */
+    public function supportsType(string $subjectType): bool
+    {
+        return true;
+    }
+
+    /**
      * Determines if the attribute and subject are supported by this voter.
      *
-     * @param string $attribute An attribute
-     * @param mixed  $subject   The subject to secure, e.g. an object the user wants to access or any other PHP type
-     *
-     * @return bool True if the attribute and subject are supported, false otherwise
+     * @param $subject The subject to secure, e.g. an object the user wants to access or any other PHP type
      */
-    abstract protected function supports(string $attribute, $subject);
+    abstract protected function supports(string $attribute, mixed $subject): bool;
 
     /**
      * Perform a single access check operation on a given attribute, subject and token.
      * It is safe to assume that $attribute and $subject already passed the "supports()" method check.
-     *
-     * @param mixed $subject
-     *
-     * @return bool
      */
-    abstract protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token);
+    abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool;
 }

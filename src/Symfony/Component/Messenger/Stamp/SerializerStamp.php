@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class SerializerStamp implements StampInterface
 {
-    private $context;
+    private array $context;
 
     public function __construct(array $context)
     {

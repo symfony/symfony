@@ -13,9 +13,12 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
+use Symfony\Component\Mailer\Bridge\MailPace\Transport\MailPaceTransportFactory;
+use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
@@ -34,12 +37,17 @@ return static function (ContainerConfigurator $container) {
                 service('http_client')->ignoreOnInvalid(),
                 service('logger')->ignoreOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'mailer'])
 
         ->set('mailer.transport_factory.amazon', SesTransportFactory::class)
             ->parent('mailer.transport_factory.abstract')
             ->tag('mailer.transport_factory')
 
         ->set('mailer.transport_factory.gmail', GmailTransportFactory::class)
+            ->parent('mailer.transport_factory.abstract')
+            ->tag('mailer.transport_factory')
+
+        ->set('mailer.transport_factory.infobip', InfobipTransportFactory::class)
             ->parent('mailer.transport_factory.abstract')
             ->tag('mailer.transport_factory')
 
@@ -52,6 +60,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('mailer.transport_factory')
 
         ->set('mailer.transport_factory.mailgun', MailgunTransportFactory::class)
+            ->parent('mailer.transport_factory.abstract')
+            ->tag('mailer.transport_factory')
+
+        ->set('mailer.transport_factory.mailpace', MailPaceTransportFactory::class)
             ->parent('mailer.transport_factory.abstract')
             ->tag('mailer.transport_factory')
 
@@ -72,8 +84,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('mailer.transport_factory')
 
         ->set('mailer.transport_factory.sendinblue', SendinblueTransportFactory::class)
-        ->parent('mailer.transport_factory.abstract')
-        ->tag('mailer.transport_factory')
+            ->parent('mailer.transport_factory.abstract')
+            ->tag('mailer.transport_factory')
+
+        ->set('mailer.transport_factory.ohmysmtp', OhMySmtpTransportFactory::class)
+            ->parent('mailer.transport_factory.abstract')
+            ->tag('mailer.transport_factory')
 
         ->set('mailer.transport_factory.smtp', EsmtpTransportFactory::class)
             ->parent('mailer.transport_factory.abstract')

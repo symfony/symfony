@@ -19,9 +19,6 @@ class LazyChoiceTypeExtension extends AbstractTypeExtension
 {
     public static $extendedType;
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('choice_loader', ChoiceList::lazy($this, function () {
@@ -32,9 +29,6 @@ class LazyChoiceTypeExtension extends AbstractTypeExtension
         }));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getExtendedTypes(): iterable
     {
         return [self::$extendedType];

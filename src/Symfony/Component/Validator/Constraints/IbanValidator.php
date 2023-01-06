@@ -36,7 +36,7 @@ class IbanValidator extends ConstraintValidator
      *
      * @see https://www.swift.com/sites/default/files/resources/iban_registry.pdf
      */
-    private static $formats = [
+    private const FORMATS = [
         'AD' => 'AD\d{2}\d{4}\d{4}[\dA-Z]{12}', // Andorra
         'AE' => 'AE\d{2}\d{3}\d{16}', // United Arab Emirates
         'AL' => 'AL\d{2}\d{8}[\dA-Z]{16}', // Albania
@@ -102,7 +102,7 @@ class IbanValidator extends ConstraintValidator
         'MK' => 'MK\d{2}\d{3}[\dA-Z]{10}\d{2}', // Macedonia, Former Yugoslav Republic of
         'ML' => 'ML\d{2}[A-Z]{1}\d{23}', // Mali
         'MQ' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // Martinique
-        'MR' => 'MR13\d{5}\d{5}\d{11}\d{2}', // Mauritania
+        'MR' => 'MR\d{2}\d{5}\d{5}\d{11}\d{2}', // Mauritania
         'MT' => 'MT\d{2}[A-Z]{4}\d{5}[\dA-Z]{18}', // Malta
         'MU' => 'MU\d{2}[A-Z]{4}\d{2}\d{2}\d{12}\d{3}[A-Z]{3}', // Mauritius
         'MZ' => 'MZ\d{2}\d{21}', // Mozambique
@@ -127,7 +127,7 @@ class IbanValidator extends ConstraintValidator
         'SN' => 'SN\d{2}[A-Z]{1}\d{23}', // Senegal
         'TF' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // French Southern Territories
         'TL' => 'TL\d{2}\d{3}\d{14}\d{2}', // Timor-Leste
-        'TN' => 'TN59\d{2}\d{3}\d{13}\d{2}', // Tunisia
+        'TN' => 'TN\d{2}\d{2}\d{3}\d{13}\d{2}', // Tunisia
         'TR' => 'TR\d{2}\d{5}[\dA-Z]{1}[\dA-Z]{16}', // Turkey
         'UA' => 'UA\d{2}\d{6}[\dA-Z]{19}', // Ukraine
         'VA' => 'VA\d{2}\d{3}\d{15}', // Vatican City State
@@ -137,10 +137,7 @@ class IbanValidator extends ConstraintValidator
         'YT' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // Mayotte
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Iban) {
             throw new UnexpectedTypeException($constraint, Iban::class);
@@ -150,7 +147,7 @@ class IbanValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -182,7 +179,7 @@ class IbanValidator extends ConstraintValidator
         }
 
         // ...have a format available
-        if (!\array_key_exists($countryCode, self::$formats)) {
+        if (!\array_key_exists($countryCode, self::FORMATS)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR)
@@ -192,7 +189,7 @@ class IbanValidator extends ConstraintValidator
         }
 
         // ...and have a valid format
-        if (!preg_match('/^'.self::$formats[$countryCode].'$/', $canonicalized)
+        if (!preg_match('/^'.self::FORMATS[$countryCode].'$/', $canonicalized)
         ) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))

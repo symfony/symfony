@@ -15,8 +15,6 @@ use Symfony\Component\Notifier\Exception\LogicException;
 
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
- *
- * @experimental in 5.2
  */
 final class VisibilityShare extends AbstractLinkedInShare
 {

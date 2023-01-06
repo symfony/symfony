@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -65,9 +66,25 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->serializer->serialize($arr, 'json'), 'Context should not be persistent');
     }
 
+    public function testWithDefaultContext()
+    {
+        $defaultContext = [
+            'json_encode_options' => \JSON_UNESCAPED_UNICODE,
+            'json_decode_associative' => false,
+        ];
+
+        $encoder = new JsonEncoder(null, null, $defaultContext);
+
+        $data = new \stdClass();
+        $data->msg = '你好';
+
+        $this->assertEquals('{"msg":"你好"}', $json = $encoder->encode($data, 'json'));
+        $this->assertEquals($data, $encoder->decode($json, 'json'));
+    }
+
     public function testEncodeNotUtf8WithoutPartialOnError()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $arr = [
             'utf8' => 'Hello World!',
             'notUtf8' => "\xb0\xd0\xb5\xd0",

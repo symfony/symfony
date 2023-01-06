@@ -14,59 +14,44 @@ namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
- *
- * @internal
- *
- * @experimental in 5.2
  */
 final class GoogleChatTransport extends AbstractTransport
 {
     protected const HOST = 'chat.googleapis.com';
 
-    private $space;
-    private $accessKey;
-    private $accessToken;
+    private string $space;
+    private string $accessKey;
+    private string $accessToken;
+    private ?string $threadKey;
 
     /**
-     * @var ?string
+     * @param string      $space       The space name the the webhook url "/v1/spaces/<space>/messages"
+     * @param string      $accessKey   The "key" parameter of the webhook url
+     * @param string      $accessToken The "token" parameter of the webhook url
+     * @param string|null $threadKey   Opaque thread identifier string that can be specified to group messages into a single thread.
+     *                                 If this is the first message with a given thread identifier, a new thread is created.
+     *                                 Subsequent messages with the same thread identifier will be posted into the same thread.
+     *                                 {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
      */
-    private $threadKey;
-
-    /**
-     * @param string $space       The space name the the webhook url "/v1/spaces/<space>/messages"
-     * @param string $accessKey   The "key" parameter of the webhook url
-     * @param string $accessToken The "token" parameter of the webhook url
-     */
-    public function __construct(string $space, string $accessKey, string $accessToken, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $space, string $accessKey, #[\SensitiveParameter] string $accessToken, string $threadKey = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->space = $space;
         $this->accessKey = $accessKey;
         $this->accessToken = $accessToken;
-
-        parent::__construct($client, $dispatcher);
-    }
-
-    /**
-     * Opaque thread identifier string that can be specified to group messages into a single thread.
-     * If this is the first message with a given thread identifier, a new thread is created.
-     * Subsequent messages with the same thread identifier will be posted into the same thread.
-     *
-     * @see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters
-     */
-    public function setThreadKey(?string $threadKey): self
-    {
         $this->threadKey = $threadKey;
 
-        return $this;
+        parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
@@ -74,7 +59,7 @@ final class GoogleChatTransport extends AbstractTransport
         return sprintf('googlechat://%s/%s%s',
             $this->getEndpoint(),
             $this->space,
-            $this->threadKey ? '?threadKey='.urlencode($this->threadKey) : ''
+            $this->threadKey ? '?thread_key='.urlencode($this->threadKey) : ''
         );
     }
 
@@ -89,8 +74,9 @@ final class GoogleChatTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
+
         if ($message->getOptions() && !$message->getOptions() instanceof GoogleChatOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, GoogleChatOptions::class));
         }
@@ -123,13 +109,19 @@ final class GoogleChatTransport extends AbstractTransport
         ]);
 
         try {
-            $result = $response->toArray(false);
-        } catch (JsonException $jsonException) {
-            throw new TransportException(sprintf('Unable to post the Google Chat message: Invalid response.'), $response, $response->getStatusCode(), $jsonException);
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote GoogleChat server.', $response, 0, $e);
         }
 
-        if (200 !== $response->getStatusCode()) {
-            throw new TransportException(sprintf('Unable to post the Google Chat message: "%s".', $result['error']['message'] ?? $response->getContent(false)), $response, $result['error']['code'] ?? $response->getStatusCode());
+        try {
+            $result = $response->toArray(false);
+        } catch (JsonException $jsonException) {
+            throw new TransportException('Unable to post the Google Chat message: Invalid response.', $response, $statusCode, $jsonException);
+        }
+
+        if (200 !== $statusCode) {
+            throw new TransportException(sprintf('Unable to post the Google Chat message: "%s".', $result['error']['message'] ?? $response->getContent(false)), $response, $result['error']['code'] ?? $statusCode);
         }
 
         if (!\array_key_exists('name', $result)) {

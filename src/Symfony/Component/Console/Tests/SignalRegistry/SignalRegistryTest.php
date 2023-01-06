@@ -26,7 +26,7 @@ class SignalRegistryTest extends TestCase
         pcntl_signal(\SIGUSR2, \SIG_DFL);
     }
 
-    public function testOneCallbackForASignal_signalIsHandled()
+    public function testOneCallbackForASignalSignalIsHandled()
     {
         $signalRegistry = new SignalRegistry();
 
@@ -40,7 +40,7 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled);
     }
 
-    public function testTwoCallbacksForASignal_bothCallbacksAreCalled()
+    public function testTwoCallbacksForASignalBothCallbacksAreCalled()
     {
         $signalRegistry = new SignalRegistry();
 
@@ -60,7 +60,7 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled2);
     }
 
-    public function testTwoSignals_signalsAreHandled()
+    public function testTwoSignalsSignalsAreHandled()
     {
         $signalRegistry = new SignalRegistry();
 
@@ -85,7 +85,7 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled2);
     }
 
-    public function testTwoCallbacksForASignal_previousAndRegisteredCallbacksWereCalled()
+    public function testTwoCallbacksForASignalPreviousAndRegisteredCallbacksWereCalled()
     {
         $signalRegistry = new SignalRegistry();
 
@@ -105,7 +105,7 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled2);
     }
 
-    public function testTwoCallbacksForASignal_previousCallbackFromAnotherRegistry()
+    public function testTwoCallbacksForASignalPreviousCallbackFromAnotherRegistry()
     {
         $signalRegistry1 = new SignalRegistry();
 

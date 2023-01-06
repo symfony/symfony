@@ -23,6 +23,7 @@ class PropertyInfoLoaderEntity
     public $scalar;
     public $object;
     public $collection;
+    public $collectionOfUnknown;
 
     /**
      * @Assert\Type(type="int")

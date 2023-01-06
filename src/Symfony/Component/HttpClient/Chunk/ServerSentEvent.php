@@ -19,17 +19,17 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
  */
 final class ServerSentEvent extends DataChunk implements ChunkInterface
 {
-    private $data = '';
-    private $id = '';
-    private $type = 'message';
-    private $retry = 0;
+    private string $data = '';
+    private string $id = '';
+    private string $type = 'message';
+    private float $retry = 0;
 
     public function __construct(string $content)
     {
         parent::__construct(-1, $content);
 
         // remove BOM
-        if (0 === strpos($content, "\xEF\xBB\xBF")) {
+        if (str_starts_with($content, "\xEF\xBB\xBF")) {
             $content = substr($content, 3);
         }
 

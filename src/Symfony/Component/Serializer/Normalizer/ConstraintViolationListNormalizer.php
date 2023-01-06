@@ -24,25 +24,22 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 class ConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const INSTANCE = 'instance';
-    const STATUS = 'status';
-    const TITLE = 'title';
-    const TYPE = 'type';
-    const PAYLOAD_FIELDS = 'payload_fields';
+    public const INSTANCE = 'instance';
+    public const STATUS = 'status';
+    public const TITLE = 'title';
+    public const TYPE = 'type';
+    public const PAYLOAD_FIELDS = 'payload_fields';
 
     private $defaultContext;
     private $nameConverter;
 
-    public function __construct($defaultContext = [], NameConverterInterface $nameConverter = null)
+    public function __construct(array $defaultContext = [], NameConverterInterface $nameConverter = null)
     {
         $this->defaultContext = $defaultContext;
         $this->nameConverter = $nameConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         if (\array_key_exists(self::PAYLOAD_FIELDS, $context)) {
             $payloadFieldsToSerialize = $context[self::PAYLOAD_FIELDS];
@@ -105,16 +102,13 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $context
      */
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
         return $data instanceof ConstraintViolationListInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

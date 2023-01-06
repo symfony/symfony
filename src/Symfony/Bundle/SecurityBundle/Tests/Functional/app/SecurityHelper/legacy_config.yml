@@ -1,0 +1,22 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+services:
+    # alias the service so we can access it in the tests
+    functional_test.security.helper:
+        alias: security.helper
+        public: true
+
+    functional.test.security.token_storage:
+        alias: security.token_storage
+        public: true
+
+security:
+    providers:
+        in_memory:
+            memory:
+                users: []
+
+    firewalls:
+        default:
+            anonymous: ~

@@ -18,13 +18,17 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
+use Symfony\Component\Form\FileUploadError;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper\Fixtures\Issue;
+use Symfony\Component\Form\Tests\Fixtures\DummyFormRendererEngine;
+use Symfony\Component\Form\Tests\Fixtures\FixedTranslator;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -34,10 +38,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ViolationMapperTest extends TestCase
 {
-    const LEVEL_0 = 0;
-    const LEVEL_1 = 1;
-    const LEVEL_1B = 2;
-    const LEVEL_2 = 3;
+    private const LEVEL_0 = 0;
+    private const LEVEL_1 = 1;
+    private const LEVEL_1B = 2;
+    private const LEVEL_2 = 3;
 
     /**
      * @var EventDispatcherInterface
@@ -78,11 +82,12 @@ class ViolationMapperTest extends TestCase
         $config = new FormConfigBuilder($name, $dataClass, $this->dispatcher, [
             'error_mapping' => $errorMapping,
         ] + $options);
-        $config->setMapped(isset($options['mapped']) ? $options['mapped'] : true);
+        $config->setMapped($options['mapped'] ?? true);
         $config->setInheritData($inheritData);
         $config->setPropertyPath($propertyPath);
         $config->setCompound(true);
         $config->setDataMapper(new DataMapper());
+        $config->setErrorBubbling($options['error_bubbling'] ?? false);
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
@@ -1595,16 +1600,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabel1()
     {
-        $renderer = $this->getMockBuilder(FormRenderer::class)
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
-        $translator->expects($this->any())->method('trans')->willReturnMap([
-            ['Name', [], null, null, 'Custom Name'],
-        ]);
-        $this->mapper = new ViolationMapper($renderer, $translator);
+        $this->mapper = new ViolationMapper(new FormRenderer(new DummyFormRendererEngine()), new FixedTranslator(['Name' => 'Custom Name']));
 
         $parent = $this->getForm('parent');
         $child = $this->getForm('name', 'name');
@@ -1627,11 +1623,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabel2()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
-        $translator->expects($this->any())->method('trans')->willReturnMap([
-            ['options_label', [], null, null, 'Translated Label'],
-        ]);
-        $this->mapper = new ViolationMapper(null, $translator);
+        $this->mapper = new ViolationMapper(null, new FixedTranslator(['options_label' => 'Translated Label']));
 
         $parent = $this->getForm('parent');
 
@@ -1665,11 +1657,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabelFormat1()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
-        $translator->expects($this->any())->method('trans')->willReturnMap([
-            ['form.custom', [], null, null, 'Translated 1st Custom Label'],
-        ]);
-        $this->mapper = new ViolationMapper(null, $translator);
+        $this->mapper = new ViolationMapper(null, new FixedTranslator(['form.custom' => 'Translated 1st Custom Label']));
 
         $parent = $this->getForm('parent');
 
@@ -1703,11 +1691,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabelFormat2()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
-        $translator->expects($this->any())->method('trans')->willReturnMap([
-            ['form_custom-id', [], null, null, 'Translated 2nd Custom Label'],
-        ]);
-        $this->mapper = new ViolationMapper(null, $translator);
+        $this->mapper = new ViolationMapper(null, new FixedTranslator(['form_custom-id' => 'Translated 2nd Custom Label']));
 
         $parent = $this->getForm('parent');
 
@@ -1737,5 +1721,192 @@ class ViolationMapperTest extends TestCase
             $error = $errors[0];
             $this->assertSame('Message Translated 2nd Custom Label', $error->getMessage());
         }
+    }
+
+    public function testLabelFormatDefinedByParentType()
+    {
+        $form = $this->getForm('', null, null, [], false, true, [
+            'label_format' => 'form.%name%',
+        ]);
+        $child = $this->getForm('foo', 'foo');
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "form.foo"', $errors[0]->getMessage());
+    }
+
+    public function testLabelPlaceholderTranslatedWithTranslationDomainDefinedByParentType()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with('foo', [], 'domain')
+            ->willReturn('translated foo label')
+        ;
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $form = $this->getForm('', null, null, [], false, true, [
+            'translation_domain' => 'domain',
+        ]);
+        $child = $this->getForm('foo', 'foo', null, [], false, true, [
+            'label' => 'foo',
+        ]);
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
+    }
+
+    public function testLabelPlaceholderTranslatedWithTranslationParametersMergedFromParentForm()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with('foo', [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ])
+            ->willReturn('translated foo label')
+        ;
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $form = $this->getForm('', null, null, [], false, true, [
+            'label_translation_parameters' => [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child parent value',
+            ],
+        ]);
+        $child = $this->getForm('foo', 'foo', null, [], false, true, [
+            'label' => 'foo',
+            'label_translation_parameters' => [
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ],
+        ]);
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
+    }
+
+    public function testTranslatorNotCalledWithoutLabel()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->never())->method('trans');
+        $this->mapper = new ViolationMapper(new FormRenderer(new DummyFormRendererEngine()), $translator);
+
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('name', 'name');
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message without label', null, [], null, 'data.name', null);
+        $this->mapper->mapViolation($violation, $parent);
+    }
+
+    public function testFileUploadErrorIsNotRemovedIfNoFileSizeConstraintViolationWasRaised()
+    {
+        $form = $this->getForm('form');
+        $form->addError(new FileUploadError(
+            'The file is too large. Allowed maximum size is 2 MB.',
+            'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ suffix }}' => 'MB',
+            ]
+        ));
+
+        $this->mapper->mapViolation($this->getConstraintViolation('data'), $form);
+
+        $this->assertCount(2, $form->getErrors());
+    }
+
+    public function testFileUploadErrorIsRemovedIfFileSizeConstraintViolationWasRaised()
+    {
+        $form = $this->getForm('form');
+        $form->addError(new FileUploadError(
+            'The file is too large. Allowed maximum size is 2 MB.',
+            'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ suffix }}' => 'MB',
+            ]
+        ));
+
+        $violation = new ConstraintViolation(
+            'The file is too large (3 MB). Allowed maximum size is 2 MB.',
+            'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ size }}' => '3',
+                '{{ suffix }}' => 'MB',
+            ],
+            '',
+            'data',
+            null,
+            null,
+            (string) \UPLOAD_ERR_INI_SIZE,
+            new File()
+        );
+        $this->mapper->mapViolation($this->getConstraintViolation('data'), $form);
+        $this->mapper->mapViolation($violation, $form);
+
+        $this->assertCount(2, $form->getErrors());
+    }
+
+    public function testFileUploadErrorIsRemovedIfFileSizeConstraintViolationWasRaisedOnFieldWithErrorBubbling()
+    {
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('child', 'file', null, [], false, true, [
+            'error_bubbling' => true,
+        ]);
+        $parent->add($child);
+        $child->addError(new FileUploadError(
+            'The file is too large. Allowed maximum size is 2 MB.',
+            'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ suffix }}' => 'MB',
+            ]
+        ));
+
+        $violation = new ConstraintViolation(
+            'The file is too large (3 MB). Allowed maximum size is 2 MB.',
+            'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ size }}' => '3',
+                '{{ suffix }}' => 'MB',
+            ],
+            null,
+            'data.file',
+            null,
+            null,
+            (string) \UPLOAD_ERR_INI_SIZE,
+            new File()
+        );
+        $this->mapper->mapViolation($this->getConstraintViolation('data'), $parent);
+        $this->mapper->mapViolation($this->getConstraintViolation('data.file'), $parent);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(3, $parent->getErrors());
+        $this->assertCount(0, $child->getErrors());
     }
 }

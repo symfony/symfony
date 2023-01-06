@@ -11,38 +11,31 @@
 
 namespace Symfony\Component\Notifier\Bridge\FreeMobile;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Antoine Makdessi <amakdessi@me.com>
- *
- * @experimental in 5.1
  */
 final class FreeMobileTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return FreeMobileTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): FreeMobileTransport
     {
         $scheme = $dsn->getScheme();
+
+        if ('freemobile' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'freemobile', $this->getSupportedSchemes());
+        }
+
         $login = $this->getUser($dsn);
         $password = $this->getPassword($dsn);
-        $phone = $dsn->getOption('phone');
+        $phone = $dsn->getRequiredOption('phone');
 
-        if (!$phone) {
-            throw new IncompleteDsnException('Missing phone.', $dsn->getOriginalDsn());
-        }
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
 
-        if ('freemobile' === $scheme) {
-            return new FreeMobileTransport($login, $password, $phone, $this->client, $this->dispatcher);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'freemobile', $this->getSupportedSchemes());
+        return (new FreeMobileTransport($login, $password, $phone, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

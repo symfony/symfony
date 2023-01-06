@@ -1,0 +1,17 @@
+{
+    "class": "Full\\Qualified\\Class3",
+    "public": false,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "deprecated": false,
+    "arguments": [],
+    "file": "\/path\/to\/file",
+    "factory_service": "inline factory service (Full\\Qualified\\FactoryClass)",
+    "factory_method": "get",
+    "tags": [],
+    "usages": []
+}

@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\ErrorHandler;
 
+use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
+
 /**
  * @internal
  */
 class ThrowableUtils
 {
-    public static function getSeverity(\Throwable $throwable): int
+    public static function getSeverity(SilencedErrorContext|\Throwable $throwable): int
     {
-        if ($throwable instanceof \ErrorException) {
+        if ($throwable instanceof \ErrorException || $throwable instanceof SilencedErrorContext) {
             return $throwable->getSeverity();
         }
 

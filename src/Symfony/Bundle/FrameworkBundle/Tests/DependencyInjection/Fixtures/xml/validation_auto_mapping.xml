@@ -3,7 +3,7 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:framework="http://symfony.com/schema/dic/symfony">
 
-    <framework:config>
+    <framework:config http-method-override="false">
         <framework:property-info enabled="true" />
         <framework:validation>
             <framework:auto-mapping namespace="App\">

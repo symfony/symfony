@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 class SmsChannel extends AbstractChannel
 {
@@ -31,9 +29,7 @@ class SmsChannel extends AbstractChannel
             $message = $notification->asSmsMessage($recipient, $transportName);
         }
 
-        if (null === $message) {
-            $message = SmsMessage::fromNotification($notification, $recipient);
-        }
+        $message ??= SmsMessage::fromNotification($notification, $recipient);
 
         if (null !== $transportName) {
             $message->transport($transportName);

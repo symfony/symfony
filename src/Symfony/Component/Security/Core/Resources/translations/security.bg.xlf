@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Това cookie вече се ползва от някой друг.</target>
+                <target>Тази бисквитка вече се ползва от някой друг.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Сесията не е достъпна, или времето за достъп е изтекло, или кукитата не са разрешени.</target>
+                <target>Сесията не е достъпна, или времето за достъп е изтекло, или бисквитките не са разрешени.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
-                <target>Токена не е открит.</target>
+                <target>Токенът не е открит.</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
-                <target>Акаунта е изтекъл.</target>
+                <target>Акаунтът е изтекъл.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>
@@ -56,12 +56,28 @@
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>
-                <target>Акаунта е деактивиран.</target>
+                <target>Акаунтът е деактивиран.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>Акаунта е заключен.</target>
+                <target>Акаунтът е заключен.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Твърде много неуспешни опити за вход, моля опитайте по-късно.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Невалиден или изтекъл линк за вход.</target>
+            </trans-unit>
+            <trans-unit id="19">
+				<source>Too many failed login attempts, please try again in %minutes% minute.</source>
+				<target>Твърде много неуспешни опити за вход, моля опитайте отново след %minutes% минута.</target>
+			</trans-unit>
+			<trans-unit id="20">
+				<source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+				<target>Твърде много неуспешни опити за вход, моля опитайте отново след %minutes% минути.</target>
+			</trans-unit>
         </body>
     </file>
 </xliff>

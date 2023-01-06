@@ -1,6 +1,56 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add method `getConstraint()` to `ConstraintViolationInterface`
+ * Add `Uuid::TIME_BASED_VERSIONS` to match that a UUID being validated embeds a timestamp
+ * Add the `pattern` parameter in violations of the `Regex` constraint
+
+6.2
+---
+
+ * Add option `Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD` with "html5-allow-no-tld" e-mail validation mode, to match with the W3C official specification
+ * Add method `getCause()` to `ConstraintViolationInterface`
+ * Add the `When` constraint and validator
+ * Deprecate the "loose" e-mail validation mode, use "html5" instead
+ * Add the `negate` option to the `Expression` constraint, to inverse the logic of the violation's creation
+ * Add the `extensions` option to the `File` constraint as an alternative to `mimeTypes` which checks the mime type of the file, its extension, and the consistency between them
+ * Add padding for enhanced privacy to the `NotCompromisedPasswordValidator`
+
+6.1
+---
+
+ * Add the `fields` option to the `Unique` constraint, to define which collection keys should be checked for uniqueness
+ * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
+ * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
+ * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
+ * Allow creating constraints with required arguments
+ * Add the `match` option to the `Choice` constraint
+
+6.0
+---
+
+ * Remove the `allowEmptyString` option from the `Length` constraint
+ * Remove the `NumberConstraintTrait` trait
+ * `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore
+ * `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore
+
+5.4
+---
+
+ * Add a `Cidr` constraint to validate CIDR notations
+ * Add a `CssColor` constraint to validate CSS colors
+ * Add support for `ConstraintViolationList::createFromMessage()`
+ * Add error's uid to `Count` and `Length` constraints with "exactly" option enabled
+
+5.3
+---
+
+ * Add the `normalizer` option to the `Unique` constraint
+ * Add `Validation::createIsValidCallable()` that returns true/false instead of throwing exceptions
+
 5.2.0
 -----
 
@@ -34,10 +84,12 @@ CHANGELOG
  * added support for UUIDv6 in `Uuid` constraint
  * enabled the validator to load constraints from PHP attributes
  * deprecated the `NumberConstraintTrait` trait
+ * deprecated setting or creating a Doctrine annotation reader via `ValidatorBuilder::enableAnnotationMapping()`, pass `true` as first parameter and additionally call `setDoctrineAnnotationReader()` or `addDefaultDoctrineAnnotationReader()` to set up the annotation reader
 
 5.1.0
 -----
 
+ * Add `AtLeastOneOf` constraint that is considered to be valid if at least one of the nested constraints is valid
  * added the `Hostname` constraint and validator
  * added the `alpha3` option to the `Country` and `Language` constraints
  * allow to define a reusable set of constraints by extending the `Compound` constraint
@@ -157,7 +209,7 @@ CHANGELOG
 3.2.0
 -----
 
- * deprecated `Tests\Constraints\AbstractContraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
+ * deprecated `Tests\Constraints\AbstractConstraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
  * added support for PHP constants in YAML configuration files
 
 3.1.0

@@ -26,7 +26,11 @@ use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Dumper\YamlFileDumper;
 use Symfony\Component\Translation\Extractor\ChainExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
+use Symfony\Component\Translation\Extractor\PhpAstExtractor;
 use Symfony\Component\Translation\Extractor\PhpExtractor;
+use Symfony\Component\Translation\Extractor\Visitor\ConstraintVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\TranslatableMessageVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\CsvFileLoader;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
@@ -39,11 +43,13 @@ use Symfony\Component\Translation\Loader\PoFileLoader;
 use Symfony\Component\Translation\Loader\QtFileLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -114,6 +120,10 @@ return static function (ContainerConfigurator $container) {
         ->set('translation.dumper.xliff', XliffFileDumper::class)
             ->tag('translation.dumper', ['alias' => 'xlf'])
 
+        ->set('translation.dumper.xliff.xliff', XliffFileDumper::class)
+            ->args(['xliff'])
+            ->tag('translation.dumper', ['alias' => 'xliff'])
+
         ->set('translation.dumper.po', PoFileDumper::class)
             ->tag('translation.dumper', ['alias' => 'po'])
 
@@ -143,7 +153,21 @@ return static function (ContainerConfigurator $container) {
             ->tag('translation.dumper', ['alias' => 'res'])
 
         ->set('translation.extractor.php', PhpExtractor::class)
+            ->deprecate('symfony/framework-bundle', '6.2', 'The "%service_id%" service is deprecated, use "translation.extractor.php_ast" instead.')
             ->tag('translation.extractor', ['alias' => 'php'])
+
+        ->set('translation.extractor.php_ast', PhpAstExtractor::class)
+            ->args([tagged_iterator('translation.extractor.visitor')])
+            ->tag('translation.extractor', ['alias' => 'php'])
+
+        ->set('translation.extractor.visitor.trans_method', TransMethodVisitor::class)
+            ->tag('translation.extractor.visitor')
+
+        ->set('translation.extractor.visitor.translatable_message', TranslatableMessageVisitor::class)
+            ->tag('translation.extractor.visitor')
+
+        ->set('translation.extractor.visitor.constraint', ConstraintVisitor::class)
+            ->tag('translation.extractor.visitor')
 
         ->set('translation.reader', TranslationReader::class)
         ->alias(TranslationReaderInterface::class, 'translation.reader')
@@ -158,5 +182,16 @@ return static function (ContainerConfigurator $container) {
             ->args([service(ContainerInterface::class)])
             ->tag('container.service_subscriber', ['id' => 'translator'])
             ->tag('kernel.cache_warmer')
+
+        ->set('translation.locale_switcher', LocaleSwitcher::class)
+            ->args([
+                param('kernel.default_locale'),
+                tagged_iterator('kernel.locale_aware', exclude: 'translation.locale_switcher'),
+                service('router.request_context')->ignoreOnInvalid(),
+            ])
+            ->tag('kernel.reset', ['method' => 'reset'])
+            ->tag('kernel.locale_aware')
+        ->alias(LocaleAwareInterface::class, 'translation.locale_switcher')
+        ->alias(LocaleSwitcher::class, 'translation.locale_switcher')
     ;
 };

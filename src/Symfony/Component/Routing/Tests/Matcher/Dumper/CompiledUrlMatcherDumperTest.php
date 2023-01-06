@@ -296,6 +296,10 @@ class CompiledUrlMatcherDumperTest extends TestCase
         $route = new Route('/with-condition');
         $route->setCondition('context.getMethod() == "GET"');
         $rootprefixCollection->add('with-condition', $route);
+        $route = new Route('/with-condition/{id}');
+        $route->setRequirement('id', '\d+');
+        $route->setCondition("params['id'] < 100");
+        $rootprefixCollection->add('with-condition-dynamic', $route);
 
         /* test case 4 */
         $headMatchCasesCollection = new RouteCollection();
@@ -492,7 +496,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
     public function testGenerateDumperMatcherWithObject()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
         $routeCollection = new RouteCollection();
         $routeCollection->add('_', new Route('/', [new \stdClass()]));

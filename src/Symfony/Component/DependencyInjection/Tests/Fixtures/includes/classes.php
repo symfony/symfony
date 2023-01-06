@@ -56,6 +56,7 @@ class BazClass
 
 class BarUserClass
 {
+    public $foo;
     public $bar;
 
     public function __construct(BarClass $bar)
@@ -83,8 +84,10 @@ class MethodCallClass
 
 class DummyProxyDumper implements ProxyDumper
 {
-    public function isProxyCandidate(Definition $definition): bool
+    public function isProxyCandidate(Definition $definition, bool &$asGhostObject = null, string $id = null): bool
     {
+        $asGhostObject = false;
+
         return $definition->isLazy();
     }
 
@@ -93,7 +96,7 @@ class DummyProxyDumper implements ProxyDumper
         return "        // lazy factory for {$definition->getClass()}\n\n";
     }
 
-    public function getProxyCode(Definition $definition): string
+    public function getProxyCode(Definition $definition, $id = null): string
     {
         return "// proxy code for {$definition->getClass()}\n";
     }
@@ -111,8 +114,39 @@ class LazyContext
     }
 }
 
+class FactoryCircular
+{
+    public $services;
+
+    public function __construct($services)
+    {
+        $this->services = $services;
+    }
+
+    public function create()
+    {
+        foreach ($this->services as $service) {
+            return $service;
+        }
+    }
+}
+
+class FactoryChecker
+{
+    public static function create($config)
+    {
+        if (!isset($config->flag)) {
+            throw new \LogicException('The injected config must contain a "flag" property.');
+        }
+
+        return new stdClass();
+    }
+}
+
 class FoobarCircular
 {
+    public $foo;
+
     public function __construct(FooCircular $foo)
     {
         $this->foo = $foo;
@@ -121,6 +155,8 @@ class FoobarCircular
 
 class FooCircular
 {
+    public $bar;
+
     public function __construct(BarCircular $bar)
     {
         $this->bar = $bar;
@@ -129,6 +165,8 @@ class FooCircular
 
 class BarCircular
 {
+    public $foobar;
+
     public function addFoobar(FoobarCircular $foobar)
     {
         $this->foobar = $foobar;

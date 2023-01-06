@@ -1,0 +1,14 @@
+imports:
+    - { resource: ./config.yml }
+    - { resource: ./config_session.yml }
+
+framework:
+    http_method_override: false
+    session:
+        cookie_secure: auto
+        cookie_samesite: lax
+
+security:
+    firewalls:
+        default:
+            stateless: true

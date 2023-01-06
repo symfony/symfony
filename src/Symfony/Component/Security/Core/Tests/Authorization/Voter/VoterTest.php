@@ -22,7 +22,7 @@ class VoterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $this->token = $this->createMock(TokenInterface::class);
     }
 
     public function getTests()
@@ -65,7 +65,7 @@ class VoterTest extends TestCase
 
     public function testVoteWithTypeError()
     {
-        $this->expectException('TypeError');
+        $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Should error');
         $voter = new TypeErrorVoterTest_Voter();
         $voter->vote($this->token, new \stdClass(), ['EDIT']);

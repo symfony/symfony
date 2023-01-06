@@ -19,6 +19,7 @@ Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
   disabled                      
   empty_data                    
   error_bubbling                
+  form_attr                     
   getter                        
   help                          
   help_attr                     
@@ -36,6 +37,7 @@ Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
   mapped                        
   method                        
   post_max_size_message         
+  priority                      
   property_path                 
   required                      
   row_attr                      

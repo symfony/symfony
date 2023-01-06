@@ -27,32 +27,30 @@ abstract class Guess
     /**
      * Marks an instance with a value that is extremely likely to be correct.
      */
-    const VERY_HIGH_CONFIDENCE = 3;
+    public const VERY_HIGH_CONFIDENCE = 3;
 
     /**
      * Marks an instance with a value that is very likely to be correct.
      */
-    const HIGH_CONFIDENCE = 2;
+    public const HIGH_CONFIDENCE = 2;
 
     /**
      * Marks an instance with a value that is likely to be correct.
      */
-    const MEDIUM_CONFIDENCE = 1;
+    public const MEDIUM_CONFIDENCE = 1;
 
     /**
      * Marks an instance with a value that may be correct.
      */
-    const LOW_CONFIDENCE = 0;
+    public const LOW_CONFIDENCE = 0;
 
     /**
      * The confidence about the correctness of the value.
      *
      * One of VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE, MEDIUM_CONFIDENCE
      * and LOW_CONFIDENCE.
-     *
-     * @var int
      */
-    private $confidence;
+    private int $confidence;
 
     /**
      * Returns the guess most likely to be correct from a list of guesses.
@@ -61,10 +59,8 @@ abstract class Guess
      * returned guess is any of them.
      *
      * @param static[] $guesses An array of guesses
-     *
-     * @return static|null
      */
-    public static function getBestGuess(array $guesses)
+    public static function getBestGuess(array $guesses): ?static
     {
         $result = null;
         $maxConfidence = -1;
@@ -80,8 +76,6 @@ abstract class Guess
     }
 
     /**
-     * @param int $confidence The confidence
-     *
      * @throws InvalidArgumentException if the given value of confidence is unknown
      */
     public function __construct(int $confidence)
@@ -100,7 +94,7 @@ abstract class Guess
      * @return int One of the constants VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE,
      *             MEDIUM_CONFIDENCE and LOW_CONFIDENCE
      */
-    public function getConfidence()
+    public function getConfidence(): int
     {
         return $this->confidence;
     }

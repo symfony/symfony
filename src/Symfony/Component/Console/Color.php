@@ -30,6 +30,17 @@ final class Color
         'default' => 9,
     ];
 
+    private const BRIGHT_COLORS = [
+        'gray' => 0,
+        'bright-red' => 1,
+        'bright-green' => 2,
+        'bright-yellow' => 3,
+        'bright-blue' => 4,
+        'bright-magenta' => 5,
+        'bright-cyan' => 6,
+        'bright-white' => 7,
+    ];
+
     private const AVAILABLE_OPTIONS = [
         'bold' => ['set' => 1, 'unset' => 22],
         'underscore' => ['set' => 4, 'unset' => 24],
@@ -38,14 +49,14 @@ final class Color
         'conceal' => ['set' => 8, 'unset' => 28],
     ];
 
-    private $foreground;
-    private $background;
-    private $options = [];
+    private string $foreground;
+    private string $background;
+    private array $options = [];
 
     public function __construct(string $foreground = '', string $background = '', array $options = [])
     {
         $this->foreground = $this->parseColor($foreground);
-        $this->background = $this->parseColor($background);
+        $this->background = $this->parseColor($background, true);
 
         foreach ($options as $option) {
             if (!isset(self::AVAILABLE_OPTIONS[$option])) {
@@ -65,10 +76,10 @@ final class Color
     {
         $setCodes = [];
         if ('' !== $this->foreground) {
-            $setCodes[] = '3'.$this->foreground;
+            $setCodes[] = $this->foreground;
         }
         if ('' !== $this->background) {
-            $setCodes[] = '4'.$this->background;
+            $setCodes[] = $this->background;
         }
         foreach ($this->options as $option) {
             $setCodes[] = $option['set'];
@@ -99,67 +110,24 @@ final class Color
         return sprintf("\033[%sm", implode(';', $unsetCodes));
     }
 
-    private function parseColor(string $color): string
+    private function parseColor(string $color, bool $background = false): string
     {
         if ('' === $color) {
             return '';
         }
 
         if ('#' === $color[0]) {
-            $color = substr($color, 1);
-
-            if (3 === \strlen($color)) {
-                $color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
-            }
-
-            if (6 !== \strlen($color)) {
-                throw new InvalidArgumentException(sprintf('Invalid "%s" color.', $color));
-            }
-
-            return $this->convertHexColorToAnsi(hexdec($color));
+            return ($background ? '4' : '3').Terminal::getColorMode()->convertFromHexToAnsiColorCode($color);
         }
 
-        if (!isset(self::COLORS[$color])) {
-            throw new InvalidArgumentException(sprintf('Invalid "%s" color; expected one of (%s).', $color, implode(', ', array_keys(self::COLORS))));
+        if (isset(self::COLORS[$color])) {
+            return ($background ? '4' : '3').self::COLORS[$color];
         }
 
-        return (string) self::COLORS[$color];
-    }
-
-    private function convertHexColorToAnsi(int $color): string
-    {
-        $r = ($color >> 16) & 255;
-        $g = ($color >> 8) & 255;
-        $b = $color & 255;
-
-        // see https://github.com/termstandard/colors/ for more information about true color support
-        if ('truecolor' !== getenv('COLORTERM')) {
-            return (string) $this->degradeHexColorToAnsi($r, $g, $b);
+        if (isset(self::BRIGHT_COLORS[$color])) {
+            return ($background ? '10' : '9').self::BRIGHT_COLORS[$color];
         }
 
-        return sprintf('8;2;%d;%d;%d', $r, $g, $b);
-    }
-
-    private function degradeHexColorToAnsi(int $r, int $g, int $b): int
-    {
-        if (0 === round($this->getSaturation($r, $g, $b) / 50)) {
-            return 0;
-        }
-
-        return (round($b / 255) << 2) | (round($g / 255) << 1) | round($r / 255);
-    }
-
-    private function getSaturation(int $r, int $g, int $b): int
-    {
-        $r = $r / 255;
-        $g = $g / 255;
-        $b = $b / 255;
-        $v = max($r, $g, $b);
-
-        if (0 === $diff = $v - min($r, $g, $b)) {
-            return 0;
-        }
-
-        return (int) $diff * 100 / $v;
+        throw new InvalidArgumentException(sprintf('Invalid "%s" color; expected one of (%s).', $color, implode(', ', array_merge(array_keys(self::COLORS), array_keys(self::BRIGHT_COLORS)))));
     }
 }

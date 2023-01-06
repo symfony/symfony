@@ -213,26 +213,25 @@ class FileProfilerStorageTest extends TestCase
 
     public function testStoreTime()
     {
-        $dt = new \DateTime('now');
-        $start = $dt->getTimestamp();
+        $start = $now = time();
 
         for ($i = 0; $i < 3; ++$i) {
-            $dt->modify('+1 minute');
+            $now += 60;
             $profile = new Profile('time_'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://foo.bar');
-            $profile->setTime($dt->getTimestamp());
+            $profile->setTime($now);
             $profile->setMethod('GET');
             $this->storage->write($profile);
         }
 
-        $records = $this->storage->find('', '', 3, 'GET', $start, time() + 3 * 60);
+        $records = $this->storage->find('', '', 3, 'GET', $start, $start + 3 * 60);
         $this->assertCount(3, $records, '->find() returns all previously added records');
         $this->assertEquals('time_2', $records[0]['token'], '->find() returns records ordered by time in descendant order');
         $this->assertEquals('time_1', $records[1]['token'], '->find() returns records ordered by time in descendant order');
         $this->assertEquals('time_0', $records[2]['token'], '->find() returns records ordered by time in descendant order');
 
-        $records = $this->storage->find('', '', 3, 'GET', $start, time() + 2 * 60);
+        $records = $this->storage->find('', '', 3, 'GET', $start, $start + 2 * 60);
         $this->assertCount(2, $records, '->find() should return only first two of the previously added records');
     }
 
@@ -298,7 +297,7 @@ class FileProfilerStorageTest extends TestCase
             $profile->setUrl('http://example.net/');
             $profile->setMethod('GET');
 
-            ///three duplicates
+            // three duplicates
             $this->storage->write($profile);
             $this->storage->write($profile);
             $this->storage->write($profile);
@@ -345,11 +344,60 @@ class FileProfilerStorageTest extends TestCase
         $this->assertFalse(fgetcsv($handle));
     }
 
+    /**
+     * @dataProvider provideExpiredProfiles
+     */
+    public function testRemoveExpiredProfiles(string $index, string $expectedOffset)
+    {
+        $file = $this->tmpDir.'/index.csv';
+        file_put_contents($file, $index);
+
+        $r = new \ReflectionMethod($this->storage, 'removeExpiredProfiles');
+        $r->invoke($this->storage);
+
+        $this->assertSame($expectedOffset, file_get_contents($this->tmpDir.'/index.csv.offset'));
+    }
+
+    public static function provideExpiredProfiles()
+    {
+        $oneHourAgo = new \DateTimeImmutable('-1 hour');
+
+        yield 'One unexpired profile' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,
+
+            CSV,
+            '0',
+        ];
+
+        $threeDaysAgo = new \DateTimeImmutable('-3 days');
+
+        yield 'One expired profile' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,
+
+            CSV,
+            '48',
+        ];
+
+        $fourDaysAgo = new \DateTimeImmutable('-4 days');
+        $threeDaysAgo = new \DateTimeImmutable('-3 days');
+        $oneHourAgo = new \DateTimeImmutable('-1 hour');
+
+        yield 'Multiple expired profiles' => [
+            <<<CSV
+            token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,
+            token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,
+            token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,
+
+            CSV,
+            '96',
+        ];
+    }
+
     public function testReadLineFromFile()
     {
         $r = new \ReflectionMethod($this->storage, 'readLineFromFile');
-
-        $r->setAccessible(true);
 
         $h = tmpfile();
 

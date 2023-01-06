@@ -15,10 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 
 class ResponseListenerTest extends TestCase
@@ -28,7 +28,7 @@ class ResponseListenerTest extends TestCase
         $cookie = new Cookie('rememberme', null, 0, '/', null, false, true, false, null);
 
         $request = $this->getRequest([
-            RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,
+            ResponseListener::COOKIE_ATTR_NAME => $cookie,
         ]);
 
         $response = $this->getResponse();
@@ -43,7 +43,7 @@ class ResponseListenerTest extends TestCase
         $cookie = new Cookie('rememberme', null, 0, '/', null, false, true, false, null);
 
         $request = $this->getRequest([
-            RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,
+            ResponseListener::COOKIE_ATTR_NAME => $cookie,
         ]);
 
         $response = $this->getResponse();
@@ -83,12 +83,12 @@ class ResponseListenerTest extends TestCase
     private function getResponse()
     {
         $response = new Response();
-        $response->headers = $this->getMockBuilder('Symfony\Component\HttpFoundation\ResponseHeaderBag')->getMock();
+        $response->headers = $this->createMock(ResponseHeaderBag::class);
 
         return $response;
     }
 
-    private function getEvent(Request $request, Response $response, int $type = HttpKernelInterface::MASTER_REQUEST): ResponseEvent
+    private function getEvent(Request $request, Response $response, int $type = HttpKernelInterface::MAIN_REQUEST): ResponseEvent
     {
         return new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, $type, $response);
     }

@@ -41,6 +41,10 @@ class UndefinedMethodErrorEnhancerTest extends TestCase
                 'Attempted to call an undefined method named "what" of class "SplObjectStorage".',
             ],
             [
+                'Call to undefined method SplObjectStorage::()',
+                'Attempted to call an undefined method named "" of class "SplObjectStorage".',
+            ],
+            [
                 'Call to undefined method SplObjectStorage::walid()',
                 "Attempted to call an undefined method named \"walid\" of class \"SplObjectStorage\".\nDid you mean to call \"valid\"?",
             ],

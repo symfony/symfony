@@ -41,7 +41,6 @@ class FinalClass4
 /**
  * @author John Doe
  *
- *
  * @final multiline
  * comment
  */

@@ -165,15 +165,34 @@ class ParameterBagTest extends TestCase
 
         $this->assertFalse($bag->filter('dec', '', \FILTER_VALIDATE_INT, [
             'flags' => \FILTER_FLAG_ALLOW_HEX,
-            'options' => ['min_range' => 1, 'max_range' => 0xff],
+            'options' => ['min_range' => 1, 'max_range' => 0xFF],
         ]), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertFalse($bag->filter('hex', '', \FILTER_VALIDATE_INT, [
             'flags' => \FILTER_FLAG_ALLOW_HEX,
-            'options' => ['min_range' => 1, 'max_range' => 0xff],
+            'options' => ['min_range' => 1, 'max_range' => 0xFF],
         ]), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertEquals(['bang'], $bag->filter('array', ''), '->filter() gets a value of parameter as an array');
+    }
+
+    public function testFilterCallback()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A Closure must be passed to "Symfony\Component\HttpFoundation\ParameterBag::filter()" when FILTER_CALLBACK is used, "string" given.');
+
+        $bag = new ParameterBag(['foo' => 'bar']);
+        $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']);
+    }
+
+    public function testFilterClosure()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => function ($value) {
+            return strtoupper($value);
+        }]);
+
+        $this->assertSame('BAR', $result);
     }
 
     public function testGetIterator()
@@ -207,4 +226,39 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->getBoolean('string_false'), '->getBoolean() gets the string false as boolean false');
         $this->assertFalse($bag->getBoolean('unknown'), '->getBoolean() returns false if a parameter is not defined');
     }
+
+    public function testGetEnum()
+    {
+        $bag = new ParameterBag(['valid-value' => 1]);
+
+        $this->assertSame(Foo::Bar, $bag->getEnum('valid-value', Foo::class));
+
+        $this->assertNull($bag->getEnum('invalid-key', Foo::class));
+        $this->assertSame(Foo::Bar, $bag->getEnum('invalid-key', Foo::class, Foo::Bar));
+    }
+
+    public function testGetEnumThrowsExceptionWithNotBackingValue()
+    {
+        $bag = new ParameterBag(['invalid-value' => 2]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum "Symfony\Component\HttpFoundation\Tests\Foo".');
+
+        $this->assertNull($bag->getEnum('invalid-value', Foo::class));
+    }
+
+    public function testGetEnumThrowsExceptionWithInvalidValueType()
+    {
+        $bag = new ParameterBag(['invalid-value' => ['foo']]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: Symfony\Component\HttpFoundation\Tests\Foo::from(): Argument #1 ($value) must be of type int, array given.');
+
+        $this->assertNull($bag->getEnum('invalid-value', Foo::class));
+    }
+}
+
+enum Foo: int
+{
+    case Bar = 1;
 }

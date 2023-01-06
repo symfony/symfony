@@ -62,6 +62,22 @@
                 <source>Account is locked.</source>
                 <target>El compte està bloquejat.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Massa intents d'inici de sessió fallits, torneu-ho a provar més tard.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Enllaç d'inici de sessió no vàlid o caducat.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Massa intents d'inici de sessió fallits, torneu-ho a provar en %minutes% minut.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Massa intents d'inici de sessió fallits, torneu-ho a provar en %minutes% minuts.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

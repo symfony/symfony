@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
-use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 
 class ChoiceLoaderTest extends TestCase
 {
@@ -25,12 +25,12 @@ class ChoiceLoaderTest extends TestCase
         $choices = ['f' => 'foo', 'b' => 'bar', 'z' => 'baz'];
         $choiceList = new ArrayChoiceList($choices);
 
-        $type = $this->createMock(FormTypeInterface::class);
+        $type = new FormType();
         $decorated = new CallbackChoiceLoader(static function () use ($choices) {
             return $choices;
         });
         $loader1 = new ChoiceLoader($type, $decorated);
-        $loader2 = new ChoiceLoader($type, $this->createMock(ChoiceLoaderInterface::class));
+        $loader2 = new ChoiceLoader($type, new ArrayChoiceLoader());
 
         $this->assertEquals($choiceList, $loader1->loadChoiceList());
         $this->assertEquals($choiceList, $loader2->loadChoiceList());

@@ -11,20 +11,17 @@
 
 namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 
-use Symfony\Component\Notifier\Bridge\GoogleChat\Component\Card;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
- *
- * @experimental in 5.2
  */
 final class GoogleChatOptions implements MessageOptionsInterface
 {
-    private $threadKey;
-    private $options = [];
+    private ?string $threadKey = null;
+    private array $options = [];
 
     public function __construct(array $options = [])
     {
@@ -40,6 +37,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
         if ($notification->getContent()) {
             $text .= "\r\n".$notification->getContent();
         }
+
         if ($exception = $notification->getExceptionAsString()) {
             $text .= "\r\n".'```'.$notification->getExceptionAsString().'```';
         }
@@ -63,21 +61,44 @@ final class GoogleChatOptions implements MessageOptionsInterface
         return $this->options;
     }
 
-    public function card(array $card): self
+    /**
+     * @deprecated since Symfony 6.3, use "cardV2()" instead
+     *
+     * @return $this
+     */
+    public function card(array $card): static
     {
+        trigger_deprecation('symfony/google-chat-notifier', '6.3', '"%s()" is deprecated, use "cardV2()" instead.', __METHOD__);
+
         $this->options['cards'][] = $card;
 
         return $this;
     }
 
-    public function text(string $text): self
+    /**
+     * @return $this
+     */
+    public function cardV2(array $card): static
+    {
+        $this->options['cardsV2'][] = $card;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function text(string $text): static
     {
         $this->options['text'] = $text;
 
         return $this;
     }
 
-    public function setThreadKey(?string $threadKey): self
+    /**
+     * @return $this
+     */
+    public function setThreadKey(?string $threadKey): static
     {
         $this->threadKey = $threadKey;
 

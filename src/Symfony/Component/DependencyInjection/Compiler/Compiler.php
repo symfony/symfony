@@ -21,9 +21,9 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
  */
 class Compiler
 {
-    private $passConfig;
-    private $log = [];
-    private $serviceReferenceGraph;
+    private PassConfig $passConfig;
+    private array $log = [];
+    private ServiceReferenceGraph $serviceReferenceGraph;
 
     public function __construct()
     {
@@ -31,29 +31,16 @@ class Compiler
         $this->serviceReferenceGraph = new ServiceReferenceGraph();
     }
 
-    /**
-     * Returns the PassConfig.
-     *
-     * @return PassConfig The PassConfig instance
-     */
-    public function getPassConfig()
+    public function getPassConfig(): PassConfig
     {
         return $this->passConfig;
     }
 
-    /**
-     * Returns the ServiceReferenceGraph.
-     *
-     * @return ServiceReferenceGraph The ServiceReferenceGraph instance
-     */
-    public function getServiceReferenceGraph()
+    public function getServiceReferenceGraph(): ServiceReferenceGraph
     {
         return $this->serviceReferenceGraph;
     }
 
-    /**
-     * Adds a pass to the PassConfig.
-     */
     public function addPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
         $this->passConfig->addPass($pass, $type, $priority);
@@ -64,19 +51,14 @@ class Compiler
      */
     public function log(CompilerPassInterface $pass, string $message)
     {
-        if (false !== strpos($message, "\n")) {
-            $message = str_replace("\n", "\n".\get_class($pass).': ', trim($message));
+        if (str_contains($message, "\n")) {
+            $message = str_replace("\n", "\n".$pass::class.': ', trim($message));
         }
 
-        $this->log[] = \get_class($pass).': '.$message;
+        $this->log[] = $pass::class.': '.$message;
     }
 
-    /**
-     * Returns the log.
-     *
-     * @return array Log array
-     */
-    public function getLog()
+    public function getLog(): array
     {
         return $this->log;
     }
@@ -99,7 +81,6 @@ class Compiler
 
                 if ($msg !== $resolvedMsg = $container->resolveEnvPlaceholders($msg, null, $usedEnvs)) {
                     $r = new \ReflectionProperty($prev, 'message');
-                    $r->setAccessible(true);
                     $r->setValue($prev, $resolvedMsg);
                 }
             } while ($prev = $prev->getPrevious());

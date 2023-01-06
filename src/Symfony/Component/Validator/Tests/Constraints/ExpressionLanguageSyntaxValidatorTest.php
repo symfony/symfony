@@ -14,16 +14,20 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntax;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+/**
+ * @group legacy
+ */
 class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new ExpressionLanguageSyntaxValidator(new ExpressionLanguage());
     }
 
-    public function testExpressionValid(): void
+    public function testExpressionValid()
     {
         $this->validator->validate('1 + 1', new ExpressionLanguageSyntax([
             'message' => 'myMessage',
@@ -33,7 +37,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpressionWithoutNames(): void
+    public function testExpressionWithoutNames()
     {
         $this->validator->validate('1 + 1', new ExpressionLanguageSyntax([
             'message' => 'myMessage',
@@ -42,7 +46,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpressionWithAllowedVariableName(): void
+    public function testExpressionWithAllowedVariableName()
     {
         $this->validator->validate('a + 1', new ExpressionLanguageSyntax([
             'message' => 'myMessage',
@@ -52,7 +56,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpressionIsNotValid(): void
+    public function testExpressionIsNotValid()
     {
         $this->validator->validate('a + 1', new ExpressionLanguageSyntax([
             'message' => 'myMessage',

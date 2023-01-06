@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Messenger\DoctrinePingConnectionMiddleware;
@@ -102,9 +102,12 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testMiddlewareNoPingInNonWorkerContext()
     {
-        $this->connection->expects($this->never())
-            ->method('ping')
-            ->willReturn(false);
+        // This method has been removed in DBAL 3.0
+        if (method_exists(Connection::class, 'ping')) {
+            $this->connection->expects($this->never())
+                ->method('ping')
+                ->willReturn(false);
+        }
 
         $this->connection->expects($this->never())
             ->method('close')

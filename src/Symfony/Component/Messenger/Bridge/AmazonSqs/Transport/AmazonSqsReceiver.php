@@ -26,8 +26,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
 {
-    private $connection;
-    private $serializer;
+    private Connection $connection;
+    private SerializerInterface $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -35,9 +35,6 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
         try {
@@ -63,9 +60,6 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
         yield $envelope->with(new AmazonSqsReceivedStamp($sqsEnvelope['id']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         try {
@@ -75,9 +69,6 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         try {
@@ -87,9 +78,6 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
         try {

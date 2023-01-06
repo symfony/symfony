@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 
@@ -48,7 +49,7 @@ class TranslationExtractorPassTest extends TestCase
 
     public function testProcessMissingAlias()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The alias for the tag "translation.extractor" of service "foo.id" must be set.');
         $container = new ContainerBuilder();
         $container->register('translation.extractor');

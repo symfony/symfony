@@ -24,6 +24,6 @@ class MergeCollectionListenerArrayObjectTest extends MergeCollectionListenerTest
 
     protected function getBuilder($name = 'name')
     {
-        return new FormBuilder($name, '\ArrayObject', new EventDispatcher(), (new FormFactoryBuilder())->getFormFactory());
+        return new FormBuilder($name, \ArrayObject::class, new EventDispatcher(), (new FormFactoryBuilder())->getFormFactory());
     }
 }

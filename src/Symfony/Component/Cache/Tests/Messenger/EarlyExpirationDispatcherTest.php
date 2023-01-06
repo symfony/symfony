@@ -12,8 +12,8 @@
 namespace Symfony\Component\Cache\Tests\Messenger;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
-use Psr\Log\Test\TestLogger;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\CacheItem;
@@ -26,9 +26,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-/**
- * @requires function Symfony\Component\DependencyInjection\ReverseContainer::__construct
- */
 class EarlyExpirationDispatcherTest extends TestCase
 {
     public static function tearDownAfterClass(): void
@@ -57,7 +54,7 @@ class EarlyExpirationDispatcherTest extends TestCase
 
         $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $dispatcher = new EarlyExpirationDispatcher($bus, $reverseContainer);
 
@@ -107,7 +104,7 @@ class EarlyExpirationDispatcherTest extends TestCase
         $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
         $msg = EarlyExpirationMessage::create($reverseContainer, $computationService, $item, $pool);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())
             ->method('dispatch')
             ->with($msg)
@@ -130,5 +127,19 @@ class EarlyExpirationDispatcherTest extends TestCase
             ],
         ];
         $this->assertSame($expected, $logger->records);
+    }
+}
+
+final class TestLogger extends AbstractLogger
+{
+    public $records = [];
+
+    public function log($level, $message, array $context = []): void
+    {
+        $this->records[] = [
+            'level' => $level,
+            'message' => $message,
+            'context' => $context,
+        ];
     }
 }

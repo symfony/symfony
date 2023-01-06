@@ -12,8 +12,6 @@
 namespace Symfony\Component\Uid;
 
 /**
- * @experimental in 5.1
- *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 abstract class AbstractUid implements \JsonSerializable
@@ -31,11 +29,57 @@ abstract class AbstractUid implements \JsonSerializable
     /**
      * Creates an AbstractUid from an identifier represented in any of the supported formats.
      *
-     * @return static
-     *
      * @throws \InvalidArgumentException When the passed value is not valid
      */
-    abstract public static function fromString(string $uid): self;
+    abstract public static function fromString(string $uid): static;
+
+    /**
+     * @throws \InvalidArgumentException When the passed value is not valid
+     */
+    public static function fromBinary(string $uid): static
+    {
+        if (16 !== \strlen($uid)) {
+            throw new \InvalidArgumentException('Invalid binary uid provided.');
+        }
+
+        return static::fromString($uid);
+    }
+
+    /**
+     * @throws \InvalidArgumentException When the passed value is not valid
+     */
+    public static function fromBase58(string $uid): static
+    {
+        if (22 !== \strlen($uid)) {
+            throw new \InvalidArgumentException('Invalid base-58 uid provided.');
+        }
+
+        return static::fromString($uid);
+    }
+
+    /**
+     * @throws \InvalidArgumentException When the passed value is not valid
+     */
+    public static function fromBase32(string $uid): static
+    {
+        if (26 !== \strlen($uid)) {
+            throw new \InvalidArgumentException('Invalid base-32 uid provided.');
+        }
+
+        return static::fromString($uid);
+    }
+
+    /**
+     * @throws \InvalidArgumentException When the passed value is not valid
+     */
+    public static function fromRfc4122(string $uid): static
+    {
+        if (36 !== \strlen($uid)) {
+            throw new \InvalidArgumentException('Invalid RFC4122 uid provided.');
+        }
+
+        return static::fromString($uid);
+    }
 
     /**
      * Returns the identifier as a raw binary string.
@@ -43,7 +87,7 @@ abstract class AbstractUid implements \JsonSerializable
     abstract public function toBinary(): string;
 
     /**
-     * Returns the identifier as a base-58 case sensitive string.
+     * Returns the identifier as a base58 case sensitive string.
      */
     public function toBase58(): string
     {
@@ -51,7 +95,7 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
-     * Returns the identifier as a base-32 case insensitive string.
+     * Returns the identifier as a base32 case insensitive string.
      */
     public function toBase32(): string
     {
@@ -84,9 +128,17 @@ abstract class AbstractUid implements \JsonSerializable
     }
 
     /**
+     * Returns the identifier as a prefixed hexadecimal case insensitive string.
+     */
+    public function toHex(): string
+    {
+        return '0x'.bin2hex($this->toBinary());
+    }
+
+    /**
      * Returns whether the argument is an AbstractUid and contains the same value as the current instance.
      */
-    public function equals($other): bool
+    public function equals(mixed $other): bool
     {
         if (!$other instanceof self) {
             return false;

@@ -1,0 +1,17 @@
+open
+validateId
+read
+doRead: invalid sessionId
+read
+$_SESSION is not empty
+
+write
+doWrite: _symfony_flashes|a:1:{s:3:"foo";a:1:{i:0;s:3:"bar";}}
+close
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: max-age=0, private, must-revalidate
+    [2] => Set-Cookie: sid=random_session_id; path=/; secure; HttpOnly
+)
+shutdown

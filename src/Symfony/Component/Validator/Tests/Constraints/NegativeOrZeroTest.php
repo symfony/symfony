@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\NegativeOrZero;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class NegativeOrZeroTest extends TestCase
 {
     public function testAttributes()
@@ -27,12 +24,12 @@ class NegativeOrZeroTest extends TestCase
         $loader = new AnnotationLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame(0, $aConstraint->value);
         self::assertNull($aConstraint->propertyPath);
         self::assertSame(['Default', 'NegativeOrZeroDummy'], $aConstraint->groups);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['foo'], $bConstraint->groups);
     }

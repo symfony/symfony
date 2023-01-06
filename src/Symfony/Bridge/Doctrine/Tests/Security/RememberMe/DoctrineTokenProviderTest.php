@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Security\RememberMe;
 
 use Doctrine\DBAL\DriverManager;
@@ -13,13 +22,6 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  */
 class DoctrineTokenProviderTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        if (\PHP_VERSION_ID >= 80000) {
-            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
-        }
-    }
-
     public function testCreateNewToken()
     {
         $provider = $this->bootstrapProvider();
@@ -61,6 +63,56 @@ class DoctrineTokenProviderTest extends TestCase
         $this->expectException(TokenNotFoundException::class);
 
         $provider->loadTokenBySeries('someSeries');
+    }
+
+    public function testVerifyOutdatedTokenAfterParallelRequest()
+    {
+        $provider = $this->bootstrapProvider();
+        $series = base64_encode(random_bytes(64));
+        $oldValue = 'oldValue';
+        $newValue = 'newValue';
+
+        // setup existing token
+        $token = new PersistentToken('someClass', 'someUser', $series, $oldValue, new \DateTime('2013-01-26T18:23:51'));
+        $provider->createNewToken($token);
+
+        // new request comes in requiring remember-me auth, which updates the token
+        $provider->updateExistingToken($token, $newValue, new \DateTime('-5 seconds'));
+        $provider->updateToken($series, $newValue, new \DateTime('-5 seconds'));
+
+        // parallel request comes in with the old remember-me cookie and session, which also requires reauth
+        $token = $provider->loadTokenBySeries($series);
+        $this->assertEquals($newValue, $token->getTokenValue());
+
+        // new token is valid
+        $this->assertTrue($provider->verifyToken($token, $newValue));
+        // old token is still valid
+        $this->assertTrue($provider->verifyToken($token, $oldValue));
+    }
+
+    public function testVerifyOutdatedTokenAfterParallelRequestFailsAfter60Seconds()
+    {
+        $provider = $this->bootstrapProvider();
+        $series = base64_encode(random_bytes(64));
+        $oldValue = 'oldValue';
+        $newValue = 'newValue';
+
+        // setup existing token
+        $token = new PersistentToken('someClass', 'someUser', $series, $oldValue, new \DateTime('2013-01-26T18:23:51'));
+        $provider->createNewToken($token);
+
+        // new request comes in requiring remember-me auth, which updates the token
+        $provider->updateExistingToken($token, $newValue, new \DateTime('-61 seconds'));
+        $provider->updateToken($series, $newValue, new \DateTime('-5 seconds'));
+
+        // parallel request comes in with the old remember-me cookie and session, which also requires reauth
+        $token = $provider->loadTokenBySeries($series);
+        $this->assertEquals($newValue, $token->getTokenValue());
+
+        // new token is valid
+        $this->assertTrue($provider->verifyToken($token, $newValue));
+        // old token is not valid anymore after 60 seconds
+        $this->assertFalse($provider->verifyToken($token, $oldValue));
     }
 
     /**

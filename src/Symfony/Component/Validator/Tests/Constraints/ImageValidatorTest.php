@@ -13,28 +13,26 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @requires extension fileinfo
+ *
+ * @extends ConstraintValidatorTestCase<ImageValidator>
  */
 class ImageValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $context;
-
-    /**
-     * @var ImageValidator
-     */
-    protected $validator;
-
     protected $path;
     protected $image;
     protected $imageLandscape;
     protected $imagePortrait;
     protected $image4By3;
+    protected $image16By9;
     protected $imageCorrupted;
+    protected $notAnImage;
 
-    protected function createValidator()
+    protected function createValidator(): ImageValidator
     {
         return new ImageValidator();
     }
@@ -47,7 +45,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->imageLandscape = __DIR__.'/Fixtures/test_landscape.gif';
         $this->imagePortrait = __DIR__.'/Fixtures/test_portrait.gif';
         $this->image4By3 = __DIR__.'/Fixtures/test_4by3.gif';
+        $this->image16By9 = __DIR__.'/Fixtures/test_16by9.gif';
         $this->imageCorrupted = __DIR__.'/Fixtures/test_corrupted.gif';
+        $this->notAnImage = __DIR__.'/Fixtures/ccc.txt';
     }
 
     public function testNullIsValid()
@@ -91,12 +91,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new Image([
             'notFoundMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(notFoundMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(notFoundMessage: 'myMessage'),
+        ];
     }
 
     public function testValidSize()
@@ -133,12 +130,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'minWidth' => 3,
             'minWidthMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(minWidth: 3, minWidthMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(minWidth: 3, minWidthMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -161,12 +155,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'maxWidth' => 1,
             'maxWidthMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(maxWidth: 1, maxWidthMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(maxWidth: 1, maxWidthMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -189,12 +180,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'minHeight' => 3,
             'minHeightMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(minHeight: 3, minHeightMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(minHeight: 3, minHeightMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -217,12 +205,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'maxHeight' => 1,
             'maxHeightMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(maxHeight: 1, maxHeightMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(maxHeight: 1, maxHeightMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -247,12 +232,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'minPixels' => 5,
             'minPixelsMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(minPixels: 5, minPixelsMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(minPixels: 5, minPixelsMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -277,17 +259,14 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'maxPixels' => 3,
             'maxPixelsMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(maxPixels: 3, maxPixelsMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(maxPixels: 3, maxPixelsMessage: 'myMessage'),
+        ];
     }
 
     public function testInvalidMinWidth()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'minWidth' => '1abc',
         ]);
@@ -297,7 +276,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxWidth()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'maxWidth' => '1abc',
         ]);
@@ -307,7 +286,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMinHeight()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'minHeight' => '1abc',
         ]);
@@ -317,7 +296,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxHeight()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'maxHeight' => '1abc',
         ]);
@@ -327,7 +306,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMinPixels()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'minPixels' => '1abc',
         ]);
@@ -337,7 +316,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxPixels()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'maxPixels' => '1abc',
         ]);
@@ -365,12 +344,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'minRatio' => 2,
             'minRatioMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(minRatio: 2, minRatioMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(minRatio: 2, minRatioMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -393,12 +369,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'maxRatio' => 0.5,
             'maxRatioMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(maxRatio: 0.5, maxRatioMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(maxRatio: 0.5, maxRatioMessage: 'myMessage'),
+        ];
     }
 
     public function testMaxRatioUsesTwoDecimalsOnly()
@@ -412,9 +385,31 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testMinRatioUsesInputMoreDecimals()
+    {
+        $constraint = new Image([
+            'minRatio' => 4 / 3,
+        ]);
+
+        $this->validator->validate($this->image4By3, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testMaxRatioUsesInputMoreDecimals()
+    {
+        $constraint = new Image([
+            'maxRatio' => 16 / 9,
+        ]);
+
+        $this->validator->validate($this->image16By9, $constraint);
+
+        $this->assertNoViolation();
+    }
+
     public function testInvalidMinRatio()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'minRatio' => '1abc',
         ]);
@@ -424,7 +419,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxRatio()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new Image([
             'maxRatio' => '1abc',
         ]);
@@ -452,12 +447,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'allowSquare' => false,
             'allowSquareMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(allowSquare: false, allowSquareMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(allowSquare: false, allowSquareMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -480,12 +472,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'allowLandscape' => false,
             'allowLandscapeMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(allowLandscape: false, allowLandscapeMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -508,12 +497,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'allowPortrait' => false,
             'allowPortraitMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(allowPortrait: false, allowPortraitMessage: "myMessage");'),
-            ];
-        }
+        yield 'Named arguments' => [
+            new Image(allowPortrait: false, allowPortraitMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -536,17 +522,61 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testInvalidMimeType()
+    {
+        $this->validator->validate($this->notAnImage, $constraint = new Image());
+
+        $this->assertSame('image/*', $constraint->mimeTypes);
+
+        $this->buildViolation('This file is not a valid image.')
+            ->setParameter('{{ file }}', sprintf('"%s"', $this->notAnImage))
+            ->setParameter('{{ type }}', '"text/plain"')
+            ->setParameter('{{ types }}', '"image/*"')
+            ->setParameter('{{ name }}', '"ccc.txt"')
+            ->setCode(Image::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
     public function provideDetectCorruptedConstraints(): iterable
     {
         yield 'Doctrine style' => [new Image([
             'detectCorrupted' => true,
             'corruptedMessage' => 'myMessage',
         ])];
+        yield 'Named arguments' => [
+            new Image(detectCorrupted: true, corruptedMessage: 'myMessage'),
+        ];
+    }
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\Image(detectCorrupted: true, corruptedMessage: "myMessage");'),
-            ];
-        }
+    /**
+     * @dataProvider provideInvalidMimeTypeWithNarrowedSet
+     */
+    public function testInvalidMimeTypeWithNarrowedSet(Image $constraint)
+    {
+        $this->validator->validate($this->image, $constraint);
+
+        $this->buildViolation('The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.')
+            ->setParameter('{{ file }}', sprintf('"%s"', $this->image))
+            ->setParameter('{{ type }}', '"image/gif"')
+            ->setParameter('{{ types }}', '"image/jpeg", "image/png"')
+            ->setParameter('{{ name }}', '"test.gif"')
+            ->setCode(Image::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function provideInvalidMimeTypeWithNarrowedSet()
+    {
+        yield 'Doctrine style' => [new Image([
+            'mimeTypes' => [
+                'image/jpeg',
+                'image/png',
+            ],
+        ])];
+        yield 'Named arguments' => [
+            new Image(mimeTypes: [
+                'image/jpeg',
+                'image/png',
+            ]),
+        ];
     }
 }

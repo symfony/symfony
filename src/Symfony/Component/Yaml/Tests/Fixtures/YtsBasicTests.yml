@@ -200,3 +200,37 @@ php: |
          'age' => 38
        ]
      ]
+---
+test: Inline first element in sequence blocks 1
+yaml: |
+  - - s1_i1
+    - s1_i2
+  - s2
+php: |
+  [
+    [
+      "s1_i1",
+      "s1_i2"
+    ],
+    "s2"
+  ]
+---
+test: Inline first element in sequence blocks 2
+yaml: |
+  - - s1_i1
+    - - s1_i1_1
+      - s1_i1_2
+    - s1_i2
+  - s2
+php: |
+  [
+    [
+      "s1_i1",
+      [
+        "s1_i1_1",
+        "s1_i1_2",
+      ],
+      "s1_i2"
+    ],
+    "s2"
+  ]

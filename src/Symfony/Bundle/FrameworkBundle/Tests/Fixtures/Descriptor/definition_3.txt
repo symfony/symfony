@@ -1,0 +1,19 @@
+ ----------------- ------------------------------------------------------ 
+ [32m Option          [39m [32m Value                                                [39m 
+ ----------------- ------------------------------------------------------ 
+  Service ID        -                                                     
+  Class             Full\Qualified\Class3                                 
+  Tags              -                                                     
+  Public            no                                                    
+  Synthetic         no                                                    
+  Lazy              no                                                    
+  Shared            yes                                                   
+  Abstract          no                                                    
+  Autowired         no                                                    
+  Autoconfigured    no                                                    
+  Required File     /path/to/file                                         
+  Factory Service   inline factory service (Full\Qualified\FactoryClass)  
+  Factory Method    get                                                   
+  Usages            none                                                  
+ ----------------- ------------------------------------------------------ 
+

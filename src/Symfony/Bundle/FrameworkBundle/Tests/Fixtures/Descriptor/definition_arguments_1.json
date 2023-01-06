@@ -7,6 +7,7 @@
     "abstract": true,
     "autowire": false,
     "autoconfigure": false,
+    "deprecated": false,
     "arguments": [
         {
             "type": "service",
@@ -22,12 +23,14 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "deprecated": false,
             "arguments": [
                 "arg1",
                 "arg2"
             ],
             "file": null,
-            "tags": []
+            "tags": [],
+            "usages": []
         },
         [
             "foo",
@@ -44,9 +47,11 @@
                 "abstract": false,
                 "autowire": false,
                 "autoconfigure": false,
+                "deprecated": false,
                 "arguments": [],
                 "file": null,
-                "tags": []
+                "tags": [],
+                "usages": []
             }
         ],
         [
@@ -58,10 +63,15 @@
                 "type": "service",
                 "id": ".definition_2"
             }
-        ]
+        ],
+        {
+            "type": "abstract",
+            "text": "placeholder"
+        }
     ],
     "file": null,
     "factory_class": "Full\\Qualified\\FactoryClass",
     "factory_method": "get",
-    "tags": []
+    "tags": [],
+    "usages": []
 }

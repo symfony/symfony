@@ -7,6 +7,7 @@ use Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeInterface;
 
 class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtures\OutsideInterface
 {
+    public function __construct() { }
     public function returnTypeGrandParent() { }
     public function returnTypeParentInterface() { }
     public function returnTypeInterface() { }
@@ -45,5 +46,9 @@ class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtur
     public function mixed() { }
     public function nullableMixed() { }
     public function static() { }
+    public function false() { }
+    public function true() { }
+    public function never() { }
+    public function null() { }
     public function outsideMethod() { }
 }

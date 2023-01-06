@@ -24,10 +24,13 @@ use Symfony\Component\Mime\RawMessage;
  */
 class RoundRobinTransport implements TransportInterface
 {
-    private $deadTransports;
-    private $transports = [];
-    private $retryPeriod;
-    private $cursor = -1;
+    /**
+     * @var \SplObjectStorage<TransportInterface, float>
+     */
+    private \SplObjectStorage $deadTransports;
+    private array $transports = [];
+    private int $retryPeriod;
+    private int $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports
@@ -45,15 +48,19 @@ class RoundRobinTransport implements TransportInterface
 
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
+        $exception = null;
+
         while ($transport = $this->getNextTransport()) {
             try {
                 return $transport->send($message, $envelope);
             } catch (TransportExceptionInterface $e) {
+                $exception ??= new TransportException('All transports failed.');
+                $exception->appendDebug(sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
                 $this->deadTransports[$transport] = microtime(true);
             }
         }
 
-        throw new TransportException('All transports failed.');
+        throw $exception ?? new TransportException('No transports found.');
     }
 
     public function __toString(): string

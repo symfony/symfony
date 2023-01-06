@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config http-method-override="false">
+        <framework:mailer enabled="false" />
+        <framework:messenger enabled="true" />
+        <framework:notifier enabled="true" notification-on-failed-messages="true">
+            <framework:chatter-transport name="slack">null</framework:chatter-transport>
+            <framework:texter-transport name="twilio">null</framework:texter-transport>
+            <framework:channel-policy name="low">slack</framework:channel-policy>
+            <framework:channel-policy name="high">twilio</framework:channel-policy>
+            <framework:admin-recipients>
+                <framework:admin-recipient email="test@test.de" phone="+490815" />
+            </framework:admin-recipients>
+        </framework:notifier>
+    </framework:config>
+</container>

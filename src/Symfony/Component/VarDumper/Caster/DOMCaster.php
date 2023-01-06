@@ -22,7 +22,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DOMCaster
 {
-    private static $errorCodes = [
+    private const ERROR_CODES = [
         \DOM_PHP_ERR => 'DOM_PHP_ERR',
         \DOM_INDEX_SIZE_ERR => 'DOM_INDEX_SIZE_ERR',
         \DOMSTRING_SIZE_ERR => 'DOMSTRING_SIZE_ERR',
@@ -42,7 +42,7 @@ class DOMCaster
         \DOM_VALIDATION_ERR => 'DOM_VALIDATION_ERR',
     ];
 
-    private static $nodeTypes = [
+    private const NODE_TYPES = [
         \XML_ELEMENT_NODE => 'XML_ELEMENT_NODE',
         \XML_ATTRIBUTE_NODE => 'XML_ATTRIBUTE_NODE',
         \XML_TEXT_NODE => 'XML_TEXT_NODE',
@@ -66,8 +66,8 @@ class DOMCaster
     public static function castException(\DOMException $e, array $a, Stub $stub, bool $isNested)
     {
         $k = Caster::PREFIX_PROTECTED.'code';
-        if (isset($a[$k], self::$errorCodes[$a[$k]])) {
-            $a[$k] = new ConstStub(self::$errorCodes[$a[$k]], $a[$k]);
+        if (isset($a[$k], self::ERROR_CODES[$a[$k]])) {
+            $a[$k] = new ConstStub(self::ERROR_CODES[$a[$k]], $a[$k]);
         }
 
         return $a;
@@ -82,7 +82,7 @@ class DOMCaster
         return $a;
     }
 
-    public static function castImplementation($dom, array $a, Stub $stub, bool $isNested)
+    public static function castImplementation(\DOMImplementation $dom, array $a, Stub $stub, bool $isNested)
     {
         $a += [
             Caster::PREFIX_VIRTUAL.'Core' => '1.0',
@@ -97,7 +97,7 @@ class DOMCaster
         $a += [
             'nodeName' => $dom->nodeName,
             'nodeValue' => new CutStub($dom->nodeValue),
-            'nodeType' => new ConstStub(self::$nodeTypes[$dom->nodeType], $dom->nodeType),
+            'nodeType' => new ConstStub(self::NODE_TYPES[$dom->nodeType], $dom->nodeType),
             'parentNode' => new CutStub($dom->parentNode),
             'childNodes' => $dom->childNodes,
             'firstChild' => new CutStub($dom->firstChild),
@@ -121,7 +121,7 @@ class DOMCaster
         $a += [
             'nodeName' => $dom->nodeName,
             'nodeValue' => new CutStub($dom->nodeValue),
-            'nodeType' => new ConstStub(self::$nodeTypes[$dom->nodeType], $dom->nodeType),
+            'nodeType' => new ConstStub(self::NODE_TYPES[$dom->nodeType], $dom->nodeType),
             'prefix' => $dom->prefix,
             'localName' => $dom->localName,
             'namespaceURI' => $dom->namespaceURI,
@@ -203,43 +203,6 @@ class DOMCaster
     {
         $a += [
             'wholeText' => $dom->wholeText,
-        ];
-
-        return $a;
-    }
-
-    public static function castTypeinfo(\DOMTypeinfo $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'typeName' => $dom->typeName,
-            'typeNamespace' => $dom->typeNamespace,
-        ];
-
-        return $a;
-    }
-
-    public static function castDomError(\DOMDomError $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'severity' => $dom->severity,
-            'message' => $dom->message,
-            'type' => $dom->type,
-            'relatedException' => $dom->relatedException,
-            'related_data' => $dom->related_data,
-            'location' => $dom->location,
-        ];
-
-        return $a;
-    }
-
-    public static function castLocator(\DOMLocator $dom, array $a, Stub $stub, bool $isNested)
-    {
-        $a += [
-            'lineNumber' => $dom->lineNumber,
-            'columnNumber' => $dom->columnNumber,
-            'offset' => $dom->offset,
-            'relatedNode' => $dom->relatedNode,
-            'uri' => $dom->uri ? new LinkStub($dom->uri, $dom->lineNumber) : $dom->uri,
         ];
 
         return $a;

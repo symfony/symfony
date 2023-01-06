@@ -12,17 +12,20 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
 class ExpressionLanguageTest extends TestCase
 {
     public function testCachedParse()
     {
-        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
-        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
+        $cacheMock = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItemMock = $this->createMock(CacheItemInterface::class);
         $savedParsedExpression = null;
         $expressionLanguage = new ExpressionLanguage($cacheMock);
 
@@ -45,8 +48,10 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
                 $savedParsedExpression = $parsedExpression;
+
+                return $cacheItemMock;
             })
         ;
 
@@ -54,6 +59,7 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('save')
             ->with($cacheItemMock)
+            ->willReturn(true)
         ;
 
         $parsedExpression = $expressionLanguage->parse('1 + 1', []);
@@ -107,7 +113,7 @@ class ExpressionLanguageTest extends TestCase
 
     public function testParseThrowsInsteadOfNotice()
     {
-        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
+        $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->parse('node.', ['node']);
@@ -115,7 +121,7 @@ class ExpressionLanguageTest extends TestCase
 
     public function shortCircuitProviderEvaluate()
     {
-        $object = $this->getMockBuilder('stdClass')->setMethods(['foo'])->getMock();
+        $object = $this->getMockBuilder(\stdClass::class)->setMethods(['foo'])->getMock();
         $object->expects($this->never())->method('foo');
 
         return [
@@ -155,8 +161,8 @@ class ExpressionLanguageTest extends TestCase
 
     public function testCachingWithDifferentNamesOrder()
     {
-        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
-        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
+        $cacheMock = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItemMock = $this->createMock(CacheItemInterface::class);
         $expressionLanguage = new ExpressionLanguage($cacheMock);
         $savedParsedExpression = null;
 
@@ -179,8 +185,10 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
                 $savedParsedExpression = $parsedExpression;
+
+                return $cacheItemMock;
             })
         ;
 
@@ -188,6 +196,7 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('save')
             ->with($cacheItemMock)
+            ->willReturn(true)
         ;
 
         $expression = 'a + b';
@@ -211,7 +220,7 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterParse($registerCallback)
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->parse('1 + 1', []);
         $registerCallback($el);
@@ -222,18 +231,126 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterEval($registerCallback)
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->evaluate('1 + 1');
         $registerCallback($el);
     }
 
-    public function testCallBadCallable()
+    /**
+     * @dataProvider provideNullSafe
+     */
+    public function testNullSafeEvaluate($expression, $foo)
     {
-        $this->expectException('RuntimeException');
-        $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
-        $el = new ExpressionLanguage();
-        $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertNull($expressionLanguage->evaluate($expression, ['foo' => $foo]));
+    }
+
+    /**
+     * @dataProvider provideNullSafe
+     */
+    public function testNullSafeCompile($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertNull(eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))));
+    }
+
+    public function provideNullSafe()
+    {
+        $foo = new class() extends \stdClass {
+            public function bar()
+            {
+                return null;
+            }
+        };
+
+        yield ['foo?.bar', null];
+        yield ['foo?.bar()', null];
+        yield ['foo.bar?.baz', (object) ['bar' => null]];
+        yield ['foo.bar?.baz()', (object) ['bar' => null]];
+        yield ['foo["bar"]?.baz', ['bar' => null]];
+        yield ['foo["bar"]?.baz()', ['bar' => null]];
+        yield ['foo.bar()?.baz', $foo];
+        yield ['foo.bar()?.baz()', $foo];
+
+        yield ['foo?.bar.baz', null];
+        yield ['foo?.bar["baz"]', null];
+        yield ['foo?.bar["baz"]["qux"]', null];
+        yield ['foo?.bar["baz"]["qux"].quux', null];
+        yield ['foo?.bar["baz"]["qux"].quux()', null];
+        yield ['foo?.bar().baz', null];
+        yield ['foo?.bar()["baz"]', null];
+        yield ['foo?.bar()["baz"]["qux"]', null];
+        yield ['foo?.bar()["baz"]["qux"].quux', null];
+        yield ['foo?.bar()["baz"]["qux"].quux()', null];
+    }
+
+    /**
+     * @dataProvider provideInvalidNullSafe
+     */
+    public function testNullSafeEvaluateFails($expression, $foo, $message)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage($message);
+        $expressionLanguage->evaluate($expression, ['foo' => $foo]);
+    }
+
+    /**
+     * @dataProvider provideInvalidNullSafe
+     */
+    public function testNullSafeCompileFails($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $this->expectWarning();
+        eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo'])));
+    }
+
+    public function provideInvalidNullSafe()
+    {
+        yield ['foo?.bar.baz', (object) ['bar' => null], 'Unable to get property "baz" of non-object "foo.bar".'];
+        yield ['foo?.bar["baz"]', (object) ['bar' => null], 'Unable to get an item of non-array "foo.bar".'];
+        yield ['foo?.bar["baz"].qux.quux', (object) ['bar' => ['baz' => null]], 'Unable to get property "qux" of non-object "foo.bar["baz"]".'];
+    }
+
+    /**
+     * @dataProvider provideNullCoalescing
+     */
+    public function testNullCoalescingEvaluate($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame($expressionLanguage->evaluate($expression, ['foo' => $foo]), 'default');
+    }
+
+    /**
+     * @dataProvider provideNullCoalescing
+     */
+    public function testNullCoalescingCompile($expression, $foo)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame(eval(sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))), 'default');
+    }
+
+    public function provideNullCoalescing()
+    {
+        $foo = new class() extends \stdClass {
+            public function bar()
+            {
+                return null;
+            }
+        };
+
+        yield ['foo.bar ?? "default"', null];
+        yield ['foo.bar.baz ?? "default"', (object) ['bar' => null]];
+        yield ['foo.bar ?? foo.baz ?? "default"', null];
+        yield ['foo[0] ?? "default"', []];
+        yield ['foo["bar"] ?? "default"', ['bar' => null]];
+        yield ['foo["baz"] ?? "default"', ['bar' => null]];
+        yield ['foo["bar"]["baz"] ?? "default"', ['bar' => null]];
+        yield ['foo["bar"].baz ?? "default"', ['bar' => null]];
+        yield ['foo.bar().baz ?? "default"', $foo];
     }
 
     /**
@@ -241,7 +358,7 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterCompile($registerCallback)
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
         $registerCallback($el);

@@ -18,8 +18,6 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 class ChatChannel extends AbstractChannel
 {
@@ -30,9 +28,7 @@ class ChatChannel extends AbstractChannel
             $message = $notification->asChatMessage($recipient, $transportName);
         }
 
-        if (null === $message) {
-            $message = ChatMessage::fromNotification($notification);
-        }
+        $message ??= ChatMessage::fromNotification($notification);
 
         if (null !== $transportName) {
             $message->transport($transportName);

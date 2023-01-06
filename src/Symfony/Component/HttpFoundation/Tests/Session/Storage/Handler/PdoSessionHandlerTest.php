@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
 /**
  * @requires extension pdo_sqlite
+ *
  * @group time-sensitive
  */
 class PdoSessionHandlerTest extends TestCase
@@ -50,7 +52,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testWrongPdoErrMode()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $pdo = $this->getMemorySqlitePdo();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
@@ -59,7 +61,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testInexistentTable()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), ['db_table' => 'inexistent_table']);
         $storage->open('', 'sid');
         $storage->read('id');
@@ -69,7 +71,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testCreateTableTwice()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->createTable();
     }
@@ -131,13 +133,13 @@ class PdoSessionHandlerTest extends TestCase
     public function testReadConvertsStreamToString()
     {
         $pdo = new MockPdo('pgsql');
-        $pdo->prepareResult = $this->getMockBuilder('PDOStatement')->getMock();
+        $pdo->prepareResult = $this->createMock(\PDOStatement::class);
 
         $content = 'foobar';
         $stream = $this->createStream($content);
 
         $pdo->prepareResult->expects($this->once())->method('fetchAll')
-            ->willReturn([[$stream, 42, time()]]);
+            ->willReturn([[$stream, time() + 42]]);
 
         $storage = new PdoSessionHandler($pdo);
         $result = $storage->read('foo');
@@ -147,16 +149,16 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testReadLockedConvertsStreamToString()
     {
-        if (filter_var(ini_get('session.use_strict_mode'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(\ini_get('session.use_strict_mode'), \FILTER_VALIDATE_BOOL)) {
             $this->markTestSkipped('Strict mode needs no locking for new sessions.');
         }
 
         $pdo = new MockPdo('pgsql');
-        $selectStmt = $this->getMockBuilder('PDOStatement')->getMock();
-        $insertStmt = $this->getMockBuilder('PDOStatement')->getMock();
+        $selectStmt = $this->createMock(\PDOStatement::class);
+        $insertStmt = $this->createMock(\PDOStatement::class);
 
         $pdo->prepareResult = function ($statement) use ($selectStmt, $insertStmt) {
-            return 0 === strpos($statement, 'INSERT') ? $insertStmt : $selectStmt;
+            return str_starts_with($statement, 'INSERT') ? $insertStmt : $selectStmt;
         };
 
         $content = 'foobar';
@@ -165,7 +167,7 @@ class PdoSessionHandlerTest extends TestCase
 
         $selectStmt->expects($this->atLeast(2))->method('fetchAll')
             ->willReturnCallback(function () use (&$exception, $stream) {
-                return $exception ? [[$stream, 42, time()]] : [];
+                return $exception ? [[$stream, time() + 42]] : [];
             });
 
         $insertStmt->expects($this->once())->method('execute')
@@ -296,9 +298,8 @@ class PdoSessionHandlerTest extends TestCase
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
 
         $method = new \ReflectionMethod($storage, 'getConnection');
-        $method->setAccessible(true);
 
-        $this->assertInstanceOf('\PDO', $method->invoke($storage));
+        $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
 
     public function testGetConnectionConnectsIfNeeded()
@@ -306,9 +307,8 @@ class PdoSessionHandlerTest extends TestCase
         $storage = new PdoSessionHandler('sqlite::memory:');
 
         $method = new \ReflectionMethod($storage, 'getConnection');
-        $method->setAccessible(true);
 
-        $this->assertInstanceOf('\PDO', $method->invoke($storage));
+        $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
 
     /**
@@ -324,14 +324,44 @@ class PdoSessionHandlerTest extends TestCase
                 continue;
             }
             $property = $reflection->getProperty($property);
-            $property->setAccessible(true);
             $this->assertSame($expectedValue, $property->getValue($storage));
         }
+    }
+
+    public function testConfigureSchemaDifferentDatabase()
+    {
+        $schema = new Schema();
+
+        $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $pdoSessionHandler->configureSchema($schema, fn() => false);
+        $this->assertFalse($schema->hasTable('sessions'));
+    }
+
+    public function testConfigureSchemaSameDatabase()
+    {
+        $schema = new Schema();
+
+        $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $pdoSessionHandler->configureSchema($schema, fn() => true);
+        $this->assertTrue($schema->hasTable('sessions'));
+    }
+
+    public function testConfigureSchemaTableExistsPdo()
+    {
+        $schema = new Schema();
+        $schema->createTable('sessions');
+
+        $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $pdoSessionHandler->configureSchema($schema, fn() => true);
+        $table = $schema->getTable('sessions');
+        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
     }
 
     public function provideUrlDsnPairs()
     {
         yield ['mysql://localhost/test', 'mysql:host=localhost;dbname=test;'];
+        yield ['mysql://localhost/test?charset=utf8mb4', 'mysql:charset=utf8mb4;host=localhost;dbname=test;'];
+        yield ['mysql://localhost/test?unix_socket=socket.sock&charset=utf8mb4', 'mysql:charset=utf8mb4;unix_socket=socket.sock;dbname=test;'];
         yield ['mysql://localhost:56/test', 'mysql:host=localhost;port=56;dbname=test;'];
         yield ['mysql2://root:pwd@localhost/test', 'mysql:host=localhost;dbname=test;', 'root', 'pwd'];
         yield ['postgres://localhost/test', 'pgsql:host=localhost;dbname=test;'];
@@ -344,6 +374,21 @@ class PdoSessionHandlerTest extends TestCase
         yield ['sqlite://localhost/:memory:', 'sqlite::memory:'];
         yield ['mssql://localhost/test', 'sqlsrv:server=localhost;Database=test'];
         yield ['mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test'];
+    }
+
+    public function testTtl()
+    {
+        foreach ([60, fn () => 60] as $ttl) {
+            $pdo = $this->getMemorySqlitePdo();
+            $storage = new PdoSessionHandler($pdo, ['ttl' => $ttl]);
+
+            $storage->open('', 'sid');
+            $storage->read('id');
+            $storage->write('id', 'data');
+            $storage->close();
+
+            $this->assertEqualsWithDelta(time() + 60, $pdo->query('SELECT sess_lifetime FROM sessions')->fetchColumn(), 5);
+        }
     }
 
     /**
@@ -371,7 +416,7 @@ class MockPdo extends \PDO
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;
     }
 
-    public function getAttribute($attribute)
+    public function getAttribute($attribute): mixed
     {
         if (\PDO::ATTR_ERRMODE === $attribute) {
             return $this->errorMode;
@@ -384,18 +429,20 @@ class MockPdo extends \PDO
         return parent::getAttribute($attribute);
     }
 
-    public function prepare($statement, $driverOptions = [])
+    public function prepare($statement, $driverOptions = []): \PDOStatement|false
     {
         return \is_callable($this->prepareResult)
             ? ($this->prepareResult)($statement, $driverOptions)
             : $this->prepareResult;
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
+        return true;
     }
 
-    public function rollBack()
+    public function rollBack(): bool
     {
+        return true;
     }
 }

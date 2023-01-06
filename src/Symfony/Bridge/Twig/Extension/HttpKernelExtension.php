@@ -22,14 +22,12 @@ use Twig\TwigFunction;
  */
 final class HttpKernelExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions(): array
     {
         return [
             new TwigFunction('render', [HttpKernelRuntime::class, 'renderFragment'], ['is_safe' => ['html']]),
             new TwigFunction('render_*', [HttpKernelRuntime::class, 'renderFragmentStrategy'], ['is_safe' => ['html']]),
+            new TwigFunction('fragment_uri', [HttpKernelRuntime::class, 'generateFragmentUri']),
             new TwigFunction('controller', static::class.'::controller'),
         ];
     }

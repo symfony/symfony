@@ -22,26 +22,22 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
  */
 class ApplicationDescription
 {
-    const GLOBAL_NAMESPACE = '_global';
+    public const GLOBAL_NAMESPACE = '_global';
 
-    private $application;
-    private $namespace;
-    private $showHidden;
-
-    /**
-     * @var array
-     */
-    private $namespaces;
+    private Application $application;
+    private ?string $namespace;
+    private bool $showHidden;
+    private array $namespaces;
 
     /**
-     * @var Command[]
+     * @var array<string, Command>
      */
-    private $commands;
+    private array $commands;
 
     /**
-     * @var Command[]
+     * @var array<string, Command>
      */
-    private $aliases;
+    private array $aliases = [];
 
     public function __construct(Application $application, string $namespace = null, bool $showHidden = false)
     {
@@ -52,7 +48,7 @@ class ApplicationDescription
 
     public function getNamespaces(): array
     {
-        if (null === $this->namespaces) {
+        if (!isset($this->namespaces)) {
             $this->inspectApplication();
         }
 
@@ -64,7 +60,7 @@ class ApplicationDescription
      */
     public function getCommands(): array
     {
-        if (null === $this->commands) {
+        if (!isset($this->commands)) {
             $this->inspectApplication();
         }
 
@@ -80,7 +76,7 @@ class ApplicationDescription
             throw new CommandNotFoundException(sprintf('Command "%s" does not exist.', $name));
         }
 
-        return isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
+        return $this->commands[$name] ?? $this->aliases[$name];
     }
 
     private function inspectApplication()
@@ -131,7 +127,7 @@ class ApplicationDescription
         }
 
         if ($namespacedCommands) {
-            ksort($namespacedCommands);
+            ksort($namespacedCommands, \SORT_STRING);
             foreach ($namespacedCommands as $key => $commandsSet) {
                 ksort($commandsSet);
                 $sortedCommands[$key] = $commandsSet;

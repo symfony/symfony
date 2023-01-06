@@ -26,4 +26,5 @@ command 2 help
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`

@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add support to dump int keys as strings by using the `Yaml::DUMP_NUMERIC_KEY_AS_STRING` flag.
+
+6.2
+---
+
+ * Add support for `!php/enum` and `!php/enum *->value`
+ * Deprecate the `!php/const:` tag in key which will be replaced by the `!php/const` tag (without the colon) since 3.4
+
+6.1
+---
+
+ * In cases where it will likely improve readability, strings containing single quotes will be double-quoted
+
+5.4
+---
+
+ * Add new `lint:yaml dirname --exclude=/dirname/foo.yaml --exclude=/dirname/bar.yaml`
+   option to exclude one or more specific files from multiple file list
+ * Allow negatable for the parse tags option with `--no-parse-tags`
+
+5.3
+---
+
+ * Added `github` format support & autodetection to render errors as annotations
+   when running the YAML linter command in a Github Action environment.
+
 5.1.0
 -----
 

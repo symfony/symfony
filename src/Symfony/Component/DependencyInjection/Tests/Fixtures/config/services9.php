@@ -137,6 +137,13 @@ return function (ContainerConfigurator $c) {
         ->tag('container.preload', ['class' => 'Some\Sidekick2'])
         ->public();
 
+    $s->set('a_factory', 'Bar')
+        ->private();
+    $s->set('a_service', 'Bar')
+        ->factory([service('a_factory'), 'getBar']);
+    $s->set('b_service', 'Bar')
+        ->factory([service('a_factory'), 'getBar']);
+
     $s->alias('alias_for_foo', 'foo')->private()->public();
     $s->alias('alias_for_alias', service('alias_for_foo'));
 };

@@ -28,7 +28,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateIntervalType extends AbstractType
 {
-    private $timeParts = [
+    private const TIME_PARTS = [
         'years',
         'months',
         'weeks',
@@ -37,15 +37,12 @@ class DateIntervalType extends AbstractType
         'minutes',
         'seconds',
     ];
-    private static $widgets = [
+    private const WIDGETS = [
         'text' => TextType::class,
         'integer' => IntegerType::class,
         'choice' => ChoiceType::class,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['with_years'] && !$options['with_months'] && !$options['with_weeks'] && !$options['with_days'] && !$options['with_hours'] && !$options['with_minutes'] && !$options['with_seconds']) {
@@ -55,7 +52,7 @@ class DateIntervalType extends AbstractType
             throw new InvalidConfigurationException('The single_text widget does not support invertible intervals.');
         }
         if ($options['with_weeks'] && $options['with_days']) {
-            throw new InvalidConfigurationException('You can not enable weeks and days fields together.');
+            throw new InvalidConfigurationException('You cannot enable weeks and days fields together.');
         }
         $format = 'P';
         $parts = [];
@@ -96,7 +93,7 @@ class DateIntervalType extends AbstractType
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateIntervalToStringTransformer($format));
         } else {
-            foreach ($this->timeParts as $part) {
+            foreach (self::TIME_PARTS as $part) {
                 if ($options['with_'.$part]) {
                     $childOptions = [
                         'error_bubbling' => true,
@@ -105,14 +102,14 @@ class DateIntervalType extends AbstractType
                         'required' => $options['required'],
                         'translation_domain' => $options['translation_domain'],
                         // when compound the array entries are ignored, we need to cascade the configuration here
-                        'empty_data' => isset($options['empty_data'][$part]) ? $options['empty_data'][$part] : null,
+                        'empty_data' => $options['empty_data'][$part] ?? null,
                     ];
                     if ('choice' === $options['widget']) {
                         $childOptions['choice_translation_domain'] = false;
                         $childOptions['choices'] = $options[$part];
                         $childOptions['placeholder'] = $options['placeholder'][$part];
                     }
-                    $childForm = $builder->create($part, self::$widgets[$options['widget']], $childOptions);
+                    $childForm = $builder->create($part, self::WIDGETS[$options['widget']], $childOptions);
                     if ('integer' === $options['widget']) {
                         $childForm->addModelTransformer(
                             new ReversedTransformer(
@@ -148,27 +145,20 @@ class DateIntervalType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $vars = [
             'widget' => $options['widget'],
             'with_invert' => $options['with_invert'],
         ];
-        foreach ($this->timeParts as $part) {
+        foreach (self::TIME_PARTS as $part) {
             $vars['with_'.$part] = $options['with_'.$part];
         }
         $view->vars = array_replace($view->vars, $vars);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $timeParts = $this->timeParts;
         $compound = function (Options $options) {
             return 'single_text' !== $options['widget'];
         };
@@ -180,14 +170,14 @@ class DateIntervalType extends AbstractType
             return $options['required'] ? null : '';
         };
 
-        $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault, $timeParts) {
+        $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
             if (\is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
-                return array_merge(array_fill_keys($timeParts, $default), $placeholder);
+                return array_merge(array_fill_keys(self::TIME_PARTS, $default), $placeholder);
             }
 
-            return array_fill_keys($timeParts, $placeholder);
+            return array_fill_keys(self::TIME_PARTS, $placeholder);
         };
 
         $labelsNormalizer = function (Options $options, array $labels) {
@@ -234,11 +224,7 @@ class DateIntervalType extends AbstractType
             'compound' => $compound,
             'empty_data' => $emptyData,
             'labels' => [],
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please choose a valid date interval.';
-            },
+            'invalid_message' => 'Please choose a valid date interval.',
         ]);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('labels', $labelsNormalizer);
@@ -282,10 +268,7 @@ class DateIntervalType extends AbstractType
         $resolver->setAllowedTypes('labels', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'dateinterval';
     }

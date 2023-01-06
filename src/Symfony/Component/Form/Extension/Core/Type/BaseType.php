@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -28,18 +29,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class BaseType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->setDisabled($options['disabled']);
         $builder->setAutoInitialize($options['auto_initialize']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $name = $form->getName();
@@ -60,9 +55,7 @@ abstract class BaseType extends AbstractType
                 $uniqueBlockPrefix = '_'.$blockName;
             }
 
-            if (null === $translationDomain) {
-                $translationDomain = $view->parent->vars['translation_domain'];
-            }
+            $translationDomain ??= $view->parent->vars['translation_domain'];
 
             $labelTranslationParameters = array_merge($view->parent->vars['label_translation_parameters'], $labelTranslationParameters);
             $attrTranslationParameters = array_merge($view->parent->vars['attr_translation_parameters'], $attrTranslationParameters);
@@ -70,8 +63,16 @@ abstract class BaseType extends AbstractType
             if (!$labelFormat) {
                 $labelFormat = $view->parent->vars['label_format'];
             }
+
+            $rootFormAttrOption = $form->getRoot()->getConfig()->getOption('form_attr');
+            if ($options['form_attr'] || $rootFormAttrOption) {
+                $options['attr']['form'] = \is_string($rootFormAttrOption) ? $rootFormAttrOption : $form->getRoot()->getName();
+                if (empty($options['attr']['form'])) {
+                    throw new LogicException('"form_attr" option must be a string identifier on root form when it has no id.');
+                }
+            }
         } else {
-            $id = $name;
+            $id = \is_string($options['form_attr']) ? $options['form_attr'] : $name;
             $fullName = $name;
             $uniqueBlockPrefix = '_'.$blockName;
 
@@ -107,6 +108,7 @@ abstract class BaseType extends AbstractType
             'translation_domain' => $translationDomain,
             'label_translation_parameters' => $labelTranslationParameters,
             'attr_translation_parameters' => $attrTranslationParameters,
+            'priority' => $options['priority'],
             // Using the block name here speeds up performance in collection
             // forms, where each entry has the same full block name.
             // Including the type is important too, because if rows of a
@@ -117,9 +119,6 @@ abstract class BaseType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -135,11 +134,17 @@ abstract class BaseType extends AbstractType
             'attr' => [],
             'translation_domain' => null,
             'auto_initialize' => true,
+            'priority' => 0,
+            'form_attr' => false,
         ]);
 
         $resolver->setAllowedTypes('block_prefix', ['null', 'string']);
         $resolver->setAllowedTypes('attr', 'array');
         $resolver->setAllowedTypes('row_attr', 'array');
         $resolver->setAllowedTypes('label_html', 'bool');
+        $resolver->setAllowedTypes('priority', 'int');
+        $resolver->setAllowedTypes('form_attr', ['bool', 'string']);
+
+        $resolver->setInfo('priority', 'The form rendering priority (higher priorities will be rendered first)');
     }
 }

@@ -1,7 +1,7 @@
 {
     "name": "symfony/error-handler",
     "type": "library",
-    "description": "Symfony ErrorHandler Component",
+    "description": "Provides tools to manage errors and ease debugging PHP code",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -16,15 +16,17 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "psr/log": "^1.0",
-        "symfony/polyfill-php80": "^1.15",
-        "symfony/var-dumper": "^4.4|^5.0"
+        "php": ">=8.1",
+        "psr/log": "^1|^2|^3",
+        "symfony/var-dumper": "^5.4|^6.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "^4.4|^5.0",
-        "symfony/serializer": "^4.4|^5.0",
-        "symfony/deprecation-contracts": "^2.1"
+        "symfony/http-kernel": "^5.4|^6.0",
+        "symfony/serializer": "^5.4|^6.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
+    },
+    "conflict": {
+        "symfony/deprecation-contracts": "<2.5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorHandler\\": "" },
@@ -32,6 +34,8 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "version": "5.2.x-dev"
+    "bin": [
+        "Resources/bin/patch-type-declarations"
+    ],
+    "minimum-stability": "dev"
 }

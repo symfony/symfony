@@ -11,11 +11,23 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
+use SebastianBergmann\Exporter\Exporter;
+
 /**
  * @internal
  */
 trait ConstraintTraitForV7
 {
+    use ConstraintLogicTrait;
+
+    /**
+     * @return bool|null
+     */
+    public function evaluate($other, $description = '', $returnResult = false)
+    {
+        return $this->doEvaluate($other, $description, $returnResult);
+    }
+
     public function count(): int
     {
         return $this->doCount();
@@ -31,6 +43,15 @@ trait ConstraintTraitForV7
         return $this->doAdditionalFailureDescription($other);
     }
 
+    protected function exporter(): Exporter
+    {
+        if (null === $this->exporter) {
+            $this->exporter = new Exporter();
+        }
+
+        return $this->exporter;
+    }
+
     protected function failureDescription($other): string
     {
         return $this->doFailureDescription($other);
@@ -39,30 +60,5 @@ trait ConstraintTraitForV7
     protected function matches($other): bool
     {
         return $this->doMatches($other);
-    }
-
-    private function doAdditionalFailureDescription($other): string
-    {
-        return '';
-    }
-
-    private function doCount(): int
-    {
-        return 1;
-    }
-
-    private function doFailureDescription($other): string
-    {
-        return $this->exporter()->export($other).' '.$this->toString();
-    }
-
-    private function doMatches($other): bool
-    {
-        return false;
-    }
-
-    private function doToString(): string
-    {
-        return '';
     }
 }

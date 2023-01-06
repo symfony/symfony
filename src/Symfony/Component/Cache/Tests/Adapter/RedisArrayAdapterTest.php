@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
+
 /**
  * @group integration
  */
@@ -19,9 +21,10 @@ class RedisArrayAdapterTest extends AbstractRedisAdapterTest
     public static function setUpBeforeClass(): void
     {
         parent::setupBeforeClass();
-        if (!class_exists('RedisArray')) {
-            self::markTestSkipped('The RedisArray class is required.');
+        if (!class_exists(\RedisArray::class)) {
+            throw new SkippedTestSuiteError('The RedisArray class is required.');
         }
         self::$redis = new \RedisArray([getenv('REDIS_HOST')], ['lazy_connect' => true]);
+        self::$redis->setOption(\Redis::OPT_PREFIX, 'prefix_');
     }
 }

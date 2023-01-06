@@ -1,6 +1,31 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Make `HttplugClient` implement `Psr\Http\Message\RequestFactoryInterface`, `StreamFactoryInterface` and `UriFactoryInterface`
+ * Deprecate implementing `Http\Message\RequestFactory`, `StreamFactory` and `UriFactory` on `HttplugClient`
+ * Add `withOptions()` to `HttplugClient` and `Psr18Client`
+ * Add support for "friendsofphp/well-known-implementations"
+
+6.1
+---
+
+ * Allow yielding `Exception` from MockResponse's `$body` to mock transport errors
+ * Remove credentials from requests redirected to same host but different port
+
+5.4
+---
+
+ * Add `MockHttpClient::setResponseFactory()` method to be able to set response factory after client creating
+
+5.3
+---
+
+ * Implement `HttpClientInterface::withOptions()` from `symfony/contracts` v2.4
+ * Add `DecoratorTrait` to ease writing simple decorators
+
 5.2.0
 -----
 
@@ -11,6 +36,7 @@ CHANGELOG
  * added `EventSourceHttpClient` a Server-Sent events stream implementing the [EventSource specification](https://www.w3.org/TR/eventsource/#eventsource)
  * added option "extra.curl" to allow setting additional curl options in `CurlHttpClient`
  * added `RetryableHttpClient` to automatically retry failed HTTP requests.
+ * added `extra.trace_content` option to `TraceableHttpClient` to prevent it from keeping the content in memory
 
 5.1.0
 -----

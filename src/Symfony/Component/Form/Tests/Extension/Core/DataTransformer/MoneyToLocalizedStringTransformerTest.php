@@ -12,21 +12,25 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyToLocalizedStringTransformerTest extends TestCase
 {
     private $previousLocale;
+    private $defaultLocale;
 
     protected function setUp(): void
     {
         $this->previousLocale = setlocale(\LC_ALL, '0');
+        $this->defaultLocale = \Locale::getDefault();
     }
 
     protected function tearDown(): void
     {
         setlocale(\LC_ALL, $this->previousLocale);
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function testTransform()
@@ -45,7 +49,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
 
         $transformer->transform('abcd');
     }
@@ -73,7 +77,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
 
         $transformer->reverseTransform(12345);
     }

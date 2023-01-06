@@ -13,8 +13,6 @@ namespace Symfony\Component\Notifier\Exception;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 class LogicException extends \LogicException implements ExceptionInterface
 {

@@ -1,0 +1,24 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    test: { password: test, roles: [ROLE_USER] }
+
+    firewalls:
+        default:
+            form_login:
+                check_path: login
+                remember_me: true
+                require_previous_session: false
+            remember_me:
+                always_remember_me: true
+                secret: key
+                secure: auto
+            logout: ~

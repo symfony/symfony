@@ -34,17 +34,17 @@ class Connection
     ];
 
     /**
-     * Available options:
+     * Available options:.
      *
      * * tube_name: name of the tube
      * * timeout: message reservation timeout (in seconds)
      * * ttr: the message time to run before it is put back in the ready queue (in seconds)
      */
-    private $configuration;
-    private $client;
-    private $tube;
-    private $timeout;
-    private $ttr;
+    private array $configuration;
+    private PheanstalkInterface $client;
+    private string $tube;
+    private int $timeout;
+    private int $ttr;
 
     public function __construct(array $configuration, PheanstalkInterface $client)
     {

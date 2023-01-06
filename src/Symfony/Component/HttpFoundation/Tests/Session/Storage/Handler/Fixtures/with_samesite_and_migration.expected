@@ -8,7 +8,7 @@ close
 open
 validateId
 read
-doRead: 
+doRead: invalid sessionId
 read
 
 write

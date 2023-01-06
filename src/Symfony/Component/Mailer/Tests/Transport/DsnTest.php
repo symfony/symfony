@@ -20,12 +20,12 @@ class DsnTest extends TestCase
     /**
      * @dataProvider fromStringProvider
      */
-    public function testFromString(string $string, Dsn $dsn): void
+    public function testFromString(string $string, Dsn $dsn)
     {
         $this->assertEquals($dsn, Dsn::fromString($string));
     }
 
-    public function testGetOption(): void
+    public function testGetOption()
     {
         $options = ['with_value' => 'some value', 'nullable' => null];
         $dsn = new Dsn('smtp', 'example.com', null, null, null, $options);
@@ -38,7 +38,7 @@ class DsnTest extends TestCase
     /**
      * @dataProvider invalidDsnProvider
      */
-    public function testInvalidDsn(string $dsn, string $exceptionMessage): void
+    public function testInvalidDsn(string $dsn, string $exceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -50,6 +50,26 @@ class DsnTest extends TestCase
         yield 'simple smtp without user and pass' => [
             'smtp://example.com',
             new Dsn('smtp', 'example.com'),
+        ];
+
+        yield 'simple dsn including @ sign, but no user/password/token' => [
+            'scheme://@localhost',
+            new Dsn('scheme', 'localhost', null, null),
+        ];
+
+        yield 'simple dsn including : sign and @ sign, but no user/password/token' => [
+            'scheme://:@localhost',
+            new Dsn('scheme', 'localhost', null, null),
+        ];
+
+        yield 'simple dsn including user, : sign and @ sign, but no password' => [
+            'scheme://user1:@localhost',
+            new Dsn('scheme', 'localhost', 'user1', null),
+        ];
+
+        yield 'simple dsn including : sign, password, and @ sign, but no user' => [
+            'scheme://:pass@localhost',
+            new Dsn('scheme', 'localhost', null, 'pass'),
         ];
 
         yield 'simple smtp with custom port' => [

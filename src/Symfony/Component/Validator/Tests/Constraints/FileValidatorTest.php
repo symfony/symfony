@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 abstract class FileValidatorTest extends ConstraintValidatorTestCase
@@ -22,7 +24,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     protected $file;
 
-    protected function createValidator()
+    protected function createValidator(): FileValidator
     {
         return new FileValidator();
     }
@@ -45,7 +47,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         }
 
         if (file_exists($this->path)) {
-            unlink($this->path);
+            @unlink($this->path);
         }
 
         $this->path = null;
@@ -68,7 +70,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleTypeOrFile()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new File());
     }
 
@@ -151,6 +153,11 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             [1048577, '1Mi', '1048577', '1048576', 'bytes'],
             [1053818, '1Mi', '1029.12', '1024', 'KiB'],
             [1053819, '1Mi', '1.01', '1', 'MiB'],
+
+            // $limit < $coef, @see FileValidator::factorizeSizes()
+            [169632, '100k', '169.63', '100', 'kB'],
+            [1000001, '990k', '1000', '990', 'kB'],
+            [123, '80', '123', '80', 'bytes'],
         ];
     }
 
@@ -183,6 +190,9 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     public function provideMaxSizeNotExceededTests()
     {
         return [
+            // 0 has no effect
+            [100, 0],
+
             // limit in bytes
             [1000, 1000],
             [1000000, 1000000],
@@ -224,7 +234,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxSize()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new File([
             'maxSize' => '1abc',
         ]);
@@ -281,16 +291,13 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testBinaryFormatNamed()
     {
         fseek($this->file, 10, \SEEK_SET);
         fwrite($this->file, '0');
         fclose($this->file);
 
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\File(maxSize: 10, binaryFormat: true, maxSizeMessage: "myMessage");');
+        $constraint = new File(maxSize: 10, binaryFormat: true, maxSizeMessage: 'myMessage');
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
@@ -307,7 +314,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     public function testValidMimeType()
     {
         $file = $this
-            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
             ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
             ->getMock();
         $file
@@ -331,7 +338,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     public function testValidWildcardMimeType()
     {
         $file = $this
-            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
             ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
             ->getMock();
         $file
@@ -358,7 +365,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidMimeType(File $constraint)
     {
         $file = $this
-            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
             ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
             ->getMock();
         $file
@@ -387,18 +394,15 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             'mimeTypes' => ['image/png', 'image/jpg'],
             'mimeTypesMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\File(mimeTypes: ["image/png", "image/jpg"], mimeTypesMessage: "myMessage");'),
-            ];
-        }
+        yield 'named arguments' => [
+            new File(mimeTypes: ['image/png', 'image/jpg'], mimeTypesMessage: 'myMessage'),
+        ];
     }
 
     public function testInvalidWildcardMimeType()
     {
         $file = $this
-            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
             ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
             ->getMock();
         $file
@@ -447,12 +451,9 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new File([
             'disallowEmptyMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\File(disallowEmptyMessage: "myMessage");'),
-            ];
-        }
+        yield 'named arguments' => [
+            new File(disallowEmptyMessage: 'myMessage'),
+        ];
     }
 
     /**
@@ -486,7 +487,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             [(string) \UPLOAD_ERR_EXTENSION, 'uploadExtensionErrorMessage'],
         ];
 
-        if (class_exists('Symfony\Component\HttpFoundation\File\UploadedFile')) {
+        if (class_exists(UploadedFile::class)) {
             // when no maxSize is specified on constraint, it should use the ini value
             $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
                 '{{ limit }}' => UploadedFile::getMaxFilesize() / 1048576,
@@ -500,27 +501,160 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ], '1'];
 
             // access FileValidator::factorizeSizes() private method to format max file size
-            $reflection = new \ReflectionClass(\get_class(new FileValidator()));
+            $reflection = new \ReflectionClass((new FileValidator()));
             $method = $reflection->getMethod('factorizeSizes');
-            $method->setAccessible(true);
-            list(, $limit, $suffix) = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
+            [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 
             // it correctly parses the maxSize option and not only uses simple string comparison
-            // 1000M should be bigger than the ini value
+            // 1000G should be bigger than the ini value
             $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
                 '{{ limit }}' => $limit,
                 '{{ suffix }}' => $suffix,
-            ], '1000M'];
+            ], '1000G'];
 
-            // it correctly parses the maxSize option and not only uses simple string comparison
-            // 1000M should be bigger than the ini value
             $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
-                '{{ limit }}' => '0.1',
-                '{{ suffix }}' => 'MB',
+                '{{ limit }}' => '100',
+                '{{ suffix }}' => 'kB',
             ], '100K'];
         }
 
         return $tests;
+    }
+
+    public function testNegativeMaxSize()
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('"-1" is not a valid maximum size.');
+
+        $file = new File();
+        $file->maxSize = -1;
+    }
+
+    /**
+     * @dataProvider validExtensionProvider
+     */
+    public function testExtensionValid(string $name)
+    {
+        $path = __DIR__.'/Fixtures/'.$name;
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypes: [], extensions: ['gif', 'txt'], extensionsMessage: 'myMessage');
+
+        $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    private function validExtensionProvider(): iterable
+    {
+        yield ['test.gif'];
+        yield ['test.png.gif'];
+        yield ['ccc.txt'];
+    }
+
+    /**
+     * @dataProvider invalidExtensionProvider
+     */
+    public function testExtensionInvalid(string $name, string $extension)
+    {
+        $path = __DIR__.'/Fixtures/'.$name;
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        $constraint = new File(extensions: ['png', 'svg'], extensionsMessage: 'myMessage');
+
+        $this->validator->validate($file, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ extension }}' => '"'.$extension.'"',
+                '{{ extensions }}' => '"png", "svg"',
+                '{{ name }}' => '"'.$name.'"',
+            ])
+            ->setCode(File::INVALID_EXTENSION_ERROR)
+            ->assertRaised();
+    }
+
+    private function invalidExtensionProvider(): iterable
+    {
+        yield ['test.gif', 'gif'];
+        yield ['test.png.gif', 'gif'];
+        yield ['bar', ''];
+    }
+
+    public function testExtensionAutodetectMimeTypesInvalid()
+    {
+        $path = __DIR__.'/Fixtures/invalid-content.gif';
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['gif']);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ name }}' => '"invalid-content.gif"',
+                '{{ type }}' => '"text/plain"',
+                '{{ types }}' => '"image/gif"',
+            ])
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testExtensionTypesIncoherent()
+    {
+        $path = __DIR__.'/Fixtures/invalid-content.gif';
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['gif', 'txt']);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ name }}' => '"invalid-content.gif"',
+                '{{ type }}' => '"text/plain"',
+                '{{ types }}' => '"image/gif"',
+            ])
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testUploadedFileExtensions()
+    {
+        $file = new UploadedFile(__DIR__.'/Fixtures/bar', 'bar.txt', 'text/plain', \UPLOAD_ERR_OK, true);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypesMessage: 'myMessage', extensions: ['txt']);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
     }
 
     abstract protected function getFile($filename);

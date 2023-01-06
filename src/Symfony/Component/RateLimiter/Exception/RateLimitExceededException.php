@@ -11,36 +11,39 @@
 
 namespace Symfony\Component\RateLimiter\Exception;
 
-use Symfony\Component\RateLimiter\Limit;
+use Symfony\Component\RateLimiter\RateLimit;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @experimental in 5.2
  */
 class RateLimitExceededException extends \RuntimeException
 {
-    private $limit;
+    private RateLimit $rateLimit;
 
-    public function __construct(Limit $limit, $code = 0, \Throwable $previous = null)
+    public function __construct(RateLimit $rateLimit, int $code = 0, \Throwable $previous = null)
     {
         parent::__construct('Rate Limit Exceeded', $code, $previous);
 
-        $this->limit = $limit;
+        $this->rateLimit = $rateLimit;
     }
 
-    public function getLimit(): Limit
+    public function getRateLimit(): RateLimit
     {
-        return $this->limit;
+        return $this->rateLimit;
     }
 
     public function getRetryAfter(): \DateTimeImmutable
     {
-        return $this->limit->getRetryAfter();
+        return $this->rateLimit->getRetryAfter();
     }
 
     public function getRemainingTokens(): int
     {
-        return $this->limit->getRemainingTokens();
+        return $this->rateLimit->getRemainingTokens();
+    }
+
+    public function getLimit(): int
+    {
+        return $this->rateLimit->getLimit();
     }
 }

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\FloatNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder as BaseNodeBuilder;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition as BaseVariableNodeDefinition;
 
@@ -19,14 +21,14 @@ class NodeBuilderTest extends TestCase
 {
     public function testThrowsAnExceptionWhenTryingToCreateANonRegisteredNodeType()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $builder = new BaseNodeBuilder();
         $builder->node('', 'foobar');
     }
 
     public function testThrowsAnExceptionWhenTheNodeClassIsNotFound()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $builder = new BaseNodeBuilder();
         $builder
             ->setNodeClass('noclasstype', '\\foo\\bar\\noclass')
@@ -64,14 +66,14 @@ class NodeBuilderTest extends TestCase
         $node1 = $builder->node('', 'VaRiAbLe');
         $node2 = $builder->node('', 'variable');
 
-        $this->assertInstanceOf(\get_class($node1), $node2);
+        $this->assertInstanceOf($node1::class, $node2);
 
         $builder->setNodeClass('CuStOm', SomeNodeDefinition::class);
 
         $node1 = $builder->node('', 'CUSTOM');
         $node2 = $builder->node('', 'custom');
 
-        $this->assertInstanceOf(\get_class($node1), $node2);
+        $this->assertInstanceOf($node1::class, $node2);
     }
 
     public function testNumericNodeCreation()
@@ -79,10 +81,10 @@ class NodeBuilderTest extends TestCase
         $builder = new BaseNodeBuilder();
 
         $node = $builder->integerNode('foo')->min(3)->max(5);
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition', $node);
+        $this->assertInstanceOf(IntegerNodeDefinition::class, $node);
 
         $node = $builder->floatNode('bar')->min(3.0)->max(5.0);
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\FloatNodeDefinition', $node);
+        $this->assertInstanceOf(FloatNodeDefinition::class, $node);
     }
 }
 

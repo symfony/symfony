@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
@@ -19,9 +20,9 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
 use Symfony\Component\Cache\DataCollector\CacheDataCollector;
 use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
-use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class CacheCollectorPassTest extends TestCase
@@ -31,6 +32,13 @@ class CacheCollectorPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('fs', FilesystemAdapter::class)
+            ->addMethodCall('setCallbackWrapper', [(new Definition())
+                ->addArgument(null)
+                ->addArgument(null)
+                ->addArgument((new Definition('callable'))
+                    ->setFactory([new Reference('fs'), 'setCallbackWrapper'])
+                ),
+            ])
             ->addTag('cache.pool');
         $container
             ->register('tagged_fs', TagAwareAdapter::class)
@@ -60,6 +68,9 @@ class CacheCollectorPassTest extends TestCase
         $this->assertSame(TagAwareAdapter::class, $container->getDefinition('php')->getClass());
 
         $this->assertFalse($collector->isPublic(), 'The "data_collector.cache" should be private after processing');
+
+        $innerFs = $container->getDefinition('fs.recorder_inner');
+        $this->assertEquals([new Reference('fs.recorder_inner'), 'setCallbackWrapper'], $innerFs->getMethodCalls()[0][1][0]->getArgument(2)->getFactory());
     }
 
     public function testProcessCacheObjectsAreDecorated()
@@ -68,7 +79,7 @@ class CacheCollectorPassTest extends TestCase
         $collector = $container->register('data_collector.cache', CacheDataCollector::class);
 
         $container
-            ->register('cache.object', ArrayCache::class)
+            ->register('cache.object', ArrayAdapter::class)
             ->addTag('cache.pool', ['name' => 'cache.object']);
 
         $container

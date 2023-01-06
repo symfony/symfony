@@ -14,28 +14,27 @@ namespace Symfony\Component\Notifier\Bridge\Mattermost;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Emanuele Panzeri <thepanz@gmail.com>
- *
- * @experimental in 5.1
  */
 final class MattermostTransportFactory extends AbstractTransportFactory
 {
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): MattermostTransport
     {
         $scheme = $dsn->getScheme();
+
+        if ('mattermost' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'mattermost', $this->getSupportedSchemes());
+        }
+
+        $path = $dsn->getPath();
         $token = $this->getUser($dsn);
-        $channel = $dsn->getOption('channel');
+        $channel = $dsn->getRequiredOption('channel');
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('mattermost' === $scheme) {
-            return (new MattermostTransport($token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'mattermost', $this->getSupportedSchemes());
+        return (new MattermostTransport($token, $channel, $path, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

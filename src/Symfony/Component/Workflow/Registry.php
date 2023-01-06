@@ -17,10 +17,12 @@ use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @internal since Symfony 6.2. Inject the workflow where you need it.
  */
 class Registry
 {
-    private $workflows = [];
+    private array $workflows = [];
 
     public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)
     {
@@ -29,7 +31,7 @@ class Registry
 
     public function has(object $subject, string $workflowName = null): bool
     {
-        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+        foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
                 return true;
             }
@@ -38,14 +40,11 @@ class Registry
         return false;
     }
 
-    /**
-     * @return Workflow
-     */
-    public function get(object $subject, string $workflowName = null)
+    public function get(object $subject, string $workflowName = null): Workflow
     {
         $matched = [];
 
-        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+        foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
                 $matched[] = $workflow;
             }
@@ -72,7 +71,7 @@ class Registry
     public function all(object $subject): array
     {
         $matched = [];
-        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+        foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($supportStrategy->supports($workflow, $subject)) {
                 $matched[] = $workflow;
             }

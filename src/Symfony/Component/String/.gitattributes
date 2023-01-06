@@ -2,4 +2,5 @@
 /Resources/WcswidthDataGenerator.php export-ignore
 /Tests export-ignore
 /phpunit.xml.dist export-ignore
+/.gitattributes export-ignore
 /.gitignore export-ignore

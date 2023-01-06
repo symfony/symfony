@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Workflow\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Validator\StateMachineValidator;
 
@@ -11,7 +21,7 @@ class StateMachineValidatorTest extends TestCase
 {
     public function testWithMultipleTransitionWithSameNameShareInput()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', 'b');
@@ -35,7 +45,7 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithMultipleTos()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition in StateMachine can only have one output.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', ['b', 'c']);
@@ -58,7 +68,7 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithMultipleFroms()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition in StateMachine can only have one input.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', ['a', 'b'], 'c');
@@ -106,8 +116,8 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithTooManyInitialPlaces()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
-        $this->expectExceptionMessage('The state machine "foo" can not store many places. But the definition has 2 initial places. Only one is supported.');
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The state machine "foo" cannot store many places. But the definition has 2 initial places. Only one is supported.');
         $places = range('a', 'c');
         $transitions = [];
         $definition = new Definition($places, $transitions, ['a', 'b']);

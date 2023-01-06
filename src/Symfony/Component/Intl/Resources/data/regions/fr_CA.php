@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'Names' => [
+        'AX' => 'îles d’Åland',
+        'BV' => 'île Bouvet',
+        'BY' => 'Bélarus',
+        'CC' => 'îles Cocos (Keeling)',
+        'CK' => 'îles Cook',
+        'CX' => 'île Christmas',
+        'FK' => 'îles Malouines',
+        'FO' => 'îles Féroé',
+        'HM' => 'îles Heard et McDonald',
+        'IM' => 'île de Man',
+        'IO' => 'territoire britannique de l’océan Indien',
+        'KG' => 'Kirghizistan',
+        'LR' => 'Libéria',
+        'MF' => 'Saint-Martin (France)',
+        'MM' => 'Myanmar',
+        'MP' => 'Mariannes du Nord',
+        'NF' => 'île Norfolk',
+        'NG' => 'Nigéria',
+        'PN' => 'îles Pitcairn',
+        'RE' => 'la Réunion',
+        'SX' => 'Saint-Martin (Pays-Bas)',
+        'TL' => 'Timor-Leste',
+        'UM' => 'îles mineures éloignées des États-Unis',
+        'VA' => 'Cité du Vatican',
+        'VG' => 'îles Vierges britanniques',
+        'VI' => 'îles Vierges américaines',
+        'VN' => 'Vietnam',
+    ],
+];

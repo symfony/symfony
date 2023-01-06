@@ -30,9 +30,9 @@ class ScopingHttpClientTest extends TestCase
     public function testRelativeUrlWithDefaultRegexp()
     {
         $mockClient = new MockHttpClient();
-        $client = new ScopingHttpClient($mockClient, ['.*' => ['base_uri' => 'http://example.com']], '.*');
+        $client = new ScopingHttpClient($mockClient, ['.*' => ['base_uri' => 'http://example.com', 'query' => ['a' => 'b']]], '.*');
 
-        $this->assertSame('http://example.com/foo', $client->request('GET', '/foo')->getInfo('url'));
+        $this->assertSame('http://example.com/foo?f=g&a=b', $client->request('GET', '/foo?f=g')->getInfo('url'));
     }
 
     /**
@@ -91,7 +91,7 @@ class ScopingHttpClientTest extends TestCase
 
     public function testForBaseUri()
     {
-        $client = ScopingHttpClient::forBaseUri(new MockHttpClient(), 'http://example.com/foo');
+        $client = ScopingHttpClient::forBaseUri(new MockHttpClient(null, null), 'http://example.com/foo');
 
         $response = $client->request('GET', '/bar');
         $this->assertSame('http://example.com/foo', implode('', $response->getRequestOptions()['base_uri']));

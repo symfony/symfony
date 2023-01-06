@@ -75,15 +75,14 @@ class MigratingSessionHandlerTest extends TestCase
         $this->currentHandler->expects($this->once())
             ->method('gc')
             ->with($maxlifetime)
-            ->willReturn(true);
+            ->willReturn(1);
 
         $this->writeOnlyHandler->expects($this->once())
             ->method('gc')
             ->with($maxlifetime)
             ->willReturn(false);
 
-        $result = $this->dualHandler->gc($maxlifetime);
-        $this->assertTrue($result);
+        $this->assertSame(1, $this->dualHandler->gc($maxlifetime));
     }
 
     public function testOpen()

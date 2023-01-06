@@ -1,0 +1,11 @@
+
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: max-age=0, private, must-revalidate
+    [2] => Cache-Control: max-age=0, must-revalidate, private
+    [3] => Date: Sat, 12 Nov 1955 20:04:00 GMT
+    [4] => Expires: %s, %d %s %d %d:%d:%d GMT
+    [5] => Set-Cookie: PHPSESSID=deleted; expires=%s, %d %s %d %d:%d:%d GMT; Max-Age=%d; %s
+)
+shutdown

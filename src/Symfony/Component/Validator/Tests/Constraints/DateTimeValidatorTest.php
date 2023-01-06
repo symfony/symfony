@@ -13,11 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\DateTimeValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DateTimeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): DateTimeValidator
     {
         return new DateTimeValidator();
     }
@@ -38,7 +39,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new DateTime());
     }
 
@@ -113,6 +114,18 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
             ['Y-m-d H:i:s', '2010-01-01 00:60:00', DateTime::INVALID_TIME_ERROR],
             ['Y-m-d H:i:s', '2010-01-01 00:00:60', DateTime::INVALID_TIME_ERROR],
         ];
+    }
+
+    public function testInvalidDateTimeNamed()
+    {
+        $constraint = new DateTime(message: 'myMessage', format: 'Y-m-d');
+
+        $this->validator->validate('2010-01-01 00:00:00', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2010-01-01 00:00:00"')
+            ->setCode(DateTime::INVALID_FORMAT_ERROR)
+            ->assertRaised();
     }
 
     public function testDateTimeWithTrailingData()

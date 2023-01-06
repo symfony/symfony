@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
  */
 class WorkflowValidator implements DefinitionValidatorInterface
 {
-    private $singlePlace;
+    private bool $singlePlace;
 
     public function __construct(bool $singlePlace = false)
     {
@@ -46,13 +46,13 @@ class WorkflowValidator implements DefinitionValidatorInterface
 
         foreach ($definition->getTransitions() as $transition) {
             if (1 < \count($transition->getTos())) {
-                throw new InvalidDefinitionException(sprintf('The marking store of workflow "%s" can not store many places. But the transition "%s" has too many output (%d). Only one is accepted.', $name, $transition->getName(), \count($transition->getTos())));
+                throw new InvalidDefinitionException(sprintf('The marking store of workflow "%s" cannot store many places. But the transition "%s" has too many output (%d). Only one is accepted.', $name, $transition->getName(), \count($transition->getTos())));
             }
         }
 
         $initialPlaces = $definition->getInitialPlaces();
         if (2 <= \count($initialPlaces)) {
-            throw new InvalidDefinitionException(sprintf('The marking store of workflow "%s" can not store many places. But the definition has %d initial places. Only one is supported.', $name, \count($initialPlaces)));
+            throw new InvalidDefinitionException(sprintf('The marking store of workflow "%s" cannot store many places. But the definition has %d initial places. Only one is supported.', $name, \count($initialPlaces)));
         }
     }
 }

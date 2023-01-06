@@ -131,20 +131,20 @@
                 <target>Энэ утга зөвхөн тоо байна.</target>
             </trans-unit>
             <trans-unit id="36">
-                <source>This value is not a valid country.</source>
-                <target>Энэ утга үнэн бодит улс биш байна.</target>
-            </trans-unit>
-            <trans-unit id="37">
                 <source>This file is not a valid image.</source>
                 <target>Файл зураг биш байна.</target>
             </trans-unit>
-            <trans-unit id="38">
+            <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
                 <target>IP хаяг зөв биш байна.</target>
             </trans-unit>
-            <trans-unit id="39">
+            <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Энэ утга үнэн зөв хэл биш байна .</target>
+                <target>Энэ утга үнэн зөв хэл биш байна.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>Энэ утга үнэн зөв байршил биш байна.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
@@ -365,6 +365,26 @@
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>Энэ утга {{ min }} -с {{ max }} хооронд байх ёстой.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Энэ утга буруу hostname байна.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Энэхүү цуглуулган дахь элемэнтийн тоо, {{ compared_value }}-н үржвэр байх ёстой.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Энэ утга доорх болзолуудын ядаж нэгийг хангах ёстой:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Энэхүү цуглуулган дахь элемэнтүүд өөр өөрсдийн болзолуудаа хангах ёстой.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Энэ утга зөв International Securities Identification Number (ISIN) биш байна.</target>
             </trans-unit>
         </body>
     </file>

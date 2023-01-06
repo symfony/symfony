@@ -18,18 +18,18 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * Allows to execute logic after a response was sent.
  *
- * Since it's only triggered on master requests, the `getRequestType()` method
- * will always return the value of `HttpKernelInterface::MASTER_REQUEST`.
+ * Since it's only triggered on main requests, the `getRequestType()` method
+ * will always return the value of `HttpKernelInterface::MAIN_REQUEST`.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 final class TerminateEvent extends KernelEvent
 {
-    private $response;
+    private Response $response;
 
     public function __construct(HttpKernelInterface $kernel, Request $request, Response $response)
     {
-        parent::__construct($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        parent::__construct($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->response = $response;
     }

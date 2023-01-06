@@ -49,14 +49,14 @@ class TranslationExtensionTest extends TestCase
 
     public function testTransUnknownKeyword()
     {
-        $this->expectException('Twig\Error\SyntaxError');
+        $this->expectException(\Twig\Error\SyntaxError::class);
         $this->expectExceptionMessage('Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.');
         $this->getTemplate("{% trans \n\nfoo %}{% endtrans %}")->render();
     }
 
     public function testTransComplexBody()
     {
-        $this->expectException('Twig\Error\SyntaxError');
+        $this->expectException(\Twig\Error\SyntaxError::class);
         $this->expectExceptionMessage('A message inside a trans tag must be a simple text in "index" at line 2.');
         $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
     }
@@ -207,9 +207,7 @@ class TranslationExtensionTest extends TestCase
 
     private function getTemplate($template, TranslatorInterface $translator = null): TemplateWrapper
     {
-        if (null === $translator) {
-            $translator = new Translator('en');
-        }
+        $translator ??= new Translator('en');
 
         if (\is_array($template)) {
             $loader = new TwigArrayLoader($template);

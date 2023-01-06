@@ -11,102 +11,13 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport as BaseInMemoryTransport;
+
+trigger_deprecation('symfony/messenger', '6.3', 'The "%s" class is deprecated, use "%s" instead. ', InMemoryTransport::class, BaseInMemoryTransport::class);
 
 /**
- * Transport that stays in memory. Useful for testing purpose.
- *
- * @author Gary PEGEOT <garypegeot@gmail.com>
+ * @deprecated since Symfony 6.3, use {@link BaseInMemoryTransport} instead
  */
-class InMemoryTransport implements TransportInterface, ResetInterface
+class InMemoryTransport extends BaseInMemoryTransport
 {
-    /**
-     * @var Envelope[]
-     */
-    private $sent = [];
-
-    /**
-     * @var Envelope[]
-     */
-    private $acknowledged = [];
-
-    /**
-     * @var Envelope[]
-     */
-    private $rejected = [];
-
-    /**
-     * @var Envelope[]
-     */
-    private $queue = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get(): iterable
-    {
-        return array_values($this->queue);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function ack(Envelope $envelope): void
-    {
-        $this->acknowledged[] = $envelope;
-        $id = spl_object_hash($envelope->getMessage());
-        unset($this->queue[$id]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function reject(Envelope $envelope): void
-    {
-        $this->rejected[] = $envelope;
-        $id = spl_object_hash($envelope->getMessage());
-        unset($this->queue[$id]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function send(Envelope $envelope): Envelope
-    {
-        $this->sent[] = $envelope;
-        $id = spl_object_hash($envelope->getMessage());
-        $this->queue[$id] = $envelope;
-
-        return $envelope;
-    }
-
-    public function reset()
-    {
-        $this->sent = $this->queue = $this->rejected = $this->acknowledged = [];
-    }
-
-    /**
-     * @return Envelope[]
-     */
-    public function getAcknowledged(): array
-    {
-        return $this->acknowledged;
-    }
-
-    /**
-     * @return Envelope[]
-     */
-    public function getRejected(): array
-    {
-        return $this->rejected;
-    }
-
-    /**
-     * @return Envelope[]
-     */
-    public function getSent(): array
-    {
-        return $this->sent;
-    }
 }

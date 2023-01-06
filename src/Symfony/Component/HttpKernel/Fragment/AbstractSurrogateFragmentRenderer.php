@@ -24,9 +24,9 @@ use Symfony\Component\HttpKernel\UriSigner;
  */
 abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRenderer
 {
-    private $surrogate;
-    private $inlineStrategy;
-    private $signer;
+    private ?SurrogateInterface $surrogate;
+    private FragmentRendererInterface $inlineStrategy;
+    private ?UriSigner $signer;
 
     /**
      * The "fallback" strategy when surrogate is not available should always be an
@@ -42,8 +42,6 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Note that if the current Request has no surrogate capability, this method
      * falls back to use the inline rendering strategy.
      *
@@ -51,13 +49,14 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
      *
      *  * alt: an alternative URI to render in case of an error
      *  * comment: a comment to add when returning the surrogate tag
+     *  * absolute_uri: whether to generate an absolute URI or not. Default is false
      *
      * Note, that not all surrogate strategies support all options. For now
      * 'alt' and 'comment' are only supported by ESI.
      *
      * @see Symfony\Component\HttpKernel\HttpCache\SurrogateInterface
      */
-    public function render($uri, Request $request, array $options = [])
+    public function render(string|ControllerReference $uri, Request $request, array $options = []): Response
     {
         if (!$this->surrogate || !$this->surrogate->hasSurrogateCapability($request)) {
             if ($uri instanceof ControllerReference && $this->containsNonScalars($uri->attributes)) {
@@ -67,38 +66,35 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
             return $this->inlineStrategy->render($uri, $request, $options);
         }
 
+        $absolute = $options['absolute_uri'] ?? false;
+
         if ($uri instanceof ControllerReference) {
-            $uri = $this->generateSignedFragmentUri($uri, $request);
+            $uri = $this->generateSignedFragmentUri($uri, $request, $absolute);
         }
 
-        $alt = isset($options['alt']) ? $options['alt'] : null;
+        $alt = $options['alt'] ?? null;
         if ($alt instanceof ControllerReference) {
-            $alt = $this->generateSignedFragmentUri($alt, $request);
+            $alt = $this->generateSignedFragmentUri($alt, $request, $absolute);
         }
 
-        $tag = $this->surrogate->renderIncludeTag($uri, $alt, isset($options['ignore_errors']) ? $options['ignore_errors'] : false, isset($options['comment']) ? $options['comment'] : '');
+        $tag = $this->surrogate->renderIncludeTag($uri, $alt, $options['ignore_errors'] ?? false, $options['comment'] ?? '');
 
         return new Response($tag);
     }
 
-    private function generateSignedFragmentUri(ControllerReference $uri, Request $request): string
+    private function generateSignedFragmentUri(ControllerReference $uri, Request $request, bool $absolute): string
     {
-        if (null === $this->signer) {
-            throw new \LogicException('You must use a URI when using the ESI rendering strategy or set a URL signer.');
-        }
-
-        // we need to sign the absolute URI, but want to return the path only.
-        $fragmentUri = $this->signer->sign($this->generateFragmentUri($uri, $request, true));
-
-        return substr($fragmentUri, \strlen($request->getSchemeAndHttpHost()));
+        return (new FragmentUriGenerator($this->fragmentPath, $this->signer))->generate($uri, $request, $absolute);
     }
 
     private function containsNonScalars(array $values): bool
     {
         foreach ($values as $value) {
-            if (\is_array($value)) {
-                return $this->containsNonScalars($value);
-            } elseif (!is_scalar($value) && null !== $value) {
+            if (\is_scalar($value) || null === $value) {
+                continue;
+            }
+
+            if (!\is_array($value) || $this->containsNonScalars($value)) {
                 return true;
             }
         }

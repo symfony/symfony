@@ -11,15 +11,20 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ResolvedFormType;
+use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -36,32 +41,15 @@ class FormDataExtractorTest extends TestCase
      */
     private $dataExtractor;
 
-    /**
-     * @var MockObject
-     */
-    private $dispatcher;
-
-    /**
-     * @var MockObject
-     */
-    private $factory;
-
     protected function setUp(): void
     {
         $this->dataExtractor = new FormDataExtractor();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
     }
 
     public function testExtractConfiguration()
     {
-        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
-        $type->expects($this->any())
-            ->method('getInnerType')
-            ->willReturn(new HiddenType());
-
         $form = $this->createBuilder('name')
-            ->setType($type)
+            ->setType(new ResolvedFormType(new HiddenType()))
             ->getForm();
 
         $this->assertSame([
@@ -76,11 +64,6 @@ class FormDataExtractorTest extends TestCase
 
     public function testExtractConfigurationSortsPassedOptions()
     {
-        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
-        $type->expects($this->any())
-            ->method('getInnerType')
-            ->willReturn(new HiddenType());
-
         $options = [
             'b' => 'foo',
             'a' => 'bar',
@@ -88,7 +71,7 @@ class FormDataExtractorTest extends TestCase
         ];
 
         $form = $this->createBuilder('name')
-            ->setType($type)
+            ->setType(new ResolvedFormType(new HiddenType()))
             // passed options are stored in an attribute by
             // ResolvedTypeDataCollectorProxy
             ->setAttribute('data_collector/passed_options', $options)
@@ -110,11 +93,6 @@ class FormDataExtractorTest extends TestCase
 
     public function testExtractConfigurationSortsResolvedOptions()
     {
-        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
-        $type->expects($this->any())
-            ->method('getInnerType')
-            ->willReturn(new HiddenType());
-
         $options = [
             'b' => 'foo',
             'a' => 'bar',
@@ -122,7 +100,7 @@ class FormDataExtractorTest extends TestCase
         ];
 
         $form = $this->createBuilder('name', $options)
-            ->setType($type)
+            ->setType(new ResolvedFormType(new HiddenType()))
             ->getForm();
 
         $this->assertSame([
@@ -141,21 +119,16 @@ class FormDataExtractorTest extends TestCase
 
     public function testExtractConfigurationBuildsIdRecursively()
     {
-        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
-        $type->expects($this->any())
-            ->method('getInnerType')
-            ->willReturn(new HiddenType());
-
         $grandParent = $this->createBuilder('grandParent')
             ->setCompound(true)
-            ->setDataMapper($this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $parent = $this->createBuilder('parent')
             ->setCompound(true)
-            ->setDataMapper($this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock())
+            ->setDataMapper(new DataMapper())
             ->getForm();
         $form = $this->createBuilder('name')
-            ->setType($type)
+            ->setType(new ResolvedFormType(new HiddenType()))
             ->getForm();
 
         $grandParent->add($parent);
@@ -414,6 +387,6 @@ EODUMP
 
     private function createBuilder(string $name, array $options = []): FormBuilder
     {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory, $options);
+        return new FormBuilder($name, null, new EventDispatcher(), new FormFactory(new FormRegistry([], new ResolvedFormTypeFactory())), $options);
     }
 }

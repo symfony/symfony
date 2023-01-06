@@ -12,11 +12,13 @@
 namespace Symfony\Component\Config\Definition\Dumper;
 
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
+use Symfony\Component\Config\Definition\VariableNode;
 use Symfony\Component\Yaml\Inline;
 
 /**
@@ -26,7 +28,7 @@ use Symfony\Component\Yaml\Inline;
  */
 class YamlReferenceDumper
 {
-    private $reference;
+    private ?string $reference = null;
 
     public function dump(ConfigurationInterface $configuration)
     {
@@ -75,7 +77,10 @@ class YamlReferenceDumper
         $default = '';
         $defaultArray = null;
         $children = null;
-        $example = $node->getExample();
+        $example = null;
+        if ($node instanceof BaseNode) {
+            $example = $node->getExample();
+        }
 
         // defaults
         if ($node instanceof ArrayNode) {
@@ -95,6 +100,9 @@ class YamlReferenceDumper
         } elseif ($node instanceof EnumNode) {
             $comments[] = 'One of '.implode('; ', array_map('json_encode', $node->getValues()));
             $default = $node->hasDefaultValue() ? Inline::dump($node->getDefaultValue()) : '~';
+        } elseif (VariableNode::class === $node::class && \is_array($example)) {
+            // If there is an array example, we are sure we dont need to print a default value
+            $default = '';
         } else {
             $default = '~';
 
@@ -119,14 +127,14 @@ class YamlReferenceDumper
         }
 
         // deprecated?
-        if ($node->isDeprecated()) {
+        if ($node instanceof BaseNode && $node->isDeprecated()) {
             $deprecation = $node->getDeprecation($node->getName(), $parentNode ? $parentNode->getPath() : $node->getPath());
             $comments[] = sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
         }
 
         // example
         if ($example && !\is_array($example)) {
-            $comments[] = 'Example: '.$example;
+            $comments[] = 'Example: '.Inline::dump($example);
         }
 
         $default = '' != (string) $default ? ' '.$default : '';
@@ -135,7 +143,7 @@ class YamlReferenceDumper
         $key = $prototypedArray ? '-' : $node->getName().':';
         $text = rtrim(sprintf('%-21s%s %s', $key, $default, $comments), ' ');
 
-        if ($info = $node->getInfo()) {
+        if ($node instanceof BaseNode && $info = $node->getInfo()) {
             $this->writeLine('');
             // indenting multi-line info
             $info = str_replace("\n", sprintf("\n%".($depth * 4).'s# ', ' '), $info);
@@ -162,7 +170,7 @@ class YamlReferenceDumper
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray($example, $depth + 1);
+            $this->writeArray(array_map(Inline::dump(...), $example), $depth + 1);
         }
 
         if ($children) {
@@ -185,7 +193,7 @@ class YamlReferenceDumper
 
     private function writeArray(array $array, int $depth)
     {
-        $isIndexed = array_values($array) === $array;
+        $isIndexed = array_is_list($array);
 
         foreach ($array as $key => $value) {
             if (\is_array($value)) {

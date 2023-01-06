@@ -2,8 +2,8 @@ imports:
     - { resource: ./../config/framework.yml }
 
 security:
-    encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
     providers:
         in_memory:

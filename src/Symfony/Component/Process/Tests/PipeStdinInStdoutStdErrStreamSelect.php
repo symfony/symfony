@@ -34,7 +34,7 @@ while ($read || $write) {
         exit(ERR_TIMEOUT);
     }
 
-    if (in_array(\STDOUT, $w) && strlen($out) > 0) {
+    if (in_array(\STDOUT, $w) && '' !== $out) {
         $written = fwrite(\STDOUT, (string) $out, 32768);
         if (false === $written) {
             exit(ERR_WRITE_FAILED);
@@ -45,7 +45,7 @@ while ($read || $write) {
         $write = array_diff($write, [\STDOUT]);
     }
 
-    if (in_array(\STDERR, $w) && strlen($err) > 0) {
+    if (in_array(\STDERR, $w) && '' !== $err) {
         $written = fwrite(\STDERR, (string) $err, 32768);
         if (false === $written) {
             exit(ERR_WRITE_FAILED);

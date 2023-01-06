@@ -14,12 +14,20 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\MapDecorated;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
@@ -28,8 +36,13 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberChild;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberIntersection;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberIntersectionWithTrait;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberParent;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberUnion;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriberUnionWithTrait;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
@@ -39,7 +52,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
 {
     public function testInvalidClass()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service "foo" must implement interface "Symfony\Contracts\Service\ServiceSubscriberInterface".');
         $container = new ContainerBuilder();
 
@@ -53,7 +66,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
     public function testInvalidAttributes()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "container.service_subscriber" tag accepts only the "key" and "id" attributes, "bar" given for service "foo".');
         $container = new ContainerBuilder();
 
@@ -125,9 +138,75 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
+    public function testUnionServices()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', \stdClass::class);
+        $container->setAlias(TestDefinition1::class, 'bar');
+        $container->setAlias(TestDefinition2::class, 'bar');
+        $container->register('foo', TestServiceSubscriberUnion::class)
+            ->addArgument(new Reference(PsrContainerInterface::class))
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getArgument(0));
+
+        $this->assertFalse($locator->isPublic());
+        $this->assertSame(ServiceLocator::class, $locator->getClass());
+
+        $expected = [
+            'string|'.TestDefinition2::class.'|'.TestDefinition1::class => new ServiceClosureArgument(new TypedReference('string|'.TestDefinition2::class.'|'.TestDefinition1::class, 'string|'.TestDefinition2::class.'|'.TestDefinition1::class)),
+            'bar' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'|'.TestDefinition2::class, TestDefinition1::class.'|'.TestDefinition2::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'bar')),
+            'baz' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'|'.TestDefinition2::class, TestDefinition1::class.'|'.TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'baz')),
+        ];
+
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+
+        (new AutowirePass())->process($container);
+
+        $expected = [
+            'string|'.TestDefinition2::class.'|'.TestDefinition1::class => new ServiceClosureArgument(new TypedReference('bar', TestDefinition1::class.'|'.TestDefinition2::class)),
+            'bar' => new ServiceClosureArgument(new TypedReference('bar', TestDefinition1::class.'|'.TestDefinition2::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'bar')),
+            'baz' => new ServiceClosureArgument(new TypedReference('bar', TestDefinition1::class.'|'.TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'baz')),
+        ];
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    public function testIntersectionServices()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', TestServiceSubscriberIntersection::class)
+            ->addArgument(new Reference(PsrContainerInterface::class))
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getArgument(0));
+
+        $this->assertFalse($locator->isPublic());
+        $this->assertSame(ServiceLocator::class, $locator->getClass());
+
+        $expected = [
+            TestDefinition1::class.'&'.TestDefinition2::class => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'&'.TestDefinition2::class, TestDefinition1::class.'&'.TestDefinition2::class)),
+            'bar' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'&'.TestDefinition2::class, TestDefinition1::class.'&'.TestDefinition2::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'bar')),
+            'baz' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'&'.TestDefinition2::class, TestDefinition1::class.'&'.TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'baz')),
+        ];
+
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
     public function testExtraServiceSubscriber()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service key "test" does not exist in the map returned by "Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber::getSubscribedServices()" for service "foo_service".');
         $container = new ContainerBuilder();
         $container->register('foo_service', TestServiceSubscriber::class)
@@ -142,8 +221,12 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->compile();
     }
 
-    public function testServiceSubscriberTrait()
+    public function testServiceSubscriberTraitWithSubscribedServiceAttribute()
     {
+        if (!class_exists(SubscribedService::class)) {
+            $this->markTestSkipped('SubscribedService attribute not available.');
+        }
+
         $container = new ContainerBuilder();
 
         $container->register('foo', TestServiceSubscriberChild::class)
@@ -158,29 +241,88 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
 
         $expected = [
-            TestServiceSubscriberChild::class.'::invalidDefinition' => new ServiceClosureArgument(new TypedReference('Symfony\Component\DependencyInjection\Tests\Fixtures\InvalidDefinition', 'Symfony\Component\DependencyInjection\Tests\Fixtures\InvalidDefinition', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            TestServiceSubscriberChild::class.'::invalidDefinition' => new ServiceClosureArgument(new TypedReference('Symfony\Component\DependencyInjection\Tests\Fixtures\InvalidDefinition', 'Symfony\Component\DependencyInjection\Tests\Fixtures\InvalidDefinition')),
             TestServiceSubscriberChild::class.'::testDefinition2' => new ServiceClosureArgument(new TypedReference(TestDefinition2::class, TestDefinition2::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
-            TestServiceSubscriberChild::class.'::testDefinition3' => new ServiceClosureArgument(new TypedReference(TestDefinition3::class, TestDefinition3::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
-            TestServiceSubscriberParent::class.'::testDefinition1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class, TestDefinition1::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            TestServiceSubscriberChild::class.'::testDefinition4' => new ServiceClosureArgument(new TypedReference(TestDefinition3::class, TestDefinition3::class)),
+            TestServiceSubscriberParent::class.'::testDefinition1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class, TestDefinition1::class)),
+            'custom_name' => new ServiceClosureArgument(new TypedReference(TestDefinition3::class, TestDefinition3::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'custom_name')),
         ];
 
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testServiceSubscriberTraitWithGetter()
+    public function testServiceSubscriberTraitWithSubscribedServiceAttributeOnStaticMethod()
     {
-        $container = new ContainerBuilder();
+        if (!class_exists(SubscribedService::class)) {
+            $this->markTestSkipped('SubscribedService attribute not available.');
+        }
 
         $subscriber = new class() implements ServiceSubscriberInterface {
             use ServiceSubscriberTrait;
 
-            public function getFoo(): \stdClass
+            #[SubscribedService]
+            public static function method(): TestDefinition1
             {
             }
         };
-        $container->register('foo', \get_class($subscriber))
+
+        $this->expectException(\LogicException::class);
+
+        $subscriber::getSubscribedServices();
+    }
+
+    public function testServiceSubscriberTraitWithSubscribedServiceAttributeOnMethodWithRequiredParameters()
+    {
+        if (!class_exists(SubscribedService::class)) {
+            $this->markTestSkipped('SubscribedService attribute not available.');
+        }
+
+        $subscriber = new class() implements ServiceSubscriberInterface {
+            use ServiceSubscriberTrait;
+
+            #[SubscribedService]
+            public function method($param1, $param2 = null): TestDefinition1
+            {
+            }
+        };
+
+        $this->expectException(\LogicException::class);
+
+        $subscriber::getSubscribedServices();
+    }
+
+    public function testServiceSubscriberTraitWithSubscribedServiceAttributeOnMethodMissingReturnType()
+    {
+        if (!class_exists(SubscribedService::class)) {
+            $this->markTestSkipped('SubscribedService attribute not available.');
+        }
+
+        $subscriber = new class() implements ServiceSubscriberInterface {
+            use ServiceSubscriberTrait;
+
+            #[SubscribedService]
+            public function method()
+            {
+            }
+        };
+
+        $this->expectException(\LogicException::class);
+
+        $subscriber::getSubscribedServices();
+    }
+
+    public function testServiceSubscriberTraitWithUnionReturnType()
+    {
+        if (!class_exists(SubscribedService::class)) {
+            $this->markTestSkipped('SubscribedService attribute not available.');
+        }
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', TestServiceSubscriberUnionWithTrait::class)
             ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
-            ->addTag('container.service_subscriber');
+            ->addTag('container.service_subscriber')
+        ;
 
         (new RegisterServiceSubscribersPass())->process($container);
         (new ResolveServiceSubscribersPass())->process($container);
@@ -189,8 +331,36 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
 
         $expected = [
-            \get_class($subscriber).'::getFoo' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'foo')),
+            TestServiceSubscriberUnionWithTrait::class.'::method1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'|'.TestDefinition2::class.'|null', TestDefinition1::class.'|'.TestDefinition2::class.'|null', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            TestServiceSubscriberUnionWithTrait::class.'::method2' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'|'.TestDefinition2::class, TestDefinition1::class.'|'.TestDefinition2::class)),
         ];
+
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    public function testServiceSubscriberTraitWithIntersectionReturnType()
+    {
+        if (!class_exists(SubscribedService::class)) {
+            $this->markTestSkipped('SubscribedService attribute not available.');
+        }
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', TestServiceSubscriberIntersectionWithTrait::class)
+            ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
+
+        $expected = [
+            TestServiceSubscriberIntersectionWithTrait::class.'::method1' => new ServiceClosureArgument(new TypedReference(TestDefinition1::class.'&'.TestDefinition2::class, TestDefinition1::class.'&'.TestDefinition2::class)),
+        ];
+
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
@@ -212,7 +382,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->setAlias('stdClass $someService', 'some.service');
         $container->setAlias('stdClass $some_service', 'some.service');
         $container->setAlias('stdClass $anotherService', 'some.service');
-        $container->register('foo', \get_class($subscriber))
+        $container->register('foo', $subscriber::class)
             ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
             ->addTag('container.service_subscriber');
 
@@ -235,6 +405,65 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'some.service' => new ServiceClosureArgument(new TypedReference('some.service', 'stdClass')),
             'some_service' => new ServiceClosureArgument(new TypedReference('stdClass $some_service', 'stdClass')),
             'another_service' => new ServiceClosureArgument(new TypedReference('stdClass $anotherService', 'stdClass')),
+        ];
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    public function testSubscribedServiceWithAttributes()
+    {
+        if (!property_exists(SubscribedService::class, 'attributes')) {
+            $this->markTestSkipped('Requires symfony/service-contracts 3.2+');
+        }
+
+        $container = new ContainerBuilder();
+
+        $subscriber = new class() implements ServiceSubscriberInterface {
+            public static function getSubscribedServices(): array
+            {
+                return [
+                    new SubscribedService('tagged.iterator', 'iterable', attributes: new TaggedIterator('tag')),
+                    new SubscribedService('tagged.locator', PsrContainerInterface::class, attributes: new TaggedLocator('tag')),
+                    new SubscribedService('autowired', 'stdClass', attributes: new Autowire(service: 'service.id')),
+                    new SubscribedService('autowired.nullable', 'stdClass', nullable: true, attributes: new Autowire(service: 'service.id')),
+                    new SubscribedService('autowired.parameter', 'string', attributes: new Autowire('%parameter.1%')),
+                    new SubscribedService('map.decorated', \stdClass::class, attributes: new MapDecorated()),
+                    new SubscribedService('target', \stdClass::class, attributes: new Target('someTarget')),
+                ];
+            }
+        };
+
+        $container->setParameter('parameter.1', 'foobar');
+        $container->register('foo', $subscriber::class)
+            ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
+            ->addTag('container.service_subscriber');
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
+
+        $expected = [
+            'tagged.iterator' => new ServiceClosureArgument(new TypedReference('iterable', 'iterable', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'tagged.iterator', [new TaggedIterator('tag')])),
+            'tagged.locator' => new ServiceClosureArgument(new TypedReference(PsrContainerInterface::class, PsrContainerInterface::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'tagged.locator', [new TaggedLocator('tag')])),
+            'autowired' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowired', [new Autowire(service: 'service.id')])),
+            'autowired.nullable' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'autowired.nullable', [new Autowire(service: 'service.id')])),
+            'autowired.parameter' => new ServiceClosureArgument(new TypedReference('string', 'string', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'autowired.parameter', [new Autowire(service: '%parameter.1%')])),
+            'map.decorated' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'map.decorated', [new MapDecorated()])),
+            'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'target', [new Target('someTarget')])),
+        ];
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+
+        (new AutowirePass())->process($container);
+
+        $expected = [
+            'tagged.iterator' => new ServiceClosureArgument(new TaggedIteratorArgument('tag')),
+            'tagged.locator' => new ServiceClosureArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('tag', 'tag', needsIndexes: true))),
+            'autowired' => new ServiceClosureArgument(new Reference('service.id')),
+            'autowired.nullable' => new ServiceClosureArgument(new Reference('service.id', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
+            'autowired.parameter' => new ServiceClosureArgument('foobar'),
+            'map.decorated' => new ServiceClosureArgument(new Reference('.service_locator.LnJLtj2.inner', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
+            'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'someTarget', [new Target('someTarget')])),
         ];
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }

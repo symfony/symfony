@@ -45,7 +45,7 @@ class HeaderBagTest extends TestCase
     {
         $bag = new HeaderBag(['foo' => 'Tue, 4 Sep 2012 20:00:00 +0200']);
         $headerDate = $bag->getDate('foo');
-        $this->assertInstanceOf('DateTime', $headerDate);
+        $this->assertInstanceOf(\DateTime::class, $headerDate);
     }
 
     public function testGetDateNull()
@@ -57,7 +57,7 @@ class HeaderBagTest extends TestCase
 
     public function testGetDateException()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $bag = new HeaderBag(['foo' => 'Tue']);
         $bag->getDate('foo');
     }

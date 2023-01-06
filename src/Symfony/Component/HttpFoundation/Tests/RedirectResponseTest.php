@@ -25,14 +25,14 @@ class RedirectResponseTest extends TestCase
 
     public function testRedirectResponseConstructorEmptyUrl()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot redirect to an empty URL.');
         new RedirectResponse('');
     }
 
     public function testRedirectResponseConstructorWrongStatusCode()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new RedirectResponse('foo.bar', 404);
     }
 
@@ -57,17 +57,6 @@ class RedirectResponseTest extends TestCase
         $response->setTargetUrl('baz.beep');
 
         $this->assertEquals('baz.beep', $response->getTargetUrl());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = RedirectResponse::create('foo', 301);
-
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
-        $this->assertEquals(301, $response->getStatusCode());
     }
 
     public function testCacheHeaders()

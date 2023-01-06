@@ -13,11 +13,13 @@ namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 
 class XliffFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoadFile()
     {
         $loader = new XliffFileLoader();
         $resource = __DIR__.'/../fixtures/resources.xlf';
@@ -25,6 +27,42 @@ class XliffFileLoaderTest extends TestCase
 
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        $this->assertSame([], libxml_get_errors());
+        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+    }
+
+    public function testLoadRawXliff()
+    {
+        $loader = new XliffFileLoader();
+        $resource = <<<XLIFF
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" datatype="plaintext" original="file.ext">
+    <body>
+      <trans-unit id="1">
+        <source>foo</source>
+        <target>bar</target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source>extra</source>
+      </trans-unit>
+      <trans-unit id="3">
+        <source>key</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source>test</source>
+        <target>with</target>
+        <note>note</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+XLIFF;
+
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
         $this->assertSame([], libxml_get_errors());
         $this->assertContainsOnly('string', $catalogue->all('domain1'));
     }
@@ -49,17 +87,9 @@ class XliffFileLoaderTest extends TestCase
 
     public function testLoadWithExternalEntitiesDisabled()
     {
-        if (\LIBXML_VERSION < 20900) {
-            $disableEntities = libxml_disable_entity_loader(true);
-        }
-
         $loader = new XliffFileLoader();
         $resource = __DIR__.'/../fixtures/resources.xlf';
         $catalogue = $loader->load($resource, 'en', 'domain1');
-
-        if (\LIBXML_VERSION < 20900) {
-            libxml_disable_entity_loader($disableEntities);
-        }
 
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
@@ -86,12 +116,12 @@ class XliffFileLoaderTest extends TestCase
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/encoding.xlf', 'en', 'domain1');
 
-        $this->assertEquals(utf8_decode('föö'), $catalogue->get('bar', 'domain1'));
-        $this->assertEquals(utf8_decode('bär'), $catalogue->get('foo', 'domain1'));
+        $this->assertEquals(mb_convert_encoding('föö', 'ISO-8859-1', 'UTF-8'), $catalogue->get('bar', 'domain1'));
+        $this->assertEquals(mb_convert_encoding('bär', 'ISO-8859-1', 'UTF-8'), $catalogue->get('foo', 'domain1'));
         $this->assertEquals(
             [
                 'source' => 'foo',
-                'notes' => [['content' => utf8_decode('bäz')]],
+                'notes' => [['content' => mb_convert_encoding('bäz', 'ISO-8859-1', 'UTF-8')]],
                 'id' => '1',
                 'file' => [
                     'original' => 'file.ext',
@@ -112,21 +142,21 @@ class XliffFileLoaderTest extends TestCase
 
     public function testLoadInvalidResource()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+        $this->expectException(InvalidResourceException::class);
         $loader = new XliffFileLoader();
         $loader->load(__DIR__.'/../fixtures/resources.php', 'en', 'domain1');
     }
 
     public function testLoadResourceDoesNotValidate()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+        $this->expectException(InvalidResourceException::class);
         $loader = new XliffFileLoader();
         $loader->load(__DIR__.'/../fixtures/non-valid.xlf', 'en', 'domain1');
     }
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\NotFoundResourceException');
+        $this->expectException(NotFoundResourceException::class);
         $loader = new XliffFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.xlf';
         $loader->load($resource, 'en', 'domain1');
@@ -134,7 +164,7 @@ class XliffFileLoaderTest extends TestCase
 
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+        $this->expectException(InvalidResourceException::class);
         $loader = new XliffFileLoader();
         $resource = 'http://example.com/resources.xlf';
         $loader->load($resource, 'en', 'domain1');
@@ -142,7 +172,7 @@ class XliffFileLoaderTest extends TestCase
 
     public function testDocTypeIsNotAllowed()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+        $this->expectException(InvalidResourceException::class);
         $this->expectExceptionMessage('Document types are not allowed.');
         $loader = new XliffFileLoader();
         $loader->load(__DIR__.'/../fixtures/withdoctype.xlf', 'en', 'domain1');
@@ -153,7 +183,7 @@ class XliffFileLoaderTest extends TestCase
         $loader = new XliffFileLoader();
         $resource = __DIR__.'/../fixtures/empty.xlf';
 
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+        $this->expectException(InvalidResourceException::class);
         $this->expectExceptionMessage(sprintf('Unable to load "%s":', $resource));
 
         $loader->load($resource, 'en', 'domain1');

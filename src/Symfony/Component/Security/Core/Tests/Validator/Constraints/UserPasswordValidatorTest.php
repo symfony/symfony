@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -23,8 +27,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 {
-    const PASSWORD = 's3Cr3t';
-    const SALT = '^S4lt$';
+    private const PASSWORD = 's3Cr3t';
+    private const SALT = '^S4lt$';
 
     /**
      * @var TokenStorageInterface
@@ -32,37 +36,36 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     protected $tokenStorage;
 
     /**
-     * @var PasswordEncoderInterface
+     * @var PasswordHasherInterface
      */
-    protected $encoder;
+    protected $hasher;
 
     /**
-     * @var EncoderFactoryInterface
+     * @var PasswordHasherFactoryInterface
      */
-    protected $encoderFactory;
+    protected $hasherFactory;
 
-    protected function createValidator()
+    protected function createValidator(): UserPasswordValidator
     {
-        return new UserPasswordValidator($this->tokenStorage, $this->encoderFactory);
+        return new UserPasswordValidator($this->tokenStorage, $this->hasherFactory);
     }
 
     protected function setUp(): void
     {
         $user = $this->createUser();
         $this->tokenStorage = $this->createTokenStorage($user);
-        $this->encoder = $this->createPasswordEncoder();
-        $this->encoderFactory = $this->createEncoderFactory($this->encoder);
+        $this->hasher = $this->createMock(PasswordHasherInterface::class);
+        $this->hasherFactory = $this->createHasherFactory($this->hasher);
 
         parent::setUp();
     }
 
-    public function testPasswordIsValid()
+    /**
+     * @dataProvider provideConstraints
+     */
+    public function testPasswordIsValid(UserPassword $constraint)
     {
-        $constraint = new UserPassword([
-            'message' => 'myMessage',
-        ]);
-
-        $this->encoder->expects($this->once())
+        $this->hasher->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
             ->willReturn(true);
@@ -72,13 +75,12 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testPasswordIsNotValid()
+    /**
+     * @dataProvider provideConstraints
+     */
+    public function testPasswordIsNotValid(UserPassword $constraint)
     {
-        $constraint = new UserPassword([
-            'message' => 'myMessage',
-        ]);
-
-        $this->encoder->expects($this->once())
+        $this->hasher->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
             ->willReturn(false);
@@ -87,6 +89,13 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->assertRaised();
+    }
+
+    public function provideConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new UserPassword(['message' => 'myMessage'])];
+
+        yield 'named arguments' => [new UserPassword(message: 'myMessage')];
     }
 
     /**
@@ -114,8 +123,8 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testUserIsNotValid()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
-        $user = $this->getMockBuilder('Foo\Bar\User')->getMock();
+        $this->expectException(ConstraintDefinitionException::class);
+        $user = new \stdClass();
 
         $this->tokenStorage = $this->createTokenStorage($user);
         $this->validator = $this->createValidator();
@@ -126,7 +135,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     protected function createUser()
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $mock = $this->createMock(UserInterface::class);
 
         $mock
             ->expects($this->any())
@@ -143,19 +152,14 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         return $mock;
     }
 
-    protected function createPasswordEncoder($isPasswordValid = true)
+    protected function createHasherFactory($hasher = null)
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface')->getMock();
-    }
-
-    protected function createEncoderFactory($encoder = null)
-    {
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface')->getMock();
+        $mock = $this->createMock(PasswordHasherFactoryInterface::class);
 
         $mock
             ->expects($this->any())
-            ->method('getEncoder')
-            ->willReturn($encoder)
+            ->method('getPasswordHasher')
+            ->willReturn($hasher)
         ;
 
         return $mock;
@@ -165,7 +169,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         $token = $this->createAuthenticationToken($user);
 
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $mock = $this->createMock(TokenStorageInterface::class);
         $mock
             ->expects($this->any())
             ->method('getToken')
@@ -177,7 +181,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     protected function createAuthenticationToken($user = null)
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $mock = $this->createMock(TokenInterface::class);
         $mock
             ->expects($this->any())
             ->method('getUser')

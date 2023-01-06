@@ -15,7 +15,7 @@ if (!$_POST) {
 foreach ($_SERVER as $k => $v) {
     switch ($k) {
         default:
-            if (0 !== strpos($k, 'HTTP_')) {
+            if (!str_starts_with($k, 'HTTP_')) {
                 continue 2;
             }
             // no break
@@ -29,7 +29,7 @@ foreach ($_SERVER as $k => $v) {
     }
 }
 
-$json = json_encode($vars, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$json = json_encode($vars, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
 
 switch ($vars['REQUEST_URI']) {
     default:
@@ -62,6 +62,15 @@ switch ($vars['REQUEST_URI']) {
     case '/404':
         header('Content-Type: application/json', true, 404);
         break;
+
+    case '/404-gzipped':
+        header('Content-Type: text/plain', true, 404);
+        ob_start('ob_gzhandler');
+        @ob_flush();
+        flush();
+        usleep(300000);
+        echo 'some text';
+        exit;
 
     case '/301':
         if ('Basic Zm9vOmJhcg==' === $vars['HTTP_AUTHORIZATION']) {
@@ -102,7 +111,7 @@ switch ($vars['REQUEST_URI']) {
         break;
 
     case '/post':
-        $output = json_encode($_POST + ['REQUEST_METHOD' => $vars['REQUEST_METHOD']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $output = json_encode($_POST + ['REQUEST_METHOD' => $vars['REQUEST_METHOD']], \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
         header('Content-Type: application/json', true);
         header('Content-Length: '.strlen($output));
         echo $output;
@@ -157,7 +166,7 @@ switch ($vars['REQUEST_URI']) {
         exit;
 
     case '/json':
-        header("Content-Type: application/json");
+        header('Content-Type: application/json');
         echo json_encode([
             'documents' => [
                 ['id' => '/json/1'],
@@ -170,7 +179,7 @@ switch ($vars['REQUEST_URI']) {
     case '/json/1':
     case '/json/2':
     case '/json/3':
-        header("Content-Type: application/json");
+        header('Content-Type: application/json');
         echo json_encode([
             'title' => $vars['REQUEST_URI'],
         ]);

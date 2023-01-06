@@ -43,7 +43,7 @@ final class Locales extends ResourceBundle
             self::readEntry(['Names', $locale]);
 
             return true;
-        } catch (MissingResourceException $e) {
+        } catch (MissingResourceException) {
             return \in_array($locale, self::getAliases(), true);
         }
     }
@@ -67,7 +67,7 @@ final class Locales extends ResourceBundle
     /**
      * @return string[]
      */
-    public static function getNames($displayLocale = null): array
+    public static function getNames(string $displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
     }

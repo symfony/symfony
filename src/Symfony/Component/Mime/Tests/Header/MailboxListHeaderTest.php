@@ -49,6 +49,12 @@ class MailboxListHeaderTest extends TestCase
         $this->assertEquals(['"Chris Corbyn, \\\\escaped\\\\" <chris@swiftmailer.org>'], $header->getAddressStrings());
     }
 
+    public function testParenthesesInNameAreQuoted()
+    {
+        $header = new MailboxListHeader('From', [new Address('j.doe@example.com', 'J Doe (ACME)')]);
+        $this->assertEquals(['"J Doe (ACME)" <j.doe@example.com>'], $header->getAddressStrings());
+    }
+
     public function testUtf8CharsInDomainAreIdnEncoded()
     {
         $header = new MailboxListHeader('From', [new Address('chris@swïftmailer.org', 'Chris Corbyn')]);

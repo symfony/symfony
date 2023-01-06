@@ -17,12 +17,10 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 final class MessageHandler
 {
-    private $transport;
+    private TransportInterface $transport;
 
     public function __construct(TransportInterface $transport)
     {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -37,6 +38,14 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
         ];
     }
 
+    public function getInvalidPropertyPaths()
+    {
+        return [
+            [$this->getContainer(['firstName' => 'Bernhard']), 'firstName', 'Bernhard'],
+            [$this->getContainer(['person' => $this->getContainer(['firstName' => 'Bernhard'])]), 'person.firstName', 'Bernhard'],
+        ];
+    }
+
     /**
      * @dataProvider getValidPropertyPaths
      */
@@ -47,7 +56,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
 
     public function testGetValueFailsIfNoSuchIndex()
     {
-        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException');
+        $this->expectException(NoSuchIndexException::class);
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
@@ -81,5 +90,13 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     public function testIsWritable($collection, $path)
     {
         $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
+    }
+
+    /**
+     * @dataProvider getInvalidPropertyPaths
+     */
+    public function testIsNotWritable($collection, $path)
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable($collection, $path));
     }
 }

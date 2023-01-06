@@ -24,7 +24,7 @@ class RouteConfigurator
 
     protected $parentConfigurator;
 
-    public function __construct(RouteCollection $collection, $route, string $name = '', CollectionConfigurator $parentConfigurator = null, array $prefixes = null)
+    public function __construct(RouteCollection $collection, RouteCollection $route, string $name = '', CollectionConfigurator $parentConfigurator = null, array $prefixes = null)
     {
         $this->collection = $collection;
         $this->route = $route;
@@ -40,7 +40,7 @@ class RouteConfigurator
      *
      * @return $this
      */
-    final public function host($host): self
+    final public function host(string|array $host): static
     {
         $this->addHost($this->route, $host);
 

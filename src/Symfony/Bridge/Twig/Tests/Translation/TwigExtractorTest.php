@@ -18,6 +18,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
+use Twig\Loader\LoaderInterface;
 
 class TwigExtractorTest extends TestCase
 {
@@ -26,22 +27,25 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtract($template, $messages)
     {
-        $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
         $twig = new Environment($loader, [
             'strict_variables' => true,
             'debug' => true,
             'cache' => false,
             'autoescape' => false,
         ]);
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
+        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $extractor->setPrefix('prefix');
         $catalogue = new MessageCatalogue('en');
 
         $m = new \ReflectionMethod($extractor, 'extractTemplate');
-        $m->setAccessible(true);
         $m->invoke($extractor, $template, $catalogue);
+
+        if (0 === \count($messages)) {
+            $this->assertSame($catalogue->all(), $messages);
+        }
 
         foreach ($messages as $key => $domain) {
             $this->assertTrue($catalogue->has($key, $domain));
@@ -61,6 +65,7 @@ class TwigExtractorTest extends TestCase
             ['{% set foo = "new key" | trans %}', ['new key' => 'messages']],
             ['{{ 1 ? "new key" | trans : "another key" | trans }}', ['new key' => 'messages', 'another key' => 'messages']],
             ['{{ t("new key") | trans() }}', ['new key' => 'messages']],
+            ['{% set foo = t("new key") %}', ['new key' => 'messages']],
             ['{{ t("new key", {}, "domain") | trans() }}', ['new key' => 'domain']],
             ['{{ 1 ? t("new key") | trans : t("another key") | trans }}', ['new key' => 'messages', 'another key' => 'messages']],
 
@@ -70,6 +75,15 @@ class TwigExtractorTest extends TestCase
 
             // make sure this works with twig's named arguments
             ['{{ "new key" | trans(domain="domain") }}', ['new key' => 'domain']],
+
+            // concat translations
+            ['{{ ("new" ~ " key") | trans() }}', ['new key' => 'messages']],
+            ['{{ ("another " ~ "new " ~ "key") | trans() }}', ['another new key' => 'messages']],
+            ['{{ ("new" ~ " key") | trans(domain="domain") }}', ['new key' => 'domain']],
+            ['{{ ("another " ~ "new " ~ "key") | trans(domain="domain") }}', ['another new key' => 'domain']],
+            // if it has a variable or other expression, we cannot extract it
+            ['{% set foo = "new" %} {{ ("new " ~ foo ~ "key") | trans() }}', []],
+            ['{{ ("foo " ~ "new"|trans ~ "key") | trans() }}', ['new' => 'messages']],
         ];
     }
 
@@ -78,8 +92,8 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtractSyntaxError($resources, array $messages)
     {
-        $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
+        $twig = new Environment($this->createMock(LoaderInterface::class));
+        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');
@@ -108,7 +122,7 @@ class TwigExtractorTest extends TestCase
             'cache' => false,
             'autoescape' => false,
         ]);
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
+        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');

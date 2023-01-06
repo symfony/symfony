@@ -8,7 +8,7 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Loginoplysninger kan findes.</target>
+                <target>Loginoplysninger kan ikke findes.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
@@ -61,6 +61,22 @@
             <trans-unit id="16">
                 <source>Account is locked.</source>
                 <target>Brugerkonto er låst.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>For mange fejlede login forsøg, prøv venligst senere.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Ugyldigt eller udløbet login link.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>For mange fejlede login forsøg, prøv igen om %minutes% minut.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>For mange fejlede login forsøg, prøv igen om %minutes% minutter.</target>
             </trans-unit>
         </body>
     </file>

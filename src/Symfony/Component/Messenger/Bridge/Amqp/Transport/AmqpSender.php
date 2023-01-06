@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -25,8 +26,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class AmqpSender implements SenderInterface
 {
-    private $serializer;
-    private $connection;
+    private SerializerInterface $serializer;
+    private Connection $connection;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -34,9 +35,6 @@ class AmqpSender implements SenderInterface
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function send(Envelope $envelope): Envelope
     {
         $encodedMessage = $this->serializer->encode($envelope);
@@ -58,7 +56,11 @@ class AmqpSender implements SenderInterface
 
         $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);
         if ($amqpReceivedStamp instanceof AmqpReceivedStamp) {
-            $amqpStamp = AmqpStamp::createFromAmqpEnvelope($amqpReceivedStamp->getAmqpEnvelope(), $amqpStamp);
+            $amqpStamp = AmqpStamp::createFromAmqpEnvelope(
+                $amqpReceivedStamp->getAmqpEnvelope(),
+                $amqpStamp,
+                $envelope->last(RedeliveryStamp::class) ? $amqpReceivedStamp->getQueueName() : null
+            );
         }
 
         try {
@@ -75,4 +77,3 @@ class AmqpSender implements SenderInterface
         return $envelope;
     }
 }
-class_alias(AmqpSender::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender::class);

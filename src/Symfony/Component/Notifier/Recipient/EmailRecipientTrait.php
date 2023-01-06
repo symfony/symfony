@@ -13,12 +13,10 @@ namespace Symfony\Component\Notifier\Recipient;
 
 /**
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
- *
- * @experimental in 5.2
  */
 trait EmailRecipientTrait
 {
-    private $email;
+    private string $email;
 
     public function getEmail(): string
     {

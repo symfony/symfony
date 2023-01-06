@@ -41,7 +41,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setForeground('default');
         $this->assertEquals("\033[39mfoo\033[39m", $style->apply('foo'));
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $style->setForeground('undefined-color');
     }
 
@@ -58,7 +58,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setBackground('default');
         $this->assertEquals("\033[49mfoo\033[49m", $style->apply('foo'));
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $style->setBackground('undefined-color');
     }
 
@@ -85,7 +85,7 @@ class OutputFormatterStyleTest extends TestCase
             $style->setOption('foo');
             $this->fail('->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
             $this->assertStringContainsString('Invalid option specified: "foo"', $e->getMessage(), '->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
         }
     }

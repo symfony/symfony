@@ -18,10 +18,10 @@ class SortableIteratorTest extends RealIteratorTestCase
     public function testConstructor()
     {
         try {
-            new SortableIterator(new Iterator([]), 'foobar');
+            new SortableIterator(new Iterator([]), -255);
             $this->fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
         }
     }
 
@@ -35,9 +35,10 @@ class SortableIteratorTest extends RealIteratorTestCase
                 case SortableIterator::SORT_BY_ACCESSED_TIME:
                     touch(self::toAbsolute('.git'));
                     sleep(1);
-                    file_get_contents(self::toAbsolute('.bar'));
+                    touch(self::toAbsolute('.bar'), time());
                     break;
                 case SortableIterator::SORT_BY_CHANGED_TIME:
+                    sleep(1);
                     file_put_contents(self::toAbsolute('test.php'), 'foo');
                     sleep(1);
                     file_put_contents(self::toAbsolute('test.py'), 'foo');
@@ -75,6 +76,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.foo/.bar',
             '.foo/bar',
             '.git',
+            'Zephire.php',
             'foo',
             'foo bar',
             'foo/bar.tmp',
@@ -91,6 +93,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
+            'zebulon.php',
         ];
 
         $sortByType = [
@@ -103,6 +106,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.bar',
             '.foo/.bar',
             '.foo/bar',
+            'Zephire.php',
             'foo bar',
             'foo/bar.tmp',
             'qux/baz_100_1.py',
@@ -115,6 +119,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'qux_2_0.php',
             'test.php',
             'test.py',
+            'zebulon.php',
         ];
 
         $sortByAccessedTime = [
@@ -127,6 +132,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 '.foo/.bar',
                 '.foo/bar',
                 'test.py',
+                'Zephire.php',
                 'foo',
                 'toto',
                 'toto/.git',
@@ -140,6 +146,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'qux_10_2.php',
                 'qux_12_0.php',
                 'qux_2_0.php',
+                'zebulon.php',
             ],
             // This file was accessed after sleeping for 1 sec
             ['.bar'],
@@ -152,6 +159,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 '.foo/.bar',
                 '.foo/bar',
                 '.bar',
+                'Zephire.php',
                 'foo',
                 'foo/bar.tmp',
                 'toto',
@@ -166,6 +174,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'qux_10_2.php',
                 'qux_12_0.php',
                 'qux_2_0.php',
+                'zebulon.php',
             ],
             ['test.php'],
             ['test.py'],
@@ -178,6 +187,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 '.foo/.bar',
                 '.foo/bar',
                 '.bar',
+                'Zephire.php',
                 'foo',
                 'foo/bar.tmp',
                 'toto',
@@ -192,6 +202,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'qux_10_2.php',
                 'qux_12_0.php',
                 'qux_2_0.php',
+                'zebulon.php',
             ],
             ['test.php'],
             ['test.py'],
@@ -203,6 +214,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.foo/.bar',
             '.foo/bar',
             '.git',
+            'Zephire.php',
             'foo',
             'foo/bar.tmp',
             'foo bar',
@@ -219,6 +231,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
+            'zebulon.php',
         ];
 
         $customComparison = [
@@ -227,6 +240,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.foo/.bar',
             '.foo/bar',
             '.git',
+            'Zephire.php',
             'foo',
             'foo bar',
             'foo/bar.tmp',
@@ -243,6 +257,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
+            'zebulon.php',
         ];
 
         return [

@@ -36,7 +36,6 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $logoutLinks = $crawler->selectLink('Log out')->links();
         $this->assertCount(2, $logoutLinks);
         $this->assertStringContainsString('_csrf_token=', $logoutLinks[0]->getUri());
-        $this->assertSame($logoutLinks[0]->getUri(), $logoutLinks[1]->getUri());
 
         $client->click($logoutLinks[0]);
 
@@ -103,9 +102,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
     public function provideClientOptions()
     {
-        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
-        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'legacy_routes_as_path.yml', 'enable_authenticator_manager' => false]];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml']];
+        yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml']];
     }
 }

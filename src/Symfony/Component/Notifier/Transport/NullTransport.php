@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\Notifier\Transport;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Notifier\Event\MessageEvent;
+use Symfony\Component\Notifier\Event\SentMessageEvent;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\NullMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -21,27 +20,29 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 class NullTransport implements TransportInterface
 {
-    private $dispatcher;
+    private ?EventDispatcherInterface $dispatcher;
 
     public function __construct(EventDispatcherInterface $dispatcher = null)
     {
-        $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     public function send(MessageInterface $message): SentMessage
     {
         $message = new NullMessage($message);
+        $sentMessage = new SentMessage($message, (string) $this);
 
-        if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(new MessageEvent($message));
+        if (null === $this->dispatcher) {
+            return $sentMessage;
         }
 
-        return new SentMessage($message, (string) $this);
+        $this->dispatcher->dispatch(new MessageEvent($message));
+        $this->dispatcher->dispatch(new SentMessageEvent($sentMessage));
+
+        return $sentMessage;
     }
 
     public function __toString(): string

@@ -5,6 +5,13 @@ namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
 abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnTypeParentInterface
 {
     /**
+     * @return void
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * No return declared here
      */
     public function returnTypeGrandParent()
@@ -210,6 +217,34 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
      * @return static
      */
     public function static()
+    {
+    }
+
+    /**
+     * @return false
+     */
+    public function false()
+    {
+    }
+
+    /**
+     * @return true
+     */
+    public function true()
+    {
+    }
+
+    /**
+     * @return never
+     */
+    public function never()
+    {
+    }
+
+    /**
+     * @return null
+     */
+    public function null()
     {
     }
 

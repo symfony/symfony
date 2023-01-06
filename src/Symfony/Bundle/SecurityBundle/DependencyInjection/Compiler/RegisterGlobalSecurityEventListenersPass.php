@@ -13,14 +13,20 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
+use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
  * Makes sure all event listeners on the global dispatcher are also listening
- * to events on the firewall-specific dipatchers.
+ * to events on the firewall-specific dispatchers.
  *
  * This compiler pass must be run after RegisterListenersPass of the
  * EventDispatcher component.
@@ -31,11 +37,21 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
  */
 class RegisterGlobalSecurityEventListenersPass implements CompilerPassInterface
 {
-    private static $eventBubblingEvents = [CheckPassportEvent::class, LoginFailureEvent::class, LoginSuccessEvent::class, LogoutEvent::class];
+    private const EVENT_BUBBLING_EVENTS = [
+        CheckPassportEvent::class,
+        LoginFailureEvent::class,
+        LoginSuccessEvent::class,
+        LogoutEvent::class,
+        AuthenticationTokenCreatedEvent::class,
+        AuthenticationSuccessEvent::class,
+        InteractiveLoginEvent::class,
+        TokenDeauthenticatedEvent::class,
 
-    /**
-     * {@inheritdoc}
-     */
+        // When events are registered by their name
+        AuthenticationEvents::AUTHENTICATION_SUCCESS,
+        SecurityEvents::INTERACTIVE_LOGIN,
+    ];
+
     public function process(ContainerBuilder $container)
     {
         if (!$container->has('event_dispatcher') || !$container->hasParameter('security.firewalls')) {
@@ -58,7 +74,7 @@ class RegisterGlobalSecurityEventListenersPass implements CompilerPassInterface
             }
 
             $methodCallArguments = $methodCall[1];
-            if (!\in_array($methodCallArguments[0], self::$eventBubblingEvents, true)) {
+            if (!\in_array($methodCallArguments[0], self::EVENT_BUBBLING_EVENTS, true)) {
                 continue;
             }
 

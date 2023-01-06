@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 /**
- * DenormalizerAware trait.
- *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
 trait DenormalizerAwareTrait

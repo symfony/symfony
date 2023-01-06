@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
@@ -21,13 +22,15 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-final class SessionValueResolver implements ArgumentValueResolverInterface
+final class SessionValueResolver implements ArgumentValueResolverInterface, ValueResolverInterface
 {
     /**
-     * {@inheritdoc}
+     * @deprecated since Symfony 6.2, use resolve() instead
      */
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
+        @trigger_deprecation('symfony/http-kernel', '6.2', 'The "%s()" method is deprecated, use "resolve()" instead.', __METHOD__);
+
         if (!$request->hasSession()) {
             return false;
         }
@@ -40,11 +43,17 @@ final class SessionValueResolver implements ArgumentValueResolverInterface
         return $request->getSession() instanceof $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    public function resolve(Request $request, ArgumentMetadata $argument): array
     {
-        yield $request->getSession();
+        if (!$request->hasSession()) {
+            return [];
+        }
+
+        $type = $argument->getType();
+        if (SessionInterface::class !== $type && !is_subclass_of($type, SessionInterface::class)) {
+            return [];
+        }
+
+        return $request->getSession() instanceof $type ? [$request->getSession()] : [];
     }
 }

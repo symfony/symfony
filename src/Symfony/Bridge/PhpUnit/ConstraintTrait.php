@@ -15,14 +15,19 @@ use PHPUnit\Framework\Constraint\Constraint;
 use ReflectionClass;
 
 $r = new ReflectionClass(Constraint::class);
-if (\PHP_VERSION_ID < 70000 || !$r->getMethod('matches')->hasReturnType()) {
+if ($r->getProperty('exporter')->isProtected()) {
     trait ConstraintTrait
     {
-        use Legacy\ConstraintTraitForV6;
+        use Legacy\ConstraintTraitForV7;
+    }
+} elseif (!$r->getMethod('evaluate')->hasReturnType()) {
+    trait ConstraintTrait
+    {
+        use Legacy\ConstraintTraitForV8;
     }
 } else {
     trait ConstraintTrait
     {
-        use Legacy\ConstraintTraitForV7;
+        use Legacy\ConstraintTraitForV9;
     }
 }

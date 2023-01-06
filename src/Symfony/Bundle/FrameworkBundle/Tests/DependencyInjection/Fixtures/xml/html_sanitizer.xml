@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <config xmlns="http://symfony.com/schema/dic/symfony" http-method-override="false">
+        <html-sanitizer>
+            <sanitizer name="custom"
+                allow-safe-elements="true"
+                allow-static-elements="true"
+                force-https-urls="true"
+                allow-relative-links="true"
+                allow-relative-medias="true"
+            >
+                <allow-element name="iframe">
+                    <attribute>src</attribute>
+                </allow-element>
+                <allow-element name="custom-tag">
+                    <attribute>data-attr</attribute>
+                    <attribute>data-attr-1</attribute>
+                </allow-element>
+                <allow-element name="custom-tag-2">
+                    <attribute>*</attribute>
+                </allow-element>
+                <block-element>section</block-element>
+                <drop-element>video</drop-element>
+                <allow-attribute name="src">
+                    <element>iframe</element>
+                </allow-attribute>
+                <allow-attribute name="data-attr">
+                    <element>*</element>
+                </allow-attribute>
+                <drop-attribute name="data-attr">
+                    <element>custom-tag</element>
+                </drop-attribute>
+                <drop-attribute name="data-attr-1" />
+                <drop-attribute name="data-attr-2">
+                    <element>*</element>
+                </drop-attribute>
+                <force-attribute name="a">
+                    <attribute name="rel">noopener noreferrer</attribute>
+                </force-attribute>
+                <force-attribute name="h1">
+                    <attribute name="class">bp4-heading</attribute>
+                </force-attribute>
+                <allowed-link-scheme>http</allowed-link-scheme>
+                <allowed-link-scheme>https</allowed-link-scheme>
+                <allowed-link-scheme>mailto</allowed-link-scheme>
+                <allowed-link-host>symfony.com</allowed-link-host>
+                <allowed-media-scheme>http</allowed-media-scheme>
+                <allowed-media-scheme>https</allowed-media-scheme>
+                <allowed-media-scheme>data</allowed-media-scheme>
+                <allowed-media-host>symfony.com</allowed-media-host>
+                <with-attribute-sanitizer>App\Sanitizer\CustomAttributeSanitizer</with-attribute-sanitizer>
+                <without-attribute-sanitizer>App\Sanitizer\OtherCustomAttributeSanitizer</without-attribute-sanitizer>
+            </sanitizer>
+
+            <sanitizer name="all.sanitizer"/>
+        </html-sanitizer>
+    </config>
+</container>

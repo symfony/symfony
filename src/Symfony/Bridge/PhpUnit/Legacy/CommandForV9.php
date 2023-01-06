@@ -20,18 +20,13 @@ use PHPUnit\TextUI\XmlConfiguration\Loader;
 use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
 
 /**
- * {@inheritdoc}
- *
  * @internal
  */
 class CommandForV9 extends BaseCommand
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createRunner(): BaseRunner
     {
-        $this->arguments['listeners'] = isset($this->arguments['listeners']) ? $this->arguments['listeners'] : [];
+        $this->arguments['listeners'] ?? $this->arguments['listeners'] = [];
 
         $registeredLocally = false;
 

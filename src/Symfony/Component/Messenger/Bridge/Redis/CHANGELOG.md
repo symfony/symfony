@@ -1,11 +1,38 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for Redis Sentinel
+
+6.0
+---
+
+ * Remove option `tls`
+ * Using invalid options will throw a `LogicException`
+ * The `delete_after_ack` config option now defaults to `true`
+
+5.4
+---
+
+ * Deprecate not setting the `delete_after_ack` config option (or DSN parameter),
+   its default value will change to `true` in 6.0
+
+5.3
+---
+
+ * Add `rediss://` DSN scheme support for TLS protocol
+ * Deprecate TLS option, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
+ * Add support for `\RedisCluster` instance in `Connection` constructor
+ * Add support for Redis Cluster in DSN
+
 5.2.0
 -----
 
  * Added a `delete_after_reject` option to the DSN to allow control over message
    deletion, similar to `delete_after_ack`.
+ * Added option `lazy` to delay connecting to Redis server until we first use it.
 
 5.1.0
 -----

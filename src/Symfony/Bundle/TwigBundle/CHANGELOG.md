@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+6.2
+---
+
+ * Add the `twig.mailer.html_to_text_converter` option to allow configuring custom `HtmlToTextConverterInterface`
+   implementations to be used by the `twig.mime_body_renderer` service
+
+6.1
+---
+
+ * Add option `twig.file_name_pattern` to restrict which files are compiled by cache warmer and linter
+ * Deprecate option `twig.autoescape`, use `twig.autoescape_service[_method]` instead
+
+6.0
+---
+
+ * The `twig` service is now private
+
+5.3
+---
+
+ * Add support for the new `serialize` filter (from Twig Bridge)
+
 5.2.0
 -----
 
@@ -33,7 +55,7 @@ CHANGELOG
 4.1.0
 -----
 
- * added priority to Twig extensions 
+ * added priority to Twig extensions
  * deprecated relying on the default value (`false`) of the `twig.strict_variables` configuration option. The `%kernel.debug%` parameter will be the new default in 5.0
 
 4.0.0

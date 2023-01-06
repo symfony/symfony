@@ -6,7 +6,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
-    <framework:config>
+    <framework:config http-method-override="false">
         <framework:mailer>
             <framework:transport name="transport1">smtp://example1.com</framework:transport>
             <framework:transport name="transport2">smtp://example2.com</framework:transport>

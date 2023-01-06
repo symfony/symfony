@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,9 +23,16 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
@@ -33,7 +41,7 @@ class RouterListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
+        $this->requestStack = $this->createMock(RequestStack::class);
     }
 
     /**
@@ -41,9 +49,8 @@ class RouterListenerTest extends TestCase
      */
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
-        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+
         $context = new RequestContext();
         $context->setHttpPort($defaultHttpPort);
         $context->setHttpsPort($defaultHttpsPort);
@@ -57,7 +64,7 @@ class RouterListenerTest extends TestCase
 
         $this->assertEquals($expectedHttpPort, $context->getHttpPort());
         $this->assertEquals($expectedHttpsPort, $context->getHttpsPort());
-        $this->assertEquals(0 === strpos($uri, 'https') ? 'https' : 'http', $context->getScheme());
+        $this->assertEquals(str_starts_with($uri, 'https') ? 'https' : 'http', $context->getScheme());
     }
 
     public function getPortData()
@@ -72,29 +79,23 @@ class RouterListenerTest extends TestCase
 
     private function createRequestEventForUri(string $uri): RequestEvent
     {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create($uri);
         $request->attributes->set('_controller', null); // Prevents going in to routing process
 
-        return new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
-    }
-
-    public function testInvalidMatcher()
-    {
-        $this->expectException('InvalidArgumentException');
-        new RouterListener(new \stdClass(), $this->requestStack);
+        return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
     public function testRequestMatcher()
     {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher->expects($this->once())
                        ->method('matchRequest')
-                       ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
+                       ->with($this->isInstanceOf(Request::class))
                        ->willReturn([]);
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
@@ -103,14 +104,14 @@ class RouterListenerTest extends TestCase
 
     public function testSubRequestWithDifferentMethod()
     {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/', 'post');
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher->expects($this->any())
                        ->method('matchRequest')
-                       ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
+                       ->with($this->isInstanceOf(Request::class))
                        ->willReturn([]);
 
         $context = new RequestContext();
@@ -119,7 +120,7 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/', 'get');
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST);
 
@@ -133,21 +134,21 @@ class RouterListenerTest extends TestCase
      */
     public function testLoggingParameter($parameter, $log, $parameters)
     {
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher->expects($this->once())
             ->method('matchRequest')
             ->willReturn($parameter);
 
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
             ->method('info')
             ->with($this->equalTo($log), $this->equalTo($parameters));
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext(), $logger);
-        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function getLoggingParameterData()
@@ -162,7 +163,7 @@ class RouterListenerTest extends TestCase
     {
         $requestStack = new RequestStack();
 
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher->expects($this->never())->method('matchRequest');
 
         $dispatcher = new EventDispatcher();
@@ -184,7 +185,7 @@ class RouterListenerTest extends TestCase
     {
         $requestStack = new RequestStack();
 
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher
             ->expects($this->once())
             ->method('matchRequest')
@@ -204,14 +205,67 @@ class RouterListenerTest extends TestCase
 
     public function testRequestWithBadHost()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $this->expectException(BadRequestHttpException::class);
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://bad host %22/');
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
+        $listener->onKernelRequest($event);
+    }
+
+    public function testResourceNotFoundException()
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('No route found for "GET https://www.symfony.com/path" (from "https://www.google.com")');
+
+        $context = new RequestContext();
+
+        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+
+        $urlMatcher->expects($this->any())
+            ->method('getContext')
+            ->willReturn($context);
+
+        $urlMatcher->expects($this->any())
+            ->method('match')
+            ->willThrowException(new ResourceNotFoundException());
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $request = Request::create('https://www.symfony.com/path');
+        $request->headers->set('referer', 'https://www.google.com');
+
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $listener = new RouterListener($urlMatcher, $this->requestStack);
+        $listener->onKernelRequest($event);
+    }
+
+    public function testMethodNotAllowedException()
+    {
+        $this->expectException(MethodNotAllowedHttpException::class);
+        $this->expectExceptionMessage('No route found for "GET https://www.symfony.com/path": Method Not Allowed (Allow: POST)');
+
+        $context = new RequestContext();
+
+        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+
+        $urlMatcher->expects($this->any())
+            ->method('getContext')
+            ->willReturn($context);
+
+        $urlMatcher->expects($this->any())
+            ->method('match')
+            ->willThrowException(new MethodNotAllowedException(['POST']));
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $request = Request::create('https://www.symfony.com/path');
+
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $listener = new RouterListener($urlMatcher, $this->requestStack);
         $listener->onKernelRequest($event);
     }
 }

@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendinblue\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Yann LUCAS
  */
 final class SendinblueSmtpTransport extends EsmtpTransport
 {
-    public function __construct(string $username, string $password, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
+    public function __construct(string $username, #[\SensitiveParameter] string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct('smtp-relay.sendinblue.com', 465, true, $dispatcher, $logger);
 

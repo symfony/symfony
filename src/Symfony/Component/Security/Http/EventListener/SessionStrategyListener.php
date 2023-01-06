@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  */
 class SessionStrategyListener implements EventSubscriberInterface
 {
-    private $sessionAuthenticationStrategy;
+    private SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy;
 
     public function __construct(SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy)
     {
@@ -39,7 +39,7 @@ class SessionStrategyListener implements EventSubscriberInterface
         $request = $event->getRequest();
         $token = $event->getAuthenticatedToken();
 
-        if (!$request->hasSession() || !$request->hasPreviousSession()) {
+        if (!$request->hasPreviousSession()) {
             return;
         }
 

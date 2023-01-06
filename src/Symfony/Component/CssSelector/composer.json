@@ -1,7 +1,7 @@
 {
     "name": "symfony/css-selector",
     "type": "library",
-    "description": "Symfony CssSelector Component",
+    "description": "Converts CSS selectors to XPath expressions",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5"
+        "php": ">=8.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\CssSelector\\": "" },
@@ -28,6 +28,5 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "version": "5.2.x-dev"
+    "minimum-stability": "dev"
 }

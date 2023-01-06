@@ -1,0 +1,23 @@
+@startuml
+allow_mixing
+title SimpleDiagram
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 2
+skinparam state {
+    BackgroundColor<<initial>> #87b741
+    BackgroundColor<<marked>> #3887C6
+    BorderColor #3887C6
+    BorderColor<<marked>> Black
+    FontColor<<marked>> White
+}
+skinparam agent {
+    BackgroundColor #ffffff
+    BorderColor #3887C6
+}
+state "place a" <<initial>>
+"place a" : My custom place description
+state "place b"
+agent "t 1"
+"place a" --> "t 1"
+"t 1" --> "place b"
+@enduml

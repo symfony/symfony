@@ -11,7 +11,7 @@
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
-use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
+use Symfony\Component\Intl\Data\Bundle\Writer\PhpBundleWriter;
 use Symfony\Component\Intl\Data\Generator\CurrencyDataGenerator;
 use Symfony\Component\Intl\Data\Generator\GeneratorConfig;
 use Symfony\Component\Intl\Data\Generator\LanguageDataGenerator;
@@ -22,6 +22,10 @@ use Symfony\Component\Intl\Data\Generator\TimezoneDataGenerator;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\Util\GitRepository;
+
+if ('cli' !== \PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
 
 require_once __DIR__.'/common.php';
 require_once __DIR__.'/autoload.php';
@@ -166,9 +170,9 @@ echo "Preparing resource bundle compilation (version $icuVersionInDownload)...\n
 
 $compiler = new GenrbCompiler($genrb, $genrbEnv);
 $config = new GeneratorConfig($sourceDir.'/data', $icuVersionInDownload);
-$jsonDir = dirname(__DIR__).'/data';
+$dataDir = dirname(__DIR__).'/data';
 
-$config->addBundleWriter($jsonDir, new JsonBundleWriter());
+$config->addBundleWriter($dataDir, new PhpBundleWriter());
 
 echo "Starting resource bundle compilation. This may take a while...\n";
 
@@ -218,13 +222,13 @@ Date: {$git->getLastAuthoredDate()->format('c')}
 
 GIT_INFO;
 
-$gitInfoFile = $jsonDir.'/git-info.txt';
+$gitInfoFile = $dataDir.'/git-info.txt';
 
 file_put_contents($gitInfoFile, $gitInfo);
 
 echo "Wrote $gitInfoFile.\n";
 
-$versionFile = $jsonDir.'/version.txt';
+$versionFile = $dataDir.'/version.txt';
 
 file_put_contents($versionFile, "$icuVersionInDownload\n");
 

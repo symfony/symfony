@@ -16,13 +16,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 final class MessageEvent extends Event
 {
-    private $message;
-    private $queued;
+    private MessageInterface $message;
+    private bool $queued;
 
     public function __construct(MessageInterface $message, bool $queued = false)
     {

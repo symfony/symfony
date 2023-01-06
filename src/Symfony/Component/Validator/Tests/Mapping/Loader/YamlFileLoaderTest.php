@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
+use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -36,7 +38,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
 
         $r = new \ReflectionProperty($loader, 'classes');
-        $r->setAccessible(true);
         $this->assertSame([], $r->getValue($loader));
     }
 
@@ -45,7 +46,7 @@ class YamlFileLoaderTest extends TestCase
      */
     public function testInvalidYamlFiles($path)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $loader = new YamlFileLoader(__DIR__.'/'.$path);
         $metadata = new ClassMetadata(Entity::class);
 
@@ -71,7 +72,7 @@ class YamlFileLoaderTest extends TestCase
             $loader->loadClassMetadata($metadata);
         } catch (\InvalidArgumentException $e) {
             // Call again. Again an exception should be thrown
-            $this->expectException('\InvalidArgumentException');
+            $this->expectException(\InvalidArgumentException::class);
             $loader->loadClassMetadata($metadata);
         }
     }
@@ -87,7 +88,7 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
-        $metadata = new ClassMetadata('\stdClass');
+        $metadata = new ClassMetadata(\stdClass::class);
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
@@ -135,6 +136,19 @@ class YamlFileLoaderTest extends TestCase
 
         $expected = new ClassMetadata(Entity::class);
         $expected->addPropertyConstraint('firstName', new Range(['max' => \PHP_INT_MAX]));
+
+        $this->assertEquals($expected, $metadata);
+    }
+
+    public function testLoadClassMetadataWithRequiredArguments()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping-required-arg.yml');
+        $metadata = new ClassMetadata(Entity_81::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata(Entity_81::class);
+        $expected->addPropertyConstraint('title', new ConstraintWithRequiredArgument('X'));
 
         $this->assertEquals($expected, $metadata);
     }

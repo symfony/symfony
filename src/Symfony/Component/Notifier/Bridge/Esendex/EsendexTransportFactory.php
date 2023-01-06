@@ -14,30 +14,25 @@ namespace Symfony\Component\Notifier\Bridge\Esendex;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
-/**
- * @experimental in 5.2
- */
 final class EsendexTransportFactory extends AbstractTransportFactory
 {
-    /**
-     * @return EsendexTransport
-     */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): EsendexTransport
     {
         $scheme = $dsn->getScheme();
-        $token = $this->getUser($dsn).':'.$this->getPassword($dsn);
-        $accountReference = $dsn->getOption('accountreference');
-        $from = $dsn->getOption('from');
+
+        if ('esendex' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'esendex', $this->getSupportedSchemes());
+        }
+
+        $email = $this->getUser($dsn);
+        $password = $this->getPassword($dsn);
+        $accountReference = $dsn->getRequiredOption('accountreference');
+        $from = $dsn->getRequiredOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('esendex' === $scheme) {
-            return (new EsendexTransport($token, $accountReference, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'esendex', $this->getSupportedSchemes());
+        return (new EsendexTransport($email, $password, $accountReference, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

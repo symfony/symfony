@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormRendererEngineInterface;
 use Twig\Compiler;
 use Twig\Environment;
+use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\NameExpression;
@@ -54,8 +55,8 @@ class FormThemeTest extends TestCase
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $environment = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
-        $formRenderer = new FormRenderer($this->getMockBuilder(FormRendererEngineInterface::class)->getMock());
+        $environment = new Environment($this->createMock(LoaderInterface::class));
+        $formRenderer = new FormRenderer($this->createMock(FormRendererEngineInterface::class));
         $this->registerTwigRuntimeLoader($environment, $formRenderer);
         $compiler = new Compiler($environment);
 
@@ -63,7 +64,7 @@ class FormThemeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], true);',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
 
@@ -73,7 +74,7 @@ class FormThemeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [0 => "tpl1", 1 => "tpl2"], false);',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
 
@@ -85,7 +86,7 @@ class FormThemeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", true);',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
 
@@ -95,7 +96,7 @@ class FormThemeTest extends TestCase
             sprintf(
                 '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", false);',
                 $this->getVariableGetter('form')
-             ),
+            ),
             trim($compiler->compile($node)->getSource())
         );
     }

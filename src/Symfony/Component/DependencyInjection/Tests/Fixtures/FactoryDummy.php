@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 class FactoryDummy extends FactoryParent
 {
-    public static function createFactory(): FactoryDummy
+    public static function createFactory(): self
     {
     }
 

@@ -14,6 +14,7 @@ services:
             - foo: { foo: foo }
             - foo: { bar: bar, baz: baz }
             - foo: { name: bar, baz: baz }
+            - nullable: { bar: bar, baz: ~ }
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
         properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
         calls:
@@ -160,18 +161,6 @@ services:
         arguments:
             - !tagged_iterator foo
         public: true
-    Psr\Container\ContainerInterface:
-        alias: service_container
-        deprecated:
-            package: symfony/dependency-injection
-            version: 5.1
-            message: The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.
-    Symfony\Component\DependencyInjection\ContainerInterface:
-        alias: service_container
-        deprecated:
-            package: symfony/dependency-injection
-            version: 5.1
-            message: The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.
     alias_for_foo:
         alias: 'foo'
         public: true
@@ -189,4 +178,14 @@ services:
         tags:
             - container.preload: { class: 'Some\Sidekick1' }
             - container.preload: { class: 'Some\Sidekick2' }
+        public: true
+    a_factory:
+        class: Bar
+    a_service:
+        class: Bar
+        factory: ['@a_factory', 'getBar']
+        public: true
+    b_service:
+        class: Bar
+        factory: ['@a_factory', 'getBar']
         public: true

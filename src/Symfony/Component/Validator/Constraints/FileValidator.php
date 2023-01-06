@@ -25,12 +25,12 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class FileValidator extends ConstraintValidator
 {
-    const KB_BYTES = 1000;
-    const MB_BYTES = 1000000;
-    const KIB_BYTES = 1024;
-    const MIB_BYTES = 1048576;
+    public const KB_BYTES = 1000;
+    public const MB_BYTES = 1000000;
+    public const KIB_BYTES = 1024;
+    public const MIB_BYTES = 1048576;
 
-    private static $suffices = [
+    private const SUFFICES = [
         1 => 'bytes',
         self::KB_BYTES => 'kB',
         self::MB_BYTES => 'MB',
@@ -38,10 +38,7 @@ class FileValidator extends ConstraintValidator
         self::MIB_BYTES => 'MiB',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof File) {
             throw new UnexpectedTypeException($constraint, File::class);
@@ -60,10 +57,10 @@ class FileValidator extends ConstraintValidator
                         $binaryFormat = $constraint->binaryFormat;
                     } else {
                         $limitInBytes = $iniLimitSize;
-                        $binaryFormat = null === $constraint->binaryFormat ? true : $constraint->binaryFormat;
+                        $binaryFormat = $constraint->binaryFormat ?? true;
                     }
 
-                    list(, $limitAsString, $suffix) = $this->factorizeSizes(0, $limitInBytes, $binaryFormat);
+                    [, $limitAsString, $suffix] = $this->factorizeSizes(0, $limitInBytes, $binaryFormat);
                     $this->context->buildViolation($constraint->uploadIniSizeErrorMessage)
                         ->setParameter('{{ limit }}', $limitAsString)
                         ->setParameter('{{ suffix }}', $suffix)
@@ -116,7 +113,7 @@ class FileValidator extends ConstraintValidator
             }
         }
 
-        if (!is_scalar($value) && !$value instanceof FileObject && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof FileObject && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -157,7 +154,7 @@ class FileValidator extends ConstraintValidator
             $limitInBytes = $constraint->maxSize;
 
             if ($sizeInBytes > $limitInBytes) {
-                list($sizeAsString, $limitAsString, $suffix) = $this->factorizeSizes($sizeInBytes, $limitInBytes, $constraint->binaryFormat);
+                [$sizeAsString, $limitAsString, $suffix] = $this->factorizeSizes($sizeInBytes, $limitInBytes, $constraint->binaryFormat);
                 $this->context->buildViolation($constraint->maxSizeMessage)
                     ->setParameter('{{ file }}', $this->formatValue($path))
                     ->setParameter('{{ size }}', $sizeAsString)
@@ -171,18 +168,60 @@ class FileValidator extends ConstraintValidator
             }
         }
 
-        if ($constraint->mimeTypes) {
+        $mimeTypes = (array) $constraint->mimeTypes;
+
+        if ($constraint->extensions) {
+            $fileExtension = pathinfo($basename, \PATHINFO_EXTENSION);
+
+            $found = false;
+            $normalizedExtensions = [];
+            foreach ((array) $constraint->extensions as $k => $v) {
+                if (!\is_string($k)) {
+                    $k = $v;
+                    $v = null;
+                }
+
+                $normalizedExtensions[] = $k;
+
+                if ($fileExtension !== $k) {
+                    continue;
+                }
+
+                $found = true;
+                if (null === $v) {
+                    if (!class_exists(MimeTypes::class)) {
+                        throw new LogicException('You cannot validate the mime-type of files as the Mime component is not installed. Try running "composer require symfony/mime".');
+                    }
+
+                    $mimeTypesHelper = MimeTypes::getDefault();
+                    $v = $mimeTypesHelper->getMimeTypes($k);
+                }
+
+                $mimeTypes = $mimeTypes ? array_intersect($v, $mimeTypes) : (array) $v;
+                break;
+            }
+
+            if (!$found) {
+                $this->context->buildViolation($constraint->extensionsMessage)
+                    ->setParameter('{{ file }}', $this->formatValue($path))
+                    ->setParameter('{{ extension }}', $this->formatValue($fileExtension))
+                    ->setParameter('{{ extensions }}', $this->formatValues($normalizedExtensions))
+                    ->setParameter('{{ name }}', $this->formatValue($basename))
+                    ->setCode(File::INVALID_EXTENSION_ERROR)
+                    ->addViolation();
+            }
+        }
+
+        if ($mimeTypes) {
             if ($value instanceof FileObject) {
                 $mime = $value->getMimeType();
-            } elseif (class_exists(MimeTypes::class)) {
-                $mime = MimeTypes::getDefault()->guessMimeType($path);
+            } elseif (isset($mimeTypesHelper) || class_exists(MimeTypes::class)) {
+                $mime = ($mimeTypesHelper ?? MimeTypes::getDefault())->guessMimeType($path);
             } elseif (!class_exists(FileObject::class)) {
                 throw new LogicException('You cannot validate the mime-type of files as the Mime component is not installed. Try running "composer require symfony/mime".');
             } else {
                 $mime = (new FileObject($value))->getMimeType();
             }
-
-            $mimeTypes = (array) $constraint->mimeTypes;
 
             foreach ($mimeTypes as $mimeType) {
                 if ($mimeType === $mime) {
@@ -215,7 +254,7 @@ class FileValidator extends ConstraintValidator
      * Convert the limit to the smallest possible number
      * (i.e. try "MB", then "kB", then "bytes").
      */
-    private function factorizeSizes(int $size, int $limit, bool $binaryFormat): array
+    private function factorizeSizes(int $size, int|float $limit, bool $binaryFormat): array
     {
         if ($binaryFormat) {
             $coef = self::MIB_BYTES;
@@ -223,6 +262,13 @@ class FileValidator extends ConstraintValidator
         } else {
             $coef = self::MB_BYTES;
             $coefFactor = self::KB_BYTES;
+        }
+
+        // If $limit < $coef, $limitAsString could be < 1 with less than 3 decimals.
+        // In this case, we would end up displaying an allowed size < 1 (eg: 0.1 MB).
+        // It looks better to keep on factorizing (to display 100 kB for example).
+        while ($limit < $coef) {
+            $coef /= $coefFactor;
         }
 
         $limitAsString = (string) ($limit / $coef);
@@ -245,6 +291,6 @@ class FileValidator extends ConstraintValidator
             $sizeAsString = (string) round($size / $coef, 2);
         }
 
-        return [$sizeAsString, $limitAsString, self::$suffices[$coef]];
+        return [$sizeAsString, $limitAsString, self::SUFFICES[$coef]];
     }
 }

@@ -22,7 +22,6 @@ class FormDataPartTest extends TestCase
     public function testConstructor()
     {
         $r = new \ReflectionProperty(TextPart::class, 'encoding');
-        $r->setAccessible(true);
 
         $b = new TextPart('content');
         $c = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');

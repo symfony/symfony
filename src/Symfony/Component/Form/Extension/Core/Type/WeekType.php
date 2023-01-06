@@ -23,14 +23,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WeekType extends AbstractType
 {
-    private static $widgets = [
+    private const WIDGETS = [
         'text' => IntegerType::class,
         'choice' => ChoiceType::class,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ('string' === $options['input']) {
@@ -78,14 +75,11 @@ class WeekType extends AbstractType
                 }
             }
 
-            $builder->add('year', self::$widgets[$options['widget']], $yearOptions);
-            $builder->add('week', self::$widgets[$options['widget']], $weekOptions);
+            $builder->add('year', self::WIDGETS[$options['widget']], $yearOptions);
+            $builder->add('week', self::WIDGETS[$options['widget']], $weekOptions);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget'] = $options['widget'];
@@ -95,9 +89,6 @@ class WeekType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
@@ -155,6 +146,7 @@ class WeekType extends AbstractType
             },
             'compound' => $compound,
             'choice_translation_domain' => false,
+            'invalid_message' => 'Please enter a valid week.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -182,10 +174,7 @@ class WeekType extends AbstractType
         $resolver->setAllowedTypes('weeks', 'int[]');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'week';
     }

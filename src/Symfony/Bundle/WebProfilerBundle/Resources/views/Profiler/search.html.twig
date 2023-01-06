@@ -1,23 +1,25 @@
-<div id="sidebar-search" class="hidden">
+<div id="sidebar-search" class="{{ (render_hidden_by_default ?? true) ? 'hidden' }}">
     <form action="{{ path('_profiler_search') }}" method="get">
         <div class="form-group">
             <label for="ip">IP</label>
             <input type="text" name="ip" id="ip" value="{{ ip }}">
         </div>
 
-        <div class="form-group">
-            <label for="method">Method</label>
-            <select name="method" id="method">
-                <option value="">Any</option>
-                {% for m in ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'] %}
-                    <option {{ m == method ? 'selected="selected"' }}>{{ m }}</option>
-                {% endfor %}
-            </select>
-        </div>
+        <div class="form-group-row">
+            <div class="form-group">
+                <label for="method">Method</label>
+                <select name="method" id="method">
+                    <option value="">Any</option>
+                    {% for m in ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'] %}
+                        <option {{ m == method ? 'selected="selected"' }}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="status_code">Status</label>
-            <input type="number" name="status_code" id="status_code" min="100" max="599" value="{{ status_code }}">
+            <div class="form-group">
+                <label for="status_code">Status</label>
+                <input type="number" name="status_code" id="status_code" min="100" max="599" value="{{ status_code }}">
+            </div>
         </div>
 
         <div class="form-group">
@@ -27,7 +29,7 @@
 
         <div class="form-group">
             <label for="token">Token</label>
-            <input type="text" name="token" id="token" value="{{ token }}">
+            <input type="text" name="token" id="token" size="8" value="{{ token }}">
         </div>
 
         <div class="form-group">
@@ -40,17 +42,19 @@
             <input type="date" name="end" id="end" value="{{ end }}">
         </div>
 
-        <div class="form-group">
-            <label for="limit">Results</label>
-            <select name="limit" id="limit">
-                {% for l in [10, 50, 100] %}
-                    <option {{ l == limit ? 'selected="selected"' }}>{{ l }}</option>
-                {% endfor %}
-            </select>
-        </div>
+        <div class="form-group-row form-group-row-search-button">
+            <div class="form-group">
+                <label for="limit">Results</label>
+                <select name="limit" id="limit">
+                    {% for l in [10, 50, 100] %}
+                        <option {{ l == limit ? 'selected="selected"' }}>{{ l }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="form-group">
-            <button type="submit" class="btn btn-sm">Search</button>
+            <div class="form-group">
+                <button type="submit" class="btn btn-sm">Search</button>
+            </div>
         </div>
     </form>
 </div>

@@ -18,7 +18,7 @@ class ConfigCacheFactoryTest extends TestCase
 {
     public function testCacheWithInvalidCallback()
     {
-        $this->expectException('TypeError');
+        $this->expectException(\TypeError::class);
         $cacheFactory = new ConfigCacheFactory(true);
 
         $cacheFactory->cache('file', new \stdClass());

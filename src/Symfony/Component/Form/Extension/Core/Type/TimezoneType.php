@@ -18,15 +18,13 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntlTimeZoneToStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Timezones;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ('datetimezone' === $options['input']) {
@@ -36,9 +34,6 @@ class TimezoneType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -47,6 +42,10 @@ class TimezoneType extends AbstractType
                 $input = $options['input'];
 
                 if ($options['intl']) {
+                    if (!class_exists(Intl::class)) {
+                        throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s" with option "intl=true". Try running "composer require symfony/intl".', static::class));
+                    }
+
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
                     return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
@@ -61,11 +60,7 @@ class TimezoneType extends AbstractType
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
-            'invalid_message' => function (Options $options, $previousValue) {
-                return ($options['legacy_error_messages'] ?? true)
-                    ? $previousValue
-                    : 'Please select a valid timezone.';
-            },
+            'invalid_message' => 'Please select a valid timezone.',
             'regions' => \DateTimeZone::ALL,
         ]);
 
@@ -90,18 +85,12 @@ class TimezoneType extends AbstractType
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'timezone';
     }

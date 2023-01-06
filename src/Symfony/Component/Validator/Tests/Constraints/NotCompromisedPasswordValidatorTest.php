@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Constraints\Luhn;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -38,9 +41,11 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         '273CA8A2A78C9B2D724144F4FAF4D221C86:6', // ISO-8859-5 leaked password: мама
         '3686792BBC66A72D40D928ED15621124CFE:7',
         '36EEC709091B810AA240179A44317ED415C:2',
+        'EE6EB9C0DFA0F07098CEDB11ECC7AFF9D4E:0', // UTF-8 not leaked password: ]<0585"%sb^5aa$w6!b38",,72?dp3r4\45b28Hy
+        'FC9F37E51AACD6B692A62769267590D46B8:0', // ISO-8859-5 non leaked password: м<в0dp3r4\45b28Hy
     ];
 
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         // Pass HttpClient::create() instead of the mock to run the tests against the real API
         return new NotCompromisedPasswordValidator($this->createHttpClientStub());
@@ -63,7 +68,6 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidPasswordButDisabled()
     {
         $r = new \ReflectionProperty($this->validator, 'enabled');
-        $r->setAccessible(true);
         $r->setValue($this->validator, false);
 
         $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword());
@@ -91,11 +95,20 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testThresholdNotReached()
+    /**
+     * @dataProvider provideConstraintsWithThreshold
+     */
+    public function testThresholdNotReached(NotCompromisedPassword $constraint)
     {
-        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(['threshold' => 10]));
+        $this->validator->validate(self::PASSWORD_LEAKED, $constraint);
 
         $this->assertNoViolation();
+    }
+
+    public function provideConstraintsWithThreshold(): iterable
+    {
+        yield 'Doctrine style' => [new NotCompromisedPassword(['threshold' => 10])];
+        yield 'named arguments' => [new NotCompromisedPassword(threshold: 10)];
     }
 
     public function testValidPassword()
@@ -151,36 +164,70 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testEndpointWithInvalidValueInReturn()
+    {
+        $returnValue = implode(
+            "\r\n",
+            [
+                '36039744C253F9B2A4E90CBEDB02EBFB82D:5',
+                'This should not break the validator',
+                '3686792BBC66A72D40D928ED15621124CFE:7',
+                '36EEC709091B810AA240179A44317ED415C:2',
+                '',
+            ]
+        );
+
+        $validator = new NotCompromisedPasswordValidator(
+            $this->createHttpClientStub($returnValue),
+            'UTF-8',
+            true,
+            'https://password-check.internal.example.com/range/%s'
+        );
+
+        $validator->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
     public function testInvalidConstraint()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
+        $this->expectException(UnexpectedTypeException::class);
         $this->validator->validate(null, new Luhn());
     }
 
     public function testInvalidValue()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
+        $this->expectException(UnexpectedTypeException::class);
         $this->validator->validate([], new NotCompromisedPassword());
     }
 
     public function testApiError()
     {
-        $this->expectException('Symfony\Contracts\HttpClient\Exception\ExceptionInterface');
+        $this->expectException(ExceptionInterface::class);
         $this->expectExceptionMessage('Problem contacting the Have I been Pwned API.');
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
     }
 
-    public function testApiErrorSkipped()
+    /**
+     * @dataProvider provideErrorSkippingConstraints
+     */
+    public function testApiErrorSkipped(NotCompromisedPassword $constraint)
     {
-        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(['skipOnError' => true]));
+        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, $constraint);
         $this->assertTrue(true); // No exception have been thrown
     }
 
-    private function createHttpClientStub(): HttpClientInterface
+    public function provideErrorSkippingConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new NotCompromisedPassword(['skipOnError' => true])];
+        yield 'named arguments' => [new NotCompromisedPassword(skipOnError: true)];
+    }
+
+    private function createHttpClientStub(?string $returnValue = null): HttpClientInterface
     {
         $httpClientStub = $this->createMock(HttpClientInterface::class);
         $httpClientStub->method('request')->willReturnCallback(
-            function (string $method, string $url): ResponseInterface {
+            function (string $method, string $url) use ($returnValue): ResponseInterface {
                 if (self::PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL === $url) {
                     throw new class('Problem contacting the Have I been Pwned API.') extends \Exception implements ServerExceptionInterface {
                         public function getResponse(): ResponseInterface
@@ -193,7 +240,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
                 $responseStub = $this->createMock(ResponseInterface::class);
                 $responseStub
                     ->method('getContent')
-                    ->willReturn(implode("\r\n", self::RETURN));
+                    ->willReturn($returnValue ?? implode("\r\n", self::RETURN));
 
                 return $responseStub;
             }

@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Loads validation metadata using a Doctrine annotation {@link Reader}.
+ * Loads validation metadata using a Doctrine annotation {@link Reader} or using PHP 8 attributes.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Alexander M. Turek <me@derrabus.de>
@@ -34,10 +34,7 @@ class AnnotationLoader implements LoaderInterface
         $this->reader = $reader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $reflClass = $metadata->getReflectionClass();
         $className = $reflClass->name;
@@ -78,7 +75,7 @@ class AnnotationLoader implements LoaderInterface
                         if (preg_match('/^(get|is|has)(.+)$/i', $method->name, $matches)) {
                             $metadata->addGetterMethodConstraint(lcfirst($matches[2]), $matches[0], $constraint);
                         } else {
-                            throw new MappingException(sprintf('The constraint on "%s::%s" cannot be added. Constraints can only be added on methods beginning with "get", "is" or "has".', $className, $method->name));
+                            throw new MappingException(sprintf('The constraint on "%s::%s()" cannot be added. Constraints can only be added on methods beginning with "get", "is" or "has".', $className, $method->name));
                         }
                     }
 
@@ -95,16 +92,14 @@ class AnnotationLoader implements LoaderInterface
      */
     private function getAnnotations(object $reflection): iterable
     {
-        if (\PHP_VERSION_ID >= 80000) {
-            foreach ($reflection->getAttributes(GroupSequence::class) as $attribute) {
-                yield $attribute->newInstance();
-            }
-            foreach ($reflection->getAttributes(GroupSequenceProvider::class) as $attribute) {
-                yield $attribute->newInstance();
-            }
-            foreach ($reflection->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-                yield $attribute->newInstance();
-            }
+        foreach ($reflection->getAttributes(GroupSequence::class) as $attribute) {
+            yield $attribute->newInstance();
+        }
+        foreach ($reflection->getAttributes(GroupSequenceProvider::class) as $attribute) {
+            yield $attribute->newInstance();
+        }
+        foreach ($reflection->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            yield $attribute->newInstance();
         }
         if (!$this->reader) {
             return;

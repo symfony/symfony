@@ -10,7 +10,7 @@
     <config>
         <provider name="default">
             <memory>
-                <user name="foo" password="foo" roles="ROLE_USER" />
+                <user identifier="foo" password="foo" roles="ROLE_USER" />
             </memory>
         </provider>
 

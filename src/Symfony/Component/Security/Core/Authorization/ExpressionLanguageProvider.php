@@ -21,19 +21,13 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new ExpressionFunction('is_anonymous', function () {
-                return '$token && $auth_checker->isGranted("IS_ANONYMOUS")';
-            }, function (array $variables) {
-                return $variables['token'] && $variables['auth_checker']->isGranted('IS_ANONYMOUS');
-            }),
-
             new ExpressionFunction('is_authenticated', function () {
-                return '$token && !$auth_checker->isGranted("IS_ANONYMOUS")';
+                return '$auth_checker->isGranted("IS_AUTHENTICATED")';
             }, function (array $variables) {
-                return $variables['token'] && !$variables['auth_checker']->isGranted('IS_ANONYMOUS');
+                return $variables['auth_checker']->isGranted('IS_AUTHENTICATED');
             }),
 
             new ExpressionFunction('is_fully_authenticated', function () {

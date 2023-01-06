@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
 
     private $defaultLocale;
 
@@ -37,7 +39,7 @@ class NumberTypeTest extends BaseTypeTest
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function testDefaultFormatting(): void
+    public function testDefaultFormatting()
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->setData('12345.67890');
@@ -45,7 +47,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,679', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithGrouping(): void
+    public function testDefaultFormattingWithGrouping()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['grouping' => true]);
         $form->setData('12345.67890');
@@ -53,7 +55,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12.345,679', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithScale(): void
+    public function testDefaultFormattingWithScale()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2]);
         $form->setData('12345.67890');
@@ -61,7 +63,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithScaleFloat(): void
+    public function testDefaultFormattingWithScaleFloat()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2]);
         $form->setData(12345.67890);
@@ -69,7 +71,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithScaleAndStringInput(): void
+    public function testDefaultFormattingWithScaleAndStringInput()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2, 'input' => 'string']);
         $form->setData('12345.67890');
@@ -77,9 +79,9 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    public function testStringInputWithFloatData(): void
+    public function testStringInputWithFloatData()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a numeric string.');
 
         $this->factory->create(static::TESTED_TYPE, 12345.6789, [
@@ -88,9 +90,9 @@ class NumberTypeTest extends BaseTypeTest
         ]);
     }
 
-    public function testStringInputWithIntData(): void
+    public function testStringInputWithIntData()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a numeric string.');
 
         $this->factory->create(static::TESTED_TYPE, 12345, [
@@ -99,7 +101,7 @@ class NumberTypeTest extends BaseTypeTest
         ]);
     }
 
-    public function testDefaultFormattingWithRounding(): void
+    public function testDefaultFormattingWithRounding()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP]);
         $form->setData('12345.54321');
@@ -139,7 +141,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertNull($form->getData());
     }
 
-    public function testSubmitNumericInput(): void
+    public function testSubmitNumericInput()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'number']);
         $form->submit('1,234');
@@ -149,7 +151,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('1,234', $form->getViewData());
     }
 
-    public function testSubmitNumericInputWithScale(): void
+    public function testSubmitNumericInputWithScale()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'number', 'scale' => 2]);
         $form->submit('1,234');
@@ -159,7 +161,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('1,23', $form->getViewData());
     }
 
-    public function testSubmitStringInput(): void
+    public function testSubmitStringInput()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string']);
         $form->submit('1,234');
@@ -169,7 +171,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('1,234', $form->getViewData());
     }
 
-    public function testSubmitStringInputWithScale(): void
+    public function testSubmitStringInputWithScale()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string', 'scale' => 2]);
         $form->submit('1,234');
@@ -194,10 +196,42 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testGroupingNotAllowedWithHtml5Widget()
     {
-        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectException(LogicException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'grouping' => true,
             'html5' => true,
         ]);
+    }
+
+    public function testNumericInputmode()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'scale' => 0,
+            'html5' => false,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertSame('numeric', $form->createView()->vars['attr']['inputmode']);
+    }
+
+    public function testDecimalInputmode()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'scale' => 2,
+            'html5' => false,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertSame('decimal', $form->createView()->vars['attr']['inputmode']);
+    }
+
+    public function testNoInputmodeWithHtml5Widget()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => true,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertArrayNotHasKey('inputmode', $form->createView()->vars['attr']);
     }
 }

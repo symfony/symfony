@@ -13,10 +13,12 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Guess\ValueGuess;
 
 class FormTypeGuesserChain implements FormTypeGuesserInterface
 {
-    private $guessers = [];
+    private array $guessers = [];
 
     /**
      * @param FormTypeGuesserInterface[] $guessers
@@ -25,53 +27,44 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      */
     public function __construct(iterable $guessers)
     {
+        $tmpGuessers = [];
         foreach ($guessers as $guesser) {
             if (!$guesser instanceof FormTypeGuesserInterface) {
-                throw new UnexpectedTypeException($guesser, 'Symfony\Component\Form\FormTypeGuesserInterface');
+                throw new UnexpectedTypeException($guesser, FormTypeGuesserInterface::class);
             }
 
             if ($guesser instanceof self) {
-                $this->guessers = array_merge($this->guessers, $guesser->guessers);
+                $tmpGuessers[] = $guesser->guessers;
             } else {
-                $this->guessers[] = $guesser;
+                $tmpGuessers[] = [$guesser];
             }
         }
+
+        $this->guessers = array_merge([], ...$tmpGuessers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessType(string $class, string $property)
+    public function guessType(string $class, string $property): ?TypeGuess
     {
         return $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessType($class, $property);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessRequired(string $class, string $property)
+    public function guessRequired(string $class, string $property): ?ValueGuess
     {
         return $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessRequired($class, $property);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessMaxLength(string $class, string $property)
+    public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
         return $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessMaxLength($class, $property);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessPattern(string $class, string $property)
+    public function guessPattern(string $class, string $property): ?ValueGuess
     {
         return $this->guess(function ($guesser) use ($class, $property) {
             return $guesser->guessPattern($class, $property);

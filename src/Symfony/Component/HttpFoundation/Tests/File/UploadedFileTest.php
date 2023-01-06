@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 use Symfony\Component\HttpFoundation\File\Exception\ExtensionFileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\FormSizeFileException;
 use Symfony\Component\HttpFoundation\File\Exception\IniSizeFileException;
 use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
@@ -26,14 +27,14 @@ class UploadedFileTest extends TestCase
 {
     protected function setUp(): void
     {
-        if (!ini_get('file_uploads')) {
+        if (!\ini_get('file_uploads')) {
             $this->markTestSkipped('file_uploads is disabled in php.ini');
         }
     }
 
     public function testConstructWhenFileNotExists()
     {
-        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->expectException(FileNotFoundException::class);
 
         new UploadedFile(
             __DIR__.'/Fixtures/not_here',
@@ -144,7 +145,7 @@ class UploadedFileTest extends TestCase
 
     public function testMoveLocalFileIsNotAllowed()
     {
-        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileException');
+        $this->expectException(FileException::class);
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
@@ -172,31 +173,16 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveFailed(UploadedFile $file)
     {
-        switch ($file->getError()) {
-            case \UPLOAD_ERR_INI_SIZE:
-                $exceptionClass = IniSizeFileException::class;
-                break;
-            case \UPLOAD_ERR_FORM_SIZE:
-                $exceptionClass = FormSizeFileException::class;
-                break;
-            case \UPLOAD_ERR_PARTIAL:
-                $exceptionClass = PartialFileException::class;
-                break;
-            case \UPLOAD_ERR_NO_FILE:
-                $exceptionClass = NoFileException::class;
-                break;
-            case \UPLOAD_ERR_CANT_WRITE:
-                $exceptionClass = CannotWriteFileException::class;
-                break;
-            case \UPLOAD_ERR_NO_TMP_DIR:
-                $exceptionClass = NoTmpDirFileException::class;
-                break;
-            case \UPLOAD_ERR_EXTENSION:
-                $exceptionClass = ExtensionFileException::class;
-                break;
-            default:
-                $exceptionClass = FileException::class;
-        }
+        $exceptionClass = match ($file->getError()) {
+            \UPLOAD_ERR_INI_SIZE => IniSizeFileException::class,
+            \UPLOAD_ERR_FORM_SIZE => FormSizeFileException::class,
+            \UPLOAD_ERR_PARTIAL => PartialFileException::class,
+            \UPLOAD_ERR_NO_FILE => NoFileException::class,
+            \UPLOAD_ERR_CANT_WRITE => CannotWriteFileException::class,
+            \UPLOAD_ERR_NO_TMP_DIR => NoTmpDirFileException::class,
+            \UPLOAD_ERR_EXTENSION => ExtensionFileException::class,
+            default => FileException::class,
+        };
 
         $this->expectException($exceptionClass);
 
@@ -324,13 +310,16 @@ class UploadedFileTest extends TestCase
     {
         $size = UploadedFile::getMaxFilesize();
 
-        $this->assertIsInt($size);
+        if ($size > \PHP_INT_MAX) {
+            $this->assertIsFloat($size);
+        } else {
+            $this->assertIsInt($size);
+        }
+
         $this->assertGreaterThan(0, $size);
 
-        if (0 === (int) ini_get('post_max_size') && 0 === (int) ini_get('upload_max_filesize')) {
+        if (0 === (int) \ini_get('post_max_size') && 0 === (int) \ini_get('upload_max_filesize')) {
             $this->assertSame(\PHP_INT_MAX, $size);
-        } else {
-            $this->assertLessThan(\PHP_INT_MAX, $size);
         }
     }
 }

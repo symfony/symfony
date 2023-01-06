@@ -12,11 +12,12 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class TimezoneTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimezoneType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimezoneType';
 
     public function testTimezonesAreSelectable()
     {
@@ -169,7 +170,7 @@ class TimezoneTypeTest extends BaseTypeTest
 
     public function testChoiceTranslationLocaleOptionWithoutIntl()
     {
-        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "choice_translation_locale" option can only be used if the "intl" option is set to true.');
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_locale' => 'uk',

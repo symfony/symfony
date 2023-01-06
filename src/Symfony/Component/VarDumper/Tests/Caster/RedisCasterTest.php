@@ -38,10 +38,10 @@ EODUMP;
 
     public function testConnected()
     {
-        $redisHost = getenv('REDIS_HOST');
+        $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379];
         $redis = new \Redis();
         try {
-            $redis->connect($redisHost);
+            $redis->connect(...$redisHost);
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }
@@ -49,8 +49,8 @@ EODUMP;
         $xCast = <<<EODUMP
 Redis {%A
   isConnected: true
-  host: "$redisHost"
-  port: 6379
+  host: "{$redisHost[0]}"
+  port: {$redisHost[1]}
   auth: null
   mode: ATOMIC
   dbNum: 0

@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter;
 
 /**
- * @requires extension couchbase 2.6.0
+ * @requires extension couchbase <3.0.0
+ * @requires extension couchbase >=2.6.0
  * @group integration
  *
  * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>
@@ -32,14 +34,15 @@ class CouchbaseBucketAdapterTest extends AdapterTestCase
 
     public static function setupBeforeClass(): void
     {
+        if (!CouchbaseBucketAdapter::isSupported()) {
+            throw new SkippedTestSuiteError('Couchbase >= 2.6.0 < 3.0.0 is required.');
+        }
+
         self::$client = AbstractAdapter::createConnection('couchbase://'.getenv('COUCHBASE_HOST').'/cache',
             ['username' => getenv('COUCHBASE_USER'), 'password' => getenv('COUCHBASE_PASS')]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         $client = $defaultLifetime

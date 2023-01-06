@@ -11,60 +11,43 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 class LogoutTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testSessionLessRememberMeLogout(array $options)
+    public function testCsrfTokensAreClearedOnLogout()
     {
-        $client = $this->createClient($options + ['test_case' => 'RememberMeLogout', 'root_config' => 'config.yml']);
+        $client = $this->createClient(['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
+        $client->disableReboot();
+        $this->callInRequestContext($client, function () {
+            static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
+        });
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
             '_password' => 'test',
         ]);
 
-        $cookieJar = $client->getCookieJar();
-        $cookieJar->expire(session_name());
-
-        $this->assertNotNull($cookieJar->get('REMEMBERME'));
-        $this->assertSame('lax', $cookieJar->get('REMEMBERME')->getSameSite());
-
-        $client->request('GET', '/logout');
-
-        $this->assertNull($cookieJar->get('REMEMBERME'));
-    }
-
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testCsrfTokensAreClearedOnLogout(array $options)
-    {
-        $client = $this->createClient($options + ['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
-        static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
-
-        $client->request('POST', '/login', [
-            '_username' => 'johannes',
-            '_password' => 'test',
-        ]);
-
-        $this->assertTrue(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
-        $this->assertSame('bar', static::$container->get('security.csrf.token_storage')->getToken('foo'));
+        $this->callInRequestContext($client, function () {
+            $this->assertTrue(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
+            $this->assertSame('bar', static::getContainer()->get('security.csrf.token_storage')->getToken('foo'));
+        });
 
         $client->request('GET', '/logout');
 
-        $this->assertFalse(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
+        $this->callInRequestContext($client, function () {
+            $this->assertFalse(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
+        });
     }
 
-    /**
-     * @dataProvider provideSecuritySystems
-     */
-    public function testAccessControlDoesNotApplyOnLogout(array $options)
+    public function testAccessControlDoesNotApplyOnLogout()
     {
-        $client = $this->createClient($options + ['test_case' => 'Logout', 'root_config' => 'config_access.yml']);
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_access.yml']);
 
         $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
         $client->request('GET', '/logout');
@@ -84,5 +67,36 @@ class LogoutTest extends AbstractWebTestCase
 
         $this->assertRedirect($client->getResponse(), '/');
         $this->assertNull($cookieJar->get('flavor'));
+    }
+
+    public function testEnabledCsrf()
+    {
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_csrf_enabled.yml']);
+
+        $cookieJar = $client->getCookieJar();
+        $cookieJar->set(new Cookie('flavor', 'chocolate', strtotime('+1 day'), null, 'somedomain'));
+
+        $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
+        $client->request('GET', '/logout');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    private function callInRequestContext(KernelBrowser $client, callable $callable): void
+    {
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $wrappedCallable = function (RequestEvent $event) use (&$callable) {
+            $callable();
+            $event->setResponse(new Response(''));
+            $event->stopPropagation();
+        };
+
+        $eventDispatcher->addListener(KernelEvents::REQUEST, $wrappedCallable);
+        try {
+            $client->request('GET', '/'.uniqid('', true));
+        } finally {
+            $eventDispatcher->removeListener(KernelEvents::REQUEST, $wrappedCallable);
+        }
     }
 }

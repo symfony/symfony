@@ -77,8 +77,8 @@ class CookieJarTest extends TestCase
         $cookieJar->set(new Cookie('bar', 'bar'));
         $cookieJar->updateFromSetCookie($setCookies);
 
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $cookieJar->get('foo'));
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $cookieJar->get('bar'));
+        $this->assertInstanceOf(Cookie::class, $cookieJar->get('foo'));
+        $this->assertInstanceOf(Cookie::class, $cookieJar->get('bar'));
         $this->assertEquals('foo', $cookieJar->get('foo')->getValue(), '->updateFromSetCookie() updates cookies from a Set-Cookie header');
         $this->assertEquals('bar', $cookieJar->get('bar')->getValue(), '->updateFromSetCookie() keeps existing cookies');
     }
@@ -103,9 +103,9 @@ class CookieJarTest extends TestCase
         $barCookie = $cookieJar->get('bar', '/', '.blog.symfony.com');
         $phpCookie = $cookieJar->get('PHPSESSID');
 
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $fooCookie);
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $barCookie);
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Cookie', $phpCookie);
+        $this->assertInstanceOf(Cookie::class, $fooCookie);
+        $this->assertInstanceOf(Cookie::class, $barCookie);
+        $this->assertInstanceOf(Cookie::class, $phpCookie);
         $this->assertEquals('foo', $fooCookie->getValue());
         $this->assertEquals('bar', $barCookie->getValue());
         $this->assertEquals('id', $phpCookie->getValue());

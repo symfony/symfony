@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:framework="http://symfony.com/schema/dic/symfony">
 
-    <framework:config>
+    <framework:config http-method-override="false">
         <framework:annotations enabled="true" />
         <framework:serializer enable-annotations="true">
             <framework:mapping>

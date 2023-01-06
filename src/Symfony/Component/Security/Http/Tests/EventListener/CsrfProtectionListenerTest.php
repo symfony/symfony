@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -76,7 +76,7 @@ class CsrfProtectionListenerTest extends TestCase
 
     private function createPassport(?CsrfTokenBadge $badge)
     {
-        $passport = new SelfValidatingPassport(new UserBadge('wouter', function ($username) { return new User($username, 'pass'); }));
+        $passport = new SelfValidatingPassport(new UserBadge('wouter', function ($username) { return new InMemoryUser($username, 'pass'); }));
         if ($badge) {
             $passport->addBadge($badge);
         }

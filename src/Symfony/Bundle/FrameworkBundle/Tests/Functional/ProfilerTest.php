@@ -36,6 +36,27 @@ class ProfilerTest extends AbstractWebTestCase
         $this->assertNull($client->getProfile());
     }
 
+    /**
+     * @dataProvider getConfigs
+     */
+    public function testProfilerCollectParameter($insulate)
+    {
+        $client = $this->createClient(['test_case' => 'ProfilerCollectParameter', 'root_config' => 'config.yml']);
+        if ($insulate) {
+            $client->insulate();
+        }
+
+        $client->request('GET', '/profiler');
+        $this->assertNull($client->getProfile());
+
+        // enable the profiler for the next request
+        $client->request('GET', '/profiler?profile=1');
+        $this->assertIsObject($client->getProfile());
+
+        $client->request('GET', '/profiler');
+        $this->assertNull($client->getProfile());
+    }
+
     public function getConfigs()
     {
         return [

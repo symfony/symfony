@@ -22,17 +22,17 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
  */
 final class Definition
 {
-    private $places = [];
-    private $transitions = [];
-    private $initialPlaces = [];
-    private $metadataStore;
+    private array $places = [];
+    private array $transitions = [];
+    private array $initialPlaces = [];
+    private MetadataStoreInterface $metadataStore;
 
     /**
      * @param string[]             $places
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
      */
-    public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, string|array $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -44,7 +44,7 @@ final class Definition
 
         $this->setInitialPlaces($initialPlaces);
 
-        $this->metadataStore = $metadataStore ?: new InMemoryMetadataStore();
+        $this->metadataStore = $metadataStore ?? new InMemoryMetadataStore();
     }
 
     /**
@@ -76,8 +76,11 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces($places = null)
+    private function setInitialPlaces(string|array $places = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/workflow', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
+        }
         if (!$places) {
             return;
         }

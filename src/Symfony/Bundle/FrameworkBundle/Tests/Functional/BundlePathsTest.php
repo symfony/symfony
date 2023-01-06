@@ -40,8 +40,8 @@ class BundlePathsTest extends AbstractWebTestCase
     public function testBundleTwigTemplatesDir()
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
-        $twig = static::$container->get('twig.alias');
-        $bundlesMetadata = static::$container->getParameter('kernel.bundles_metadata');
+        $twig = static::getContainer()->get('twig.alias');
+        $bundlesMetadata = static::getContainer()->getParameter('kernel.bundles_metadata');
 
         $this->assertSame([$bundlesMetadata['LegacyBundle']['path'].'/Resources/views'], $twig->getLoader()->getPaths('Legacy'));
         $this->assertSame("OK\n", $twig->render('@Legacy/index.html.twig'));
@@ -53,7 +53,7 @@ class BundlePathsTest extends AbstractWebTestCase
     public function testBundleTranslationsDir()
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
-        $translator = static::$container->get('translator.alias');
+        $translator = static::getContainer()->get('translator.alias');
 
         $this->assertSame('OK', $translator->trans('ok_label', [], 'legacy'));
         $this->assertSame('OK', $translator->trans('ok_label', [], 'modern'));
@@ -62,7 +62,7 @@ class BundlePathsTest extends AbstractWebTestCase
     public function testBundleValidationConfigDir()
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
-        $validator = static::$container->get('validator.alias');
+        $validator = static::getContainer()->get('validator.alias');
 
         $this->assertTrue($validator->hasMetadataFor(LegacyPerson::class));
         $this->assertCount(1, $constraintViolationList = $validator->validate(new LegacyPerson('john', 5)));
@@ -76,7 +76,7 @@ class BundlePathsTest extends AbstractWebTestCase
     public function testBundleSerializationConfigDir()
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
-        $serializer = static::$container->get('serializer.alias');
+        $serializer = static::getContainer()->get('serializer.alias');
 
         $this->assertEquals(['full_name' => 'john', 'age' => 5], $serializer->normalize(new LegacyPerson('john', 5), 'json'));
         $this->assertEquals(['full_name' => 'john', 'age' => 5], $serializer->normalize(new ModernPerson('john', 5), 'json'));

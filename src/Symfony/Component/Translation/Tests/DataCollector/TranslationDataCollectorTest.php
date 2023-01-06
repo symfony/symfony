@@ -17,13 +17,6 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 
 class TranslationDataCollectorTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (!class_exists('Symfony\Component\HttpKernel\DataCollector\DataCollector')) {
-            $this->markTestSkipped('The "DataCollector" is not available');
-        }
-    }
-
     public function testCollectEmptyMessages()
     {
         $translator = $this->getTranslator();
@@ -140,7 +133,7 @@ class TranslationDataCollectorTest extends TestCase
     private function getTranslator()
     {
         $translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
+            ->getMockBuilder(DataCollectorTranslator::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;

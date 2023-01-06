@@ -13,6 +13,7 @@
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Deprecated: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
@@ -23,3 +24,4 @@
 - Tag: `tag1`
     - Attr3: val3
 - Tag: `tag2`
+- Usages: .alias_2

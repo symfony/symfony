@@ -69,4 +69,14 @@ class ClockMockTest extends TestCase
 
         $this->assertSame('1555075769', gmdate('U'));
     }
+
+    public function testHrTime()
+    {
+        $this->assertSame([1234567890, 125000000], hrtime());
+    }
+
+    public function testHrTimeAsNumber()
+    {
+        $this->assertSame(1234567890125000000, hrtime(true));
+    }
 }

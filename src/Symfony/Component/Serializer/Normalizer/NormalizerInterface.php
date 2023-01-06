@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 
 /**
- * Defines the interface of normalizers.
- *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface NormalizerInterface
@@ -38,15 +36,16 @@ interface NormalizerInterface
      * @throws LogicException             Occurs when the normalizer is not called in an expected context
      * @throws ExceptionInterface         Occurs for all the other cases of errors
      */
-    public function normalize($object, string $format = null, array $context = []);
+    public function normalize(mixed $object, string $format = null, array $context = []);
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer.
      *
-     * @param mixed  $data   Data to normalize
-     * @param string $format The format being (de-)serialized from or into
+     * @param mixed  $data    Data to normalize
+     * @param string $format  The format being (de-)serialized from or into
+     * @param array  $context Context options for the normalizer
      *
      * @return bool
      */
-    public function supportsNormalization($data, string $format = null);
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
 }

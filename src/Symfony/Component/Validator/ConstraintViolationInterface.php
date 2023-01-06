@@ -30,15 +30,17 @@ namespace Symfony\Component\Validator;
  * element is still the person, but the property path is "address.street".
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method Constraint|null getConstraint() Returns the constraint whose validation caused the violation. Not implementing it is deprecated since Symfony 6.3.
+ * @method mixed           getCause()      Returns the cause of the violation. Not implementing it is deprecated since Symfony 6.2.
+ * @method string          __toString()    Converts the violation into a string for debugging purposes. Not implementing it is deprecated since Symfony 6.1.
  */
 interface ConstraintViolationInterface
 {
     /**
      * Returns the violation message.
-     *
-     * @return string|\Stringable The violation message as a string or a stringable object
      */
-    public function getMessage();
+    public function getMessage(): string|\Stringable;
 
     /**
      * Returns the raw violation message.
@@ -46,10 +48,8 @@ interface ConstraintViolationInterface
      * The raw violation message contains placeholders for the parameters
      * returned by {@link getParameters}. Typically you'll pass the
      * message template and parameters to a translation engine.
-     *
-     * @return string The raw violation message
      */
-    public function getMessageTemplate();
+    public function getMessageTemplate(): string;
 
     /**
      * Returns the parameters to be inserted into the raw violation message.
@@ -59,7 +59,7 @@ interface ConstraintViolationInterface
      *
      * @see getMessageTemplate()
      */
-    public function getParameters();
+    public function getParameters(): array;
 
     /**
      * Returns a number for pluralizing the violation message.
@@ -74,10 +74,8 @@ interface ConstraintViolationInterface
      *
      * This method returns the value of the parameter for choosing the right
      * pluralization form (in this case "choices").
-     *
-     * @return int|null The number to use to pluralize of the message
      */
-    public function getPlural();
+    public function getPlural(): ?int;
 
     /**
      * Returns the root element of the validation.
@@ -87,7 +85,7 @@ interface ConstraintViolationInterface
      *               the object graph, the value at which the violation occurs
      *               is not necessarily the value that was originally validated.
      */
-    public function getRoot();
+    public function getRoot(): mixed;
 
     /**
      * Returns the property path from the root element to the violation.
@@ -101,7 +99,7 @@ interface ConstraintViolationInterface
      *                dots, while array access is denoted by square brackets,
      *                for example "addresses[1].street".
      */
-    public function getPropertyPath();
+    public function getPropertyPath(): string;
 
     /**
      * Returns the value that caused the violation.
@@ -109,12 +107,10 @@ interface ConstraintViolationInterface
      * @return mixed the invalid value that caused the validated constraint to
      *               fail
      */
-    public function getInvalidValue();
+    public function getInvalidValue(): mixed;
 
     /**
      * Returns a machine-digestible error code for the violation.
-     *
-     * @return string|null The error code
      */
-    public function getCode();
+    public function getCode(): ?string;
 }

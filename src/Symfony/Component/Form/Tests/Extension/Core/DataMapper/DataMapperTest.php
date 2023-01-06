@@ -14,10 +14,14 @@ namespace Symfony\Component\Form\Tests\Extension\Core\DataMapper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\Tests\Fixtures\TypehintedPropertiesCar;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DataMapperTest extends TestCase
@@ -50,7 +54,7 @@ class DataMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertSame($engine, $form->getData());
     }
@@ -68,7 +72,7 @@ class DataMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNotSame($engine, $form->getData());
         self::assertEquals($engine, $form->getData());
@@ -84,7 +88,7 @@ class DataMapperTest extends TestCase
 
         self::assertNull($form->getPropertyPath());
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNull($form->getData());
     }
@@ -101,14 +105,11 @@ class DataMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNull($form->getData());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testMapDataToFormsIgnoresUninitializedProperties()
     {
         $engineForm = new Form(new FormConfigBuilder('engine', null, $this->dispatcher));
@@ -117,7 +118,7 @@ class DataMapperTest extends TestCase
         $car = new TypehintedPropertiesCar();
         $car->engine = 'BMW';
 
-        $this->mapper->mapDataToForms($car, [$engineForm, $colorForm]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$engineForm, $colorForm]));
 
         self::assertSame($car->engine, $engineForm->getData());
         self::assertNull($colorForm->getData());
@@ -135,7 +136,7 @@ class DataMapperTest extends TestCase
 
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms(null, [$form]);
+        $this->mapper->mapDataToForms(null, new \ArrayIterator([$form]));
 
         self::assertSame($default, $form->getData());
     }
@@ -152,7 +153,7 @@ class DataMapperTest extends TestCase
 
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms([], [$form]);
+        $this->mapper->mapDataToForms([], new \ArrayIterator([$form]));
 
         self::assertSame($default, $form->getData());
     }
@@ -171,7 +172,7 @@ class DataMapperTest extends TestCase
         $config->setData($engine);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertEquals($engine, $car->engine);
         self::assertNotSame($engine, $car->engine);
@@ -190,7 +191,7 @@ class DataMapperTest extends TestCase
         $config->setData($engine);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($engine, $car->engine);
     }
@@ -209,7 +210,7 @@ class DataMapperTest extends TestCase
 
         $car->engine = 'Rolls-Royce';
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame('Rolls-Royce', $car->engine);
     }
@@ -229,7 +230,7 @@ class DataMapperTest extends TestCase
         $config->setMapped(false);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -248,7 +249,7 @@ class DataMapperTest extends TestCase
         $config->setData($engine);
         $form = new Form($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -266,7 +267,7 @@ class DataMapperTest extends TestCase
         $config->setData(null);
         $form = new Form($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -285,7 +286,7 @@ class DataMapperTest extends TestCase
         $config->setData($engine);
         $form = new NotSynchronizedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -305,14 +306,11 @@ class DataMapperTest extends TestCase
         $config->setDisabled(true);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testMapFormsToUninitializedProperties()
     {
         $car = new TypehintedPropertiesCar();
@@ -320,7 +318,7 @@ class DataMapperTest extends TestCase
         $config->setData('BMW');
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame('BMW', $car->engine);
     }
@@ -336,13 +334,13 @@ class DataMapperTest extends TestCase
         $article['publishedAt'] = $publishedAtValue;
         $propertyPath = new PropertyPath('[publishedAt]');
 
-        $config = new FormConfigBuilder('publishedAt', \get_class($publishedAt), $this->dispatcher);
+        $config = new FormConfigBuilder('publishedAt', $publishedAt::class, $this->dispatcher);
         $config->setByReference(false);
         $config->setPropertyPath($propertyPath);
         $config->setData($publishedAt);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $article);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $article);
 
         self::assertSame($publishedAtValue, $article['publishedAt']);
     }
@@ -367,7 +365,7 @@ class DataMapperTest extends TestCase
         ]);
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms($person, [$form]);
+        $this->mapper->mapDataToForms($person, new \ArrayIterator([$form]));
 
         self::assertSame($initialName, $form->getData());
     }
@@ -384,9 +382,36 @@ class DataMapperTest extends TestCase
         $config->setData('Jane Doe');
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $person);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $person);
 
         self::assertSame('Jane Doe', $person->myName());
+    }
+
+    public function testMapFormsToDataMapsDateTimeInstanceToArrayIfNotSetBefore()
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+        $form = (new FormFactoryBuilder())->getFormFactory()->createBuilder()
+            ->setDataMapper(new DataMapper(new PropertyPathAccessor($propertyAccessor)))
+            ->add('date', DateType::class, [
+                'auto_initialize' => false,
+                'format' => 'dd/MM/yyyy',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => 'UTC',
+                'widget' => 'single_text',
+            ])
+            ->getForm();
+
+        $form->submit([
+            'date' => '04/08/2022',
+        ]);
+
+        $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 }
 

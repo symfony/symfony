@@ -1,7 +1,7 @@
 {
     "name": "symfony/asset",
     "type": "library",
-    "description": "Symfony Asset Component",
+    "description": "Manages URL generation and versioning of web assets such as CSS stylesheets, JavaScript files and image files",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -16,15 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5"
+        "php": ">=8.1"
     },
     "suggest": {
         "symfony/http-foundation": ""
     },
     "require-dev": {
-        "symfony/http-client": "^4.4|^5.0",
-        "symfony/http-foundation": "^4.4|^5.0",
-        "symfony/http-kernel": "^4.4|^5.0"
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/http-foundation": "^5.4|^6.0",
+        "symfony/http-kernel": "^5.4|^6.0"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<5.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Asset\\": "" },
@@ -32,6 +35,5 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "version": "5.2.x-dev"
+    "minimum-stability": "dev"
 }

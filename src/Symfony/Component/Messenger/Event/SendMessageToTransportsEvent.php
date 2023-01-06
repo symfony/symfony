@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Event;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * Event is dispatched before a message is sent to the transport.
@@ -26,11 +27,14 @@ use Symfony\Component\Messenger\Envelope;
  */
 final class SendMessageToTransportsEvent
 {
-    private $envelope;
+    private Envelope $envelope;
 
-    public function __construct(Envelope $envelope)
+    private array $senders;
+
+    public function __construct(Envelope $envelope, array $senders)
     {
         $this->envelope = $envelope;
+        $this->senders = $senders;
     }
 
     public function getEnvelope(): Envelope
@@ -41,5 +45,13 @@ final class SendMessageToTransportsEvent
     public function setEnvelope(Envelope $envelope)
     {
         $this->envelope = $envelope;
+    }
+
+    /**
+     * @return array<string, SenderInterface>
+     */
+    public function getSenders(): array
+    {
+        return $this->senders;
     }
 }

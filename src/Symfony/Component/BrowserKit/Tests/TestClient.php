@@ -24,12 +24,12 @@ class TestClient extends AbstractBrowser
         $this->nextResponse = $response;
     }
 
-    public function setNextScript($script)
+    public function setNextScript(string $script)
     {
         $this->nextScript = $script;
     }
 
-    protected function doRequest($request): Response
+    protected function doRequest(object $request): Response
     {
         if (null === $this->nextResponse) {
             return new Response();
@@ -41,9 +41,9 @@ class TestClient extends AbstractBrowser
         return $response;
     }
 
-    protected function getScript($request)
+    protected function getScript(object $request)
     {
-        $r = new \ReflectionClass('Symfony\Component\BrowserKit\Response');
+        $r = new \ReflectionClass(Response::class);
         $path = $r->getFileName();
 
         return <<<EOF

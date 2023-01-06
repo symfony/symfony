@@ -41,29 +41,29 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [[new NumberComparator('< 1K'), new NumberComparator('> 0.5K')], $this->toAbsolute($lessThan1KGreaterThan05K)],
+            [[new NumberComparator('< 1K'), new NumberComparator('> 0.5K')], self::toAbsolute($lessThan1KGreaterThan05K)],
         ];
     }
 }
 
 class InnerSizeIterator extends \ArrayIterator
 {
-    public function current()
+    public function current(): \SplFileInfo
     {
         return new \SplFileInfo(parent::current());
     }
 
-    public function getFilename()
+    public function getFilename(): string
     {
         return parent::current();
     }
 
-    public function isFile()
+    public function isFile(): bool
     {
         return $this->current()->isFile();
     }
 
-    public function getSize()
+    public function getSize(): int
     {
         return $this->current()->getSize();
     }

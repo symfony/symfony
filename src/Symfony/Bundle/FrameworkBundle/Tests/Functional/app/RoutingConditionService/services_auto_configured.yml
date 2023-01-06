@@ -1,0 +1,13 @@
+services:
+
+  _defaults:
+    autoconfigure: true
+
+  Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\RoutingConditionServiceBundle\Service\AutoConfiguredService:
+
+  auto_configured_non_aliased:
+    class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\RoutingConditionServiceBundle\Service\AutoConfiguredNonAliasedService
+
+  Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\RoutingConditionServiceBundle\Service\FooOriginalService:
+
+  Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\RoutingConditionServiceBundle\Service\FooReplacementService:

@@ -11,53 +11,38 @@
 
 namespace Symfony\Component\Notifier\Bridge\Infobip\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
-final class InfobipTransportFactoryTest extends TestCase
+final class InfobipTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn(): void
+    public function createFactory(): InfobipTransportFactory
     {
-        $factory = new InfobipTransportFactory();
-
-        $dsn = 'infobip://authtoken@default?from=0611223344';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
-
-        $this->assertSame('infobip://host.test?from=0611223344', (string) $transport);
+        return new InfobipTransportFactory();
     }
 
-    public function testCreateWithNoFromThrowsMalformed(): void
+    public function createProvider(): iterable
     {
-        $factory = new InfobipTransportFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $dsnIncomplete = 'infobip://authtoken@default';
-        $factory->create(Dsn::fromString($dsnIncomplete));
+        yield [
+            'infobip://host.test?from=0611223344',
+            'infobip://authtoken@host.test?from=0611223344',
+        ];
     }
 
-    public function testSupportsInfobipScheme(): void
+    public function supportsProvider(): iterable
     {
-        $factory = new InfobipTransportFactory();
-
-        $dsn = 'infobip://authtoken@default?from=0611223344';
-        $dsnUnsupported = 'unsupported://authtoken@default?from=0611223344';
-
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
+        yield [true, 'infobip://authtoken@default?from=0611223344'];
+        yield [false, 'somethingElse://authtoken@default?from=0611223344'];
     }
 
-    public function testNonInfobipSchemeThrows(): void
+    public function missingRequiredOptionProvider(): iterable
     {
-        $factory = new InfobipTransportFactory();
+        yield 'missing option: from' => ['infobip://authtoken@default'];
+    }
 
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $dsnUnsupported = 'unsupported://authtoken@default?from=0611223344';
-        $factory->create(Dsn::fromString($dsnUnsupported));
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://authtoken@default?from=FROM'];
+        yield ['somethingElse://authtoken@default']; // missing "from" option
     }
 }

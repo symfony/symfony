@@ -25,26 +25,14 @@ final class PropertyInfoConstructorPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    private $service;
-    private $tag;
-
-    public function __construct(string $service = 'property_info.constructor_extractor', string $tag = 'property_info.constructor_extractor')
-    {
-        $this->service = $service;
-        $this->tag = $tag;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->service)) {
+        if (!$container->hasDefinition('property_info.constructor_extractor')) {
             return;
         }
-        $definition = $container->getDefinition($this->service);
+        $definition = $container->getDefinition('property_info.constructor_extractor');
 
-        $listExtractors = $this->findAndSortTaggedServices($this->tag, $container);
+        $listExtractors = $this->findAndSortTaggedServices('property_info.constructor_extractor', $container);
         $definition->replaceArgument(0, new IteratorArgument($listExtractors));
     }
 }

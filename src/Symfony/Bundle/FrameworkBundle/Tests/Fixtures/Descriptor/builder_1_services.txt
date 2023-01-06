@@ -7,5 +7,6 @@
  --------------- ------------------------ 
   .alias_2        alias for ".service_2"  
   .definition_2   Full\Qualified\Class2   
+  .definition_3   Full\Qualified\Class3   
  --------------- ------------------------
 

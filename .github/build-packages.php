@@ -1,21 +1,17 @@
 <?php
 
 if (3 > $_SERVER['argc']) {
-    echo "Usage: branch dir1 dir2 ... dirN\n";
+    echo "Usage: branch version dir1 dir2 ... dirN\n";
     exit(1);
 }
 chdir(dirname(__DIR__));
 
-$json = ltrim(file_get_contents('composer.json'));
-if ($json !== $package = preg_replace('/\n    "repositories": \[\n.*?\n    \],/s', '', $json)) {
-    file_put_contents('composer.json', $package);
-}
-
 $dirs = $_SERVER['argv'];
 array_shift($dirs);
 $mergeBase = trim(shell_exec(sprintf('git merge-base "%s" HEAD', array_shift($dirs))));
+$version = array_shift($dirs);
 
-$packages = array();
+$packages = [];
 $flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 $preferredInstall = json_decode(file_get_contents(__DIR__.'/composer-config.json'), true)['config']['preferred-install'];
 
@@ -35,12 +31,12 @@ foreach ($dirs as $k => $dir) {
         exit(1);
     }
 
-    $package->repositories = array(array(
+    $package->repositories = [[
         'type' => 'composer',
         'url' => 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)).'/',
-    ));
-    if (false === strpos($json, "\n    \"repositories\": [\n")) {
-        $json = rtrim(json_encode(array('repositories' => $package->repositories), $flags), "\n}").','.substr($json, 1);
+    ]];
+    if (!str_contains($json, "\n    \"repositories\": [\n")) {
+        $json = rtrim(json_encode(['repositories' => $package->repositories], $flags), "\n}").','.substr($json, 1);
         file_put_contents($dir.'/composer.json', $json);
     }
 
@@ -50,10 +46,7 @@ foreach ($dirs as $k => $dir) {
         passthru("cd $dir && git init && git add . && git commit -q -m - && git archive -o package.tar HEAD && rm .git/ -Rf");
     }
 
-    if (!isset($package->version)) {
-        echo "Missing \"version\" in composer.json.\n";
-        exit(1);
-    }
+    $package->version = preg_replace('/(?:\.x)?-dev$/', '', $package->extra->{'branch-alias'}->{'dev-main'} ?? $version).'.x-dev';
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 
@@ -62,10 +55,8 @@ foreach ($dirs as $k => $dir) {
     $versions = @file_get_contents('https://repo.packagist.org/p/'.$package->name.'.json') ?: sprintf('{"packages":{"%s":{"%s":%s}}}', $package->name, $package->version, file_get_contents($dir.'/composer.json'));
     $versions = json_decode($versions)->packages->{$package->name};
 
-    unset($versions->{'dev-master'});
-
     foreach ($versions as $v => $package) {
-        $packages[$package->name] += array($v => $package);
+        $packages[$package->name] += [$v => $package];
     }
 }
 
@@ -78,10 +69,12 @@ if ($dirs) {
         exit(1);
     }
 
-    $package->repositories = array(array(
+    $package->repositories[] = [
         'type' => 'composer',
         'url' => 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)).'/',
-    ));
-    $json = rtrim(json_encode(array('repositories' => $package->repositories), $flags), "\n}").','.substr($json, 1);
+    ];
+
+    $json = preg_replace('/\n    "repositories": \[\n.*?\n    \],/s', '', $json);
+    $json = rtrim(json_encode(['repositories' => $package->repositories], $flags), "\n}").','.substr($json, 1);
     file_put_contents('composer.json', $json);
 }

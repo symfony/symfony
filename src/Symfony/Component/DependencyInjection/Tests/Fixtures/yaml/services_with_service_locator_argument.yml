@@ -1,0 +1,28 @@
+
+services:
+    foo_service:
+        class: stdClass
+
+    bar_service:
+        class: stdClass
+
+    locator_dependent_service_indexed:
+        class: ArrayObject
+        arguments:
+            - !service_locator
+                'foo': '@foo_service'
+                'bar': '@bar_service'
+
+    locator_dependent_service_not_indexed:
+        class: ArrayObject
+        arguments:
+            - !service_locator
+                - '@foo_service'
+                - '@bar_service'
+
+    locator_dependent_service_mixed:
+        class: ArrayObject
+        arguments:
+            - !service_locator
+                'foo': '@foo_service'
+                '0': '@bar_service'

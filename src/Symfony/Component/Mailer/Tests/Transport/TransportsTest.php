@@ -64,4 +64,28 @@ class TransportsTest extends TestCase
         $this->expectExceptionMessage('The "foobar" transport does not exist (available transports: "foo", "bar").');
         $transport->send($email);
     }
+
+    public function testTransportRestoredAfterFailure()
+    {
+        $exception = new \Exception();
+
+        $fooTransport = $this->createMock(TransportInterface::class);
+        $fooTransport->method('send')
+            ->willThrowException($exception);
+
+        $transport = new Transports([
+            'foo' => $fooTransport,
+        ]);
+
+        $headers = (new Headers())->addTextHeader('X-Transport', 'foo');
+        $email = new Message($headers, new TextPart('...'));
+
+        $this->expectExceptionObject($exception);
+
+        try {
+            $transport->send($email);
+        } finally {
+            $this->assertSame('foo', $email->getHeaders()->getHeaderBody('X-Transport'));
+        }
+    }
 }

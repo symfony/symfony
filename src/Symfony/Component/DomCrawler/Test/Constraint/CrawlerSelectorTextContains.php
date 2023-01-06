@@ -16,8 +16,10 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class CrawlerSelectorTextContains extends Constraint
 {
-    private $selector;
-    private $expectedText;
+    private string $selector;
+    private string $expectedText;
+    private bool $hasNode = false;
+    private string $nodeText;
 
     public function __construct(string $selector, string $expectedText)
     {
@@ -25,36 +27,38 @@ final class CrawlerSelectorTextContains extends Constraint
         $this->expectedText = $expectedText;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
-        return sprintf('has a node matching selector "%s" with content containing "%s"', $this->selector, $this->expectedText);
+        if ($this->hasNode) {
+            return sprintf('the text "%s" of the node matching selector "%s" contains "%s"', $this->nodeText, $this->selector, $this->expectedText);
+        }
+
+        return sprintf('the Crawler has a node matching selector "%s"', $this->selector);
     }
 
     /**
      * @param Crawler $crawler
-     *
-     * {@inheritdoc}
      */
     protected function matches($crawler): bool
     {
         $crawler = $crawler->filter($this->selector);
         if (!\count($crawler)) {
+            $this->hasNode = false;
+
             return false;
         }
 
-        return false !== mb_strpos($crawler->text(null, true), $this->expectedText);
+        $this->hasNode = true;
+        $this->nodeText = $crawler->text(null, true);
+
+        return str_contains($this->nodeText, $this->expectedText);
     }
 
     /**
      * @param Crawler $crawler
-     *
-     * {@inheritdoc}
      */
     protected function failureDescription($crawler): string
     {
-        return 'the Crawler '.$this->toString();
+        return $this->toString();
     }
 }

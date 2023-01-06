@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Twig\Mime;
 
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Twig\Environment;
 
 /**
@@ -21,8 +23,8 @@ use Twig\Environment;
  */
 final class WrappedTemplatedEmail
 {
-    private $twig;
-    private $message;
+    private Environment $twig;
+    private TemplatedEmail $message;
 
     public function __construct(Environment $twig, TemplatedEmail $message)
     {
@@ -35,32 +37,39 @@ final class WrappedTemplatedEmail
         return $this->message->getTo()[0]->getName();
     }
 
+    /**
+     * @param string $image            A Twig path to the image file. It's recommended to define
+     *                                 some Twig namespace for email images (e.g. '@email/images/logo.png').
+     * @param string|null $contentType The media type (i.e. MIME type) of the image file (e.g. 'image/png').
+     *                                 Some email clients require this to display embedded images.
+     */
     public function image(string $image, string $contentType = null): string
     {
         $file = $this->twig->getLoader()->getSourceContext($image);
-        if ($path = $file->getPath()) {
-            $this->message->embedFromPath($path, $image, $contentType);
-        } else {
-            $this->message->embed($file->getCode(), $image, $contentType);
-        }
+        $body = $file->getPath() ? new File($file->getPath()) : $file->getCode();
+        $this->message->addPart((new DataPart($body, $image, $contentType))->asInline());
 
         return 'cid:'.$image;
     }
 
+    /**
+     * @param string $file             A Twig path to the file. It's recommended to define
+     *                                 some Twig namespace for email files (e.g. '@email/files/contract.pdf').
+     * @param string|null $name        A custom file name that overrides the original name of the attached file.
+     * @param string|null $contentType The media type (i.e. MIME type) of the file (e.g. 'application/pdf').
+     *                                 Some email clients require this to display attached files.
+     */
     public function attach(string $file, string $name = null, string $contentType = null): void
     {
         $file = $this->twig->getLoader()->getSourceContext($file);
-        if ($path = $file->getPath()) {
-            $this->message->attachFromPath($path, $name, $contentType);
-        } else {
-            $this->message->attach($file->getCode(), $name, $contentType);
-        }
+        $body = $file->getPath() ? new File($file->getPath()) : $file->getCode();
+        $this->message->addPart(new DataPart($body, $name, $contentType));
     }
 
     /**
      * @return $this
      */
-    public function setSubject(string $subject): self
+    public function setSubject(string $subject): static
     {
         $this->message->subject($subject);
 
@@ -75,7 +84,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function setReturnPath(string $address): self
+    public function setReturnPath(string $address): static
     {
         $this->message->returnPath($address);
 
@@ -90,7 +99,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addFrom(string $address, string $name = ''): self
+    public function addFrom(string $address, string $name = ''): static
     {
         $this->message->addFrom(new Address($address, $name));
 
@@ -108,7 +117,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addReplyTo(string $address): self
+    public function addReplyTo(string $address): static
     {
         $this->message->addReplyTo($address);
 
@@ -126,7 +135,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addTo(string $address, string $name = ''): self
+    public function addTo(string $address, string $name = ''): static
     {
         $this->message->addTo(new Address($address, $name));
 
@@ -144,7 +153,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addCc(string $address, string $name = ''): self
+    public function addCc(string $address, string $name = ''): static
     {
         $this->message->addCc(new Address($address, $name));
 
@@ -162,7 +171,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addBcc(string $address, string $name = ''): self
+    public function addBcc(string $address, string $name = ''): static
     {
         $this->message->addBcc(new Address($address, $name));
 
@@ -180,9 +189,9 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function setPriority(int $priority): self
+    public function setPriority(int $priority): static
     {
-        $this->message->setPriority($priority);
+        $this->message->priority($priority);
 
         return $this;
     }

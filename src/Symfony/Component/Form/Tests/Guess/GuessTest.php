@@ -31,7 +31,7 @@ class GuessTest extends TestCase
 
     public function testGuessExpectsValidConfidence()
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new TestGuess(5);
     }
 }

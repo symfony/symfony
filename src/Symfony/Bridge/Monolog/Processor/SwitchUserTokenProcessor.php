@@ -18,20 +18,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * Adds the original security token to the log entry.
  *
  * @author Igor Timoshenko <igor.timoshenko@i.ua>
+ *
+ * @final since Symfony 6.1
  */
 class SwitchUserTokenProcessor extends AbstractTokenProcessor
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getKey(): string
     {
         return 'impersonator_token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getToken(): ?TokenInterface
     {
         $token = $this->tokenStorage->getToken();

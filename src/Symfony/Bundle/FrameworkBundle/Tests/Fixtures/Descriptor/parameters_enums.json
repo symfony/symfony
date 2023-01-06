@@ -1,0 +1,17 @@
+{
+    "array_of_enums": [
+        "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\Suit::Hearts",
+        "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\Suit::Diamonds",
+        "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\Suit::Clubs",
+        "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\Suit::Spades"
+    ],
+    "backed_enum": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\Suit::Hearts",
+    "map": {
+        "mixed": [
+            "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\Suit::Hearts",
+            "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\FooUnitEnum::BAR"
+        ],
+        "single": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\FooUnitEnum::BAR"
+    },
+    "unit_enum": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\FooUnitEnum::BAR"
+}

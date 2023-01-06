@@ -26,13 +26,10 @@ class YamlFileLoader extends FileLoader
 {
     private $yamlParser;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function loadResource($resource)
+    protected function loadResource(string $resource): array
     {
         if (null === $this->yamlParser) {
-            if (!class_exists('Symfony\Component\Yaml\Parser')) {
+            if (!class_exists(\Symfony\Component\Yaml\Parser::class)) {
                 throw new LogicException('Loading translations from the YAML format requires the Symfony Yaml component.');
             }
 

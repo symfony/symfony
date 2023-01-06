@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 
-class DateTimeToTimestampTransformerTest extends TestCase
+class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTest
 {
     public function testTransform()
     {
@@ -72,7 +73,7 @@ class DateTimeToTimestampTransformerTest extends TestCase
     {
         $transformer = new DateTimeToTimestampTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
 
         $transformer->transform('1234');
     }
@@ -109,8 +110,13 @@ class DateTimeToTimestampTransformerTest extends TestCase
     {
         $reverseTransformer = new DateTimeToTimestampTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
+    }
+
+    protected function createDateTimeTransformer(string $inputTimezone = null, string $outputTimezone = null): BaseDateTimeTransformer
+    {
+        return new DateTimeToTimestampTransformer($inputTimezone, $outputTimezone);
     }
 }

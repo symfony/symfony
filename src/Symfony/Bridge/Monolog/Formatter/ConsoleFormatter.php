@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Formatter;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
@@ -24,13 +25,17 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  *
  * @author Tobias Schultze <http://tobion.de>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since Symfony 6.1
  */
 class ConsoleFormatter implements FormatterInterface
 {
-    const SIMPLE_FORMAT = "%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n";
-    const SIMPLE_DATE = 'H:i:s';
+    use CompatibilityFormatter;
 
-    private static $levelColorMap = [
+    public const SIMPLE_FORMAT = "%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n";
+    public const SIMPLE_DATE = 'H:i:s';
+
+    private const LEVEL_COLOR_MAP = [
         Logger::DEBUG => 'fg=white',
         Logger::INFO => 'fg=green',
         Logger::NOTICE => 'fg=blue',
@@ -41,10 +46,15 @@ class ConsoleFormatter implements FormatterInterface
         Logger::EMERGENCY => 'fg=white;bg=red',
     ];
 
-    private $options;
-    private $cloner;
+    private array $options;
+    private VarCloner $cloner;
+
+    /**
+     * @var resource|null
+     */
     private $outputBuffer;
-    private $dumper;
+
+    private CliDumper $dumper;
 
     /**
      * Available options:
@@ -67,24 +77,21 @@ class ConsoleFormatter implements FormatterInterface
         if (class_exists(VarCloner::class)) {
             $this->cloner = new VarCloner();
             $this->cloner->addCasters([
-                '*' => [$this, 'castObject'],
+                '*' => $this->castObject(...),
             ]);
 
-            $this->outputBuffer = fopen('php://memory', 'r+b');
+            $this->outputBuffer = fopen('php://memory', 'r+');
             if ($this->options['multiline']) {
                 $output = $this->outputBuffer;
             } else {
-                $output = [$this, 'echoLine'];
+                $output = $this->echoLine(...);
             }
 
             $this->dumper = new CliDumper($output, null, CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatBatch(array $records)
+    public function formatBatch(array $records): mixed
     {
         foreach ($records as $key => $record) {
             $records[$key] = $this->format($record);
@@ -93,14 +100,12 @@ class ConsoleFormatter implements FormatterInterface
         return $records;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function format(array $record)
+    private function doFormat(array|LogRecord $record): mixed
     {
+        if ($record instanceof LogRecord) {
+            $record = $record->toArray();
+        }
         $record = $this->replacePlaceHolder($record);
-
-        $levelColor = self::$levelColorMap[$record['level']];
 
         if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {
             $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['context']);
@@ -118,7 +123,7 @@ class ConsoleFormatter implements FormatterInterface
             '%datetime%' => $record['datetime'] instanceof \DateTimeInterface
                 ? $record['datetime']->format($this->options['date_format'])
                 : $record['datetime'],
-            '%start_tag%' => sprintf('<%s>', $levelColor),
+            '%start_tag%' => sprintf('<%s>', self::LEVEL_COLOR_MAP[$record['level']]),
             '%level_name%' => sprintf($this->options['level_name_format'], $record['level_name']),
             '%end_tag%' => '</>',
             '%channel%' => $record['channel'],
@@ -143,7 +148,7 @@ class ConsoleFormatter implements FormatterInterface
     /**
      * @internal
      */
-    public function castObject($v, array $a, Stub $s, bool $isNested): array
+    public function castObject(mixed $v, array $a, Stub $s, bool $isNested): array
     {
         if ($this->options['multiline']) {
             return $a;
@@ -161,7 +166,7 @@ class ConsoleFormatter implements FormatterInterface
     {
         $message = $record['message'];
 
-        if (false === strpos($message, '{')) {
+        if (!str_contains($message, '{')) {
             return $record;
         }
 
@@ -180,9 +185,9 @@ class ConsoleFormatter implements FormatterInterface
         return $record;
     }
 
-    private function dumpData($data, bool $colors = null): string
+    private function dumpData(mixed $data, bool $colors = null): string
     {
-        if (null === $this->dumper) {
+        if (!isset($this->dumper)) {
             return '';
         }
 

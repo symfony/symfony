@@ -19,6 +19,9 @@ use Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB;
  * @Symfony\Component\Validator\Tests\Fixtures\ConstraintA
  * @Assert\GroupSequence({"Foo", "Entity"})
  * @Assert\Callback({"Symfony\Component\Validator\Tests\Fixtures\CallbackClass", "callback"})
+ * @Assert\Sequentially({
+ *     @Assert\Expression("this.getFirstName() != null")
+ * })
  */
 class Entity extends EntityParent implements EntityInterfaceB
 {
@@ -29,9 +32,13 @@ class Entity extends EntityParent implements EntityInterfaceB
      * @Assert\All(constraints={@Assert\NotNull, @Assert\Range(min=3)})
      * @Assert\Collection(fields={
      *   "foo" = {@Assert\NotNull, @Assert\Range(min=3)},
-     *   "bar" = @Assert\Range(min=5)
-     * })
+     *   "bar" = @Assert\Range(min=5),
+     *   "baz" = @Assert\Required({@Assert\Email()}),
+     *   "qux" = @Assert\Optional({@Assert\NotBlank()})
+     * }, allowExtraFields=true)
      * @Assert\Choice(choices={"A", "B"}, message="Must be one of %choices%")
+     * @Assert\AtLeastOneOf({@Assert\NotNull, @Assert\Range(min=3)}, message="foo", includeInternalMessages=false)
+     * @Assert\Sequentially({@Assert\NotBlank, @Assert\Range(min=5)})
      */
     public $firstName;
     /**
@@ -116,10 +123,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     {
     }
 
-    /**
-     * @return mixed
-     */
-    public function getChildA()
+    public function getChildA(): mixed
     {
         return $this->childA;
     }
@@ -132,10 +136,7 @@ class Entity extends EntityParent implements EntityInterfaceB
         $this->childA = $childA;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getChildB()
+    public function getChildB(): mixed
     {
         return $this->childB;
     }

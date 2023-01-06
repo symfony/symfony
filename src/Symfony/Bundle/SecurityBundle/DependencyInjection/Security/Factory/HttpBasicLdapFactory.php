@@ -30,7 +30,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
 {
     use LdapFactoryTrait;
 
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $provider = 'security.authentication.provider.ldap_bind.'.$id;
         $definition = $container
@@ -45,7 +45,14 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         ;
 
         // entry point
-        $entryPointId = $this->registerEntryPoint($container, $id, $config, $defaultEntryPoint);
+        $entryPointId = $defaultEntryPoint;
+
+        if (null === $entryPointId) {
+            $entryPointId = 'security.authentication.basic_entry_point.'.$id;
+            $container
+                ->setDefinition($entryPointId, new ChildDefinition('security.authentication.basic_entry_point'))
+                ->addArgument($config['realm']);
+        }
 
         if (!empty($config['query_string'])) {
             if ('' === $config['search_dn'] || '' === $config['search_password']) {
@@ -76,10 +83,5 @@ class HttpBasicLdapFactory extends HttpBasicFactory
                 ->scalarNode('search_password')->defaultValue('')->end()
             ->end()
         ;
-    }
-
-    public function getKey()
-    {
-        return 'http-basic-ldap';
     }
 }

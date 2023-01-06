@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add a "role=img" and an explicit title in the .svg file used by the web debug toolbar
+   to improve accessibility with screen readers for blind users
+
+6.1
+---
+
+ * Add a download link in mailer profiler for email attachments
+
+5.4
+---
+
+ * Add a "preview" tab in mailer profiler for HTML email
+
 5.2.0
 -----
 
@@ -33,7 +49,7 @@ CHANGELOG
 -----
 
  * added information about orphaned events
- * made the toolbar auto-update with info from ajax reponses when they set the 
+ * made the toolbar auto-update with info from ajax reponses when they set the
    `Symfony-Debug-Toolbar-Replace header` to `1`
 
 4.0.0

@@ -40,29 +40,21 @@ abstract class AbstractSurrogate implements SurrogateInterface
 
     /**
      * Returns a new cache strategy instance.
-     *
-     * @return ResponseCacheStrategyInterface A ResponseCacheStrategyInterface instance
      */
-    public function createCacheStrategy()
+    public function createCacheStrategy(): ResponseCacheStrategyInterface
     {
         return new ResponseCacheStrategy();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasSurrogateCapability(Request $request)
+    public function hasSurrogateCapability(Request $request): bool
     {
         if (null === $value = $request->headers->get('Surrogate-Capability')) {
             return false;
         }
 
-        return false !== strpos($value, sprintf('%s/1.0', strtoupper($this->getName())));
+        return str_contains($value, sprintf('%s/1.0', strtoupper($this->getName())));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addSurrogateCapability(Request $request)
     {
         $current = $request->headers->get('Surrogate-Capability');
@@ -71,10 +63,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
         $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function needsParsing(Response $response)
+    public function needsParsing(Response $response): bool
     {
         if (!$control = $response->headers->get('Surrogate-Control')) {
             return false;
@@ -85,17 +74,14 @@ abstract class AbstractSurrogate implements SurrogateInterface
         return (bool) preg_match($pattern, $control);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(HttpCache $cache, string $uri, string $alt, bool $ignoreErrors)
+    public function handle(HttpCache $cache, string $uri, string $alt, bool $ignoreErrors): string
     {
         $subRequest = Request::create($uri, Request::METHOD_GET, [], $cache->getRequest()->cookies->all(), [], $cache->getRequest()->server->all());
 
         try {
             $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
 
-            if (!$response->isSuccessful()) {
+            if (!$response->isSuccessful() && Response::HTTP_NOT_MODIFIED !== $response->getStatusCode()) {
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %d).', $subRequest->getUri(), $response->getStatusCode()));
             }
 

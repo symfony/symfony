@@ -1,11 +1,33 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\String\Tests;
 
 use Symfony\Component\String\Exception\InvalidArgumentException;
 
 abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 {
+    public static function provideWidth(): array
+    {
+        return array_merge(
+            parent::provideWidth(),
+            [
+                [14, '<<<END
+This is a
+multiline text
+END'],
+            ]
+        );
+    }
+
     public function testCreateFromStringWithInvalidUtf8Input()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -37,9 +59,9 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
             ['*', [42]],
             ['AZ', [65, 90]],
             ['€', [8364]],
-            ['€', [0x20ac]],
+            ['€', [0x20AC]],
             ['Ʃ', [425]],
-            ['Ʃ', [0x1a9]],
+            ['Ʃ', [0x1A9]],
             ['☢☎❄', [0x2622, 0x260E, 0x2744]],
         ];
     }
@@ -60,6 +82,10 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
      */
     public function testCodePointsAt(array $expected, string $string, int $offset, int $form = null)
     {
+        if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
+            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+        }
+
         $instance = static::createFromString($string);
         $instance = $form ? $instance->normalize($form) : $instance;
 
@@ -406,8 +432,8 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
                 ['dé', 'jÀ', 'déjàdéjà', 0, true],
                 ['éjàdéjà', 'é', 'déjàdéjà', 0, false],
                 ['d', 'é', 'déjàdéjà', 0, true],
-                ['', 'Ç', 'déjàdéjà', 0, false],
-                ['', 'Ç', 'déjàdéjà', 0, true],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, false],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, true],
             ]
         );
     }
@@ -417,8 +443,8 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         return array_merge(
             parent::provideBeforeAfterLast(),
             [
-                ['', 'Ç', 'déjàdéjà', 0, false],
-                ['', 'Ç', 'déjàdéjà', 0, true],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, false],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, true],
                 ['éjà', 'é', 'déjàdéjà', 0, false],
                 ['déjàd', 'é', 'déjàdéjà', 0, true],
             ]
@@ -430,7 +456,7 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         return array_merge(
             parent::provideBeforeAfterLastIgnoreCase(),
             [
-                ['', 'Ç', 'déjàdéjà', 0, false],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, false],
                 ['éjà', 'é', 'déjàdéjà', 0, false],
                 ['éjà', 'É', 'déjàdéjà', 0, false],
             ]

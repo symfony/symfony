@@ -20,8 +20,8 @@ namespace Symfony\Component\Config\Resource;
  */
 class DirectoryResource implements SelfCheckingResourceInterface
 {
-    private $resource;
-    private $pattern;
+    private string $resource;
+    private ?string $pattern;
 
     /**
      * @param string      $resource The file path to the resource
@@ -31,41 +31,31 @@ class DirectoryResource implements SelfCheckingResourceInterface
      */
     public function __construct(string $resource, string $pattern = null)
     {
-        $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
+        $resolvedResource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
         $this->pattern = $pattern;
 
-        if (false === $this->resource || !is_dir($this->resource)) {
+        if (false === $resolvedResource || !is_dir($resolvedResource)) {
             throw new \InvalidArgumentException(sprintf('The directory "%s" does not exist.', $resource));
         }
+
+        $this->resource = $resolvedResource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         return md5(serialize([$this->resource, $this->pattern]));
     }
 
-    /**
-     * @return string The file path to the resource
-     */
     public function getResource(): string
     {
         return $this->resource;
     }
 
-    /**
-     * Returns the pattern to restrict monitored files.
-     */
     public function getPattern(): ?string
     {
         return $this->pattern;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFresh(int $timestamp): bool
     {
         if (!is_dir($this->resource)) {
@@ -84,14 +74,14 @@ class DirectoryResource implements SelfCheckingResourceInterface
 
             // always monitor directories for changes, except the .. entries
             // (otherwise deleted files wouldn't get detected)
-            if ($file->isDir() && '/..' === substr($file, -3)) {
+            if ($file->isDir() && str_ends_with($file, '/..')) {
                 continue;
             }
 
             // for broken links
             try {
                 $fileMTime = $file->getMTime();
-            } catch (\RuntimeException $e) {
+            } catch (\RuntimeException) {
                 continue;
             }
 

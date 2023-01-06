@@ -18,33 +18,24 @@ use Symfony\Component\DependencyInjection\Container;
  */
 class ContainerBag extends FrozenParameterBag implements ContainerBagInterface
 {
-    private $container;
+    private Container $container;
 
     public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function all()
+    public function all(): array
     {
         return $this->container->getParameterBag()->all();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function get($name)
+    public function get(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         return $this->container->getParameter($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function has($name)
+    public function has(string $name): bool
     {
         return $this->container->hasParameter($name);
     }

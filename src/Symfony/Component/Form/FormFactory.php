@@ -11,51 +11,39 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
 class FormFactory implements FormFactoryInterface
 {
-    private $registry;
+    private FormRegistryInterface $registry;
 
     public function __construct(FormRegistryInterface $registry)
     {
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function create(string $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
+    public function create(string $type = FormType::class, mixed $data = null, array $options = []): FormInterface
     {
         return $this->createBuilder($type, $data, $options)->getForm();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createNamed(string $name, string $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
+    public function createNamed(string $name, string $type = FormType::class, mixed $data = null, array $options = []): FormInterface
     {
         return $this->createNamedBuilder($name, $type, $data, $options)->getForm();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createForProperty(string $class, string $property, $data = null, array $options = [])
+    public function createForProperty(string $class, string $property, mixed $data = null, array $options = []): FormInterface
     {
         return $this->createBuilderForProperty($class, $property, $data, $options)->getForm();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createBuilder(string $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
+    public function createBuilder(string $type = FormType::class, mixed $data = null, array $options = []): FormBuilderInterface
     {
         return $this->createNamedBuilder($this->registry->getType($type)->getBlockPrefix(), $type, $data, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createNamedBuilder(string $name, string $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
+    public function createNamedBuilder(string $name, string $type = FormType::class, mixed $data = null, array $options = []): FormBuilderInterface
     {
         if (null !== $data && !\array_key_exists('data', $options)) {
             $options['data'] = $data;
@@ -63,7 +51,7 @@ class FormFactory implements FormFactoryInterface
 
         $type = $this->registry->getType($type);
 
-        $builder = $type->createBuilder($this, (string) $name, $options);
+        $builder = $type->createBuilder($this, $name, $options);
 
         // Explicitly call buildForm() in order to be able to override either
         // createBuilder() or buildForm() in the resolved form type
@@ -72,13 +60,10 @@ class FormFactory implements FormFactoryInterface
         return $builder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createBuilderForProperty(string $class, string $property, $data = null, array $options = [])
+    public function createBuilderForProperty(string $class, string $property, mixed $data = null, array $options = []): FormBuilderInterface
     {
         if (null === $guesser = $this->registry->getTypeGuesser()) {
-            return $this->createNamedBuilder($property, 'Symfony\Component\Form\Extension\Core\Type\TextType', $data, $options);
+            return $this->createNamedBuilder($property, TextType::class, $data, $options);
         }
 
         $typeGuess = $guesser->guessType($class, $property);
@@ -86,10 +71,10 @@ class FormFactory implements FormFactoryInterface
         $requiredGuess = $guesser->guessRequired($class, $property);
         $patternGuess = $guesser->guessPattern($class, $property);
 
-        $type = $typeGuess ? $typeGuess->getType() : 'Symfony\Component\Form\Extension\Core\Type\TextType';
+        $type = $typeGuess ? $typeGuess->getType() : TextType::class;
 
-        $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
-        $pattern = $patternGuess ? $patternGuess->getValue() : null;
+        $maxLength = $maxLengthGuess?->getValue();
+        $pattern = $patternGuess?->getValue();
 
         if (null !== $pattern) {
             $options = array_replace_recursive(['attr' => ['pattern' => $pattern]], $options);

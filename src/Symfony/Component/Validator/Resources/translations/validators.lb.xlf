@@ -35,12 +35,12 @@
                 <target>Een oder méi vun de Wäerter ass ongëlteg.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>D'Felder {{ fields }} goufen net erwaart.</target>
+                <source>This field was not expected.</source>
+                <target>D'Feld gouf net erwaart.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>D'Felder {{ fields }} feelen.</target>
+                <source>This field is missing.</source>
+                <target>D'Feld feelt.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -333,6 +333,58 @@
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
                 <target>Dëse Wäert sollt gëlteg JSON.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Dës Sammlung sollt just eenzegaarteg Elementer enthalen.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Dëse Wäert sollt positiv sinn.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Dëse Wäert sollt entweeder positiv oder null sinn.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Dëse Wäert sollt negativ sinn.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Dëse Wäert sollt entweeder negativ oder null sinn.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Dëse Wäert ass keng gëlteg Zäitzon.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Dëst Passwuert war Deel vun engem Dateleck an dierf net benotzt ginn. Benotzt w.e.g. en anert Passwuert .</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>De Wäert sollt tëscht {{ min }} a(n) {{ max }} leien.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Dëse Wäert ass kee gëltegen Hostnumm.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>D'Unzuel un Elementer an dëser Sammlung sollt e multipel vu(n) {{ compared_value }} sinn.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Dëse Wäert sollt op d'mannst ee vun dësen Aschränkungen erfëllen:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>All Element aus dëser Sammlung sollt seng eegen Aschränkungen erfëllen.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Dëse Wäert ass keng gëlteg International Wäertpabeiererkennnummer (ISIN).</target>
             </trans-unit>
         </body>
     </file>

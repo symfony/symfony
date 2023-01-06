@@ -27,13 +27,14 @@ use Symfony\Component\Ldap\Security\LdapAuthenticator;
  */
 trait LdapFactoryTrait
 {
+    public function getKey(): string
+    {
+        return parent::getKey().'-ldap';
+    }
+
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         $key = str_replace('-', '_', $this->getKey());
-        if (!class_exists(LdapAuthenticator::class)) {
-            throw new \LogicException(sprintf('The "%s" authenticator requires the "symfony/ldap" package version "5.1" or higher.', $key));
-        }
-
         $authenticatorId = parent::createAuthenticator($container, $firewallName, $config, $userProviderId);
 
         $container->setDefinition('security.listener.'.$key.'.'.$firewallName, new Definition(CheckLdapCredentialsListener::class))

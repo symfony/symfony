@@ -1,0 +1,44 @@
+name: 🐛 Bug Report
+description: ⚠️ NEVER report security issues, read https://symfony.com/security instead
+labels: Bug
+
+body:
+    - type: input
+      id: affected-versions
+      attributes:
+          label: Symfony version(s) affected
+          placeholder: x.y.z
+      validations:
+          required: true
+    - type: textarea
+      id: description
+      attributes:
+          label: Description
+          description: A clear and concise description of the problem
+      validations:
+          required: true
+    - type: textarea
+      id: how-to-reproduce
+      attributes:
+          label: How to reproduce
+          description: |
+            ⚠️  This is the most important part of the report ⚠️
+            Without a way to easily reproduce your issue, there is little chance we will be able to help you and work on a fix.
+            Please, take the time to show us some code and/or config that is needed for others to reproduce the problem easily.
+            Most of the time, creating a "bug reproducer" as explained in the URL below is the best way to help us
+            and increases the chances someone will have a look at it:
+            https://symfony.com/doc/current/contributing/code/reproducer.html
+      validations:
+          required: true
+    - type: textarea
+      id: possible-solution
+      attributes:
+          label: Possible Solution
+          description: |
+            Optional: only if you have suggestions on a fix/reason for the bug
+            Don't hesitate to create a pull request with your solution, it helps get faster feedback.
+    - type: textarea
+      id: additional-context
+      attributes:
+          label: Additional Context
+          description: "Optional: any other context about the problem: log messages, screenshots, etc."

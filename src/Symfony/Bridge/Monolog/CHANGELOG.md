@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add support for Monolog 3
+
+6.0
+---
+
+ * The `$actionLevel` constructor argument of `NotFoundActivationStrategy` has been replaced by the `$inner` one which expects an `ActivationStrategyInterface` to decorate instead
+ * The `$actionLevel` constructor argument of `HttpCodeActivationStrategy` has been replaced by the `$inner` one which expects an `ActivationStrategyInterface` to decorate instead
+ * Remove `ResetLoggersWorkerSubscriber` in favor of "reset_on_message" option in messenger configuration
+ * Remove `SwiftMailerHandler`, use `MailerHandler` instead
+
+5.4
+---
+
+ * Deprecate `ResetLoggersWorkerSubscriber` to reset buffered logs in messenger
+   workers, use "reset_on_message" option in messenger configuration instead.
+
+5.3
+---
+
+ * Add `ResetLoggersWorkerSubscriber` to reset buffered logs in messenger workers
+
 5.2.0
 -----
 
@@ -21,9 +45,9 @@ CHANGELOG
 4.4.0
 -----
 
-* The `RouteProcessor` class has been made final
-* Added `ElasticsearchLogstashHandler`
-* Added the `ServerLogCommand`. Backport from the deprecated WebServerBundle
+ * The `RouteProcessor` class has been made final
+ * Added `ElasticsearchLogstashHandler`
+ * Added the `ServerLogCommand`. Backport from the deprecated WebServerBundle
 
 4.3.0
 -----

@@ -17,6 +17,8 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 
 class SortFirewallListenersPassTest extends TestCase
@@ -59,6 +61,14 @@ class SortFirewallListenersPassTest extends TestCase
 
 class FirewallListenerPriorityMinus1 implements FirewallListenerInterface
 {
+    public function supports(Request $request): ?bool
+    {
+    }
+
+    public function authenticate(RequestEvent $event)
+    {
+    }
+
     public static function getPriority(): int
     {
         return -1;
@@ -67,6 +77,14 @@ class FirewallListenerPriorityMinus1 implements FirewallListenerInterface
 
 class FirewallListenerPriority1 implements FirewallListenerInterface
 {
+    public function supports(Request $request): ?bool
+    {
+    }
+
+    public function authenticate(RequestEvent $event)
+    {
+    }
+
     public static function getPriority(): int
     {
         return 1;
@@ -75,6 +93,14 @@ class FirewallListenerPriority1 implements FirewallListenerInterface
 
 class FirewallListenerPriority2 implements FirewallListenerInterface
 {
+    public function supports(Request $request): ?bool
+    {
+    }
+
+    public function authenticate(RequestEvent $event)
+    {
+    }
+
     public static function getPriority(): int
     {
         return 2;

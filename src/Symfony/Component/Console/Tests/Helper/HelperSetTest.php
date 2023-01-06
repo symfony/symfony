@@ -12,7 +12,8 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 
 class HelperSetTest extends TestCase
@@ -66,33 +67,10 @@ class HelperSetTest extends TestCase
             $helperset->get('foo');
             $this->fail('->get() throws InvalidArgumentException when helper not found');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws InvalidArgumentException when helper not found');
-            $this->assertInstanceOf('Symfony\Component\Console\Exception\ExceptionInterface', $e, '->get() throws domain specific exception when helper not found');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->get() throws InvalidArgumentException when helper not found');
+            $this->assertInstanceOf(ExceptionInterface::class, $e, '->get() throws domain specific exception when helper not found');
             $this->assertStringContainsString('The helper "foo" is not defined.', $e->getMessage(), '->get() throws InvalidArgumentException when helper not found');
         }
-    }
-
-    public function testSetCommand()
-    {
-        $cmd_01 = new Command('foo');
-        $cmd_02 = new Command('bar');
-
-        $helperset = new HelperSet();
-        $helperset->setCommand($cmd_01);
-        $this->assertEquals($cmd_01, $helperset->getCommand(), '->setCommand() stores given command');
-
-        $helperset = new HelperSet();
-        $helperset->setCommand($cmd_01);
-        $helperset->setCommand($cmd_02);
-        $this->assertEquals($cmd_02, $helperset->getCommand(), '->setCommand() overwrites stored command with consecutive calls');
-    }
-
-    public function testGetCommand()
-    {
-        $cmd = new Command('foo');
-        $helperset = new HelperSet();
-        $helperset->setCommand($cmd);
-        $this->assertEquals($cmd, $helperset->getCommand(), '->getCommand() retrieves stored command');
     }
 
     public function testIteration()
@@ -111,7 +89,7 @@ class HelperSetTest extends TestCase
 
     private function getGenericMockHelper($name, HelperSet $helperset = null)
     {
-        $mock_helper = $this->getMockBuilder('\Symfony\Component\Console\Helper\HelperInterface')->getMock();
+        $mock_helper = $this->createMock(HelperInterface::class);
         $mock_helper->expects($this->any())
             ->method('getName')
             ->willReturn($name);

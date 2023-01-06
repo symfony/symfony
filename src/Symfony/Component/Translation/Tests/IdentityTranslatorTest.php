@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Tests;
 
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Contracts\Translation\Test\TranslatorTest;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IdentityTranslatorTest extends TranslatorTest
 {
@@ -23,6 +24,7 @@ class IdentityTranslatorTest extends TranslatorTest
         parent::setUp();
 
         $this->defaultLocale = \Locale::getDefault();
+        \Locale::setDefault('en');
     }
 
     protected function tearDown(): void
@@ -32,7 +34,7 @@ class IdentityTranslatorTest extends TranslatorTest
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return new IdentityTranslator();
     }

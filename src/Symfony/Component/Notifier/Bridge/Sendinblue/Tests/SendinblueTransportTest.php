@@ -11,42 +11,40 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class SendinblueTransportTest extends TestCase
+final class SendinblueTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties(): void
+    public function createTransport(HttpClientInterface $client = null): SendinblueTransport
     {
-        $transport = $this->initTransport();
-
-        $this->assertSame('sendinblue://host.test?sender=0611223344', (string) $transport);
+        return (new SendinblueTransport('api-key', '0611223344', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
-    public function testSupportsMessageInterface(): void
+    public function toStringProvider(): iterable
     {
-        $transport = $this->initTransport();
-
-        $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class), 'Hello!'));
+        yield ['sendinblue://host.test?sender=0611223344', $this->createTransport()];
     }
 
-    public function testSendNonSmsMessageThrowsException(): void
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->initTransport();
-
-        $this->expectException(LogicException::class);
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function unsupportedMessagesProvider(): iterable
+    {
+        yield [new ChatMessage('Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
+    }
+
+    public function testSendWithErrorResponseThrowsTransportException()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
@@ -60,17 +58,11 @@ final class SendinblueTransportTest extends TestCase
             return $response;
         });
 
-        $transport = $this->initTransport($client);
+        $transport = $this->createTransport($client);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to send the SMS: bad request');
-        $transport->send(new SmsMessage('phone', 'testMessage'));
-    }
 
-    private function initTransport(?HttpClientInterface $client = null): SendinblueTransport
-    {
-        return (new SendinblueTransport(
-            'api-key', '0611223344', $client ?: $this->createMock(HttpClientInterface::class)
-        ))->setHost('host.test');
+        $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 }

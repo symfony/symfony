@@ -6,7 +6,7 @@ $test =  realpath(__DIR__.'/FailTests/ExpectDeprecationTraitTestFail.php');
 passthru('php '.getenv('SYMFONY_SIMPLE_PHPUNIT_BIN_DIR').'/simple-phpunit.php --colors=never '.$test);
 ?>
 --EXPECTF--
-PHPUnit %s by Sebastian Bergmann and contributors.
+PHPUnit %s
 
 %ATesting Symfony\Bridge\PhpUnit\Tests\FailTests\ExpectDeprecationTraitTestFail
 FF                                                                  2 / 2 (100%)

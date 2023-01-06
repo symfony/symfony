@@ -3,8 +3,8 @@
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -15,11 +15,13 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     protected $parameters = [];
-    protected $getService;
+    protected readonly \WeakReference $ref;
+    protected \Closure $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable([$this, 'getService']);
+        $containerRef = $this->ref = \WeakReference::create($this);
+        $this->getService = static function () use ($containerRef) { return $containerRef->get()->getService(...\func_get_args()); };
         $this->services = $this->privates = [];
         $this->methodMap = [
             'bar' => 'getBarService',
@@ -43,8 +45,6 @@ class ProjectServiceContainer extends Container
     {
         return [
             '.service_locator.mtT6G8y' => true,
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo' => true,
         ];
     }
@@ -54,9 +54,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected static function getBarService($container)
     {
-        return $this->services['bar'] = new \stdClass((new \stdClass()), (new \stdClass()));
+        return $container->services['bar'] = new \stdClass((new \stdClass()), (new \stdClass()));
     }
 
     /**
@@ -64,9 +64,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBazService()
+    protected static function getBazService($container)
     {
-        return $this->services['baz'] = new \stdClass(new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($this->getService, [
+        return $container->services['baz'] = new \stdClass(new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService, [
             'foo' => [false, 'foo', 'getFooService', false],
         ], [
             'foo' => '?',
@@ -78,12 +78,12 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getFooService()
+    protected static function getFooService($container)
     {
-        $this->factories['service_container']['foo'] = function () {
+        $container->factories['service_container']['foo'] = static function ($container) {
             return new \stdClass();
         };
 
-        return $this->factories['service_container']['foo']();
+        return $container->factories['service_container']['foo']($container);
     }
 }

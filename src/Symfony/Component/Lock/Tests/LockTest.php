@@ -12,14 +12,18 @@
 namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\BlockingSharedLockStoreInterface;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockStoreInterface;
+use Symfony\Component\Lock\Store\ExpiringStoreTrait;
+use Symfony\Component\Lock\Store\InMemoryStore;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -29,7 +33,7 @@ class LockTest extends TestCase
     public function testAcquireNoBlocking()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -45,7 +49,7 @@ class LockTest extends TestCase
     public function testAcquireNoBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -61,7 +65,7 @@ class LockTest extends TestCase
     public function testAcquireBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -77,7 +81,7 @@ class LockTest extends TestCase
     public function testAcquireBlockingRetryWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -99,7 +103,7 @@ class LockTest extends TestCase
     public function testAcquireReturnsFalse()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -116,7 +120,7 @@ class LockTest extends TestCase
     public function testAcquireReturnsFalseStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -152,7 +156,7 @@ class LockTest extends TestCase
     public function testAcquireSetsTtl()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -172,7 +176,7 @@ class LockTest extends TestCase
     public function testRefresh()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -189,7 +193,7 @@ class LockTest extends TestCase
     public function testRefreshCustom()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -206,7 +210,7 @@ class LockTest extends TestCase
     public function testIsAquired()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -220,7 +224,7 @@ class LockTest extends TestCase
     public function testRelease()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -240,7 +244,7 @@ class LockTest extends TestCase
     public function testReleaseStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -297,9 +301,9 @@ class LockTest extends TestCase
 
     public function testReleaseThrowsExceptionWhenDeletionFail()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\LockReleasingException');
+        $this->expectException(LockReleasingException::class);
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -318,9 +322,9 @@ class LockTest extends TestCase
 
     public function testReleaseThrowsExceptionIfNotWellDeleted()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\LockReleasingException');
+        $this->expectException(LockReleasingException::class);
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -339,10 +343,10 @@ class LockTest extends TestCase
 
     public function testReleaseThrowsAndLog()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\LockReleasingException');
+        $this->expectException(LockReleasingException::class);
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
-        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
         $lock = new Lock($key, $store, 10, true);
         $lock->setLogger($logger);
 
@@ -364,13 +368,41 @@ class LockTest extends TestCase
         $lock->release();
     }
 
+    public function testSuccessReleaseLog()
+    {
+        $key = new Key((string) random_int(100, 1000));
+        $store = new InMemoryStore();
+        $logger = new class() extends AbstractLogger {
+            private array $logs = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->logs[] = [
+                    $level,
+                    (string) $message,
+                    $context,
+                ];
+            }
+
+            public function logs(): array
+            {
+                return $this->logs;
+            }
+        };
+        $lock = new Lock($key, $store, 10, true);
+        $lock->setLogger($logger);
+        $lock->release();
+
+        $this->assertSame([['debug', 'Successfully released the "{resource}" lock.', ['resource' => $key]]], $logger->logs());
+    }
+
     /**
      * @dataProvider provideExpiredDates
      */
     public function testExpiration($ttls, $expected)
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         foreach ($ttls as $ttl) {
@@ -389,7 +421,7 @@ class LockTest extends TestCase
     public function testExpirationStoreInterface($ttls, $expected)
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         foreach ($ttls as $ttl) {
@@ -427,6 +459,98 @@ class LockTest extends TestCase
             ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertTrue($lock->acquireRead(false));
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testAcquireReadTwiceWithExpiration()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = new class() implements PersistingStoreInterface {
+            use ExpiringStoreTrait;
+            private $keys = [];
+            private $initialTtl = 30;
+
+            public function save(Key $key)
+            {
+                $key->reduceLifetime($this->initialTtl);
+                $this->keys[spl_object_hash($key)] = $key;
+                $this->checkNotExpired($key);
+
+                return true;
+            }
+
+            public function delete(Key $key)
+            {
+                unset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function exists(Key $key): bool
+            {
+                return isset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function putOffExpiration(Key $key, $ttl)
+            {
+                $key->reduceLifetime($ttl);
+                $this->checkNotExpired($key);
+            }
+        };
+        $ttl = 1;
+        $lock = new Lock($key, $store, $ttl);
+
+        $this->assertTrue($lock->acquireRead());
+        $lock->release();
+        sleep($ttl + 1);
+        $this->assertTrue($lock->acquireRead());
+        $lock->release();
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testAcquireTwiceWithExpiration()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = new class() implements PersistingStoreInterface {
+            use ExpiringStoreTrait;
+            private $keys = [];
+            private $initialTtl = 30;
+
+            public function save(Key $key)
+            {
+                $key->reduceLifetime($this->initialTtl);
+                $this->keys[spl_object_hash($key)] = $key;
+                $this->checkNotExpired($key);
+
+                return true;
+            }
+
+            public function delete(Key $key)
+            {
+                unset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function exists(Key $key): bool
+            {
+                return isset($this->keys[spl_object_hash($key)]);
+            }
+
+            public function putOffExpiration(Key $key, $ttl)
+            {
+                $key->reduceLifetime($ttl);
+                $this->checkNotExpired($key);
+            }
+        };
+        $ttl = 1;
+        $lock = new Lock($key, $store, $ttl);
+
+        $this->assertTrue($lock->acquire());
+        $lock->release();
+        sleep($ttl + 1);
+        $this->assertTrue($lock->acquire());
+        $lock->release();
     }
 
     public function testAcquireReadBlockingWithBlockingSharedLockStoreInterface()

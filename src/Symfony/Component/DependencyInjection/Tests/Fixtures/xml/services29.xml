@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+    <imports>
+        <import resource="services30.xml"/>
+    </imports>
+
+    <parameters>
+        <parameter key="root_parameter">default value</parameter>
+    </parameters>
+
+    <when env="dev">
+        <parameters>
+            <parameter key="root_parameter">value when on dev</parameter>
+        </parameters>
+    </when>
+
+    <when env="test">
+        <parameters>
+            <parameter key="root_parameter">value when on test</parameter>
+        </parameters>
+    </when>
+
+    <when env="prod">
+        <parameters>
+            <parameter key="root_parameter">value when on prod</parameter>
+        </parameters>
+    </when>
+</container>

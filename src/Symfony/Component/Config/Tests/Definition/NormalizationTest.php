@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\NodeInterface;
 
 class NormalizationTest extends TestCase
@@ -50,7 +51,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $denormalized, $normalized);
     }
 
-    public function getEncoderTests()
+    public function getEncoderTests(): array
     {
         $configs = [];
 
@@ -119,7 +120,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $denormalized, $normalized);
     }
 
-    public function getAnonymousKeysTests()
+    public function getAnonymousKeysTests(): array
     {
         $configs = [];
 
@@ -150,7 +151,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, $normalized);
     }
 
-    public function getNumericKeysTests()
+    public function getNumericKeysTests(): array
     {
         $configs = [];
 
@@ -171,7 +172,7 @@ class NormalizationTest extends TestCase
 
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
         $denormalized = [
             'thing' => [
@@ -201,15 +202,40 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $data, $data);
     }
 
+    public function testFloatLikeValueAsMapKeyAttribute()
+    {
+        $tree = (new TreeBuilder('root'))
+            ->getRootNode()
+                ->useAttributeAsKey('number')
+                ->arrayPrototype()
+                    ->children()
+                        ->scalarNode('foo')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $this->assertNormalized($tree, [
+            [
+                'number' => 3.0,
+                'foo' => 'bar',
+            ],
+        ], [
+            '3.0' => [
+                'foo' => 'bar',
+            ],
+        ]);
+    }
+
     public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized)
     {
         self::assertSame($normalized, $tree->normalize($denormalized));
     }
 
-    private function getNumericKeysTestTree()
+    private function getNumericKeysTestTree(): NodeInterface
     {
-        $tb = new TreeBuilder('root', 'array');
-        $tree = $tb
+        return (new TreeBuilder('root', 'array'))
             ->getRootNode()
                 ->children()
                     ->node('thing', 'array')
@@ -220,9 +246,6 @@ class NormalizationTest extends TestCase
                     ->end()
                 ->end()
             ->end()
-            ->buildTree()
-        ;
-
-        return $tree;
+            ->buildTree();
     }
 }

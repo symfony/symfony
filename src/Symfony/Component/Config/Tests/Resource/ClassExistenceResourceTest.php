@@ -85,7 +85,7 @@ EOF
 
     public function testBadParentWithNoTimestamp()
     {
-        $this->expectException('ReflectionException');
+        $this->expectException(\ReflectionException::class);
         $this->expectExceptionMessage('Class "Symfony\Component\Config\Tests\Fixtures\MissingParent" not found while loading "Symfony\Component\Config\Tests\Fixtures\BadParent".');
 
         $res = new ClassExistenceResource(BadParent::class, false);
@@ -94,7 +94,7 @@ EOF
 
     public function testBadFileName()
     {
-        $this->expectException('ReflectionException');
+        $this->expectException(\ReflectionException::class);
         $this->expectExceptionMessage('Mismatch between file name and class name.');
 
         $res = new ClassExistenceResource(BadFileName::class, false);
@@ -103,7 +103,7 @@ EOF
 
     public function testBadFileNameBis()
     {
-        $this->expectException('ReflectionException');
+        $this->expectException(\ReflectionException::class);
         $this->expectExceptionMessage('Mismatch between file name and class name.');
 
         $res = new ClassExistenceResource(BadFileName::class, false);
@@ -119,7 +119,7 @@ EOF
 
     public function testParseError()
     {
-        $this->expectException('ParseError');
+        $this->expectException(\ParseError::class);
 
         $res = new ClassExistenceResource(ParseError::class, false);
         $res->isFresh(0);

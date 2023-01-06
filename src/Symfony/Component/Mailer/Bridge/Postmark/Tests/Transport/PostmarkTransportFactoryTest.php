@@ -69,6 +69,11 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('postmark+api', 'example.com', self::USER, '', 8080, ['message_stream' => 'broadcasts']),
+            (new PostmarkApiTransport(self::USER, $this->getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080)->setMessageStream('broadcasts'),
+        ];
+
+        yield [
             new Dsn('postmark', 'default', self::USER),
             new PostmarkSmtpTransport(self::USER, $dispatcher, $logger),
         ];
@@ -81,6 +86,11 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         yield [
             new Dsn('postmark+smtps', 'default', self::USER),
             new PostmarkSmtpTransport(self::USER, $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('postmark+smtps', 'default', self::USER, null, null, ['message_stream' => 'broadcasts']),
+            (new PostmarkSmtpTransport(self::USER, $dispatcher, $logger))->setMessageStream('broadcasts'),
         ];
     }
 

@@ -26,10 +26,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class IssnValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Issn) {
             throw new UnexpectedTypeException($constraint, Issn::class);
@@ -39,7 +36,7 @@ class IssnValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -114,10 +111,7 @@ class IssnValidator extends ConstraintValidator
         }
 
         // Calculate a checksum. "X" equals 10.
-        $checkSum = 'X' === $canonical[7]
-        || 'x' === $canonical[7]
-        ? 10
-            : $canonical[7];
+        $checkSum = 'X' === $canonical[7] || 'x' === $canonical[7] ? 10 : $canonical[7];
 
         for ($i = 0; $i < 7; ++$i) {
             // Multiply the first digit by 8, the second by 7, etc.

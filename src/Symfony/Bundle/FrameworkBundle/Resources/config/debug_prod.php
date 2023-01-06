@@ -25,7 +25,6 @@ return static function (ContainerConfigurator $container) {
                 null, // Log levels map for enabled error levels
                 param('debug.error_handler.throw_at'),
                 param('kernel.debug'),
-                service('debug.file_link_formatter'),
                 param('kernel.debug'),
                 service('monolog.logger.deprecation')->nullOnInvalid(),
             ])

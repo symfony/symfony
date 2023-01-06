@@ -81,6 +81,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
                     ],
                 ],
                 'choice_translation_domain' => 'forms',
+                'label_format' => 'label format for field "%name%" with id "%id%"',
             ])
             ->add('choice_multiple', ChoiceType::class, [
                 'choices' => [
@@ -89,6 +90,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
                 ],
                 'multiple' => true,
                 'expanded' => true,
+                'label' => false,
             ])
             ->getForm()
         ;
@@ -119,6 +121,21 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
     public function testFieldTranslatedLabel()
     {
         $this->assertSame('[trans]base.username[/trans]', $this->translatorExtension->getFieldLabel($this->view->children['username']));
+    }
+
+    public function testFieldLabelFromFormat()
+    {
+        $this->assertSame('label format for field "choice_grouped" with id "register_choice_grouped"', $this->rawExtension->getFieldLabel($this->view->children['choice_grouped']));
+    }
+
+    public function testFieldLabelFallsBackToName()
+    {
+        $this->assertSame('Choice flat', $this->rawExtension->getFieldLabel($this->view->children['choice_flat']));
+    }
+
+    public function testFieldLabelReturnsNullWhenLabelIsDisabled()
+    {
+        $this->assertNull($this->rawExtension->getFieldLabel($this->view->children['choice_multiple']));
     }
 
     public function testFieldHelp()

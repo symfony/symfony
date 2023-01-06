@@ -16,13 +16,20 @@ use Symfony\Component\Form\FormInterface;
 
 class DateTimeTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
+
+    private $defaultLocale;
 
     protected function setUp(): void
     {
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
-
         parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function testSubmitDateTime()
@@ -323,7 +330,7 @@ class DateTimeTypeTest extends BaseTypeTest
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->create(static::TESTED_TYPE, new \DateTime()));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
@@ -516,7 +523,6 @@ class DateTimeTypeTest extends BaseTypeTest
     public function testSingleTextWidgetWithCustomNonHtml5Format()
     {
         $form = $this->factory->create(static::TESTED_TYPE, new \DateTime('2019-02-13 19:12:13'), [
-            'html5' => false,
             'widget' => 'single_text',
             'date_format' => \IntlDateFormatter::SHORT,
             'format' => null,
@@ -717,7 +723,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ];
     }
 
-    public function testSubmitStringWithCustomInputFormat(): void
+    public function testSubmitStringWithCustomInputFormat()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'UTC',

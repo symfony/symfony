@@ -23,8 +23,6 @@ use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 /**
  * Semaphore is the default implementation of the SemaphoreInterface.
  *
- * @experimental in 5.2
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
@@ -48,6 +46,16 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
+    public function __sleep(): array
+    {
+        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+    }
+
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+    }
+
     /**
      * Automatically releases the underlying semaphore when the object is destructed.
      */
@@ -60,12 +68,10 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         $this->release();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function acquire(): bool
     {
         try {
+            $this->key->resetLifetime();
             $this->store->save($this->key, $this->ttlInSecond);
             $this->key->reduceLifetime($this->ttlInSecond);
             $this->dirty = true;
@@ -73,7 +79,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
             $this->logger->debug('Successfully acquired the "{resource}" semaphore.', ['resource' => $this->key]);
 
             return true;
-        } catch (SemaphoreAcquiringException $e) {
+        } catch (SemaphoreAcquiringException) {
             $this->logger->notice('Failed to acquire the "{resource}" semaphore. Someone else already acquired the semaphore.', ['resource' => $this->key]);
 
             return false;
@@ -84,19 +90,14 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function refresh(?float $ttlInSecond = null)
+    public function refresh(float $ttlInSecond = null)
     {
-        if (null === $ttlInSecond) {
-            $ttlInSecond = $this->ttlInSecond;
-        }
-        if (!$ttlInSecond) {
+        if (!$ttlInSecond ??= $this->ttlInSecond) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
         }
 
         try {
+            $this->key->resetLifetime();
             $this->store->putOffExpiration($this->key, $ttlInSecond);
             $this->key->reduceLifetime($ttlInSecond);
 
@@ -115,17 +116,11 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAcquired(): bool
     {
         return $this->dirty = $this->store->exists($this->key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function release()
     {
         try {
@@ -140,17 +135,11 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isExpired(): bool
     {
         return $this->key->isExpired();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRemainingLifetime(): ?float
     {
         return $this->key->getRemainingLifetime();

@@ -17,7 +17,7 @@ namespace Symfony\Component\ExpressionLanguage;
 interface ExpressionFunctionProviderInterface
 {
     /**
-     * @return ExpressionFunction[] An array of Function instances
+     * @return ExpressionFunction[]
      */
     public function getFunctions();
 }

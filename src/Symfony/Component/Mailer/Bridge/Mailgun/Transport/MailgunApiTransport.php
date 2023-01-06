@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -20,7 +21,8 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -31,9 +33,9 @@ class MailgunApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.%region_dot%mailgun.net';
 
-    private $key;
-    private $domain;
-    private $region;
+    private string $key;
+    private string $domain;
+    private ?string $region;
 
     public function __construct(string $key, string $domain, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
@@ -64,17 +66,19 @@ class MailgunApiTransport extends AbstractApiTransport
             'body' => $body->bodyToIterable(),
         ]);
 
-        if (200 !== $response->getStatusCode()) {
-            if ('application/json' === $response->getHeaders(false)['content-type'][0]) {
-                $result = $response->toArray(false);
-                throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $response->getStatusCode()), $response);
-            }
-
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $response->getStatusCode()), $response);
+        try {
+            $statusCode = $response->getStatusCode();
+            $result = $response->toArray(false);
+        } catch (DecodingExceptionInterface) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
+        } catch (TransportExceptionInterface $e) {
+            throw new HttpTransportException('Could not reach the remote Mailgun server.', $response, 0, $e);
         }
 
-        // The assumption here is that all 200 responses are "application/json", so it's safe to call "toArray".
-        $result = $response->toArray(false);
+        if (200 !== $statusCode) {
+            throw new HttpTransportException('Unable to send an email: '.$result['message'].sprintf(' (code %d).', $statusCode), $response);
+        }
+
         $sentMessage->setMessageId($result['id']);
 
         return $response;
@@ -119,7 +123,7 @@ class MailgunApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
-                $payload['o:tag'] = $header->getValue();
+                $payload[] = ['o:tag' => $header->getValue()];
 
                 continue;
             }
@@ -133,11 +137,9 @@ class MailgunApiTransport extends AbstractApiTransport
             // Check if it is a valid prefix or header name according to Mailgun API
             $prefix = substr($name, 0, 2);
             if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
-                $headerName = $name;
+                $headerName = $header->getName();
             } else {
-                // fallback to prefix with "h:" to not break BC
-                $headerName = 'h:'.$name;
-                @trigger_error(sprintf('Not prefixing the Mailgun header name with "h:" is deprecated since Symfony  5.1. Use header name "%s" instead.', $headerName), \E_USER_DEPRECATED);
+                $headerName = 'h:'.$header->getName();
             }
 
             $payload[$headerName] = $header->getBodyAsString();
@@ -158,7 +160,6 @@ class MailgunApiTransport extends AbstractApiTransport
                     $new = basename($filename);
                     $html = str_replace('cid:'.$filename, 'cid:'.$new, $html);
                     $p = new \ReflectionProperty($attachment, 'filename');
-                    $p->setAccessible(true);
                     $p->setValue($attachment, $new);
                 }
                 $inlines[] = $attachment;

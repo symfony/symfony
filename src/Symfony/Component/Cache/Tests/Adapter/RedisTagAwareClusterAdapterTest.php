@@ -13,7 +13,6 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
-use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 
 /**
@@ -29,8 +28,12 @@ class RedisTagAwareClusterAdapterTest extends RedisClusterAdapterTest
         $this->skippedTests['testTagItemExpiry'] = 'Testing expiration slows down the test suite';
     }
 
-    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
     {
+        if ('testClearWithPrefix' === $testMethod && \defined('Redis::SCAN_PREFIX')) {
+            self::$redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_PREFIX);
+        }
+
         $this->assertInstanceOf(RedisClusterProxy::class, self::$redis);
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 

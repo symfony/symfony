@@ -13,6 +13,8 @@ namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -22,7 +24,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ImmutableEventDispatcherTest extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private $innerDispatcher;
 
@@ -33,7 +35,7 @@ class ImmutableEventDispatcherTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->innerDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $this->innerDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->dispatcher = new ImmutableEventDispatcher($this->innerDispatcher);
     }
 
@@ -72,28 +74,28 @@ class ImmutableEventDispatcherTest extends TestCase
 
     public function testAddListenerDisallowed()
     {
-        $this->expectException('\BadMethodCallException');
+        $this->expectException(\BadMethodCallException::class);
         $this->dispatcher->addListener('event', function () { return 'foo'; });
     }
 
     public function testAddSubscriberDisallowed()
     {
-        $this->expectException('\BadMethodCallException');
-        $subscriber = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventSubscriberInterface')->getMock();
+        $this->expectException(\BadMethodCallException::class);
+        $subscriber = $this->createMock(EventSubscriberInterface::class);
 
         $this->dispatcher->addSubscriber($subscriber);
     }
 
     public function testRemoveListenerDisallowed()
     {
-        $this->expectException('\BadMethodCallException');
+        $this->expectException(\BadMethodCallException::class);
         $this->dispatcher->removeListener('event', function () { return 'foo'; });
     }
 
     public function testRemoveSubscriberDisallowed()
     {
-        $this->expectException('\BadMethodCallException');
-        $subscriber = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventSubscriberInterface')->getMock();
+        $this->expectException(\BadMethodCallException::class);
+        $subscriber = $this->createMock(EventSubscriberInterface::class);
 
         $this->dispatcher->removeSubscriber($subscriber);
     }

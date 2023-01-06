@@ -132,7 +132,7 @@ class ArgumentResolverTest extends TestCase
             self::$resolver->getArguments($request, $controller);
             $this->fail('->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
+            $this->assertInstanceOf(\RuntimeException::class, $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
         }
     }
 
@@ -164,7 +164,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testGetVariadicArgumentsWithoutArrayInRequest()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'foo');
@@ -173,11 +173,14 @@ class ArgumentResolverTest extends TestCase
         self::$resolver->getArguments($request, $controller);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetArgumentWithoutArray()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $factory = new ArgumentMetadataFactory();
-        $valueResolver = $this->getMockBuilder(ArgumentValueResolverInterface::class)->getMock();
+        $valueResolver = $this->createMock(ArgumentValueResolverInterface::class);
         $resolver = new ArgumentResolver($factory, [$valueResolver]);
 
         $valueResolver->expects($this->any())->method('supports')->willReturn(true);
@@ -186,15 +189,15 @@ class ArgumentResolverTest extends TestCase
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'foo');
-        $controller = [$this, 'controllerWithFooAndDefaultBar'];
+        $controller = $this->controllerWithFooAndDefaultBar(...);
         $resolver->getArguments($request, $controller);
     }
 
     public function testIfExceptionIsThrownWhenMissingAnArgument()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $request = Request::create('/');
-        $controller = [$this, 'controllerWithFoo'];
+        $controller = $this->controllerWithFoo(...);
 
         self::$resolver->getArguments($request, $controller);
     }
@@ -224,7 +227,7 @@ class ArgumentResolverTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithSession'];
+        $controller = $this->controllerWithSession(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
@@ -234,48 +237,48 @@ class ArgumentResolverTest extends TestCase
         $session = new ExtendingSession(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
 
     public function testGetSessionArgumentsWithInterface()
     {
-        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithSessionInterface'];
+        $controller = $this->controllerWithSessionInterface(...);
 
         $this->assertEquals([$session], self::$resolver->getArguments($request, $controller));
     }
 
     public function testGetSessionMissMatchWithInterface()
     {
-        $this->expectException('RuntimeException');
-        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
+        $this->expectException(\RuntimeException::class);
+        $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }
 
     public function testGetSessionMissMatchWithImplementation()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }
 
     public function testGetSessionMissMatchOnNull()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $request = Request::create('/');
-        $controller = [$this, 'controllerWithExtendingSession'];
+        $controller = $this->controllerWithExtendingSession(...);
 
         self::$resolver->getArguments($request, $controller);
     }

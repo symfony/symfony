@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -11,9 +12,12 @@
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Dumper\PlantUmlDumper;
 use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
+use Symfony\Component\Workflow\Transition;
 
 class PlantUmlDumperTest extends TestCase
 {
@@ -60,6 +64,34 @@ class PlantUmlDumperTest extends TestCase
         yield [$this->createComplexStateMachineDefinition(), null, 'complex-state-machine-nomarking', 'SimpleDiagram'];
         $marking = new Marking(['c' => 1, 'e' => 1]);
         yield [$this->createComplexStateMachineDefinition(), $marking, 'complex-state-machine-marking', 'SimpleDiagram'];
+    }
+
+    public function testDumpWorkflowWithSpacesInTheStateNamesAndDescription()
+    {
+        $dumper = new PlantUmlDumper(PlantUmlDumper::WORKFLOW_TRANSITION);
+
+        // The graph looks like:
+        //
+        // +---------+  t 1   +----------+  |
+        // | place a | -----> | place b  |  |
+        // +---------+        +----------+  |
+        $places = ['place a', 'place b'];
+
+        $transitions = [];
+        $transition = new Transition('t 1', 'place a', 'place b');
+        $transitions[] = $transition;
+
+        $placesMetadata = [];
+        $placesMetadata['place a'] = [
+            'description' => 'My custom place description',
+        ];
+        $inMemoryMetadataStore = new InMemoryMetadataStore([], $placesMetadata);
+        $definition = new Definition($places, $transitions, null, $inMemoryMetadataStore);
+
+        $dump = $dumper->dump($definition, null, ['title' => 'SimpleDiagram']);
+        $dump = str_replace(\PHP_EOL, "\n", $dump.\PHP_EOL);
+        $file = $this->getFixturePath('simple-workflow-with-spaces', PlantUmlDumper::WORKFLOW_TRANSITION);
+        $this->assertStringEqualsFile($file, $dump);
     }
 
     private function getFixturePath($name, $transitionType)

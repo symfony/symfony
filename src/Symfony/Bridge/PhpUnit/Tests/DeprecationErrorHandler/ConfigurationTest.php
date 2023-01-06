@@ -184,7 +184,7 @@ class ConfigurationTest extends TestCase
         return [
             ['disabled', false],
             ['disabled=1', false],
-            ['disabled=0', true]
+            ['disabled=0', true],
         ];
     }
 
@@ -234,6 +234,103 @@ class ConfigurationTest extends TestCase
         $this->assertFalse($configuration->verboseOutput('other'));
     }
 
+    /**
+     * @dataProvider provideDataForToleratesForGroup
+     */
+    public function testToleratesForIndividualGroups(string $deprecationsHelper, array $deprecationsPerType, array $expected)
+    {
+        $configuration = Configuration::fromUrlEncodedString($deprecationsHelper);
+
+        $groups = $this->buildGroups($deprecationsPerType);
+
+        foreach ($expected as $groupName => $tolerates) {
+            $this->assertSame($tolerates, $configuration->toleratesForGroup($groupName, $groups), sprintf('Deprecation type "%s" is %s', $groupName, $tolerates ? 'tolerated' : 'not tolerated'));
+        }
+    }
+
+    public function provideDataForToleratesForGroup() {
+
+        yield 'total threshold not reached' => ['max[total]=1', [
+            'unsilenced' => 0,
+            'self' => 0,
+            'legacy' => 1, // Legacy group is ignored in total threshold
+            'other' => 0,
+            'direct' => 1,
+            'indirect' => 0,
+        ], [
+            'unsilenced' => true,
+            'self' => true,
+            'legacy' => true,
+            'other' => true,
+            'direct' => true,
+            'indirect' => true,
+        ]];
+
+        yield 'total threshold reached' => ['max[total]=1', [
+            'unsilenced' => 0,
+            'self' => 0,
+            'legacy' => 1,
+            'other' => 0,
+            'direct' => 1,
+            'indirect' => 1,
+        ], [
+            'unsilenced' => false,
+            'self' => false,
+            'legacy' => false,
+            'other' => false,
+            'direct' => false,
+            'indirect' => false,
+        ]];
+
+        yield 'direct threshold reached' => ['max[total]=99&max[direct]=0', [
+            'unsilenced' => 0,
+            'self' => 0,
+            'legacy' => 1,
+            'other' => 0,
+            'direct' => 1,
+            'indirect' => 1,
+        ], [
+            'unsilenced' => true,
+            'self' => true,
+            'legacy' => true,
+            'other' => true,
+            'direct' => false,
+            'indirect' => true,
+        ]];
+
+        yield 'indirect & self threshold reached' => ['max[total]=99&max[direct]=0&max[self]=0', [
+            'unsilenced' => 0,
+            'self' => 1,
+            'legacy' => 1,
+            'other' => 1,
+            'direct' => 1,
+            'indirect' => 1,
+        ], [
+            'unsilenced' => true,
+            'self' => false,
+            'legacy' => true,
+            'other' => true,
+            'direct' => false,
+            'indirect' => true,
+        ]];
+
+        yield 'indirect & self threshold not reached' => ['max[total]=99&max[direct]=2&max[self]=2', [
+            'unsilenced' => 0,
+            'self' => 1,
+            'legacy' => 1,
+            'other' => 1,
+            'direct' => 1,
+            'indirect' => 1,
+        ], [
+            'unsilenced' => true,
+            'self' => true,
+            'legacy' => true,
+            'other' => true,
+            'direct' => true,
+            'indirect' => true,
+        ]];
+    }
+
     private function buildGroups($counts)
     {
         $groups = [];
@@ -251,7 +348,7 @@ class ConfigurationTest extends TestCase
     public function testBaselineGenerationEmptyFile()
     {
         $filename = $this->createFile();
-        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $this->assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
@@ -277,7 +374,7 @@ class ConfigurationTest extends TestCase
     public function testBaselineGenerationNoFile()
     {
         $filename = $this->createFile();
-        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $this->assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
@@ -299,7 +396,6 @@ class ConfigurationTest extends TestCase
             ],
         ];
         $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
-
     }
 
     public function testExistingBaseline()
@@ -319,7 +415,7 @@ class ConfigurationTest extends TestCase
         ];
         file_put_contents($filename, json_encode($baseline));
 
-        $configuration = Configuration::fromUrlEncodedString('baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
         $this->assertFalse($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
@@ -344,7 +440,7 @@ class ConfigurationTest extends TestCase
             ],
         ];
         file_put_contents($filename, json_encode($baseline));
-        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $this->assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
@@ -379,7 +475,7 @@ class ConfigurationTest extends TestCase
         unlink($filename);
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('The baselineFile "%s" does not exist.', $filename));
-        Configuration::fromUrlEncodedString('baselineFile=' . urlencode($filename));
+        Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
     }
 
     public function testBaselineFileWriteError()
@@ -387,9 +483,65 @@ class ConfigurationTest extends TestCase
         $filename = $this->createFile();
         chmod($filename, 0444);
         $this->expectError();
-        $this->expectErrorMessageMatches('/failed to open stream: Permission denied/');
-        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $this->expectErrorMessageMatches('/[Ff]ailed to open stream: Permission denied/');
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $configuration->writeBaseline();
+    }
+
+    public function testExistingIgnoreFile()
+    {
+        $filename = $this->createFile();
+        $ignorePatterns = [
+            '/Test message .*/',
+            '/^\d* occurrences/',
+        ];
+        file_put_contents($filename, implode("\n", $ignorePatterns));
+
+        $configuration = Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('Test message 2', $trace, '')));
+        $this->assertFalse($configuration->isIgnoredDeprecation(new Deprecation('Test mexxage 3', $trace, '')));
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('1 occurrences', $trace, '')));
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('1200 occurrences and more', $trace, '')));
+        $this->assertFalse($configuration->isIgnoredDeprecation(new Deprecation('Many occurrences', $trace, '')));
+    }
+
+    public function testIgnoreFilePatternInvalid()
+    {
+        $filename = $this->createFile();
+        $ignorePatterns = [
+            '/Test message (.*/',
+        ];
+        file_put_contents($filename, implode("\n", $ignorePatterns));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('missing closing parenthesis');
+        $configuration = Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
+    }
+
+    public function testIgnoreFilePatternException()
+    {
+        $filename = $this->createFile();
+        $ignorePatterns = [
+            '/(?:\D+|<\d+>)*[!?]/',
+        ];
+        file_put_contents($filename, implode("\n", $ignorePatterns));
+
+        $configuration = Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
+        $trace = debug_backtrace();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/[Bb]acktrack limit exhausted/');
+        $configuration->isIgnoredDeprecation(new Deprecation('foobar foobar foobar', $trace, ''));
+    }
+
+    public function testIgnoreFileException()
+    {
+        $filename = $this->createFile();
+        unlink($filename);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The ignoreFile "%s" does not exist.', $filename));
+        Configuration::fromUrlEncodedString('ignoreFile='.urlencode($filename));
     }
 
     protected function setUp(): void
@@ -401,15 +553,16 @@ class ConfigurationTest extends TestCase
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {
-                unlink($file);
+                @unlink($file);
             }
         }
     }
 
-    private function createFile() {
+    private function createFile()
+    {
         $filename = tempnam(sys_get_temp_dir(), 'sf-');
         $this->files[] = $filename;
+
         return $filename;
     }
-
 }

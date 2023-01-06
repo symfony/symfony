@@ -18,8 +18,8 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class AmqpReceivedStamp implements NonSendableStampInterface
 {
-    private $amqpEnvelope;
-    private $queueName;
+    private \AMQPEnvelope $amqpEnvelope;
+    private string $queueName;
 
     public function __construct(\AMQPEnvelope $amqpEnvelope, string $queueName)
     {
@@ -37,4 +37,3 @@ class AmqpReceivedStamp implements NonSendableStampInterface
         return $this->queueName;
     }
 }
-class_alias(AmqpReceivedStamp::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp::class);

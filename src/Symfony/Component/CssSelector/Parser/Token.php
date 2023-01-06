@@ -23,17 +23,17 @@ namespace Symfony\Component\CssSelector\Parser;
  */
 class Token
 {
-    const TYPE_FILE_END = 'eof';
-    const TYPE_DELIMITER = 'delimiter';
-    const TYPE_WHITESPACE = 'whitespace';
-    const TYPE_IDENTIFIER = 'identifier';
-    const TYPE_HASH = 'hash';
-    const TYPE_NUMBER = 'number';
-    const TYPE_STRING = 'string';
+    public const TYPE_FILE_END = 'eof';
+    public const TYPE_DELIMITER = 'delimiter';
+    public const TYPE_WHITESPACE = 'whitespace';
+    public const TYPE_IDENTIFIER = 'identifier';
+    public const TYPE_HASH = 'hash';
+    public const TYPE_NUMBER = 'number';
+    public const TYPE_STRING = 'string';
 
-    private $type;
-    private $value;
-    private $position;
+    private ?string $type;
+    private ?string $value;
+    private ?int $position;
 
     public function __construct(?string $type, ?string $value, ?int $position)
     {
@@ -68,7 +68,7 @@ class Token
             return false;
         }
 
-        if (empty($values)) {
+        if (!$values) {
             return true;
         }
 

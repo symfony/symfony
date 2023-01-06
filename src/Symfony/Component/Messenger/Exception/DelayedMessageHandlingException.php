@@ -19,13 +19,13 @@ namespace Symfony\Component\Messenger\Exception;
  */
 class DelayedMessageHandlingException extends RuntimeException
 {
-    private $exceptions;
+    private array $exceptions;
 
     public function __construct(array $exceptions)
     {
         $exceptionMessages = implode(", \n", array_map(
             function (\Throwable $e) {
-                return \get_class($e).': '.$e->getMessage();
+                return $e::class.': '.$e->getMessage();
             },
             $exceptions
         ));

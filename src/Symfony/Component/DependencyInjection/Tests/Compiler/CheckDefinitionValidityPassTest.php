@@ -14,13 +14,14 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CheckDefinitionValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class CheckDefinitionValidityPassTest extends TestCase
 {
     public function testProcessDetectsSyntheticNonPublicDefinitions()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(true)->setPublic(false);
 
@@ -29,11 +30,21 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
 
         $this->process($container);
+    }
+
+    public function testProcessAcceptsServiceLocatorWithoutClass()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('container.service_locator');
+
+        $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     public function testProcessDetectsFactoryWithoutClass()
@@ -77,7 +88,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testInvalidTags()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a', 'class')->addTag('foo', ['bar' => ['baz' => 'baz']]);
 
@@ -86,7 +97,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicServiceName()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\EnvParameterException');
+        $this->expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->register("foo.$env", 'class')->setPublic(true);
@@ -96,7 +107,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicAliasName()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\EnvParameterException');
+        $this->expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->setAlias("foo.$env", 'class')->setPublic(true);

@@ -13,12 +13,10 @@ namespace Symfony\Component\Notifier\Message;
 
 /**
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
- *
- * @experimental in 5.2
  */
 final class NullMessage implements MessageInterface
 {
-    private $decoratedMessage;
+    private MessageInterface $decoratedMessage;
 
     public function __construct(MessageInterface $message)
     {

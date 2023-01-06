@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>Nije moguće odrediti poslužitelja.</target>
+                <target>Ime hosta ne može biti razrešeno.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -385,6 +385,22 @@
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
                 <target>Ova vrednost nije ispravna međunarodna identifikaciona oznaka hartija od vrednosti (ISIN).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Ova vrednost treba da bude validan izraz.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Ova vrednost nije ispravna CSS boja.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Ova vrednost nije ispravna CIDR notacija.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Vrednost mrežne maske treba biti između {{ min }} i {{ max }}.</target>
             </trans-unit>
         </body>
     </file>

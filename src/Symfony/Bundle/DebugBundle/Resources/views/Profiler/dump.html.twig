@@ -3,7 +3,7 @@
 {% block toolbar %}
     {% if collector.dumpsCount %}
         {% set icon %}
-            {{ include('@Debug/Profiler/icon.svg') }}
+            {{ source('@Debug/Profiler/icon.svg') }}
             <span class="sf-toolbar-value">{{ collector.dumpsCount }}</span>
         {% endset %}
 
@@ -35,7 +35,7 @@
 
 {% block menu %}
     <span class="label {{ collector.dumpsCount == 0 ? 'disabled' }}">
-        <span class="icon">{{ include('@Debug/Profiler/icon.svg') }}</span>
+        <span class="icon">{{ source('@Debug/Profiler/icon.svg') }}</span>
         <strong>Debug</strong>
     </span>
 {% endblock %}
@@ -68,7 +68,7 @@
             {{ dump.data|raw }}
         </div>
     {% else %}
-        <div class="empty">
+        <div class="empty empty-panel">
             <p>No content was dumped.</p>
         </div>
     {% endfor %}

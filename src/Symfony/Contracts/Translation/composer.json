@@ -16,20 +16,25 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5"
+        "php": ">=8.1"
     },
     "suggest": {
         "symfony/translation-implementation": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Contracts\\Translation\\": "" }
+        "psr-4": { "Symfony\\Contracts\\Translation\\": "" },
+        "exclude-from-classmap": [
+            "/Test/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {
+        "branch-alias": {
+            "dev-main": "3.3-dev"
+        },
         "thanks": {
             "name": "symfony/contracts",
             "url": "https://github.com/symfony/contracts"
         }
-    },
-    "version": "2.3.x-dev"
+    }
 }

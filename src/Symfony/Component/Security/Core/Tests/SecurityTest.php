@@ -18,14 +18,17 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
+/**
+ * @group legacy
+ */
 class SecurityTest extends TestCase
 {
     public function testGetToken()
     {
-        $token = new UsernamePasswordToken('foo', 'bar', 'provider');
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar'), 'provider');
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
@@ -42,11 +45,11 @@ class SecurityTest extends TestCase
      */
     public function testGetUser($userInToken, $expectedUser)
     {
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($userInToken);
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
@@ -62,17 +65,13 @@ class SecurityTest extends TestCase
     {
         yield [null, null];
 
-        yield ['string_username', null];
-
-        yield [new StringishUser(), null];
-
-        $user = new User('nice_user', 'foo');
+        $user = new InMemoryUser('nice_user', 'foo');
         yield [$user, $user];
     }
 
     public function testIsGranted()
     {
-        $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -87,7 +86,7 @@ class SecurityTest extends TestCase
 
     private function createContainer($serviceId, $serviceObject)
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->createMock(ContainerInterface::class);
 
         $container->expects($this->atLeastOnce())
             ->method('get')
@@ -95,13 +94,5 @@ class SecurityTest extends TestCase
             ->willReturn($serviceObject);
 
         return $container;
-    }
-}
-
-class StringishUser
-{
-    public function __toString(): string
-    {
-        return 'stringish_user';
     }
 }

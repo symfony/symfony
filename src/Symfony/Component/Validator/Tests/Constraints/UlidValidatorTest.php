@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UlidValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): UlidValidator
     {
         return new UlidValidator();
     }
@@ -78,6 +78,19 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
             ['01ARZ3NDEKTSV4RRFFQ69G5FAVA', Ulid::TOO_LONG_ERROR],
             ['01ARZ3NDEKTSV4RRFFQ69G5FAO', Ulid::INVALID_CHARACTERS_ERROR],
             ['Z1ARZ3NDEKTSV4RRFFQ69G5FAV', Ulid::TOO_LARGE_ERROR],
+            ['not-even-ulid-like', Ulid::TOO_SHORT_ERROR],
         ];
+    }
+
+    public function testInvalidUlidNamed()
+    {
+        $constraint = new Ulid(message: 'testMessage');
+
+        $this->validator->validate('01ARZ3NDEKTSV4RRFFQ69G5FA', $constraint);
+
+        $this->buildViolation('testMessage')
+            ->setParameter('{{ value }}', '"01ARZ3NDEKTSV4RRFFQ69G5FA"')
+            ->setCode(Ulid::TOO_SHORT_ERROR)
+            ->assertRaised();
     }
 }

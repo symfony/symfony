@@ -13,11 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\RegexValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class RegexValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): RegexValidator
     {
         return new RegexValidator();
     }
@@ -38,7 +39,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Regex(['pattern' => '/^[0-9]+$/']));
     }
 
@@ -59,6 +60,17 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     public function testValidValuesWithWhitespaces($value)
     {
         $constraint = new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'trim']);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getValidValuesWithWhitespaces
+     */
+    public function testValidValuesWithWhitespacesNamed($value)
+    {
+        $constraint = new Regex(pattern: '/^[0-9]+$/', normalizer: 'trim');
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -106,6 +118,23 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ pattern }}', '/^[0-9]+$/')
+            ->setCode(Regex::REGEX_FAILED_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getInvalidValues
+     */
+    public function testInvalidValuesNamed($value)
+    {
+        $constraint = new Regex(pattern: '/^[0-9]+$/', message: 'myMessage');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ pattern }}', '/^[0-9]+$/')
             ->setCode(Regex::REGEX_FAILED_ERROR)
             ->assertRaised();
     }

@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveReferencesToAliasesPassTest extends TestCase
@@ -56,7 +57,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
 
     public function testAliasCircularReference()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');
+        $this->expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
         $container->setAlias('bar', 'foo');
         $container->setAlias('foo', 'bar');
@@ -124,6 +125,44 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         ;
 
         $this->process($container);
+    }
+
+    public function testNoDeprecationNoticeWhenReferencedByDeprecatedAlias()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass');
+
+        $aliasDeprecated = new Alias('foo');
+        $aliasDeprecated->setDeprecated('foobar', '1.2.3.4', '');
+        $container->setAlias('deprecated_foo_alias', $aliasDeprecated);
+
+        $alias = new Alias('deprecated_foo_alias');
+        $alias->setDeprecated('foobar', '1.2.3.4', '');
+        $container->setAlias('alias', $alias);
+
+        $this->process($container);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testNoDeprecationNoticeWhenReferencedByDeprecatedDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass');
+
+        $aliasDeprecated = new Alias('foo');
+        $aliasDeprecated->setDeprecated('foobar', '1.2.3.4', '');
+        $container->setAlias('foo_aliased', $aliasDeprecated);
+
+        $container
+            ->register('definition')
+            ->setDeprecated('foobar', '1.2.3.4', '')
+            ->setArguments([new Reference('foo_aliased')])
+        ;
+
+        $this->process($container);
+        $this->addToAssertionCount(1);
     }
 
     protected function process(ContainerBuilder $container)

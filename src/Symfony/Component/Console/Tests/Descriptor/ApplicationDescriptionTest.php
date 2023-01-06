@@ -36,17 +36,14 @@ final class ApplicationDescriptionTest extends TestCase
         return [
             [['_global'], ['foobar']],
             [['a', 'b'], ['b:foo', 'a:foo', 'b:bar']],
-            [['_global', 'b', 'z', 22, 33], ['z:foo', '1', '33:foo', 'b:foo', '22:foo:bar']],
+            [['_global', 22, 33, 'b', 'z'], ['z:foo', '1', '33:foo', 'b:foo', '22:foo:bar']],
         ];
     }
 }
 
 final class TestApplication extends Application
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultCommands()
+    protected function getDefaultCommands(): array
     {
         return [];
     }

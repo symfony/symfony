@@ -330,6 +330,62 @@
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Ky Kod Identifikues i Biznesit (BIC) nuk është i lidhur me IBAN {{ iban }}.</target>
             </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Kjo vlerë duhet të jetë JSON i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ky koleksion duhet të përmbajë vetëm elementë unikë.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Kjo vlerë duhet të jetë pozitive.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Kjo vlerë duhet të jetë pozitive ose zero.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Kjo vlerë duhet të jetë negative.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Kjo vlerë duhet të jetë negative ose zero.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Kjo vlerë nuk është një zonë e vlefshme kohore.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Ky fjalëkalim është zbuluar në një shkelje të të dhënave, nuk duhet të përdoret. Ju lutemi përdorni një fjalëkalim tjetër.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Kjo vlerë duhet të jetë ndërmjet {{ min }} dhe {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Kjo vlerë nuk është një emër i vlefshëm hosti.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Numri i elementeve në këtë koleksion duhet të jetë një shumëfish i {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Kjo vlerë duhet të plotësojë të paktën njërën nga kufizimet e mëposhtme:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Secili element i këtij koleksioni duhet të përmbushë kufizimet e veta.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Kjo vlerë nuk është një numër i vlefshëm identifikues ndërkombëtar i sigurisë (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

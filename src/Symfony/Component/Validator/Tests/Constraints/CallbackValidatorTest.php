@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CallbackValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CallbackValidatorTest_Class
@@ -46,7 +47,7 @@ class CallbackValidatorTest_Object
 
 class CallbackValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): CallbackValidator
     {
         return new CallbackValidator();
     }
@@ -182,7 +183,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectValidMethods()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(['callback' => ['foobar']]));
@@ -190,7 +191,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectValidCallbacks()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(['callback' => ['foo', 'bar']]));
@@ -241,13 +242,11 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($object, $constraint);
         $this->assertEquals('Hello world!', $payloadCopy);
 
-        if (\PHP_VERSION_ID >= 80000) {
-            $payloadCopy = 'Replace me!';
-            $constraint = eval('return new \Symfony\Component\Validator\Constraints\Callback(callback: $callback, payload: "Hello world!");');
-            $this->validator->validate($object, $constraint);
-            $this->assertEquals('Hello world!', $payloadCopy);
-            $payloadCopy = 'Replace me!';
-        }
+        $payloadCopy = 'Replace me!';
+        $constraint = new Callback(callback: $callback, payload: 'Hello world!');
+        $this->validator->validate($object, $constraint);
+        $this->assertEquals('Hello world!', $payloadCopy);
+        $payloadCopy = 'Replace me!';
 
         $payloadCopy = 'Replace me!';
         $constraint = new Callback([

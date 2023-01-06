@@ -64,6 +64,7 @@ class NoTemplatingEntryKernel extends Kernel
         $loader->load(function (ContainerBuilder $container) {
             $container
                 ->loadFromExtension('framework', [
+                    'http_method_override' => false,
                     'secret' => '$ecret',
                     'form' => ['enabled' => false],
                 ])

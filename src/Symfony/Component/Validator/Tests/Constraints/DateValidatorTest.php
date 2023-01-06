@@ -13,11 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DateValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): DateValidator
     {
         return new DateValidator();
     }
@@ -38,7 +39,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Date());
     }
 
@@ -75,6 +76,18 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$date.'"')
             ->setCode($code)
+            ->assertRaised();
+    }
+
+    public function testInvalidDateNamed()
+    {
+        $constraint = new Date(message: 'myMessage');
+
+        $this->validator->validate('foobar', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"foobar"')
+            ->setCode(Date::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }
 

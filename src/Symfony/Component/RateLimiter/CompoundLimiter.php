@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.2
  */
 final class CompoundLimiter implements LimiterInterface
 {
-    private $limiters;
+    private array $limiters;
 
     /**
      * @param LimiterInterface[] $limiters
@@ -31,18 +31,23 @@ final class CompoundLimiter implements LimiterInterface
         $this->limiters = $limiters;
     }
 
-    public function consume(int $tokens = 1): Limit
+    public function reserve(int $tokens = 1, float $maxTime = null): Reservation
     {
-        $minimalLimit = null;
-        foreach ($this->limiters as $limiter) {
-            $limit = $limiter->consume($tokens);
+        throw new ReserveNotSupportedException(__CLASS__);
+    }
 
-            if (null === $minimalLimit || $limit->getRemainingTokens() < $minimalLimit->getRemainingTokens()) {
-                $minimalLimit = $limit;
+    public function consume(int $tokens = 1): RateLimit
+    {
+        $minimalRateLimit = null;
+        foreach ($this->limiters as $limiter) {
+            $rateLimit = $limiter->consume($tokens);
+
+            if (null === $minimalRateLimit || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+                $minimalRateLimit = $rateLimit;
             }
         }
 
-        return $minimalLimit;
+        return $minimalRateLimit;
     }
 
     public function reset(): void

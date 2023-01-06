@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -30,17 +31,17 @@ class YamlFileLoader extends FileLoader
      */
     protected $classes = null;
 
-    /**
-     * Caches the used YAML parser.
-     *
-     * @var YamlParser
-     */
-    private $yamlParser;
+    public function __construct(string $file)
+    {
+        $this->file = $file;
+    }
 
     /**
-     * {@inheritdoc}
+     * Caches the used YAML parser.
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    private YamlParser $yamlParser;
+
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (null === $this->classes) {
             $this->loadClassesFromYaml();
@@ -60,9 +61,9 @@ class YamlFileLoader extends FileLoader
     /**
      * Return the names of the classes mapped in this file.
      *
-     * @return string[] The classes names
+     * @return string[]
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
         if (null === $this->classes) {
             $this->loadClassesFromYaml();
@@ -76,9 +77,9 @@ class YamlFileLoader extends FileLoader
      *
      * @param array $nodes The YAML nodes
      *
-     * @return array An array of values or Constraint instances
+     * @return array<array|scalar|Constraint>
      */
-    protected function parseNodes(array $nodes)
+    protected function parseNodes(array $nodes): array
     {
         $values = [];
 
@@ -132,10 +133,9 @@ class YamlFileLoader extends FileLoader
 
     private function loadClassesFromYaml()
     {
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new YamlParser();
-        }
+        parent::__construct($this->file);
 
+        $this->yamlParser ??= new YamlParser();
         $this->classes = $this->parseFile($this->file);
 
         if (isset($this->classes['namespaces'])) {

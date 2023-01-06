@@ -11,9 +11,12 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
+use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -27,79 +30,37 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
-    private $connections;
-    private $eventManagers;
-    private $managerTemplate;
-    private $tagPrefix;
+    private string $connectionsParameter;
+    private array $connections;
 
     /**
-     * @param string $connections     Parameter ID for connections
+     * @var array<string, Definition>
+     */
+    private array $eventManagers = [];
+
+    private string $managerTemplate;
+    private string $tagPrefix;
+
+    /**
      * @param string $managerTemplate sprintf() template for generating the event
      *                                manager's service ID for a connection name
      * @param string $tagPrefix       Tag prefix for listeners and subscribers
      */
-    public function __construct(string $connections, string $managerTemplate, string $tagPrefix)
+    public function __construct(string $connectionsParameter, string $managerTemplate, string $tagPrefix)
     {
-        $this->connections = $connections;
+        $this->connectionsParameter = $connectionsParameter;
         $this->managerTemplate = $managerTemplate;
         $this->tagPrefix = $tagPrefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasParameter($this->connections)) {
+        if (!$container->hasParameter($this->connectionsParameter)) {
             return;
         }
 
-        $this->connections = $container->getParameter($this->connections);
-        $this->addTaggedSubscribers($container);
-        $this->addTaggedListeners($container);
-    }
-
-    private function addTaggedSubscribers(ContainerBuilder $container)
-    {
-        $subscriberTag = $this->tagPrefix.'.event_subscriber';
-        $taggedSubscribers = $this->findAndSortTags($subscriberTag, $container);
-
-        foreach ($taggedSubscribers as $taggedSubscriber) {
-            list($id, $tag) = $taggedSubscriber;
-            $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
-            foreach ($connections as $con) {
-                if (!isset($this->connections[$con])) {
-                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
-                }
-
-                $this->getEventManagerDef($container, $con)->addMethodCall('addEventSubscriber', [new Reference($id)]);
-            }
-        }
-    }
-
-    private function addTaggedListeners(ContainerBuilder $container)
-    {
-        $listenerTag = $this->tagPrefix.'.event_listener';
-        $taggedListeners = $this->findAndSortTags($listenerTag, $container);
-        $listenerRefs = [];
-
-        foreach ($taggedListeners as $taggedListener) {
-            list($id, $tag) = $taggedListener;
-            if (!isset($tag['event'])) {
-                throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
-            }
-
-            $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
-            foreach ($connections as $con) {
-                if (!isset($this->connections[$con])) {
-                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
-                }
-                $listenerRefs[$con][$id] = new Reference($id);
-
-                // we add one call per event per service so we have the correct order
-                $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', [[$tag['event']], $id]);
-            }
-        }
+        $this->connections = $container->getParameter($this->connectionsParameter);
+        $listenerRefs = $this->addTaggedServices($container);
 
         // replace service container argument of event managers with smaller service locator
         // so services can even remain private
@@ -107,6 +68,60 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             $this->getEventManagerDef($container, $connection)
                 ->replaceArgument(0, ServiceLocatorTagPass::register($container, $refs));
         }
+    }
+
+    private function addTaggedServices(ContainerBuilder $container): array
+    {
+        $listenerTag = $this->tagPrefix.'.event_listener';
+        $subscriberTag = $this->tagPrefix.'.event_subscriber';
+        $listenerRefs = [];
+        $taggedServices = $this->findAndSortTags([$subscriberTag, $listenerTag], $container);
+
+        $managerDefs = [];
+        foreach ($taggedServices as $taggedSubscriber) {
+            [$tagName, $id, $tag] = $taggedSubscriber;
+            $connections = isset($tag['connection'])
+                ? [$container->getParameterBag()->resolveValue($tag['connection'])]
+                : array_keys($this->connections);
+            if ($listenerTag === $tagName && !isset($tag['event'])) {
+                throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
+            }
+            foreach ($connections as $con) {
+                if (!isset($this->connections[$con])) {
+                    throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
+                }
+
+                if (!isset($managerDefs[$con])) {
+                    $managerDef = $parentDef = $this->getEventManagerDef($container, $con);
+                    while (!$parentDef->getClass() && $parentDef instanceof ChildDefinition) {
+                        $parentDef = $container->findDefinition($parentDef->getParent());
+                    }
+                    $managerClass = $container->getParameterBag()->resolveValue($parentDef->getClass());
+                    $managerDefs[$con] = [$managerDef, $managerClass];
+                } else {
+                    [$managerDef, $managerClass] = $managerDefs[$con];
+                }
+
+                if (ContainerAwareEventManager::class === $managerClass) {
+                    $refs = $managerDef->getArguments()[1] ?? [];
+                    $listenerRefs[$con][$id] = new Reference($id);
+                    if ($subscriberTag === $tagName) {
+                        $refs[] = $id;
+                    } else {
+                        $refs[] = [[$tag['event']], $id];
+                    }
+                    $managerDef->setArgument(1, $refs);
+                } else {
+                    if ($subscriberTag === $tagName) {
+                        $managerDef->addMethodCall('addEventSubscriber', [new Reference($id)]);
+                    } else {
+                        $managerDef->addMethodCall('addEventListener', [[$tag['event']], new Reference($id)]);
+                    }
+                }
+            }
+        }
+
+        return $listenerRefs;
     }
 
     private function getEventManagerDef(ContainerBuilder $container, string $name)
@@ -128,14 +143,16 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      * @see https://bugs.php.net/53710
      * @see https://bugs.php.net/60926
      */
-    private function findAndSortTags(string $tagName, ContainerBuilder $container): array
+    private function findAndSortTags(array $tagNames, ContainerBuilder $container): array
     {
         $sortedTags = [];
 
-        foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tags) {
-            foreach ($tags as $attributes) {
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-                $sortedTags[$priority][] = [$serviceId, $attributes];
+        foreach ($tagNames as $tagName) {
+            foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tags) {
+                foreach ($tags as $attributes) {
+                    $priority = $attributes['priority'] ?? 0;
+                    $sortedTags[$priority][] = [$tagName, $serviceId, $attributes];
+                }
             }
         }
 

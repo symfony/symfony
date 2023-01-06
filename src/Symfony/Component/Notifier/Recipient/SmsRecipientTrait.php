@@ -13,12 +13,10 @@ namespace Symfony\Component\Notifier\Recipient;
 
 /**
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
- *
- * @experimental in 5.2
  */
 trait SmsRecipientTrait
 {
-    private $phone;
+    private string $phone;
 
     public function getPhone(): string
     {

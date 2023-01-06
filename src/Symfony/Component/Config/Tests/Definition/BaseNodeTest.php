@@ -20,7 +20,7 @@ class BaseNodeTest extends TestCase
     /**
      * @dataProvider providePath
      */
-    public function testGetPathForChildNode($expected, array $params)
+    public function testGetPathForChildNode(string $expected, array $params)
     {
         $constructorArgs = [];
         $constructorArgs[] = $params[0];
@@ -41,7 +41,7 @@ class BaseNodeTest extends TestCase
         $this->assertSame($expected, $node->getPath());
     }
 
-    public function providePath()
+    public function providePath(): array
     {
         return [
             'name only' => ['root', ['root']],

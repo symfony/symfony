@@ -13,28 +13,26 @@ namespace Symfony\Component\Notifier\Bridge\RocketChat;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
- *
- * @internal
- *
- * @experimental in 5.1
  */
 final class RocketChatTransport extends AbstractTransport
 {
     protected const HOST = 'rocketchat.com';
 
-    private $accessToken;
-    private $chatChannel;
+    private string $accessToken;
+    private ?string $chatChannel;
 
-    public function __construct(string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $accessToken, string $chatChannel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accessToken = $accessToken;
         $this->chatChannel = $chatChannel;
@@ -45,6 +43,10 @@ final class RocketChatTransport extends AbstractTransport
 
     public function __toString(): string
     {
+        if (null === $this->chatChannel) {
+            return sprintf('rocketchat://%s', $this->getEndpoint());
+        }
+
         return sprintf('rocketchat://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
     }
 
@@ -54,12 +56,12 @@ final class RocketChatTransport extends AbstractTransport
     }
 
     /**
-     * @see https://rocket.chat/docs/administrator-guides/integrations/
+     * @see https://rocket.chat/docs/administrator-guides/integrations
      */
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
         if ($message->getOptions() && !$message->getOptions() instanceof RocketChatOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, RocketChatOptions::class));
@@ -79,7 +81,13 @@ final class RocketChatTransport extends AbstractTransport
             ]
         );
 
-        if (200 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote RocketChat server.', $response, 0, $e);
+        }
+
+        if (200 !== $statusCode) {
             throw new TransportException(sprintf('Unable to post the RocketChat message: %s.', $response->getContent(false)), $response);
         }
 
@@ -90,9 +98,12 @@ final class RocketChatTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['message']['_id']);
+        $sentMessage = new SentMessage($message, (string) $this);
 
-        return $message;
+        if (isset($success['message']['_id'])) {
+            $sentMessage->setMessageId($success['message']['_id']);
+        }
+
+        return $sentMessage;
     }
 }

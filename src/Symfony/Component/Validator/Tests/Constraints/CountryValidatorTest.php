@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\CountryValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CountryValidatorTest extends ConstraintValidatorTestCase
@@ -34,7 +35,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    protected function createValidator()
+    protected function createValidator(): CountryValidator
     {
         return new CountryValidator();
     }
@@ -55,7 +56,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Country());
     }
 
@@ -150,6 +151,19 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
             ['ZZZ'],
             ['zzz'],
         ];
+    }
+
+    public function testInvalidAlpha3CountryNamed()
+    {
+        $this->validator->validate(
+            'DE',
+            new Country(alpha3: true, message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"DE"')
+            ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
+            ->assertRaised();
     }
 
     public function testValidateUsingCountrySpecificLocale()

@@ -101,19 +101,19 @@ class EnvelopeTest extends TestCase
     public function testSenderFromHeadersWithMulitpleHeaders()
     {
         $headers = new Headers();
-        $headers->addMailboxListHeader('From', [$from = new Address('from@symfony.com', 'from'), 'some@symfony.com']);
-        $headers->addPathHeader('Return-Path', $return = new Address('return@symfony.com', 'return'));
+        $headers->addMailboxListHeader('From', [new Address('from@symfony.com', 'from'), 'some@symfony.com']);
+        $headers->addPathHeader('Return-Path', new Address('return@symfony.com', 'return'));
         $headers->addMailboxHeader('Sender', $sender = new Address('sender@symfony.com', 'sender'));
         $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create(new Message($headers));
         $this->assertEquals($sender, $e->getSender());
 
         $headers = new Headers();
-        $headers->addMailboxListHeader('From', [$from = new Address('from@symfony.com', 'from'), 'some@symfony.com']);
+        $headers->addMailboxListHeader('From', [new Address('from@symfony.com', 'from'), 'some@symfony.com']);
         $headers->addPathHeader('Return-Path', $return = new Address('return@symfony.com', 'return'));
         $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create(new Message($headers));
-        $this->assertEquals($from, $e->getSender());
+        $this->assertEquals($return, $e->getSender());
     }
 
     public function testRecipientsFromHeaders()

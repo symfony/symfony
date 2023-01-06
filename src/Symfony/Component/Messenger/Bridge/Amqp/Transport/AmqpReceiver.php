@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
@@ -25,10 +25,10 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
+class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 {
-    private $serializer;
-    private $connection;
+    private SerializerInterface $serializer;
+    private Connection $connection;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -36,12 +36,14 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(): iterable
     {
-        foreach ($this->connection->getQueueNames() as $queueName) {
+        yield from $this->getFromQueues($this->connection->getQueueNames());
+    }
+
+    public function getFromQueues(array $queueNames): iterable
+    {
+        foreach ($queueNames as $queueName) {
             yield from $this->getEnvelope($queueName);
         }
     }
@@ -75,9 +77,6 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope, $queueName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function ack(Envelope $envelope): void
     {
         try {
@@ -92,9 +91,6 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reject(Envelope $envelope): void
     {
         $stamp = $this->findAmqpStamp($envelope);
@@ -105,9 +101,6 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageCount(): int
     {
         try {
@@ -136,4 +129,3 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         return $amqpReceivedStamp;
     }
 }
-class_alias(AmqpReceiver::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver::class);

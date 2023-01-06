@@ -3,6 +3,7 @@
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
 
 $container->loadFromExtension('framework', [
+    'http_method_override' => false,
     'workflows' => [
         'article' => [
             'type' => 'workflow',
@@ -12,7 +13,7 @@ $container->loadFromExtension('framework', [
             'initial_marking' => ['draft'],
             'metadata' => [
                 'title' => 'article workflow',
-                'description' => 'workflow for articles'
+                'description' => 'workflow for articles',
             ],
             'places' => [
                 'draft',

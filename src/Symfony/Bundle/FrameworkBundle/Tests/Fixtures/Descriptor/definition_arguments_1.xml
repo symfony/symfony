@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definition class="Full\Qualified\Class1" public="true" synthetic="false" lazy="true" shared="true" abstract="true" autowired="false" autoconfigured="false" file="">
+<definition class="Full\Qualified\Class1" public="true" synthetic="false" lazy="true" shared="true" abstract="true" autowired="false" autoconfigured="false" deprecated="false" file="">
   <factory class="Full\Qualified\FactoryClass" method="get"/>
   <argument type="service" id=".definition_2"/>
   <argument>%parameter%</argument>
   <argument>
-    <definition class="inline_service" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file="">
+    <definition class="inline_service" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
       <argument>arg1</argument>
       <argument>arg2</argument>
     </definition>
@@ -13,11 +13,12 @@
     <argument>foo</argument>
     <argument type="service" id=".definition_2"/>
     <argument>
-      <definition class="inline_service" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file=""/>
+      <definition class="inline_service" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file=""/>
     </argument>
   </argument>
   <argument type="iterator">
     <argument type="service" id="definition_1"/>
     <argument type="service" id=".definition_2"/>
   </argument>
+  <argument type="abstract">placeholder</argument>
 </definition>

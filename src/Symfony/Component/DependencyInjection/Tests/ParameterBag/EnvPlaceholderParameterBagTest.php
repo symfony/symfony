@@ -12,14 +12,26 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Loader\Configurator\EnvConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 class EnvPlaceholderParameterBagTest extends TestCase
 {
+    public function testEnumEnvVarProcessorPassesRegex()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $name = trim((new EnvConfigurator('FOO'))->enum(StringBackedEnum::class), '%');
+        $this->assertIsString($bag->get($name));
+    }
+
     public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
         $bag = new EnvPlaceholderParameterBag();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid env(%foo%) name: only "word" characters are allowed.');
         $bag->get('env(%foo%)');
     }
 
@@ -111,7 +123,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testResolveEnvRequiresStrings()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of env parameter "INT_VAR" must be a string or null, "int" given.');
 
         $bag = new EnvPlaceholderParameterBag();
@@ -122,7 +134,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testGetDefaultScalarEnv()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "int" given to "env(INT_VAR)".');
 
         $bag = new EnvPlaceholderParameterBag();
@@ -153,7 +165,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testResolveThrowsOnBadDefaultValue()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be a string or null, "array" given.');
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
@@ -173,7 +185,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testGetThrowsOnBadDefaultValue()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "array" given to "env(ARRAY_VAR)".');
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(ARRAY_VAR)', []);
@@ -193,5 +205,13 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag = new EnvPlaceholderParameterBag();
         $bag->resolve();
         $this->assertStringMatchesFormat('env_%s_key_a_b_c_FOO_%s', $bag->get('env(key:a.b-c:FOO)'));
+    }
+
+    public function testGetEnum()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $bag->set('ENUM_VAR', StringBackedEnum::Bar);
+        $this->assertInstanceOf(StringBackedEnum::class, $bag->get('ENUM_VAR'));
+        $this->assertEquals(StringBackedEnum::Bar, $bag->get('ENUM_VAR'));
     }
 }

@@ -24,7 +24,7 @@ class ChainLoader extends Loader
     protected $loaders = [];
 
     /**
-     * @param LoaderInterface[] $loaders An array of loader instances
+     * @param LoaderInterface[] $loaders
      */
     public function __construct(array $loaders = [])
     {
@@ -33,20 +33,12 @@ class ChainLoader extends Loader
         }
     }
 
-    /**
-     * Adds a loader instance.
-     */
     public function addLoader(LoaderInterface $loader)
     {
         $this->loaders[] = $loader;
     }
 
-    /**
-     * Loads a template.
-     *
-     * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
-     */
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): Storage|false
     {
         foreach ($this->loaders as $loader) {
             if (false !== $storage = $loader->load($template)) {
@@ -57,14 +49,7 @@ class ChainLoader extends Loader
         return false;
     }
 
-    /**
-     * Returns true if the template is still fresh.
-     *
-     * @param int $time The last modification time of the cached template (timestamp)
-     *
-     * @return bool
-     */
-    public function isFresh(TemplateReferenceInterface $template, int $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         foreach ($this->loaders as $loader) {
             return $loader->isFresh($template, $time);

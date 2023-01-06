@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -75,10 +76,9 @@ class EventTraceSubscriber implements EventSubscriberInterface
     }
 }
 
+#[AsCommand(name: 'fail')]
 class FailingCommand extends Command
 {
-    protected static $defaultName = 'fail';
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         throw new \RuntimeException('I failed. Sorry.');

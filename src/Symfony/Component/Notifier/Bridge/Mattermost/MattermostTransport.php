@@ -11,29 +11,30 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mattermost;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Emanuele Panzeri <thepanz@gmail.com>
- *
- * @experimental in 5.1
  */
 final class MattermostTransport extends AbstractTransport
 {
-    private $token;
-    private $channel;
+    private string $token;
+    private string $channel;
+    private ?string $path;
 
-    public function __construct(string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(#[\SensitiveParameter] string $token, string $channel, string $path = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->channel = $channel;
+        $this->path = $path;
 
         parent::__construct($client, $dispatcher);
     }
@@ -54,10 +55,8 @@ final class MattermostTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
-
-        $endpoint = sprintf('https://%s/api/v4/posts', $this->getEndpoint());
 
         $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
         $options['message'] = $message->getSubject();
@@ -65,12 +64,21 @@ final class MattermostTransport extends AbstractTransport
         if (!isset($options['channel_id'])) {
             $options['channel_id'] = $message->getRecipientId() ?: $this->channel;
         }
+
+        $endpoint = sprintf('https://%s/api/v4/posts', $this->getEndpoint());
+
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->token,
             'json' => array_filter($options),
         ]);
 
-        if (201 !== $response->getStatusCode()) {
+        try {
+            $statusCode = $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException('Could not reach the remote Mattermost server.', $response, 0, $e);
+        }
+
+        if (201 !== $statusCode) {
             $result = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to post the Mattermost message: %s (%s).', $result['message'], $result['id']), $response);
@@ -78,9 +86,14 @@ final class MattermostTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['id']);
 
-        return $message;
+        return $sentMessage;
+    }
+
+    protected function getEndpoint(): string
+    {
+        return rtrim($this->host.($this->port ? ':'.$this->port : '').($this->path ?? ''), '/');
     }
 }

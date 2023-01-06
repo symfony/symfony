@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank as BlankConstraint;
-use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Tests\Fixtures\DummyConstraint;
+use Symfony\Component\Validator\Tests\Fixtures\DummyConstraintValidator;
 
 class ContainerConstraintValidatorFactoryTest extends TestCase
 {
@@ -47,8 +49,8 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 
     public function testGetInstanceInvalidValidatorClass()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ValidatorException');
-        $constraint = $this->getMockBuilder(Constraint::class)->getMock();
+        $this->expectException(ValidatorException::class);
+        $constraint = $this->createMock(Constraint::class);
         $constraint
             ->expects($this->once())
             ->method('validatedBy')
@@ -56,20 +58,5 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 
         $factory = new ContainerConstraintValidatorFactory(new Container());
         $factory->getInstance($constraint);
-    }
-}
-
-class DummyConstraint extends Constraint
-{
-    public function validatedBy(): string
-    {
-        return DummyConstraintValidator::class;
-    }
-}
-
-class DummyConstraintValidator extends ConstraintValidator
-{
-    public function validate($value, Constraint $constraint)
-    {
     }
 }

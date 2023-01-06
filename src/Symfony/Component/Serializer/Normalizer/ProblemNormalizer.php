@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
  * Normalizes errors according to the API Problem spec (RFC 7807).
@@ -23,10 +24,14 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
  */
 class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
+    public const TITLE = 'title';
+    public const TYPE = 'type';
+    public const STATUS = 'status';
+
     private $debug;
     private $defaultContext = [
-        'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-        'title' => 'An error occurred',
+        self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
+        self::TITLE => 'An error occurred',
     ];
 
     public function __construct(bool $debug = false, array $defaultContext = [])
@@ -35,39 +40,37 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
         $this->defaultContext = $defaultContext + $this->defaultContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize($exception, string $format = null, array $context = [])
+    public function normalize(mixed $object, string $format = null, array $context = []): array
     {
+        if (!$object instanceof FlattenException) {
+            throw new InvalidArgumentException(sprintf('The object must implement "%s".', FlattenException::class));
+        }
+
         $context += $this->defaultContext;
         $debug = $this->debug && ($context['debug'] ?? true);
 
         $data = [
-            'type' => $context['type'],
-            'title' => $context['title'],
-            'status' => $context['status'] ?? $exception->getStatusCode(),
-            'detail' => $debug ? $exception->getMessage() : $exception->getStatusText(),
+            self::TYPE => $context['type'],
+            self::TITLE => $context['title'],
+            self::STATUS => $context['status'] ?? $object->getStatusCode(),
+            'detail' => $debug ? $object->getMessage() : $object->getStatusText(),
         ];
         if ($debug) {
-            $data['class'] = $exception->getClass();
-            $data['trace'] = $exception->getTrace();
+            $data['class'] = $object->getClass();
+            $data['trace'] = $object->getTrace();
         }
 
         return $data;
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $context
      */
-    public function supportsNormalization($data, string $format = null): bool
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
     {
         return $data instanceof FlattenException;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheableSupportsMethod(): bool
     {
         return true;

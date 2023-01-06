@@ -13,9 +13,11 @@ namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\ConsoleCommandProcessor;
+use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleCommandProcessorTest extends TestCase
 {
@@ -28,7 +30,7 @@ class ConsoleCommandProcessorTest extends TestCase
         $processor = new ConsoleCommandProcessor();
         $processor->addCommandData($this->getConsoleEvent());
 
-        $record = $processor(['extra' => []]);
+        $record = $processor(RecordFactory::create());
 
         $this->assertArrayHasKey('command', $record['extra']);
         $this->assertEquals(
@@ -42,7 +44,7 @@ class ConsoleCommandProcessorTest extends TestCase
         $processor = new ConsoleCommandProcessor(true, true);
         $processor->addCommandData($this->getConsoleEvent());
 
-        $record = $processor(['extra' => []]);
+        $record = $processor(RecordFactory::create());
 
         $this->assertArrayHasKey('command', $record['extra']);
         $this->assertEquals(
@@ -55,21 +57,18 @@ class ConsoleCommandProcessorTest extends TestCase
     {
         $processor = new ConsoleCommandProcessor(true, true);
 
-        $record = $processor(['extra' => []]);
-        $this->assertEquals(['extra' => []], $record);
+        $record = $processor(RecordFactory::create());
+        $this->assertEquals([], $record['extra']);
     }
 
     private function getConsoleEvent(): ConsoleEvent
     {
-        $input = $this->getMockBuilder(InputInterface::class)->getMock();
+        $input = $this->createMock(InputInterface::class);
         $input->method('getArguments')->willReturn(self::TEST_ARGUMENTS);
         $input->method('getOptions')->willReturn(self::TEST_OPTIONS);
-        $command = $this->getMockBuilder(Command::class)->disableOriginalConstructor()->getMock();
+        $command = $this->createMock(Command::class);
         $command->method('getName')->willReturn(self::TEST_NAME);
-        $consoleEvent = $this->getMockBuilder(ConsoleEvent::class)->disableOriginalConstructor()->getMock();
-        $consoleEvent->method('getCommand')->willReturn($command);
-        $consoleEvent->method('getInput')->willReturn($input);
 
-        return $consoleEvent;
+        return new ConsoleEvent($command, $input, $this->createMock(OutputInterface::class));
     }
 }

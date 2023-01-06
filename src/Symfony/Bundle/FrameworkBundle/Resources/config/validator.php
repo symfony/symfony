@@ -13,9 +13,11 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
+use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Validation;
@@ -28,9 +30,7 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('validator', ValidatorInterface::class)
-            ->public()
             ->factory([service('validator.builder'), 'getValidator'])
-            ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
         ->alias(ValidatorInterface::class, 'validator')
 
         ->set('validator.builder', ValidatorBuilder::class)
@@ -66,9 +66,17 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('validator.expression', ExpressionValidator::class)
+            ->args([service('validator.expression_language')->nullOnInvalid()])
             ->tag('validator.constraint_validator', [
                 'alias' => 'validator.expression',
             ])
+
+        ->set('validator.expression_language', ExpressionLanguage::class)
+            ->args([service('cache.validator_expression_language')->nullOnInvalid()])
+
+        ->set('cache.validator_expression_language')
+            ->parent('cache.system')
+            ->tag('cache.pool')
 
         ->set('validator.email', EmailValidator::class)
             ->args([
@@ -88,6 +96,12 @@ return static function (ContainerConfigurator $container) {
                 'alias' => NotCompromisedPasswordValidator::class,
             ])
 
+        ->set('validator.when', WhenValidator::class)
+            ->args([service('validator.expression_language')->nullOnInvalid()])
+            ->tag('validator.constraint_validator', [
+                'alias' => WhenValidator::class,
+            ])
+
         ->set('validator.property_info_loader', PropertyInfoLoader::class)
             ->args([
                 service('property_info'),
@@ -95,5 +109,5 @@ return static function (ContainerConfigurator $container) {
                 service('property_info'),
             ])
             ->tag('validator.auto_mapper')
-        ;
+    ;
 };

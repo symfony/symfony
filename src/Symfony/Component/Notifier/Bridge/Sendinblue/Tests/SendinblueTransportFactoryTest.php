@@ -11,47 +11,43 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
-final class SendinblueTransportFactoryTest extends TestCase
+final class SendinblueTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn(): void
-    {
-        $factory = $this->initFactory();
-
-        $dsn = 'sendinblue://apiKey@default?sender=0611223344';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
-
-        $this->assertSame('sendinblue://host.test?sender=0611223344', (string) $transport);
-    }
-
-    public function testCreateWithNoPhoneThrowsMalformed(): void
-    {
-        $factory = $this->initFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $dsnIncomplete = 'sendinblue://apiKey@default';
-        $factory->create(Dsn::fromString($dsnIncomplete));
-    }
-
-    public function testSupportsSendinblueScheme(): void
-    {
-        $factory = $this->initFactory();
-
-        $dsn = 'sendinblue://apiKey@default?sender=0611223344';
-        $dsnUnsupported = 'foobarmobile://apiKey@default?sender=0611223344';
-
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
-    }
-
-    private function initFactory(): SendinblueTransportFactory
+    public function createFactory(): SendinblueTransportFactory
     {
         return new SendinblueTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'sendinblue://host.test?sender=0611223344',
+            'sendinblue://apiKey@host.test?sender=0611223344',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'sendinblue://apiKey@default?sender=0611223344'];
+        yield [false, 'somethingElse://apiKey@default?sender=0611223344'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing api_key' => ['sendinblue://default?sender=0611223344'];
+    }
+
+    public function missingRequiredOptionProvider(): iterable
+    {
+        yield 'missing option: sender' => ['sendinblue://apiKey@host.test'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://apiKey@default?sender=0611223344'];
+        yield ['somethingElse://apiKey@host']; // missing "sender" option
     }
 }

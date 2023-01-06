@@ -11,47 +11,47 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 
-final class SlackTransportFactoryTest extends TestCase
+final class SlackTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn(): void
+    public function createFactory(): SlackTransportFactory
     {
-        $factory = new SlackTransportFactory();
-
-        $host = 'testHost';
-        $channel = 'testChannel';
-        $transport = $factory->create(Dsn::fromString(sprintf('slack://testUser@%s/?channel=%s', $host, $channel)));
-
-        $this->assertSame(sprintf('slack://%s?channel=%s', $host, $channel), (string) $transport);
+        return new SlackTransportFactory();
     }
 
-    public function testCreateWithNoTokenThrowsMalformed(): void
+    public function createProvider(): iterable
     {
-        $factory = new SlackTransportFactory();
+        yield [
+            'slack://host.test',
+            'slack://xoxb-TestToken@host.test',
+        ];
 
-        $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('slack://%s/?channel=%s', 'testHost', 'testChannel')));
+        yield 'with path' => [
+            'slack://host.test?channel=testChannel',
+            'slack://xoxb-TestToken@host.test/?channel=testChannel',
+        ];
+
+        yield 'without path' => [
+            'slack://host.test?channel=testChannel',
+            'slack://xoxb-TestToken@host.test?channel=testChannel',
+        ];
     }
 
-    public function testSupportsSlackScheme(): void
+    public function supportsProvider(): iterable
     {
-        $factory = new SlackTransportFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('slack://host/?channel=testChannel')));
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?channel=testChannel')));
+        yield [true, 'slack://xoxb-TestToken@host?channel=testChannel'];
+        yield [false, 'somethingElse://xoxb-TestToken@host?channel=testChannel'];
     }
 
-    public function testNonSlackSchemeThrows(): void
+    public function incompleteDsnProvider(): iterable
     {
-        $factory = new SlackTransportFactory();
+        yield 'missing token' => ['slack://host.test?channel=testChannel'];
+    }
 
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://user:pwd@host/?channel=testChannel'));
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://xoxb-TestToken@host?channel=testChannel'];
     }
 }

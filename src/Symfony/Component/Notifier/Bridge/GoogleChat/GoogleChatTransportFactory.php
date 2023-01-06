@@ -14,39 +14,31 @@ namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
-use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
- *
- * @experimental in 5.2
  */
 final class GoogleChatTransportFactory extends AbstractTransportFactory
 {
     /**
-     * @param Dsn $dsn Format: googlechat://<key>:<token>@default/<space>?threadKey=<thread>
-     *
-     * @return GoogleChatTransport
+     * @param Dsn $dsn Format: googlechat://<key>:<token>@default/<space>?thread_key=<thread>
      */
-    public function create(Dsn $dsn): TransportInterface
+    public function create(Dsn $dsn): GoogleChatTransport
     {
         $scheme = $dsn->getScheme();
 
-        if ('googlechat' === $scheme) {
-            $space = explode('/', $dsn->getPath())[1];
-            $accessKey = $this->getUser($dsn);
-            $accessToken = $this->getPassword($dsn);
-            $threadKey = $dsn->getOption('threadKey');
-            $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-            $port = $dsn->getPort();
-
-            return (new GoogleChatTransport($space, $accessKey, $accessToken, $this->client, $this->dispatcher))
-                ->setThreadKey($threadKey)
-                ->setHost($host)
-                ->setPort($port);
+        if ('googlechat' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'googlechat', $this->getSupportedSchemes());
         }
 
-        throw new UnsupportedSchemeException($dsn, 'googlechat', $this->getSupportedSchemes());
+        $space = explode('/', $dsn->getPath())[1];
+        $accessKey = $this->getUser($dsn);
+        $accessToken = $this->getPassword($dsn);
+        $threadKey = $dsn->getOption('thread_key');
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
+
+        return (new GoogleChatTransport($space, $accessKey, $accessToken, $threadKey, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

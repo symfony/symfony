@@ -28,7 +28,7 @@ class AbstractExtensionTest extends TestCase
     public function testGetType()
     {
         $loader = new ConcreteExtension();
-        $this->assertInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType', $loader->getType('Symfony\Component\Form\Tests\Fixtures\FooType'));
+        $this->assertInstanceOf(FooType::class, $loader->getType('Symfony\Component\Form\Tests\Fixtures\FooType'));
     }
 }
 

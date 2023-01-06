@@ -34,7 +34,7 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
         $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
         $loginLinkHandler->expects($this->once())
             ->method('createLoginLink')
-            ->with($user)
+            ->with($user, $request)
             ->willReturn($linkDetails);
         $loginLinkHandler->expects($this->once())
             ->method('consumeLoginLink')
@@ -47,7 +47,7 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
         $requestStack->push($request);
 
         $linker = new FirewallAwareLoginLinkHandler($firewallMap, $locator, $requestStack);
-        $actualLinkDetails = $linker->createLoginLink($user);
+        $actualLinkDetails = $linker->createLoginLink($user, $request);
         $this->assertSame($linkDetails, $actualLinkDetails);
 
         $actualUser = $linker->consumeLoginLink($request);

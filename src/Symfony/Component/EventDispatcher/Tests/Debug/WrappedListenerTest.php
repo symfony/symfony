@@ -23,7 +23,7 @@ class WrappedListenerTest extends TestCase
      */
     public function testListenerDescription($listener, $expected)
     {
-        $wrappedListener = new WrappedListener($listener, null, $this->getMockBuilder(Stopwatch::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock());
+        $wrappedListener = new WrappedListener($listener, null, $this->createMock(Stopwatch::class), $this->createMock(EventDispatcherInterface::class));
 
         $this->assertStringMatchesFormat($expected, $wrappedListener->getPretty());
     }
@@ -40,6 +40,7 @@ class WrappedListenerTest extends TestCase
             [\Closure::fromCallable([new FooListener(), 'listen']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
             [\Closure::fromCallable(['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
             [\Closure::fromCallable(function () {}), 'closure'],
+            [[#[\Closure(name: FooListener::class)] static fn () => new FooListener(), 'listen'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
         ];
     }
 }

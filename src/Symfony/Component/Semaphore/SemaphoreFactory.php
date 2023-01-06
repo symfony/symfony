@@ -18,8 +18,6 @@ use Psr\Log\NullLogger;
 /**
  * Factory provides method to create semaphores.
  *
- * @experimental in 5.2
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
@@ -42,7 +40,16 @@ class SemaphoreFactory implements LoggerAwareInterface
      */
     public function createSemaphore(string $resource, int $limit, int $weight = 1, ?float $ttlInSecond = 300.0, bool $autoRelease = true): SemaphoreInterface
     {
-        $semaphore = new Semaphore(new Key($resource, $limit, $weight), $this->store, $ttlInSecond, $autoRelease);
+        return $this->createSemaphoreFromKey(new Key($resource, $limit, $weight), $ttlInSecond, $autoRelease);
+    }
+
+    /**
+     * @param float|null $ttlInSecond Maximum expected semaphore duration in seconds
+     * @param bool       $autoRelease Whether to automatically release the semaphore or not when the semaphore instance is destroyed
+     */
+    public function createSemaphoreFromKey(Key $key, ?float $ttlInSecond = 300.0, bool $autoRelease = true): SemaphoreInterface
+    {
+        $semaphore = new Semaphore($key, $this->store, $ttlInSecond, $autoRelease);
         $semaphore->setLogger($this->logger);
 
         return $semaphore;

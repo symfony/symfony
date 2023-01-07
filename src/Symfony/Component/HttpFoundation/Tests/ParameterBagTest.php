@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum;
 
 class ParameterBagTest extends TestCase
 {
@@ -231,10 +232,10 @@ class ParameterBagTest extends TestCase
     {
         $bag = new ParameterBag(['valid-value' => 1]);
 
-        $this->assertSame(Foo::Bar, $bag->getEnum('valid-value', Foo::class));
+        $this->assertSame(FooEnum::Bar, $bag->getEnum('valid-value', FooEnum::class));
 
-        $this->assertNull($bag->getEnum('invalid-key', Foo::class));
-        $this->assertSame(Foo::Bar, $bag->getEnum('invalid-key', Foo::class, Foo::Bar));
+        $this->assertNull($bag->getEnum('invalid-key', FooEnum::class));
+        $this->assertSame(FooEnum::Bar, $bag->getEnum('invalid-key', FooEnum::class, FooEnum::Bar));
     }
 
     public function testGetEnumThrowsExceptionWithNotBackingValue()
@@ -242,9 +243,13 @@ class ParameterBagTest extends TestCase
         $bag = new ParameterBag(['invalid-value' => 2]);
 
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum "Symfony\Component\HttpFoundation\Tests\Foo".');
+        if (\PHP_VERSION_ID >= 80200) {
+            $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum.');
+        } else {
+            $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum "Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum".');
+        }
 
-        $this->assertNull($bag->getEnum('invalid-value', Foo::class));
+        $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
 
     public function testGetEnumThrowsExceptionWithInvalidValueType()
@@ -252,13 +257,8 @@ class ParameterBagTest extends TestCase
         $bag = new ParameterBag(['invalid-value' => ['foo']]);
 
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: Symfony\Component\HttpFoundation\Tests\Foo::from(): Argument #1 ($value) must be of type int, array given.');
+        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum::from(): Argument #1 ($value) must be of type int, array given.');
 
-        $this->assertNull($bag->getEnum('invalid-value', Foo::class));
+        $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
-}
-
-enum Foo: int
-{
-    case Bar = 1;
 }

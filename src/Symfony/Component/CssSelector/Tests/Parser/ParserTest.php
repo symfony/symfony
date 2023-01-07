@@ -148,6 +148,10 @@ class ParserTest extends TestCase
             // unicode escape: \20 ==  (space)
             ['*[aval="\'\20  \'"]', ['Attribute[Element[*][aval = \'\'  \'\']]']],
             ["*[aval=\"'\\20\r\n '\"]", ['Attribute[Element[*][aval = \'\'  \'\']]']],
+            // unicode escape: \5c == \
+            ['*[aval="\\5cz"]', ['Attribute[Element[*][aval = \'\\z\']]']],
+            ['*[aval="\\5c\\z"]', ['Attribute[Element[*][aval = \'\\z\']]']],
+            ['*[aval="\\\\5cz"]', ['Attribute[Element[*][aval = \'\\5cz\']]']],
         ];
     }
 

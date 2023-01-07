@@ -140,7 +140,7 @@
         "predis/predis": "~1.1",
         "psr/http-client": "^1.0",
         "psr/simple-cache": "^1.0|^2.0",
-        "egulias/email-validator": "^2.1.10|^3.1",
+        "egulias/email-validator": "^2.1.10|^3.1|^4",
         "symfony/mercure-bundle": "^0.3",
         "symfony/phpunit-bridge": "^5.2|^6.0",
         "symfony/runtime": "self.version",

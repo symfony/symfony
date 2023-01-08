@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpClient;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -2678,12 +2677,18 @@ class FrameworkExtension extends Extension
 
         foreach ($headers as $h) {
             switch ($h) {
-                case 'forwarded': $trustedHeaders |= Request::HEADER_FORWARDED; break;
-                case 'x-forwarded-for': $trustedHeaders |= Request::HEADER_X_FORWARDED_FOR; break;
-                case 'x-forwarded-host': $trustedHeaders |= Request::HEADER_X_FORWARDED_HOST; break;
-                case 'x-forwarded-proto': $trustedHeaders |= Request::HEADER_X_FORWARDED_PROTO; break;
-                case 'x-forwarded-port': $trustedHeaders |= Request::HEADER_X_FORWARDED_PORT; break;
-                case 'x-forwarded-prefix': $trustedHeaders |= Request::HEADER_X_FORWARDED_PREFIX; break;
+                case 'forwarded': $trustedHeaders |= Request::HEADER_FORWARDED;
+                break;
+                case 'x-forwarded-for': $trustedHeaders |= Request::HEADER_X_FORWARDED_FOR;
+                break;
+                case 'x-forwarded-host': $trustedHeaders |= Request::HEADER_X_FORWARDED_HOST;
+                break;
+                case 'x-forwarded-proto': $trustedHeaders |= Request::HEADER_X_FORWARDED_PROTO;
+                break;
+                case 'x-forwarded-port': $trustedHeaders |= Request::HEADER_X_FORWARDED_PORT;
+                break;
+                case 'x-forwarded-prefix': $trustedHeaders |= Request::HEADER_X_FORWARDED_PREFIX;
+                break;
             }
         }
 

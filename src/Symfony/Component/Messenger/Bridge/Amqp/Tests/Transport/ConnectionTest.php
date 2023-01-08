@@ -149,8 +149,8 @@ class ConnectionTest extends TestCase
     public function testSetsParametersOnTheQueueAndExchange()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
             $amqpQueue = $this->createMock(\AMQPQueue::class),
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
@@ -232,8 +232,8 @@ class ConnectionTest extends TestCase
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createMock(\AMQPConnection::class),
             $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $amqpExchange = $this->createMock(\AMQPExchange::class)
+            $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPExchange::class)
         );
 
         // makes sure the channel looks connected, so it's not re-created
@@ -249,8 +249,8 @@ class ConnectionTest extends TestCase
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createMock(\AMQPConnection::class),
             $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $amqpExchange = $this->createMock(\AMQPExchange::class)
+            $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPExchange::class)
         );
 
         // makes sure the channel looks connected, so it's not re-created
@@ -264,8 +264,8 @@ class ConnectionTest extends TestCase
     public function testItSetupsTheConnectionWithDefaults()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
             $amqpQueue = $this->createMock(\AMQPQueue::class),
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
@@ -389,6 +389,8 @@ class ConnectionTest extends TestCase
         $amqpChannel = $this->createMock(\AMQPChannel::class);
         $amqpExchange = $this->createMock(\AMQPExchange::class);
         $amqpQueue = $this->createMock(\AMQPQueue::class);
+        $timestampTime = time();
+        $amqpStamp = new AmqpStamp(null, \AMQP_NOPARAM, ['timestamp' => $timestampTime]);
 
         $factory = $this->createMock(AmqpFactory::class);
         $factory->method('createConnection')->willReturn($amqpConnection);
@@ -397,7 +399,8 @@ class ConnectionTest extends TestCase
         $factory->method('createQueue')->willReturn($amqpQueue);
 
         $amqpExchange->expects($this->once())->method('declareExchange');
-        $amqpExchange->expects($this->once())->method('publish')->with('body', null, AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2]);
+        $amqpExchange->expects($this->once())->method('publish')
+            ->with('body', null, AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => $timestampTime]);
         $amqpQueue->expects($this->once())->method('declareQueue');
         $amqpQueue->expects($this->exactly(2))->method('bind')->withConsecutive(
             [self::DEFAULT_EXCHANGE_NAME, null, ['x-match' => 'all', 'header-property' => 'change']],
@@ -412,7 +415,7 @@ class ConnectionTest extends TestCase
             '&queues[queue0][bindings][two][key]=binding_key0';
 
         $connection = Connection::fromDsn($dsn, [], $factory);
-        $connection->publish('body');
+        $connection->publish('body', [], 0, $amqpStamp);
     }
 
     public function testItCanDisableTheSetup()
@@ -441,8 +444,8 @@ class ConnectionTest extends TestCase
     public function testItSetupQueuesOnce()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
             $amqpQueue = $this->createMock(\AMQPQueue::class),
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
@@ -560,9 +563,9 @@ class ConnectionTest extends TestCase
         $this->expectExceptionMessage('Could not connect to the AMQP server. Please verify the provided DSN.');
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $amqpExchange = $this->createMock(\AMQPExchange::class)
+            $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPExchange::class)
         );
 
         $amqpConnection->method('connect')->willThrowException(
@@ -579,10 +582,10 @@ class ConnectionTest extends TestCase
         $this->expectExceptionMessage('No CA certificate has been provided. Set "amqp.cacert" in your php.ini or pass the "cacert" parameter in the DSN to use SSL. Alternatively, you can use amqp:// to use without SSL.');
 
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $amqpExchange = $this->createMock(\AMQPExchange::class)
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPExchange::class)
         );
 
         $oldCaCertValue = ini_set('amqp.cacert', '');
@@ -627,9 +630,9 @@ class ConnectionTest extends TestCase
     public function testItCanPublishWithTheDefaultRoutingKey()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
+             $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
 
@@ -642,9 +645,9 @@ class ConnectionTest extends TestCase
     public function testItCanPublishWithASuppliedRoutingKey()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
 
@@ -697,9 +700,9 @@ class ConnectionTest extends TestCase
     public function testItCanPublishWithCustomFlagsAndAttributes()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
 
@@ -717,10 +720,10 @@ class ConnectionTest extends TestCase
     public function testItPublishMessagesWithoutWaitingForConfirmation()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPConnection::class),
             $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $amqpExchange = $this->createMock(\AMQPExchange::class)
+            $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPExchange::class)
         );
 
         $amqpChannel->expects($this->never())->method('waitForConfirm')->with(0.5);
@@ -732,10 +735,10 @@ class ConnectionTest extends TestCase
     public function testSetChannelToConfirmMessage()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPConnection::class),
             $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $amqpExchange = $this->createMock(\AMQPExchange::class)
+            $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPExchange::class)
         );
 
         $amqpChannel->expects($this->once())->method('confirmSelect');
@@ -747,10 +750,10 @@ class ConnectionTest extends TestCase
     public function testItCanPublishAndWaitForConfirmation()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPConnection::class),
             $amqpChannel = $this->createMock(\AMQPChannel::class),
-            $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $amqpExchange = $this->createMock(\AMQPExchange::class)
+            $this->createMock(\AMQPQueue::class),
+            $this->createMock(\AMQPExchange::class)
         );
 
         $amqpChannel->expects($this->once())->method('waitForConfirm')->with(0.5);
@@ -814,10 +817,10 @@ class ConnectionTest extends TestCase
 
 class TestAmqpFactory extends AmqpFactory
 {
-    private $connection;
-    private $channel;
-    private $queue;
-    private $exchange;
+    private \AMQPConnection $connection;
+    private \AMQPChannel $channel;
+    private \AMQPQueue $queue;
+    private \AMQPExchange $exchange;
 
     public function __construct(\AMQPConnection $connection, \AMQPChannel $channel, \AMQPQueue $queue, \AMQPExchange $exchange)
     {

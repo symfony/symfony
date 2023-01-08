@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum;
 
 class InputBagTest extends TestCase
 {
@@ -111,7 +112,7 @@ class InputBagTest extends TestCase
     {
         $bag = new InputBag(['valid-value' => 1]);
 
-        $this->assertSame(Foo::Bar, $bag->getEnum('valid-value', Foo::class));
+        $this->assertSame(FooEnum::Bar, $bag->getEnum('valid-value', FooEnum::class));
     }
 
     public function testGetEnumThrowsExceptionWithInvalidValue()
@@ -119,8 +120,12 @@ class InputBagTest extends TestCase
         $bag = new InputBag(['invalid-value' => 2]);
 
         $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum "Symfony\Component\HttpFoundation\Tests\Foo".');
+        if (\PHP_VERSION_ID >= 80200) {
+            $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum.');
+        } else {
+            $this->expectExceptionMessage('Parameter "invalid-value" cannot be converted to enum: 2 is not a valid backing value for enum "Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum".');
+        }
 
-        $this->assertNull($bag->getEnum('invalid-value', Foo::class));
+        $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
 }

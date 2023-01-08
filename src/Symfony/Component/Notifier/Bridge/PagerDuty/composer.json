@@ -1,0 +1,30 @@
+{
+    "name": "symfony/pager-duty-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony PagerDuty Notifier Bridge",
+    "keywords": ["chat", "pagerduty", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joseph Bielawski",
+            "email": "stloyd@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-client": "^5.4|^6.3",
+        "symfony/notifier": "^6.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\PagerDuty\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

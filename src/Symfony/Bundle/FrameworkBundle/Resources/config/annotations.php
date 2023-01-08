@@ -22,19 +22,13 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
 return static function (ContainerConfigurator $container) {
-    // compatibility layer to support doctrine/annotations ^1.0 and ^2.0
-    // registerLoader only exists in doctrine/annotations ^1.0
-    if (method_exists(AnnotationRegistry::class, 'registerLoader')) {
-        // registerUniqueLoader only exists in doctrine/annotations ^1.6
-        if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
-            $container->services()
-                ->set('annotations.dummy_registry', AnnotationRegistry::class)
-                ->call('registerUniqueLoader', ['class_exists']);
-        } else {
-            $container->services()
-                ->set('annotations.dummy_registry', AnnotationRegistry::class)
-                ->call('registerLoader', ['class_exists']);
-        }
+    // compatibility layer to support doctrine/annotations ^1.13 and ^2.0
+    // registerUniqueLoader only exists in doctrine/annotations ^1.13
+    // (it was added in 1.6 but a conflict forbid versions lower than 1.13.1)
+    if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
+        $container->services()
+            ->set('annotations.dummy_registry', AnnotationRegistry::class)
+            ->call('registerUniqueLoader', ['class_exists']);
 
         $container->services()
             ->set('annotations.reader', AnnotationReader::class)
@@ -44,7 +38,7 @@ return static function (ContainerConfigurator $container) {
             ])
         ;
     }
-    // for doctrine/annotations v2
+    // with doctrine/annotations v2, there's no need for annotations.dummy_registry
     else {
         $container->services()
             ->set('annotations.reader', AnnotationReader::class)

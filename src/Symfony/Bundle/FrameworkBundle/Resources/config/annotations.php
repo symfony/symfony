@@ -22,16 +22,36 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
 return static function (ContainerConfigurator $container) {
-    $container->services()
-        ->set('annotations.reader', AnnotationReader::class)
+    // compatibility layer to support doctrine/annotations ^1.0 and ^2.0
+    // registerLoader only exists in doctrine/annotations ^1.0
+    if (method_exists(AnnotationRegistry::class, 'registerLoader')) {
+        // registerUniqueLoader only exists in doctrine/annotations ^1.6
+        if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
+            $container->services()
+                ->set('annotations.dummy_registry', AnnotationRegistry::class)
+                ->call('registerUniqueLoader', ['class_exists']);
+        } else {
+            $container->services()
+                ->set('annotations.dummy_registry', AnnotationRegistry::class)
+                ->call('registerLoader', ['class_exists']);
+        }
+
+        $container->services()
+            ->set('annotations.reader', AnnotationReader::class)
             ->call('addGlobalIgnoredName', [
                 'required',
                 service('annotations.dummy_registry')->ignoreOnInvalid(), // dummy arg to register class_exists as annotation loader only when required
             ])
+        ;
+    }
+    // for doctrine/annotations v2
+    else {
+        $container->services()
+            ->set('annotations.reader', AnnotationReader::class)
+            ->call('addGlobalIgnoredName', ['required']);
+    }
 
-        ->set('annotations.dummy_registry', AnnotationRegistry::class)
-            ->call('registerUniqueLoader', ['class_exists'])
-
+    $container->services()
         ->set('annotations.cached_reader', PsrCachedReader::class)
             ->args([
                 service('annotations.reader'),

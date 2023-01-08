@@ -14,7 +14,9 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireAsDecoratorPass;
@@ -39,6 +41,11 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class AutowirePassTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        ClassExistsMock::register(AutowirePass::class);
+    }
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -502,6 +509,30 @@ class AutowirePassTest extends TestCase
         } catch (AutowiringFailedException $e) {
             $this->assertMatchesRegularExpression('{^Cannot autowire service "a": argument "\$r" of method "(Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Compiler\\\\)BadParentTypeHintedArgument::__construct\(\)" has type "\1OptionalServiceClass" but this class is missing a parent class \(Class "?Symfony\\\\Bug\\\\NotExistClass"? not found}', (string) $e->getMessage());
         }
+    }
+
+    public function testParentClassNotFoundThrowsExceptionWithoutConfigComponent()
+    {
+        ClassExistsMock::withMockedClasses([
+            ClassExistenceResource::class => false,
+        ]);
+
+        $container = new ContainerBuilder();
+
+        $aDefinition = $container->register('a', BadParentTypeHintedArgument::class);
+        $aDefinition->setAutowired(true);
+
+        $container->register(Dunglas::class, Dunglas::class);
+
+        $pass = new AutowirePass();
+        try {
+            $pass->process($container);
+            $this->fail('AutowirePass should have thrown an exception');
+        } catch (AutowiringFailedException $e) {
+            $this->assertSame('Cannot autowire service "a": argument "$r" of method "Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\BadParentTypeHintedArgument::__construct()" has type "Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\OptionalServiceClass" but this class couldn\'t be loaded. Either it was not found or it is missing a parent class or a trait.', $e->getMessage());
+        }
+
+        ClassExistsMock::withMockedClasses([]);
     }
 
     public function testDontUseAbstractServices()

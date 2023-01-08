@@ -540,15 +540,19 @@ class AutowirePass extends AbstractRecursivePass
         if (!$r = $this->container->getReflectionClass($type, false)) {
             // either $type does not exist or a parent class does not exist
             try {
-                $resource = new ClassExistenceResource($type, false);
-                // isFresh() will explode ONLY if a parent class/trait does not exist
-                $resource->isFresh(0);
-                $parentMsg = false;
+                if (class_exists(ClassExistenceResource::class)) {
+                    $resource = new ClassExistenceResource($type, false);
+                    // isFresh() will explode ONLY if a parent class/trait does not exist
+                    $resource->isFresh(0);
+                    $parentMsg = false;
+                } else {
+                    $parentMsg = "couldn't be loaded. Either it was not found or it is missing a parent class or a trait";
+                }
             } catch (\ReflectionException $e) {
-                $parentMsg = $e->getMessage();
+                $parentMsg = sprintf('is missing a parent class (%s)', $e->getMessage());
             }
 
-            $message = sprintf('has type "%s" but this class %s.', $type, $parentMsg ? sprintf('is missing a parent class (%s)', $parentMsg) : 'was not found');
+            $message = sprintf('has type "%s" but this class %s.', $type, $parentMsg ?: 'was not found');
         } elseif ($reference->getAttributes()) {
             $message = $label;
             $label = sprintf('"#[Target(\'%s\')" on', $reference->getName());

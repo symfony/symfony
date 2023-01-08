@@ -64,9 +64,11 @@ final class MethodMarkingStore implements MarkingStoreInterface
         if (null === $marking) {
             return new Marking();
         }
-        
+
         if($marking instanceof \BackedEnum) {
             $marking = $marking->value;
+        }elseif($marking instanceof \UnitEnum) {
+            $marking = $marking->name;
         }
 
         if ($this->singleState) {

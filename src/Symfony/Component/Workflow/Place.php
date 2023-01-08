@@ -10,6 +10,9 @@ class Place
 
     public function name(): string
     {
+        if($this->value instanceof \BackedEnum) {
+            return $this->value->value;
+        }
         if($this->value instanceof \UnitEnum) {
             return $this->value->name;
         }

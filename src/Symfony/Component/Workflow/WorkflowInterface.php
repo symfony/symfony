@@ -30,19 +30,19 @@ interface WorkflowInterface
     /**
      * Returns true if the transition is enabled.
      */
-    public function can(object $subject, string $transitionName): bool;
+    public function can(object $subject, string|\UnitEnum $transitionName): bool;
 
     /**
      * Builds a TransitionBlockerList to know why a transition is blocked.
      */
-    public function buildTransitionBlockerList(object $subject, string $transitionName): TransitionBlockerList;
+    public function buildTransitionBlockerList(object $subject, string|\UnitEnum $transitionName): TransitionBlockerList;
 
     /**
      * Fire a transition.
      *
      * @throws LogicException If the transition is not applicable
      */
-    public function apply(object $subject, string $transitionName, array $context = []): Marking;
+    public function apply(object $subject, string|\UnitEnum $transitionName, array $context = []): Marking;
 
     /**
      * Returns all enabled transitions.

@@ -25,25 +25,32 @@ class Transition
      * @param string|string[] $froms
      * @param string|string[] $tos
      */
-    public function __construct(string|\UnitEnum $name, string|array|\UnitEnum $froms, string|array|\UnitEnum $tos)
+    public function __construct(string $name, string|array|\UnitEnum $froms, string|array|\UnitEnum $tos)
     {
         $this->name = $name;
-        if($froms instanceof \UnitEnum) {
-            $this->froms = [$froms->name];
-        }else{
+        if ($froms instanceof \UnitEnum) {
+            $this->froms = [$froms];
+        } else {
             $this->froms = (array)$froms;
         }
 
-        if($tos instanceof \UnitEnum) {
-            $this->tos = [$tos->name];
-        }else{
+        if ($tos instanceof \UnitEnum) {
+            $this->tos = [$tos];
+        } else {
             $this->tos = (array)$tos;
         }
     }
 
     public function getName(): string
     {
-        return $this->name instanceof \UnitEnum ? $this->name->name : $this->name;
+        if ($this->name instanceof \BackedEnum) {
+            return $this->name->value;
+        }
+        if ($this->name instanceof \UnitEnum) {
+            return $this->name->name;
+        }
+
+        return $this->name;
     }
 
     /**
@@ -52,7 +59,14 @@ class Transition
     public function getFroms(): array
     {
         return array_map(static function (string|\UnitEnum $from) {
-            return $from instanceof \UnitEnum ? $from->name : $from;
+            if ($from instanceof \BackedEnum) {
+                return $from->value;
+            }
+            if ($from instanceof \UnitEnum) {
+                return $from->name;
+            }
+
+            return $from;
         }, $this->froms);
     }
 
@@ -62,7 +76,14 @@ class Transition
     public function getTos(): array
     {
         return array_map(static function (string|\UnitEnum $to) {
-            return $to instanceof \UnitEnum ? $to->name : $to;
+            if ($to instanceof \BackedEnum) {
+                return $to->value;
+            }
+            if ($to instanceof \UnitEnum) {
+                return $to->name;
+            }
+
+            return $to;
         }, $this->tos);
     }
 }

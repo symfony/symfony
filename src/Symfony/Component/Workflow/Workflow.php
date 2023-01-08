@@ -86,7 +86,7 @@ class Workflow implements WorkflowInterface
                 throw new LogicException(sprintf('The Marking is empty and there is no initial place for workflow "%s".', $this->name));
             }
             foreach ($this->definition->getInitialPlaces() as $place) {
-                $marking->mark($place);
+                $marking->mark($place->name());
             }
 
             // update the subject with the new marking
@@ -115,10 +115,11 @@ class Workflow implements WorkflowInterface
         return $marking;
     }
 
-    public function can(object $subject, string $transitionName): bool
+    public function can(object $subject, string|\UnitEnum $transitionName): bool
     {
         $transitions = $this->definition->getTransitions();
         $marking = $this->getMarking($subject);
+        $transitionName = $this->transitionNameToString($transitionName);
 
         foreach ($transitions as $transition) {
             if ($transition->getName() !== $transitionName) {
@@ -135,11 +136,12 @@ class Workflow implements WorkflowInterface
         return false;
     }
 
-    public function buildTransitionBlockerList(object $subject, string $transitionName): TransitionBlockerList
+    public function buildTransitionBlockerList(object $subject, string|\UnitEnum $transitionName): TransitionBlockerList
     {
         $transitions = $this->definition->getTransitions();
         $marking = $this->getMarking($subject);
         $transitionBlockerList = null;
+        $transitionName = $this->transitionNameToString($transitionName);
 
         foreach ($transitions as $transition) {
             if ($transition->getName() !== $transitionName) {
@@ -168,9 +170,10 @@ class Workflow implements WorkflowInterface
         return $transitionBlockerList;
     }
 
-    public function apply(object $subject, string $transitionName, array $context = []): Marking
+    public function apply(object $subject, string|\UnitEnum $transitionName, array $context = []): Marking
     {
         $marking = $this->getMarking($subject, $context);
+        $transitionName = $this->transitionNameToString($transitionName);
 
         $transitionExist = false;
         $approvedTransitions = [];
@@ -444,5 +447,13 @@ class Workflow implements WorkflowInterface
         }
 
         return \in_array($eventName, $this->eventsToDispatch, true);
+    }
+
+    private function transitionNameToString(string|\UnitEnum $transitionName): string
+    {
+        if($transitionName instanceof \UnitEnum) {
+            return $transitionName->name;
+        }
+        return $transitionName;
     }
 }

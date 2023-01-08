@@ -17,7 +17,7 @@ namespace Symfony\Component\Workflow;
  */
 class Transition
 {
-    private string $name;
+    private string|\UnitEnum $name;
     private array $froms;
     private array $tos;
 
@@ -25,16 +25,25 @@ class Transition
      * @param string|string[] $froms
      * @param string|string[] $tos
      */
-    public function __construct(string $name, string|array $froms, string|array $tos)
+    public function __construct(string|\UnitEnum $name, string|array|\UnitEnum $froms, string|array|\UnitEnum $tos)
     {
         $this->name = $name;
-        $this->froms = (array) $froms;
-        $this->tos = (array) $tos;
+        if($froms instanceof \UnitEnum) {
+            $this->froms = [$froms->name];
+        }else{
+            $this->froms = (array)$froms;
+        }
+
+        if($tos instanceof \UnitEnum) {
+            $this->tos = [$tos->name];
+        }else{
+            $this->tos = (array)$tos;
+        }
     }
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->name instanceof \UnitEnum ? $this->name->name : $this->name;
     }
 
     /**
@@ -42,7 +51,9 @@ class Transition
      */
     public function getFroms(): array
     {
-        return $this->froms;
+        return array_map(static function (string|\UnitEnum $from) {
+            return $from instanceof \UnitEnum ? $from->name : $from;
+        }, $this->froms);
     }
 
     /**
@@ -50,6 +61,8 @@ class Transition
      */
     public function getTos(): array
     {
-        return $this->tos;
+        return array_map(static function (string|\UnitEnum $to) {
+            return $to instanceof \UnitEnum ? $to->name : $to;
+        }, $this->tos);
     }
 }

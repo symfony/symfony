@@ -68,12 +68,13 @@ class MermaidDumper implements DumperInterface
         $meta = $definition->getMetadataStore();
 
         foreach ($definition->getPlaces() as $place) {
+            $placeName = $place->name();
             [$placeNode, $placeStyle] = $this->preparePlace(
                 $placeId,
-                $place,
-                $meta->getPlaceMetadata($place),
+                $place->name(),
+                $meta->getPlaceMetadata($placeName),
                 \in_array($place, $definition->getInitialPlaces()),
-                $marking?->has($place) ?? false
+                $marking?->has($placeName) ?? false
             );
 
             $output[] = $placeNode;
@@ -82,7 +83,7 @@ class MermaidDumper implements DumperInterface
                 $output[] = $placeStyle;
             }
 
-            $placeNameMap[$place] = $place.$placeId;
+            $placeNameMap[$placeName] = $placeName.$placeId;
 
             ++$placeId;
         }

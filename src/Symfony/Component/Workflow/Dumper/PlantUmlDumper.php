@@ -70,7 +70,7 @@ class PlantUmlDumper implements DumperInterface
         $code = $this->initialize($options, $definition);
 
         foreach ($definition->getPlaces() as $place) {
-            $code[] = $this->getState($place, $definition, $marking);
+            $code[] = $this->getState($place->name(), $definition, $marking);
         }
         if ($this->isWorkflowTransitionType()) {
             foreach ($definition->getTransitions() as $transition) {
@@ -157,7 +157,7 @@ class PlantUmlDumper implements DumperInterface
 
         // Add style from nodes
         foreach ($definition->getPlaces() as $place) {
-            $backgroundColor = $workflowMetadata->getMetadata('bg_color', $place);
+            $backgroundColor = $workflowMetadata->getMetadata('bg_color', $place->name());
             if (null !== $backgroundColor) {
                 $key = 'BackgroundColor<<'.$this->getColorId($backgroundColor).'>>';
 

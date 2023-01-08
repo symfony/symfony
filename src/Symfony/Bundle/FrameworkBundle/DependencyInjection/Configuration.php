@@ -466,6 +466,12 @@ class Configuration implements ConfigurationInterface
                                                     return $places;
                                                 }
 
+                                                if(isset($places[0]) && $places[0] instanceof \UnitEnum) {
+                                                    return array_map(function(\UnitEnum $place) {
+                                                        return ['name' => $place];
+                                                    }, $places);
+                                                }
+
                                                 foreach ($places as $name => $place) {
                                                     if (\is_array($place) && \array_key_exists('name', $place)) {
                                                         continue;
@@ -530,8 +536,13 @@ class Configuration implements ConfigurationInterface
                                                 ->end()
                                                 ->arrayNode('from')
                                                     ->beforeNormalization()
-                                                        ->ifString()
-                                                        ->then(function ($v) { return [$v]; })
+                                                        ->always()
+                                                        ->then(function ($v) {
+                                                            if(is_string($v) || $v instanceof \UnitEnum) {
+                                                                return [$v];
+                                                            }
+                                                            // throw exception ?
+                                                        })
                                                     ->end()
                                                     ->requiresAtLeastOneElement()
                                                     ->prototype('scalar')
@@ -540,8 +551,13 @@ class Configuration implements ConfigurationInterface
                                                 ->end()
                                                 ->arrayNode('to')
                                                     ->beforeNormalization()
-                                                        ->ifString()
-                                                        ->then(function ($v) { return [$v]; })
+                                                        ->always()
+                                                        ->then(function ($v) {
+                                                            if(is_string($v) || $v instanceof \UnitEnum) {
+                                                                return [$v];
+                                                            }
+                                                            // throw exception ?
+                                                        })
                                                     ->end()
                                                     ->requiresAtLeastOneElement()
                                                     ->prototype('scalar')

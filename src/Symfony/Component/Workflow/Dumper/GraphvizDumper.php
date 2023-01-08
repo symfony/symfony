@@ -68,23 +68,23 @@ class GraphvizDumper implements DumperInterface
 
         foreach ($definition->getPlaces() as $place) {
             $attributes = [];
-            if (\in_array($place, $definition->getInitialPlaces(), true)) {
+            if (\in_array($place->name(), $definition->getInitialPlaces(), true)) {
                 $attributes['style'] = 'filled';
             }
-            if ($marking?->has($place)) {
+            if ($marking?->has($place->name())) {
                 $attributes['color'] = '#FF0000';
                 $attributes['shape'] = 'doublecircle';
             }
-            $backgroundColor = $workflowMetadata->getMetadata('bg_color', $place);
+            $backgroundColor = $workflowMetadata->getMetadata('bg_color', $place->name());
             if (null !== $backgroundColor) {
                 $attributes['style'] = 'filled';
                 $attributes['fillcolor'] = $backgroundColor;
             }
-            $label = $workflowMetadata->getMetadata('label', $place);
+            $label = $workflowMetadata->getMetadata('label', $place->name());
             if (null !== $label) {
                 $attributes['name'] = $label;
             }
-            $places[$place] = [
+            $places[$place->name()] = [
                 'attributes' => $attributes,
             ];
         }

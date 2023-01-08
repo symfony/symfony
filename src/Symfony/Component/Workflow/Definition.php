@@ -28,14 +28,14 @@ final class Definition
     private MetadataStoreInterface $metadataStore;
 
     /**
-     * @param string[]             $places
+     * @param string|\UnitEnum[]             $places
      * @param Transition[]         $transitions
      * @param string|string[]|null $initialPlaces
      */
     public function __construct(array $places, array $transitions, string|array $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
-            $this->addPlace($place);
+            $this->addPlace(new Place($place));
         }
 
         foreach ($transitions as $transition) {
@@ -48,7 +48,7 @@ final class Definition
     }
 
     /**
-     * @return string[]
+     * @return Place[]
      */
     public function getInitialPlaces(): array
     {
@@ -56,7 +56,7 @@ final class Definition
     }
 
     /**
-     * @return string[]
+     * @return Place[]
      */
     public function getPlaces(): array
     {
@@ -85,10 +85,12 @@ final class Definition
             return;
         }
 
-        $places = (array) $places;
+        $places = array_map(static function(string|\UnitEnum $place): Place {
+            return new Place($place);
+        }, (array) $places);
 
         foreach ($places as $place) {
-            if (!isset($this->places[$place])) {
+            if (!isset($this->places[$place->name()])) {
                 throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
             }
         }
@@ -96,13 +98,13 @@ final class Definition
         $this->initialPlaces = $places;
     }
 
-    private function addPlace(string $place)
+    private function addPlace(Place $place)
     {
         if (!\count($this->places)) {
             $this->initialPlaces = [$place];
         }
 
-        $this->places[$place] = $place;
+        $this->places[$place->name()] = $place;
     }
 
     private function addTransition(Transition $transition)

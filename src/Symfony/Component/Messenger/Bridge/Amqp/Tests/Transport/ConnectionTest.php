@@ -421,8 +421,8 @@ class ConnectionTest extends TestCase
     public function testItCanDisableTheSetup()
     {
         $factory = new TestAmqpFactory(
-            $amqpConnection = $this->createMock(\AMQPConnection::class),
-            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
             $amqpQueue = $this->createMock(\AMQPQueue::class),
             $amqpExchange = $this->createMock(\AMQPExchange::class)
         );
@@ -469,7 +469,7 @@ class ConnectionTest extends TestCase
         $factory->method('createChannel')->willReturn($amqpChannel);
         $factory->method('createQueue')->will($this->onConsecutiveCalls(
             $amqpQueue = $this->createMock(\AMQPQueue::class),
-            $delayQueue = $this->createMock(\AMQPQueue::class)
+            $this->createMock(\AMQPQueue::class)
         ));
         $factory->method('createExchange')->will($this->onConsecutiveCalls(
             $amqpExchange = $this->createMock(\AMQPExchange::class),

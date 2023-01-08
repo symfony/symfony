@@ -114,6 +114,11 @@ acme_root:
         # which should be indented
         child3:               ~ # Example: 'example setting'
     scalar_prototyped:    []
+    variable:
+
+        # Examples:
+        - foo
+        - bar
     parameters:
 
         # Prototype: Parameter name

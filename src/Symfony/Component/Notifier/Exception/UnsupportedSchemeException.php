@@ -156,6 +156,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',
         ],
+        'pagerduty' => [
+            'class' => Bridge\PagerDuty\PagerDutyTransportFactory::class,
+            'package' => 'symfony/pager-duty-notifier',
+        ],
         'plivo' => [
             'class' => Bridge\Plivo\PlivoTransportFactory::class,
             'package' => 'symfony/plivo-notifier',

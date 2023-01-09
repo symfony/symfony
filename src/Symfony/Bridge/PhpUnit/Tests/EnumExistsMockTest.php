@@ -23,6 +23,9 @@ class EnumExistsMockTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
+        // Require the fixture file to allow PHP to be fully aware of the enum existence
+        require __DIR__.'/Fixtures/ExistingEnumReal.php';
+
         ClassExistsMock::register(__CLASS__);
     }
 
@@ -32,6 +35,11 @@ class EnumExistsMockTest extends TestCase
             ExistingEnum::class => false,
             'NonExistingEnum' => true,
         ]);
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        ClassExistsMock::withMockedEnums([]);
     }
 
     public function testClassExists()

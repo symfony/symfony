@@ -351,16 +351,22 @@ abstract class AbstractCrawlerTest extends TestCase
     public function testInnerText()
     {
         self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element"]'));
+
         self::assertSame('Parent text Child text', $crawler->text());
         self::assertSame('Parent text', $crawler->innerText());
+        self::assertSame(' Parent text ', $crawler->innerText(false));
 
         self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element-two"]'));
+
         self::assertSame('Child text Parent text', $crawler->text());
         self::assertSame('Parent text', $crawler->innerText());
+        self::assertSame(' Parent text ', $crawler->innerText(false));
 
         self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath('//*[@id="complex-element-three"]'));
+
         self::assertSame('Parent text Child text Parent text', $crawler->text());
         self::assertSame('Parent text', $crawler->innerText());
+        self::assertSame(' Parent text ', $crawler->innerText(false));
     }
 
     public function testHtml()
@@ -1272,19 +1278,9 @@ HTML;
                         <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
                     <div id="sibling"><img /></div>
-                    <div id="complex-element">
-                        Parent text
-                        <span>Child text</span>
-                    </div>
-                    <div id="complex-element-two">
-                        <span>Child text</span>
-                        Parent text
-                    </div>
-                    <div id="complex-element-three">
-                        Parent text
-                        <span>Child text</span>
-                        Parent text
-                    </div>
+                    <div id="complex-element"> Parent text <span>Child text</span> </div>
+                    <div id="complex-element-two"> <span>Child text</span> Parent text </div>
+                    <div id="complex-element-three"> Parent text <span>Child text</span> Parent text </div>
                 </body>
             </html>
         ');

@@ -562,11 +562,11 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns only the inner text that is the direct descendent of the current node, excluding any child nodes.
      */
-    public function innerText(): string
+    public function innerText(bool $normalizeWhitespace = true): string
     {
         foreach ($this->getNode(0)->childNodes as $childNode) {
             if (\XML_TEXT_NODE === $childNode->nodeType && '' !== trim($childNode->nodeValue)) {
-                return $this->normalizeWhitespace($childNode->nodeValue);
+                return $normalizeWhitespace ? $this->normalizeWhitespace($childNode->nodeValue) : $childNode->nodeValue;
             }
         }
 

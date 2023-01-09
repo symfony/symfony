@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2022-12-15T15:23:52Z
+
+Question: Can I use this mocking mechanism to test code that looks like this?
+
+```php
+if (class_exists(SomeClass::class) && !enum_exists(SomeClass::class)) {
+    // do something
+}
+```
+
+This is a common pattern if you want to check to make sure a class is actually a class because an enum would also pass a `class_exists()` check. See https://3v4l.org/5qfuI
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-12-15T17:01:36Z
+
+@derrabus It doesn't seem. Actually, if you declare a mocked class, it will return `true` for `interface_exists`, `trait_exists` and `class_exists` because of the way the Mocker is designed. Do we want to make a differentiation with enums? I don't have a strong opinion on this, as it is a bridge dedicated to tests. :thinking:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2022-12-15T17:07:43Z
+
+Maybe we should make a difference, yes. 🤔
+
+What do _you_ think? Since you're contributing this feature, you must have some use case for it?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2022-12-15T18:24:28Z
+
+I actually don't have the use case. This contribution idea came to me when crawling the bridge documentation 😄 I updated the code so there's a diff between classes and enums. I added `withMockedEnums` that fills a new `$enums` properties, as well as `$classes`. This way, `class_exists` will return true on enums 👍

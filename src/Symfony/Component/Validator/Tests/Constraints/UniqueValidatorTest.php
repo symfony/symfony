@@ -280,6 +280,14 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ['id' => 1, 'email' => 'bar@email.com'],
                 ['id' => 1, 'email' => 'foo@email.com'],
             ], ['id']],
+            'unique null' => [
+                [null, null],
+                [],
+            ],
+            'unique field null' => [
+                [['nullField' => null], ['nullField' => null]],
+                ['nullField'],
+            ],
         ];
     }
 }

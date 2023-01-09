@@ -1102,7 +1102,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } else {
             $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
-            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs(array_values($arguments));
+            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
 
             if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
                 trigger_deprecation('', '', 'The "%s" service relies on the deprecated "%s" class. It should either be deprecated or its implementation upgraded.', $id, $r->name);

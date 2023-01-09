@@ -10,6 +10,7 @@ CHANGELOG
  * Add `--format` option to the `debug:config` command
  * Add support to pass namespace wildcard in `framework.messenger.routing`
  * Deprecate `framework:exceptions` tag, unwrap it and replace `framework:exception` tags' `name` attribute by `class`
+ * Deprecate the `notifier.logger_notification_listener` service, use the `notifier.notification_logger_listener` service instead
 
 6.2
 ---

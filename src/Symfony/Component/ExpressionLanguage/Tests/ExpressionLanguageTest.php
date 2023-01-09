@@ -18,6 +18,8 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
+use Symfony\Component\ExpressionLanguage\Tests\Fixtures\FooBackedEnum;
+use Symfony\Component\ExpressionLanguage\Tests\Fixtures\FooEnum;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
 class ExpressionLanguageTest extends TestCase
@@ -76,6 +78,53 @@ class ExpressionLanguageTest extends TestCase
 
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+    }
+
+    public function testEnumFunctionWithConstantThrows()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('The string "PHP_VERSION" is not the name of a valid enum case.');
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionLanguage->evaluate('enum("PHP_VERSION")');
+    }
+
+    public function testCompiledEnumFunctionWithConstantThrows()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('The string "PHP_VERSION" is not the name of a valid enum case.');
+        $expressionLanguage = new ExpressionLanguage();
+        eval($expressionLanguage->compile('enum("PHP_VERSION")').';');
+    }
+
+    public function testEnumFunction()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame(FooEnum::Foo, $expressionLanguage->evaluate('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooEnum::Foo")'));
+    }
+
+    public function testCompiledEnumFunction()
+    {
+        $result = null;
+        $expressionLanguage = new ExpressionLanguage();
+        eval(sprintf('$result = %s;', $expressionLanguage->compile('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooEnum::Foo")')));
+
+        $this->assertSame(FooEnum::Foo, $result);
+    }
+
+    public function testBackedEnumFunction()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame(FooBackedEnum::Bar, $expressionLanguage->evaluate('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooBackedEnum::Bar")'));
+        $this->assertSame('Foo', $expressionLanguage->evaluate('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooBackedEnum::Bar").value'));
+    }
+
+    public function testCompiledEnumFunctionWithBackedEnum()
+    {
+        $result = null;
+        $expressionLanguage = new ExpressionLanguage();
+        eval(sprintf('$result = %s;', $expressionLanguage->compile('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooBackedEnum::Bar")')));
+
+        $this->assertSame(FooBackedEnum::Bar, $result);
     }
 
     public function testProviders()

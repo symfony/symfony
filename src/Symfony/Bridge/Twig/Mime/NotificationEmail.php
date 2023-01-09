@@ -38,7 +38,7 @@ class NotificationEmail extends TemplatedEmail
         'action_url' => null,
         'markdown' => false,
         'raw' => false,
-        'footer_text' => 'Notification e-mail sent by Symfony',
+        'footer_text' => 'Notification email sent by Symfony',
     ];
     private bool $rendered = false;
 

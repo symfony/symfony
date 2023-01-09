@@ -35,7 +35,7 @@ class NotificationEmailTest extends TestCase
             'markdown' => true,
             'raw' => false,
             'a' => 'b',
-            'footer_text' => 'Notification e-mail sent by Symfony',
+            'footer_text' => 'Notification email sent by Symfony',
         ], $email->getContext());
     }
 
@@ -58,7 +58,7 @@ class NotificationEmailTest extends TestCase
             'markdown' => false,
             'raw' => true,
             'a' => 'b',
-            'footer_text' => 'Notification e-mail sent by Symfony',
+            'footer_text' => 'Notification email sent by Symfony',
         ], $email->getContext());
 
         $this->assertSame('@email/example/notification/body.html.twig', $email->getHtmlTemplate());

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-01-04T11:11:29Z
+
+What about those two references https://github.com/symfony/symfony/blob/6.2/src/Symfony/Component/Intl/Resources/emoji/build.php#L61?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-05T09:45:34Z
+
+Oops, fixed.

@@ -33,9 +33,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testValidValues($value)
+    public function testValidValues($value, array $fields)
     {
-        $this->validator->validate($value, new Unique());
+        $this->validator->validate($value, new Unique(fields: $fields));
 
         $this->assertNoViolation();
     }
@@ -43,17 +43,79 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public static function getValidValues()
     {
         return [
-            yield 'null' => [[null]],
-            yield 'empty array' => [[]],
-            yield 'single integer' => [[5]],
-            yield 'single string' => [['a']],
-            yield 'single object' => [[new \stdClass()]],
-            yield 'unique booleans' => [[true, false]],
-            yield 'unique integers' => [[1, 2, 3, 4, 5, 6]],
-            yield 'unique floats' => [[0.1, 0.2, 0.3]],
-            yield 'unique strings' => [['a', 'b', 'c']],
-            yield 'unique arrays' => [[[1, 2], [2, 4], [4, 6]]],
-            yield 'unique objects' => [[new \stdClass(), new \stdClass()]],
+            yield 'null' => [[null], []],
+            yield 'empty array' => [[], []],
+            yield 'single integer' => [[5], []],
+            yield 'single string' => [['a'], []],
+            yield 'single object' => [[new \stdClass()], []],
+            yield 'unique booleans' => [[true, false], []],
+            yield 'unique integers' => [[1, 2, 3, 4, 5, 6], []],
+            yield 'unique floats' => [[0.1, 0.2, 0.3], []],
+            yield 'unique strings' => [['a', 'b', 'c'], []],
+            yield 'unique arrays' => [[[1, 2], [2, 4], [4, 6]], []],
+            yield 'unique objects' => [[new \stdClass(), new \stdClass()], []],
+            yield 'unique objects public field' => [
+                [
+                    new class {
+                        public int $fieldA = 1;
+                    },
+                    new class {
+                        public int $fieldA = 2;
+                    },
+                ],
+                ['fieldA'],
+            ],
+            yield 'unique objects private field' => [
+                [
+                    new class {
+                        private int $fieldB = 1;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                    new class {
+                        private int $fieldB = 2;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                ],
+                ['fieldB'],
+            ],
+            yield 'unique objects property accessor field' => [
+                [
+                    new class {
+                        public array $fieldA = ['fieldB' => 1];
+                    },
+                    new class {
+                        public array $fieldA = ['fieldB' => 2];
+                    },
+                ],
+                ['fieldA[fieldB]'],
+            ],
+            'unique objects polymorph field' => [
+                [
+                    new class {
+                        private int $fieldB = 1;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                    new class {
+                        public int $fieldB = 2;
+                    },
+                    [
+                        'fieldB'=>3
+                    ],
+                ],
+                ['fieldB'],
+            ],
         ];
     }
 
@@ -68,9 +130,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-             ->setParameter('{{ value }}', 'array')
-             ->setCode(Unique::IS_NOT_UNIQUE)
-             ->assertRaised();
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
     }
 
     public static function getInvalidValues()
@@ -117,9 +179,12 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $value = [$object1, $object2, $object3];
 
-        $this->validator->validate($value, new Unique([
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate(
+            $value,
+            new Unique([
+                'normalizer' => $callback,
+            ])
+        );
 
         $this->assertNoViolation();
     }
@@ -143,10 +208,13 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $value = [$object1, $object2, $object3];
 
-        $this->validator->validate($value, new Unique([
-            'message' => 'myMessage',
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate(
+            $value,
+            new Unique([
+                'message' => 'myMessage',
+                'normalizer' => $callback,
+            ])
+        );
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
@@ -167,10 +235,11 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsInvalidNonStrictComparison()
     {
-        $this->validator->validate([1, '1', 1.0, '1.0'], new Unique([
-            'message' => 'myMessage',
-            'normalizer' => 'intval',
-        ]));
+        $this->validator->validate([1, '1', 1.0, '1.0'],
+            new Unique([
+                'message' => 'myMessage',
+                'normalizer' => 'intval',
+            ]));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
@@ -182,9 +251,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     {
         $callback = static fn ($item) => (int) $item;
 
-        $this->validator->validate([1, '2', 3, '4.0'], new Unique([
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate([1, '2', 3, '4.0'],
+            new Unique([
+                'normalizer' => $callback,
+            ]));
 
         $this->assertNoViolation();
     }
@@ -193,10 +263,11 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     {
         $callback = static fn ($item) => mb_strtolower($item);
 
-        $this->validator->validate(['Hello', 'hello', 'HELLO', 'hellO'], new Unique([
-            'message' => 'myMessage',
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate(['Hello', 'hello', 'HELLO', 'hellO'],
+            new Unique([
+                'message' => 'myMessage',
+                'normalizer' => $callback,
+            ]));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
@@ -208,9 +279,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     {
         $callback = static fn ($item) => mb_strtolower($item);
 
-        $this->validator->validate(['Hello', 'World'], new Unique([
-            'normalizer' => $callback,
-        ]));
+        $this->validator->validate(['Hello', 'World'],
+            new Unique([
+                'normalizer' => $callback,
+            ]));
 
         $this->assertNoViolation();
     }
@@ -218,6 +290,43 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public function testCollectionFieldsAreOptional()
     {
         $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: 'id'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testCollectionObjectFieldsAreOptional()
+    {
+        $this->validator->validate([
+            new class {
+                public int $value = 5;
+            },
+            new class {
+                public int $id = 1;
+                public int $value = 5;
+            },
+        ], new Unique(fields: 'id'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testCollectionObjectPrivateFieldsAreOptional()
+    {
+        $this->validator->validate([
+                new class {
+                    private int $id = 2;
+                    public int $value = 5;
+                },
+                new class {
+                    private int $id = 2;
+                    public int $value = 5;
+
+                    public function getId(): int
+                    {
+                        return $this->id;
+                    }
+                },
+
+        ], new Unique(fields: 'id'));
 
         $this->assertNoViolation();
     }
@@ -247,9 +356,12 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidCollectionValues(array $value, array $fields)
     {
-        $this->validator->validate($value, new Unique([
-            'message' => 'myMessage',
-        ], fields: $fields));
+        $this->validator->validate(
+            $value,
+            new Unique([
+                'message' => 'myMessage',
+            ], fields: $fields)
+        );
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
@@ -260,19 +372,97 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public static function getInvalidCollectionValues(): array
     {
         return [
-            'unique string' => [[
-                ['lang' => 'eng', 'translation' => 'hi'],
-                ['lang' => 'eng', 'translation' => 'hello'],
-            ], ['lang']],
-            'unique floats' => [[
-                ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
-                ['latitude' => 52.520008, 'longitude' => 13.404954],
-                ['latitude' => 51.509865, 'longitude' => -0.118092],
-            ], ['latitude', 'longitude']],
-            'unique int' => [[
-                ['id' => 1, 'email' => 'bar@email.com'],
-                ['id' => 1, 'email' => 'foo@email.com'],
-            ], ['id']],
+            'unique string' => [
+                [
+                    ['lang' => 'eng', 'translation' => 'hi'],
+                    ['lang' => 'eng', 'translation' => 'hello'],
+                ],
+                ['lang'],
+            ],
+            'unique floats' => [
+                [
+                    ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
+                    ['latitude' => 52.520008, 'longitude' => 13.404954],
+                    ['latitude' => 51.509865, 'longitude' => -0.118092],
+                ],
+                ['latitude', 'longitude'],
+            ],
+            'unique int' => [
+                [
+                    ['id' => 1, 'email' => 'bar@email.com'],
+                    ['id' => 1, 'email' => 'foo@email.com'],
+                ],
+                ['id'],
+            ],
+            'unique object string' => [
+                [
+                    (object)['lang' => 'eng', 'translation' => 'hi'],
+                    (object)['lang' => 'eng', 'translation' => 'hello'],
+                ],
+                ['lang'],
+            ],
+            'unique objects public field' => [
+                [
+                    new class {
+                        public int $fieldA = 1;
+                    },
+                    new class {
+                        public int $fieldA = 1;
+                    },
+                ],
+                ['fieldA'],
+            ],
+            'unique objects property accessor field' => [
+                [
+                    new class {
+                        public array $fieldA = ['fieldB' => 1];
+                    },
+                    new class {
+                        public array $fieldA = ['fieldB' => 1];
+                    },
+                ],
+                ['fieldA[fieldB]'],
+            ],
+            'unique objects private field' => [
+                [
+                    new class {
+                        private int $fieldB = 1;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                    new class {
+                        private int $fieldB = 1;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                ],
+                ['fieldB'],
+            ],
+            'unique objects polymorph field' => [
+                [
+                    new class {
+                        private int $fieldB = 1;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                    new class {
+                        public int $fieldB = 1;
+                    },
+                    [
+                        'fieldB'=>1
+                    ],
+                ],
+                ['fieldB'],
+            ],
             'unique null' => [
                 [null, null],
                 [],

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-12-22T15:22:24Z
+
+I'm moot here. Is this possibly used directly by anyone? If not can't we take a shortcut and change the name on 6.1?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2022-12-22T15:39:01Z
+
+> Is this possibly used directly by anyone?
+
+Possibly some `Container::get()` in test cases yes, as it has been introduced before `NotificationAssertionsTrait` (5.2 vs 6.2). I think it's worth taking the smooth path

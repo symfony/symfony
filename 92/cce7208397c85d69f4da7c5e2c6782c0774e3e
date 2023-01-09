@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-01-09T03:30:45Z
+
+Would your type declaration also work for Psalm? If yes, shall we change the existing `@psalm-return` annotation instead of adding a new one for PHPStan?
+
+---------------------------------------------------------------------------
+
+by BackEndTea at 2023-01-09T07:29:19Z
+
+Unfortunately this doesn't work with psalm: https://psalm.dev/r/3dc046f934
+It becomes unable to resolve the types

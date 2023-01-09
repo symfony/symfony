@@ -42,6 +42,7 @@ class XmlReferenceDumperTest extends TestCase
 <!-- scalar-deprecated-with-message: Deprecated (Since vendor/package 1.1: Deprecation custom message for "scalar_deprecated_with_message" at "acme_root") -->
 <!-- enum-with-default: One of "this"; "that" -->
 <!-- enum: One of "this"; "that" -->
+<!-- variable: Example: foo, bar -->
 <config
     boolean="true"
     scalar-empty=""
@@ -57,6 +58,7 @@ class XmlReferenceDumperTest extends TestCase
     node-with-a-looong-name=""
     enum-with-default="this"
     enum=""
+    variable=""
     custom-node="true"
 >
 

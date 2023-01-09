@@ -55,8 +55,10 @@ class TranslatorPass implements CompilerPassInterface
 
             foreach ($container->findTaggedServiceIds('validator.constraint_validator', true) as $id => $attributes) {
                 $serviceDefinition = $container->getDefinition($id);
+                // Resolve constraint validator FQCN even if defined as %foo.validator.class% parameter
+                $className = $container->getParameterBag()->resolveValue($serviceDefinition->getClass());
                 // Extraction of the constraint class name from the Constraint Validator FQCN
-                $constraintClassNames[] = str_replace('Validator', '', substr(strrchr($serviceDefinition->getClass(), '\\'), 1));
+                $constraintClassNames[] = str_replace('Validator', '', substr(strrchr($className, '\\'), 1));
             }
 
             $constraintVisitorDefinition->setArgument(0, $constraintClassNames);

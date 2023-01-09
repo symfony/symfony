@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\Pusher;
 
 use Pusher\Pusher;
-use RuntimeException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -65,7 +64,7 @@ final class PusherTransport extends AbstractTransport
         try {
             $this->pusherClient->trigger($options->getChannels(), $message->getSubject(), $message->getContent(), [], true);
         } catch (Throwable) {
-            throw new RuntimeException('An error occurred at Pusher Notifier Transport.');
+            throw new \RuntimeException('An error occurred at Pusher Notifier Transport.');
         }
 
         return new SentMessage($message, $this->__toString());

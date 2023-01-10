@@ -6,6 +6,7 @@ CHANGELOG
 
  * Remove `exit` call in `Application` signal handlers. Commands will no longer be automatically interrupted after receiving signal other than `SIGUSR1` or `SIGUSR2`
  * Add `ProgressBar::setPlaceholderFormatter` to set a placeholder attached to a instance, instead of being global.
+ * Add `Application::getShellVerbosity` for getting the current shell verbosity from `InputInterface` and environment variables.
 
 6.2
 ---

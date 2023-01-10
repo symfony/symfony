@@ -1396,7 +1396,8 @@ PHP
     public function testWither()
     {
         $container = new ContainerBuilder();
-        $container->register(Foo::class);
+        $container->register(Foo::class)
+            ->setAutowired(true);
 
         $container
             ->register('wither', Wither::class)

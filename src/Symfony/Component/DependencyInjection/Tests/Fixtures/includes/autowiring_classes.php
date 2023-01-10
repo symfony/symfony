@@ -15,6 +15,14 @@ if (\PHP_VERSION_ID >= 80200) {
 
 class Foo
 {
+    /**
+     * @required
+     * @return static
+     */
+    public function cloneFoo()
+    {
+        return clone $this;
+    }
 }
 
 class Bar

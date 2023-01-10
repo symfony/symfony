@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "egulias/email-validator": "^2.1.10|^3",
+        "egulias/email-validator": "^2.1.10|^3|^4",
         "psr/event-dispatcher": "^1",
         "psr/log": "^1|^2|^3",
         "symfony/event-dispatcher": "^5.4|^6.0",

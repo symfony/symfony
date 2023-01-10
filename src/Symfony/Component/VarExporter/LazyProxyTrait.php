@@ -25,8 +25,9 @@ trait LazyProxyTrait
      * Creates a lazy-loading virtual proxy.
      *
      * @param \Closure():object $initializer Returns the proxied object
+     * @param static|null $instance
      */
-    public static function createLazyProxy(\Closure $initializer, self $instance = null): static
+    public static function createLazyProxy(\Closure $initializer, object $instance = null): static
     {
         if (self::class !== $class = $instance ? $instance::class : static::class) {
             $skippedProperties = ["\0".self::class."\0lazyObjectState" => true];

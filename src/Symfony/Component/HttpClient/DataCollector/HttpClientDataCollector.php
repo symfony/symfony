@@ -38,6 +38,10 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
+    }
+
+    public function lateCollect()
+    {
         $this->reset();
 
         foreach ($this->clients as $name => $client) {
@@ -50,12 +54,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
             $this->data['request_count'] += \count($traces);
             $this->data['error_count'] += $errorCount;
-        }
-    }
 
-    public function lateCollect()
-    {
-        foreach ($this->clients as $client) {
             $client->reset();
         }
     }

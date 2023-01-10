@@ -96,7 +96,6 @@ class UniqueValidator extends ConstraintValidator
             }
 
             $elementAsArray = null;
-
             //handle public object property
             if (\is_object($element) && \property_exists($element, $field)) {
                 $elementAsArray = (array)$element;
@@ -104,7 +103,7 @@ class UniqueValidator extends ConstraintValidator
                 $elementAsArray = $element;
             }
 
-            if ($elementAsArray && \array_key_exists($field, $element)) {
+            if ($elementAsArray && \array_key_exists($field, $elementAsArray)) {
                 $output[$field] = $elementAsArray[$field];
                 continue;
             }

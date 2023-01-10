@@ -902,6 +902,32 @@ class Application implements ResetInterface
     }
 
     /**
+     * Get shell verbosity.
+     *
+     * @param InputInterface $input
+     * @return int
+     */
+    public function getShellVerbosity(InputInterface $input): int
+    {
+        $optionValue = $input->getParameterOption('--verbose', false, true);
+
+        if ($input->hasParameterOption(['--quiet', '-q'], true)) {
+            return -1;
+        }
+        if ($input->hasParameterOption(['-vvv', '--verbose=3'], true) || 3 === $optionValue) {
+            return 3;
+        }
+        if ($input->hasParameterOption(['-vv', '--verbose=2'], true) || 2 === $optionValue) {
+            return 2;
+        }
+        if ($input->hasParameterOption(['-v', '--verbose=1', '--verbose'], true) || $optionValue) {
+            return 1;
+        }
+
+        return (int)getenv('SHELL_VERBOSITY');
+    }
+
+    /**
      * Configures the input and output instances based on the user arguments and options.
      */
     protected function configureIO(InputInterface $input, OutputInterface $output)
@@ -916,39 +942,8 @@ class Application implements ResetInterface
             $input->setInteractive(false);
         }
 
-        switch ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
-            case -1:
-                $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-                break;
-            case 1:
-                $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
-                break;
-            case 2:
-                $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-                break;
-            case 3:
-                $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
-                break;
-            default:
-                $shellVerbosity = 0;
-                break;
-        }
-
-        if (true === $input->hasParameterOption(['--quiet', '-q'], true)) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-            $shellVerbosity = -1;
-        } else {
-            if ($input->hasParameterOption('-vvv', true) || $input->hasParameterOption('--verbose=3', true) || 3 === $input->getParameterOption('--verbose', false, true)) {
-                $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
-                $shellVerbosity = 3;
-            } elseif ($input->hasParameterOption('-vv', true) || $input->hasParameterOption('--verbose=2', true) || 2 === $input->getParameterOption('--verbose', false, true)) {
-                $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-                $shellVerbosity = 2;
-            } elseif ($input->hasParameterOption('-v', true) || $input->hasParameterOption('--verbose=1', true) || $input->hasParameterOption('--verbose', true) || $input->getParameterOption('--verbose', false, true)) {
-                $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
-                $shellVerbosity = 1;
-            }
-        }
+        $shellVerbosity = $this->getShellVerbosity($input);
+        $output->setVerbosity(1 << $shellVerbosity + 5);
 
         if (-1 === $shellVerbosity) {
             $input->setInteractive(false);

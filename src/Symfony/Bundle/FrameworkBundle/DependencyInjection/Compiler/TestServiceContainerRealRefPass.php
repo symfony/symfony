@@ -30,10 +30,14 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
         $privateContainer = $container->getDefinition('test.private_services_locator');
         $definitions = $container->getDefinitions();
         $privateServices = $privateContainer->getArgument(0);
+        $renamedIds = [];
 
         foreach ($privateServices as $id => $argument) {
             if (isset($definitions[$target = (string) $argument->getValues()[0]])) {
                 $argument->setValues([new Reference($target)]);
+                if ($id !== $target) {
+                    $renamedIds[$id] = $target;
+                }
             } else {
                 unset($privateServices[$id]);
             }
@@ -47,8 +51,14 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
             if ($definitions[$target]->hasTag('container.private')) {
                 $privateServices[$id] = new ServiceClosureArgument(new Reference($target));
             }
+
+            $renamedIds[$id] = $target;
         }
 
         $privateContainer->replaceArgument(0, $privateServices);
+
+        if ($container->hasDefinition('test.service_container') && $renamedIds) {
+            $container->getDefinition('test.service_container')->setArgument(2, $renamedIds);
+        }
     }
 }

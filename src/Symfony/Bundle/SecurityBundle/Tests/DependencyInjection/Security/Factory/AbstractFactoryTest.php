@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Facto
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -69,12 +70,19 @@ class AbstractFactoryTest extends TestCase
         $this->assertEquals(new Reference('security.authentication.failure_handler.foo.abstract_factory'), $arguments['index_6']);
         $failureHandler = $container->findDefinition((string) $arguments['index_6']);
 
+        $expectedFailureHandlerOptions = ['login_path' => '/bar'];
         $methodCalls = $failureHandler->getMethodCalls();
         if ($defaultHandlerInjection) {
             $this->assertEquals('setOptions', $methodCalls[0][0]);
-            $this->assertEquals(['login_path' => '/bar'], $methodCalls[0][1][0]);
+            $this->assertEquals($expectedFailureHandlerOptions, $methodCalls[0][1][0]);
         } else {
             $this->assertCount(0, $methodCalls);
+            $this->assertInstanceOf(ChildDefinition::class, $failureHandler);
+            $this->assertEquals('security.authentication.custom_failure_handler', $failureHandler->getParent());
+            $failureHandlerArguments = $failureHandler->getArguments();
+            $this->assertInstanceOf(ChildDefinition::class, $failureHandlerArguments['index_0']);
+            $this->assertEquals($serviceId, $failureHandlerArguments['index_0']->getParent());
+            $this->assertEquals($expectedFailureHandlerOptions, $failureHandlerArguments['index_1']);
         }
     }
 
@@ -108,13 +116,22 @@ class AbstractFactoryTest extends TestCase
         $successHandler = $container->findDefinition((string) $arguments['index_5']);
         $methodCalls = $successHandler->getMethodCalls();
 
+        $expectedSuccessHandlerOptions = ['default_target_path' => '/bar'];
+        $expectedFirewallName = 'foo';
         if ($defaultHandlerInjection) {
             $this->assertEquals('setOptions', $methodCalls[0][0]);
-            $this->assertEquals(['default_target_path' => '/bar'], $methodCalls[0][1][0]);
+            $this->assertEquals($expectedSuccessHandlerOptions, $methodCalls[0][1][0]);
             $this->assertEquals('setFirewallName', $methodCalls[1][0]);
-            $this->assertEquals(['foo'], $methodCalls[1][1]);
+            $this->assertEquals($expectedFirewallName, $methodCalls[1][1][0]);
         } else {
             $this->assertCount(0, $methodCalls);
+            $this->assertInstanceOf(ChildDefinition::class, $successHandler);
+            $this->assertEquals('security.authentication.custom_success_handler', $successHandler->getParent());
+            $successHandlerArguments = $successHandler->getArguments();
+            $this->assertInstanceOf(ChildDefinition::class, $successHandlerArguments['index_0']);
+            $this->assertEquals($serviceId, $successHandlerArguments['index_0']->getParent());
+            $this->assertEquals($expectedSuccessHandlerOptions, $successHandlerArguments['index_1']);
+            $this->assertEquals($expectedFirewallName, $successHandlerArguments['index_2']);
         }
     }
 

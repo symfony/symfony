@@ -943,7 +943,10 @@ class Application implements ResetInterface
         }
 
         $shellVerbosity = $this->getShellVerbosity($input);
-        $output->setVerbosity(1 << $shellVerbosity + 5);
+
+        if ($shellVerbosity) {
+            $output->setVerbosity(1 << $shellVerbosity + 5);
+        }
 
         if (-1 === $shellVerbosity) {
             $input->setInteractive(false);

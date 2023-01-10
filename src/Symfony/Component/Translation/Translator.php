@@ -66,10 +66,12 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
     private bool $hasIntlFormatter;
 
+    private bool $fallbackOnBlankString;
+
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [])
+    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false, array $cacheVary = [], bool $fallbackOnBlankString = false)
     {
         $this->setLocale($locale);
 
@@ -78,6 +80,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $this->debug = $debug;
         $this->cacheVary = $cacheVary;
         $this->hasIntlFormatter = $formatter instanceof IntlFormatterInterface;
+        $this->fallbackOnBlankString = $fallbackOnBlankString;
     }
 
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
@@ -169,7 +172,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
 
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();
-        while (!$catalogue->defines($id, $domain)) {
+        while (!$catalogue->defines($id, $domain) || ($this->fallbackOnBlankString && '' === $catalogue->get($id, $domain))) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
                 $locale = $catalogue->getLocale();

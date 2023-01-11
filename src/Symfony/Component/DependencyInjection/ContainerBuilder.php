@@ -1048,12 +1048,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             if (\is_object($tryProxy)) {
                 if ($r->getConstructor()) {
-                    $tryProxy->__construct(...array_values($arguments));
+                    $tryProxy->__construct(...$arguments);
                 }
 
                 $service = $tryProxy;
             } else {
-                $service = $r->getConstructor() ? $r->newInstanceArgs(array_values($arguments)) : $r->newInstance();
+                $service = $r->getConstructor() ? $r->newInstanceArgs($arguments) : $r->newInstance();
             }
 
             if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ")) {

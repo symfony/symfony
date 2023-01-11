@@ -35,8 +35,8 @@ class DateTimeValueResolverTest extends TestCase
     public static function getTimeZones()
     {
         yield ['UTC'];
-        yield ['Etc/GMT+9'];
-        yield ['Etc/GMT-14'];
+        yield ['Pacific/Honolulu'];
+        yield ['America/Toronto'];
     }
 
     public static function getClasses()

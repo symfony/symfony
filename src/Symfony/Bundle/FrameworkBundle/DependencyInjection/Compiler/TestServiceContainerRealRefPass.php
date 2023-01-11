@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -35,6 +36,16 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
                 $argument->setValues([new Reference($target)]);
             } else {
                 unset($privateServices[$id]);
+            }
+        }
+
+        foreach ($container->getAliases() as $id => $target) {
+            while ($container->hasAlias($target = (string) $target)) {
+                $target = $container->getAlias($target);
+            }
+
+            if ($definitions[$target]->hasTag('container.private')) {
+                $privateServices[$id] = new ServiceClosureArgument(new Reference($target));
             }
         }
 

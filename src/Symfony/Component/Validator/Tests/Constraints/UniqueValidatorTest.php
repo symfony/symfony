@@ -57,10 +57,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             yield 'unique objects' => [[new \stdClass(), new \stdClass()], []],
             yield 'unique objects public field' => [
                 [
-                    new class {
+                    new class() {
                         public int $fieldA = 1;
                     },
-                    new class {
+                    new class() {
                         public int $fieldA = 2;
                     },
                 ],
@@ -68,7 +68,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ],
             yield 'unique objects private field' => [
                 [
-                    new class {
+                    new class() {
                         private int $fieldB = 1;
 
                         public function getFieldB(): int
@@ -76,7 +76,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                             return $this->fieldB;
                         }
                     },
-                    new class {
+                    new class() {
                         private int $fieldB = 2;
 
                         public function getFieldB(): int
@@ -89,10 +89,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ],
             yield 'unique objects property accessor field' => [
                 [
-                    new class {
+                    new class() {
                         public array $fieldA = ['fieldB' => 1];
                     },
-                    new class {
+                    new class() {
                         public array $fieldA = ['fieldB' => 2];
                     },
                 ],
@@ -100,7 +100,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ],
             'unique objects polymorph field' => [
                 [
-                    new class {
+                    new class() {
                         private int $fieldB = 1;
 
                         public function getFieldB(): int
@@ -108,11 +108,11 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                             return $this->fieldB;
                         }
                     },
-                    new class {
+                    new class() {
                         public int $fieldB = 2;
                     },
                     [
-                        'fieldB'=>3
+                        'fieldB' => 3,
                     ],
                 ],
                 ['fieldB'],
@@ -303,10 +303,10 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public function testCollectionObjectFieldsAreOptional()
     {
         $this->validator->validate([
-            new class {
+            new class() {
                 public int $value = 5;
             },
-            new class {
+            new class() {
                 public int $id = 1;
                 public int $value = 5;
             },
@@ -318,11 +318,11 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     public function testCollectionObjectPrivateFieldsAreOptional()
     {
         $this->validator->validate([
-                new class {
+                new class() {
                     private int $id = 2;
                     public int $value = 5;
                 },
-                new class {
+                new class() {
                     private int $id = 2;
                     public int $value = 5;
 
@@ -331,7 +331,6 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                         return $this->id;
                     }
                 },
-
         ], new Unique(fields: 'id'));
 
         $this->assertNoViolation();
@@ -393,30 +392,30 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ['id' => 1, 'email' => 'foo@email.com'],
             ], ['id'], 'array', 'property.path[1]'],
             'unique object string' => [[
-                    (object)['lang' => 'eng', 'translation' => 'hi'],
-                    (object)['lang' => 'eng', 'translation' => 'hello'],
+                    (object) ['lang' => 'eng', 'translation' => 'hi'],
+                    (object) ['lang' => 'eng', 'translation' => 'hello'],
                 ],
                 ['lang'], 'array', 'property.path[1]'],
             'unique objects public field' => [[
-                    new class {
+                    new class() {
                         public int $fieldA = 1;
                     },
-                    new class {
+                    new class() {
                         public int $fieldA = 1;
                     },
                 ],
                 ['fieldA'], 'array', 'property.path[1]'],
             'unique objects property accessor field' => [[
-                    new class {
+                    new class() {
                         public array $fieldA = ['fieldB' => 1];
                     },
-                    new class {
+                    new class() {
                         public array $fieldA = ['fieldB' => 1];
                     },
                 ],
                 ['fieldA[fieldB]'], 'array', 'property.path[1]'],
             'unique objects private field' => [[
-                    new class {
+                    new class() {
                         private int $fieldB = 1;
 
                         public function getFieldB(): int
@@ -424,7 +423,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                             return $this->fieldB;
                         }
                     },
-                    new class {
+                    new class() {
                         private int $fieldB = 1;
 
                         public function getFieldB(): int
@@ -435,7 +434,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ],
                 ['fieldB'], 'array', 'property.path[1]'],
             'unique objects polymorph field' => [[
-                    new class {
+                    new class() {
                         private int $fieldB = 1;
 
                         public function getFieldB(): int
@@ -443,11 +442,11 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                             return $this->fieldB;
                         }
                     },
-                    new class {
+                    new class() {
                         public int $fieldB = 1;
                     },
                     [
-                        'fieldB'=>1
+                        'fieldB' => 1,
                     ],
                 ],
                 ['fieldB'], 'array', 'property.path[1]'],

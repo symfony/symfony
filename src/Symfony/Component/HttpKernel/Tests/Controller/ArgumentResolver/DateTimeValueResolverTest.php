@@ -36,11 +36,11 @@ class DateTimeValueResolverTest extends TestCase
     public static function getTimeZones()
     {
         yield ['UTC', false];
-        yield ['Etc/GMT+9', false];
-        yield ['Etc/GMT-14', false];
+        yield ['Pacific/Honolulu', false];
+        yield ['America/Toronto', false];
         yield ['UTC', true];
-        yield ['Etc/GMT+9', true];
-        yield ['Etc/GMT-14', true];
+        yield ['Pacific/Honolulu', true];
+        yield ['America/Toronto', true];
     }
 
     public static function getClasses()
@@ -137,7 +137,7 @@ class DateTimeValueResolverTest extends TestCase
      */
     public function testNow(string $class)
     {
-        date_default_timezone_set($timezone = 'Etc/GMT+9');
+        date_default_timezone_set($timezone = 'Pacific/Honolulu');
         $resolver = new DateTimeValueResolver();
 
         $argument = new ArgumentMetadata('dummy', $class, false, false, null, false);
@@ -158,7 +158,7 @@ class DateTimeValueResolverTest extends TestCase
      */
     public function testNowWithClock(string $class)
     {
-        date_default_timezone_set('Etc/GMT+9');
+        date_default_timezone_set('Pacific/Honolulu');
         $clock = new MockClock('2022-02-20 22:20:02');
         $resolver = new DateTimeValueResolver($clock);
 

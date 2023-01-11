@@ -757,7 +757,7 @@ EOF;
             $witherAssignation = '';
 
             if ($call[2] ?? false) {
-                if (null !== $sharedNonLazyId && $lastWitherIndex === $k) {
+                if (null !== $sharedNonLazyId && $lastWitherIndex === $k && 'instance' === $variableName) {
                     $witherAssignation = sprintf('$container->%s[\'%s\'] = ', $definition->isPublic() ? 'services' : 'privates', $sharedNonLazyId);
                 }
                 $witherAssignation .= sprintf('$%s = ', $variableName);

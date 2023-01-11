@@ -55,6 +55,7 @@ class Symfony_DI_PhpDumper_Service_Wither extends Container
         $instance = new \Symfony\Component\DependencyInjection\Tests\Compiler\Wither();
 
         $a = new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo();
+        $a = $a->cloneFoo();
 
         $instance = $instance->withFoo1($a);
         $container->services['wither'] = $instance = $instance->withFoo2($a);

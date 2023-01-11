@@ -41,8 +41,9 @@ trait LazyGhostTrait
      *        |array{"\0": \Closure(static, array<string, mixed>):array<string, mixed>}) $initializer
      * @param array<string, true>|null $skippedProperties An array indexed by the properties to skip, aka the ones
      *                                                    that the initializer doesn't set when its a closure
+     * @param static|null              $instance
      */
-    public static function createLazyGhost(\Closure|array $initializer, array $skippedProperties = null, self $instance = null): static
+    public static function createLazyGhost(\Closure|array $initializer, array $skippedProperties = null, object $instance = null): static
     {
         $onlyProperties = null === $skippedProperties && \is_array($initializer) ? $initializer : null;
 

@@ -29,7 +29,7 @@ final class Builder
 
     public static function getEmojisCodePoints(): array
     {
-        $lines = file(__DIR__.'/vendor/unicode-org/cldr/tools/cldr-code/src/main/resources/org/unicode/cldr/util/data/emoji/emoji-test.txt');
+        $lines = file(__DIR__.'/vendor/emoji-test.txt');
 
         $emojisCodePoints = [];
         foreach ($lines as $line) {

@@ -186,6 +186,10 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
+        if ((80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) && \is_string($timezone) && str_contains($timezone, 'GMT')) {
+            $this->markTestSkipped('Broken version of PHP');
+        }
+
         return new class($locale, $datetype, $timetype, $timezone, $calendar, $pattern) extends IntlDateFormatter {
         };
     }

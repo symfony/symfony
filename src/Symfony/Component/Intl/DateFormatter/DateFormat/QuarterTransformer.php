@@ -35,10 +35,18 @@ class QuarterTransformer extends Transformer
                 return $this->padLeft($quarter, $length);
             case 3:
                 return 'Q'.$quarter;
-            default:
+            case 4:
                 $map = [1 => '1st quarter', 2 => '2nd quarter', 3 => '3rd quarter', 4 => '4th quarter'];
 
                 return $map[$quarter];
+            default:
+                if (\defined('INTL_ICU_VERSION') && version_compare(\INTL_ICU_VERSION, '70.1', '<')) {
+                    $map = [1 => '1st quarter', 2 => '2nd quarter', 3 => '3rd quarter', 4 => '4th quarter'];
+
+                    return $map[$quarter];
+                } else {
+                    return $quarter;
+                }
         }
     }
 

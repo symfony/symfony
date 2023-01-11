@@ -35,6 +35,10 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
      */
     public function testFormatTimezone($pattern, $timezone, $expected)
     {
+        if ((80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) && str_contains($timezone, 'GMT')) {
+            $this->markTestSkipped('Broken version of PHP');
+        }
+
         IntlTestHelper::requireFullIntl($this, '59.1');
 
         parent::testFormatTimezone($pattern, $timezone, $expected);
@@ -59,6 +63,10 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
+        if ((80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) && \is_string($timezone) && str_contains($timezone, 'GMT')) {
+            $this->markTestSkipped('Broken version of PHP');
+        }
+
         IntlTestHelper::requireFullIntl($this, '55.1');
 
         if (!$formatter = new \IntlDateFormatter($locale, $datetype ?? IntlDateFormatter::FULL, $timetype ?? IntlDateFormatter::FULL, $timezone, $calendar, $pattern)) {

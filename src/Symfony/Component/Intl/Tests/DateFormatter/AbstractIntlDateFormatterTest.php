@@ -96,6 +96,12 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $dateTime = new \DateTime('@0');
         $dateTimeImmutable = new \DateTimeImmutable('@0');
 
+        /* https://unicode-org.atlassian.net/browse/ICU-21647 */
+        $expectedQuarterX5 = '1';
+        if (\defined('INTL_ICU_VERSION') && version_compare(\INTL_ICU_VERSION, '70.1', '<')) {
+            $expectedQuarterX5 = '1st quarter';
+        }
+
         $formatData = [
             /* general */
             ['y-M-d', 0, '1970-1-1'],
@@ -144,13 +150,13 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             ['QQ', 0, '01'],
             ['QQQ', 0, 'Q1'],
             ['QQQQ', 0, '1st quarter'],
-            ['QQQQQ', 0, '1st quarter'],
+            ['QQQQQ', 0, $expectedQuarterX5],
 
             ['q', 0, '1'],
             ['qq', 0, '01'],
             ['qqq', 0, 'Q1'],
             ['qqqq', 0, '1st quarter'],
-            ['qqqqq', 0, '1st quarter'],
+            ['qqqqq', 0, $expectedQuarterX5],
 
             // 4 months
             ['Q', 7776000, '2'],
@@ -363,6 +369,10 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
      */
     public function testFormatTimezone($pattern, $timezone, $expected)
     {
+        if ((80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) && str_contains($timezone, 'GMT')) {
+            $this->markTestSkipped('Broken version of PHP');
+        }
+
         $formatter = $this->getDefaultDateFormatter($pattern);
         $formatter->setTimeZone(new \DateTimeZone($timezone));
 
@@ -421,6 +431,10 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithGmtTimezone()
     {
+        if (80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) {
+            $this->markTestSkipped('Broken version of PHP');
+        }
+
         $formatter = $this->getDefaultDateFormatter('zzzz');
 
         $formatter->setTimeZone('GMT+03:00');
@@ -430,6 +444,10 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithGmtTimeZoneAndMinutesOffset()
     {
+        if (80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) {
+            $this->markTestSkipped('Broken version of PHP');
+        }
+
         $formatter = $this->getDefaultDateFormatter('zzzz');
 
         $formatter->setTimeZone('GMT+00:30');
@@ -794,6 +812,10 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function parseTimezoneProvider()
     {
+        if (80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) {
+            return [['y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0]];
+        }
+
         return [
             ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-03:00', 10800],
             ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-04:00', 14400],
@@ -912,6 +934,10 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
      */
     public function testSetTimeZoneId($timeZoneId, $expectedTimeZoneId)
     {
+        if ((80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) && str_contains($timeZoneId ?? '', 'GMT')) {
+            $this->markTestSkipped('Broken version of PHP');
+        }
+
         $formatter = $this->getDefaultDateFormatter();
 
         $formatter->setTimeZone($timeZoneId);

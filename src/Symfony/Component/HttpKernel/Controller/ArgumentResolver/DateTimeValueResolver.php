@@ -73,7 +73,7 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface, Val
         }
 
         if (null !== $format) {
-            $date = $class::createFromFormat($format, $value);
+            $date = $class::createFromFormat($format, $value, $this->clock?->now()->getTimeZone());
 
             if (($class::getLastErrors() ?: ['warning_count' => 0])['warning_count']) {
                 $date = false;
@@ -83,7 +83,7 @@ final class DateTimeValueResolver implements ArgumentValueResolverInterface, Val
                 $value = '@'.$value;
             }
             try {
-                $date = new $class($value);
+                $date = new $class($value, $this->clock?->now()->getTimeZone());
             } catch (\Exception) {
                 $date = false;
             }

@@ -84,8 +84,8 @@ class DateTimeValueResolverTest extends TestCase
      */
     public function testFullDate(string $timezone, bool $withClock)
     {
-        date_default_timezone_set($timezone);
-        $resolver = new DateTimeValueResolver($withClock ? new MockClock() : null);
+        date_default_timezone_set($withClock ? 'UTC' : $timezone);
+        $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
 
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
         $request = self::requestWithAttributes(['dummy' => '2012-07-21 00:00:00']);
@@ -103,7 +103,7 @@ class DateTimeValueResolverTest extends TestCase
      */
     public function testUnixTimestamp(string $timezone, bool $withClock)
     {
-        date_default_timezone_set($timezone);
+        date_default_timezone_set($withClock ? 'UTC' : $timezone);
         $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
 
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
@@ -212,7 +212,7 @@ class DateTimeValueResolverTest extends TestCase
      */
     public function testDateTimeImmutable(string $timezone, bool $withClock)
     {
-        date_default_timezone_set($timezone);
+        date_default_timezone_set($withClock ? 'UTC' : $timezone);
         $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
 
         $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
@@ -231,7 +231,7 @@ class DateTimeValueResolverTest extends TestCase
      */
     public function testWithFormat(string $timezone, bool $withClock)
     {
-        date_default_timezone_set($timezone);
+        date_default_timezone_set($withClock ? 'UTC' : $timezone);
         $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
 
         $argument = new ArgumentMetadata('dummy', \DateTimeInterface::class, false, false, null, false, [

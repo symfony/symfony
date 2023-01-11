@@ -1731,6 +1731,24 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertSame(['tag1', 'tag2', 'tag3'], $container->findTags());
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testNamedArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register(E::class)
+            ->setPublic(true)
+            ->setArguments(['$second' => 2]);
+
+        $container->compile();
+
+        $e = $container->get(E::class);
+
+        $this->assertSame('', $e->first);
+        $this->assertSame(2, $e->second);
+    }
 }
 
 class FooClass
@@ -1758,4 +1776,16 @@ class C implements X
 
 class D implements X
 {
+}
+
+class E
+{
+    public $first;
+    public $second;
+
+    public function __construct($first = '', $second = '')
+    {
+        $this->first = $first;
+        $this->second = $second;
+    }
 }

@@ -165,7 +165,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass = new ResolveNamedArgumentsPass();
         $pass->process($container);
 
-        $this->assertSame($expected, $definition->getArgument(3));
+        $this->assertSame($expected, $definition->getArgument('container'));
     }
 
     public function testResolvesMultipleArgumentsOfTheSameType()

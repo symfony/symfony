@@ -172,7 +172,7 @@ class HttpClientDataCollectorTest extends TestCase
     {
         $sut = new HttpClientDataCollector();
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([$request]));
-        $sut->collect(new Request(), new Response());
+        $sut->lateCollect();
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
@@ -356,7 +356,7 @@ class HttpClientDataCollectorTest extends TestCase
                 ],
             ],
         ]));
-        $sut->collect(new Request(), new Response());
+        $sut->lateCollect();
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
@@ -386,7 +386,7 @@ class HttpClientDataCollectorTest extends TestCase
                 ],
             ],
         ]));
-        $sut->collect(new Request(), new Response());
+        $sut->lateCollect();
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
@@ -408,7 +408,7 @@ class HttpClientDataCollectorTest extends TestCase
                 ],
             ],
         ]));
-        $sut->collect(new Request(), new Response());
+        $sut->lateCollect();
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
@@ -430,7 +430,7 @@ class HttpClientDataCollectorTest extends TestCase
                 ],
             ],
         ]));
-        $sut->collect(new Request(), new Response());
+        $sut->lateCollect();
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];

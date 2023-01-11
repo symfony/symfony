@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-09-29T19:38:44Z
+
+>This misses the update of the ContainerBuilder merging to copy the deprecations.
+
+Thanks for the heads-up :), fixed!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-10-22T10:41:44Z
+
+The new implementation does not trigger deprecations in the API itself, so the label can be removed.
+Thanks for the reviews.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2022-12-17T13:18:40Z
+
+While trying the feature I realized that the `FrozenParameterBag` fails to trigger a deprecation due to property visibility in `parent::get()`.
+I've added a test that covers this and fixed it by using `protected`, the property remains immutable anyway thanks to the exception in `deprecate()` (now covered as well).

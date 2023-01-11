@@ -76,7 +76,7 @@ class UniqueValidator extends ConstraintValidator
             if (!\is_string($field)) {
                 throw new UnexpectedTypeException($field, 'string');
             }
-            if (isset($element[$field])) {
+            if (\array_key_exists($field, $element)) {
                 $output[$field] = $element[$field];
             }
         }

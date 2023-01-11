@@ -49,7 +49,7 @@ class JsonValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getValidValues()
+    public static function getValidValues()
     {
         return [
             ['{"planet":"earth", "country": "Morocco","city": "Rabat" ,"postcode" : 10160, "is_great": true,
@@ -65,7 +65,7 @@ class JsonValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getInvalidValues()
+    public static function getInvalidValues()
     {
         return [
             ['{"foo": 3 "bar": 4}'],

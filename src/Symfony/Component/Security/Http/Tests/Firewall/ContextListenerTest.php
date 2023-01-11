@@ -169,7 +169,7 @@ class ContextListenerTest extends TestCase
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function provideInvalidToken()
+    public static function provideInvalidToken()
     {
         return [
             ['foo'],

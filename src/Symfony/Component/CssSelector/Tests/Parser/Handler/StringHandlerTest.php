@@ -18,7 +18,7 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 
 class StringHandlerTest extends AbstractHandlerTest
 {
-    public function getHandleValueTestData()
+    public static function getHandleValueTestData()
     {
         return [
             ['"hello"', new Token(Token::TYPE_STRING, 'hello', 1), ''],
@@ -31,7 +31,7 @@ class StringHandlerTest extends AbstractHandlerTest
         ];
     }
 
-    public function getDontHandleValueTestData()
+    public static function getDontHandleValueTestData()
     {
         return [
             ['hello'],

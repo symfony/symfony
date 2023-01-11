@@ -137,13 +137,13 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
         $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getResponse());
     }
 
-    public function getLocalesAndClientConfig()
+    public static function getLocalesAndClientConfig()
     {
         yield ['en', ['root_config' => 'localized_routes.yml']];
         yield ['de', ['root_config' => 'localized_routes.yml']];
     }
 
-    public function getLegacyLocalesAndClientConfig()
+    public static function getLegacyLocalesAndClientConfig()
     {
         yield ['en', ['root_config' => 'legacy_localized_routes.yml']];
         yield ['de', ['root_config' => 'legacy_localized_routes.yml']];

@@ -109,7 +109,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->assertSame($response, $actualResponse);
     }
 
-    public function getTokenClearingTests()
+    public static function getTokenClearingTests()
     {
         $tests = [];
         // matching firewall => clear the token

@@ -78,7 +78,7 @@ class AbstractFactoryTest extends TestCase
         }
     }
 
-    public function getFailureHandlers()
+    public static function getFailureHandlers()
     {
         return [
             [null, true],
@@ -118,7 +118,7 @@ class AbstractFactoryTest extends TestCase
         }
     }
 
-    public function getSuccessHandlers()
+    public static function getSuccessHandlers()
     {
         return [
             [null, true],

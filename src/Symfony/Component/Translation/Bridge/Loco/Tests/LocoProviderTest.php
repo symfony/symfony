@@ -844,7 +844,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->delete($translatorBag);
     }
 
-    public function getResponsesForOneLocaleAndOneDomain(): \Generator
+    public static function getResponsesForOneLocaleAndOneDomain(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 
@@ -909,7 +909,7 @@ XLIFF
         ];
     }
 
-    public function getResponsesForManyLocalesAndManyDomains(): \Generator
+    public static function getResponsesForManyLocalesAndManyDomains(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 

@@ -233,7 +233,7 @@ abstract class AbstractDescriptorTest extends TestCase
         $this->assertEquals($expectedDescription, $this->getDescriptor()->getClassDescription($object));
     }
 
-    public function getClassDescriptionTestData()
+    public static function getClassDescriptionTestData()
     {
         return [
             [ClassWithDocCommentOnMultipleLines::class, 'This is the first line of the description. This is the second line.'],

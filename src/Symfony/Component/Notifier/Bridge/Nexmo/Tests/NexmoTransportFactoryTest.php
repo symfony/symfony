@@ -28,7 +28,7 @@ final class NexmoTransportFactoryTest extends TransportFactoryTestCase
         return new NexmoTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'nexmo://host.test?from=0611223344',
@@ -36,18 +36,18 @@ final class NexmoTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'nexmo://apiKey:apiSecret@default?from=0611223344'];
         yield [false, 'somethingElse://apiKey:apiSecret@default?from=0611223344'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['nexmo://apiKey:apiSecret@default'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://apiKey:apiSecret@default?from=0611223344'];
         yield ['somethingElse://apiKey:apiSecret@default']; // missing "from" option

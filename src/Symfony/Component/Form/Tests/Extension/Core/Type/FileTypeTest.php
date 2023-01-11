@@ -183,7 +183,7 @@ class FileTypeTest extends BaseTypeTest
         $this->assertSame([], $form->getViewData());
     }
 
-    public function requestHandlerProvider()
+    public static function requestHandlerProvider()
     {
         return [
             [new HttpFoundationRequestHandler()],
@@ -301,7 +301,7 @@ class FileTypeTest extends BaseTypeTest
         }
     }
 
-    public function uploadFileErrorCodes()
+    public static function uploadFileErrorCodes()
     {
         return [
             'no error' => [\UPLOAD_ERR_OK, null],

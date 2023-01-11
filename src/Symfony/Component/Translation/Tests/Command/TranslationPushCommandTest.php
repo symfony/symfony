@@ -340,7 +340,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions(): \Generator
+    public static function provideCompletionSuggestions(): \Generator
     {
         yield 'provider' => [
             [''],

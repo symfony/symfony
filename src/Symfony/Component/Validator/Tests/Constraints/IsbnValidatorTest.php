@@ -26,7 +26,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         return new IsbnValidator();
     }
 
-    public function getValidIsbn10()
+    public static function getValidIsbn10()
     {
         return [
             ['2723442284'],
@@ -45,7 +45,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getInvalidIsbn10()
+    public static function getInvalidIsbn10()
     {
         return [
             ['27234422841', Isbn::TOO_LONG_ERROR],
@@ -65,7 +65,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getValidIsbn13()
+    public static function getValidIsbn13()
     {
         return [
             ['978-2723442282'],
@@ -83,7 +83,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getInvalidIsbn13()
+    public static function getInvalidIsbn13()
     {
         return [
             ['978-27234422821', Isbn::TOO_LONG_ERROR],

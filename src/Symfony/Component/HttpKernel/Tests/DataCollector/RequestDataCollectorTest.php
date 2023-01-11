@@ -445,7 +445,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame($expected, $c->isJsonRequest());
     }
 
-    public function provideJsonContentTypes()
+    public static function provideJsonContentTypes()
     {
         return [
             ['text/csv', false],
@@ -472,7 +472,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame($expected, $c->getPrettyJson());
     }
 
-    public function providePrettyJson()
+    public static function providePrettyJson()
     {
         return [
             ['null', 'null'],

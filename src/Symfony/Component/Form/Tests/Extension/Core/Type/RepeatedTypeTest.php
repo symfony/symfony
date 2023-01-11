@@ -107,7 +107,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertTrue($form['second']->getConfig()->getMapped());
     }
 
-    public function notMappedConfigurationKeys()
+    public static function notMappedConfigurationKeys()
     {
         return [
             ['first_options'],

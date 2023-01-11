@@ -16,7 +16,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class AsciiSluggerTest extends TestCase
 {
-    public function provideSlugTests(): iterable
+    public static function provideSlugTests(): iterable
     {
         yield ['', ''];
         yield ['foo', ' foo '];

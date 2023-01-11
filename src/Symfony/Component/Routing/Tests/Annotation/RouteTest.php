@@ -42,7 +42,7 @@ class RouteTest extends TestCase
         return $route;
     }
 
-    public function provideDeprecationArrayAsFirstArgument()
+    public static function provideDeprecationArrayAsFirstArgument()
     {
         return [
             ['requirements', ['locale' => 'en'], 'getRequirements'],
@@ -89,7 +89,7 @@ class RouteTest extends TestCase
         $this->assertEquals($route->$getter(), $expectedReturn);
     }
 
-    public function getValidParameters(): iterable
+    public static function getValidParameters(): iterable
     {
         return [
             ['simplePath', 'getPath', '/Blog'],

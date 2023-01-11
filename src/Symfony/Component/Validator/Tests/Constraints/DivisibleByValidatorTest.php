@@ -68,7 +68,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath(): array
+    public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [25],
@@ -104,7 +104,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         ]));
     }
 
-    public function throwsOnNonNumericValuesProvider()
+    public static function throwsOnNonNumericValuesProvider()
     {
         return [
             [\stdClass::class, 2, new \stdClass()],

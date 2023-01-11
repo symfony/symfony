@@ -60,7 +60,7 @@ final class PseudoLocalizationTranslatorTest extends TestCase
         ]);
     }
 
-    public function provideInvalidExpansionFactor(): array
+    public static function provideInvalidExpansionFactor(): array
     {
         return [
             [0],

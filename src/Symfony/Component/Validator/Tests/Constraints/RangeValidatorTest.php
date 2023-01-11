@@ -31,7 +31,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getTenToTwenty()
+    public static function getTenToTwenty()
     {
         return [
             [10.00001],
@@ -45,7 +45,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getLessThanTen()
+    public static function getLessThanTen()
     {
         return [
             [9.99999, '9.99999'],
@@ -55,7 +55,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getMoreThanTwenty()
+    public static function getMoreThanTwenty()
     {
         return [
             [20.000001, '20.000001'],
@@ -600,7 +600,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         ]));
     }
 
-    public function throwsOnInvalidStringDatesProvider(): array
+    public static function throwsOnInvalidStringDatesProvider(): array
     {
         return [
             ['The min value "foo" could not be converted to a "DateTimeImmutable" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTimeImmutable(), 'foo', null],
@@ -1028,7 +1028,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideMessageIfMinAndMaxSet(): array
+    public static function provideMessageIfMinAndMaxSet(): array
     {
         $notInRangeMessage = (new Range(['min' => '']))->notInRangeMessage;
 

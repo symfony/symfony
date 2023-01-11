@@ -69,7 +69,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         return $result;
     }
 
-    public function provideInvalidConstraintOptions()
+    public static function provideInvalidConstraintOptions()
     {
         return [
             [null],
@@ -168,7 +168,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
     abstract public function provideValidComparisons(): array;
 
-    abstract public function provideValidComparisonsToPropertyPath(): array;
+    abstract public static function provideValidComparisonsToPropertyPath(): array;
 
     /**
      * @dataProvider provideAllInvalidComparisons

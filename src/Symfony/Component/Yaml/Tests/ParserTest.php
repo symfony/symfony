@@ -144,7 +144,7 @@ YAML;
         $this->parser->parse($given);
     }
 
-    public function invalidIndentation(): array
+    public static function invalidIndentation(): array
     {
         return [
             [
@@ -189,7 +189,7 @@ YAML;
         $this->assertSameData($expected, $actual);
     }
 
-    public function validTokenSeparators(): array
+    public static function validTokenSeparators(): array
     {
         return [
             [
@@ -222,7 +222,7 @@ EOF;
         $this->assertEquals('foo', $this->parser->parse($yaml));
     }
 
-    public function getBlockChompingTests()
+    public static function getBlockChompingTests()
     {
         $tests = [];
 
@@ -586,7 +586,7 @@ EOF;
         $this->assertSameData($expected, $this->parser->parse($yaml, $flags));
     }
 
-    public function getObjectForMapTests()
+    public static function getObjectForMapTests()
     {
         $tests = [];
 
@@ -833,7 +833,7 @@ EOT;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function getParseExceptionNotAffectedMultiLineStringLastResortParsing()
+    public static function getParseExceptionNotAffectedMultiLineStringLastResortParsing()
     {
         $tests = [];
 
@@ -975,7 +975,7 @@ EOD;
         Yaml::parse($input);
     }
 
-    public function getParseExceptionOnDuplicateData()
+    public static function getParseExceptionOnDuplicateData()
     {
         $tests = [];
 
@@ -1280,7 +1280,7 @@ EOT;
         $this->assertSame($expectedParserResult, $this->parser->parse($yaml));
     }
 
-    public function getCommentLikeStringInScalarBlockData()
+    public static function getCommentLikeStringInScalarBlockData()
     {
         $tests = [];
 
@@ -1465,7 +1465,7 @@ EOT
         $this->assertSame(['data' => 'Hello world'], $this->parser->parse($data));
     }
 
-    public function getBinaryData()
+    public static function getBinaryData()
     {
         return [
             'enclosed with double quotes' => ['data: !!binary "SGVsbG8gd29ybGQ="'],
@@ -1497,7 +1497,7 @@ EOT
         $this->parser->parse($data);
     }
 
-    public function getInvalidBinaryData()
+    public static function getInvalidBinaryData()
     {
         return [
             'length not a multiple of four' => ['data: !!binary "SGVsbG8d29ybGQ="', '/The normalized base64 encoded data \(data without whitespace characters\) length must be a multiple of four \(\d+ bytes given\)/'],
@@ -1563,7 +1563,7 @@ EOT;
         $this->parser->parse($yaml);
     }
 
-    public function parserThrowsExceptionWithCorrectLineNumberProvider()
+    public static function parserThrowsExceptionWithCorrectLineNumberProvider()
     {
         return [
             [
@@ -1720,7 +1720,7 @@ EOT;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function escapedQuotationCharactersInQuotedStrings()
+    public static function escapedQuotationCharactersInQuotedStrings()
     {
         return [
             'single quoted string' => [
@@ -1778,7 +1778,7 @@ YAML
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function multiLineDataProvider()
+    public static function multiLineDataProvider()
     {
         $tests = [];
 
@@ -1845,7 +1845,7 @@ EOF;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function inlineNotationSpanningMultipleLinesProvider(): array
+    public static function inlineNotationSpanningMultipleLinesProvider(): array
     {
         return [
             'mapping' => [
@@ -2234,7 +2234,7 @@ YAML;
         $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function taggedValuesProvider()
+    public static function taggedValuesProvider()
     {
         return [
             'scalars' => [
@@ -2658,7 +2658,7 @@ EOE;
         $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS);
     }
 
-    public function circularReferenceProvider()
+    public static function circularReferenceProvider()
     {
         $tests = [];
 
@@ -2698,7 +2698,7 @@ YAML;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function indentedMappingData()
+    public static function indentedMappingData()
     {
         $tests = [];
 

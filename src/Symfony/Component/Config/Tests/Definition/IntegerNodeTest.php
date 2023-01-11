@@ -37,7 +37,7 @@ class IntegerNodeTest extends TestCase
         $this->assertSame($value, $node->finalize($value));
     }
 
-    public function getValidValues(): array
+    public static function getValidValues(): array
     {
         return [
             [1798],
@@ -56,7 +56,7 @@ class IntegerNodeTest extends TestCase
         $node->normalize($value);
     }
 
-    public function getInvalidValues(): array
+    public static function getInvalidValues(): array
     {
         return [
             [null],

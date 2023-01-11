@@ -40,7 +40,7 @@ class NativePasswordEncoderTest extends TestCase
         $this->assertInstanceOf(NativePasswordEncoder::class, new NativePasswordEncoder(null, null, $cost));
     }
 
-    public function validRangeData()
+    public static function validRangeData()
     {
         $costs = range(4, 31);
         array_walk($costs, function (&$cost) { $cost = [$cost]; });

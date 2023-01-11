@@ -43,7 +43,7 @@ class StringInputTest extends TestCase
         $this->assertEquals('bar', $input->getOption('foo'));
     }
 
-    public function getTokenizeData()
+    public static function getTokenizeData()
     {
         return [
             ['', [], '->tokenize() parses an empty string'],

@@ -90,7 +90,7 @@ class CidrTest extends TestCase
         ]);
     }
 
-    public function getInvalidMinMaxValues(): array
+    public static function getInvalidMinMaxValues(): array
     {
         return [
             [Ip::ALL, -1, 23],
@@ -108,7 +108,7 @@ class CidrTest extends TestCase
         ];
     }
 
-    public function getValidMinMaxValues(): array
+    public static function getValidMinMaxValues(): array
     {
         return [
             [Ip::ALL, 0, 23],

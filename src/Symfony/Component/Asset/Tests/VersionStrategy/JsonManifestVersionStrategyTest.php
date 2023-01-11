@@ -114,7 +114,7 @@ class JsonManifestVersionStrategyTest extends TestCase
         yield [new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestPath)];
     }
 
-    public function provideStrictStrategies()
+    public static function provideStrictStrategies()
     {
         $strategy = new JsonManifestVersionStrategy(__DIR__.'/../fixtures/manifest-valid.json', null, true);
 

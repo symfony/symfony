@@ -36,7 +36,7 @@ class ErrorControllerTest extends TestCase
         self::assertStringContainsString($content, strtr($response->getContent(), ["\n" => '', '    ' => '']));
     }
 
-    public function getInvokeControllerDataProvider()
+    public static function getInvokeControllerDataProvider()
     {
         yield 'default status code and HTML format' => [
             new Request(),

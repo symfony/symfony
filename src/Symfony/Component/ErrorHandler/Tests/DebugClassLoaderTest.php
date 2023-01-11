@@ -141,7 +141,7 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function provideDeprecatedSuper(): array
+    public static function provideDeprecatedSuper(): array
     {
         return [
             ['DeprecatedInterfaceClass', 'DeprecatedInterface', 'implements'],

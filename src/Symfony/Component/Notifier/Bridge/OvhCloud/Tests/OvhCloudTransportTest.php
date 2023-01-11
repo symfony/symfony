@@ -48,7 +48,7 @@ final class OvhCloudTransportTest extends TransportTestCase
         yield [$this->createMock(MessageInterface::class)];
     }
 
-    public function validMessagesProvider(): iterable
+    public static function validMessagesProvider(): iterable
     {
         yield 'without a slash' => ['hello'];
         yield 'including a slash' => ['hel/lo'];

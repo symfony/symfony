@@ -552,7 +552,7 @@ XLIFF;
         $provider->write($translatorBag);
     }
 
-    public function getResponsesForProcessAddFileAndUploadTranslations(): \Generator
+    public static function getResponsesForProcessAddFileAndUploadTranslations(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 
@@ -660,7 +660,7 @@ XLIFF
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
 
-    public function getResponsesForOneLocaleAndOneDomain(): \Generator
+    public static function getResponsesForOneLocaleAndOneDomain(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 
@@ -773,7 +773,7 @@ XLIFF
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
 
-    public function getResponsesForDefaultLocaleAndOneDomain(): \Generator
+    public static function getResponsesForDefaultLocaleAndOneDomain(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 

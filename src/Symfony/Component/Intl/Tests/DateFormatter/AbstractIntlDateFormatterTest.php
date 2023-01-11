@@ -91,7 +91,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertIsIntlSuccess($formatter, $errorMessage, $errorCode);
     }
 
-    public function formatProvider()
+    public static function formatProvider()
     {
         $dateTime = new \DateTime('@0');
         $dateTimeImmutable = new \DateTimeImmutable('@0');
@@ -310,7 +310,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertIsIntlFailure($formatter, $errorMessage, $errorCode);
     }
 
-    public function formatErrorProvider()
+    public static function formatErrorProvider()
     {
         return [
             ['y-M-d', 'foobar', 'datefmt_format: string \'foobar\' is not numeric, which would be required for it to be a valid date: U_ILLEGAL_ARGUMENT_ERROR'],
@@ -327,7 +327,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
-    public function formatWithTimezoneProvider()
+    public static function formatWithTimezoneProvider()
     {
         $data = [
             [0, 'UTC', '1970-01-01 00:00:00'],
@@ -369,7 +369,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertEquals($expected, $formatter->format(0));
     }
 
-    public function formatTimezoneProvider()
+    public static function formatTimezoneProvider()
     {
         return [
             ['z', 'GMT', 'GMT'],
@@ -510,7 +510,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
-    public function dateAndTimeTypeProvider()
+    public static function dateAndTimeTypeProvider()
     {
         return [
             [0, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Thursday, January 1, 1970'],
@@ -868,7 +868,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertIsIntlFailure($formatter, $errorMessage, $errorCode);
     }
 
-    public function parseErrorProvider()
+    public static function parseErrorProvider()
     {
         return [
             // 1 char month
@@ -919,7 +919,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertEquals($expectedTimeZoneId, $formatter->getTimeZoneId());
     }
 
-    public function setTimeZoneIdProvider()
+    public static function setTimeZoneIdProvider()
     {
         return [
             ['UTC', 'UTC'],

@@ -59,7 +59,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport(new CheckPassportEvent($authenticator, $passport));
     }
 
-    public function provideShouldNotCheckPassport()
+    public static function provideShouldNotCheckPassport()
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
             $this->markTestSkipped('This test requires symfony/security-http:^5.1');
@@ -108,7 +108,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
     }
 
-    public function provideWrongPassportData()
+    public static function provideWrongPassportData()
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
             $this->markTestSkipped('This test requires symfony/security-http:^5.1');

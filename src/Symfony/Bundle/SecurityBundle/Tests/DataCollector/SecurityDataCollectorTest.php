@@ -352,7 +352,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
-    public function provideRoles()
+    public static function provideRoles()
     {
         return [
             // Basic roles

@@ -135,7 +135,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function getEmptyTokenCases()
+    public static function getEmptyTokenCases()
     {
         return [
             [null],
@@ -164,7 +164,7 @@ class ProfilerControllerTest extends WebTestCase
         }
     }
 
-    public function getOpenFileCases()
+    public static function getOpenFileCases()
     {
         return [
             ['README.md', true],
@@ -354,7 +354,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('PHP License', $client->getResponse()->getContent());
     }
 
-    public function provideCspVariants()
+    public static function provideCspVariants()
     {
         return [
             [true],

@@ -329,7 +329,7 @@ class PdoSessionHandlerTest extends TestCase
         }
     }
 
-    public function provideUrlDsnPairs()
+    public static function provideUrlDsnPairs()
     {
         yield ['mysql://localhost/test', 'mysql:host=localhost;dbname=test;'];
         yield ['mysql://localhost/test?charset=utf8mb4', 'mysql:charset=utf8mb4;host=localhost;dbname=test;'];

@@ -93,7 +93,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load($file.'.yml');
     }
 
-    public function provideInvalidFiles()
+    public static function provideInvalidFiles()
     {
         return [
             ['bad_parameters'],

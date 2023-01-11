@@ -164,7 +164,7 @@ class SerializerTest extends TestCase
         $serializer->decode($data);
     }
 
-    public function getMissingKeyTests(): iterable
+    public static function getMissingKeyTests(): iterable
     {
         yield 'no_body' => [
             ['headers' => ['type' => 'bar']],

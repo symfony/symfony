@@ -70,7 +70,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ]);
     }
 
-    public function providePropagatedEvents(): array
+    public static function providePropagatedEvents(): array
     {
         return [
             [CheckPassportEvent::class, CheckPassportEvent::class],

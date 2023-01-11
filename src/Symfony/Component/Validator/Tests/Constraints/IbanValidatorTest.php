@@ -48,7 +48,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidIbans()
+    public static function getValidIbans()
     {
         return [
             ['CH9300762011623852957'], // Switzerland without spaces
@@ -170,7 +170,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($iban, Iban::INVALID_FORMAT_ERROR);
     }
 
-    public function getIbansWithInvalidFormat()
+    public static function getIbansWithInvalidFormat()
     {
         return [
             ['AL47 2121 1009 0000 0002 3569 874'], // Albania
@@ -289,7 +289,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($iban, Iban::CHECKSUM_FAILED_ERROR);
     }
 
-    public function getIbansWithValidFormatButIncorrectChecksum()
+    public static function getIbansWithValidFormatButIncorrectChecksum()
     {
         return [
             ['AL47 2121 1009 0000 0002 3569 8742'], // Albania
@@ -401,7 +401,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         $this->assertViolationRaised($countryCode.'260211000000230064016', Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR);
     }
 
-    public function getUnsupportedCountryCodes()
+    public static function getUnsupportedCountryCodes()
     {
         return [
             ['AG'],
@@ -443,7 +443,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getIbansWithInvalidCountryCode()
+    public static function getIbansWithInvalidCountryCode()
     {
         return [
             ['0750447346'],

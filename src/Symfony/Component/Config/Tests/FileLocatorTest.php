@@ -30,7 +30,7 @@ class FileLocatorTest extends TestCase
         $this->assertTrue($m->invoke($loader, $path), '->isAbsolutePath() returns true for an absolute path');
     }
 
-    public function getIsAbsolutePathTests(): array
+    public static function getIsAbsolutePathTests(): array
     {
         return [
             ['/foo.xml'],

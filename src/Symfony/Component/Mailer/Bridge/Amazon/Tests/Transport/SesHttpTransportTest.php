@@ -33,7 +33,7 @@ class SesHttpTransportTest extends TestCase
         $this->assertSame($expected, (string) $transport);
     }
 
-    public function getTransportData()
+    public static function getTransportData()
     {
         return [
             [

@@ -82,7 +82,7 @@ class SessionListenerTest extends TestCase
         }
     }
 
-    public function provideSessionOptions(): \Generator
+    public static function provideSessionOptions(): \Generator
     {
         if (\PHP_VERSION_ID > 70300) {
             yield 'set_samesite_by_php' => [

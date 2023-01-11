@@ -42,7 +42,7 @@ class TranslationUpdateCommandCompletionTest extends TestCase
         $this->assertSame($expectedSuggestions, $suggestions);
     }
 
-    public function provideCompletionSuggestions()
+    public static function provideCompletionSuggestions()
     {
         $bundle = new ExtensionPresentBundle();
 

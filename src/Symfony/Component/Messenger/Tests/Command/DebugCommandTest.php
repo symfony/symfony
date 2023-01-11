@@ -185,7 +185,7 @@ TXT
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    public function provideCompletionSuggestions(): iterable
+    public static function provideCompletionSuggestions(): iterable
     {
         yield 'bus' => [
             [''],

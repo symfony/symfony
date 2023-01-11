@@ -146,7 +146,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($themeColor, $options->toArray()['themeColor']);
     }
 
-    public function validThemeColors(): \Generator
+    public static function validThemeColors(): \Generator
     {
         yield ['#333'];
         yield ['#333333'];
@@ -181,7 +181,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
             ->themeColor($themeColor);
     }
 
-    public function invalidThemeColors(): \Generator
+    public static function invalidThemeColors(): \Generator
     {
         yield [''];
         yield [' '];

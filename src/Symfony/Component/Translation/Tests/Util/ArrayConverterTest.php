@@ -24,7 +24,7 @@ class ArrayConverterTest extends TestCase
         $this->assertEquals($expectedOutput, ArrayConverter::expandToTree($input));
     }
 
-    public function messagesData()
+    public static function messagesData()
     {
         return [
             [

@@ -84,7 +84,7 @@ final class EnumTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function provideSingleSubmitData(): iterable
+    public static function provideSingleSubmitData(): iterable
     {
         yield 'unbacked' => [
             Answer::class,
@@ -226,7 +226,7 @@ final class EnumTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function provideMultiSubmitData(): iterable
+    public static function provideMultiSubmitData(): iterable
     {
         yield 'unbacked' => [
             Answer::class,

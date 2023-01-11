@@ -55,7 +55,7 @@ class FormErrorIteratorTest extends TestCase
         $this->assertCount($violationsCount, $specificFormErrors);
     }
 
-    public function findByCodesProvider()
+    public static function findByCodesProvider()
     {
         return [
             ['code1', 2],

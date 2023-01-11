@@ -46,7 +46,7 @@ class UidNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function normalizeProvider()
+    public static function normalizeProvider()
     {
         $uidFormats = [null, 'canonical', 'base58', 'base32', 'rfc4122'];
         $data = [
@@ -117,7 +117,7 @@ class UidNormalizerTest extends TestCase
         ] : []));
     }
 
-    public function dataProvider()
+    public static function dataProvider()
     {
         return [
             ['9b7541de-6f87-11ea-ab3c-9da9a81562fc', UuidV1::class],

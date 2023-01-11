@@ -174,13 +174,13 @@ class RememberMeTest extends AbstractWebTestCase
         $this->assertNull($cookieJar->get('REMEMBERME'));
     }
 
-    public function provideConfigs()
+    public static function provideConfigs()
     {
         yield [['root_config' => 'config_session.yml']];
         yield [['root_config' => 'config_persistent.yml']];
     }
 
-    public function provideLegacyConfigs()
+    public static function provideLegacyConfigs()
     {
         yield [['root_config' => 'legacy_config_session.yml']];
         yield [['root_config' => 'legacy_config_persistent.yml']];

@@ -26,7 +26,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         return new IssnValidator();
     }
 
-    public function getValidLowerCasedIssn()
+    public static function getValidLowerCasedIssn()
     {
         return [
             ['2162-321x'],
@@ -39,7 +39,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getValidNonHyphenatedIssn()
+    public static function getValidNonHyphenatedIssn()
     {
         return [
             ['2162321X'],
@@ -75,7 +75,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function getInvalidIssn()
+    public static function getInvalidIssn()
     {
         return [
             [0, Issn::TOO_SHORT_ERROR],

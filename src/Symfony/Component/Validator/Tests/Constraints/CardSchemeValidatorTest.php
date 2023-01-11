@@ -90,7 +90,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getValidNumbers()
+    public static function getValidNumbers()
     {
         return [
             ['AMEX', '378282246310005'],
@@ -145,7 +145,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function getInvalidNumbers()
+    public static function getInvalidNumbers()
     {
         return [
             ['VISA', '42424242424242424242', CardScheme::INVALID_FORMAT_ERROR],

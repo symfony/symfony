@@ -39,7 +39,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         return $this->getBuilder($name)->setAttribute('property_path', $propertyPath)->getForm();
     }
 
-    public function getBooleanMatrix1()
+    public static function getBooleanMatrix1()
     {
         return [
             [true],
@@ -47,7 +47,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         ];
     }
 
-    public function getBooleanMatrix2()
+    public static function getBooleanMatrix2()
     {
         return [
             [true, true],

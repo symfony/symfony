@@ -54,7 +54,7 @@ class TwigExtractorTest extends TestCase
         }
     }
 
-    public function getExtractData()
+    public static function getExtractData()
     {
         return [
             ['{{ "new key" | trans() }}', ['new key' => 'messages']],
@@ -102,7 +102,7 @@ class TwigExtractorTest extends TestCase
         $this->assertSame($messages, $catalogue->all());
     }
 
-    public function resourcesWithSyntaxErrorsProvider(): array
+    public static function resourcesWithSyntaxErrorsProvider(): array
     {
         return [
             [__DIR__.'/../Fixtures', ['messages' => ['Hi!' => 'Hi!']]],
@@ -133,7 +133,7 @@ class TwigExtractorTest extends TestCase
         $this->assertEquals('Hi!', $catalogue->get('Hi!', 'messages'));
     }
 
-    public function resourceProvider(): array
+    public static function resourceProvider(): array
     {
         $directory = __DIR__.'/../Fixtures/extractor/';
 

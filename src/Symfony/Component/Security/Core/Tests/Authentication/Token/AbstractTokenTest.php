@@ -73,7 +73,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($username, $token->getUserIdentifier());
     }
 
-    public function provideUsers()
+    public static function provideUsers()
     {
         yield [new InMemoryUser('fabien', null), 'fabien'];
     }
@@ -89,7 +89,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($username, $token->getUserIdentifier());
     }
 
-    public function provideLegacyUsers()
+    public static function provideLegacyUsers()
     {
         return [
             [new TestUser('fabien'), 'fabien'],

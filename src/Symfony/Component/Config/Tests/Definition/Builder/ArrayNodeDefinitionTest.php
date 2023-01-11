@@ -55,7 +55,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode();
     }
 
-    public function providePrototypeNodeSpecificCalls(): array
+    public static function providePrototypeNodeSpecificCalls(): array
     {
         return [
             ['defaultValue', [[]]],
@@ -137,7 +137,7 @@ class ArrayNodeDefinitionTest extends TestCase
         }
     }
 
-    public function providePrototypedArrayNodeDefaults(): array
+    public static function providePrototypedArrayNodeDefaults(): array
     {
         return [
             [null, true, false, [[]]],
@@ -298,7 +298,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertEquals($node->prototype('enum'), $node->enumPrototype());
     }
 
-    public function getEnableableNodeFixtures(): array
+    public static function getEnableableNodeFixtures(): array
     {
         return [
             [['enabled' => true, 'foo' => 'bar'], [true], 'true enables an enableable node'],

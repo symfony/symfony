@@ -208,7 +208,7 @@ class ParserTest extends TestCase
         $parser->parse($lexer->tokenize($expr), $names);
     }
 
-    public function getInvalidPostfixData()
+    public static function getInvalidPostfixData()
     {
         return [
             [
@@ -258,7 +258,7 @@ class ParserTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function getLintData(): array
+    public static function getLintData(): array
     {
         return [
             'valid expression' => [

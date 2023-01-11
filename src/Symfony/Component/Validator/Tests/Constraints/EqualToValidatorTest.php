@@ -55,7 +55,7 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath(): array
+    public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [5],

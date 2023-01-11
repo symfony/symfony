@@ -74,7 +74,7 @@ class DebugExtensionTest extends TestCase
         $this->assertTrue($called);
     }
 
-    public function provideServicesUsingDumpDestinationCreation(): array
+    public static function provideServicesUsingDumpDestinationCreation(): array
     {
         return [
             ['tcp://localhost:1234', 'tcp://localhost:1234', null],

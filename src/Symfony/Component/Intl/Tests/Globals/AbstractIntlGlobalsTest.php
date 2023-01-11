@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class AbstractIntlGlobalsTest extends TestCase
 {
-    public function errorNameProvider()
+    public static function errorNameProvider()
     {
         return [
             [-129, '[BOGUS UErrorCode]'],

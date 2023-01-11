@@ -29,7 +29,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($expectedResult, $config);
     }
 
-    public function getDebugModes()
+    public static function getDebugModes()
     {
         return [
             [
@@ -71,7 +71,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($expectedResult, $config);
     }
 
-    public function getInterceptRedirectsConfiguration()
+    public static function getInterceptRedirectsConfiguration()
     {
         return [
             [

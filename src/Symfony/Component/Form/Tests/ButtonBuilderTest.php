@@ -20,7 +20,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class ButtonBuilderTest extends TestCase
 {
-    public function getValidNames()
+    public static function getValidNames()
     {
         return [
             ['reset'],
@@ -47,7 +47,7 @@ class ButtonBuilderTest extends TestCase
         $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder('button[]'));
     }
 
-    public function getInvalidNames()
+    public static function getInvalidNames()
     {
         return [
             [''],

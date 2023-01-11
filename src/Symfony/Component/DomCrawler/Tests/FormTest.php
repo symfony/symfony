@@ -78,7 +78,7 @@ class FormTest extends TestCase
         new Form($node, 'http://example.com');
     }
 
-    public function constructorThrowsExceptionIfNoRelatedFormProvider()
+    public static function constructorThrowsExceptionIfNoRelatedFormProvider()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
@@ -217,7 +217,7 @@ class FormTest extends TestCase
         );
     }
 
-    public function provideInitializeValues()
+    public static function provideInitializeValues()
     {
         return [
             [
@@ -585,7 +585,7 @@ class FormTest extends TestCase
         $this->assertEquals('http://localhost/bar', $form->getUri(), '->getUri() returns absolute URIs');
     }
 
-    public function provideGetUriValues()
+    public static function provideGetUriValues()
     {
         return [
             [

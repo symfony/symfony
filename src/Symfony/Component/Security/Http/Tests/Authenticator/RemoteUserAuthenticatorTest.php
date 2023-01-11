@@ -64,7 +64,7 @@ class RemoteUserAuthenticatorTest extends TestCase
         $this->assertTrue($user->isEqualTo($passport->getUser()));
     }
 
-    public function provideAuthenticators()
+    public static function provideAuthenticators()
     {
         $userProvider = new InMemoryUserProvider();
         yield [$userProvider, new RemoteUserAuthenticator($userProvider, new TokenStorage(), 'main'), 'REMOTE_USER'];

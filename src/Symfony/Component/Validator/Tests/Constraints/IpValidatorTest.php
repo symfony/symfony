@@ -64,7 +64,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidIpsV4()
+    public static function getValidIpsV4()
     {
         return [
             ['0.0.0.0'],
@@ -104,7 +104,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidIpsV4WithWhitespaces()
+    public static function getValidIpsV4WithWhitespaces()
     {
         return [
             ["\x200.0.0.0"],
@@ -128,7 +128,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidIpsV6()
+    public static function getValidIpsV6()
     {
         return [
             ['2001:0db8:85a3:0000:0000:8a2e:0370:7334'],
@@ -188,7 +188,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidIpsV4()
+    public static function getInvalidIpsV4()
     {
         return [
             ['0'],
@@ -221,7 +221,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidPrivateIpsV4()
+    public static function getInvalidPrivateIpsV4()
     {
         return [
             ['10.0.0.0'],
@@ -248,7 +248,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidReservedIpsV4()
+    public static function getInvalidReservedIpsV4()
     {
         return [
             ['0.0.0.0'],
@@ -298,7 +298,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidIpsV6()
+    public static function getInvalidIpsV6()
     {
         return [
             ['z001:0db8:85a3:0000:0000:8a2e:0370:7334'],
@@ -335,7 +335,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidPrivateIpsV6()
+    public static function getInvalidPrivateIpsV6()
     {
         return [
             ['fdfe:dcba:9876:ffff:fdc6:c46b:bb8f:7d4c'],

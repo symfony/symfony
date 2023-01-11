@@ -56,7 +56,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(0, Validation::createValidator()->validate($value, new AtLeastOneOf($constraints)));
     }
 
-    public function getValidCombinations()
+    public static function getValidCombinations()
     {
         return [
             ['symfony', [
@@ -125,7 +125,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertEquals(new ConstraintViolation('foo', 'foo', [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
-    public function getInvalidCombinations()
+    public static function getInvalidCombinations()
     {
         return [
             ['symphony', [

@@ -90,7 +90,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function provideConstraints(): iterable
+    public static function provideConstraints(): iterable
     {
         yield 'Doctrine style' => [new UserPassword(['message' => 'myMessage'])];
 
@@ -114,7 +114,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function emptyPasswordData()
+    public static function emptyPasswordData()
     {
         return [
             [null],

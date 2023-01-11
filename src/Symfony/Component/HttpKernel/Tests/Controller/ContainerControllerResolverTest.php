@@ -149,7 +149,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame('action', $controller[1]);
     }
 
-    public function getControllers()
+    public static function getControllers()
     {
         return [
             ['\\'.ControllerTestService::class.'::action'],
@@ -204,7 +204,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $resolver->getController($request);
     }
 
-    public function getUndefinedControllers()
+    public static function getUndefinedControllers()
     {
         $tests = parent::getUndefinedControllers();
         $tests[0] = ['foo', \InvalidArgumentException::class, 'Controller "foo" does neither exist as service nor as class'];

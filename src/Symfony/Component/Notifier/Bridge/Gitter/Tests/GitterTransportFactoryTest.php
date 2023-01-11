@@ -25,7 +25,7 @@ final class GitterTransportFactoryTest extends TransportFactoryTestCase
         return new GitterTransportFactory();
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             'gitter://api.gitter.im?room_id=5539a3ee5etest0d3255bfef',
@@ -33,23 +33,23 @@ final class GitterTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [true, 'gitter://token@host?room_id=5539a3ee5etest0d3255bfef'];
         yield [false, 'somethingElse://token@host?room_id=5539a3ee5etest0d3255bfef'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield 'missing token' => ['gitter://api.gitter.im?room_id=5539a3ee5etest0d3255bfef'];
     }
 
-    public function missingRequiredOptionProvider(): iterable
+    public static function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: room_id' => ['gitter://token@host'];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://token@host?room_id=5539a3ee5etest0d3255bfef'];
         yield ['somethingElse://token@host'];

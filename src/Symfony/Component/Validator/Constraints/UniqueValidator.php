@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -21,6 +25,13 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class UniqueValidator extends ConstraintValidator
 {
+    private ?PropertyAccessorInterface $propertyAccessor;
+
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
+    {
+        $this->propertyAccessor = $propertyAccessor;
+    }
+
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Unique) {
@@ -69,18 +80,37 @@ class UniqueValidator extends ConstraintValidator
         return $unique->normalizer;
     }
 
-    private function reduceElementKeys(array $fields, array $element): array
+    private function reduceElementKeys(array $fields, array|object $element): array
     {
         $output = [];
         foreach ($fields as $field) {
             if (!\is_string($field)) {
                 throw new UnexpectedTypeException($field, 'string');
             }
-            if (isset($element[$field])) {
-                $output[$field] = $element[$field];
+
+            // For no BC, because PropertyAccessor require brackets for array keys
+            // Previous implementation, only check in array
+            if (\is_array($element) && !str_contains($field, '[')) {
+                $field = "[{$field}]";
+            }
+
+            if (null !== $value = $this->getPropertyAccessor()->getValue($element, $field)) {
+                $output[$field] = $value;
             }
         }
 
         return $output;
+    }
+
+    private function getPropertyAccessor(): PropertyAccessor
+    {
+        if (null === $this->propertyAccessor) {
+            if (!class_exists(PropertyAccess::class)) {
+                throw new LogicException('Unable to use property path as the Symfony PropertyAccess component is not installed.');
+            }
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

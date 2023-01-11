@@ -26,7 +26,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class UniqueValidator extends ConstraintValidator
 {
-
     private ?PropertyAccessorInterface $propertyAccessor;
 
     /**
@@ -96,9 +95,9 @@ class UniqueValidator extends ConstraintValidator
             }
 
             $elementAsArray = null;
-            //handle public object property
-            if (\is_object($element) && \property_exists($element, $field)) {
-                $elementAsArray = (array)$element;
+            // handle public object property
+            if (\is_object($element) && property_exists($element, $field)) {
+                $elementAsArray = (array) $element;
             } elseif (\is_array($element)) {
                 $elementAsArray = $element;
             }
@@ -111,7 +110,7 @@ class UniqueValidator extends ConstraintValidator
             try {
                 $output[$field] = $this->getPropertyAccessor()->getValue($element, $field);
             } catch (AccessException) {
-                //fields are optional
+                // fields are optional
             }
         }
 
@@ -122,9 +121,7 @@ class UniqueValidator extends ConstraintValidator
     {
         if (null === $this->propertyAccessor) {
             if (!class_exists(PropertyAccess::class)) {
-                throw new LogicException(
-                    'Unable to use property path as the Symfony PropertyAccess component is not installed.'
-                );
+                throw new LogicException('Unable to use property path as the Symfony PropertyAccess component is not installed.');
             }
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }

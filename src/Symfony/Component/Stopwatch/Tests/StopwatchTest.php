@@ -42,7 +42,7 @@ class StopwatchTest extends TestCase
         $stopwatch = new Stopwatch();
         $stopwatch->start('foo');
         $foo1 = $stopwatch->stop('foo');
-        $stopwatch->start('foo');
+        $stopwatch->restart('foo');
         $foo2 = $stopwatch->stop('foo');
 
         $this->assertSame($foo2, $stopwatch->getEvent('foo'));

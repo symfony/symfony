@@ -14,8 +14,12 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Doctrine\Common\EventSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
+use Symfony\Bridge\Doctrine\Exception\EventListenerCircularException;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
@@ -295,6 +299,19 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->removeEventListener('foo', 'lazy');
         $this->assertSame([], $this->evm->getListeners('foo'));
     }
+
+    public function testCircularException()
+    {
+        $this->container = new ContainerBuilder();
+        $this->evm = new ContainerAwareEventManager($this->container, [[['foo'], 'lazy']]);
+        $this->container->set('evm', $this->evm);
+        $this->container->setDefinition('lazy', new Definition(CircularSubscriber::class, [new Reference('evm')]));
+
+        $this->expectException(EventListenerCircularException::class);
+        $this->expectExceptionMessage('Circular dependency detected during initialization of listener "lazy" for event "foo".');
+
+        $this->evm->dispatchEvent('foo');
+    }
 }
 
 class MyListener
@@ -328,5 +345,23 @@ class MySubscriber extends MyListener implements EventSubscriber
         ++$this->calledSubscribedEventsCount;
 
         return $this->listenedEvents;
+    }
+}
+
+class CircularSubscriber implements EventSubscriber
+{
+    public function __construct(ContainerAwareEventManager $evm)
+    {
+        $evm->dispatchEvent('foo');
+    }
+
+    public function foo()
+    {
+        throw new \LogicException('failed');
+    }
+
+    public function getSubscribedEvents(): array
+    {
+        return ['foo'];
     }
 }

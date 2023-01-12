@@ -15,6 +15,7 @@ use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\Doctrine\Exception\EventListenerCircularException;
 
 /**
  * Allows lazy loading of listener and subscriber services.
@@ -29,6 +30,7 @@ class ContainerAwareEventManager extends EventManager
      * <event> => <listeners>
      */
     private array $listeners = [];
+    private array $initializing = [];
     private array $initialized = [];
     private bool $initializedSubscribers = false;
     private array $methods = [];
@@ -165,14 +167,24 @@ class ContainerAwareEventManager extends EventManager
 
     private function initializeListeners(string $eventName): void
     {
-        $this->initialized[$eventName] = true;
+        if (isset($this->initializing[$eventName])) {
+            throw new EventListenerCircularException();
+        }
+        $this->initializing[$eventName] = true;
         foreach ($this->listeners[$eventName] as $hash => $listener) {
             if (\is_string($listener)) {
-                $this->listeners[$eventName][$hash] = $listener = $this->container->get($listener);
+                try {
+                    $this->listeners[$eventName][$hash] = $listener = $this->container->get($listener);
+                } catch (EventListenerCircularException $exception) {
+                    unset($this->initializing[$eventName]);
+                    throw $exception->setMessage(sprintf('Circular dependency detected during initialization of listener "%s" for event "%s".', $listener, $eventName));
+                }
 
                 $this->methods[$eventName][$hash] = $this->getMethod($listener, $eventName);
             }
         }
+        $this->initialized[$eventName] = true;
+        unset($this->initializing[$eventName]);
     }
 
     private function initializeSubscribers(): void

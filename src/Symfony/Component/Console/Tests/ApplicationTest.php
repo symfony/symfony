@@ -1807,7 +1807,7 @@ class ApplicationTest extends TestCase
         $this->assertSame(
             0,
             $application->getShellVerbosity(new ArrayInput([])),
-            'Function returns 0 if not shell verbosity is specified'
+            'Function returns 0 if no shell verbosity is specified'
         );
         putenv('SHELL_VERBOSITY=3');
         $this->assertSame(

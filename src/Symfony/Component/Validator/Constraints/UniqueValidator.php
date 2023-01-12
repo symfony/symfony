@@ -26,11 +26,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class UniqueValidator extends ConstraintValidator
 {
-
     public function __construct(
         private ?PropertyAccessorInterface $propertyAccessor = null
-    )
-    {
+    ) {
     }
 
 

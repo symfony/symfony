@@ -100,6 +100,18 @@ class Section
     }
 
     /**
+     * Starts an event.
+     *
+     * If an event with the same name already exists, replaces it.
+     */
+    public function restartEvent(string $name, ?string $category): StopwatchEvent
+    {
+        $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category, $this->morePrecision, $name);
+
+        return $this->events[$name]->start();
+    }
+
+    /**
      * Checks if the event was started.
      */
     public function isEventStarted(string $name): bool

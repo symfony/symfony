@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+* Added the `Stopwatch::restart()` method
+
 5.2
 ---
 

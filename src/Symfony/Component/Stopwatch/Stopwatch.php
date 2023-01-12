@@ -106,6 +106,16 @@ class Stopwatch implements ResetInterface
     }
 
     /**
+     * Starts an event.
+     *
+     * If an event with the same name already exists, removes it.
+     */
+    public function restart(string $name, string $category = null): StopwatchEvent
+    {
+        return end($this->activeSections)->restartEvent($name, $category);
+    }
+
+    /**
      * Checks if the event was started.
      */
     public function isStarted(string $name): bool

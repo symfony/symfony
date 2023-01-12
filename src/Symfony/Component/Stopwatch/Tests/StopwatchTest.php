@@ -37,6 +37,20 @@ class StopwatchTest extends TestCase
         $this->assertSame($event, $stopwatch->getEvent('foo'));
     }
 
+    public function testRestart()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('foo');
+        $foo1 = $stopwatch->stop('foo');
+        $stopwatch->start('foo');
+        $foo2 = $stopwatch->stop('foo');
+
+        $this->assertSame($foo2, $stopwatch->getEvent('foo'));
+        $this->assertNotSame($foo1, $stopwatch->getEvent('foo'));
+        $this->assertNotSame($foo1, $foo2);
+        $this->assertCount(1, $foo2->getPeriods());
+    }
+
     public function testStartWithoutCategory()
     {
         $stopwatch = new Stopwatch();

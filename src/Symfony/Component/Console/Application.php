@@ -901,12 +901,6 @@ class Application implements ResetInterface
         } while ($e = $e->getPrevious());
     }
 
-    /**
-     * Get shell verbosity.
-     *
-     * @param InputInterface $input
-     * @return int
-     */
     public function getShellVerbosity(InputInterface $input): int
     {
         $optionValue = $input->getParameterOption('--verbose', false, true);
@@ -945,6 +939,7 @@ class Application implements ResetInterface
         $shellVerbosity = $this->getShellVerbosity($input);
 
         if ($shellVerbosity) {
+            // Transform to match the corresponding const OutputInterface::VERBOSITY_*, which is a power of two
             $output->setVerbosity(1 << $shellVerbosity + 5);
         }
 

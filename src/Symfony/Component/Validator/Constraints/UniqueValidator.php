@@ -111,7 +111,7 @@ class UniqueValidator extends ConstraintValidator
     {
         if (null === $this->propertyAccessor) {
             if (!class_exists(PropertyAccess::class)) {
-                throw new LogicException('Property path requires symfony/property-access package to be installed.');
+                throw new LogicException('Property path requires symfony/property-access package to be installed. Try running "composer require symfony/property-access".');
             }
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }

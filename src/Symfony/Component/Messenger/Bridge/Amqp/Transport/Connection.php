@@ -65,12 +65,15 @@ class Connection
     ];
 
     private const AVAILABLE_QUEUE_OPTIONS = [
-        'bindings',
         'flags',
         'arguments',
     ];
 
-    private const ORIGINAL_BINDING_KEYS = [
+    private const NEW_QUEUE_OPTIONS = [
+        'bindings',
+    ];
+
+    private const DEPRECATED_BINDING_KEYS = [
         'binding_keys',
         'binding_arguments',
     ];
@@ -252,17 +255,21 @@ class Connection
                 if (!\is_array($queue)) {
                     continue;
                 }
+                if (0 < \count($invalidQueueOptions1 = array_intersect(array_keys($queue), self::DEPRECATED_BINDING_KEYS))) {
+                    trigger_deprecation('symfony/messenger', '6.3', 'Deprecated queue option(s) "%s" passed to the AMQP Messenger transport. The "%s" option(s) should be used rather than "%s".', implode('", "', $invalidQueueOptions1), implode('", ', self::NEW_QUEUE_OPTIONS), implode('", ', self::DEPRECATED_BINDING_KEYS));
+                    if (0 < \count($invalidQueueOptions2 = array_intersect(array_keys($queue), self::NEW_QUEUE_OPTIONS))) {
+                        throw new LogicException(sprintf('New "%s" and deprecated "%s" option(s) passed to the AMQP Messenger transport', implode('", "', $invalidQueueOptions2), implode('", "', $invalidQueueOptions1)));
+                    }
+                }
 
-                if (0 < \count($invalidQueueOptions = array_diff(array_keys($queue), self::AVAILABLE_QUEUE_OPTIONS, self::ORIGINAL_BINDING_KEYS))) {
+                if (0 < \count($invalidQueueOptions = array_diff(array_keys($queue), self::AVAILABLE_QUEUE_OPTIONS, self::NEW_QUEUE_OPTIONS, self::DEPRECATED_BINDING_KEYS))) {
                     throw new LogicException(sprintf('Invalid queue option(s) "%s" passed to the AMQP Messenger transport.', implode('", "', $invalidQueueOptions)));
-                } elseif (0 < \count($invalidQueueOptions = array_diff(array_keys($queue), self::AVAILABLE_QUEUE_OPTIONS))) {
-                    trigger_deprecation('symfony/messenger', '6.3', 'Deprecated queue option(s) "%s" passed to the AMQP Messenger transport. The "bindings" option should be used rather than "binding_keys" and "binding_arguments".', implode('", "', $invalidQueueOptions));
                 }
 
                 if (\is_array($queue['bindings'] ?? false)) {
                     foreach ($queue['bindings'] as $individualBinding) {
                         if (0 < \count(array_diff(array_keys($individualBinding), self::AVAILABLE_BINDINGS_OPTIONS))) {
-                            throw new \InvalidArgumentException(sprintf("Valid options for each 'bindings' are: %s", implode(', ', self::AVAILABLE_BINDINGS_OPTIONS)));
+                            throw new LogicException(sprintf("Valid options for each 'bindings' are: %s", implode(', ', self::AVAILABLE_BINDINGS_OPTIONS)));
                         }
                     }
                 }

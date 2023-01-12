@@ -491,13 +491,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected function getDoctrine_ListenerService()
     {
-        $a = ($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService());
-
-        if (isset($this->privates['doctrine.listener'])) {
-            return $this->privates['doctrine.listener'];
-        }
-
-        return $this->privates['doctrine.listener'] = new \stdClass($a);
+        return $this->privates['doctrine.listener'] = new \stdClass(($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService()));
     }
 
     /**

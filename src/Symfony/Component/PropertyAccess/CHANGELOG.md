@@ -8,6 +8,7 @@ CHANGELOG
  * Added method `isNullSafe()` to `PropertyPathInterface`, implementing the interface without implementing this method
    is deprecated
  * Add support for the null-coalesce operator in property paths
+ * Add `PropertyPath::append()`
 
 6.0
 ---

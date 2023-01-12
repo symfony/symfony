@@ -237,9 +237,10 @@ class Connection
             'claim_interval' => $claimInterval,
         ];
 
+        $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
+        $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
+
         if (isset($parsedUrl['host'])) {
-            $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
-            $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
             $connectionCredentials = [
                 'host' => $parsedUrl['host'] ?? '127.0.0.1',
                 'port' => $parsedUrl['port'] ?? 6379,
@@ -256,9 +257,6 @@ class Connection
                 $connectionCredentials['host'] = 'tls://'.$connectionCredentials['host'];
             }
         } else {
-            $pass = '' !== ($parsedUrl['pass'] ?? '') ? $parsedUrl['pass'] : null;
-            $user = '' !== ($parsedUrl['user'] ?? '') ? $parsedUrl['user'] : null;
-
             $connectionCredentials = [
                 'host' => $parsedUrl['path'],
                 'port' => 0,
@@ -275,12 +273,10 @@ class Connection
         $url = $dsn;
         $scheme = 0 === strpos($dsn, 'rediss:') ? 'rediss' : 'redis';
 
-        // if scheme:///...
         if (preg_match('#^'.$scheme.':///([^:@])+$#', $dsn)) {
             $url = str_replace($scheme.':', 'file:', $dsn);
         }
 
-        // if scheme://...
         $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
             if (isset($m['password'])) {
                 if (!\in_array($m['user'], ['', 'default'], true)) {
@@ -299,11 +295,11 @@ class Connection
 
         if (null !== $auth) {
             unset($parsedUrl['user']); // parse_url thinks //0@localhost/ is a username of "0"! doh!
-            $parsedUrl = $parsedUrl + ($auth ?? []); // But don't worry as $auth array will have user, user/pass or pass as needed
+            $parsedUrl += ($auth ?? []); // But don't worry as $auth array will have user, user/pass or pass as needed
         }
 
         // revert scheme now we are finished using PHP parse_url
-        if ('file' == $parsedUrl['scheme']) {
+        if ('file' === $parsedUrl['scheme']) {
             $parsedUrl['scheme'] = $scheme;
         }
 

@@ -80,7 +80,7 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
 
         if (isset($config['success_handler'])) {
             $successHandler = $container->setDefinition($successHandlerId, new ChildDefinition('security.authentication.custom_success_handler'));
-            $successHandler->replaceArgument(0, new Reference($config['success_handler']));
+            $successHandler->replaceArgument(0, new ChildDefinition($config['success_handler']));
             $successHandler->replaceArgument(1, $options);
             $successHandler->replaceArgument(2, $id);
         } else {
@@ -99,7 +99,7 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
 
         if (isset($config['failure_handler'])) {
             $failureHandler = $container->setDefinition($id, new ChildDefinition('security.authentication.custom_failure_handler'));
-            $failureHandler->replaceArgument(0, new Reference($config['failure_handler']));
+            $failureHandler->replaceArgument(0, new ChildDefinition($config['failure_handler']));
             $failureHandler->replaceArgument(1, $options);
         } else {
             $failureHandler = $container->setDefinition($id, new ChildDefinition('security.authentication.failure_handler'));

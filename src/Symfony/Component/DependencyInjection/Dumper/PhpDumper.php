@@ -500,7 +500,7 @@ EOF;
                             $loop = [];
                         }
                     }
-                    $this->addCircularReferences($first, $loop, true);
+                    $this->addCircularReferences($first, $loop, $loopByConstructor);
                     break;
                 }
             }

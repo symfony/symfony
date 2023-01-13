@@ -425,17 +425,16 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected static function getPAService($container)
     {
-        $a = new \stdClass();
-
-        $b = ($container->privates['pC'] ?? self::getPCService($container));
+        $a = ($container->privates['pC'] ?? $container->getPCService());
 
         if (isset($container->services['pA'])) {
             return $container->services['pA'];
         }
+        $b = new \stdClass();
 
-        $container->services['pA'] = $instance = new \stdClass($a, $b);
+        $container->services['pA'] = $instance = new \stdClass($b, $a);
 
-        $a->d = ($container->privates['pD'] ?? self::getPDService($container));
+        $b->d = ($container->privates['pD'] ?? $container->getPDService());
 
         return $instance;
     }

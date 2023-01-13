@@ -80,19 +80,44 @@ class CheckDefinitionValidityPassTest extends TestCase
         $container->register('b', 'class')->addTag('foo', ['bar' => null]);
         $container->register('c', 'class')->addTag('foo', ['bar' => 1]);
         $container->register('d', 'class')->addTag('foo', ['bar' => 1.1]);
+        $container->register('d', 'class')->addTag('foo', ['bar' => ['baz' => 'baz']]);
+        $container->register('e', 'class')->addTag('foo', ['deep' => ['foo' => ['bar' => 'baz']]]);
 
         $this->process($container);
 
         $this->addToAssertionCount(1);
     }
 
-    public function testInvalidTags()
+    /**
+     * @dataProvider provideInvalidTags
+     */
+    public function testInvalidTags(string $name, array $attributes, string $message)
     {
         $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage($message);
         $container = new ContainerBuilder();
-        $container->register('a', 'class')->addTag('foo', ['bar' => ['baz' => 'baz']]);
-
+        $container->register('a', 'class')->addTag($name, $attributes);
         $this->process($container);
+    }
+
+    public static function provideInvalidTags(): iterable
+    {
+        $message = 'A "tags" attribute must be of a scalar-type for service "a", tag "%s", attribute "%s".';
+        yield 'object attribute value' => [
+            'foo',
+            ['bar' => new class() {}],
+            sprintf($message, 'foo', 'bar'),
+        ];
+        yield 'nested object attribute value' => [
+            'foo',
+            ['bar' => ['baz' => new class() {}]],
+            sprintf($message, 'foo', 'bar.baz'),
+        ];
+        yield 'deeply nested object attribute value' => [
+            'foo',
+            ['bar' => ['baz' => ['qux' => new class() {}]]],
+            sprintf($message, 'foo', 'bar.baz.qux'),
+        ];
     }
 
     public function testDynamicPublicServiceName()

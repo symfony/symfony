@@ -937,13 +937,14 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function validateAttributes(string $message, array $attributes, string $prefix = ''): void
+    private function validateAttributes(string $message, array $attributes, array $path = []): void
     {
-        foreach ($attributes as $attribute => $value) {
+        foreach ($attributes as $name => $value) {
             if (\is_array($value)) {
-                $this->validateAttributes($message, $value, $attribute.'.');
+                $this->validateAttributes($message, $value, [...$path, $name]);
             } elseif (!\is_scalar($value ?? '')) {
-                throw new InvalidArgumentException(sprintf($message, $prefix.$attribute));
+                $name = implode('.', [...$path, $name]);
+                throw new InvalidArgumentException(sprintf($message, $name));
             }
         }
     }

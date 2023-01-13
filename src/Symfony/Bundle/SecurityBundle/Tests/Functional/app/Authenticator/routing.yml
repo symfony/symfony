@@ -22,6 +22,9 @@ security_custom_profile:
 firewall1_login:
     path: /firewall1/login
 
+firewall_dummy_login:
+    path: /firewall1/dummy_login
+
 firewall2_profile:
     path: /firewall2/profile
     defaults:

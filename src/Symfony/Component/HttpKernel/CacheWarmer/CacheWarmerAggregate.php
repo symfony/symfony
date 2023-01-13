@@ -93,7 +93,12 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                     continue;
                 }
 
-                $preload[] = array_values((array) $warmer->warmUp($cacheDir));
+                foreach ((array) $warmer->warmUp($cacheDir) as $item) {
+                    if (is_dir($item) || (str_starts_with($item, \dirname($cacheDir)) && !is_file($item))) {
+                        throw new \LogicException(sprintf('"%s::warmUp()" should return a list of files or classes but "%s" is none of them.', $warmer::class, $item));
+                    }
+                    $preload[] = $item;
+                }
             }
         } finally {
             if ($collectDeprecations) {
@@ -110,7 +115,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
             }
         }
 
-        return array_values(array_unique(array_merge([], ...$preload)));
+        return array_values(array_unique($preload));
     }
 
     public function isOptional(): bool

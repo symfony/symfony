@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by damienalexandre at 2023-01-10T11:23:16Z
+
+Really looking forward this one! Thanks a lot!
+
+---------------------------------------------------------------------------
+
+by bastnic at 2023-01-10T11:23:20Z
+
+Awesome!
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2023-01-10T11:43:10Z
+
+Is this cool? Yes I think so. It'd make tests less brittle if you don't have to instantiate smth but can rely on auto wiring too.
+
+Just one thought: could it detect if a service which was set is then not used during a test and output a warning? That'd allow to catch errors where you configure stuff that's useless / dead code. Possibly would back fire tho and be more annoying than useful :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-10T11:55:49Z
+
+@Seldaek that'd be neat but I don't know how we could make that work. There is no infrastructure in the container to know when a service is injected into another one, and even less to know when such a service is actually used.
+
+On a case by case basis, it's doable of course:
+
+```php
+$client = new TraceableHttpClient(new MockHttpClient(...));
+static::getContainer()->set('example.client', $client);
+
+// do stuff
+
+// do expectations using TraceableHttpClient's API
+```
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2023-01-10T12:08:01Z
+
+This would also be super useful to mock the clock (I do it all the time, mocking in the config isn't enough to test all cases):
+
+```php
+static::getContainer()->set(ClockInterface::class, new MockClock('2022-11-23 00:00:00', 'UTC'));
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-10T12:23:35Z
+
+@tgalopin see also https://github.com/symfony/symfony/pull/48642
+TL;DR, use `ClockSensitiveTrait::mockTime()`.

@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
  * @author Robin Chalas <robin.chalas@gmail.com>
  *
  * @internal
+ *
  * @final
  */
 class Connection
@@ -203,13 +204,13 @@ class Connection
             };
         }
 
+        $pass = '' !== ($parsedUrl['pass'] ?? '') ? urldecode($parsedUrl['pass']) : null;
+        $user = '' !== ($parsedUrl['user'] ?? '') ? urldecode($parsedUrl['user']) : null;
+        $options['auth'] ??= null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user);
+
         if (isset($parsedUrl['host'])) {
-            $pass = '' !== ($parsedUrl['pass'] ?? '') ? urldecode($parsedUrl['pass']) : null;
-            $user = '' !== ($parsedUrl['user'] ?? '') ? urldecode($parsedUrl['user']) : null;
             $options['host'] = $parsedUrl['host'] ?? $options['host'];
             $options['port'] = $parsedUrl['port'] ?? $options['port'];
-            // See: https://github.com/phpredis/phpredis/#auth
-            $options['auth'] ??= null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user);
 
             $pathParts = explode('/', rtrim($parsedUrl['path'] ?? '', '/'));
             $options['stream'] = $pathParts[1] ?? $options['stream'];
@@ -232,9 +233,27 @@ class Connection
             $url = str_replace($scheme.':', 'file:', $dsn);
         }
 
+        $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
+            if (isset($m['password'])) {
+                if (!\in_array($m['user'], ['', 'default'], true)) {
+                    $auth['user'] = $m['user'];
+                }
+
+                $auth['pass'] = $m['password'];
+            }
+
+            return 'file:'.($m[1] ?? '');
+        }, $url);
+
         if (false === $parsedUrl = parse_url($url)) {
             throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
         }
+
+        if (null !== $auth) {
+            unset($parsedUrl['user']); // parse_url thinks //0@localhost/ is a username of "0"! doh!
+            $parsedUrl += ($auth ?? []); // But don't worry as $auth array will have user, user/pass or pass as needed
+        }
+
         if (isset($parsedUrl['query'])) {
             parse_str($parsedUrl['query'], $dsnOptions);
             $options = array_merge($options, $dsnOptions);

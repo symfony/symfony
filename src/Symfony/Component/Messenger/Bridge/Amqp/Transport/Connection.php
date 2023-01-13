@@ -255,10 +255,10 @@ class Connection
                 if (!\is_array($queue)) {
                     continue;
                 }
-                if (0 < \count($invalidQueueOptions1 = array_intersect(array_keys($queue), self::DEPRECATED_BINDING_KEYS))) {
-                    trigger_deprecation('symfony/messenger', '6.3', 'Deprecated queue option(s) "%s" passed to the AMQP Messenger transport. The "%s" option(s) should be used rather than "%s".', implode('", "', $invalidQueueOptions1), implode('", ', self::NEW_QUEUE_OPTIONS), implode('", ', self::DEPRECATED_BINDING_KEYS));
-                    if (0 < \count($invalidQueueOptions2 = array_intersect(array_keys($queue), self::NEW_QUEUE_OPTIONS))) {
-                        throw new LogicException(sprintf('New "%s" and deprecated "%s" option(s) passed to the AMQP Messenger transport', implode('", "', $invalidQueueOptions2), implode('", "', $invalidQueueOptions1)));
+                if (0 < \count($deprecatedQueueOptions = array_intersect(array_keys($queue), self::DEPRECATED_BINDING_KEYS))) {
+                    //trigger_deprecation('symfony/messenger', '6.3', 'Deprecated queue option(s) "%s" passed to the AMQP Messenger transport. The "%s" option(s) should be used rather than "%s".', implode('", "', $deprecatedQueueOptions), implode('", ', self::NEW_QUEUE_OPTIONS), implode('", ', self::DEPRECATED_BINDING_KEYS));
+                    if (0 < \count($newQueueOptions = array_intersect(array_keys($queue), self::NEW_QUEUE_OPTIONS))) {
+                        throw new LogicException(sprintf('New "%s" and deprecated "%s" option(s) passed to the AMQP Messenger transport', implode('", "', $newQueueOptions), implode('", "', $deprecatedQueueOptions)));
                     }
                 }
 

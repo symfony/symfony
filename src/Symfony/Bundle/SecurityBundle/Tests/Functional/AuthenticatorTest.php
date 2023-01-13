@@ -102,4 +102,38 @@ class AuthenticatorTest extends AbstractWebTestCase
         $client->request('GET', '/firewall2/profile');
         $this->assertResponseRedirects('http://localhost/login');
     }
+
+    public function testCustomSuccessHandler()
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'custom_handlers.yml']);
+
+        $client->request('POST', '/firewall1/login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'test',
+        ]);
+        $this->assertResponseRedirects('http://localhost/firewall1/test');
+
+        $client->request('POST', '/firewall1/dummy_login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'test',
+        ]);
+        $this->assertResponseRedirects('http://localhost/firewall1/dummy');
+    }
+
+    public function testCustomFailureHandler()
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'custom_handlers.yml']);
+
+        $client->request('POST', '/firewall1/login', [
+            '_username' => 'jane@example.org',
+            '_password' => '',
+        ]);
+        $this->assertResponseRedirects('http://localhost/firewall1/login');
+
+        $client->request('POST', '/firewall1/dummy_login', [
+            '_username' => 'jane@example.org',
+            '_password' => '',
+        ]);
+        $this->assertResponseRedirects('http://localhost/firewall1/dummy_login');
+    }
 }

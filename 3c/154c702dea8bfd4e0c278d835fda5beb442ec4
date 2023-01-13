@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by Iyadhfaleh at 2023-01-12T16:27:14Z
+
+Thank you :D
+I saw the problem since months https://github.com/symfony/symfony/issues/46499#issuecomment-1380610213
+
+---------------------------------------------------------------------------
+
+by cpetit-sigma-fr at 2023-01-12T17:29:21Z
+
+It seems to work with this fix, either with my test command or my "real" process using 2 different external sites.
+
+Great job!

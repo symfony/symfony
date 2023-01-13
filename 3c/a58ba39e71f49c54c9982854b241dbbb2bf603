@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by RobertMe at 2023-01-10T13:05:52Z
+
+Regarding the updated tests I'm unsure. I've updated the actual (low level) unit tests to check that it's a `ChildDefinition`, but this obviously doesn't really validate that this issue is fixed (One might still think "why isn't this using a Reference?", change it to that and update the unit tests, after which the test would succeed again, while the issue this fixes isn't noticed). That's why I added the (very high level) functional tests as well. But there might be "something in between" as well (some "layer" of tests where the compiled container can be checked, without also making the HTTP calls etc).

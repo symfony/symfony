@@ -60,6 +60,7 @@ CHANGELOG
 
 6.3
 ---
+
  * Add support for reading objects properties with `Unique` constraint `fields` option
  * Add method `getConstraint()` to `ConstraintViolationInterface`
  * Add `Uuid::TIME_BASED_VERSIONS` to match that a UUID being validated embeds a timestamp

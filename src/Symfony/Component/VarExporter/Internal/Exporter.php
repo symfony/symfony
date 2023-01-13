@@ -200,7 +200,7 @@ class Exporter
             case true === $value: return 'true';
             case null === $value: return 'null';
             case '' === $value: return "''";
-            case $value instanceof \UnitEnum: return ltrim(var_export($value, true), '\\');
+            case $value instanceof \UnitEnum: return '\\'.ltrim(var_export($value, true), '\\');
         }
 
         if ($value instanceof Reference) {

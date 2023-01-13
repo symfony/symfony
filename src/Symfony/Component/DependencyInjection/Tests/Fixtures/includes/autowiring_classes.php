@@ -15,9 +15,8 @@ class Foo
 {
     /**
      * @required
-     * @return static
      */
-    public function cloneFoo()
+    public function cloneFoo(): static
     {
         return clone $this;
     }

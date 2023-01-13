@@ -245,13 +245,9 @@ class ChoiceType extends AbstractType
         // closure here that is optimized for the value of the form, to
         // avoid making the type check inside the closure.
         if ($options['multiple']) {
-            $view->vars['is_selected'] = function ($choice, array $values) {
-                return \in_array($choice, $values, true);
-            };
+            $view->vars['is_selected'] = fn ($choice, array $values) => \in_array($choice, $values, true);
         } else {
-            $view->vars['is_selected'] = function ($choice, $value) {
-                return $choice === $value;
-            };
+            $view->vars['is_selected'] = fn ($choice, $value) => $choice === $value;
         }
 
         // Check if the choices already contain the empty value
@@ -301,9 +297,7 @@ class ChoiceType extends AbstractType
             return '';
         };
 
-        $placeholderDefault = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
+        $placeholderDefault = fn (Options $options) => $options['required'] ? null : '';
 
         $placeholderNormalizer = function (Options $options, $placeholder) {
             if ($options['multiple']) {
@@ -324,9 +318,7 @@ class ChoiceType extends AbstractType
             return $placeholder;
         };
 
-        $compound = function (Options $options) {
-            return $options['expanded'];
-        };
+        $compound = fn (Options $options) => $options['expanded'];
 
         $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
             if (true === $choiceTranslationDomain) {

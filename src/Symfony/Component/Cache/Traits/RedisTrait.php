@@ -559,7 +559,7 @@ trait RedisTrait
 
         if (!$redis instanceof \Predis\ClientInterface && 'eval' === $command && $redis->getLastError()) {
             $e = new \RedisException($redis->getLastError());
-            $results = array_map(function ($v) use ($e) { return false === $v ? $e : $v; }, (array) $results);
+            $results = array_map(fn ($v) => false === $v ? $e : $v, (array) $results);
         }
 
         if (\is_bool($results)) {

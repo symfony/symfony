@@ -146,9 +146,7 @@ class CachingFactoryDecoratorTest extends TestCase
         $filter = function () {};
         $list1 = $this->factory->createListFromChoices($choices, null, $filter);
         $list2 = $this->factory->createListFromChoices($choices, null, $filter);
-        $lazyChoiceList = new LazyChoiceList(new FilterChoiceLoaderDecorator(new CallbackChoiceLoader(static function () use ($choices) {
-            return $choices;
-        }), $filter), null);
+        $lazyChoiceList = new LazyChoiceList(new FilterChoiceLoaderDecorator(new CallbackChoiceLoader(static fn () => $choices), $filter), null);
 
         $this->assertNotSame($list1, $list2);
         $this->assertEquals($lazyChoiceList, $list1);
@@ -162,9 +160,7 @@ class CachingFactoryDecoratorTest extends TestCase
         $filterCallback = function () {};
         $list1 = $this->factory->createListFromChoices($choices, null, ChoiceList::filter($formType, $filterCallback));
         $list2 = $this->factory->createListFromChoices($choices, null, ChoiceList::filter($formType, function () {}));
-        $lazyChoiceList = new LazyChoiceList(new FilterChoiceLoaderDecorator(new CallbackChoiceLoader(static function () use ($choices) {
-            return $choices;
-        }), function () {}), null);
+        $lazyChoiceList = new LazyChoiceList(new FilterChoiceLoaderDecorator(new CallbackChoiceLoader(static fn () => $choices), function () {}), null);
 
         $this->assertSame($list1, $list2);
         $this->assertEquals($lazyChoiceList, $list1);
@@ -178,9 +174,7 @@ class CachingFactoryDecoratorTest extends TestCase
         $closure2 = function () {};
         $list1 = $this->factory->createListFromChoices($choices, null, $closure1);
         $list2 = $this->factory->createListFromChoices($choices, null, $closure2);
-        $lazyChoiceList = new LazyChoiceList(new FilterChoiceLoaderDecorator(new CallbackChoiceLoader(static function () use ($choices) {
-            return $choices;
-        }), function () {}), null);
+        $lazyChoiceList = new LazyChoiceList(new FilterChoiceLoaderDecorator(new CallbackChoiceLoader(static fn () => $choices), function () {}), null);
 
         $this->assertNotSame($list1, $list2);
         $this->assertEquals($lazyChoiceList, $list1);

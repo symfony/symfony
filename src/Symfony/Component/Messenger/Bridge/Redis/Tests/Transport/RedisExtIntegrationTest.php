@@ -288,9 +288,7 @@ class RedisExtIntegrationTest extends TestCase
 
         $hosts = explode(' ', getenv('REDIS_CLUSTER_HOSTS'));
 
-        $dsn = array_map(function ($host) {
-            return 'redis://'.$host;
-        }, $hosts);
+        $dsn = array_map(fn ($host) => 'redis://'.$host, $hosts);
         $dsn = implode(',', $dsn);
 
         $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, ['sentinel_master' => getenv('MESSENGER_REDIS_SENTINEL_MASTER')]));

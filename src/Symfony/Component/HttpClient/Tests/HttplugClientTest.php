@@ -251,11 +251,7 @@ class HttplugClientTest extends TestCase
                     $failureCallableCalled = true;
 
                     // Ensure arbitrary levels of promises work.
-                    return (new FulfilledPromise(null))->then(function () use ($client, $request) {
-                        return (new GuzzleFulfilledPromise(null))->then(function () use ($client, $request) {
-                            return $client->sendAsyncRequest($request);
-                        });
-                    });
+                    return (new FulfilledPromise(null))->then(fn () => (new GuzzleFulfilledPromise(null))->then(fn () => $client->sendAsyncRequest($request)));
                 }
             )
         ;

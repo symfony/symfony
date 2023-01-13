@@ -157,9 +157,7 @@ class PdoSessionHandlerTest extends TestCase
         $selectStmt = $this->createMock(\PDOStatement::class);
         $insertStmt = $this->createMock(\PDOStatement::class);
 
-        $pdo->prepareResult = function ($statement) use ($selectStmt, $insertStmt) {
-            return str_starts_with($statement, 'INSERT') ? $insertStmt : $selectStmt;
-        };
+        $pdo->prepareResult = fn ($statement) => str_starts_with($statement, 'INSERT') ? $insertStmt : $selectStmt;
 
         $content = 'foobar';
         $stream = $this->createStream($content);
@@ -333,7 +331,7 @@ class PdoSessionHandlerTest extends TestCase
         $schema = new Schema();
 
         $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
-        $pdoSessionHandler->configureSchema($schema, fn() => false);
+        $pdoSessionHandler->configureSchema($schema, fn () => false);
         $this->assertFalse($schema->hasTable('sessions'));
     }
 
@@ -342,7 +340,7 @@ class PdoSessionHandlerTest extends TestCase
         $schema = new Schema();
 
         $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
-        $pdoSessionHandler->configureSchema($schema, fn() => true);
+        $pdoSessionHandler->configureSchema($schema, fn () => true);
         $this->assertTrue($schema->hasTable('sessions'));
     }
 
@@ -352,7 +350,7 @@ class PdoSessionHandlerTest extends TestCase
         $schema->createTable('sessions');
 
         $pdoSessionHandler = new PdoSessionHandler($this->getMemorySqlitePdo());
-        $pdoSessionHandler->configureSchema($schema, fn() => true);
+        $pdoSessionHandler->configureSchema($schema, fn () => true);
         $table = $schema->getTable('sessions');
         $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
     }

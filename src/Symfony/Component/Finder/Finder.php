@@ -671,9 +671,7 @@ class Finder implements \IteratorAggregate, \Countable
 
         $iterator = new \AppendIterator();
         foreach ($this->dirs as $dir) {
-            $iterator->append(new \IteratorIterator(new LazyIterator(function () use ($dir) {
-                return $this->searchInDirectory($dir);
-            })));
+            $iterator->append(new \IteratorIterator(new LazyIterator(fn () => $this->searchInDirectory($dir))));
         }
 
         foreach ($this->iterators as $it) {

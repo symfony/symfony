@@ -121,9 +121,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
             // If the symbols map is passed as a closure, there is no need to fallback to the parent locale
             // as the closure can just provide substitutions for all locales of interest.
             $symbolsMap = $this->symbolsMap;
-            array_unshift($transliterator, static function ($s) use ($symbolsMap, $locale) {
-                return $symbolsMap($s, $locale);
-            });
+            array_unshift($transliterator, static fn ($s) => $symbolsMap($s, $locale));
         }
 
         $unicodeString = (new UnicodeString($string))->ascii($transliterator);

@@ -260,9 +260,7 @@ class CsrfTokenManagerTest extends TestCase
         $data[] = ['https-', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator];
 
         [$generator, $storage] = $this->getGeneratorAndStorage();
-        $data[] = ['generated-', new CsrfTokenManager($generator, $storage, function () {
-            return 'generated-';
-        }), $storage, $generator];
+        $data[] = ['generated-', new CsrfTokenManager($generator, $storage, fn () => 'generated-'), $storage, $generator];
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request());

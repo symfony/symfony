@@ -188,9 +188,7 @@ class ProfilerControllerTest extends WebTestCase
         $profiler
             ->expects($this->exactly(2))
             ->method('loadProfile')
-            ->willReturnCallback(function ($token) {
-                return 'found' == $token ? new Profile($token) : null;
-            })
+            ->willReturnCallback(fn ($token) => 'found' == $token ? new Profile($token) : null)
         ;
 
         $controller = $this->createController($profiler, $twig, $withCsp);

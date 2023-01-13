@@ -534,9 +534,7 @@ final class ProgressBar
 
                 return $display;
             },
-            'elapsed' => function (self $bar) {
-                return Helper::formatTime(time() - $bar->getStartTime());
-            },
+            'elapsed' => fn (self $bar) => Helper::formatTime(time() - $bar->getStartTime()),
             'remaining' => function (self $bar) {
                 if (!$bar->getMaxSteps()) {
                     throw new LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
@@ -551,18 +549,10 @@ final class ProgressBar
 
                 return Helper::formatTime($bar->getEstimated());
             },
-            'memory' => function (self $bar) {
-                return Helper::formatMemory(memory_get_usage(true));
-            },
-            'current' => function (self $bar) {
-                return str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', \STR_PAD_LEFT);
-            },
-            'max' => function (self $bar) {
-                return $bar->getMaxSteps();
-            },
-            'percent' => function (self $bar) {
-                return floor($bar->getProgressPercent() * 100);
-            },
+            'memory' => fn (self $bar) => Helper::formatMemory(memory_get_usage(true)),
+            'current' => fn (self $bar) => str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', \STR_PAD_LEFT),
+            'max' => fn (self $bar) => $bar->getMaxSteps(),
+            'percent' => fn (self $bar) => floor($bar->getProgressPercent() * 100),
         ];
     }
 
@@ -606,9 +596,7 @@ final class ProgressBar
         $line = preg_replace_callback($regex, $callback, $this->format);
 
         // gets string length for each sub line with multiline format
-        $linesLength = array_map(function ($subLine) {
-            return Helper::width(Helper::removeDecoration($this->output->getFormatter(), rtrim($subLine, "\r")));
-        }, explode("\n", $line));
+        $linesLength = array_map(fn ($subLine) => Helper::width(Helper::removeDecoration($this->output->getFormatter(), rtrim($subLine, "\r"))), explode("\n", $line));
 
         $linesWidth = max($linesLength);
 

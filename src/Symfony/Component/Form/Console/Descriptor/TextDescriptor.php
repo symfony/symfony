@@ -35,9 +35,7 @@ class TextDescriptor extends Descriptor
     {
         if ($options['core_types']) {
             $this->output->section('Built-in form types (Symfony\Component\Form\Extension\Core\Type)');
-            $shortClassNames = array_map(function ($fqcn) {
-                return $this->formatClassLink($fqcn, \array_slice(explode('\\', $fqcn), -1)[0]);
-            }, $options['core_types']);
+            $shortClassNames = array_map(fn ($fqcn) => $this->formatClassLink($fqcn, \array_slice(explode('\\', $fqcn), -1)[0]), $options['core_types']);
             for ($i = 0, $loopsMax = \count($shortClassNames); $i * 5 < $loopsMax; ++$i) {
                 $this->output->writeln(' '.implode(', ', \array_slice($shortClassNames, $i * 5, 5)));
             }

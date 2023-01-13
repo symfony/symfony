@@ -228,12 +228,10 @@ EOF
 
     private function getDirectoryIterator(string $directory)
     {
-        $default = function ($directory) {
-            return new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
-                \RecursiveIteratorIterator::LEAVES_ONLY
-            );
-        };
+        $default = fn ($directory) => new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
 
         if (null !== $this->directoryIteratorProvider) {
             return ($this->directoryIteratorProvider)($directory, $default);
@@ -244,9 +242,7 @@ EOF
 
     private function isReadable(string $fileOrDirectory)
     {
-        $default = function ($fileOrDirectory) {
-            return is_readable($fileOrDirectory);
-        };
+        $default = fn ($fileOrDirectory) => is_readable($fileOrDirectory);
 
         if (null !== $this->isReadableProvider) {
             return ($this->isReadableProvider)($fileOrDirectory, $default);

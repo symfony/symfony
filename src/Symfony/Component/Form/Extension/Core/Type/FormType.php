@@ -124,37 +124,25 @@ class FormType extends BaseType
         parent::configureOptions($resolver);
 
         // Derive "data_class" option from passed "data" object
-        $dataClass = function (Options $options) {
-            return isset($options['data']) && \is_object($options['data']) ? $options['data']::class : null;
-        };
+        $dataClass = fn (Options $options) => isset($options['data']) && \is_object($options['data']) ? $options['data']::class : null;
 
         // Derive "empty_data" closure from "data_class" option
         $emptyData = function (Options $options) {
             $class = $options['data_class'];
 
             if (null !== $class) {
-                return function (FormInterface $form) use ($class) {
-                    return $form->isEmpty() && !$form->isRequired() ? null : new $class();
-                };
+                return fn (FormInterface $form) => $form->isEmpty() && !$form->isRequired() ? null : new $class();
             }
 
-            return function (FormInterface $form) {
-                return $form->getConfig()->getCompound() ? [] : '';
-            };
+            return fn (FormInterface $form) => $form->getConfig()->getCompound() ? [] : '';
         };
 
         // Wrap "post_max_size_message" in a closure to translate it lazily
-        $uploadMaxSizeMessage = function (Options $options) {
-            return function () use ($options) {
-                return $options['post_max_size_message'];
-            };
-        };
+        $uploadMaxSizeMessage = fn (Options $options) => fn () => $options['post_max_size_message'];
 
         // For any form that is not represented by a single HTML control,
         // errors should bubble up by default
-        $errorBubbling = function (Options $options) {
-            return $options['compound'] && !$options['inherit_data'];
-        };
+        $errorBubbling = fn (Options $options) => $options['compound'] && !$options['inherit_data'];
 
         // If data is given, the form is locked to that data
         // (independent of its value)

@@ -271,9 +271,7 @@ class TextDescriptor extends Descriptor
             $tagInformation = [];
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $tagParameters) {
-                    $parameters = array_map(function ($key, $value) {
-                        return sprintf('<info>%s</info>: %s', $key, $value);
-                    }, array_keys($tagParameters), array_values($tagParameters));
+                    $parameters = array_map(fn ($key, $value) => sprintf('<info>%s</info>: %s', $key, $value), array_keys($tagParameters), array_values($tagParameters));
                     $parameters = implode(', ', $parameters);
 
                     if ('' === $parameters) {
@@ -496,7 +494,7 @@ class TextDescriptor extends Descriptor
         } else {
             $title .= ' Grouped by Event';
             // Try to see if "events" exists
-            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(function ($event) use ($eventDispatcher) { return $eventDispatcher->getListeners($event); }, $options['events'])) : $eventDispatcher->getListeners();
+            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(fn ($event) => $eventDispatcher->getListeners($event), $options['events'])) : $eventDispatcher->getListeners();
         }
 
         $options['output']->title($title);

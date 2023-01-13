@@ -87,12 +87,8 @@ foreach ($config['original_files'] as $originalFilePath) {
     $translationFilePaths = findTranslationFiles($originalFilePath, $config['locale_to_analyze']);
     $translationStatus = calculateTranslationStatus($originalFilePath, $translationFilePaths);
 
-    $totalMissingTranslations += array_sum(array_map(function ($translation) {
-        return count($translation['missingKeys']);
-    }, array_values($translationStatus)));
-    $totalTranslationMismatches += array_sum(array_map(function ($translation) {
-        return count($translation['mismatches']);
-    }, array_values($translationStatus)));
+    $totalMissingTranslations += array_sum(array_map(fn ($translation) => count($translation['missingKeys']), array_values($translationStatus)));
+    $totalTranslationMismatches += array_sum(array_map(fn ($translation) => count($translation['mismatches']), array_values($translationStatus)));
 
     printTranslationStatus($originalFilePath, $translationStatus, $config['verbose_output'], $config['include_completed_languages']);
 }

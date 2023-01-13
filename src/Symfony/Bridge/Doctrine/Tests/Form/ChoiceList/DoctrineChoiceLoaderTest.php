@@ -222,7 +222,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
-        $value = function (\stdClass $object) { return $object->name; };
+        $value = fn (\stdClass $object) => $object->name;
 
         $this->repository->expects($this->never())
             ->method('findAll')
@@ -367,7 +367,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
-        $value = function (\stdClass $object) { return $object->name; };
+        $value = fn (\stdClass $object) => $object->name;
 
         $this->repository->expects($this->once())
             ->method('findAll')

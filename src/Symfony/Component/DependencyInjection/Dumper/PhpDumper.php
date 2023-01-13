@@ -923,7 +923,7 @@ EOF;
             $c = $this->addServiceInclude($id, $definition, null !== $isProxyCandidate);
 
             if ('' !== $c && $isProxyCandidate && !$definition->isShared()) {
-                $c = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $c)));
+                $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $code .= "        static \$include = true;\n\n";
                 $code .= "        if (\$include) {\n";
                 $code .= $c;
@@ -936,7 +936,7 @@ EOF;
             $c = $this->addInlineService($id, $definition);
 
             if (!$isProxyCandidate && !$definition->isShared()) {
-                $c = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $c)));
+                $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $lazyloadInitialization = $definition->isLazy() ? ', $lazyLoad = true' : '';
 
                 $c = sprintf("        %s = static function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
@@ -1715,7 +1715,7 @@ EOF;
         }
 
         // re-indent the wrapped code
-        $code = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $code)));
+        $code = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $code)));
 
         return sprintf("        if (%s) {\n%s        }\n", $condition, $code);
     }
@@ -1937,9 +1937,7 @@ EOF;
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter($match[1]);
             } else {
-                $replaceParameters = function ($match) {
-                    return "'.".$this->dumpParameter($match[2]).".'";
-                };
+                $replaceParameters = fn ($match) => "'.".$this->dumpParameter($match[2]).".'";
 
                 $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
 
@@ -2214,7 +2212,7 @@ EOF;
         }
         if (\is_string($value) && str_contains($value, "\n")) {
             $cleanParts = explode("\n", $value);
-            $cleanParts = array_map(function ($part) { return var_export($part, true); }, $cleanParts);
+            $cleanParts = array_map(fn ($part) => var_export($part, true), $cleanParts);
             $export = implode('."\n".', $cleanParts);
         } else {
             $export = var_export($value, true);

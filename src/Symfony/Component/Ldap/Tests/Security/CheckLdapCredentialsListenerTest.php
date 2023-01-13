@@ -214,15 +214,13 @@ class CheckLdapCredentialsListenerTest extends TestCase
     {
         return new CheckPassportEvent(
             new TestAuthenticator(),
-            new Passport(new UserBadge('Wouter', function () { return new InMemoryUser('Wouter', null, ['ROLE_USER']); }), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
+            new Passport(new UserBadge('Wouter', fn () => new InMemoryUser('Wouter', null, ['ROLE_USER'])), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
         );
     }
 
     private function createListener()
     {
-        $ldapLocator = new class(['app.ldap' => function () {
-            return $this->ldap;
-        }]) implements ContainerInterface {
+        $ldapLocator = new class(['app.ldap' => fn () => $this->ldap]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
 

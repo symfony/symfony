@@ -154,7 +154,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             }
         }
 
-        $defined = \Closure::bind(static function ($c) { return \defined($c); }, null, $class->name);
+        $defined = \Closure::bind(static fn ($c) => \defined($c), null, $class->name);
 
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
             foreach ($m->getAttributes() as $a) {

@@ -59,7 +59,7 @@ class LdapFactory implements UserProviderFactoryInterface
                     ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('default_roles')
-                    ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                    ->beforeNormalization()->ifString()->then(fn ($v) => preg_split('/\s*,\s*/', $v))->end()
                     ->requiresAtLeastOneElement()
                     ->prototype('scalar')->end()
                 ->end()

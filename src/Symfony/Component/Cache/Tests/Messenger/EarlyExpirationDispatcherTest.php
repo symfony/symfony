@@ -67,7 +67,7 @@ class EarlyExpirationDispatcherTest extends TestCase
             }
         });
 
-        $this->assertSame(345, $pool->get('foo', function () { return 345; }));
+        $this->assertSame(345, $pool->get('foo', fn () => 345));
         $this->assertTrue($saveResult);
 
         $expected = [

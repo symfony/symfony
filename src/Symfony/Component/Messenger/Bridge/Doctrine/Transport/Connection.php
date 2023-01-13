@@ -305,9 +305,7 @@ class Connection implements ResetInterface
         $stmt = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
         $data = $stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchAllAssociative() : $stmt->fetchAll();
 
-        return array_map(function ($doctrineEnvelope) {
-            return $this->decodeEnvelopeHeaders($doctrineEnvelope);
-        }, $data);
+        return array_map(fn ($doctrineEnvelope) => $this->decodeEnvelopeHeaders($doctrineEnvelope), $data);
     }
 
     public function find(mixed $id): ?array

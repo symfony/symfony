@@ -46,9 +46,7 @@ class StatsCommandTest extends TestCase
             });
         $serviceLocator
             ->method('has')
-            ->willReturnCallback(function (string $transportName) {
-                return \in_array($transportName, ['message_countable', 'simple', 'another_message_countable'], true);
-            })
+            ->willReturnCallback(fn (string $transportName) => \in_array($transportName, ['message_countable', 'simple', 'another_message_countable'], true))
         ;
 
         $this->command = new StatsCommand($serviceLocator, [

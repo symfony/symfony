@@ -71,9 +71,7 @@ final class SlackTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn('[]');
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client, 'testChannel');
 
@@ -94,9 +92,7 @@ final class SlackTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['error' => 'testErrorCode']));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client, 'testChannel');
 
@@ -177,9 +173,7 @@ final class SlackTransportTest extends TransportTestCase
     {
         $this->expectException(LogicException::class);
 
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
-            return $this->createMock(ResponseInterface::class);
-        });
+        $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => $this->createMock(ResponseInterface::class));
 
         $transport = $this->createTransport($client, 'testChannel');
 
@@ -255,9 +249,7 @@ final class SlackTransportTest extends TransportTestCase
                 'errors' => ['no more than 50 items allowed [json-pointer:/blocks]'],
             ]));
 
-        $client = new MockHttpClient(function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client, 'testChannel');
 

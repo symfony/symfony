@@ -136,7 +136,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 continue;
             }
             if ('request_headers' === $key || 'response_headers' === $key) {
-                $this->data[$key] = array_map(function ($v) { return isset($v[0]) && !isset($v[1]) ? $v[0] : $v; }, $value);
+                $this->data[$key] = array_map(fn ($v) => isset($v[0]) && !isset($v[1]) ? $v[0] : $v, $value);
             }
         }
 

@@ -34,7 +34,7 @@ class PdoSessionHandlerSchemaSubscriberTest extends TestCase
         $pdoSessionHandler = $this->createMock(PdoSessionHandler::class);
         $pdoSessionHandler->expects($this->once())
             ->method('configureSchema')
-            ->with($schema, fn() => true);
+            ->with($schema, fn () => true);
 
         $subscriber = new PdoSessionHandlerSchemaSubscriber([$pdoSessionHandler]);
         $subscriber->postGenerateSchema($event);

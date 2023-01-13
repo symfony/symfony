@@ -501,9 +501,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $configuredEntryPoint = $defaultEntryPoint;
 
         // authenticator manager
-        $authenticators = array_map(function ($id) {
-            return new Reference($id);
-        }, $firewallAuthenticationProviders);
+        $authenticators = array_map(fn ($id) => new Reference($id), $firewallAuthenticationProviders);
         $container
             ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authenticator.manager'))
             ->replaceArgument(0, $authenticators)
@@ -1027,9 +1025,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
     private function isValidIps(string|array $ips): bool
     {
-        $ipsList = array_reduce((array) $ips, static function (array $ips, string $ip) {
-            return array_merge($ips, preg_split('/\s*,\s*/', $ip));
-        }, []);
+        $ipsList = array_reduce((array) $ips, static fn (array $ips, string $ip) => array_merge($ips, preg_split('/\s*,\s*/', $ip)), []);
 
         if (!$ipsList) {
             return false;
@@ -1081,9 +1077,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $factories[] = array_merge($factory, [$i]);
             }
 
-            usort($factories, function ($a, $b) {
-                return $b[0] <=> $a[0] ?: $a[2] <=> $b[2];
-            });
+            usort($factories, fn ($a, $b) => $b[0] <=> $a[0] ?: $a[2] <=> $b[2]);
 
             $this->sortedFactories = array_column($factories, 1);
         }

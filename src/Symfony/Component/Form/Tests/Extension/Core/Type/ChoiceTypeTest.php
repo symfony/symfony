@@ -531,9 +531,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => [
                 'Empty' => 'EMPTY_CHOICE',
             ],
-            'choice_value' => function () {
-                return '';
-            },
+            'choice_value' => fn () => '',
         ]);
 
         $form->submit('');
@@ -2208,9 +2206,7 @@ class ChoiceTypeTest extends BaseTypeTest
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'choices' => $this->choices,
-            'choice_filter' => function ($choice) {
-                return \in_array($choice, range('a', 'c'), true);
-            },
+            'choice_filter' => fn ($choice) => \in_array($choice, range('a', 'c'), true),
         ]);
 
         $this->assertEquals([
@@ -2224,9 +2220,7 @@ class ChoiceTypeTest extends BaseTypeTest
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'choices' => $this->groupedChoices,
-            'choice_filter' => function ($choice) {
-                return \in_array($choice, range('a', 'c'), true);
-            },
+            'choice_filter' => fn ($choice) => \in_array($choice, range('a', 'c'), true),
         ]);
 
         $this->assertEquals(['Symfony' => new ChoiceGroupView('Symfony', [
@@ -2239,12 +2233,8 @@ class ChoiceTypeTest extends BaseTypeTest
     public function testFilteredChoiceLoader()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'choice_loader' => new CallbackChoiceLoader(function () {
-                return $this->choices;
-            }),
-            'choice_filter' => function ($choice) {
-                return \in_array($choice, range('a', 'c'), true);
-            },
+            'choice_loader' => new CallbackChoiceLoader(fn () => $this->choices),
+            'choice_filter' => fn ($choice) => \in_array($choice, range('a', 'c'), true),
         ]);
 
         $this->assertEquals([
@@ -2256,9 +2246,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testWithSameLoaderAndDifferentChoiceValueCallbacks()
     {
-        $choiceLoader = new CallbackChoiceLoader(function () {
-            return [1, 2, 3];
-        });
+        $choiceLoader = new CallbackChoiceLoader(fn () => [1, 2, 3]);
 
         $view = $this->factory->create(FormTypeTest::TESTED_TYPE)
             ->add('choice_one', self::TESTED_TYPE, [
@@ -2266,9 +2254,7 @@ class ChoiceTypeTest extends BaseTypeTest
             ])
             ->add('choice_two', self::TESTED_TYPE, [
                 'choice_loader' => $choiceLoader,
-                'choice_value' => function ($choice) {
-                    return $choice ? (string) $choice * 10 : '';
-                },
+                'choice_value' => fn ($choice) => $choice ? (string) $choice * 10 : '',
             ])
             ->createView()
         ;

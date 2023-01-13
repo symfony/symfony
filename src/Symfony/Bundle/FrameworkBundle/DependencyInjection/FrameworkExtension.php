@@ -1014,9 +1014,7 @@ class FrameworkExtension extends Extension
                 $validator = new Workflow\Validator\WorkflowValidator();
             }
 
-            $trs = array_map(function (Reference $ref) use ($container): Workflow\Transition {
-                return $container->get((string) $ref);
-            }, $transitions);
+            $trs = array_map(fn (Reference $ref): Workflow\Transition => $container->get((string) $ref), $transitions);
             $realDefinition = new Workflow\Definition($places, $trs, $initialMarking);
             $validator->validate($realDefinition, $name);
 
@@ -1401,9 +1399,7 @@ class FrameworkExtension extends Extension
                 $finder = Finder::create()
                     ->followLinks()
                     ->files()
-                    ->filter(function (\SplFileInfo $file) {
-                        return 2 <= substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
-                    })
+                    ->filter(fn (\SplFileInfo $file) => 2 <= substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename()))
                     ->in($dir)
                     ->sortByName()
                 ;
@@ -1426,9 +1422,7 @@ class FrameworkExtension extends Extension
                     'resource_files' => $files,
                     'scanned_directories' => $scannedDirectories = array_merge($dirs, $nonExistingDirs),
                     'cache_vary' => [
-                        'scanned_directories' => array_map(static function (string $dir) use ($projectDir): string {
-                            return str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir;
-                        }, $scannedDirectories),
+                        'scanned_directories' => array_map(static fn (string $dir): string => str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir, $scannedDirectories),
                     ],
                 ]
             );
@@ -2144,9 +2138,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        $failureTransportReferencesByTransportName = array_map(function ($failureTransportName) use ($senderReferences) {
-            return $senderReferences[$failureTransportName];
-        }, $failureTransportsByName);
+        $failureTransportReferencesByTransportName = array_map(fn ($failureTransportName) => $senderReferences[$failureTransportName], $failureTransportsByName);
 
         $messageToSendersMapping = [];
         foreach ($config['routing'] as $message => $messageConfiguration) {

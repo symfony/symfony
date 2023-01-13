@@ -108,9 +108,7 @@ class LazyChoiceListTest extends TestCase
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use ($choices) {
-            return array_search($choice, $choices);
-        });
+        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), fn ($choice) => array_search($choice, $choices));
 
         // load choice list
         $list->getChoices();
@@ -126,9 +124,7 @@ class LazyChoiceListTest extends TestCase
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use ($choices) {
-            return array_search($choice, $choices);
-        });
+        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), fn ($choice) => array_search($choice, $choices));
 
         // load choice list
         $list->getChoices();

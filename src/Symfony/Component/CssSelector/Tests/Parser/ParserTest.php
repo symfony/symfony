@@ -25,9 +25,7 @@ class ParserTest extends TestCase
     {
         $parser = new Parser();
 
-        $this->assertEquals($representation, array_map(function (SelectorNode $node) {
-            return (string) $node->getTree();
-        }, $parser->parse($source)));
+        $this->assertEquals($representation, array_map(fn (SelectorNode $node) => (string) $node->getTree(), $parser->parse($source)));
     }
 
     /** @dataProvider getParserExceptionTestData */

@@ -1018,9 +1018,7 @@ class OptionsResolver implements Options
                 $fmtActualValue = $this->formatValue($value);
                 $fmtAllowedTypes = implode('" or "', $this->allowedTypes[$option]);
                 $fmtProvidedTypes = implode('|', array_keys($invalidTypes));
-                $allowedContainsArrayType = \count(array_filter($this->allowedTypes[$option], static function ($item) {
-                    return str_ends_with($item, '[]');
-                })) > 0;
+                $allowedContainsArrayType = \count(array_filter($this->allowedTypes[$option], static fn ($item) => str_ends_with($item, '[]'))) > 0;
 
                 if (\is_array($value) && $allowedContainsArrayType) {
                     throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but one of the elements is of type "%s".', $this->formatOptions([$option]), $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
@@ -1281,9 +1279,7 @@ class OptionsResolver implements Options
                 $prefix .= sprintf('[%s]', $this->prototypeIndex);
             }
 
-            $options = array_map(static function (string $option) use ($prefix): string {
-                return sprintf('%s[%s]', $prefix, $option);
-            }, $options);
+            $options = array_map(static fn (string $option): string => sprintf('%s[%s]', $prefix, $option), $options);
         }
 
         return implode('", "', $options);

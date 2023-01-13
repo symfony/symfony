@@ -104,9 +104,7 @@ EOT;
             return [hexdec($start), hexdec($end)];
         }, $rawData);
 
-        usort($data, static function (array $a, array $b): int {
-            return $a[0] - $b[0];
-        });
+        usort($data, static fn (array $a, array $b): int => $a[0] - $b[0]);
 
         return $data;
     }

@@ -218,18 +218,10 @@ class ProgressIndicator
     private static function initPlaceholderFormatters(): array
     {
         return [
-            'indicator' => function (self $indicator) {
-                return $indicator->indicatorValues[$indicator->indicatorCurrent % \count($indicator->indicatorValues)];
-            },
-            'message' => function (self $indicator) {
-                return $indicator->message;
-            },
-            'elapsed' => function (self $indicator) {
-                return Helper::formatTime(time() - $indicator->startTime);
-            },
-            'memory' => function () {
-                return Helper::formatMemory(memory_get_usage(true));
-            },
+            'indicator' => fn (self $indicator) => $indicator->indicatorValues[$indicator->indicatorCurrent % \count($indicator->indicatorValues)],
+            'message' => fn (self $indicator) => $indicator->message,
+            'elapsed' => fn (self $indicator) => Helper::formatTime(time() - $indicator->startTime),
+            'memory' => fn () => Helper::formatMemory(memory_get_usage(true)),
         ];
     }
 }

@@ -96,12 +96,10 @@ class TimeType extends AbstractType
             $emptyData = $builder->getEmptyData() ?: [];
 
             if ($emptyData instanceof \Closure) {
-                $lazyEmptyData = static function ($option) use ($emptyData) {
-                    return static function (FormInterface $form) use ($emptyData, $option) {
-                        $emptyData = $emptyData($form->getParent());
+                $lazyEmptyData = static fn ($option) => static function (FormInterface $form) use ($emptyData, $option) {
+                    $emptyData = $emptyData($form->getParent());
 
-                        return $emptyData[$option] ?? '';
-                    };
+                    return $emptyData[$option] ?? '';
                 };
 
                 $hourOptions['empty_data'] = $lazyEmptyData('hour');
@@ -235,13 +233,9 @@ class TimeType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $compound = function (Options $options) {
-            return 'single_text' !== $options['widget'];
-        };
+        $compound = fn (Options $options) => 'single_text' !== $options['widget'];
 
-        $placeholderDefault = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
+        $placeholderDefault = fn (Options $options) => $options['required'] ? null : '';
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
             if (\is_array($placeholder)) {
@@ -324,9 +318,7 @@ class TimeType extends AbstractType
             // representation is not \DateTime, but an array, we need to unset
             // this option.
             'data_class' => null,
-            'empty_data' => function (Options $options) {
-                return $options['compound'] ? [] : '';
-            },
+            'empty_data' => fn (Options $options) => $options['compound'] ? [] : '',
             'compound' => $compound,
             'choice_translation_domain' => false,
             'invalid_message' => 'Please enter a valid time.',

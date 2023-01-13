@@ -28,9 +28,7 @@ class RealServiceInstantiatorTest extends TestCase
         $instantiator = new RealServiceInstantiator();
         $instance = new \stdClass();
         $container = $this->createMock(ContainerInterface::class);
-        $callback = function () use ($instance) {
-            return $instance;
-        };
+        $callback = fn () => $instance;
 
         $this->assertSame($instance, $instantiator->instantiateProxy($container, new Definition(), 'foo', $callback));
     }

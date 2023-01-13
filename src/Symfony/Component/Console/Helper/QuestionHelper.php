@@ -68,9 +68,7 @@ class QuestionHelper extends Helper
                 return $this->doAsk($output, $question);
             }
 
-            $interviewer = function () use ($output, $question) {
-                return $this->doAsk($output, $question);
-            };
+            $interviewer = fn () => $this->doAsk($output, $question);
 
             return $this->validateAttempts($interviewer, $output, $question);
         } catch (MissingInputException $exception) {
@@ -314,9 +312,7 @@ class QuestionHelper extends Helper
 
                         $matches = array_filter(
                             $autocomplete($ret),
-                            function ($match) use ($ret) {
-                                return '' === $ret || str_starts_with($match, $ret);
-                            }
+                            fn ($match) => '' === $ret || str_starts_with($match, $ret)
                         );
                         $numMatches = \count($matches);
                         $ofs = -1;

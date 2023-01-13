@@ -306,9 +306,7 @@ class Connection
      */
     public function countMessagesInQueues(): int
     {
-        return array_sum(array_map(function ($queueName) {
-            return $this->queue($queueName)->declareQueue();
-        }, $this->getQueueNames()));
+        return array_sum(array_map(fn ($queueName) => $this->queue($queueName)->declareQueue(), $this->getQueueNames()));
     }
 
     /**
@@ -494,12 +492,8 @@ class Connection
             if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
                 $this->amqpChannel->confirmSelect();
                 $this->amqpChannel->setConfirmCallback(
-                    static function (): bool {
-                        return false;
-                    },
-                    static function (): bool {
-                        return false;
-                    }
+                    static fn (): bool => false,
+                    static fn (): bool => false
                 );
             }
 

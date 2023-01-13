@@ -91,7 +91,7 @@ trait PriorityTaggedServiceTrait
             }
         }
 
-        uasort($services, static function ($a, $b) { return $b[0] <=> $a[0] ?: $a[1] <=> $b[1]; });
+        uasort($services, static fn ($a, $b) => $b[0] <=> $a[0] ?: $a[1] <=> $b[1]);
 
         $refs = [];
         foreach ($services as [, , $index, $serviceId, $class]) {

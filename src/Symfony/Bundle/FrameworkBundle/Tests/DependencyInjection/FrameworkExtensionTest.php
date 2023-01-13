@@ -1146,9 +1146,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $nonExistingDirectories = array_filter(
             $options['scanned_directories'],
-            function ($directory) {
-                return !file_exists($directory);
-            }
+            fn ($directory) => !file_exists($directory)
         );
 
         $this->assertNotEmpty($nonExistingDirectories, 'FrameworkBundle should pass non existing directories to Translator');

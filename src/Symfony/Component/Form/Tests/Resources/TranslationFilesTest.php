@@ -46,7 +46,7 @@ class TranslationFilesTest extends TestCase
     public function provideTranslationFiles()
     {
         return array_map(
-            function ($filePath) { return (array) $filePath; },
+            fn ($filePath) => (array) $filePath,
             glob(\dirname(__DIR__, 2).'/Resources/translations/*.xlf')
         );
     }

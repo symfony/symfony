@@ -217,9 +217,7 @@ final class LocoProvider implements ProviderInterface
             }
         }
 
-        return array_map(function ($asset) {
-            return $asset['id'];
-        }, $response->toArray(false));
+        return array_map(fn ($asset) => $asset['id'], $response->toArray(false));
     }
 
     private function createAssets(array $keys, string $domain): array

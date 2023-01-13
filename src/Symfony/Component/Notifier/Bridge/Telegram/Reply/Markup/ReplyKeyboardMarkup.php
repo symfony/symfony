@@ -32,9 +32,7 @@ final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup
      */
     public function keyboard(array $buttons): static
     {
-        $buttons = array_map(static function (KeyboardButton $button) {
-            return $button->toArray();
-        }, $buttons);
+        $buttons = array_map(static fn (KeyboardButton $button) => $button->toArray(), $buttons);
 
         $this->options['keyboard'][] = $buttons;
 

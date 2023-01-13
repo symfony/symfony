@@ -112,9 +112,7 @@ abstract class AbstractTransport implements TransportInterface
      */
     protected function stringifyAddresses(array $addresses): array
     {
-        return array_map(function (Address $a) {
-            return $a->toString();
-        }, $addresses);
+        return array_map(fn (Address $a) => $a->toString(), $addresses);
     }
 
     protected function getLogger(): LoggerInterface

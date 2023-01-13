@@ -103,11 +103,9 @@ class MandrillApiTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418]), [
-                'http_code' => 418,
-            ]);
-        });
+        $client = new MockHttpClient(fn (string $method, string $url, array $options): ResponseInterface => new MockResponse(json_encode(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418]), [
+            'http_code' => 418,
+        ]));
 
         $transport = new MandrillApiTransport('KEY', $client);
 

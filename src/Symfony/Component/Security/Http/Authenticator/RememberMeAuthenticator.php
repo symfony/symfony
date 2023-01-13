@@ -87,9 +87,7 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 
         $rememberMeCookie = RememberMeDetails::fromRawCookie($rawCookie);
 
-        $userBadge = new UserBadge($rememberMeCookie->getUserIdentifier(), function () use ($rememberMeCookie) {
-            return $this->rememberMeHandler->consumeRememberMeCookie($rememberMeCookie);
-        });
+        $userBadge = new UserBadge($rememberMeCookie->getUserIdentifier(), fn () => $this->rememberMeHandler->consumeRememberMeCookie($rememberMeCookie));
 
         return new SelfValidatingPassport($userBadge);
     }

@@ -61,9 +61,7 @@ final class ResponseHasCookie extends Constraint
     {
         $cookies = $response->headers->getCookies();
 
-        $filteredCookies = array_filter($cookies, function (Cookie $cookie) {
-            return $cookie->getName() === $this->name && $cookie->getPath() === $this->path && $cookie->getDomain() === $this->domain;
-        });
+        $filteredCookies = array_filter($cookies, fn (Cookie $cookie) => $cookie->getName() === $this->name && $cookie->getPath() === $this->path && $cookie->getDomain() === $this->domain);
 
         return reset($filteredCookies) ?: null;
     }

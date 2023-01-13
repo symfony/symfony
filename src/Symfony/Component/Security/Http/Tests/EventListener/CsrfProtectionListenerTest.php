@@ -76,7 +76,7 @@ class CsrfProtectionListenerTest extends TestCase
 
     private function createPassport(?CsrfTokenBadge $badge)
     {
-        $passport = new SelfValidatingPassport(new UserBadge('wouter', function ($username) { return new InMemoryUser($username, 'pass'); }));
+        $passport = new SelfValidatingPassport(new UserBadge('wouter', fn ($username) => new InMemoryUser($username, 'pass')));
         if ($badge) {
             $passport->addBadge($badge);
         }

@@ -42,9 +42,7 @@ class CheckboxType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $emptyData = function (FormInterface $form, $viewData) {
-            return $viewData;
-        };
+        $emptyData = fn (FormInterface $form, $viewData) => $viewData;
 
         $resolver->setDefaults([
             'value' => '1',
@@ -52,9 +50,7 @@ class CheckboxType extends AbstractType
             'compound' => false,
             'false_values' => [null],
             'invalid_message' => 'The checkbox has an invalid value.',
-            'is_empty_callback' => static function ($modelData): bool {
-                return false === $modelData;
-            },
+            'is_empty_callback' => static fn ($modelData): bool => false === $modelData,
         ]);
 
         $resolver->setAllowedTypes('false_values', 'array');

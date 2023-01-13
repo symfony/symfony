@@ -189,9 +189,7 @@ class ParameterBagTest extends TestCase
     public function testFilterClosure()
     {
         $bag = new ParameterBag(['foo' => 'bar']);
-        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => function ($value) {
-            return strtoupper($value);
-        }]);
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => strtoupper(...)]);
 
         $this->assertSame('BAR', $result);
     }

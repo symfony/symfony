@@ -93,7 +93,7 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('container1');
 
-        $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return str_starts_with($key, 'security.user.provider.concrete'); }));
+        $providers = array_values(array_filter($container->getServiceIds(), fn ($key) => str_starts_with($key, 'security.user.provider.concrete')));
 
         $expectedProviders = [
             'security.user.provider.concrete.default',

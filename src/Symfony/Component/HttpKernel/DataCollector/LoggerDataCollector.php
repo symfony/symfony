@@ -110,9 +110,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         // sort logs from oldest to newest
-        usort($logs, static function ($logA, $logB) {
-            return $logA['timestamp'] <=> $logB['timestamp'];
-        });
+        usort($logs, static fn ($logA, $logB) => $logA['timestamp'] <=> $logB['timestamp']);
 
         return $this->processedLogs = $logs;
     }

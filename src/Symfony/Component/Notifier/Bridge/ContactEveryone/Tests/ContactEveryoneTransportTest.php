@@ -50,9 +50,7 @@ final class ContactEveryoneTransportTest extends TransportTestCase
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $response->method('getContent')->willReturn($messageId);
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 

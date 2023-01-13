@@ -64,9 +64,7 @@ class FunctionNode extends AbstractNode
 
     public function __toString(): string
     {
-        $arguments = implode(', ', array_map(function (Token $token) {
-            return "'".$token->getValue()."'";
-        }, $this->arguments));
+        $arguments = implode(', ', array_map(fn (Token $token) => "'".$token->getValue()."'", $this->arguments));
 
         return sprintf('%s[%s:%s(%s)]', $this->getNodeName(), $this->selector, $this->name, $arguments ? '['.$arguments.']' : '');
     }

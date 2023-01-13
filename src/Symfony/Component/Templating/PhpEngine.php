@@ -364,11 +364,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  *
                  * @return string
                  */
-                function ($value) use ($flags) {
-                    // Numbers and Boolean values get turned into strings which can cause problems
-                    // with type comparisons (e.g. === or is_int() etc).
-                    return \is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value;
-                },
+                fn ($value) => // Numbers and Boolean values get turned into strings which can cause problems
+// with type comparisons (e.g. === or is_int() etc).
+\is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value,
 
             'js' =>
                 /**

@@ -233,12 +233,8 @@ EOF
 
                 $list = array_merge(
                     array_diff($allKeys, $newKeys),
-                    array_map(function ($id) {
-                        return sprintf('<fg=green>%s</>', $id);
-                    }, $newKeys),
-                    array_map(function ($id) {
-                        return sprintf('<fg=red>%s</>', $id);
-                    }, array_keys($operation->getObsoleteMessages($domain)))
+                    array_map(fn ($id) => sprintf('<fg=green>%s</>', $id), $newKeys),
+                    array_map(fn ($id) => sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
                 );
 
                 $domainMessagesCount = \count($list);

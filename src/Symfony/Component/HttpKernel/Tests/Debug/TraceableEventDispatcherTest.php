@@ -113,9 +113,7 @@ class TraceableEventDispatcherTest extends TestCase
     protected function getHttpKernel($dispatcher)
     {
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
-        $controllerResolver->expects($this->once())->method('getController')->willReturn(function () {
-            return new Response();
-        });
+        $controllerResolver->expects($this->once())->method('getController')->willReturn(fn () => new Response());
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
         $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);
 

@@ -491,9 +491,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 }
 
                 if ($propertyMetadata instanceof GetterMetadata) {
-                    $propertyValue = new LazyProperty(static function () use ($propertyMetadata, $object) {
-                        return $propertyMetadata->getPropertyValue($object);
-                    });
+                    $propertyValue = new LazyProperty(static fn () => $propertyMetadata->getPropertyValue($object));
                 } else {
                     $propertyValue = $propertyMetadata->getPropertyValue($object);
                 }

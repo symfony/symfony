@@ -144,9 +144,7 @@ class Configuration implements ConfigurationInterface
             return ContainerBuilder::willBeAvailable($package, $class, $parentPackages);
         };
 
-        $enableIfStandalone = static function (string $package, string $class) use ($willBeAvailable) {
-            return !class_exists(FullStack::class) && $willBeAvailable($package, $class) ? 'canBeDisabled' : 'canBeEnabled';
-        };
+        $enableIfStandalone = static fn (string $package, string $class) => !class_exists(FullStack::class) && $willBeAvailable($package, $class) ? 'canBeDisabled' : 'canBeEnabled';
 
         $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode, $enableIfStandalone);
@@ -693,8 +691,8 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->beforeNormalization()
-                                    ->ifTrue(function ($v) { return \is_array($v) && isset($v['mime_type']); })
-                                    ->then(function ($v) { return $v['mime_type']; })
+                                    ->ifTrue(fn ($v) => \is_array($v) && isset($v['mime_type']))
+                                    ->then(fn ($v) => $v['mime_type'])
                                 ->end()
                                 ->beforeNormalization()->castToArray()->end()
                                 ->prototype('scalar')->end()
@@ -1169,7 +1167,7 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->validate()
-                                ->ifTrue(function ($v) { return !(\is_int($v) || \is_bool($v) || \is_array($v)); })
+                                ->ifTrue(fn ($v) => !(\is_int($v) || \is_bool($v) || \is_array($v)))
                                 ->thenInvalid('The "php_errors.log" parameter should be either an integer, a boolean, or an array')
                             ->end()
                         ->end()
@@ -1220,7 +1218,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('log_level')
                                 ->info('The level of log message. Null to let Symfony decide.')
                                 ->validate()
-                                    ->ifTrue(function ($v) use ($logLevels) { return null !== $v && !\in_array($v, $logLevels, true); })
+                                    ->ifTrue(fn ($v) => null !== $v && !\in_array($v, $logLevels, true))
                                     ->thenInvalid(sprintf('The log level is not valid. Pick one among "%s".', implode('", "', $logLevels)))
                                 ->end()
                                 ->defaultNull()
@@ -1228,11 +1226,11 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('status_code')
                                 ->info('The status code of the response. Null or 0 to let Symfony decide.')
                                 ->beforeNormalization()
-                                    ->ifTrue(function ($v) { return 0 === $v; })
-                                    ->then(function ($v) { return null; })
+                                    ->ifTrue(fn ($v) => 0 === $v)
+                                    ->then(fn ($v) => null)
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) { return null !== $v && ($v < 100 || $v > 599); })
+                                    ->ifTrue(fn ($v) => null !== $v && ($v < 100 || $v > 599))
                                     ->thenInvalid('The status code is not valid. Pick a value between 100 and 599.')
                                 ->end()
                                 ->defaultNull()
@@ -1252,14 +1250,14 @@ class Configuration implements ConfigurationInterface
                     ->info('Lock configuration')
                     ->{$enableIfStandalone('symfony/lock', Lock::class)}()
                     ->beforeNormalization()
-                        ->ifString()->then(function ($v) { return ['enabled' => true, 'resources' => $v]; })
+                        ->ifString()->then(fn ($v) => ['enabled' => true, 'resources' => $v])
                     ->end()
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['enabled']); })
-                        ->then(function ($v) { return $v + ['enabled' => true]; })
+                        ->ifTrue(fn ($v) => \is_array($v) && !isset($v['enabled']))
+                        ->then(fn ($v) => $v + ['enabled' => true])
                     ->end()
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['resources']) && !isset($v['resource']); })
+                        ->ifTrue(fn ($v) => \is_array($v) && !isset($v['resources']) && !isset($v['resource']))
                         ->then(function ($v) {
                             $e = $v['enabled'];
                             unset($v['enabled']);
@@ -1269,7 +1267,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->addDefaultsIfNotSet()
                     ->validate()
-                        ->ifTrue(static function (array $config) { return $config['enabled'] && !$config['resources']; })
+                        ->ifTrue(static fn (array $config) => $config['enabled'] && !$config['resources'])
                         ->thenInvalid('At least one resource must be defined.')
                     ->end()
                     ->fixXmlConfig('resource')
@@ -1279,10 +1277,10 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->defaultValue(['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']])
                             ->beforeNormalization()
-                                ->ifString()->then(function ($v) { return ['default' => $v]; })
+                                ->ifString()->then(fn ($v) => ['default' => $v])
                             ->end()
                             ->beforeNormalization()
-                                ->ifTrue(function ($v) { return \is_array($v) && array_is_list($v); })
+                                ->ifTrue(fn ($v) => \is_array($v) && array_is_list($v))
                                 ->then(function ($v) {
                                     $resources = [];
                                     foreach ($v as $resource) {
@@ -1297,7 +1295,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->prototype('array')
                                 ->performNoDeepMerging()
-                                ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
+                                ->beforeNormalization()->ifString()->then(fn ($v) => [$v])->end()
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()
@@ -1315,14 +1313,14 @@ class Configuration implements ConfigurationInterface
                     ->info('Semaphore configuration')
                     ->{$enableIfStandalone('symfony/semaphore', Semaphore::class)}()
                     ->beforeNormalization()
-                        ->ifString()->then(function ($v) { return ['enabled' => true, 'resources' => $v]; })
+                        ->ifString()->then(fn ($v) => ['enabled' => true, 'resources' => $v])
                     ->end()
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['enabled']); })
-                        ->then(function ($v) { return $v + ['enabled' => true]; })
+                        ->ifTrue(fn ($v) => \is_array($v) && !isset($v['enabled']))
+                        ->then(fn ($v) => $v + ['enabled' => true])
                     ->end()
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['resources']) && !isset($v['resource']); })
+                        ->ifTrue(fn ($v) => \is_array($v) && !isset($v['resources']) && !isset($v['resource']))
                         ->then(function ($v) {
                             $e = $v['enabled'];
                             unset($v['enabled']);
@@ -1338,10 +1336,10 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->requiresAtLeastOneElement()
                             ->beforeNormalization()
-                                ->ifString()->then(function ($v) { return ['default' => $v]; })
+                                ->ifString()->then(fn ($v) => ['default' => $v])
                             ->end()
                             ->beforeNormalization()
-                                ->ifTrue(function ($v) { return \is_array($v) && array_is_list($v); })
+                                ->ifTrue(fn ($v) => \is_array($v) && array_is_list($v))
                                 ->then(function ($v) {
                                     $resources = [];
                                     foreach ($v as $resource) {
@@ -1939,9 +1937,7 @@ class Configuration implements ConfigurationInterface
                                 ->arrayNode('methods')
                                     ->beforeNormalization()
                                     ->ifArray()
-                                        ->then(function ($v) {
-                                            return array_map('strtoupper', $v);
-                                        })
+                                        ->then(fn ($v) => array_map('strtoupper', $v))
                                     ->end()
                                     ->prototype('scalar')->end()
                                     ->info('A list of HTTP methods that triggers a retry for this status code. When empty, all methods are retried')
@@ -1967,7 +1963,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Mailer configuration')
                     ->{$enableIfStandalone('symfony/mailer', Mailer::class)}()
                     ->validate()
-                        ->ifTrue(function ($v) { return isset($v['dsn']) && \count($v['transports']); })
+                        ->ifTrue(fn ($v) => isset($v['dsn']) && \count($v['transports']))
                         ->thenInvalid('"dsn" and "transports" cannot be used together.')
                     ->end()
                     ->fixXmlConfig('transport')
@@ -1987,9 +1983,7 @@ class Configuration implements ConfigurationInterface
                                     ->performNoDeepMerging()
                                     ->beforeNormalization()
                                     ->ifArray()
-                                        ->then(function ($v) {
-                                            return array_filter(array_values($v));
-                                        })
+                                        ->then(fn ($v) => array_filter(array_values($v)))
                                     ->end()
                                     ->prototype('scalar')->end()
                                 ->end()
@@ -2001,8 +1995,8 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->normalizeKeys(false)
                                 ->beforeNormalization()
-                                    ->ifTrue(function ($v) { return !\is_array($v) || array_keys($v) !== ['value']; })
-                                    ->then(function ($v) { return ['value' => $v]; })
+                                    ->ifTrue(fn ($v) => !\is_array($v) || array_keys($v) !== ['value'])
+                                    ->then(fn ($v) => ['value' => $v])
                                 ->end()
                                 ->children()
                                     ->variableNode('value')->end()
@@ -2076,7 +2070,7 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/rate-limiter', TokenBucketLimiter::class)}()
                     ->fixXmlConfig('limiter')
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return \is_array($v) && !isset($v['limiters']) && !isset($v['limiter']); })
+                        ->ifTrue(fn ($v) => \is_array($v) && !isset($v['limiters']) && !isset($v['limiter']))
                         ->then(function (array $v) {
                             $newV = [
                                 'enabled' => $v['enabled'] ?? true,
@@ -2127,7 +2121,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) { return 'no_limit' !== $v['policy'] && !isset($v['limit']); })
+                                    ->ifTrue(fn ($v) => 'no_limit' !== $v['policy'] && !isset($v['limit']))
                                     ->thenInvalid('A limit must be provided when using a policy different than "no_limit".')
                                 ->end()
                             ->end()

@@ -103,9 +103,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
         if ($this->priorities) {
             $priorities = $this->priorities;
             $keysOrder = array_flip(array_keys($this->routes));
-            uksort($this->routes, static function ($n1, $n2) use ($priorities, $keysOrder) {
-                return (($priorities[$n2] ?? 0) <=> ($priorities[$n1] ?? 0)) ?: ($keysOrder[$n1] <=> $keysOrder[$n2]);
-            });
+            uksort($this->routes, static fn ($n1, $n2) => (($priorities[$n2] ?? 0) <=> ($priorities[$n1] ?? 0)) ?: ($keysOrder[$n1] <=> $keysOrder[$n2]));
         }
 
         return $this->routes;

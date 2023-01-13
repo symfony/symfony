@@ -55,9 +55,7 @@ class ChatworkTransportTest extends TransportTestCase
             ->method('getContent')
             ->willReturn(json_encode(['errors' => ['first error', 'second error']]));
 
-        $client = new MockHttpClient(static function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);
 

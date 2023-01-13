@@ -677,7 +677,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     public function provideCurrencies()
     {
         return array_map(
-            function ($currency) { return [$currency]; },
+            fn ($currency) => [$currency],
             self::CURRENCIES
         );
     }
@@ -704,7 +704,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     public function provideCurrenciesWithNumericEquivalent()
     {
         return array_map(
-            function ($value) { return [$value]; },
+            fn ($value) => [$value],
             array_keys(self::ALPHA3_TO_NUMERIC)
         );
     }
@@ -720,7 +720,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     public function provideCurrenciesWithoutNumericEquivalent()
     {
         return array_map(
-            function ($value) { return [$value]; },
+            fn ($value) => [$value],
             array_diff(self::CURRENCIES, array_keys(self::ALPHA3_TO_NUMERIC))
         );
     }
@@ -739,7 +739,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         $numericToAlpha3 = $this->getNumericToAlpha3Mapping();
 
         return array_map(
-            function ($numeric, $alpha3) { return [$numeric, $alpha3]; },
+            fn ($numeric, $alpha3) => [$numeric, $alpha3],
             array_keys($numericToAlpha3),
             $numericToAlpha3
         );
@@ -765,7 +765,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         $invalidNumericCodes = array_diff(range(0, 1000), $validNumericCodes);
 
         return array_map(
-            function ($value) { return [$value]; },
+            fn ($value) => [$value],
             $invalidNumericCodes
         );
     }

@@ -19,7 +19,7 @@ final class Php74Full
     public int $int;
     public float $float;
     public bool $bool;
-    public \DateTime $dateTime;
+    public \DateTimeInterface $dateTime;
     public \DateTimeImmutable $dateTimeImmutable;
     public \DateTimeZone $dateTimeZone;
     public \SplFileInfo $splFileInfo;

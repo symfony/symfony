@@ -148,7 +148,8 @@
         "symfony/security-acl": "~2.8|~3.0",
         "twig/cssinliner-extra": "^2.12|^3",
         "twig/inky-extra": "^2.12|^3",
-        "twig/markdown-extra": "^2.12|^3"
+        "twig/markdown-extra": "^2.12|^3",
+        "vimeo/psalm": "^5.0@dev"
     },
     "conflict": {
         "ext-psr": "<1.1|>=2",

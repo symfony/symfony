@@ -200,7 +200,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             }
         }
 
-        if (!isset($types[0])) {
+        if (!isset($types[0]) || [] === $types[0]) {
             return null;
         }
 

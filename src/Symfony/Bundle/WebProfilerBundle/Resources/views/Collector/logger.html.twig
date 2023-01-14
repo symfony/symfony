@@ -55,27 +55,24 @@
         {% set filters = collector.filters %}
         <div class="log-filters">
             <div id="log-filter-type" class="log-filter">
-                <div class="tab-navigation" role="tablist">
-                    <button role="tab" class="tab-control {{ not has_error_logs and not has_deprecation_logs ? 'active' }}">
-                        <input {{ not has_error_logs and not has_deprecation_logs ? 'checked' }} type="radio" id="filter-log-type-all" name="filter-log-type" value="all">
-                        <label for="filter-log-type-all">All messages</label>
-                    </button>
+                <div class="tab-navigation">
+                    {% set initially_active_tab = has_error_logs ? 'error' : has_deprecation_logs ? 'deprecation' : 'all' %}
+                    <input type="radio" id="filter-log-type-all" name="filter-log-type" value="all" {{ 'all' == initially_active_tab ? 'checked' }}>
+                    <label for="filter-log-type-all" class="tab-control">
+                        All messages
+                    </label>
 
-                    <button role="tab" class="tab-control {{ has_error_logs ? 'active' }}">
-                        <input {{ has_error_logs ? 'checked' }} type="radio" id="filter-log-type-error" name="filter-log-type" value="error">
-                        <label for="filter-log-type-error">
-                            Errors
-                            <span class="badge status-{{ collector.counterrors ? 'error' }}">{{ collector.counterrors|default(0) }}</span>
-                        </label>
-                    </button>
+                    <input type="radio" id="filter-log-type-error" name="filter-log-type" value="error" {{ 'error' == initially_active_tab ? 'checked' }}>
+                    <label for="filter-log-type-error" class="tab-control">
+                        Errors
+                        <span class="badge status-{{ collector.counterrors ? 'error' }}">{{ collector.counterrors|default(0) }}</span>
+                    </label>
 
-                    <button role="tab" class="tab-control {{ not has_error_logs and has_deprecation_logs ? 'active' }}">
-                        <input {{ not has_error_logs and has_deprecation_logs ? 'checked' }} type="radio" id="filter-log-type-deprecation" name="filter-log-type" value="deprecation">
-                        <label for="filter-log-type-deprecation">
-                            Deprecations
-                            <span class="badge status-{{ collector.countdeprecations ? 'warning' }}">{{ collector.countdeprecations|default(0) }}</span>
-                        </label>
-                    </button>
+                    <input type="radio" id="filter-log-type-deprecation" name="filter-log-type" value="deprecation" {{ 'deprecation' == initially_active_tab ? 'checked' }}>
+                    <label for="filter-log-type-deprecation" class="tab-control">
+                        Deprecations
+                        <span class="badge status-{{ collector.countdeprecations ? 'warning' }}">{{ collector.countdeprecations|default(0) }}</span>
+                    </label>
                 </div>
             </div>
 

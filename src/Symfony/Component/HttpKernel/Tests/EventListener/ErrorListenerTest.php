@@ -209,7 +209,7 @@ class ErrorListenerTest extends TestCase
         }];
 
         yield [function ($exception) {
-            $this->assertInstanceOf(FlattenException::class, $exception);
+            static::assertInstanceOf(FlattenException::class, $exception);
 
             return new Response('OK: '.$exception->getMessage());
         }];

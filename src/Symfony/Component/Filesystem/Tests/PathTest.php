@@ -458,11 +458,30 @@ class PathTest extends TestCase
         yield ['..', '/webmozart/symfony', '/webmozart'];
     }
 
+    private static function getPathTests(): \Generator
+    {
+        yield from [
+            // relative to absolute path
+            ['css/style.css', '/webmozart/symfony', '/webmozart/symfony/css/style.css'],
+            ['../css/style.css', '/webmozart/symfony', '/webmozart/css/style.css'],
+            ['../../css/style.css', '/webmozart/symfony', '/css/style.css'],
+
+            // relative to root
+            ['css/style.css', '/', '/css/style.css'],
+            ['css/style.css', 'C:', 'C:/css/style.css'],
+            ['css/style.css', 'C:/', 'C:/css/style.css'],
+
+            // same sub directories in different base directories
+            ['../../symfony/css/style.css', '/webmozart/css', '/symfony/css/style.css'],
+
+            ['', '/webmozart/symfony', '/webmozart/symfony'],
+            ['..', '/webmozart/symfony', '/webmozart'],
+        ];
+    }
+
     public function provideMakeAbsoluteTests(): \Generator
     {
-        foreach ($this->providePathTests() as $set) {
-            yield $set;
-        }
+        yield from static::getPathTests();
 
         // collapse dots
         yield ['css/./style.css', '/webmozart/symfony', '/webmozart/symfony/css/style.css'];
@@ -589,7 +608,7 @@ class PathTest extends TestCase
 
     public function provideMakeRelativeTests(): \Generator
     {
-        foreach ($this->providePathTests() as $set) {
+        foreach (static::getPathTests() as $set) {
             yield [$set[2], $set[1], $set[0]];
         }
 

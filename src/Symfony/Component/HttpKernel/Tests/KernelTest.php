@@ -650,7 +650,7 @@ EOF
             public function boot()
             {
                 $this->container->compile();
-                parent::dumpContainer(new ConfigCache(tempnam('/tmp', 'symfony-kernel-deprecated-parameter'), true), $this->container, Container::class, $this->getContainerBaseClass());
+                parent::dumpContainer(new ConfigCache(tempnam(sys_get_temp_dir(), 'symfony-kernel-deprecated-parameter'), true), $this->container, Container::class, $this->getContainerBaseClass());
             }
 
             public function getContainerClass(): string

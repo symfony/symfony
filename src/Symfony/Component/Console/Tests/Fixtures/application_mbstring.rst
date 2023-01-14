@@ -34,11 +34,11 @@ Usage
 
 The help command displays help for a given command:
 
-  ./phpunit help list
+  %%PHP_SELF%% help list
 
 You can also output the help in other formats by using the --format option:
 
-  ./phpunit help --format=xml list
+  %%PHP_SELF%% help --format=xml list
 
 To display the list of available commands, please use the list command.
 
@@ -86,19 +86,19 @@ Usage
 
 The list command lists all commands:
 
-  ./phpunit list
+  %%PHP_SELF%% list
 
 You can also display the commands for a specific namespace:
 
-  ./phpunit list test
+  %%PHP_SELF%% list test
 
 You can also output the information in other formats by using the --format option:
 
-  ./phpunit list --format=xml
+  %%PHP_SELF%% list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  ./phpunit list --raw
+  %%PHP_SELF%% list --raw
 
 Arguments
 ^^^^^^^^^

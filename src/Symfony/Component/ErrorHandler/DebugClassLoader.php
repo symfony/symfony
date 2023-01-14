@@ -134,7 +134,7 @@ class DebugClassLoader
     {
         $this->classLoader = $classLoader;
         $this->isFinder = \is_array($classLoader) && method_exists($classLoader[0], 'findFile');
-        parse_str(getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') ?: '', $this->patchTypes);
+        parse_str($_ENV['SYMFONY_PATCH_TYPE_DECLARATIONS'] ?? $_SERVER['SYMFONY_PATCH_TYPE_DECLARATIONS'] ?? getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') ?: '', $this->patchTypes);
         $this->patchTypes += [
             'force' => null,
             'php' => \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION,

@@ -588,25 +588,25 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     public function parseProvider()
     {
         return array_merge(
-            $this->parseYearProvider(),
-            $this->parseQuarterProvider(),
-            $this->parseMonthProvider(),
-            $this->parseStandaloneMonthProvider(),
-            $this->parseDayProvider(),
-            $this->parseDayOfWeekProvider(),
-            $this->parseDayOfYearProvider(),
-            $this->parseHour12ClockOneBasedProvider(),
-            $this->parseHour12ClockZeroBasedProvider(),
-            $this->parseHour24ClockOneBasedProvider(),
-            $this->parseHour24ClockZeroBasedProvider(),
-            $this->parseMinuteProvider(),
-            $this->parseSecondProvider(),
-            $this->parseTimezoneProvider(),
-            $this->parseAmPmProvider(),
-            $this->parseStandaloneAmPmProvider(),
-            $this->parseRegexMetaCharsProvider(),
-            $this->parseQuoteCharsProvider(),
-            $this->parseDashSlashProvider()
+            static::parseYearProvider(),
+            static::parseQuarterProvider(),
+            static::parseMonthProvider(),
+            static::parseStandaloneMonthProvider(),
+            static::parseDayProvider(),
+            static::parseDayOfWeekProvider(),
+            static::parseDayOfYearProvider(),
+            static::parseHour12ClockOneBasedProvider(),
+            static::parseHour12ClockZeroBasedProvider(),
+            static::parseHour24ClockOneBasedProvider(),
+            static::parseHour24ClockZeroBasedProvider(),
+            static::parseMinuteProvider(),
+            static::parseSecondProvider(),
+            static::parseTimezoneProvider(),
+            static::parseAmPmProvider(),
+            static::parseStandaloneAmPmProvider(),
+            static::parseRegexMetaCharsProvider(),
+            static::parseQuoteCharsProvider(),
+            static::parseDashSlashProvider()
         );
     }
 

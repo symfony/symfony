@@ -15,7 +15,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TraversableArrayObject;
 
 class PropertyAccessorTraversableArrayObjectTest extends PropertyAccessorCollectionTest
 {
-    protected function getContainer(array $array)
+    protected static function getContainer(array $array)
     {
         return new TraversableArrayObject($array);
     }

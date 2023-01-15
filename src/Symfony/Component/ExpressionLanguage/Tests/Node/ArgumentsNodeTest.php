@@ -15,21 +15,21 @@ use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
 
 class ArgumentsNodeTest extends ArrayNodeTest
 {
-    public function getCompileData()
+    public static function getCompileData(): array
     {
         return [
-            ['"a", "b"', $this->getArrayNode()],
+            ['"a", "b"', static::getArrayNode()],
         ];
     }
 
-    public function getDumpData()
+    public static function getDumpData(): \Generator
     {
-        return [
-            ['"a", "b"', $this->getArrayNode()],
+        yield from [
+            ['"a", "b"', static::getArrayNode()],
         ];
     }
 
-    protected function createArrayNode()
+    protected static function createArrayNode(): \Symfony\Component\ExpressionLanguage\Node\ArrayNode
     {
         return new ArgumentsNode();
     }

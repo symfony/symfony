@@ -85,7 +85,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
                 }
                 // @deprecated since Symfony 5.3, change to $user->getUserIdentifier() in 6.0
                 $username = $ldap->escape(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), '', LdapInterface::ESCAPE_FILTER);
-                $query = str_replace('{username}', $username, $ldapBadge->getQueryString());
+                $query = str_replace(['{username}', '{user_identifier}'], $username, $ldapBadge->getQueryString());
                 $result = $ldap->query($ldapBadge->getDnString(), $query)->execute();
                 if (1 !== $result->count()) {
                     throw new BadCredentialsException('The presented username is invalid.');

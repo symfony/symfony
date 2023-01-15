@@ -410,6 +410,7 @@ class PhpDocExtractorTest extends TestCase
             ['dateObject', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeInterface')]],
             ['dateTime', null],
             ['ddd', null],
+            ['mixed', null],
         ];
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -57,7 +58,7 @@ class ChoiceValidator extends ConstraintValidator
         }
 
         if (true !== $constraint->strict) {
-            throw new \RuntimeException('The "strict" option of the Choice constraint should not be used.');
+            throw new RuntimeException('The "strict" option of the Choice constraint should not be used.');
         }
 
         if ($constraint->multiple) {

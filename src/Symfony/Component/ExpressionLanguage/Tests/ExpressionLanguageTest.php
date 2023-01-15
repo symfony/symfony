@@ -121,8 +121,19 @@ class ExpressionLanguageTest extends TestCase
 
     public function shortCircuitProviderEvaluate()
     {
-        $object = $this->getMockBuilder(\stdClass::class)->setMethods(['foo'])->getMock();
-        $object->expects($this->never())->method('foo');
+        $object = new class(\Closure::fromCallable([static::class, 'fail'])) {
+            private $fail;
+
+            public function __construct(callable $fail)
+            {
+                $this->fail = $fail;
+            }
+
+            public function foo()
+            {
+                ($this->fail)();
+            }
+        };
 
         return [
             ['false and object.foo()', ['object' => $object], false],

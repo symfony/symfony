@@ -69,16 +69,28 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function itAddsHandledStampsProvider(): iterable
     {
-        $first = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
-        $first->method('__invoke')->willReturn('first result');
+        $first = new class() extends HandleMessageMiddlewareTestCallable {
+            public function __invoke()
+            {
+                return 'first result';
+            }
+        };
         $firstClass = \get_class($first);
 
-        $second = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
-        $second->method('__invoke')->willReturn(null);
+        $second = new class() extends HandleMessageMiddlewareTestCallable {
+            public function __invoke()
+            {
+                return null;
+            }
+        };
         $secondClass = \get_class($second);
 
-        $failing = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
-        $failing->method('__invoke')->will($this->throwException(new \Exception('handler failed.')));
+        $failing = new class() extends HandleMessageMiddlewareTestCallable {
+            public function __invoke()
+            {
+                throw new \Exception('handler failed.');
+            }
+        };
 
         yield 'A stamp is added' => [
             [$first],

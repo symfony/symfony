@@ -5,25 +5,21 @@ namespace Symfony\Component\Validator\Attribute;
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
 final class RequestValidator
 {
-    private string $class;
-    private ?string $finalize;
+    public const ORDER_ATTRIBUTES = 'attributes';
+    public const ORDER_SERIALIZE = 'serialize';
+    public const ORDER_QUERY = 'query';
+    public const ORDER_REQUEST = 'request';
 
     public function __construct(
-        string $class,
-        ?string $finalize = null
-    )
-    {
-        $this->class = $class;
-        $this->finalize = $finalize;
-    }
-
-    public function getClass(): string
-    {
-        return $this->class;
-    }
-
-    public function getFinalize(): ?string
-    {
-        return $this->finalize;
+        public string $class,
+        public bool $override = true,
+        public array $order = [
+            self::ORDER_SERIALIZE,
+            self::ORDER_ATTRIBUTES,
+            self::ORDER_QUERY,
+            self::ORDER_REQUEST,
+        ],
+        public string $serializedFormat = 'json'
+    ) {
     }
 }

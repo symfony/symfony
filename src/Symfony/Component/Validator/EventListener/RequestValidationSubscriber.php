@@ -4,15 +4,19 @@ namespace Symfony\Component\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Attribute\RequestValidator;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RequestValidationSubscriber implements EventSubscriberInterface
 {
-    public function __construct(readonly ?SerializerInterface $serializer = null, readonly ValidatorInterface $validator)
-    {
+    public function __construct(
+        readonly ValidatorInterface $validator,
+        readonly ?SerializerInterface $serializer = null
+    ) {
     }
 
     public static function getSubscribedEvents()
@@ -30,7 +34,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
 
         $attributes = $reflectionMethod->getAttributes(RequestValidator::class, \ReflectionAttribute::IS_INSTANCEOF);
 
-        if(count($attributes) === 0) {
+        if (count($attributes) === 0) {
             return;
         }
 
@@ -38,22 +42,30 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         $attribute = $attributes[0];
 
         $class = $attribute->getArguments()['class'];
+        $override = $attribute->getArguments()['override'];
+        $serializedFormat = $attribute->getArguments()['serializedFormat'];
+        $order = $attribute->getArguments()['order'];
 
         $object = new $class();
 
-        // if serializer is installed serialize input body
-        if(null !== $this->serializer) {
-            $object = $this->serializer->deserialize($request->getContent(), $class, 'json');
-        }
+        foreach ($order as $type) {
+            switch ($type) {
+                case RequestValidator::ORDER_SERIALIZE:
+                    $serializer = $this->getSerializer();
+                    $serializer->deserialize($request->getContent(), $class, $serializedFormat,
+                        [AbstractNormalizer::OBJECT_TO_POPULATE => $object]);
+                    continue 2;
+                case RequestValidator::ORDER_REQUEST:
+                    $this->setProperties($object, $request->request, $override);
+                    break;
+                case RequestValidator::ORDER_QUERY:
+                    $this->setProperties($object, $request->query, $override);
+                    break;
+                case RequestValidator::ORDER_ATTRIBUTES:
+                    $this->setProperties($object, $request->attributes, $override);
+                    break;
+            }
 
-        // set input variables in object
-        foreach ($request->request as $key => $input) {
-            $object->{$key} = $input;
-        }
-
-        // set parameter variables in object
-        foreach ($request->attributes as $key => $parameter) {
-            $object->{$key} = $parameter;
         }
 
         $violations = $this->validator->validate($object);
@@ -72,6 +84,15 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         $event->setArguments($arguments);
     }
 
+    private function setProperties(object $object, \IteratorAggregate $bag, bool $override) {
+        foreach ($bag as $key => $value) {
+            if(false === $override && property_exists($object, $key)) {
+                continue;
+            }
+            $object->{$key} = $value;
+        }
+    }
+
     private function getReflectionMethod(callable $controller): \ReflectionMethod
     {
         if (is_array($controller)) {
@@ -84,5 +105,15 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         }
 
         return new \ReflectionMethod($class, $method);
+    }
+
+    private function getSerializer(): SerializerInterface
+    {
+        if (!class_exists(SerializerInterface::class)) {
+            throw new LogicException(sprintf('The "symfony/serializer" component is required to use the "%s" validator. Try running "composer require symfony/serializer".',
+                __CLASS__));
+        }
+
+        return $this->serializer;
     }
 }

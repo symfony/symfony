@@ -113,8 +113,8 @@ return static function (ContainerConfigurator $container) {
 
         ->set('validator.request_validator', RequestValidationSubscriber::class)
             ->args([
+                service('validator'),
                 service('serializer')->nullOnInvalid(),
-                service('validator')
             ])
             ->tag('kernel.event_subscriber')
     ;

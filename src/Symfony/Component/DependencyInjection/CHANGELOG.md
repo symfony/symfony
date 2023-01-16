@@ -17,6 +17,7 @@ CHANGELOG
  * Add `#[Exclude]` to skip autoregistering a class
  * Add support for autowiring services as closures using `#[AutowireCallable]` or `#[AutowireServiceClosure]`
  * Deprecate `#[MapDecorated]`, use `#[AutowireDecorated]` instead
+ * Deprecate the `@required` annotation, use the `Symfony\Contracts\Service\Attribute\Required` attribute instead
 
 6.2
 ---

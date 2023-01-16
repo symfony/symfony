@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
 use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
+use Symfony\Component\Validator\EventListener\RequestValidationSubscriber;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -109,5 +110,12 @@ return static function (ContainerConfigurator $container) {
                 service('property_info'),
             ])
             ->tag('validator.auto_mapper')
+
+        ->set('validator.request_validator', RequestValidationSubscriber::class)
+            ->args([
+                service('serializer')->nullOnInvalid(),
+                service('validator')
+            ])
+            ->tag('kernel.event_subscriber')
     ;
 };

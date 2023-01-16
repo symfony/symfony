@@ -24,7 +24,7 @@ abstract class AbstractNodeTest extends TestCase
         $this->assertSame($expected, $node->evaluate($functions, $variables));
     }
 
-    abstract public function getEvaluateData();
+    abstract public static function getEvaluateData();
 
     /**
      * @dataProvider getCompileData
@@ -36,7 +36,7 @@ abstract class AbstractNodeTest extends TestCase
         $this->assertSame($expected, $compiler->getSource());
     }
 
-    abstract public function getCompileData();
+    abstract public static function getCompileData();
 
     /**
      * @dataProvider getDumpData
@@ -46,5 +46,5 @@ abstract class AbstractNodeTest extends TestCase
         $this->assertSame($expected, $node->dump());
     }
 
-    abstract public function getDumpData();
+    abstract public static function getDumpData();
 }

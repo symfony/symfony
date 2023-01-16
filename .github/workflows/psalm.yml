@@ -19,12 +19,30 @@ jobs:
     name: Psalm
     runs-on: Ubuntu-20.04
 
+    env:
+      php-version: '8.1'
+      extensions: json,couchbase,memcached,mongodb,redis,xsl,ldap,dom
     steps:
+      - name: Setup cache environment
+        id: extcache
+        uses: shivammathur/cache-extensions@v1
+        with:
+          php-version: ${{ env.php-version }}
+          extensions: ${{ env.extensions }}
+          key: cache-v1 # can be any string, change to clear the extension cache.
+
+      - name: Cache extensions
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.extcache.outputs.dir }}
+          key: ${{ steps.extcache.outputs.key }}
+          restore-keys: ${{ steps.extcache.outputs.key }}
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
-          extensions: "json,couchbase,memcached,mongodb,redis,xsl,ldap,dom"
+          php-version: ${{ env.php-version }}
+          extensions: ${{ env.extensions }}
           ini-values: "memory_limit=-1"
           coverage: none
 

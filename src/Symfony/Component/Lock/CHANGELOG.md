@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Create migration for lock table when DoctrineDbalStore is used
+
 6.0
 ---
 

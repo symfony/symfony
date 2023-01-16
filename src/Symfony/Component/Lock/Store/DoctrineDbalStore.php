@@ -181,10 +181,18 @@ class DoctrineDbalStore implements PersistingStoreInterface
 
     /**
      * Adds the Table to the Schema if it doesn't exist.
+     *
+     * @param \Closure $isSameDatabase
      */
-    public function configureSchema(Schema $schema): void
+    public function configureSchema(Schema $schema/* , \Closure $isSameDatabase */): void
     {
         if ($schema->hasTable($this->table)) {
+            return;
+        }
+
+        $isSameDatabase = 1 < \func_num_args() ? func_get_arg(1) : static fn () => true;
+
+        if (!$isSameDatabase($this->conn->executeStatement(...))) {
             return;
         }
 

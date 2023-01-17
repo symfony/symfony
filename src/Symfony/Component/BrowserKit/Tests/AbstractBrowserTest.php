@@ -725,7 +725,9 @@ class AbstractBrowserTest extends TestCase
         $client->request('GET', 'http://www.example.com/foo/foobar');
         $client->restart();
 
-        $this->assertSame(['HTTP_USER_AGENT' => 'Symfony BrowserKit'], $client->getServerParameters(), '->restart() clears the server parameters');
+        $getServerParameters = \Closure::bind(fn () => $this->server, $client, $client);
+
+        $this->assertSame(['HTTP_USER_AGENT' => 'Symfony BrowserKit'], $getServerParameters(), '->restart() clears the server parameters');
         $this->assertTrue($client->getHistory()->isEmpty(), '->restart() clears the history');
         $this->assertSame([], $client->getCookieJar()->all(), '->restart() clears the cookies');
     }

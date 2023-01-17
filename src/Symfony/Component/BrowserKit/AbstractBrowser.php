@@ -154,14 +154,6 @@ abstract class AbstractBrowser
         return $this->server[$key] ?? $default;
     }
 
-    /**
-     * Gets server parameters.
-     */
-    public function getServerParameters(): array
-    {
-        return $this->server;
-    }
-
     public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
     {
         $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');

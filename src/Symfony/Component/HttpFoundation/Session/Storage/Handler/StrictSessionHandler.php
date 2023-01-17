@@ -47,22 +47,22 @@ class StrictSessionHandler extends AbstractSessionHandler
         return $this->handler->open($savePath, $sessionName);
     }
 
-    protected function doRead(string $sessionId): string
+    protected function doRead(#[\SensitiveParameter] string $sessionId): string
     {
         return $this->handler->read($sessionId);
     }
 
-    public function updateTimestamp(string $sessionId, string $data): bool
+    public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->write($sessionId, $data);
     }
 
-    protected function doWrite(string $sessionId, string $data): bool
+    protected function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->handler->write($sessionId, $data);
     }
 
-    public function destroy(string $sessionId): bool
+    public function destroy(#[\SensitiveParameter] string $sessionId): bool
     {
         $this->doDestroy = true;
         $destroyed = parent::destroy($sessionId);
@@ -70,7 +70,7 @@ class StrictSessionHandler extends AbstractSessionHandler
         return $this->doDestroy ? $this->doDestroy($sessionId) : $destroyed;
     }
 
-    protected function doDestroy(string $sessionId): bool
+    protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool
     {
         $this->doDestroy = false;
 

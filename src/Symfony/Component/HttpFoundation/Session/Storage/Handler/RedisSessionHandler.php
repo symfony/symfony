@@ -50,12 +50,12 @@ class RedisSessionHandler extends AbstractSessionHandler
         $this->ttl = $options['ttl'] ?? null;
     }
 
-    protected function doRead(string $sessionId): string
+    protected function doRead(#[\SensitiveParameter] string $sessionId): string
     {
         return $this->redis->get($this->prefix.$sessionId) ?: '';
     }
 
-    protected function doWrite(string $sessionId, string $data): bool
+    protected function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         $ttl = ($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? \ini_get('session.gc_maxlifetime');
         $result = $this->redis->setEx($this->prefix.$sessionId, (int) $ttl, $data);
@@ -63,7 +63,7 @@ class RedisSessionHandler extends AbstractSessionHandler
         return $result && !$result instanceof ErrorInterface;
     }
 
-    protected function doDestroy(string $sessionId): bool
+    protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool
     {
         static $unlink = true;
 
@@ -93,7 +93,7 @@ class RedisSessionHandler extends AbstractSessionHandler
         return 0;
     }
 
-    public function updateTimestamp(string $sessionId, string $data): bool
+    public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         $ttl = ($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? \ini_get('session.gc_maxlifetime');
 

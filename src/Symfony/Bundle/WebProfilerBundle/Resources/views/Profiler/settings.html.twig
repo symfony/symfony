@@ -41,7 +41,9 @@
 }
 
 .modal-wrap {
-    -webkit-transition: all 0.3s ease-in-out;
+    -webkit-transition-duration: 0.3s;
+    -webkit-transition-property: opacity, visibility;
+    -webkit-transition-timing-function: ease-in-out;
     align-items: center;
     background: rgba(0, 0, 0, 0.70);
     display: flex;
@@ -49,11 +51,13 @@
     height: 100%;
     justify-content: center;
     left: 0;
-    opacity: 1;
+    opacity: 0;
     overflow: auto;
     position: fixed;
     top: 0;
-    transition: all 0.3s ease-in-out;
+    transition-duration: 0.3s;
+    transition-property: opacity, visibility;
+    transition-timing-function: ease-in-out;
     visibility: hidden;
     width: 100%;
     z-index: 100000;
@@ -195,7 +199,7 @@
     <div class="modal-container">
         <div class="modal-header">
             <h3>Configuration Settings</h3>
-            <button class="close-modal">&times;</button>
+            <button aria-label="Close" class="close-modal">&times;</button>
         </div>
 
         <div class="modal-content">
@@ -282,22 +286,30 @@
     const openModalButton = document.getElementById('open-settings');
     const modalWindow = document.getElementById('profiler-settings');
     const closeModalButton = document.getElementsByClassName('close-modal')[0];
-    const modalWrapper = document.getElementsByClassName('modal-wrap')[0]
+    const modalWrapper = document.getElementsByClassName('modal-wrap')[0];
+    const closeModal = () => {
+        modalWindow.classList.remove('visible');
+        setTimeout(() => openModalButton.focus(), 30);
+    };
 
     openModalButton.addEventListener('click', function(event) {
         document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/theme') || 'theme-auto')).checked = 'checked';
         document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/width') || 'width-normal')).checked = 'checked';
 
         modalWindow.classList.toggle('visible');
+        setTimeout(() => closeModalButton.focus(), 30);
         event.preventDefault();
     });
 
-    closeModalButton.addEventListener('click', function() {
-        modalWindow.classList.remove('visible');
-    });
+    closeModalButton.addEventListener('click', closeModal);
     modalWrapper.addEventListener('click', function(event) {
         if (event.target == event.currentTarget) {
-            modalWindow.classList.remove('visible');
+            closeModal();
+        }
+    });
+    modalWrapper.addEventListener('keydown', function(event) {
+        if (event.key === 'Esc' || event.key === 'Escape') {
+            closeModal();
         }
     });
 })();

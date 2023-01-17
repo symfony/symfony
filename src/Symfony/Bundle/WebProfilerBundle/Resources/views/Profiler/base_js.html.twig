@@ -910,12 +910,49 @@ if (typeof Sfjs === 'undefined' || typeof Sfjs.loadToolbar === 'undefined') {
                 document.querySelector('#log-filter-priority .filter-active-num').innerText = (priorities.length === selectedPriorities.length) ? 'All' : selectedPriorities.length;
                 document.querySelector('#log-filter-channel .filter-active-num').innerText = (channels.length === selectedChannels.length) ? 'All' : selectedChannels.length;
             },
+
+            convertDateTimesToUserTimezone: function() {
+                const userTimezoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+                document.querySelectorAll('time[data-convert-to-user-timezone]').forEach((timeElement) => {
+                    const iso8601Datetime = timeElement.getAttribute('datetime');
+                    const dateInUserTimezone = new Date(iso8601Datetime);
+
+                    let options = {};
+                    if (timeElement.hasAttribute('data-render-as-datetime')) {
+                        options = {
+                            year: 'numeric', month: 'long', day: 'numeric',
+                            hour: 'numeric', minute: 'numeric', second: 'numeric'
+                        };
+                    } else if (timeElement.hasAttribute('data-render-as-date')) {
+                        options = { year: 'numeric', month: 'long', day: 'numeric' };
+                    } else if (timeElement.hasAttribute('data-render-as-time')) {
+                        options = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+                    }
+
+                    if (timeElement.hasAttribute('data-render-with-millisecond-precision')) {
+                        options.fractionalSecondDigits = 3;
+                    }
+
+                    /* dates/times are always rendered in English to match the rest of the Profiler interface */
+                    timeElement.textContent = dateInUserTimezone.toLocaleString('en', options);
+
+                    if (undefined !== userTimezoneName) {
+                        const existingTitle = timeElement.getAttribute('title');
+                        const newTitle = null === existingTitle
+                            ? `Date/times shown in your timezone: ${userTimezoneName}`
+                            : existingTitle + ` (date/times shown in your timezone: ${userTimezoneName})`;
+                        timeElement.setAttribute('title', newTitle);
+                    }
+                });
+            },
         };
     })();
 
     Sfjs.addEventListener(document, 'DOMContentLoaded', function() {
         Sfjs.createTabs();
         Sfjs.createToggles();
+        Sfjs.convertDateTimesToUserTimezone();
     });
 }
 /*]]>*/</script>

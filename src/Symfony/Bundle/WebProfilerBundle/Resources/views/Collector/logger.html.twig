@@ -138,7 +138,7 @@
                     %}
                     <tr class="log-status-{{ css_class }}" data-type="{{ log.type }}" data-priority="{{ log.priority }}" data-channel="{{ log.channel }}" style="{{ 'event' == log.channel or 'DEBUG' == log.priorityName ? 'display: none' }}">
                         <td class="log-timestamp">
-                            <time title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date('c') }}">
+                            <time class="newline" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date(constant('\DateTime::RFC3339_EXTENDED')) }}" data-convert-to-user-timezone data-render-as-time data-render-with-millisecond-precision>
                                 {{ log.timestamp|date('H:i:s.v') }}
                             </time>
 

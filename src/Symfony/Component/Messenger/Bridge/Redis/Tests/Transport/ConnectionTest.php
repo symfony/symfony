@@ -157,6 +157,14 @@ class ConnectionTest extends TestCase
             ->with('symfony', 'consumer', ['queue' => 0], 1, null)
             ->willReturn(['queue' => [['message' => json_encode(['body' => 'Test', 'headers' => []])]]]);
 
+        $redis->expects($this->exactly(3))->method('xpending')->willReturn(
+            [[
+                0 => 'redisid-123', // message-id
+                1 => 'consumer', // consumer-name
+                2 => 0, // idle
+            ]]
+        );
+
         $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
         $this->assertNotNull($connection->get());
         $this->assertNotNull($connection->get());
@@ -253,6 +261,14 @@ class ConnectionTest extends TestCase
             ->with('symfony', 'consumer', ['queue' => '0'], 1, null)
             ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
 
+        $redis->expects($this->once())->method('xpending')->willReturn(
+            [[
+                0 => 'redisid-123', // message-id
+                1 => 'consumer', // consumer-name
+                2 => 0, // idle
+            ]]
+        );
+
         $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
         $message = $connection->get();
 
@@ -271,33 +287,78 @@ class ConnectionTest extends TestCase
     {
         $redis = $this->createMock(\Redis::class);
 
-        $redis->expects($this->exactly(3))->method('xreadgroup')
-            ->willReturnCallback(function (...$args) {
-                static $series = [
-                    // first call for pending messages
-                    [['symfony', 'consumer', ['queue' => '0'], 1, null], []],
-                    // second call because of claimed message (redisid-123)
-                    [['symfony', 'consumer', ['queue' => '0'], 1, null], []],
-                    // third call because of no result (other consumer claimed message redisid-123)
-                    [['symfony', 'consumer', ['queue' => '>'], 1, null], []],
-                ];
+        // xpending -> xclaim -> xpending -> xreadgroup
+        $redis->expects($this->once())->method('xreadgroup')
+            ->with('symfony', 'consumer', ['queue' => '>'], 1, null) // weren't able to claim the message, asking for new ones
+            ->willReturn([]);
 
-                [$expectedArgs, $return] = array_shift($series);
-                $this->assertSame($expectedArgs, $args);
-
-                return $return;
-            })
-        ;
-
-        $redis->expects($this->once())->method('xpending')->willReturn([[
-            0 => 'redisid-123', // message-id
-            1 => 'consumer-2', // consumer-name
-            2 => 3600001, // idle
-        ]]);
+        $redis->expects($this->exactly(2))->method('xpending')->willReturnOnConsecutiveCalls(
+            [[
+                0 => 'redisid-123', // message-id
+                1 => 'consumer-2', // consumer-name
+                2 => 3600001, // idle
+            ]],
+            []
+        );
 
         $redis->expects($this->exactly(1))->method('xclaim')
             ->with('queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID'])
+            ->willReturn([]);   // other consumer claimed the message first
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
+        $connection->get();
+    }
+
+    public function testClaimAbandonedMessageWithRaceConditionExtremeContention()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        // (xpending -> xclaim) x 3 -> xreadgroup
+        $redis->expects($this->once())->method('xreadgroup')
+            ->with('symfony', 'consumer', ['queue' => '>'], 1, null) // weren't able to claim a message, asking for new ones
             ->willReturn([]);
+
+        $redis->expects($this->exactly(3))->method('xpending')->willReturnOnConsecutiveCalls(
+            [[
+                0 => 'redisid-123', // message-id
+                1 => 'consumer-2', // consumer-name
+                2 => 3600001, // idle
+            ]],
+            [[
+                0 => 'redisid-234', // message-id
+                1 => 'consumer-2', // consumer-name
+                2 => 3600001, // idle
+            ]],
+            [[
+                0 => 'redisid-345', // message-id
+                1 => 'consumer-2', // consumer-name
+                2 => 3600001, // idle
+            ]]
+        );
+
+        $redis->expects($this->exactly(3))->method('xclaim')
+            ->withConsecutive(
+                ['queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID']], // claim and get message redisid-123
+                ['queue', 'symfony', 'consumer', 3600000, ['redisid-234'], ['JUSTID']],  // claim and get message redisid-234
+                ['queue', 'symfony', 'consumer', 3600000, ['redisid-345'], ['JUSTID']]  // claim and get message redisid-345
+            )
+            ->willReturn([]);   // other consumers claimed all messages first
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
+        $connection->get();
+    }
+
+    public function testExitClaimMode()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        // xpending -> xreadgroup
+        $redis->expects($this->once())->method('xreadgroup')
+            ->with('symfony', 'consumer', ['queue' => '>'], 1, null) // no pending messages, asking for new ones straightaway
+            ->willReturn([]);
+
+        $redis->expects($this->once())->method('xpending')->willReturn([]);
+        $redis->expects($this->never())->method('xclaim');
 
         $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
         $connection->get();
@@ -307,21 +368,9 @@ class ConnectionTest extends TestCase
     {
         $redis = $this->createMock(\Redis::class);
 
-        $redis->expects($this->exactly(2))->method('xreadgroup')
-            ->willReturnCallback(function (...$args) {
-                static $series = [
-                    // first call for pending messages
-                    [['symfony', 'consumer', ['queue' => '0'], 1, null], []],
-                    // second call because of claimed message (redisid-123)
-                    [['symfony', 'consumer', ['queue' => '0'], 1, null], ['queue' => [['message' => '{"body":"1","headers":[]}']]]],
-                ];
-
-                [$expectedArgs, $return] = array_shift($series);
-                $this->assertSame($expectedArgs, $args);
-
-                return $return;
-            })
-        ;
+        $redis->expects($this->once())->method('xreadgroup')
+            ->with('symfony', 'consumer', ['queue' => '0'], 1, null) // claim and get the message (redisid-123)
+            ->willReturn(['queue' => [['message' => '{"body":"1","headers":[]}']]]);
 
         $redis->expects($this->once())->method('xpending')->willReturn([[
             0 => 'redisid-123', // message-id
@@ -331,9 +380,49 @@ class ConnectionTest extends TestCase
 
         $redis->expects($this->exactly(1))->method('xclaim')
             ->with('queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID'])
-            ->willReturn([]);
+            ->willReturn(['something']);
 
         $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
+        $connection->get();
+    }
+
+    public function testClaimTwoAbandonedMessagesInSequence()
+    {
+        $redis = $this->createMock(\Redis::class);
+
+        // twice: xpending -> xclaim -> xreadgroup
+        $redis->expects($this->exactly(2))->method('xreadgroup')
+            ->withConsecutive(
+                ['symfony', 'consumer', ['queue' => '0'], 1, null], // claim and get message redisid-123
+                ['symfony', 'consumer', ['queue' => '0'], 1, null]  // claim and get message redisid-234
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['queue' => [['message' => '{"body":"1","headers":[]}']]],
+                ['queue' => [['message' => '{"body":"2","headers":[]}']]]
+            );
+
+        $redis->expects($this->exactly(2))->method('xpending')->willReturnOnConsecutiveCalls(
+            [[
+                0 => 'redisid-123', // message-id
+                1 => 'consumer-2', // consumer-name
+                2 => 3600001, // idle
+            ]],
+            [[
+                0 => 'redisid-234', // message-id
+                1 => 'consumer-2', // consumer-name
+                2 => 3600001, // idle
+            ]]
+        );
+
+        $redis->expects($this->exactly(2))->method('xclaim')
+            ->withConsecutive(
+                ['queue', 'symfony', 'consumer', 3600000, ['redisid-123'], ['JUSTID']],
+                ['queue', 'symfony', 'consumer', 3600000, ['redisid-234'], ['JUSTID']]
+            )
+            ->willReturn(['something']);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['delete_after_ack' => true], $redis);
+        $connection->get();
         $connection->get();
     }
 
@@ -342,6 +431,7 @@ class ConnectionTest extends TestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Redis error happens');
         $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->once())->method('xpending')->willReturn([]);
         $redis->expects($this->once())->method('xreadgroup')->willReturn(false);
         $redis->expects($this->once())->method('getLastError')->willReturn('Redis error happens');
 

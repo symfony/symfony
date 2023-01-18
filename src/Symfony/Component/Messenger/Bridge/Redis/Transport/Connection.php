@@ -57,7 +57,6 @@ class Connection
     private $claimInterval;
     private $deleteAfterAck;
     private $deleteAfterReject;
-    private $couldHavePendingMessages = true;
 
     /**
      * @param \Redis|\RedisCluster|null $redis
@@ -295,8 +294,9 @@ class Connection
         }
     }
 
-    private function claimOldPendingMessages()
+    private function claimOldPendingMessages(int $try = 1): bool
     {
+        $couldHavePendingMessages = false;
         try {
             // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or
             // https://github.com/antirez/redis/issues/6256
@@ -308,19 +308,15 @@ class Connection
         $claimableIds = [];
         foreach ($pendingMessages as $pendingMessage) {
             if ($pendingMessage[1] === $this->consumer) {
-                $this->couldHavePendingMessages = true;
-
-                return;
-            }
-
-            if ($pendingMessage[2] >= $this->redeliverTimeout) {
+                $couldHavePendingMessages = true;
+            } elseif ($pendingMessage[2] >= $this->redeliverTimeout) {
                 $claimableIds[] = $pendingMessage[0];
             }
         }
 
-        if (\count($claimableIds) > 0) {
+        if ($claimableIds) {
             try {
-                $this->connection->xclaim(
+                $claimResult = $this->connection->xclaim(
                     $this->stream,
                     $this->group,
                     $this->consumer,
@@ -329,13 +325,13 @@ class Connection
                     ['JUSTID']
                 );
 
-                $this->couldHavePendingMessages = true;
+                $couldHavePendingMessages = $couldHavePendingMessages || $claimResult || $try < 3 && $this->claimOldPendingMessages(++$try);
             } catch (\RedisException $e) {
                 throw new TransportException($e->getMessage(), 0, $e);
             }
         }
 
-        $this->nextClaim = microtime(true) + $this->claimInterval;
+        return $couldHavePendingMessages;
     }
 
     public function get(): ?array
@@ -370,13 +366,13 @@ class Connection
             $this->add(\array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage, $decodedQueuedMessage['headers'] ?? [], 0);
         }
 
-        if (!$this->couldHavePendingMessages && $this->nextClaim <= microtime(true)) {
-            $this->claimOldPendingMessages();
+        if (!$couldHavePendingMessages = $this->nextClaim <= microtime(true) && $this->claimOldPendingMessages()) {
+            $this->nextClaim = microtime(true) + $this->claimInterval;
         }
 
         $messageId = '>'; // will receive new messages
 
-        if ($this->couldHavePendingMessages) {
+        if ($couldHavePendingMessages) {
             $messageId = '0'; // will receive consumers pending messages
         }
 
@@ -397,13 +393,6 @@ class Connection
             }
 
             throw new TransportException($error ?? 'Could not read messages from the redis stream.');
-        }
-
-        if ($this->couldHavePendingMessages && empty($messages[$this->stream])) {
-            $this->couldHavePendingMessages = false;
-
-            // No pending messages so get a new one
-            return $this->get();
         }
 
         foreach ($messages[$this->stream] ?? [] as $key => $message) {

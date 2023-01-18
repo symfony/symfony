@@ -384,7 +384,7 @@ class DebugClassLoader
 
         // Detect annotations on the class
         if ($doc = $this->parsePhpDoc($refl)) {
-            $classIsTemplate = isset($doc['template']);
+            $classIsTemplate = isset($doc['template']) || isset($doc['template-covariant']);
 
             foreach (['final', 'deprecated', 'internal'] as $annotation) {
                 if (null !== $description = $doc[$annotation][0] ?? null) {
@@ -531,7 +531,7 @@ class DebugClassLoader
             // To read method annotations
             $doc = $this->parsePhpDoc($method);
 
-            if (($classIsTemplate || isset($doc['template'])) && $method->hasReturnType()) {
+            if (($classIsTemplate || isset($doc['template']) || isset($doc['template-covariant'])) && $method->hasReturnType()) {
                 unset($doc['return']);
             }
 

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by alli83 at 2023-01-16T22:49:42Z
+
+I'm going to add a tag on the store definitions in order to inject them in the lockStoreSchemasubscriber
+
+---------------------------------------------------------------------------
+
+by alli83 at 2023-01-18T18:06:57Z
+
+> I have a doubt about the interest of this on `PdoStore`. To use the schema, they will have to install `doctrine/dbal` and instantiate a DBAL connection or use a DSN different from what is expected by PDO. What would be the point of not using `DoctrineDBALStore`?
+
+Please correct me if I'm wrong, If I understand you correctly, it's that by logic if one installed doctrine/dbal, he would have chosen DoctrineDbalStore ?
+
+I'm wondering if there is a possibility to get to that case, shouldn't we cover this case ? I mean if one doesn't want to install doctrine bundle then it will be ignored.
+
+Thanks you for your feedback !
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2023-01-18T18:47:19Z
+
+That's it. Basically if the project uses `DoctrineBundle` they will mostly use the `DoctrineDbalStore` to reuse the same configuration DSN and additional features. On the other hand, the project would use `PdoStore` when they don't include the Doctrine dependencies.
+
+The Cache `PdoAdapter` has [`createTable`](https://github.com/symfony/symfony/blob/v6.2.4/src/Symfony/Component/Cache/Adapter/PdoAdapter.php#L101) but no `configureSchema` which is in `DoctrineDbalAdapter`.
+
+For Sessions, there is a single `PdoSessionHandler` that accepts both DBAL and PDO DSN, that's why it has both `createTable` and `configureSchema`.
+
+I may be wrong, but I don't find the `PdoStore::configureSchema` useful.
+
+---------------------------------------------------------------------------
+
+by alli83 at 2023-01-19T16:45:24Z
+
+> I may be wrong, but I don't find the `PdoStore::configureSchema` useful.
+
+I get your point. Not useful in the sense of not logical to get to that case. So I will update my PR.

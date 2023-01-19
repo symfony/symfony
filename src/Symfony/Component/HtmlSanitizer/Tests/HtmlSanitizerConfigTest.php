@@ -292,4 +292,21 @@ class HtmlSanitizerConfigTest extends TestCase
         $config = $config->withoutAttributeSanitizer($sanitizer);
         $this->assertNotContains($sanitizer, $config->getAttributeSanitizers());
     }
+
+    public function testDefaultAllowedLinkSchemes()
+    {
+        $config = new HtmlSanitizerConfig();
+
+        $this->assertSame(['http', 'https', 'mailto', 'tel'], $config->getAllowedLinkSchemes());
+    }
+
+    public function testAllowAnyLinkScheme()
+    {
+        $config = new HtmlSanitizerConfig();
+        $anySchemeAllowedConfig = $config->allowAnyLinkScheme();
+
+        $this->assertNotSame($config, $anySchemeAllowedConfig);
+        $this->assertSame(['http', 'https', 'mailto', 'tel'], $config->getAllowedLinkSchemes());
+        $this->assertNull($anySchemeAllowedConfig->getAllowedLinkSchemes());
+    }
 }

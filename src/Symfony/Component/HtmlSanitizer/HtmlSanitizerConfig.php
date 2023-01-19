@@ -45,9 +45,9 @@ class HtmlSanitizerConfig
     /**
      * Links schemes that should be retained, other being dropped.
      *
-     * @var list<string>
+     * @var list<string>|null
      */
-    private array $allowedLinkSchemes = ['http', 'https', 'mailto', 'tel'];
+    private ?array $allowedLinkSchemes = ['http', 'https', 'mailto', 'tel'];
 
     /**
      * Links hosts that should be retained (by default, all hosts are allowed).
@@ -164,6 +164,17 @@ class HtmlSanitizerConfig
     {
         $clone = clone $this;
         $clone->allowedLinkSchemes = $allowLinkSchemes;
+
+        return $clone;
+    }
+
+    /**
+     * Allows arbitrary schemes to be used in links href attributes.
+     */
+    public function allowAnyLinkScheme(): static
+    {
+        $clone = clone $this;
+        $clone->allowedLinkSchemes = null;
 
         return $clone;
     }
@@ -445,9 +456,9 @@ class HtmlSanitizerConfig
     }
 
     /**
-     * @return list<string>
+     * @return list<string>|null
      */
-    public function getAllowedLinkSchemes(): array
+    public function getAllowedLinkSchemes(): ?array
     {
         return $this->allowedLinkSchemes;
     }

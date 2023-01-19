@@ -293,6 +293,24 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
+    public function testAllowAnyLinkScheme()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('a', ['href'])
+            ->allowAnyLinkScheme()
+        ;
+
+        $this->assertSame(
+            '<a href="https://trusted.com">Hello world</a>',
+            $this->sanitize($config, '<a href="https://trusted.com">Hello world</a>')
+        );
+
+        $this->assertSame(
+            '<a href="mailto:galopintitouan&#64;gmail.com">Hello world</a>',
+            $this->sanitize($config, '<a href="mailto:galopintitouan@gmail.com">Hello world</a>')
+        );
+    }
+
     public function testAllowLinksHosts()
     {
         $config = (new HtmlSanitizerConfig())

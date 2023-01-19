@@ -2811,6 +2811,8 @@ class FrameworkExtension extends Extension
             $def->addMethodCall('forceHttpsUrls', [$sanitizerConfig['force_https_urls']], true);
             if ($sanitizerConfig['allowed_link_schemes']) {
                 $def->addMethodCall('allowLinkSchemes', [$sanitizerConfig['allowed_link_schemes']], true);
+            } elseif (null === $sanitizerConfig['allowed_link_schemes']) {
+                $def->addMethodCall('allowAnyLinkScheme', [], true);
             }
             $def->addMethodCall('allowLinkHosts', [$sanitizerConfig['allowed_link_hosts']], true);
             $def->addMethodCall('allowRelativeLinks', [$sanitizerConfig['allow_relative_links']], true);

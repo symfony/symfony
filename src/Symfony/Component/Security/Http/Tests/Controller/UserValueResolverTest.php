@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\Controller\UserValueResolver;
 class UserValueResolverTest extends TestCase
 {
     /**
-     * In Symfony 7, keep this test case but remove the call to supports()
+     * In Symfony 7, keep this test case but remove the call to supports().
      *
      * @group legacy
      */
@@ -43,7 +43,7 @@ class UserValueResolverTest extends TestCase
     }
 
     /**
-     * In Symfony 7, keep this test case but remove the call to supports()
+     * In Symfony 7, keep this test case but remove the call to supports().
      *
      * @group legacy
      */
@@ -51,10 +51,10 @@ class UserValueResolverTest extends TestCase
     {
         $tokenStorage = new TokenStorage();
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, true, new InMemoryUser('username', 'password'));
+        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, true, $default = new InMemoryUser('username', 'password'));
 
-        $this->assertSame([], $resolver->resolve(Request::create('/'), $metadata));
-        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+        $this->assertSame([$default], $resolver->resolve(Request::create('/'), $metadata));
+        $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
     }
 
     public function testResolveSucceedsWithUserInterface()

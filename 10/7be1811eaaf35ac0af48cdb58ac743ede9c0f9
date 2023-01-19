@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-17T21:50:04Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mfb at 2023-01-18T06:38:51Z
+
+The suggested code style fix at https://fabbot.io/patch/symfony/symfony/49016/32c9f28bebe3573431644838db625ef941f5405b/cs.diff looks wrong - I don't think I should remove a blank line just because I added an attribute to the function arguments.  I _could_ not add it in those places, given this is just an abstract class, but seemed helpful for developers to have it there too.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-18T09:18:07Z
+
+Those blank line removals indeed look like a bug in php-cs-fixer (maybe a fixer is not handling attributes on parameters properly)

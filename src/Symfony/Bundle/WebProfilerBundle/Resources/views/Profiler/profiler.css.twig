@@ -673,8 +673,7 @@ table tbody td.num-col {
 .empty p {
     font-size: var(--font-size-body);
     max-width: 60ch;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 1em auto;
     text-align: center;
 }
 .empty.empty-panel {
@@ -2086,6 +2085,26 @@ tr.log-status-silenced > td:first-child:before {
 .mailer-message-attachments-list li a {
     margin-left: 5px;
 }
+.mailer-email-body {
+    margin: 0;
+    padding: 6px 8px;
+}
+.mailer-empty-email-body {
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23e5e5e5' stroke-width='4' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+    border-radius: 6px;
+    color: var(--color-muted);
+    margin: 1em 0 0;
+    padding: .5em 1em;
+}
+.theme-dark .mailer-empty-email-body {
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23737373' stroke-width='4' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+}
+.mailer-empty-email-body p {
+    font-size: var(--font-size-body);
+    margin: 0;
+    padding: 0.5em 0;
+}
+
 .mailer-message-download-raw {
     align-items: center;
     display: flex;

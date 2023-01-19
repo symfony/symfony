@@ -177,56 +177,59 @@
                             </div>
                         {% endif %}
 
-                        {% if message.htmlBody or message.textBody %}
-                            <div class="card-block">
-                                <div class="sf-tabs sf-tabs-sm">
-                                    {% if message.htmlBody %}
-                                        {% set htmlBody = message.htmlBody() %}
-                                        <div class="tab">
-                                            <h3 class="tab-title">HTML content</h3>
-                                            <div class="tab-content">
-                                                <pre class="prewrap" style="max-height: 600px">
-                                                    {%- if message.htmlCharset() %}
-                                                        {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
-                                                    {%- else %}
-                                                        {{- htmlBody }}
-                                                    {%- endif -%}
-                                                </pre>
+                        <div class="card-block">
+                            {% set textBody = message.textBody %}
+                            {% set htmlBody = message.htmlBody %}
+                            <div class="sf-tabs sf-tabs-sm">
+                                <div class="tab {{ not textBody ? 'disabled' }} {{ textBody ? 'active' }}">
+                                    <h3 class="tab-title">Text content</h3>
+                                    <div class="tab-content">
+                                        {% if textBody %}
+                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                                {%- if message.textCharset() %}
+                                                    {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
+                                                {%- else %}
+                                                    {{- textBody }}
+                                                {%- endif -%}
+                                            </pre>
+                                        {% else %}
+                                            <div class="mailer-empty-email-body">
+                                                <p>The text body is empty.</p>
                                             </div>
-                                        </div>
-
-                                        <div class="tab">
-                                            <h3 class="tab-title">HTML preview</h3>
-                                            <div class="tab-content">
-                                                <pre class="prewrap" style="max-height: 600px">
-                                                    <iframe
-                                                        src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}"
-                                                        style="height: 80vh;width: 100%;"
-                                                    >
-                                                    </iframe>
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-
-                                    {% if message.textBody %}
-                                        {% set textBody = message.textBody() %}
-                                        <div class="tab">
-                                            <h3 class="tab-title">Text content</h3>
-                                            <div class="tab-content">
-                                                <pre class="prewrap" style="max-height: 600px">
-                                                    {%- if message.textCharset() %}
-                                                        {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
-                                                    {%- else %}
-                                                        {{- textBody }}
-                                                    {%- endif -%}
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
+
+                                <div class="tab {{ not htmlBody ? 'disabled' }} {{ not textBody and htmlBody ? 'active' }}">
+                                    <h3 class="tab-title">HTML content</h3>
+                                    <div class="tab-content">
+                                        {% if htmlBody %}
+                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                                {%- if message.htmlCharset() %}
+                                                    {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
+                                                {%- else %}
+                                                    {{- htmlBody }}
+                                                {%- endif -%}
+                                            </pre>
+                                        {% else %}
+                                            <div class="mailer-empty-email-body">
+                                                <p>The HTML body is empty.</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                {% if htmlBody %}
+                                    <div class="tab">
+                                        <h3 class="tab-title">HTML preview</h3>
+                                        <div class="tab-content">
+                                            <pre class="prewrap" style="max-height: 600px"><iframe src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}" style="height: 80vh;width: 100%;"></iframe>
+                                            </pre>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
 

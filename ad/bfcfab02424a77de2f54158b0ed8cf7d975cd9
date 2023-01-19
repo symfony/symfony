@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by tarlepp at 2023-01-17T16:17:39Z
+
+> **A question remains**: should we display date/times in the user timezone AND locale; or on their timezone BUT always in English, like the rest of the interface?
+
+What about making those as choice that user could change from profiler configuration? With that each user could choose how they want to show those.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-01-17T16:19:08Z
+
+I'd prefer to not introduce a config option for that. I don't think it's important enough to require a customizable setting.
+
+The entire interface is (and will remain) in English ... so maybe it's better to just use English for this too?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-01-17T16:19:30Z
+
+I would not make this configurable. Local time always in English sounds good enough to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T17:08:39Z
+
+I also vote for keeping it in English like other parts of the interface
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-01-18T08:45:24Z
+
+I've updated this PR:
+
+* Dates/times now displayed always in English
+* The existing `title` attribute of `<time>` is no longer removed
+* The logger panel timestamps have millisecond precision again

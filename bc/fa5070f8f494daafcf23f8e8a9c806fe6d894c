@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2023-01-12T08:56:57Z
+
+>but it causes an issue with non-scalar values that get coerced to the same string
+
+Why no using `array_unique(..., \SORT_REGULAR)` instead?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2023-01-12T09:04:22Z
+
+`array_unique([true, false, null, ''], \SORT_REGULAR)` still outputs `[true, false]`

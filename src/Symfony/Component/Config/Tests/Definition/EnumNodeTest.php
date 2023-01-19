@@ -71,4 +71,20 @@ class EnumNodeTest extends TestCase
         $this->expectExceptionMessage('The value "foo" is not allowed for path "cookie_samesite". Permissible values: "lax", "strict", "none"');
         $node->finalize('custom');
     }
+
+    public function testSameStringCoercedValuesAreDifferent()
+    {
+        $node = new EnumNode('ccc', null, ['', false, null]);
+        $this->assertSame('', $node->finalize(''));
+        $this->assertFalse($node->finalize(false));
+        $this->assertNull($node->finalize(null));
+    }
+
+    public function testNonScalarOrNullValueThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"Symfony\Component\Config\Definition\EnumNode" only supports scalar or null values, "stdClass" given.');
+
+        new EnumNode('ccc', null, [new \stdClass()]);
+    }
 }

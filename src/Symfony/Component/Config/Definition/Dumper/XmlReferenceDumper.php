@@ -107,7 +107,7 @@ class XmlReferenceDumper
                             FloatNode::class,
                             IntegerNode::class => 'numeric value',
                             BooleanNode::class => 'true|false',
-                            EnumNode::class => implode('|', array_map('json_encode', $prototype->getValues())),
+                            EnumNode::class => implode('|', array_unique(array_map('json_encode', $prototype->getValues()))),
                             default => 'value',
                         };
                     }
@@ -149,7 +149,7 @@ class XmlReferenceDumper
                 }
 
                 if ($child instanceof EnumNode) {
-                    $comments[] = 'One of '.implode('; ', array_map('json_encode', $child->getValues()));
+                    $comments[] = 'One of '.implode('; ', array_unique(array_map('json_encode', $child->getValues())));
                 }
 
                 if (\count($comments)) {

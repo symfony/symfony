@@ -24,9 +24,14 @@ class EnumNode extends ScalarNode
 
     public function __construct(?string $name, NodeInterface $parent = null, array $values = [], string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
     {
-        $values = array_unique($values);
         if (!$values) {
             throw new \InvalidArgumentException('$values must contain at least one element.');
+        }
+
+        foreach ($values as $value) {
+            if (null !== $value && !\is_scalar($value)) {
+                throw new \InvalidArgumentException(sprintf('"%s" only supports scalar or null values, "%s" given.', __CLASS__, get_debug_type($value)));
+            }
         }
 
         parent::__construct($name, $parent, $pathSeparator);

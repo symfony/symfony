@@ -49,8 +49,12 @@
                             {{ _self.profile_search_filter(request, result, 'url') }}
                         </td>
                         <td class="text-small">
-                            <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>
-                            <span class="nowrap newline">{{ result.time|date('H:i:s') }}</span>
+                            <time data-convert-to-user-timezone data-render-as-date datetime="{{ result.time|date('c') }}">
+                                {{ result.time|date('d-M-Y') }}
+                            </time>
+                            <time class="newline" data-convert-to-user-timezone data-render-as-time datetime="{{ result.time|date('c') }}">
+                                {{ result.time|date('H:i:s') }}
+                            </time>
                         </td>
                         <td class="nowrap"><a href="{{ path('_profiler', { token: result.token }) }}">{{ result.token }}</a></td>
                     </tr>

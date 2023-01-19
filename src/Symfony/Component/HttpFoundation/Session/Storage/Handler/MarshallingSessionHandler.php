@@ -37,7 +37,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
         return $this->handler->close();
     }
 
-    public function destroy(string $sessionId): bool
+    public function destroy(#[\SensitiveParameter] string $sessionId): bool
     {
         return $this->handler->destroy($sessionId);
     }
@@ -47,12 +47,12 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
         return $this->handler->gc($maxlifetime);
     }
 
-    public function read(string $sessionId): string
+    public function read(#[\SensitiveParameter] string $sessionId): string
     {
         return $this->marshaller->unmarshall($this->handler->read($sessionId));
     }
 
-    public function write(string $sessionId, string $data): bool
+    public function write(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         $failed = [];
         $marshalledData = $this->marshaller->marshall(['data' => $data], $failed);
@@ -64,12 +64,12 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
         return $this->handler->write($sessionId, $marshalledData['data']);
     }
 
-    public function validateId(string $sessionId): bool
+    public function validateId(#[\SensitiveParameter] string $sessionId): bool
     {
         return $this->handler->validateId($sessionId);
     }
 
-    public function updateTimestamp(string $sessionId, string $data): bool
+    public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->handler->updateTimestamp($sessionId, $data);
     }

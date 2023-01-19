@@ -285,7 +285,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return parent::open($savePath, $sessionName);
     }
 
-    public function read(string $sessionId): string
+    public function read(#[\SensitiveParameter] string $sessionId): string
     {
         try {
             return parent::read($sessionId);
@@ -305,7 +305,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return 0;
     }
 
-    protected function doDestroy(string $sessionId): bool
+    protected function doDestroy(#[\SensitiveParameter] string $sessionId): bool
     {
         // delete the record associated with this id
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id";
@@ -323,7 +323,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    protected function doWrite(string $sessionId, string $data): bool
+    protected function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         $maxlifetime = (int) (($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? \ini_get('session.gc_maxlifetime'));
 
@@ -366,7 +366,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function updateTimestamp(string $sessionId, string $data): bool
+    public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         $expiry = time() + (int) (($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? \ini_get('session.gc_maxlifetime'));
 
@@ -610,7 +610,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      * We need to make sure we do not return session data that is already considered garbage according
      * to the session.gc_maxlifetime setting because gc() is called after read() and only sometimes.
      */
-    protected function doRead(string $sessionId): string
+    protected function doRead(#[\SensitiveParameter] string $sessionId): string
     {
         if (self::LOCK_ADVISORY === $this->lockMode) {
             $this->unlockStatements[] = $this->doAdvisoryLock($sessionId);
@@ -681,7 +681,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *       - for oci using DBMS_LOCK.REQUEST
      *       - for sqlsrv using sp_getapplock with LockOwner = Session
      */
-    private function doAdvisoryLock(string $sessionId): \PDOStatement
+    private function doAdvisoryLock(#[\SensitiveParameter] string $sessionId): \PDOStatement
     {
         switch ($this->driver) {
             case 'mysql':
@@ -780,7 +780,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Returns an insert statement supported by the database for writing session data.
      */
-    private function getInsertStatement(string $sessionId, string $sessionData, int $maxlifetime): \PDOStatement
+    private function getInsertStatement(#[\SensitiveParameter] string $sessionId, string $sessionData, int $maxlifetime): \PDOStatement
     {
         switch ($this->driver) {
             case 'oci':
@@ -807,7 +807,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Returns an update statement supported by the database for writing session data.
      */
-    private function getUpdateStatement(string $sessionId, string $sessionData, int $maxlifetime): \PDOStatement
+    private function getUpdateStatement(#[\SensitiveParameter] string $sessionId, string $sessionData, int $maxlifetime): \PDOStatement
     {
         switch ($this->driver) {
             case 'oci':
@@ -834,7 +834,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Returns a merge/upsert (i.e. insert or update) statement when supported by the database for writing session data.
      */
-    private function getMergeStatement(string $sessionId, string $data, int $maxlifetime): ?\PDOStatement
+    private function getMergeStatement(#[\SensitiveParameter] string $sessionId, string $data, int $maxlifetime): ?\PDOStatement
     {
         switch (true) {
             case 'mysql' === $this->driver:

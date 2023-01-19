@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
@@ -207,5 +208,40 @@ class DoctrineDbalStoreTest extends AbstractStoreTest
         $key = new Key(uniqid(__METHOD__, true));
 
         $store->save($key);
+    }
+
+    public function testConfigureSchemaDifferentDatabase()
+    {
+        $conn = $this->createMock(Connection::class);
+        $someFunction = function () { return false; };
+        $schema = new Schema();
+
+        $dbalStore = new DoctrineDbalStore($conn);
+        $dbalStore->configureSchema($schema, $someFunction);
+        $this->assertFalse($schema->hasTable('lock_keys'));
+    }
+
+    public function testConfigureSchemaSameDatabase()
+    {
+        $conn = $this->createMock(Connection::class);
+        $someFunction = function () { return true; };
+        $schema = new Schema();
+
+        $dbalStore = new DoctrineDbalStore($conn);
+        $dbalStore->configureSchema($schema, $someFunction);
+        $this->assertTrue($schema->hasTable('lock_keys'));
+    }
+
+    public function testConfigureSchemaTableExists()
+    {
+        $conn = $this->createMock(Connection::class);
+        $schema = new Schema();
+        $schema->createTable('lock_keys');
+
+        $dbalStore = new DoctrineDbalStore($conn);
+        $someFunction = function () { return true; };
+        $dbalStore->configureSchema($schema, $someFunction);
+        $table = $schema->getTable('lock_keys');
+        $this->assertEmpty($table->getColumns(), 'The table was not overwritten');
     }
 }

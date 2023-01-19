@@ -1898,8 +1898,10 @@ class FrameworkExtension extends Extension
             foreach ($resourceStores as $resourceStore) {
                 $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
                 $storeDefinition = new Definition(PersistingStoreInterface::class);
-                $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
-                $storeDefinition->setArguments([$resourceStore]);
+                $storeDefinition
+                    ->setFactory([StoreFactory::class, 'createStore'])
+                    ->setArguments([$resourceStore])
+                    ->addTag('lock.store');
 
                 $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 

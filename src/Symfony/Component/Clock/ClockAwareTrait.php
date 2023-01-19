@@ -31,6 +31,6 @@ trait ClockAwareTrait
 
     protected function now(): \DateTimeImmutable
     {
-        return ($this->clock ??= new NativeClock())->now();
+        return ($this->clock ??= new Clock())->now();
     }
 }

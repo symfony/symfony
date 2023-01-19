@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Allow enum values in `EnumNode`
+
 6.2
 ---
 

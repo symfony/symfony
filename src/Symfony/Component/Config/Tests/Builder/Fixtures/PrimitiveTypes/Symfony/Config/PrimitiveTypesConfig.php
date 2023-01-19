@@ -33,7 +33,7 @@ class PrimitiveTypesConfig implements \Symfony\Component\Config\Builder\ConfigBu
 
     /**
      * @default null
-     * @param ParamConfigurator|'foo'|'bar'|'baz' $value
+     * @param ParamConfigurator|'foo'|'bar'|'baz'|\Symfony\Component\Config\Tests\Fixtures\TestEnum::Bar $value
      * @return $this
      */
     public function enumNode($value): static

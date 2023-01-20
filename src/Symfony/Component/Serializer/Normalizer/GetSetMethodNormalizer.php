@@ -156,14 +156,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         $key = \get_class($object).':'.$setter;
 
         if (!isset(self::$setterAccessibleCache[$key])) {
-            try {
-                // We have to use is_callable() here since method_exists()
-                // does not "see" protected/private methods
-                self::$setterAccessibleCache[$key] = \is_callable([$object, $setter]) && !(new \ReflectionMethod($object, $setter))->isStatic();
-            } catch (\ReflectionException $e) {
-                // Method does not exist in the class, probably a magic method
-                self::$setterAccessibleCache[$key] = false;
-            }
+            self::$setterAccessibleCache[$key] = method_exists($object, $setter) && \is_callable([$object, $setter]) && !(new \ReflectionMethod($object, $setter))->isStatic();
         }
 
         if (self::$setterAccessibleCache[$key]) {

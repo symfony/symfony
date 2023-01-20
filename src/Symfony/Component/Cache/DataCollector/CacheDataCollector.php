@@ -112,7 +112,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
             /** @var TraceableAdapterEvent $call */
             foreach ($calls as $call) {
                 ++$statistics[$name]['calls'];
-                $statistics[$name]['time'] += $call->end - $call->start;
+                $statistics[$name]['time'] += ($call->end ?? microtime(true)) - $call->start;
                 if ('get' === $call->name) {
                     ++$statistics[$name]['reads'];
                     if ($call->hits) {
@@ -134,10 +134,8 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
                     $statistics[$name]['misses'] += $call->misses;
                 } elseif ('hasItem' === $call->name) {
                     ++$statistics[$name]['reads'];
-                    if (false === $call->result) {
-                        ++$statistics[$name]['misses'];
-                    } else {
-                        ++$statistics[$name]['hits'];
+                    foreach ($call->result ?? [] as $result) {
+                        ++$statistics[$name][$result ? 'hits' : 'misses'];
                     }
                 } elseif ('save' === $call->name) {
                     ++$statistics[$name]['writes'];

@@ -29,8 +29,9 @@ class ConstructorDummy
      * @param \DateTimeZone      $timezone
      * @param int                $date       Timestamp
      * @param \DateTimeInterface $dateObject
+     * @param mixed              $mixed
      */
-    public function __construct(\DateTimeZone $timezone, $date, $dateObject, \DateTime $dateTime)
+    public function __construct(\DateTimeZone $timezone, $date, $dateObject, \DateTime $dateTime, $mixed)
     {
         $this->timezone = $timezone->getName();
         $this->date = \DateTime::createFromFormat('U', $date);

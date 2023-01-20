@@ -47,11 +47,6 @@ final class UserValueResolver implements ArgumentValueResolverInterface, ValueRe
             return false;
         }
 
-        // if no user is present but a default value exists we delegate to DefaultValueResolver
-        if ($argument->hasDefaultValue() && null === $this->tokenStorage->getToken()?->getUser()) {
-            return false;
-        }
-
         return true;
     }
 
@@ -62,20 +57,21 @@ final class UserValueResolver implements ArgumentValueResolverInterface, ValueRe
         if (UserInterface::class !== $argument->getType() && !$argument->getAttributesOfType(CurrentUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
             return [];
         }
-        $user = $this->tokenStorage->getToken()?->getUser();
 
-        // if no user is present but a default value exists we delegate to DefaultValueResolver
-        if ($argument->hasDefaultValue() && null === $user) {
-            return [];
-        }
+        if (null === $user = $this->tokenStorage->getToken()?->getUser()) {
+            // if no user is present but a default value exists we use it to prevent the EntityValueResolver or others
+            // from attempting resolution of the User as the current logged in user was requested here
+            if ($argument->hasDefaultValue()) {
+                return [$argument->getDefaultValue()];
+            }
 
-        if (null === $user) {
             if (!$argument->isNullable()) {
                 throw new AccessDeniedException(sprintf('There is no logged-in user to pass to $%s, make the argument nullable if you want to allow anonymous access to the action.', $argument->getName()));
             }
 
             return [null];
         }
+
         if (null === $argument->getType() || $user instanceof ($argument->getType())) {
             return [$user];
         }

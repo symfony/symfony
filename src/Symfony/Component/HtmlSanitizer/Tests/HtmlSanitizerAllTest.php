@@ -447,6 +447,14 @@ class HtmlSanitizerAllTest extends TestCase
                 '<img title />',
             ],
             [
+                '<img src="data:image/jpg;base64,aMf+Tct/RLn2WQ==" />',
+                '<img src="data:image/jpg;base64,aMf+Tct/RLn2WQ==" />',
+            ],
+            [
+                '<img src="aMf+Tct/RLn2WQ==" />',
+                '<img src="aMf&#43;Tct/RLn2WQ&#61;&#61;" />',
+            ],
+            [
                 '<i>Lorem ipsum</i>',
                 '<i>Lorem ipsum</i>',
             ],

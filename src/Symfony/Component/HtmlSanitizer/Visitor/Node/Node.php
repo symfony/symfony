@@ -39,6 +39,10 @@ final class Node implements NodeInterface
         'wbr' => true,
     ];
 
+    private const VALID_BASE64_ATTRIBUTES = [
+        'src',
+    ];
+
     private NodeInterface $parent;
     private string $tagName;
     private array $attributes = [];
@@ -114,12 +118,23 @@ final class Node implements NodeInterface
                     $value .= ' ';
                 }
 
-                $attr .= '="'.StringSanitizer::encodeHtmlEntities($value).'"';
+                if (\in_array($name, self::VALID_BASE64_ATTRIBUTES, true) && $this->isValidBase64Src($value)) {
+                    $attr .= '="'.$value.'"';
+                } else {
+                    $attr .= '="'.StringSanitizer::encodeHtmlEntities($value).'"';
+                }
             }
 
             $rendered[] = $attr;
         }
 
         return $rendered ? ' '.implode(' ', $rendered) : '';
+    }
+
+    private function isValidBase64Src(string $string): bool
+    {
+        $string = preg_replace('/data:(.+);base64,/', '', $string, -1, $count);
+
+        return 0 !== $count && false !== base64_decode($string, true);
     }
 }

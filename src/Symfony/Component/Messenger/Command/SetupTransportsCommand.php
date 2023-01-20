@@ -71,11 +71,16 @@ EOF
 
         foreach ($transportNames as $id => $transportName) {
             $transport = $this->transportLocator->get($transportName);
-            if ($transport instanceof SetupableTransportInterface) {
+            if (!$transport instanceof SetupableTransportInterface) {
+                $io->note(sprintf('The "%s" transport does not support setup.', $transportName));
+                continue;
+            }
+
+            try {
                 $transport->setup();
                 $io->success(sprintf('The "%s" transport was set up successfully.', $transportName));
-            } else {
-                $io->note(sprintf('The "%s" transport does not support setup.', $transportName));
+            } catch (\Exception $e) {
+                throw new \RuntimeException(sprintf('An error occurred while setting up the "%s" transport: ', $transportName).$e->getMessage(), 0, $e);
             }
         }
 

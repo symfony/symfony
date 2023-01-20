@@ -80,7 +80,7 @@
         "symfony/console": "<5.4",
         "symfony/dotenv": "<5.4",
         "symfony/dom-crawler": "<5.4",
-        "symfony/http-client": "<5.4",
+        "symfony/http-client": "<6.3",
         "symfony/form": "<5.4",
         "symfony/lock": "<5.4",
         "symfony/mailer": "<5.4",

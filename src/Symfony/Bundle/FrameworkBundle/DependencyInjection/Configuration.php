@@ -122,7 +122,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('trusted_header')
                     ->performNoDeepMerging()
                     ->defaultValue(['x-forwarded-for', 'x-forwarded-port', 'x-forwarded-proto'])
-                    ->beforeNormalization()->ifString()->then(function ($v) { return $v ? array_map('trim', explode(',', $v)) : []; })->end()
+                    ->beforeNormalization()->ifString()->then(function ($v) { return $v ? array_map(trim(...), explode(',', $v)) : []; })->end()
                     ->enumPrototype()
                         ->values([
                             'forwarded',
@@ -1937,7 +1937,7 @@ class Configuration implements ConfigurationInterface
                                 ->arrayNode('methods')
                                     ->beforeNormalization()
                                     ->ifArray()
-                                        ->then(fn ($v) => array_map('strtoupper', $v))
+                                        ->then(fn ($v) => array_map(strtoupper(...), $v))
                                     ->end()
                                     ->prototype('scalar')->end()
                                     ->info('A list of HTTP methods that triggers a retry for this status code. When empty, all methods are retried')

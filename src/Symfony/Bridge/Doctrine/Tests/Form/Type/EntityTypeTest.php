@@ -821,7 +821,7 @@ class EntityTypeTest extends BaseTypeTest
         $field->submit(1);
 
         $unitOfWorkIdentityMap = $this->em->getUnitOfWork()->getIdentityMap();
-        $managedEntitiesNames = array_map('strval', $unitOfWorkIdentityMap['Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity']);
+        $managedEntitiesNames = array_map(strval(...), $unitOfWorkIdentityMap['Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity']);
 
         $this->assertContains((string) $entity1, $managedEntitiesNames);
         $this->assertNotContains((string) $entity2, $managedEntitiesNames);

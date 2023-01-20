@@ -263,7 +263,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             return;
         }
 
-        $groupLabels = \is_array($groupLabels) ? array_map('strval', $groupLabels) : [(string) $groupLabels];
+        $groupLabels = \is_array($groupLabels) ? array_map(strval(...), $groupLabels) : [(string) $groupLabels];
 
         foreach ($groupLabels as $groupLabel) {
             // Initialize the group views if necessary. Unnecessarily built group

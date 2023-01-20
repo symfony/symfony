@@ -42,7 +42,7 @@ class RouterTest extends TestCase
     protected function tearDown(): void
     {
         if (is_dir($this->cacheDir)) {
-            array_map('unlink', glob($this->cacheDir.\DIRECTORY_SEPARATOR.'*'));
+            array_map(unlink(...), glob($this->cacheDir.\DIRECTORY_SEPARATOR.'*'));
             @rmdir($this->cacheDir);
         }
 

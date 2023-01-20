@@ -72,7 +72,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchScheme(string|array|null $scheme)
     {
-        $this->schemes = null !== $scheme ? array_map('strtolower', (array) $scheme) : [];
+        $this->schemes = null !== $scheme ? array_map(strtolower(...), (array) $scheme) : [];
     }
 
     /**
@@ -130,7 +130,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchMethod(string|array|null $method)
     {
-        $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : [];
+        $this->methods = null !== $method ? array_map(strtoupper(...), (array) $method) : [];
     }
 
     /**

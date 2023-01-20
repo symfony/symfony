@@ -397,7 +397,7 @@ EOF
 
     private function filterDuplicateTransPaths(array $transPaths): array
     {
-        $transPaths = array_filter(array_map('realpath', $transPaths));
+        $transPaths = array_filter(array_map(realpath(...), $transPaths));
 
         sort($transPaths);
 

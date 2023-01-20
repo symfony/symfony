@@ -51,6 +51,6 @@ class CommandCompletionTester
             $options[] = '--'.$option->getName();
         }
 
-        return array_map('strval', array_merge($options, $suggestions->getValueSuggestions()));
+        return array_map(strval(...), array_merge($options, $suggestions->getValueSuggestions()));
     }
 }

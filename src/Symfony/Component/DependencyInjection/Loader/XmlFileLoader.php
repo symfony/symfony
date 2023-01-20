@@ -449,7 +449,7 @@ class XmlFileLoader extends FileLoader
         }
 
         // resolve definitions
-        uksort($definitions, 'strnatcmp');
+        uksort($definitions, strnatcmp(...));
         foreach (array_reverse($definitions) as $id => [$domElement, $file]) {
             if (null !== $definition = $this->parseDefinition($domElement, $file, new Definition())) {
                 $this->setDefinition($id, $definition);
@@ -668,7 +668,7 @@ class XmlFileLoader extends FileLoader
                 $locationstart = '';
             }
             $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
-            $location = $locationstart.$drive.implode('/', array_map('rawurlencode', $parts));
+            $location = $locationstart.$drive.implode('/', array_map(rawurlencode(...), $parts));
 
             $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
         }

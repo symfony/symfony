@@ -405,7 +405,7 @@ abstract class AbstractUnicodeString extends AbstractString
             $prefix = $prefix->string;
         }
 
-        $prefix = implode('|', array_map('preg_quote', (array) $prefix));
+        $prefix = implode('|', array_map(preg_quote(...), (array) $prefix));
         $str->string = preg_replace("{^(?:$prefix)}iuD", '', $this->string);
 
         return $str;
@@ -438,7 +438,7 @@ abstract class AbstractUnicodeString extends AbstractString
             $suffix = $suffix->string;
         }
 
-        $suffix = implode('|', array_map('preg_quote', (array) $suffix));
+        $suffix = implode('|', array_map(preg_quote(...), (array) $suffix));
         $str->string = preg_replace("{(?:$suffix)$}iuD", '', $this->string);
 
         return $str;

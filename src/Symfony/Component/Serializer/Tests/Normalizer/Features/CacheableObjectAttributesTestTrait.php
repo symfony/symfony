@@ -48,7 +48,7 @@ trait CacheableObjectAttributesTestTrait
      */
     public function testReversedObjectCollectionNormalization()
     {
-        [$collection, $expectedArray] = array_map('array_reverse', $this->getObjectCollectionWithExpectedArray());
+        [$collection, $expectedArray] = array_map(array_reverse(...), $this->getObjectCollectionWithExpectedArray());
         $this->assertCollectionNormalizedProperly($collection, $expectedArray);
     }
 

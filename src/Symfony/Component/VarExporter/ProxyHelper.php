@@ -307,7 +307,7 @@ final class ProxyHelper
     private static function exportPropertyScopes(string $parent): string
     {
         $propertyScopes = Hydrator::$propertyScopes[$parent] ??= Hydrator::getPropertyScopes($parent);
-        uksort($propertyScopes, 'strnatcmp');
+        uksort($propertyScopes, strnatcmp(...));
         $propertyScopes = VarExporter::export($propertyScopes);
         $propertyScopes = str_replace(VarExporter::export($parent), 'parent::class', $propertyScopes);
         $propertyScopes = preg_replace("/(?|(,)\n( )       |\n        |,\n    (\]))/", '$1$2', $propertyScopes);

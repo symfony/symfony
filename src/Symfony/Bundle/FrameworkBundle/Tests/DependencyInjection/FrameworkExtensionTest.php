@@ -1093,7 +1093,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertArrayHasKey('cache_dir', $options);
         $this->assertSame($container->getParameter('kernel.cache_dir').'/translations', $options['cache_dir']);
 
-        $files = array_map('realpath', $options['resource_files']['en']);
+        $files = array_map(realpath(...), $options['resource_files']['en']);
         $ref = new \ReflectionClass(Validation::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),

@@ -148,7 +148,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
                     ),
                     \RecursiveIteratorIterator::LEAVES_ONLY
                 ));
-                uksort($files, 'strnatcmp');
+                uksort($files, strnatcmp(...));
 
                 foreach ($files as $path => $info) {
                     if ($info->isFile()) {

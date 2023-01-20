@@ -122,7 +122,7 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments[0]->getValues());
+            $listeners[] = array_map(strval(...), $arguments[0]->getValues());
 
             $configDef = $container->getDefinition((string) $arguments[3]);
             $configs[] = array_values($configDef->getArguments());

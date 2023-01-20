@@ -46,7 +46,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         ksort($headers);
-        $max = max(array_map('strlen', array_keys($headers))) + 1;
+        $max = max(array_map(strlen(...), array_keys($headers))) + 1;
         $content = '';
         foreach ($headers as $name => $values) {
             $name = ucwords($name, '-');

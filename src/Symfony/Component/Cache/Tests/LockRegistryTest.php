@@ -23,7 +23,7 @@ class LockRegistryTest extends TestCase
         }
         $lockFiles = LockRegistry::setFiles([]);
         LockRegistry::setFiles($lockFiles);
-        $expected = array_map('realpath', glob(__DIR__.'/../Adapter/*'));
+        $expected = array_map(realpath(...), glob(__DIR__.'/../Adapter/*'));
         $this->assertSame($expected, $lockFiles);
     }
 }

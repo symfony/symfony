@@ -386,7 +386,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             }
 
             if (\function_exists('openssl_x509_read') && $certinfo = curl_getinfo($ch, \CURLINFO_CERTINFO)) {
-                $info['peer_certificate_chain'] = array_map('openssl_x509_read', array_column($certinfo, 'Cert'));
+                $info['peer_certificate_chain'] = array_map(openssl_x509_read(...), array_column($certinfo, 'Cert'));
             }
 
             if (300 <= $info['http_code'] && $info['http_code'] < 400) {

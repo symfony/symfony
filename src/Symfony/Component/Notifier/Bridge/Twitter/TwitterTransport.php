@@ -95,7 +95,7 @@ final class TwitterTransport extends AbstractTransport
 
         $oauth['oauth_signature'] = base64_encode(hash_hmac(
             'sha1',
-            implode('&', array_map('rawurlencode', [
+            implode('&', array_map(rawurlencode(...), [
                 $method,
                 $url,
                 implode('&', array_map(fn ($k) => rawurlencode($k).'='.rawurlencode($sign[$k]), array_keys($sign))),

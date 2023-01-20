@@ -547,7 +547,7 @@ class RouterTest extends TestCase
             $this->assertTrue($cache->isFresh());
         } finally {
             if (is_dir($cacheDir)) {
-                array_map('unlink', glob($cacheDir.\DIRECTORY_SEPARATOR.'*'));
+                array_map(unlink(...), glob($cacheDir.\DIRECTORY_SEPARATOR.'*'));
                 rmdir($cacheDir);
             }
         }

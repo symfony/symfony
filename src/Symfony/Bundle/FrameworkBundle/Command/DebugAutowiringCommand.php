@@ -86,7 +86,7 @@ EOF
             }
         }
 
-        uasort($serviceIds, 'strnatcmp');
+        uasort($serviceIds, strnatcmp(...));
 
         $io->title('Autowirable Types');
         $io->text('The following classes & interfaces can be used as type-hints when autowiring:');

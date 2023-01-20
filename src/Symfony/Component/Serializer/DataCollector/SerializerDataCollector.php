@@ -50,7 +50,7 @@ class SerializerDataCollector extends DataCollector implements LateDataCollector
 
     public function getHandledCount(): int
     {
-        return array_sum(array_map('count', $this->data));
+        return array_sum(array_map(count(...), $this->data));
     }
 
     public function getTotalTime(): float

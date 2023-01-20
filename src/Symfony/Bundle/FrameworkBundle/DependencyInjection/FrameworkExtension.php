@@ -1132,7 +1132,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($enabledLocales) {
-            $enabledLocales = implode('|', array_map('preg_quote', $enabledLocales));
+            $enabledLocales = implode('|', array_map(preg_quote(...), $enabledLocales));
             $container->getDefinition('routing.loader')->replaceArgument(2, ['_locale' => $enabledLocales]);
         }
 

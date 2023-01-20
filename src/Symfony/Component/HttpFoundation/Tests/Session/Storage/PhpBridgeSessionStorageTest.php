@@ -41,7 +41,7 @@ class PhpBridgeSessionStorageTest extends TestCase
     protected function tearDown(): void
     {
         session_write_close();
-        array_map('unlink', glob($this->savePath.'/*'));
+        array_map(unlink(...), glob($this->savePath.'/*'));
         if (is_dir($this->savePath)) {
             @rmdir($this->savePath);
         }

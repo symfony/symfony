@@ -82,7 +82,7 @@ class PoFileLoader extends FileLoader
                 $item = $defaults;
                 $flags = [];
             } elseif (str_starts_with($line, '#,')) {
-                $flags = array_map('trim', explode(',', substr($line, 2)));
+                $flags = array_map(trim(...), explode(',', substr($line, 2)));
             } elseif (str_starts_with($line, 'msgid "')) {
                 // We start a new msg so save previous
                 // TODO: this fails when comments or contexts are added

@@ -78,7 +78,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
     public function testLoadChoicesForValues()
     {
         $evenChoices = [1 => 2, 3 => 4];
-        $values = array_map('strval', range(1, 4));
+        $values = array_map(strval(...), range(1, 4));
 
         $filter = fn ($choice) => 0 === $choice % 2;
 

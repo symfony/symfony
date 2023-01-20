@@ -121,7 +121,7 @@ class Connection extends AbstractConnection
         $resolver->setDefault('referrals', false);
         $resolver->setAllowedTypes('referrals', 'bool');
         $resolver->setDefault('options', function (OptionsResolver $options, Options $parent) {
-            $options->setDefined(array_map('strtolower', array_keys((new \ReflectionClass(ConnectionOptions::class))->getConstants())));
+            $options->setDefined(array_map(strtolower(...), array_keys((new \ReflectionClass(ConnectionOptions::class))->getConstants())));
 
             if (true === $parent['debug']) {
                 $options->setDefault('debug_level', 7);

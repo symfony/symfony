@@ -438,7 +438,7 @@ class PdoSessionHandler extends AbstractSessionHandler
             return $dsnOrUrl; // If the URL is not valid, let's assume it might be a DSN already.
         }
 
-        $params = array_map('rawurldecode', $params);
+        $params = array_map(rawurldecode(...), $params);
 
         // Override the default username and password. Values passed through options will still win over these in the constructor.
         if (isset($params['user'])) {

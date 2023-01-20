@@ -35,7 +35,7 @@ final class MessengerTransportListener implements EventSubscriberInterface
         }
 
         $names = $message->getHeaders()->get('X-Bus-Transport')->getBody();
-        $names = array_map('trim', explode(',', $names));
+        $names = array_map(trim(...), explode(',', $names));
         $event->addStamp(new TransportNamesStamp($names));
         $message->getHeaders()->remove('X-Bus-Transport');
     }

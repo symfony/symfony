@@ -681,7 +681,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'inline_factories' => $inlineFactories,
             'inline_class_loader' => $inlineClassLoader,
             'build_time' => $container->hasParameter('kernel.container_build_time') ? $container->getParameter('kernel.container_build_time') : time(),
-            'preload_classes' => array_map('get_class', $this->bundles),
+            'preload_classes' => array_map(get_class(...), $this->bundles),
         ]);
 
         $rootCode = array_pop($content);
@@ -741,7 +741,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if ($container->hasParameter('kernel.trusted_proxies') && $container->hasParameter('kernel.trusted_headers') && $trustedProxies = $container->getParameter('kernel.trusted_proxies')) {
-            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map('trim', explode(',', $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
+            Request::setTrustedProxies(\is_array($trustedProxies) ? $trustedProxies : array_map(trim(...), explode(',', $trustedProxies)), $container->getParameter('kernel.trusted_headers'));
         }
 
         return $container;

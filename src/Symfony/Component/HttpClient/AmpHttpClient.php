@@ -137,7 +137,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
 
         if ('' !== $request->getUri()->getUserInfo() && !$request->hasHeader('authorization')) {
             $auth = explode(':', $request->getUri()->getUserInfo(), 2);
-            $auth = array_map('rawurldecode', $auth) + [1 => ''];
+            $auth = array_map(rawurldecode(...), $auth) + [1 => ''];
             $request->setHeader('Authorization', 'Basic '.base64_encode(implode(':', $auth)));
         }
 

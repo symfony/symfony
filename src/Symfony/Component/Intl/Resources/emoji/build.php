@@ -80,7 +80,7 @@ final class Builder
                 $emoji = $result->getAttribute('cp');
                 $name = $result->textContent;
                 $parts = preg_split('//u', $emoji, -1, \PREG_SPLIT_NO_EMPTY);
-                $emojiCodePoints = implode(' ', array_map('dechex', array_map('mb_ord', $parts)));
+                $emojiCodePoints = implode(' ', array_map(dechex(...), array_map(mb_ord(...), $parts)));
                 if (!array_key_exists($emojiCodePoints, $emojisCodePoints)) {
                     $ignored[] = [
                         'locale' => $locale,

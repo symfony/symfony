@@ -14,7 +14,7 @@ if ('cli' !== \PHP_SAPI) {
 }
 
 $operators = ['not', '!', 'or', '||', '&&', 'and', '|', '^', '&', '==', '===', '!=', '!==', '<', '>', '>=', '<=', 'not in', 'in', '..', '+', '-', '~', '*', '/', '%', 'contains', 'starts with', 'ends with', 'matches', '**'];
-$operators = array_combine($operators, array_map('strlen', $operators));
+$operators = array_combine($operators, array_map(strlen(...), $operators));
 arsort($operators);
 
 $regex = [];

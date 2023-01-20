@@ -95,7 +95,7 @@ class ArrayChoiceList implements ChoiceListInterface
 
     public function getValues(): array
     {
-        return array_map('strval', array_keys($this->choices));
+        return array_map(strval(...), array_keys($this->choices));
     }
 
     public function getStructuredValues(): array

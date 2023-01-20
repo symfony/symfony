@@ -43,7 +43,7 @@ class RedisProxiesTest extends TestCase
             EOPHP;
         }
 
-        uksort($methods, 'strnatcmp');
+        uksort($methods, strnatcmp(...));
         $proxy .= implode('', $methods)."}\n";
 
         $this->assertStringEqualsFile(\dirname(__DIR__, 2)."/Traits/{$class}5Proxy.php", $proxy);
@@ -80,7 +80,7 @@ class RedisProxiesTest extends TestCase
             EOPHP;
         }
 
-        uksort($methods, 'strnatcmp');
+        uksort($methods, strnatcmp(...));
         $proxy .= implode('', $methods)."}\n";
 
         $this->assertStringEqualsFile(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php", $proxy);

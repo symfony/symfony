@@ -209,7 +209,7 @@ function printTable($translations, $verboseOutput, bool $includeCompletedLanguag
 
         return;
     }
-    $longestLocaleNameLength = max(array_map('strlen', array_keys($translations)));
+    $longestLocaleNameLength = max(array_map(strlen(...), array_keys($translations)));
 
     foreach ($translations as $locale => $translation) {
         if (!$includeCompletedLanguages && $translation['is_completed']) {

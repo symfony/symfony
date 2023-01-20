@@ -57,8 +57,8 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [FileTypeFilterIterator::ONLY_FILES, $this->toAbsolute($onlyFiles)],
-            [FileTypeFilterIterator::ONLY_DIRECTORIES, $this->toAbsolute($onlyDirectories)],
+            [FileTypeFilterIterator::ONLY_FILES, static::toAbsolute($onlyFiles)],
+            [FileTypeFilterIterator::ONLY_DIRECTORIES, static::toAbsolute($onlyDirectories)],
         ];
     }
 }

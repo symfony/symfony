@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransport;
+use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -87,5 +88,27 @@ final class OvhCloudTransportTest extends TransportTestCase
         $endpoint = 'https://eu.api.ovh.com/1.0/sms/serviceName/jobs';
         $toSign = 'applicationSecret+consumerKey+POST+'.$endpoint.'+'.$body.'+'.$time;
         $this->assertSame('$1$'.sha1($toSign), $signature);
+    }
+
+    public function testInvalidReceiver()
+    {
+        $smsMessage = new SmsMessage('invalid_receiver', 'lorem ipsum');
+
+        $data = json_encode([
+            'totalCreditsRemoved' => '1',
+            'invalidReceivers' => ['invalid_receiver'],
+            'ids' => [],
+            'validReceivers' => [],
+        ]);
+        $responses = [
+            new MockResponse((string) time()),
+            new MockResponse($data),
+        ];
+
+        $transport = $this->createTransport(new MockHttpClient($responses));
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Attempt to send the SMS to invalid receivers: "invalid_receiver"');
+        $transport->send($smsMessage);
     }
 }

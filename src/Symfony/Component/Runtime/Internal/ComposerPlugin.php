@@ -58,7 +58,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
 
     public function updateAutoloadFile(): void
     {
-        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
+        $vendorDir = realpath($this->composer->getConfig()->get('vendor-dir'));
 
         if (!is_file($autoloadFile = $vendorDir.'/autoload.php')
             || false === $extra = $this->composer->getPackage()->getExtra()['runtime'] ?? []

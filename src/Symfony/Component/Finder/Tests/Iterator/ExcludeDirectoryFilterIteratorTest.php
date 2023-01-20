@@ -105,9 +105,9 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [['foo'], $this->toAbsolute($foo)],
-            [['fo'], $this->toAbsolute($fo)],
-            [['toto/'], $this->toAbsolute($toto)],
+            [['foo'], static::toAbsolute($foo)],
+            [['fo'], static::toAbsolute($fo)],
+            [['toto/'], static::toAbsolute($toto)],
         ];
     }
 }

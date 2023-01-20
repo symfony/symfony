@@ -134,6 +134,10 @@ final class OvhCloudTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
+        if (!isset($success['ids'][0])) {
+            throw new TransportException(sprintf('Attempt to send the SMS to invalid receivers: "%s".', implode(',', $success['invalidReceivers'])), $response);
+        }
+
         $sentMessage = new SentMessage($message, (string) $this);
         $sentMessage->setMessageId($success['ids'][0]);
 

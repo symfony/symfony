@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Scheduler\Trigger;
 
+/**
+ * @experimental
+ */
 final class ExcludeTimeTrigger implements TriggerInterface
 {
     public function __construct(
@@ -20,11 +23,11 @@ final class ExcludeTimeTrigger implements TriggerInterface
     ) {
     }
 
-    public function nextTo(\DateTimeImmutable $run): \DateTimeImmutable
+    public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
-        $nextRun = $this->inner->nextTo($run);
+        $nextRun = $this->inner->getNextRunDate($run);
         if ($nextRun >= $this->from && $nextRun <= $this->to) {
-            return $this->inner->nextTo($this->to);
+            return $this->inner->getNextRunDate($this->to);
         }
 
         return $nextRun;

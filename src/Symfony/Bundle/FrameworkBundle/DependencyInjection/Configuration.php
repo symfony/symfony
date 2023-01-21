@@ -37,6 +37,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Semaphore\Semaphore;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -173,6 +174,7 @@ class Configuration implements ConfigurationInterface
         $this->addLockSection($rootNode, $enableIfStandalone);
         $this->addSemaphoreSection($rootNode, $enableIfStandalone);
         $this->addMessengerSection($rootNode, $enableIfStandalone);
+        $this->addSchedulerSection($rootNode, $enableIfStandalone);
         $this->addRobotsIndexSection($rootNode);
         $this->addHttpClientSection($rootNode, $enableIfStandalone);
         $this->addMailerSection($rootNode, $enableIfStandalone);
@@ -1601,6 +1603,18 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addSchedulerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('scheduler')
+                    ->info('Scheduler configuration')
+                    ->{$enableIfStandalone('symfony/scheduler', SchedulerTransportFactory::class)}()
                 ->end()
             ->end()
         ;

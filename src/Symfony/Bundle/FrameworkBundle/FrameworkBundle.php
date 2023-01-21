@@ -60,7 +60,7 @@ use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
-use Symfony\Component\Scheduler\DependencyInjection\SchedulerPass;
+use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
@@ -166,8 +166,8 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, AddMimeTypeGuesserPass::class);
+        $this->addCompilerPassIfExists($container, AddScheduleMessengerPass::class);
         $this->addCompilerPassIfExists($container, MessengerPass::class);
-        $this->addCompilerPassIfExists($container, SchedulerPass::class);
         $this->addCompilerPassIfExists($container, HttpClientPass::class);
         $this->addCompilerPassIfExists($container, AddAutoMappingConfigurationPass::class);
         $container->addCompilerPass(new RegisterReverseContainerPass(true));

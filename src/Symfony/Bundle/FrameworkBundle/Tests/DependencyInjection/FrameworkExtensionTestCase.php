@@ -813,13 +813,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->compile();
 
         $expectedFactories = [
+            new Reference('scheduler.messenger_transport_factory'),
             new Reference('messenger.transport.amqp.factory'),
             new Reference('messenger.transport.redis.factory'),
             new Reference('messenger.transport.sync.factory'),
             new Reference('messenger.transport.in_memory.factory'),
             new Reference('messenger.transport.sqs.factory'),
             new Reference('messenger.transport.beanstalkd.factory'),
-            new Reference('scheduler.messenger_transport_factory'),
         ];
 
         $this->assertTrue($container->hasDefinition('messenger.receiver_locator'));
@@ -978,8 +978,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
         $this->assertCount(3, $transportArguments);
         $this->assertSame('schedule://default', $transportArguments[0]);
-
-        $this->assertTrue($container->hasDefinition('scheduler.messenger_transport_factory'));
 
         $this->assertSame(10, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(0));
         $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(1));

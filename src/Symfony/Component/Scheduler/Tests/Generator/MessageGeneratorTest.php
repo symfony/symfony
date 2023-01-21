@@ -9,18 +9,49 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\Tests\Schedule;
+namespace Symfony\Component\Scheduler\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\Scheduler\Schedule\Schedule;
-use Symfony\Component\Scheduler\Schedule\ScheduleConfig;
-use Symfony\Component\Scheduler\State\State;
+use Symfony\Component\Scheduler\Generator\MessageGenerator;
+use Symfony\Component\Scheduler\RecurringMessage;
+use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
-class ScheduleTest extends TestCase
+class MessageGeneratorTest extends TestCase
 {
-    public function messagesProvider(): \Generator
+    /**
+     * @dataProvider messagesProvider
+     */
+    public function testGetMessages(string $startTime, array $runs, array $schedule)
+    {
+        // for referencing
+        $now = self::makeDateTime($startTime);
+
+        $clock = $this->createMock(ClockInterface::class);
+        $clock->method('now')->willReturnReference($now);
+
+        foreach ($schedule as $i => $s) {
+            if (\is_array($s)) {
+                $schedule[$i] = $this->createMessage(...$s);
+            }
+        }
+        $schedule = (new Schedule())->add(...$schedule);
+        $schedule->stateful(new ArrayAdapter());
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', $clock);
+
+        // Warmup. The first run is always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages()));
+
+        foreach ($runs as $time => $expected) {
+            $now = self::makeDateTime($time);
+            $this->assertSame($expected, iterator_to_array($scheduler->getMessages()));
+        }
+    }
+
+    public static function messagesProvider(): \Generator
     {
         $first = (object) ['id' => 'first'];
         $second = (object) ['id' => 'second'];
@@ -34,9 +65,7 @@ class ScheduleTest extends TestCase
                 '22:13:00' => [$first],
                 '22:13:01' => [],
             ],
-            'schedule' => [
-                $this->makeSchedule($first, '22:13:00', '22:14:00'),
-            ],
+            'schedule' => [[$first, '22:13:00', '22:14:00']],
         ];
 
         yield 'microseconds' => [
@@ -46,9 +75,7 @@ class ScheduleTest extends TestCase
                 '22:13:00' => [$first],
                 '22:13:01' => [],
             ],
-            'schedule' => [
-                $this->makeSchedule($first, '22:13:00', '22:14:00', '22:15:00'),
-            ],
+            'schedule' => [[$first, '22:13:00', '22:14:00', '22:15:00']],
         ];
 
         yield 'skipped' => [
@@ -56,9 +83,7 @@ class ScheduleTest extends TestCase
             'runs' => [
                 '22:14:01' => [$first, $first],
             ],
-            'schedule' => [
-                $this->makeSchedule($first, '22:13:00', '22:14:00', '22:15:00'),
-            ],
+            'schedule' => [[$first, '22:13:00', '22:14:00', '22:15:00']],
         ];
 
         yield 'sequence' => [
@@ -71,9 +96,7 @@ class ScheduleTest extends TestCase
                 '22:14:00' => [$first],
                 '22:14:01' => [],
             ],
-            'schedule' => [
-                $this->makeSchedule($first, '22:13:00', '22:14:00', '22:15:00'),
-            ],
+            'schedule' => [[$first, '22:13:00', '22:14:00', '22:15:00']],
         ];
 
         yield 'concurrency' => [
@@ -85,9 +108,9 @@ class ScheduleTest extends TestCase
                 '22:13:02.555' => [],
             ],
             'schedule' => [
-                $this->makeSchedule($first, '22:12:59', '22:13:00', '22:13:01', '22:13:02', '22:13:03'),
-                $this->makeSchedule($second, '22:13:00', '22:14:00'),
-                $this->makeSchedule($third, '22:12:30', '22:13:30'),
+                [$first, '22:12:59', '22:13:00', '22:13:01', '22:13:02', '22:13:03'],
+                [$second, '22:13:00', '22:14:00'],
+                [$third, '22:12:30', '22:13:30'],
             ],
         ];
 
@@ -100,8 +123,8 @@ class ScheduleTest extends TestCase
                 '22:14:01' => [],
             ],
             'schedule' => [
-                $this->makeSchedule($first, '22:13:00', '22:14:00', '22:15:00'),
-                $this->makeSchedule($second, '22:13:00', '22:14:00', '22:15:00'),
+                [$first, '22:13:00', '22:14:00', '22:15:00'],
+                [$second, '22:13:00', '22:14:00', '22:15:00'],
             ],
         ];
 
@@ -111,51 +134,25 @@ class ScheduleTest extends TestCase
                 '22:12:01' => [],
             ],
             'schedule' => [
-                [$this->createMock(TriggerInterface::class), $this],
+                RecurringMessage::trigger(new class() implements TriggerInterface {
+                    public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
+                    {
+                        return null;
+                    }
+                }, (object) []),
             ],
         ];
     }
 
-    /**
-     * @dataProvider messagesProvider
-     */
-    public function testGetMessages(string $startTime, array $runs, array $schedule)
+    private function createMessage(object $message, string ...$runs): RecurringMessage
     {
-        // for referencing
-        $now = $this->makeDateTime($startTime);
-
-        $clock = $this->createMock(ClockInterface::class);
-        $clock->method('now')->willReturnReference($now);
-
-        $scheduler = new Schedule($clock, new State(), new ScheduleConfig($schedule));
-
-        // Warmup. The first run is always returns nothing.
-        $this->assertSame([], iterator_to_array($scheduler->getMessages()));
-
-        foreach ($runs as $time => $expected) {
-            $now = $this->makeDateTime($time);
-            $this->assertSame($expected, iterator_to_array($scheduler->getMessages()));
-        }
-    }
-
-    private function makeDateTime(string $time): \DateTimeImmutable
-    {
-        return new \DateTimeImmutable('2020-02-20T'.$time, new \DateTimeZone('UTC'));
-    }
-
-    /**
-     * @return array{TriggerInterface, object}
-     */
-    private function makeSchedule(object $message, string ...$runs): array
-    {
-        $runs = array_map(fn ($time) => $this->makeDateTime($time), $runs);
+        $runs = array_map(fn ($time) => self::makeDateTime($time), $runs);
         sort($runs);
 
-        $ticks = [$this->makeDateTime(''), 0];
-
+        $ticks = [self::makeDateTime(''), 0];
         $trigger = $this->createMock(TriggerInterface::class);
         $trigger
-            ->method('nextTo')
+            ->method('getNextRunDate')
             ->willReturnCallback(function (\DateTimeImmutable $lastTick) use ($runs, &$ticks): \DateTimeImmutable {
                 [$tick, $count] = $ticks;
                 if ($lastTick > $tick) {
@@ -175,6 +172,11 @@ class ScheduleTest extends TestCase
                 $this->fail(sprintf('There is no next run for tick %s', $lastTick->format(\DateTimeImmutable::RFC3339_EXTENDED)));
             });
 
-        return [$trigger, $message];
+        return RecurringMessage::trigger($trigger, $message);
+    }
+
+    private static function makeDateTime(string $time): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('2020-02-20T'.$time, new \DateTimeZone('UTC'));
     }
 }

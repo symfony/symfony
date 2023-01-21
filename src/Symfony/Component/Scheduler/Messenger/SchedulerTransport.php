@@ -13,23 +13,23 @@ namespace Symfony\Component\Scheduler\Messenger;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
-use Symfony\Component\Scheduler\Exception\LogicMessengerException;
-use Symfony\Component\Scheduler\Schedule\ScheduleInterface;
+use Symfony\Component\Scheduler\Exception\LogicException;
+use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
 
-class ScheduleTransport implements TransportInterface
+/**
+ * @experimental
+ */
+class SchedulerTransport implements TransportInterface
 {
-    private readonly array $stamps;
-
     public function __construct(
-        private readonly ScheduleInterface $schedule,
+        private readonly MessageGeneratorInterface $messageGenerator,
     ) {
-        $this->stamps = [new ScheduledStamp()];
     }
 
     public function get(): iterable
     {
-        foreach ($this->schedule->getMessages() as $message) {
-            yield new Envelope($message, $this->stamps);
+        foreach ($this->messageGenerator->getMessages() as $message) {
+            yield Envelope::wrap($message, [new ScheduledStamp()]);
         }
     }
 
@@ -40,11 +40,11 @@ class ScheduleTransport implements TransportInterface
 
     public function reject(Envelope $envelope): void
     {
-        throw new LogicMessengerException('Messages from ScheduleTransport must not be rejected.');
+        throw new LogicException(sprintf('Messages from "%s" must not be rejected.', __CLASS__));
     }
 
     public function send(Envelope $envelope): Envelope
     {
-        throw new LogicMessengerException('The ScheduleTransport cannot send messages.');
+        throw new LogicException(sprintf('"%s" cannot send messages.', __CLASS__));
     }
 }

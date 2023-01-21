@@ -9,9 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\State;
+namespace Symfony\Component\Scheduler\Generator;
 
-interface StateInterface
+/**
+ * @experimental
+ */
+interface CheckpointInterface
 {
     public function acquire(\DateTimeImmutable $now): bool;
 

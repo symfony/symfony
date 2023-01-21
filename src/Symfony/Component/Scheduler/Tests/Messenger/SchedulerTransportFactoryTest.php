@@ -13,52 +13,39 @@ namespace Symfony\Component\Scheduler\Tests\Messenger;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
-use Symfony\Component\Scheduler\Locator\ScheduleConfigLocatorInterface;
-use Symfony\Component\Scheduler\Messenger\ScheduleTransport;
-use Symfony\Component\Scheduler\Messenger\ScheduleTransportFactory;
-use Symfony\Component\Scheduler\Schedule\Schedule;
-use Symfony\Component\Scheduler\Schedule\ScheduleConfig;
-use Symfony\Component\Scheduler\State\StateFactoryInterface;
-use Symfony\Component\Scheduler\State\StateInterface;
+use Symfony\Component\Scheduler\Generator\MessageGenerator;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
+use Symfony\Component\Scheduler\RecurringMessage;
+use Symfony\Component\Scheduler\Schedule;
+use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
+use Symfony\Contracts\Service\ServiceLocatorTrait;
 
-class ScheduleTransportFactoryTest extends TestCase
+class SchedulerTransportFactoryTest extends TestCase
 {
     public function testCreateTransport()
     {
         $trigger = $this->createMock(TriggerInterface::class);
         $serializer = $this->createMock(SerializerInterface::class);
         $clock = $this->createMock(ClockInterface::class);
-        $container = new class() extends \ArrayObject implements ScheduleConfigLocatorInterface {
-            public function get(string $id): ScheduleConfig
-            {
-                return $this->offsetGet($id);
-            }
 
-            public function has(string $id): bool
-            {
-                return $this->offsetExists($id);
-            }
-        };
+        $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
+        $customRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'custom']);
 
-        $stateFactory = $this->createMock(StateFactoryInterface::class);
-        $stateFactory
-            ->expects($this->exactly(2))
-            ->method('create')
-            ->withConsecutive(
-                ['default', ['cache' => null, 'lock' => null]],
-                ['custom', ['cache' => 'app', 'lock' => null]]
-            )
-            ->willReturn($state = $this->createMock(StateInterface::class));
+        $default = new SchedulerTransport(new MessageGenerator((new SomeScheduleProvider([$defaultRecurringMessage]))->getSchedule(), 'default', $clock));
+        $custom = new SchedulerTransport(new MessageGenerator((new SomeScheduleProvider([$customRecurringMessage]))->getSchedule(), 'custom', $clock));
 
-        $container['default'] = new ScheduleConfig([[$trigger, (object) ['id' => 'default']]]);
-        $container['custom'] = new ScheduleConfig([[$trigger, (object) ['id' => 'custom']]]);
-        $default = new ScheduleTransport(new Schedule($clock, $state, $container['default']));
-        $custom = new ScheduleTransport(new Schedule($clock, $state, $container['custom']));
-
-        $factory = new ScheduleTransportFactory($clock, $container, $stateFactory);
+        $factory = new SchedulerTransportFactory(
+            new Container([
+                'default' => fn () => (new SomeScheduleProvider([$defaultRecurringMessage]))->getSchedule(),
+                'custom' => fn () => (new SomeScheduleProvider([$customRecurringMessage]))->getSchedule(),
+            ]),
+            $clock,
+        );
 
         $this->assertEquals($default, $factory->createTransport('schedule://default', [], $serializer));
         $this->assertEquals($custom, $factory->createTransport('schedule://custom', ['cache' => 'app'], $serializer));
@@ -84,16 +71,6 @@ class ScheduleTransportFactoryTest extends TestCase
         $factory->createTransport('schedule://', [], $this->createMock(SerializerInterface::class));
     }
 
-    public function testInvalidOption()
-    {
-        $factory = $this->makeTransportFactoryWithStubs();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid option(s) "invalid" passed to the Schedule Messenger transport.');
-
-        $factory->createTransport('schedule://name', ['invalid' => true], $this->createMock(SerializerInterface::class));
-    }
-
     public function testNotFound()
     {
         $factory = $this->makeTransportFactoryWithStubs();
@@ -114,12 +91,31 @@ class ScheduleTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports('string', []));
     }
 
-    private function makeTransportFactoryWithStubs(): ScheduleTransportFactory
+    private function makeTransportFactoryWithStubs(): SchedulerTransportFactory
     {
-        return new ScheduleTransportFactory(
+        return new SchedulerTransportFactory(
+            new Container([
+                'default' => fn () => $this->createMock(ScheduleProviderInterface::class),
+            ]),
             $this->createMock(ClockInterface::class),
-            $this->createMock(ScheduleConfigLocatorInterface::class),
-            $this->createMock(StateFactoryInterface::class)
         );
     }
+}
+
+class SomeScheduleProvider implements ScheduleProviderInterface
+{
+    public function __construct(
+        private array $messages,
+    ) {
+    }
+
+    public function getSchedule(): Schedule
+    {
+        return (new Schedule())->add(...$this->messages);
+    }
+}
+
+class Container implements ContainerInterface
+{
+    use ServiceLocatorTrait;
 }

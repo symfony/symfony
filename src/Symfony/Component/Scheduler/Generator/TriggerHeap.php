@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\Schedule;
+namespace Symfony\Component\Scheduler\Generator;
 
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
@@ -17,8 +17,10 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
  * @internal
  *
  * @extends \SplHeap<array{\DateTimeImmutable, int, TriggerInterface, object}>
+ *
+ * @experimental
  */
-final class ScheduleHeap extends \SplHeap
+final class TriggerHeap extends \SplHeap
 {
     public function __construct(
         public \DateTimeImmutable $time,

@@ -13,6 +13,9 @@ namespace Symfony\Component\Scheduler\Messenger;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
+/**
+ * @experimental
+ */
 final class ScheduledStamp implements NonSendableStampInterface
 {
 }

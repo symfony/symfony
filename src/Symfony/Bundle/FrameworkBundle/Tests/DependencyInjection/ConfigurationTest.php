@@ -26,6 +26,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
@@ -686,6 +687,9 @@ class ConfigurationTest extends TestCase
             'html_sanitizer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
                 'sanitizers' => [],
+            ],
+            'scheduler' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(SchedulerTransportFactory::class),
             ],
             'exceptions' => [],
             'webhook' => [

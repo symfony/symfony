@@ -13,21 +13,24 @@ namespace Symfony\Component\Scheduler\Trigger;
 
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 
+/**
+ * @experimental
+ */
 final class PeriodicalTrigger implements TriggerInterface
 {
     public function __construct(
         private readonly int $intervalInSeconds,
-        private readonly \DateTimeImmutable $firstRun,
-        private readonly \DateTimeImmutable $priorTo,
+        private readonly \DateTimeImmutable $firstRun = new \DateTimeImmutable(),
+        private readonly \DateTimeImmutable $priorTo = new \DateTimeImmutable('3000-01-01'),
     ) {
         if (0 >= $this->intervalInSeconds) {
-            throw new InvalidArgumentException('The `$intervalInSeconds` argument must be greater then zero.');
+            throw new InvalidArgumentException('The "$intervalInSeconds" argument must be greater then zero.');
         }
     }
 
     public static function create(
         string|int|\DateInterval $interval,
-        string|\DateTimeImmutable $firstRun,
+        string|\DateTimeImmutable $firstRun = new \DateTimeImmutable(),
         string|\DateTimeImmutable $priorTo = new \DateTimeImmutable('3000-01-01'),
     ): self {
         if (\is_string($firstRun)) {
@@ -67,6 +70,24 @@ final class PeriodicalTrigger implements TriggerInterface
         return new self($interval, $firstRun, $priorTo);
     }
 
+    public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
+    {
+        if ($this->firstRun > $run) {
+            return $this->firstRun;
+        }
+        if ($this->priorTo <= $run) {
+            return null;
+        }
+
+        $delta = $run->format('U.u') - $this->firstRun->format('U.u');
+        $recurrencesPassed = (int) ($delta / $this->intervalInSeconds);
+        $nextRunTimestamp = ($recurrencesPassed + 1) * $this->intervalInSeconds + $this->firstRun->getTimestamp();
+        /** @var \DateTimeImmutable $nextRun */
+        $nextRun = \DateTimeImmutable::createFromFormat('U.u', $nextRunTimestamp.$this->firstRun->format('.u'));
+
+        return $this->priorTo > $nextRun ? $nextRun : null;
+    }
+
     private static function calcInterval(\DateTimeImmutable $from, \DateTimeImmutable $to): int
     {
         if (8 <= \PHP_INT_SIZE) {
@@ -84,29 +105,7 @@ final class PeriodicalTrigger implements TriggerInterface
     private static function ensureIntervalSize(string|float $interval): void
     {
         if ($interval > \PHP_INT_MAX) {
-            throw new InvalidArgumentException('The interval for a periodical message is too big. If you need to run it once, use `$priorTo` argument.');
+            throw new InvalidArgumentException('The interval for a periodical message is too big. If you need to run it once, use "$priorTo" argument.');
         }
-    }
-
-    public function nextTo(\DateTimeImmutable $run): ?\DateTimeImmutable
-    {
-        if ($this->firstRun > $run) {
-            return $this->firstRun;
-        }
-        if ($this->priorTo <= $run) {
-            return null;
-        }
-
-        $delta = (float) $run->format('U.u') - (float) $this->firstRun->format('U.u');
-        $recurrencesPassed = (int) ($delta / $this->intervalInSeconds);
-        $nextRunTimestamp = ($recurrencesPassed + 1) * $this->intervalInSeconds + $this->firstRun->getTimestamp();
-        /** @var \DateTimeImmutable $nextRun */
-        $nextRun = \DateTimeImmutable::createFromFormat('U.u', $nextRunTimestamp.$this->firstRun->format('.u'));
-
-        if ($this->priorTo <= $nextRun) {
-            return null;
-        }
-
-        return $nextRun;
     }
 }

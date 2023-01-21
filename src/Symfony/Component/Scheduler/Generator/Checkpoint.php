@@ -9,24 +9,31 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\State;
+namespace Symfony\Component\Scheduler\Generator;
 
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
-final class LockStateDecorator implements StateInterface
+/**
+ * @experimental
+ */
+final class Checkpoint implements CheckpointInterface
 {
+    private \DateTimeImmutable $time;
+    private int $index = -1;
     private bool $reset = false;
 
     public function __construct(
-        private readonly State $inner,
-        private readonly LockInterface $lock,
+        private readonly string $name,
+        private readonly ?LockInterface $lock = null,
+        private readonly ?CacheInterface $cache = null,
     ) {
     }
 
     public function acquire(\DateTimeImmutable $now): bool
     {
-        if (!$this->lock->acquire()) {
-            // Reset local state if a `Lock` is acquired by another `Worker`.
+        if ($this->lock && !$this->lock->acquire()) {
+            // Reset local state if a Lock is acquired by another Worker.
             $this->reset = true;
 
             return false;
@@ -34,35 +41,44 @@ final class LockStateDecorator implements StateInterface
 
         if ($this->reset) {
             $this->reset = false;
-            $this->inner->save($now, -1);
+            $this->save($now, -1);
         }
 
-        return $this->inner->acquire($now);
+        $this->time ??= $now;
+        if ($this->cache) {
+            $this->save(...$this->cache->get($this->name, fn () => [$now, -1]));
+        }
+
+        return true;
     }
 
     public function time(): \DateTimeImmutable
     {
-        return $this->inner->time();
+        return $this->time;
     }
 
     public function index(): int
     {
-        return $this->inner->index();
+        return $this->index;
     }
 
     public function save(\DateTimeImmutable $time, int $index): void
     {
-        $this->inner->save($time, $index);
+        $this->time = $time;
+        $this->index = $index;
+        $this->cache?->get($this->name, fn () => [$time, $index], \INF);
     }
 
     /**
-     * Releases `State`, not `Lock`.
+     * Releases State, not Lock.
      *
-     * It tries to keep a `Lock` as long as a `Worker` is alive.
+     * It tries to keep a Lock as long as a Worker is alive.
      */
     public function release(\DateTimeImmutable $now, ?\DateTimeImmutable $nextTime): void
     {
-        $this->inner->release($now, $nextTime);
+        if (!$this->lock) {
+            return;
+        }
 
         if (!$nextTime) {
             $this->lock->release();

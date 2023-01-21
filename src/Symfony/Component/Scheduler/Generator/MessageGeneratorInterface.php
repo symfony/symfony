@@ -9,11 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\Exception;
+namespace Symfony\Component\Scheduler\Generator;
 
-use Symfony\Component\Messenger\Exception\ExceptionInterface;
-
-// not sure about this
-class LogicMessengerException extends LogicException implements ExceptionInterface
+/**
+ * @experimental
+ */
+interface MessageGeneratorInterface
 {
+    public function getMessages(): iterable;
 }

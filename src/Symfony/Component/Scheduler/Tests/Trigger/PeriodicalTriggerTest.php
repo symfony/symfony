@@ -17,7 +17,15 @@ use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger;
 
 class PeriodicalTriggerTest extends TestCase
 {
-    public function providerNextTo(): iterable
+    /**
+     * @dataProvider providerGetNextRunDate
+     */
+    public function testGetNextRunDate(PeriodicalTrigger $periodicalMessage, \DateTimeImmutable $lastRun, ?\DateTimeImmutable $expected)
+    {
+        $this->assertEquals($expected, $periodicalMessage->getNextRunDate($lastRun));
+    }
+
+    public static function providerGetNextRunDate(): iterable
     {
         $periodicalMessage = new PeriodicalTrigger(
             600,
@@ -79,14 +87,6 @@ class PeriodicalTriggerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerNextTo
-     */
-    public function testNextTo(PeriodicalTrigger $periodicalMessage, \DateTimeImmutable $lastRun, ?\DateTimeImmutable $expected)
-    {
-        $this->assertEquals($expected, $periodicalMessage->nextTo($lastRun));
-    }
-
     public function testConstructors()
     {
         $firstRun = new \DateTimeImmutable($now = '2222-02-22');
@@ -115,14 +115,6 @@ class PeriodicalTriggerTest extends TestCase
         PeriodicalTrigger::create(\PHP_INT_MAX.'0', new \DateTimeImmutable('2002-02-02'));
     }
 
-    public function getInvalidIntervals(): iterable
-    {
-        yield ['wrong'];
-        yield ['3600.5'];
-        yield [0];
-        yield [-3600];
-    }
-
     /**
      * @dataProvider getInvalidIntervals
      */
@@ -130,6 +122,14 @@ class PeriodicalTriggerTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         PeriodicalTrigger::create($interval, $now = new \DateTimeImmutable(), $now->modify('1 day'));
+    }
+
+    public static function getInvalidIntervals(): iterable
+    {
+        yield ['wrong'];
+        yield ['3600.5'];
+        yield [0];
+        yield [-3600];
     }
 
     public function testNegativeInterval()

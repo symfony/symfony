@@ -4,4 +4,4 @@ CHANGELOG
 6.3
 ---
 
- * Add the component
+ * Add the component as experimental

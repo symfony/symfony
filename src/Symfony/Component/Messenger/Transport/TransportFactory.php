@@ -49,8 +49,6 @@ class TransportFactory implements TransportFactoryInterface
             $packageSuggestion = ' Run "composer require symfony/amazon-sqs-messenger" to install Amazon SQS transport.';
         } elseif (str_starts_with($dsn, 'beanstalkd://')) {
             $packageSuggestion = ' Run "composer require symfony/beanstalkd-messenger" to install Beanstalkd transport.';
-        } elseif (str_starts_with($dsn, 'schedule://')) {
-            $packageSuggestion = ' Run "composer require symfony/scheduler" to install Schedule transport.';
         }
 
         throw new InvalidArgumentException('No transport supports the given Messenger DSN.'.$packageSuggestion);

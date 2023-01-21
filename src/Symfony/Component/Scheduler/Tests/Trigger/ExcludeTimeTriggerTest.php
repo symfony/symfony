@@ -21,7 +21,7 @@ class ExcludeTimeTriggerTest extends TestCase
     {
         $inner = $this->createMock(TriggerInterface::class);
         $inner
-            ->method('nextTo')
+            ->method('getNextRunDate')
             ->willReturnCallback(static fn (\DateTimeImmutable $d) => $d->modify('+1 sec'));
 
         $scheduled = new ExcludeTimeTrigger(
@@ -30,9 +30,9 @@ class ExcludeTimeTriggerTest extends TestCase
             new \DateTimeImmutable('2020-02-20T20:20:20Z')
         );
 
-        $this->assertEquals(new \DateTimeImmutable('2020-02-20T02:02:01Z'), $scheduled->nextTo(new \DateTimeImmutable('2020-02-20T02:02:00Z')));
-        $this->assertEquals(new \DateTimeImmutable('2020-02-20T20:20:21Z'), $scheduled->nextTo(new \DateTimeImmutable('2020-02-20T02:02:02Z')));
-        $this->assertEquals(new \DateTimeImmutable('2020-02-20T20:20:21Z'), $scheduled->nextTo(new \DateTimeImmutable('2020-02-20T20:20:20Z')));
-        $this->assertEquals(new \DateTimeImmutable('2020-02-20T22:22:23Z'), $scheduled->nextTo(new \DateTimeImmutable('2020-02-20T22:22:22Z')));
+        $this->assertEquals(new \DateTimeImmutable('2020-02-20T02:02:01Z'), $scheduled->getNextRunDate(new \DateTimeImmutable('2020-02-20T02:02:00Z')));
+        $this->assertEquals(new \DateTimeImmutable('2020-02-20T20:20:21Z'), $scheduled->getNextRunDate(new \DateTimeImmutable('2020-02-20T02:02:02Z')));
+        $this->assertEquals(new \DateTimeImmutable('2020-02-20T20:20:21Z'), $scheduled->getNextRunDate(new \DateTimeImmutable('2020-02-20T20:20:20Z')));
+        $this->assertEquals(new \DateTimeImmutable('2020-02-20T22:22:23Z'), $scheduled->getNextRunDate(new \DateTimeImmutable('2020-02-20T22:22:22Z')));
     }
 }

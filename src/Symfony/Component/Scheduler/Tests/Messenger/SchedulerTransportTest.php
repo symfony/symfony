@@ -13,12 +13,12 @@ namespace Symfony\Component\Scheduler\Tests\Messenger;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Scheduler\Exception\LogicMessengerException;
+use Symfony\Component\Scheduler\Exception\LogicException;
+use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
 use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
-use Symfony\Component\Scheduler\Messenger\ScheduleTransport;
-use Symfony\Component\Scheduler\Schedule\ScheduleInterface;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
 
-class ScheduleTransportTest extends TestCase
+class SchedulerTransportTest extends TestCase
 {
     public function testGetFromIterator()
     {
@@ -26,10 +26,10 @@ class ScheduleTransportTest extends TestCase
             (object) ['id' => 'first'],
             (object) ['id' => 'second'],
         ];
-        $scheduler = $this->createConfiguredMock(ScheduleInterface::class, [
+        $generator = $this->createConfiguredMock(MessageGeneratorInterface::class, [
             'getMessages' => $messages,
         ]);
-        $transport = new ScheduleTransport($scheduler);
+        $transport = new SchedulerTransport($generator);
 
         foreach ($transport->get() as $envelope) {
             $this->assertInstanceOf(Envelope::class, $envelope);
@@ -42,26 +42,25 @@ class ScheduleTransportTest extends TestCase
 
     public function testAckIgnored()
     {
-        $transport = new ScheduleTransport($this->createMock(ScheduleInterface::class));
+        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
 
+        $this->expectNotToPerformAssertions();
         $transport->ack(new Envelope(new \stdClass()));
-
-        $this->assertTrue(true); // count coverage
     }
 
     public function testRejectException()
     {
-        $transport = new ScheduleTransport($this->createMock(ScheduleInterface::class));
+        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
 
-        $this->expectException(LogicMessengerException::class);
+        $this->expectException(LogicException::class);
         $transport->reject(new Envelope(new \stdClass()));
     }
 
     public function testSendException()
     {
-        $transport = new ScheduleTransport($this->createMock(ScheduleInterface::class));
+        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
 
-        $this->expectException(LogicMessengerException::class);
+        $this->expectException(LogicException::class);
         $transport->send(new Envelope(new \stdClass()));
     }
 }

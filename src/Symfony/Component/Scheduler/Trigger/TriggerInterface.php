@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Scheduler\Trigger;
 
+/**
+ * @experimental
+ */
 interface TriggerInterface
 {
-    public function nextTo(\DateTimeImmutable $run): ?\DateTimeImmutable;
+    public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable;
 }

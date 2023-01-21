@@ -12,29 +12,28 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
-use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyScheduleConfigLocator;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummySchedule;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Scheduler\Messenger\ScheduleTransport;
-use Symfony\Component\Scheduler\Schedule\ScheduleConfig;
-use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger;
+use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
+use Symfony\Component\Scheduler\RecurringMessage;
 
 class SchedulerTest extends AbstractWebTestCase
 {
     public function testScheduler()
     {
-        $scheduleConfig = new ScheduleConfig([
-            [PeriodicalTrigger::create(600, '2020-01-01T00:00:00Z'), $foo = new FooMessage()],
-            [PeriodicalTrigger::create(600, '2020-01-01T00:01:00Z'), $bar = new BarMessage()],
-        ]);
-        DummyScheduleConfigLocator::$schedules = ['default' => $scheduleConfig];
+        $scheduledMessages = [
+            RecurringMessage::every('5 minutes', $foo = new FooMessage(), new \DateTimeImmutable('2020-01-01T00:00:00Z')),
+            RecurringMessage::every('5 minutes', $bar = new BarMessage(), new \DateTimeImmutable('2020-01-01T00:01:00Z')),
+        ];
+        DummySchedule::$recurringMessages = $scheduledMessages;
 
         $container = self::getContainer();
         $container->set('clock', $clock = new MockClock('2020-01-01T00:09:59Z'));
 
-        $this->assertTrue($container->get('receivers')->has('schedule'));
-        $this->assertInstanceOf(ScheduleTransport::class, $cron = $container->get('receivers')->get('schedule'));
+        $this->assertTrue($container->get('receivers')->has('scheduler_dummy'));
+        $this->assertInstanceOf(SchedulerTransport::class, $cron = $container->get('receivers')->get('scheduler_dummy'));
 
         $fetchMessages = static function (float $sleep) use ($clock, $cron) {
             if (0 < $sleep) {
@@ -52,7 +51,7 @@ class SchedulerTest extends AbstractWebTestCase
         $this->assertSame([$foo], $fetchMessages(1.0));
         $this->assertSame([], $fetchMessages(1.0));
         $this->assertSame([$bar], $fetchMessages(60.0));
-        $this->assertSame([$foo, $bar], $fetchMessages(600.0));
+        $this->assertSame([$foo, $bar, $foo, $bar], $fetchMessages(600.0));
     }
 
     protected static function createKernel(array $options = []): KernelInterface

@@ -75,6 +75,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -880])
 
         ->set('messenger.transport.native_php_serializer', PhpSerializer::class)
+        ->alias('messenger.default_serializer', 'messenger.transport.native_php_serializer')
 
         // Middleware
         ->set('messenger.middleware.handle_message', HandleMessageMiddleware::class)

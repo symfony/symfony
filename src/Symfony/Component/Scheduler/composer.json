@@ -1,7 +1,7 @@
 {
     "name": "symfony/scheduler",
     "type": "library",
-    "description": "Provides basic scheduling through the Symfony Messenger",
+    "description": "Provides scheduling through Symfony Messenger",
     "keywords": ["scheduler", "schedule", "cron"],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -11,26 +11,24 @@
             "email": "upyx.00@gmail.com"
         },
         {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
             "name": "Symfony Community",
             "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
         "php": ">=8.1",
-        "psr/clock-implementation": "^1.0",
-        "psr/container-implementation": "^1.1|^2.0",
-        "symfony/cache-implementation": "^1.1|^2.0|^3.0",
-        "symfony/messenger": "^5.4|^6.0"
+        "symfony/clock": "^6.3"
     },
     "require-dev": {
+        "dragonmantank/cron-expression": "^3",
         "symfony/cache": "^5.4|^6.0",
-        "symfony/clock": "^6.2",
         "symfony/dependency-injection": "^5.4|^6.0",
-        "symfony/lock": "^5.4|^6.0"
-    },
-    "suggest": {
-        "symfony/cache": "For saving state between restarts.",
-        "symfony/lock": "For preventing workers race."
+        "symfony/lock": "^5.4|^6.0",
+        "symfony/messenger": "^6.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Scheduler\\": "" },

@@ -9,9 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Scheduler\Schedule;
+namespace Symfony\Component\Scheduler;
 
-interface ScheduleInterface
+/**
+ * @experimental
+ */
+interface ScheduleProviderInterface
 {
-    public function getMessages(): iterable;
+    public function getSchedule(): Schedule;
 }

@@ -47,6 +47,10 @@ class NumberType extends AbstractType
     {
         if ($options['html5']) {
             $view->vars['type'] = 'number';
+
+            if (!isset($view->vars['attr']['step'])) {
+                $view->vars['attr']['step'] = 'any';
+            }
         }
     }
 

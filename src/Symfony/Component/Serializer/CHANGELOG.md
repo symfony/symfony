@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `XmlEncoder::SAVE_OPTIONS` context option
  * Deprecate `MissingConstructorArgumentsException` in favor of `MissingConstructorArgumentException`
+ * Deprecate denormalizing an array that is not a list into a `list` typed property
 
 6.2
 ---

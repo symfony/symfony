@@ -140,7 +140,7 @@ final class PhpStanTypeHelper
                 }
             }
 
-            return [new Type($mainType->getBuiltinType(), $mainType->isNullable(), $mainType->getClassName(), true, $collectionKeyTypes, $collectionKeyValues)];
+            return [new Type($mainType->getBuiltinType(), $mainType->isNullable(), $mainType->getClassName(), true, $collectionKeyTypes, $collectionKeyValues, list: 'list' === $node->type->name)];
         }
         if ($node instanceof ArrayShapeNode) {
             return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)];
@@ -175,7 +175,7 @@ final class PhpStanTypeHelper
                 'negative-int' => [new Type(Type::BUILTIN_TYPE_INT)],
                 'double' => [new Type(Type::BUILTIN_TYPE_FLOAT)],
                 'list',
-                'non-empty-list' => [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))],
+                'non-empty-list' => [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), list: true)],
                 'non-empty-array' => [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)],
                 'mixed' => [], // mixed seems to be ignored in all other extractors
                 'parent' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $node->name)],

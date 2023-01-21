@@ -69,6 +69,7 @@ class Type
     private $collection;
     private $collectionKeyType;
     private $collectionValueType;
+    private $list;
 
     /**
      * @param Type[]|Type|null $collectionKeyType
@@ -76,7 +77,7 @@ class Type
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, array|Type $collectionKeyType = null, array|Type $collectionValueType = null)
+    public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, array|Type $collectionKeyType = null, array|Type $collectionValueType = null, bool $list = false)
     {
         if (!\in_array($builtinType, self::$builtinTypes)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
@@ -88,6 +89,7 @@ class Type
         $this->collection = $collection;
         $this->collectionKeyType = $this->validateCollectionArgument($collectionKeyType, 5, '$collectionKeyType') ?? [];
         $this->collectionValueType = $this->validateCollectionArgument($collectionValueType, 6, '$collectionValueType') ?? [];
+        $this->list = $list;
     }
 
     private function validateCollectionArgument(array|Type|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
@@ -161,5 +163,10 @@ class Type
     public function getCollectionValueTypes(): array
     {
         return $this->collectionValueType;
+    }
+
+    public function isList(): bool
+    {
+        return $this->list;
     }
 }

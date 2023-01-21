@@ -126,7 +126,7 @@ class PhpDocExtractorTest extends TestCase
             ['emptyVar', null, 'This should not be removed.', null],
             ['arrayWithKeys', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING))], null, null],
             ['arrayOfMixed', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), null)], null, null],
-            ['listOfStrings', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))], null, null],
+            ['listOfStrings', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING), true)], null, null],
             ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], null, null],
         ];
     }

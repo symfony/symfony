@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add support of `list` typed properties
+
 6.1
 ---
 

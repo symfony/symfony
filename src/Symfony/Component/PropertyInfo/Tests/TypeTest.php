@@ -37,12 +37,19 @@ class TypeTest extends TestCase
         $this->assertIsArray($collectionValueTypes);
         $this->assertContainsOnlyInstancesOf('Symfony\Component\PropertyInfo\Type', $collectionValueTypes);
         $this->assertEquals(Type::BUILTIN_TYPE_STRING, $collectionValueTypes[0]->getBuiltinType());
+        $this->assertFalse($type->isList());
     }
 
     public function testIterable()
     {
         $type = new Type('iterable');
         $this->assertSame('iterable', $type->getBuiltinType());
+    }
+
+    public function testList()
+    {
+        $type = new Type('array', list: true);
+        $this->assertTrue($type->isList());
     }
 
     public function testInvalidType()

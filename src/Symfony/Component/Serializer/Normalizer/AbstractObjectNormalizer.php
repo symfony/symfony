@@ -552,6 +552,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return $data;
                 }
 
+                if ($type->isList() && false === array_is_list($data)) {
+                    // In 7.0, an UnexpectedValueException should be raised instead
+                    trigger_deprecation('symfony/serializer', '6.3', 'Denormalizing an array that is not a list into a list-typed property is deprecated.');
+                }
+
                 if (('is_'.$builtinType)($data)) {
                     return $data;
                 }

@@ -113,10 +113,10 @@ final class PhpDocTypeHelper
             $fqsen = $type->getFqsen();
             if ($fqsen && 'list' === $fqsen->getName() && !class_exists(List_::class, false) && !class_exists((string) $fqsen)) {
                 // Workaround for phpdocumentor/type-resolver < 1.6
-                return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), $this->getTypes($type->getValueType()));
+                return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), $this->getTypes($type->getValueType()), list: true);
             }
 
-            [$phpType, $class] = $this->getPhpTypeAndClass((string) $fqsen);
+            [$phpType, $class] = $this->getPhpTypeAndClass((string) $type->getFqsen());
 
             $key = $this->getTypes($type->getKeyType());
             $value = $this->getTypes($type->getValueType());
@@ -141,7 +141,7 @@ final class PhpDocTypeHelper
             return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);
         }
 
-        if ((str_starts_with($docType, 'list<') || str_starts_with($docType, 'array<')) && $type instanceof Array_) {
+        if ((($list = str_starts_with($docType, 'list<')) || str_starts_with($docType, 'array<')) && $type instanceof Array_) {
             // array<value> is converted to x[] which is handled above
             // so it's only necessary to handle array<key, value> here
             $collectionKeyType = $this->getTypes($type->getKeyType())[0];
@@ -154,7 +154,7 @@ final class PhpDocTypeHelper
                 $collectionValueType = $collectionValueTypes[0];
             }
 
-            return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);
+            return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType, $list);
         }
 
         if ($type instanceof PseudoType) {

@@ -14,7 +14,6 @@ final class RequestValidator
         public string $class,
         public bool $override = true,
         public array $order = [
-            self::ORDER_SERIALIZE,
             self::ORDER_ATTRIBUTES,
             self::ORDER_QUERY,
             self::ORDER_REQUEST,

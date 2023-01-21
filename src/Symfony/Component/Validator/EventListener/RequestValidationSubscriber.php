@@ -47,7 +47,6 @@ class RequestValidationSubscriber implements EventSubscriberInterface
             $class = $attributeArguments['class'];
             $override = key_exists('override', $attributeArguments) ? $attributeArguments['override'] : true;
             $order = key_exists('order', $attributeArguments) ? $attributeArguments['order'] : [
-                RequestValidator::ORDER_SERIALIZE,
                 RequestValidator::ORDER_ATTRIBUTES,
                 RequestValidator::ORDER_QUERY,
                 RequestValidator::ORDER_REQUEST,
@@ -57,7 +56,6 @@ class RequestValidationSubscriber implements EventSubscriberInterface
             $class = $attributeArguments[0];
             $override = key_exists(1, $attributeArguments) ? $attributeArguments[1] : true;
             $order = key_exists(2, $attributeArguments) ? $attributeArguments[2] : [
-                RequestValidator::ORDER_SERIALIZE,
                 RequestValidator::ORDER_ATTRIBUTES,
                 RequestValidator::ORDER_QUERY,
                 RequestValidator::ORDER_REQUEST,

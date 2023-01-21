@@ -5,6 +5,7 @@ namespace Symfony\Component\Validator\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Attribute\RequestValidator;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -41,28 +42,49 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         // only first attribute can validate
         $attribute = $attributes[0];
 
-        $class = $attribute->getArguments()['class'];
-        $override = $attribute->getArguments()['override'];
-        $serializedFormat = $attribute->getArguments()['serializedFormat'];
-        $order = $attribute->getArguments()['order'];
+        $attributeArguments = $attribute->getArguments();
+        if(key_exists('class', $attributeArguments)) {
+            $class = $attributeArguments['class'];
+            $override = key_exists('override', $attributeArguments) ? $attributeArguments['override'] : true;
+            $order = key_exists('order', $attributeArguments) ? $attributeArguments['order'] : [
+                RequestValidator::ORDER_SERIALIZE,
+                RequestValidator::ORDER_ATTRIBUTES,
+                RequestValidator::ORDER_QUERY,
+                RequestValidator::ORDER_REQUEST,
+            ];
+            $serializedFormat = key_exists('serializedFormat', $attributeArguments) ? $attributeArguments['json'] : 'json';
+        }else {
+            $class = $attributeArguments[0];
+            $override = key_exists(1, $attributeArguments) ? $attributeArguments[1] : true;
+            $order = key_exists(2, $attributeArguments) ? $attributeArguments[2] : [
+                RequestValidator::ORDER_SERIALIZE,
+                RequestValidator::ORDER_ATTRIBUTES,
+                RequestValidator::ORDER_QUERY,
+                RequestValidator::ORDER_REQUEST,
+            ];
+            $serializedFormat = key_exists(3, $attributeArguments) ? $attributeArguments[3] : 'json';
+        }
 
         $object = new $class();
 
         foreach ($order as $type) {
             switch ($type) {
                 case RequestValidator::ORDER_SERIALIZE:
+                    if(empty($request->getContent())) {
+                        continue 2;
+                    }
                     $serializer = $this->getSerializer();
                     $serializer->deserialize($request->getContent(), $class, $serializedFormat,
                         [AbstractNormalizer::OBJECT_TO_POPULATE => $object]);
                     continue 2;
                 case RequestValidator::ORDER_REQUEST:
-                    $this->setProperties($object, $request->request, $override);
+                    $this->setProperties($object, $request->request->all(), $override);
                     break;
                 case RequestValidator::ORDER_QUERY:
-                    $this->setProperties($object, $request->query, $override);
+                    $this->setProperties($object, $request->query->all(), $override);
                     break;
                 case RequestValidator::ORDER_ATTRIBUTES:
-                    $this->setProperties($object, $request->attributes, $override);
+                    $this->setProperties($object, $request->attributes->all(), $override);
                     break;
             }
 
@@ -84,9 +106,9 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         $event->setArguments($arguments);
     }
 
-    private function setProperties(object $object, \IteratorAggregate $bag, bool $override) {
-        foreach ($bag as $key => $value) {
-            if(false === $override && property_exists($object, $key)) {
+    private function setProperties(object $object, array $parameters, bool $override) {
+        foreach ($parameters as $key => $value) {
+            if(false === $override && property_exists($object, $key) && isset($object->{$key})) {
                 continue;
             }
             $object->{$key} = $value;
@@ -109,7 +131,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
 
     private function getSerializer(): SerializerInterface
     {
-        if (!class_exists(SerializerInterface::class)) {
+        if (!class_exists(Serializer::class)) {
             throw new LogicException(sprintf('The "symfony/serializer" component is required to use the "%s" validator. Try running "composer require symfony/serializer".',
                 __CLASS__));
         }

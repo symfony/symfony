@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Validator\Attribute;
 
-#[\Attribute(\Attribute::TARGET_FUNCTION)]
+#[\Attribute(\Attribute::TARGET_METHOD)]
 final class RequestValidator
 {
     public const ORDER_ATTRIBUTES = 'attributes';

@@ -269,7 +269,7 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage = new ExpressionLanguage();
         $expression = 'foo.not in [bar]';
         $compiled = $expressionLanguage->compile($expression, ['foo', 'bar']);
-        $this->assertSame('in_array($foo->not, [0 => $bar])', $compiled);
+        $this->assertSame('\Symfony\Component\ExpressionLanguage\Node\BinaryNode::inArray($foo->not, [0 => $bar])', $compiled);
 
         $result = $expressionLanguage->evaluate($expression, ['foo' => (object) ['not' => 'test'], 'bar' => 'test']);
         $this->assertTrue($result);

@@ -38,7 +38,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
      *
      * @throws InvalidArgumentException When first argument is not Connection nor string
      */
-    public function __construct(Connection|string $connOrUrl)
+    public function __construct(#[\SensitiveParameter] Connection|string $connOrUrl)
     {
         if ($connOrUrl instanceof Connection) {
             if (!$connOrUrl->getDatabasePlatform() instanceof PostgreSQLPlatform) {
@@ -243,7 +243,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
      *
      * @throws InvalidArgumentException when driver is not supported
      */
-    private function filterDsn(string $dsn): string
+    private function filterDsn(#[\SensitiveParameter] string $dsn): string
     {
         if (!str_contains($dsn, '://')) {
             throw new InvalidArgumentException(sprintf('String "%" is not a valid DSN for Doctrine DBAL.', $dsn));

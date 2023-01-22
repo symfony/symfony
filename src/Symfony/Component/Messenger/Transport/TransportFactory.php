@@ -29,7 +29,7 @@ class TransportFactory implements TransportFactoryInterface
         $this->factories = $factories;
     }
 
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         foreach ($this->factories as $factory) {
             if ($factory->supports($dsn, $options)) {
@@ -54,7 +54,7 @@ class TransportFactory implements TransportFactoryInterface
         throw new InvalidArgumentException(sprintf('No transport supports the given Messenger DSN "%s".%s.', $dsn, $packageSuggestion));
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
         foreach ($this->factories as $factory) {
             if ($factory->supports($dsn, $options)) {

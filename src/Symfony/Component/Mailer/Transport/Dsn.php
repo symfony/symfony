@@ -35,7 +35,7 @@ final class Dsn
         $this->options = $options;
     }
 
-    public static function fromString(string $dsn): self
+    public static function fromString(#[\SensitiveParameter] string $dsn): self
     {
         if (false === $parsedDsn = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The "%s" mailer DSN is invalid.', $dsn));

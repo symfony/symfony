@@ -17,7 +17,7 @@ Installation
 Sponsor
 -------
 
-Symfony 6.3 is [backed][27] by [SensioLabs][28] and [Shopware][29].
+Symfony 6.3 is [backed][27] by [SensioLabs][28], [Shopware][29] and [Les-Tilleuls.coop][30].
 
 As the creator of Symfony, **SensioLabs** supports companies using Symfony,
 with an offering encompassing consultancy, expertise, services, training, and
@@ -28,7 +28,12 @@ by the world's most acclaimed brands. Create outstanding customer experiences,
 innovate fast, and accelerate your growth in the ever-evolving space of digital
 commerce. You decide how far you want to go, and we'll be by your side.
 
-Help Symfony by [sponsoring][30] its development!
+**Les-Tilleuls.coop** is a team of 70+ Symfony experts who can help you design,
+develop and fix your projects. We provide a wide range of professional services
+including development, consulting, coaching, training and audits. We also are
+highly skilled in JS, Go and DevOps. We are a worker cooperative!
+
+Help Symfony by [sponsoring][31] its development!
 
 Documentation
 -------------
@@ -93,4 +98,5 @@ and supported by [Symfony contributors][19].
 [27]: https://symfony.com/backers
 [28]: https://sensiolabs.com
 [29]: https://www.shopware.com
-[30]: https://symfony.com/sponsor
+[30]: https://les-tilleuls.coop
+[31]: https://symfony.com/sponsor

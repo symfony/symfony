@@ -165,7 +165,7 @@ class Connection
         if (false === $parsedUrl = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
             if (!\in_array($dsn, ['amqp://', 'amqps://'])) {
-                throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
+                throw new InvalidArgumentException('The given AMQP DSN is invalid.');
             }
 
             $parsedUrl = [];

@@ -37,11 +37,11 @@ class ZookeeperStore implements PersistingStoreInterface
     public static function createConnection(#[\SensitiveParameter] string $dsn): \Zookeeper
     {
         if (!str_starts_with($dsn, 'zookeeper:')) {
-            throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
+            throw new InvalidArgumentException('Unsupported DSN for Zookeeper.');
         }
 
         if (false === $params = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('Invalid Zookeeper DSN: "%s".', $dsn));
+            throw new InvalidArgumentException('Invalid Zookeeper DSN.');
         }
 
         $host = $params['host'] ?? '';

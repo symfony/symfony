@@ -44,11 +44,11 @@ final class PagerDutyTransportFactory extends AbstractTransportFactory
     {
         $host = $dsn->getHost();
         if ('default' === $host) {
-            throw new IncompleteDsnException('Host is not set.', $dsn->getOriginalDsn());
+            throw new IncompleteDsnException('Host is not set.', 'pagerduty://default');
         }
 
         if (!str_ends_with($host, '.pagerduty.com')) {
-            throw new IncompleteDsnException('Host must be in format: "subdomain.pagerduty.com".', $dsn->getOriginalDsn());
+            throw new IncompleteDsnException('Host must be in format: "subdomain.pagerduty.com".', 'pagerduty://'.$host);
         }
 
         return $host;

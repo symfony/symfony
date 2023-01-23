@@ -45,11 +45,11 @@ final class ZendeskTransportFactory extends AbstractTransportFactory
     {
         $host = $dsn->getHost();
         if ('default' === $host) {
-            throw new IncompleteDsnException('Host is not set.', $dsn->getOriginalDsn());
+            throw new IncompleteDsnException('Host is not set.', 'zendesk://default');
         }
 
         if (!str_ends_with($host, '.zendesk.com')) {
-            throw new IncompleteDsnException('Host must be in format: "subdomain.zendesk.com".', $dsn->getOriginalDsn());
+            throw new IncompleteDsnException('Host must be in format: "subdomain.zendesk.com".', 'zendesk://'.$dsn->getHost());
         }
 
         return $host;

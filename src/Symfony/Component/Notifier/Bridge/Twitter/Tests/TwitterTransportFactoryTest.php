@@ -39,6 +39,6 @@ class TwitterTransportFactoryTest extends TransportFactoryTestCase
 
     public function incompleteDsnProvider(): iterable
     {
-        yield ['twitter://A:B@default', 'Invalid "twitter://A:B@default" notifier DSN: Access Token is missing'];
+        yield ['twitter://A:B@default', 'Invalid "twitter://default" notifier DSN: Access Token is missing'];
     }
 }

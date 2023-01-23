@@ -66,7 +66,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
             $this->conn = $connOrUrl;
         } else {
             if (!class_exists(DriverManager::class)) {
-                throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrUrl));
+                throw new InvalidArgumentException('Failed to parse the DSN. Try running "composer require doctrine/dbal".');
             }
             $this->conn = DriverManager::getConnection(['url' => $connOrUrl]);
         }

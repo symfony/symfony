@@ -34,7 +34,7 @@ final class TwitterTransportFactory extends AbstractTransportFactory
 
         foreach (['API Key' => $apiKey, 'API Key Secret' => $apiSecret, 'Access Token' => $accessToken, 'Access Token Secret' => $accessSecret] as $name => $key) {
             if (!$key) {
-                throw new IncompleteDsnException($name.' is missing.', $dsn->getOriginalDsn());
+                throw new IncompleteDsnException($name.' is missing.', 'twitter://'.$dsn->getHost());
             }
         }
 

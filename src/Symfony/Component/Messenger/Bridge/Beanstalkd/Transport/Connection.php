@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *
  * @internal
+ *
  * @final
  */
 class Connection
@@ -58,7 +59,7 @@ class Connection
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = []): self
     {
         if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Beanstalkd DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException('The given Beanstalkd DSN is invalid.');
         }
 
         $connectionCredentials = [

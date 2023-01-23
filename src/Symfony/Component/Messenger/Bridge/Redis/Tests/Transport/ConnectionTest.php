@@ -23,7 +23,7 @@ class ConnectionTest extends TestCase
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given Redis DSN "redis://" is invalid.');
+        $this->expectExceptionMessage('The given Redis DSN is invalid.');
 
         Connection::fromDsn('redis://');
     }

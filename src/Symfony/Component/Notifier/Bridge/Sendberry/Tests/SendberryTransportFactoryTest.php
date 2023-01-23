@@ -24,7 +24,7 @@ final class SendberryTransportFactoryTest extends TransportFactoryTestCase
     public function createProvider(): iterable
     {
         yield [
-            'sendberry://user:password@host.test?auth_key=auth_key&from=+0611223344',
+            'sendberry://host.test?from=+0611223344',
             'sendberry://user:password@host.test?auth_key=auth_key&from=%2B0611223344',
         ];
     }

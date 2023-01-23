@@ -77,7 +77,7 @@ class ConnectionTest extends TestCase
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given Amazon SQS DSN "sqs://" is invalid.');
+        $this->expectExceptionMessage('The given Amazon SQS DSN is invalid.');
 
         Connection::fromDsn('sqs://');
     }

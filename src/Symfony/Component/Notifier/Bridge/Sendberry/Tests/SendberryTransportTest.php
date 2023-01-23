@@ -27,7 +27,7 @@ final class SendberryTransportTest extends TransportTestCase
 
     public function toStringProvider(): iterable
     {
-        yield ['sendberry://username:password@api.sendberry.com?auth_key=auth_key&from=from', $this->createTransport()];
+        yield ['sendberry://api.sendberry.com?from=from', $this->createTransport()];
     }
 
     public function supportedMessagesProvider(): iterable

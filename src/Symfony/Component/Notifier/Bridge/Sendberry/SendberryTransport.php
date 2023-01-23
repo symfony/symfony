@@ -46,7 +46,7 @@ final class SendberryTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('sendberry://%s:%s@%s?auth_key=%s&from=%s', $this->username, $this->password, $this->getEndpoint(), $this->authKey, $this->from);
+        return sprintf('sendberry://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool

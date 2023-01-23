@@ -90,7 +90,7 @@ class DoctrineTransportFactoryTest extends TestCase
     public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
     {
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN "doctrine://default".');
+        $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN.');
         $registry = $this->createMock(ConnectionRegistry::class);
         $registry->expects($this->once())
             ->method('getConnection')

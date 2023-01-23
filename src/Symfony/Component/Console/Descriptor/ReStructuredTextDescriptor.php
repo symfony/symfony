@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\String\UnicodeString;
 
 class ReStructuredTextDescriptor extends Descriptor
 {
@@ -77,7 +78,7 @@ class ReStructuredTextDescriptor extends Descriptor
         }
 
         $option_description = $option->getDescription() ? preg_replace('/\s*[\r\n]\s*/', "\n\n", $option->getDescription())."\n\n" : '';
-        $option_description = iconv('UTF-8', 'ASCII//TRANSLIT', $option_description);
+        $option_description = (new UnicodeString($option_description))->ascii();
         $this->write(
             $name."\n".str_repeat($this->paragraphsChar, Helper::width($name))."\n\n"
             .$option_description

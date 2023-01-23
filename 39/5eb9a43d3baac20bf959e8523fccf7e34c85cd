@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-17T15:39:24Z
+
+The [Symfony 5.4 version of MigratingSessionHandler](https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MigratingSessionHandler.php) does not use intersection types, so it does not suffer from this problem. No backport needed unless you run CI on a branch other than 5.4 or 6.3.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T16:06:14Z
+
+Given that Psalm v5 has support for intersection type, it would be better to migrate to psalm v5 in our CI.
+
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-17T16:42:57Z
+
+> Given that Psalm v5 has support for intersection type, it would be better to migrate to psalm v5 in our CI
+
+We're [already using Psalm v5](https://packagist.org/packages/psalm/phar), what makes you think that we aren't? See the `@see` link, I'm pretty sure this is an upstream bug in Psalm, not a general lack of support for intersection types.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-01-17T16:56:04Z
+
+Psalm does support intersection types, so this patch seems too generic to me. https://psalm.dev/r/1daf678918
+
+The referenced bug talks about using *build-in* types in intersection types, which seems to be broken: https://psalm.dev/r/bea279b49e
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-17T16:58:50Z
+
+> what makes you think that we aren't?
+
+What made me think that we aren't is the comment in the code saying "remove this when Psalm implements intersection types", while Psalm v5 has implemented them.
+
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-17T17:03:28Z
+
+Ah I see what you mean, I'll update the comment to indicate that this is a Psalm bug and not a lack of support.
+
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-17T17:42:08Z
+
+@wouterj are you saying you want to see a new Psalm bug opened?
+
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-20T20:59:23Z
+
+Let me know what you want on this, it would really help contributors (and maintainers, I imagine!) to have all tests passing.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-01-21T18:36:59Z
+
+Sorry, I misread the changes (I thought it was doing a global find&replace instead of a local one in the file). Let's go :+1:
+
+(the Psalm bug you referenced is good enough, the maintainers are already on the case it seems and it is about the same issue)

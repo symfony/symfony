@@ -24,13 +24,13 @@ use Symfony\Component\String\UnicodeString;
 class ReStructuredTextDescriptor extends Descriptor
 {
     // <h1>
-    private string $partChar = '#';
+    private string $partChar = '=';
     // <h2>
-    private string $chapterChar = '*';
+    private string $chapterChar = '-';
     // <h3>
-    private string $sectionChar = '=';
+    private string $sectionChar = '~';
     // <h4>
-    private string $subsectionChar = '-';
+    private string $subsectionChar = '.';
     // <h5>
     private string $subsubsectionChar = '^';
     // <h6>

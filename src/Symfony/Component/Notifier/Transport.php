@@ -136,14 +136,14 @@ final class Transport
 
     private iterable $factories;
 
-    public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
     {
         $factory = new self(self::getDefaultFactories($dispatcher, $client));
 
         return $factory->fromString($dsn);
     }
 
-    public static function fromDsns(array $dsns, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
+    public static function fromDsns(#[\SensitiveParameter] array $dsns, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null): TransportInterface
     {
         $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client)));
 
@@ -158,7 +158,7 @@ final class Transport
         $this->factories = $factories;
     }
 
-    public function fromStrings(array $dsns): Transports
+    public function fromStrings(#[\SensitiveParameter] array $dsns): Transports
     {
         $transports = [];
         foreach ($dsns as $name => $dsn) {
@@ -168,7 +168,7 @@ final class Transport
         return new Transports($transports);
     }
 
-    public function fromString(string $dsn): TransportInterface
+    public function fromString(#[\SensitiveParameter] string $dsn): TransportInterface
     {
         $dsns = preg_split('/\s++\|\|\s++/', $dsn);
         if (\count($dsns) > 1) {
@@ -197,7 +197,7 @@ final class Transport
     /**
      * @return TransportInterface[]
      */
-    private function createFromDsns(array $dsns): array
+    private function createFromDsns(#[\SensitiveParameter] array $dsns): array
     {
         $transports = [];
         foreach ($dsns as $dsn) {

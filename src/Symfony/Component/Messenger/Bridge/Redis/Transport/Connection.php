@@ -157,7 +157,7 @@ class Connection
         return $redis;
     }
 
-    public static function fromDsn(string $dsn, array $options = [], \Redis|\RedisCluster $redis = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], \Redis|\RedisCluster $redis = null): self
     {
         if (!str_contains($dsn, ',')) {
             $parsedUrl = self::parseDsn($dsn, $options);

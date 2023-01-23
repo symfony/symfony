@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 interface TransportFactoryInterface
 {
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface;
+    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface;
 
-    public function supports(string $dsn, array $options): bool;
+    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool;
 }

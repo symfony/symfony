@@ -160,7 +160,7 @@ class Connection
      *     * verify: Enable or disable peer verification. If peer verification is enabled then the common name in the
      *       server certificate must match the server name. Peer verification is enabled by default.
      */
-    public static function fromDsn(string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options

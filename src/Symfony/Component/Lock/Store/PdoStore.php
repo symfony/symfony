@@ -64,7 +64,7 @@ class PdoStore implements PersistingStoreInterface
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct(\PDO|string $connOrDsn, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct(#[\SensitiveParameter] \PDO|string $connOrDsn, #[\SensitiveParameter] array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
         $this->init($options, $gcProbability, $initialTtl);
 

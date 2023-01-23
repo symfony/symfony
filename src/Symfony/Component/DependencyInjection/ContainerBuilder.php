@@ -1029,6 +1029,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $this->services[$id] ?? $this->privates[$id];
         }
 
+        if (!array_is_list($arguments)) {
+            $arguments = array_combine(array_map(function ($k) { return preg_replace('/^.*\\$/', '', $k); }, array_keys($arguments)), $arguments);
+        }
+
         if (null !== $factory) {
             $service = $factory(...$arguments);
 

@@ -63,6 +63,7 @@
 
         <service id="security.authentication.session_strategy" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy">
             <argument>%security.authentication.session_strategy.strategy%</argument>
+            <argument type="service" id="security.csrf.token_storage" on-invalid="ignore" />
         </service>
         <service id="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface" alias="security.authentication.session_strategy" />
 

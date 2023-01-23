@@ -25,7 +25,7 @@
         "symfony/security-core": "^4.4",
         "symfony/security-csrf": "^4.2|^5.0",
         "symfony/security-guard": "^4.2|^5.0",
-        "symfony/security-http": "^4.4.5"
+        "symfony/security-http": "^4.4.50"
     },
     "require-dev": {
         "doctrine/annotations": "^1.10.4",

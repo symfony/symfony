@@ -3,7 +3,7 @@
 .. _alias2:
 
 descriptor:command1
--------------------
+...................
 
 command 1 description
 

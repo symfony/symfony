@@ -1,8 +1,8 @@
 My Symfony application v1.0
-###########################
+===========================
 
 Table of Contents
-*****************
+-----------------
 
 
 
@@ -10,7 +10,7 @@ Table of Contents
 - `list`_
 
 descriptor
-==========
+~~~~~~~~~~
 
 
 
@@ -19,13 +19,13 @@ descriptor
 - `descriptor:command4`_
 
 Commands
-********
+--------
 
 Global
-======
+~~~~~~
 
 help
-----
+....
 
 Display help for a command
 
@@ -77,7 +77,7 @@ To output raw command help
 
 
 list
-----
+....
 
 List commands
 
@@ -146,14 +146,14 @@ To skip describing commands' arguments
 
 
 descriptor
-==========
+~~~~~~~~~~
 
 .. _alias1:
 
 .. _alias2:
 
 descriptor:command1
--------------------
+...................
 
 command 1 description
 
@@ -169,7 +169,7 @@ command 1 help
 
 
 descriptor:command2
--------------------
+...................
 
 command 2 description
 
@@ -206,7 +206,7 @@ Options
 .. _command4:descriptor:
 
 descriptor:command4
--------------------
+...................
 
 Usage
 ^^^^^

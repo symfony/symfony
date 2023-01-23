@@ -1,5 +1,5 @@
 descriptor:command2
--------------------
+...................
 
 command 2 description
 

@@ -1,5 +1,5 @@
 descriptor:åèä
---------------
+..............
 
 command åèä description
 

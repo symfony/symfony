@@ -1,8 +1,8 @@
 Console Tool
-############
+============
 
 Table of Contents
-*****************
+-----------------
 
 
 
@@ -10,13 +10,13 @@ Table of Contents
 - `list`_
 
 Commands
-********
+--------
 
 Global
-======
+~~~~~~
 
 help
-----
+....
 
 Display help for a command
 
@@ -68,7 +68,7 @@ To output raw command help
 
 
 list
-----
+....
 
 List commands
 

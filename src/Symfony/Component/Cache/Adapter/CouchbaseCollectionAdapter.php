@@ -79,7 +79,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
 
             foreach ($dsn as $server) {
                 if (0 !== strpos($server, 'couchbase:')) {
-                    throw new InvalidArgumentException(sprintf('Invalid Couchbase DSN: "%s" does not start with "couchbase:".', $server));
+                    throw new InvalidArgumentException('Invalid Couchbase DSN: it does not start with "couchbase:".');
                 }
 
                 preg_match($dsnPattern, $server, $matches);

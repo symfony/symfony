@@ -140,7 +140,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
+        throw new InvalidArgumentException('Unsupported DSN: it does not start with "redis[s]:", "memcached:" nor "couchbase:".');
     }
 
     /**

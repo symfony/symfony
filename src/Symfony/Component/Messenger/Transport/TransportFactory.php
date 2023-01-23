@@ -51,7 +51,7 @@ class TransportFactory implements TransportFactoryInterface
             $packageSuggestion = ' Run "composer require symfony/beanstalkd-messenger" to install Beanstalkd transport.';
         }
 
-        throw new InvalidArgumentException(sprintf('No transport supports the given Messenger DSN "%s".%s.', $dsn, $packageSuggestion));
+        throw new InvalidArgumentException('No transport supports the given Messenger DSN.'.$packageSuggestion);
     }
 
     public function supports(string $dsn, array $options): bool

@@ -52,7 +52,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             $this->conn = $connOrUrl;
         } elseif (\is_string($connOrUrl)) {
             if (!class_exists(DriverManager::class)) {
-                throw new InvalidArgumentException(sprintf('Failed to parse the DSN "%s". Try running "composer require doctrine/dbal".', $connOrUrl));
+                throw new InvalidArgumentException('Failed to parse DSN. Try running "composer require doctrine/dbal".');
             }
             if (class_exists(DsnParser::class)) {
                 $params = (new DsnParser([
@@ -274,7 +274,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
     private function filterDsn(string $dsn): string
     {
         if (!str_contains($dsn, '://')) {
-            throw new InvalidArgumentException(sprintf('String "%s" is not a valid DSN for Doctrine DBAL.', $dsn));
+            throw new InvalidArgumentException('DSN is invalid for Doctrine DBAL.');
         }
 
         [$scheme, $rest] = explode(':', $dsn, 2);

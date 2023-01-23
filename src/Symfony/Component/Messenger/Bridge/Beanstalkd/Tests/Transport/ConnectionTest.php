@@ -30,7 +30,7 @@ final class ConnectionTest extends TestCase
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given Beanstalkd DSN "beanstalkd://" is invalid.');
+        $this->expectExceptionMessage('The given Beanstalkd DSN is invalid.');
 
         Connection::fromDsn('beanstalkd://');
     }

@@ -83,7 +83,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
 
             foreach ($servers as $dsn) {
                 if (0 !== strpos($dsn, 'couchbase:')) {
-                    throw new InvalidArgumentException(sprintf('Invalid Couchbase DSN: "%s" does not start with "couchbase:".', $dsn));
+                    throw new InvalidArgumentException('Invalid Couchbase DSN: it does not start with "couchbase:".');
                 }
 
                 preg_match($dsnPattern, $dsn, $matches);

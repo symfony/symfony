@@ -112,7 +112,7 @@ class Transport
     {
         [$transport, $offset] = $this->parseDsn($dsn);
         if ($offset !== \strlen($dsn)) {
-            throw new InvalidArgumentException(sprintf('The DSN has some garbage at the end: "%s".', substr($dsn, $offset)));
+            throw new InvalidArgumentException('The mailer DSN has some garbage at the end.');
         }
 
         return $transport;

@@ -162,9 +162,9 @@ class Connection
             $parsedUrl = array_merge(...$parsedUrls);
 
             // Regroup all the hosts in an array interpretable by RedisCluster
-            $parsedUrl['host'] = array_map(function ($parsedUrl, $dsn) {
+            $parsedUrl['host'] = array_map(function ($parsedUrl) {
                 if (!isset($parsedUrl['host'])) {
-                    throw new InvalidArgumentException(sprintf('Missing host in DSN part "%s", it must be defined when using Redis Cluster.', $dsn));
+                    throw new InvalidArgumentException('Missing host in DSN, it must be defined when using Redis Cluster.');
                 }
 
                 return $parsedUrl['host'].':'.($parsedUrl['port'] ?? 6379);
@@ -276,7 +276,7 @@ class Connection
         }
 
         if (false === $parsedUrl = parse_url($url)) {
-            throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException('The given Redis DSN is invalid.');
         }
         if (isset($parsedUrl['query'])) {
             parse_str($parsedUrl['query'], $dsnOptions);

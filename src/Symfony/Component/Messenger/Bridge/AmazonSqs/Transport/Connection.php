@@ -104,7 +104,7 @@ class Connection
     public static function fromDsn(string $dsn, array $options = [], HttpClientInterface $client = null, LoggerInterface $logger = null): self
     {
         if (false === $parsedUrl = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Amazon SQS DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException('The given Amazon SQS DSN is invalid.');
         }
 
         $query = [];

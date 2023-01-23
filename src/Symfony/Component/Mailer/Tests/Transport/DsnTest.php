@@ -92,17 +92,17 @@ class DsnTest extends TestCase
     {
         yield [
             'some://',
-            'The "some://" mailer DSN is invalid.',
+            'The mailer DSN is invalid.',
         ];
 
         yield [
             '//sendmail',
-            'The "//sendmail" mailer DSN must contain a scheme.',
+            'The mailer DSN must contain a scheme.',
         ];
 
         yield [
             'file:///some/path',
-            'The "file:///some/path" mailer DSN must contain a host (use "default" by default).',
+            'The mailer DSN must contain a host (use "default" by default).',
         ];
     }
 }

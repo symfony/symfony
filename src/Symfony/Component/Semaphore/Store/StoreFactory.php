@@ -48,7 +48,7 @@ class StoreFactory
             case 0 === strpos($connection, 'redis://'):
             case 0 === strpos($connection, 'rediss://'):
                 if (!class_exists(AbstractAdapter::class)) {
-                    throw new InvalidArgumentException(sprintf('Unsupported DSN "%s". Try running "composer require symfony/cache".', $connection));
+                    throw new InvalidArgumentException('Unsupported Redis DSN. Try running "composer require symfony/cache".');
                 }
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 

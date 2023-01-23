@@ -8,6 +8,9 @@ services:
             - '@request_stack'
         tags:
             - { name: form.type }
+    test.security.csrf.token_storage:
+        alias: security.csrf.token_storage
+        public: true
 
 security:
     encoders:

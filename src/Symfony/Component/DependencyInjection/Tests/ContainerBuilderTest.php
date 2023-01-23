@@ -1934,7 +1934,7 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(['tag1', 'tag2', 'tag3'], $container->findTags());
     }
 
-    public function testNamedArgument()
+    public function testNamedArgumentAfterCompile()
     {
         $container = new ContainerBuilder();
         $container->register(E::class)
@@ -1947,6 +1947,18 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertSame('', $e->first);
         $this->assertSame(2, $e->second);
+    }
+
+    public function testNamedArgumentBeforeCompile()
+    {
+        $container = new ContainerBuilder();
+        $container->register(E::class, E::class)
+            ->setPublic(true)
+            ->setArguments(['$first' => 1]);
+
+        $e = $container->get(E::class);
+
+        $this->assertSame(1, $e->first);
     }
 }
 

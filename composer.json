@@ -192,16 +192,16 @@
         ]
     },
     "scripts": {
-        "docker-build": "docker build --tag symfony-tests .docker/",
+        "docker-build": "docker build --build-arg DOCKER_PHP_VERSION=${DOCKER_PHP_VERSION} --tag symfony-tests .docker/",
         "docker-run": "docker run --rm --tty --user $(id --user):$(id --group) --volume $(pwd):/symfony symfony-tests",
         "docker-composer": "@docker-run env COMPOSER_ROOT_VERSION=6.2.x-dev composer update",
         "docker-tests": "@docker-run ./phpunit"
     },
     "scripts-descriptions": {
-        "docker-build": "Build the Docker image",
+        "docker-build": "Build the Docker image, you can use a different version by defining “DOCKER_PHP_VERSION”, e.g. “env DOCKER_PHP_VERSION=\"8.1\" composer docker-build”",
         "docker-run": "Base command to run Docker",
         "docker-composer": "Install dependencies through Composer",
-        "docker-tests": "Run tests, you should pass arguments, e.g. “composer docker-tests src/Symfony/Component/Yaml/” for testing a specific folder or “composer docker-tests src/Symfony/” to run the whole test suite in parallel. Options for PHPUnit must be prepend with --, e.g. “composer docker-tests -- --verbose --debug src/Symfony/Component/Yaml/”"
+        "docker-tests": "Run tests, you should pass arguments, e.g. “composer docker-tests src/Symfony/Component/DependencyInjection/” for testing a specific folder or “composer docker-tests src/Symfony/” to run the whole test suite in parallel. Options for PHPUnit must be prepend with --, e.g. “composer docker-tests -- --verbose --debug src/Symfony/Component/DependencyInjection/”"
     },
     "repositories": [
         {

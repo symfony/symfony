@@ -1,4 +1,6 @@
-FROM php:8.1-cli-bullseye
+ARG DOCKER_PHP_VERSION=8.2
+
+FROM php:${DOCKER_PHP_VERSION}-cli-bullseye
 
 ENV DEBIAN_FRONTEND=noninteractive
 

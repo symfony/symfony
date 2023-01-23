@@ -194,7 +194,7 @@
     "scripts": {
         "docker-build": "docker build --build-arg DOCKER_PHP_VERSION=${DOCKER_PHP_VERSION} --tag symfony-tests .docker/",
         "docker-run": "docker run --rm --tty --user $(id --user):$(id --group) --volume $(pwd):/symfony symfony-tests",
-        "docker-composer": "@docker-run env COMPOSER_ROOT_VERSION=6.2.x-dev composer update",
+        "docker-composer": "@docker-run env COMPOSER_ROOT_VERSION=6.3.x-dev composer update",
         "docker-tests": "@docker-run ./phpunit"
     },
     "scripts-descriptions": {

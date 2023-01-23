@@ -39,7 +39,7 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
     public function testInvalidDSNHasBothClusterAndSentinel()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot use both "redis_cluster" and "redis_sentinel" at the same time:');
+        $this->expectExceptionMessage('Cannot use both "redis_cluster" and "redis_sentinel" at the same time.');
         $dsn = 'redis:?host[redis1]&host[redis2]&host[redis3]&redis_cluster=1&redis_sentinel=mymaster';
         RedisAdapter::createConnection($dsn);
     }
@@ -49,7 +49,7 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
         $hosts = getenv('REDIS_SENTINEL_HOSTS');
         $dsn = 'redis:?host['.str_replace(' ', ']&host[', $hosts).']';
         $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Failed to retrieve master information from sentinel "invalid-masterset-name" and dsn "'.$dsn.'".');
+        $this->expectExceptionMessage('Failed to retrieve master information from sentinel "invalid-masterset-name".');
         AbstractAdapter::createConnection($dsn, ['redis_sentinel' => 'invalid-masterset-name']);
     }
 }

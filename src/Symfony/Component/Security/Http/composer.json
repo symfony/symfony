@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "symfony/security-core": "^5.4|^6.0",
+        "symfony/security-core": "^5.4.19|~6.0.19|~6.1.11|^6.2.5",
         "symfony/http-foundation": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0",
         "symfony/polyfill-mbstring": "~1.0",

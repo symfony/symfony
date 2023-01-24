@@ -93,8 +93,8 @@ class PersistentRememberMeHandlerTest extends TestCase
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $rememberParts = explode(':', base64_decode($rememberMeDetails->toString()), 4);
-        $cookieParts = explode(':', base64_decode($cookie->getValue()), 4);
+        $rememberParts = explode(':', $rememberMeDetails->toString(), 4);
+        $cookieParts = explode(':', $cookie->getValue(), 4);
 
         $this->assertSame($rememberParts[0], $cookieParts[0]); // class
         $this->assertSame($rememberParts[1], $cookieParts[1]); // identifier

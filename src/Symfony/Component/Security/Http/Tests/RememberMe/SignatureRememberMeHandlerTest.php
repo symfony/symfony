@@ -12,13 +12,11 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
-use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
 use Symfony\Component\Security\Core\Signature\SignatureHasher;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -36,10 +34,8 @@ class SignatureRememberMeHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->signatureHasher = $this->createMock(SignatureHasher::class);
+        $this->signatureHasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), [], 's3cret');
         $this->userProvider = new InMemoryUserProvider();
-        $user = new InMemoryUser('wouter', null);
-        $this->userProvider->createUser($user);
         $this->requestStack = new RequestStack();
         $this->request = Request::create('/login');
         $this->requestStack->push($this->request);
@@ -51,10 +47,9 @@ class SignatureRememberMeHandlerTest extends TestCase
      */
     public function testCreateRememberMeCookie()
     {
-        ClockMock::register(SignatureRememberMeHandler::class);
-
         $user = new InMemoryUser('wouter', null);
-        $this->signatureHasher->expects($this->once())->method('computeSignatureHash')->with($user, $expire = time() + 31536000)->willReturn('abc');
+        $signature = $this->signatureHasher->computeSignatureHash($user, $expire = time() + 31536000);
+        $this->userProvider->createUser(new InMemoryUser('wouter', null));
 
         $this->handler->createRememberMeCookie($user);
 
@@ -62,7 +57,7 @@ class SignatureRememberMeHandlerTest extends TestCase
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertEquals(base64_encode(InMemoryUser::class.':d291dGVy:'.$expire.':abc'), $cookie->getValue());
+        $this->assertEquals(strtr(InMemoryUser::class, '\\', '.').':d291dGVy:'.$expire.':'.$signature, $cookie->getValue());
     }
 
     public function testClearRememberMeCookie()
@@ -76,50 +71,36 @@ class SignatureRememberMeHandlerTest extends TestCase
         $this->assertNull($cookie->getValue());
     }
 
-    /**
-     * @group time-sensitive
-     */
     public function testConsumeRememberMeCookieValid()
     {
-        $this->signatureHasher->expects($this->once())->method('verifySignatureHash')->with($user = new InMemoryUser('wouter', null), 360, 'signature');
-        $this->signatureHasher->expects($this->any())
-            ->method('computeSignatureHash')
-            ->with($user, $expire = time() + 31536000)
-            ->willReturn('newsignature');
+        $user = new InMemoryUser('wouter', null);
+        $signature = $this->signatureHasher->computeSignatureHash($user, $expire = time() + 3600);
+        $this->userProvider->createUser(new InMemoryUser('wouter', null));
 
-        $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'signature');
+        $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', $expire, $signature);
         $this->handler->consumeRememberMeCookie($rememberMeDetails);
 
         $this->assertTrue($this->request->attributes->has(ResponseListener::COOKIE_ATTR_NAME));
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertEquals((new RememberMeDetails(InMemoryUser::class, 'wouter', $expire, 'newsignature'))->toString(), $cookie->getValue());
+        $this->assertNotEquals((new RememberMeDetails(InMemoryUser::class, 'wouter', $expire, $signature))->toString(), $cookie->getValue());
     }
 
     public function testConsumeRememberMeCookieInvalidHash()
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('The cookie\'s hash is invalid.');
-
-        $this->signatureHasher->expects($this->any())
-            ->method('verifySignatureHash')
-            ->with(new InMemoryUser('wouter', null), 360, 'badsignature')
-            ->will($this->throwException(new InvalidSignatureException()));
-
-        $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'badsignature'));
+        $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', time() + 600, 'badsignature'));
     }
 
     public function testConsumeRememberMeCookieExpired()
     {
+        $user = new InMemoryUser('wouter', null);
+        $signature = $this->signatureHasher->computeSignatureHash($user, 360);
+
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('The cookie has expired.');
-
-        $this->signatureHasher->expects($this->any())
-            ->method('verifySignatureHash')
-            ->with(new InMemoryUser('wouter', null), 360, 'signature')
-            ->will($this->throwException(new ExpiredSignatureException()));
-
-        $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', 360, 'signature'));
+        $this->handler->consumeRememberMeCookie(new RememberMeDetails(InMemoryUser::class, 'wouter', 360, $signature));
     }
 }

@@ -41,6 +41,27 @@
     {{ parent() }}
 
     <style>
+        .form-type-class {
+            font-size: var(--font-size-body);
+            display: flex;
+            margin: 0 0 15px;
+        }
+        .form-type-class-label {
+            margin-right: 4px;
+        }
+        .form-type-class pre.sf-dump {
+            font-family: var(--font-family-system) !important;
+            font-size: var(--font-size-body) !important;
+            margin-left: 5px;
+        }
+        .form-type-class .sf-dump .sf-dump-str {
+            color: var(--color-link) !important;
+            text-decoration: underline;
+        }
+        .form-type-class .sf-dump .sf-dump-str:hover {
+            text-decoration: none;
+        }
+
         #tree-menu {
             float: left;
             padding-right: 10px;

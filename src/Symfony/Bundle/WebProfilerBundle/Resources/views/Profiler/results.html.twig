@@ -6,6 +6,28 @@
     {%- endif -%}
 {% endmacro %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #search-results td {
+            font-family: var(--font-family-system);
+            vertical-align: middle;
+        }
+
+        #search-results .sf-search {
+            visibility: hidden;
+            margin-left: 2px;
+        }
+        #search-results tr:hover .sf-search {
+            visibility: visible;
+        }
+        #search-results .sf-search svg {
+            stroke-width: 3;
+        }
+    </style>
+{% endblock %}
+
 {% block summary %}
     <div class="status">
         <h2>Profile Search</h2>

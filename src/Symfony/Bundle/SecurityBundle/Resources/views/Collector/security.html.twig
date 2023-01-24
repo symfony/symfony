@@ -2,6 +2,35 @@
 
 {% block page_title 'Security' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #collector-content .decision-log .voter_result td {
+            border-top-width: 1px;
+            border-bottom-width: 0;
+            padding-bottom: 0;
+        }
+
+        #collector-content .decision-log .voter_details td {
+            border-top-width: 0;
+            border-bottom-width: 1px;
+            padding-bottom: 0;
+        }
+
+        #collector-content .decision-log .voter_details table {
+            border: 0;
+            margin: 0;
+            box-shadow: unset;
+        }
+
+        #collector-content .decision-log .voter_details table td {
+            border: 0;
+            padding: 0 0 8px 0;
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% if collector.firewall %}
         {% set icon %}

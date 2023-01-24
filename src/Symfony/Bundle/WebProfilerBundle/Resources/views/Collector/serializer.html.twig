@@ -1,5 +1,33 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #collector-content .sf-serializer {
+            margin-bottom: 2em;
+        }
+
+        #collector-content .sf-serializer .trace {
+            border: var(--border);
+            background: var(--page-background);
+            padding: 10px;
+            margin: 0.5em 0;
+            overflow: auto;
+        }
+        #collector-content .sf-serializer .trace {
+            font-size: 12px;
+        }
+        #collector-content .sf-serializer .trace li {
+            margin-bottom: 0;
+            padding: 0;
+        }
+        #collector-content .sf-serializer .trace li.selected {
+            background: var(--highlight-selected-line);
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% if collector.handledCount > 0 %}
         {% set icon %}

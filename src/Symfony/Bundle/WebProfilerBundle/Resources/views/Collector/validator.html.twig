@@ -1,5 +1,34 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #collector-content .sf-validator {
+            margin-bottom: 2em;
+        }
+
+        #collector-content .sf-validator .sf-validator-context,
+        #collector-content .sf-validator .trace {
+            border: var(--border);
+            background: var(--base-0);
+            padding: 10px;
+            margin: 0.5em 0;
+            overflow: auto;
+        }
+        #collector-content .sf-validator .trace {
+            font-size: 12px;
+        }
+        #collector-content .sf-validator .trace li {
+            margin-bottom: 0;
+            padding: 0;
+        }
+        #collector-content .sf-validator .trace li.selected {
+            background: var(--highlight-selected-line);
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% if collector.violationsCount > 0 or collector.calls|length %}
         {% set status_color = collector.violationsCount ? 'red' %}

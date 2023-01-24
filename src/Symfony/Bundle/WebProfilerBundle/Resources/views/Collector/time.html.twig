@@ -1,5 +1,43 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        #timeline-control {
+            background: var(--table-background);
+            box-shadow: var(--shadow);
+            margin: 1em 0;
+            padding: 10px;
+        }
+        #timeline-control label {
+            font-weight: bold;
+            margin-right: 1em;
+        }
+        #timeline-control input {
+            background: var(--metric-value-background);
+            font-size: 16px;
+            padding: 4px;
+            text-align: right;
+            width: 5em;
+        }
+        #timeline-control .help {
+            margin-left: 1em;
+        }
+
+        .sf-profiler-timeline .legends {
+            font-size: 12px;
+            line-height: 1.5em;
+        }
+        .sf-profiler-timeline .legends button {
+            color: var(--color-text);
+        }
+        .sf-profiler-timeline + p.help {
+            margin-top: 0;
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% set has_time_events = collector.events|length > 0 %}
     {% set total_time = has_time_events ? '%.0f'|format(collector.duration) : 'n/a' %}

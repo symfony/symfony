@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate `framework:exceptions` tag, unwrap it and replace `framework:exception` tags' `name` attribute by `class`
  * Deprecate the `notifier.logger_notification_listener` service, use the `notifier.notification_logger_listener` service instead
  * Allow setting private services with the test container
+ * Add `framework.uri_max_length` option
 
 6.2
 ---

@@ -206,6 +206,19 @@ class HttpKernelTest extends TestCase
         }
     }
 
+    public function testHandleUriTooLongException()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+            $event->setResponse(new Response($event->getThrowable()->getMessage()));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, uriMaxLength: 16);
+        $response = $kernel->handle(Request::create('https://symfony.com/too-long'));
+
+        $this->assertEquals(414, $response->getStatusCode());
+    }
+
     public function testHandleExceptionWithARedirectionResponse()
     {
         $dispatcher = new EventDispatcher();
@@ -477,7 +490,7 @@ class HttpKernelTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false)
+    private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false, int $uriMaxLength = null)
     {
         $controller ??= fn () => new Response('Hello');
 
@@ -493,7 +506,7 @@ class HttpKernelTest extends TestCase
             ->method('getArguments')
             ->willReturn($arguments);
 
-        return new HttpKernel($eventDispatcher, $controllerResolver, $requestStack, $argumentResolver, $handleAllThrowables);
+        return new HttpKernel($eventDispatcher, $controllerResolver, $requestStack, $argumentResolver, $handleAllThrowables, $uriMaxLength);
     }
 
     private function assertResponseEquals(Response $expected, Response $actual)

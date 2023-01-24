@@ -9,6 +9,7 @@ CHANGELOG
  * Add `#[WithHttpStatus]` for defining status codes for exceptions
  * Use an instance of `Psr\Clock\ClockInterface` to generate the current date time in `DateTimeValueResolver`
  * Add `#[WithLogLevel]` for defining log levels for exceptions
+ * Add `UriTooLongHttpException` and allow setting a length limit to URL being handled by `HttpKernel`
 
 6.2
 ---

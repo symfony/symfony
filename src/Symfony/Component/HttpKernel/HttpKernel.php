@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UriTooLongHttpException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 // Help opcache.preload discover always-needed symbols
@@ -55,14 +56,16 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     protected $requestStack;
     private ArgumentResolverInterface $argumentResolver;
     private bool $handleAllThrowables;
+    private ?int $uriMaxLength;
 
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null, bool $handleAllThrowables = false)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null, bool $handleAllThrowables = false, int $uriMaxLength = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?? new RequestStack();
         $this->argumentResolver = $argumentResolver ?? new ArgumentResolver();
         $this->handleAllThrowables = $handleAllThrowables;
+        $this->uriMaxLength = $uriMaxLength;
     }
 
     public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
@@ -71,6 +74,10 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $this->requestStack->push($request);
         try {
+            if (null !== $this->uriMaxLength && $this->uriMaxLength < \strlen($request->getUri())) {
+                throw new UriTooLongHttpException(sprintf('Max URI length allowed is %d, got %d.', $this->uriMaxLength, \strlen($request->getUri())));
+            }
+
             return $this->handleRaw($request, $type);
         } catch (\Throwable $e) {
             if ($e instanceof \Error && !$this->handleAllThrowables) {

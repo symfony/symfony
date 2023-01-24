@@ -134,6 +134,11 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue('error_controller')
                 ->end()
                 ->booleanNode('handle_all_throwables')->info('HttpKernel will handle all kinds of \Throwable')->end()
+                ->integerNode('uri_max_length')
+                    ->min(0)
+                    ->defaultNull()
+                    ->info('The maximum length of URLs the HttpKernel should handle')
+                ->end()
             ->end()
         ;
 

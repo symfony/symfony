@@ -687,6 +687,7 @@ class ConfigurationTest extends TestCase
                 'sanitizers' => [],
             ],
             'exceptions' => [],
+            'uri_max_length' => null,
         ];
     }
 }

@@ -1,5 +1,41 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        .sf-profiler-httpclient-requests thead th {
+            vertical-align: top;
+        }
+        .sf-profiler-httpclient-requests .http-method {
+            border: 1px solid var(--header-status-request-method-color);
+            border-radius: 5px;
+            color: var(--header-status-request-method-color);
+            display: inline-block;
+            font-weight: 500;
+            line-height: 1;
+            margin-right: 6px;
+            padding: 2px 4px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .sf-profiler-httpclient-requests .status-response-status-code {
+            background: var(--gray-600);
+            border-radius: 4px;
+            color: var(--white);
+            display: inline-block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            padding: 1px 3px;
+        }
+        .sf-profiler-httpclient-requests .status-response-status-code.status-success { background: var(--header-success-status-code-background); color: var(--header-success-status-code-color); }
+        .sf-profiler-httpclient-requests .status-response-status-code.status-warning { background: var(--header-warning-status-code-background); color: var(--header-warning-status-code-color); }
+        .sf-profiler-httpclient-requests .status-response-status-code.status-error { background: var(--header-error-status-code-background); color: var(--header-error-status-code-color); }
+    </style>
+{% endblock %}
+
+
 {% block toolbar %}
     {% if collector.requestCount %}
         {% set icon %}

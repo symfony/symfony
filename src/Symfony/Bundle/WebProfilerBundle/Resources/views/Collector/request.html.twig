@@ -1,5 +1,28 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        .empty-query-post-files {
+            display: flex;
+            justify-content: space-between;
+        }
+        .empty-query-post-files > div {
+            flex: 1;
+        }
+        .empty-query-post-files > div + div {
+            margin-left: 30px;
+        }
+        .empty-query-post-files h3 {
+            margin-top: 0;
+        }
+        .empty-query-post-files .empty {
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% set request_handler %}
         {{ _self.set_handler(collector.controller) }}

@@ -1,5 +1,143 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{  parent() }}
+
+    <style>
+        :root {
+            --mailer-email-table-wrapper-background: var(--gray-100);
+            --mailer-email-table-active-row-background: #dbeafe;
+            --mailer-email-table-active-row-color: var(--color-text);
+        }
+        .theme-dark {
+            --mailer-email-table-wrapper-background: var(--gray-900);
+            --mailer-email-table-active-row-background: var(--gray-300);
+            --mailer-email-table-active-row-color: var(--gray-800);
+        }
+
+        .mailer-email-summary-table-wrapper {
+            background: var(--mailer-email-table-wrapper-background);
+            border-bottom: 4px double var(--table-border-color);
+            border-radius: inherit;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            margin: 0 -9px 10px -9px;
+            padding-bottom: 10px;
+            transform: translateY(-9px);
+            max-height: 265px;
+            overflow-y: auto;
+        }
+        .mailer-email-summary-table,
+        .mailer-email-summary-table tr,
+        .mailer-email-summary-table td {
+            border: 0;
+            border-radius: inherit;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            box-shadow: none;
+        }
+        .mailer-email-summary-table th {
+            color: var(--color-muted);
+            font-size: 13px;
+            padding: 4px 10px;
+        }
+        .mailer-email-summary-table tr td,
+        .mailer-email-summary-table tr:last-of-type td {
+            border: solid var(--table-border-color);
+            border-width: 1px 0;
+        }
+        .mailer-email-summary-table-row {
+            margin: 5px 0;
+        }
+        .mailer-email-summary-table-row:hover {
+            cursor: pointer;
+        }
+        .mailer-email-summary-table-row.active {
+            background: var(--mailer-email-table-active-row-background);
+            color: var(--mailer-email-table-active-row-color);
+        }
+        .mailer-email-summary-table-row td {
+            font-family: var(--font-family-system);
+            font-size: inherit;
+        }
+        .mailer-email-details {
+            display: none;
+        }
+        .mailer-email-details.active {
+            display: block;
+        }
+        .mailer-transport-information {
+            border-bottom: 1px solid var(--form-input-border-color);
+            padding-bottom: 5px;
+            font-size: var(--font-size-body);
+            margin: 5px 0 10px 5px;
+        }
+        .mailer-transport-information .badge {
+            font-size: inherit;
+            font-weight: inherit;
+        }
+        .mailer-message-subject {
+            font-size: 21px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        .mailer-message-headers {
+            margin-bottom: 10px;
+        }
+        .mailer-message-headers p {
+            font-size: var(--font-size-body);
+            margin: 2px 5px;
+        }
+        .mailer-message-header-secondary {
+            color: var(--color-muted);
+        }
+        .mailer-message-attachments-title {
+            align-items: center;
+            display: flex;
+            font-size: var(--font-size-body);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .mailer-message-attachments-title svg {
+            color: var(--color-muted);
+            margin-right: 5px;
+            height: 18px;
+            width: 18px;
+        }
+        .mailer-message-attachments-title span {
+            font-weight: normal;
+            margin-left: 4px;
+        }
+        .mailer-message-attachments-list {
+            list-style: none;
+            margin: 0 0 5px 20px;
+            padding: 0;
+        }
+        .mailer-message-attachments-list li {
+            align-items: center;
+            display: flex;
+        }
+        .mailer-message-attachments-list li svg {
+            margin-right: 5px;
+            height: 18px;
+            width: 18px;
+        }
+        .mailer-message-attachments-list li a {
+            margin-left: 5px;
+        }
+        .mailer-message-download-raw {
+            align-items: center;
+            display: flex;
+            padding: 5px 0 0 5px;
+        }
+        .mailer-message-download-raw svg {
+            height: 18px;
+            width: 18px;
+            margin-right: 3px;
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% set events = collector.events %}
 

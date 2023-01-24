@@ -1,5 +1,51 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        .config-symfony-version-lts {
+            border: 0;
+            color: var(--color-muted);
+            font-size: 21px;
+            line-height: 33px;
+        }
+        .config-symfony-version-lts[title] {
+            text-decoration: none;
+        }
+        .config-symfony-version-status-badge {
+            background-color: var(--badge-background);
+            border-radius: 4px;
+            color: var(--badge-color);
+            display: inline-block;
+            font-size: 15px;
+            font-weight: bold;
+            margin: 10px 0 5px;
+            padding: 3px 7px;
+            white-space: nowrap;
+        }
+        .config-symfony-version-status-badge.status-success {
+            background-color: var(--badge-success-background);
+            color: var(--badge-success-color);
+        }
+        .config-symfony-version-status-badge.status-warning {
+            background-color: var(--badge-warning-background);
+            color: var(--badge-warning-color);
+        }
+        .config-symfony-version-status-badge.status-error {
+            background-color: var(--badge-danger-background);
+            color: var(--badge-danger-color);
+        }
+        .config-symfony-version-roadmap-link {
+            display: inline-block;
+            margin: 10px 5px 5px;
+        }
+        .config-symfony-eol {
+            margin-top: 5px;
+        }
+    </style>
+{% endblock %}
+
 {% block toolbar %}
     {% if 'unknown' == collector.symfonyState %}
         {% set block_status = '' %}

@@ -215,6 +215,14 @@ class ByteString extends AbstractString
         return $str;
     }
 
+    public function kebab(): static
+    {
+        $str = $this->camel();
+        $str->string = strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], '\1-\2', $str->string));
+
+        return $str;
+    }
+
     public function length(): int
     {
         return \strlen($this->string);

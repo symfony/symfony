@@ -83,12 +83,6 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     {
         $userIdentifier = $request->get('user');
 
-        try {
-            $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
-        } catch (UserNotFoundException $exception) {
-            throw new InvalidLoginLinkException('User not found.', 0, $exception);
-        }
-
         if (!$hash = $request->get('hash')) {
             throw new InvalidLoginLinkException('Missing "hash" parameter.');
         }
@@ -97,7 +91,13 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         }
 
         try {
+            $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash);
+
+            $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
+
             $this->signatureHasher->verifySignatureHash($user, $expires, $hash);
+        } catch (UserNotFoundException $e) {
+            throw new InvalidLoginLinkException('User not found.', 0, $e);
         } catch (ExpiredSignatureException $e) {
             throw new ExpiredLoginLinkException(ucfirst(str_ireplace('signature', 'login link', $e->getMessage())), 0, $e);
         } catch (InvalidSignatureException $e) {

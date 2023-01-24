@@ -7,6 +7,33 @@ in 6.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.1.0...v6.1.1
 
+* 6.1.11 (2023-01-24)
+
+ * bug #49078 [Security/Http] Check tokens before loading users from providers (nicolas-grekas)
+ * bug #49077 [DependencyInjection] Fix named arguments when using ContainerBuilder before compilation (nicolas-grekas)
+ * bug #49031 [Cache] fix collecting cache stats when nesting computations (nicolas-grekas)
+ * bug #49046 Fix for Windows when projects are deployed on junctions/symlinks (nerdgod)
+ * bug #49025 [Notifier] [OvhCloud] handle invalid receiver (seferov)
+ * bug #48993 [VarDumper] Fix JS to expand / collapse (nicolas-grekas)
+ * bug #48983 Fix BC user_identifier support after deprecation username (vtsykun)
+ * bug #48986 [Validator] Fix Email validator logic (fabpot)
+ * bug #48969 [PropertyInfo] Fixes constructor extractor for mixed type (michael.kubovic)
+ * bug #48978 [Serializer] use method_exists() instead of catching reflection exceptions (xabbuh)
+ * bug #48937 [SecurityBundle] Fix using same handler for multiple authenticators (RobertMe)
+ * bug #48971 [DependencyInjection] Fix dump order of inlined deps (nicolas-grekas)
+ * bug #48966 [HttpClient] Let curl handle content-length headers (nicolas-grekas)
+ * bug #48968 [VarExporter] Fix exporting enums (nicolas-grekas)
+ * bug #48933 [Validator] Fix bad handling of nulls when the 'fields' option of the Unique constraint is set (plfort)
+ * bug #48926 [DependencyInjection] Fix support for named arguments on non-autowired services (nicolas-grekas)
+ * bug #48943 [FrameworkBundle] Fix deprecation when accessing a "container.private" service from the test container (nicolas-grekas)
+ * bug #48931 [DependencyInjection] Fix dumping inlined withers (nicolas-grekas)
+ * bug #48898 [HttpClient] Move Http clients data collecting at a late level (pforesi)
+ * bug #48896 [DoctrineBridge] Fix detecting mapping with one line annotations (franmomu)
+ * bug #48916 [FrameworkBundle] restore call to addGlobalIgnoredName (alexislefebvre)
+ * bug #48917 [Config] Fix XML dump when node example is an array (alexandre-daubois)
+ * bug #48904 [Validator] Allow egulias/email-validator v4 (chalasr)
+ * bug #48831 [Uid] Fix validating nil and max uuid (fancyweb)
+
 * 6.1.10 (2022-12-29)
 
  * bug #48823 [Cache] Fix possibly null value passed to preg_match() in RedisTrait (chalasr)

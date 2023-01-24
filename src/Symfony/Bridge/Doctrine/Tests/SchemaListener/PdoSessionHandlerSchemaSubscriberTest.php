@@ -36,7 +36,7 @@ class PdoSessionHandlerSchemaSubscriberTest extends TestCase
             ->method('configureSchema')
             ->with($schema, fn () => true);
 
-        $subscriber = new PdoSessionHandlerSchemaSubscriber([$pdoSessionHandler]);
+        $subscriber = new PdoSessionHandlerSchemaSubscriber($pdoSessionHandler);
         $subscriber->postGenerateSchema($event);
     }
 }

@@ -16,22 +16,24 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
 final class PdoSessionHandlerSchemaSubscriber extends AbstractSchemaSubscriber
 {
-    private iterable $pdoSessionHandlers;
+    private PdoSessionHandler $sessionHandler;
 
-    /**
-     * @param iterable<mixed, PdoSessionHandler> $pdoSessionHandlers
-     */
-    public function __construct(iterable $pdoSessionHandlers)
+    public function __construct(\SessionHandlerInterface $sessionHandler)
     {
-        $this->pdoSessionHandlers = $pdoSessionHandlers;
+        if ($sessionHandler instanceof PdoSessionHandler) {
+            $this->sessionHandler = $sessionHandler;
+        }
+    }
+
+    public function getSubscribedEvents(): array
+    {
+        return isset($this->sessionHandler) ? parent::getSubscribedEvents() : [];
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
     {
         $connection = $event->getEntityManager()->getConnection();
 
-        foreach ($this->pdoSessionHandlers as $pdoSessionHandler) {
-            $pdoSessionHandler->configureSchema($event->getSchema(), $this->getIsSameDatabaseChecker($connection));
-        }
+        $this->sessionHandler->configureSchema($event->getSchema(), $this->getIsSameDatabaseChecker($connection));
     }
 }

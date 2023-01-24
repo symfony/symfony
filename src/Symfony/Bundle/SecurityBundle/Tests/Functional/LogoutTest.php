@@ -36,15 +36,13 @@ class LogoutTest extends AbstractWebTestCase
     public function testCsrfTokensAreClearedOnLogout()
     {
         $client = $this->createClient(['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
-        static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
             '_password' => 'test',
         ]);
 
-        $this->assertTrue(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
-        $this->assertSame('bar', static::$container->get('security.csrf.token_storage')->getToken('foo'));
+        static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
 
         $client->request('GET', '/logout');
 

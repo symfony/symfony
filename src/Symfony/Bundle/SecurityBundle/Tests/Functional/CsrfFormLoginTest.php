@@ -19,11 +19,14 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     public function testFormLoginAndLogoutWithCsrfTokens($config)
     {
         $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
         $form['user_login[password]'] = 'test';
         $client->submit($form);
+
+        $this->assertFalse(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
 
         $this->assertRedirect($client->getResponse(), '/profile');
 
@@ -48,10 +51,13 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     public function testFormLoginWithInvalidCsrfToken($config)
     {
         $client = $this->createClient(['test_case' => 'CsrfFormLogin', 'root_config' => $config]);
+        static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[_token]'] = '';
         $client->submit($form);
+
+        $this->assertTrue(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
 
         $this->assertRedirect($client->getResponse(), '/login');
 

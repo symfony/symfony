@@ -36,13 +36,14 @@ class RememberMeDetails
 
     public static function fromRawCookie(string $rawCookie): self
     {
-        $cookieParts = explode(self::COOKIE_DELIMITER, base64_decode($rawCookie), 4);
+        $cookieParts = explode(self::COOKIE_DELIMITER, $rawCookie, 4);
         if (4 !== \count($cookieParts)) {
             throw new AuthenticationException('The cookie contains invalid data.');
         }
-        if (false === $cookieParts[1] = base64_decode($cookieParts[1], true)) {
+        if (false === $cookieParts[1] = base64_decode(strtr($cookieParts[1], '-_~', '+/='), true)) {
             throw new AuthenticationException('The user identifier contains a character from outside the base64 alphabet.');
         }
+        $cookieParts[0] = strtr($cookieParts[0], '.', '\\');
 
         return new static(...$cookieParts);
     }
@@ -83,6 +84,6 @@ class RememberMeDetails
     public function toString(): string
     {
         // $userIdentifier is encoded because it might contain COOKIE_DELIMITER, we assume other values don't
-        return base64_encode(implode(self::COOKIE_DELIMITER, [$this->userFqcn, base64_encode($this->userIdentifier), $this->expires, $this->value]));
+        return implode(self::COOKIE_DELIMITER, [strtr($this->userFqcn, '\\', '.'), strtr(base64_encode($this->userIdentifier), '+/=', '-_~'), $this->expires, $this->value]);
     }
 }

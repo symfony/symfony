@@ -1006,6 +1006,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition($workflowId, $workflowDefinition);
             $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
             $container->registerAliasForArgument($workflowId, WorkflowInterface::class, $name.'.'.$type);
+            $container->registerAliasForArgument($workflowId, WorkflowInterface::class, $name);
 
             // Validate Workflow
             if ('state_machine' === $workflow['type']) {

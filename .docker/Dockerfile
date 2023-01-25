@@ -24,6 +24,6 @@ RUN docker-php-ext-configure intl \
 # ensure that git is available
 RUN git --version
 
-COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer/composer:2-bin /composer /usr/local/bin/composer
 
 WORKDIR /symfony

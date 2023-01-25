@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by silverbackdan at 2023-01-25T15:11:58Z
+
+Really sorry but I do have gaps in my knowledge on how I bring in this change into my application to test the fix. I'm using the latest Symfony version, would you be find enough to let me know how to bring the change into my application and I'll run my tests again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-25T15:14:05Z
+
+The easiest way might be to just replace the file in your vendor directory by copy/pasting the one attached to this PR.
+
+---------------------------------------------------------------------------
+
+by silverbackdan at 2023-01-25T16:51:20Z
+
+Thanks @nicolas-grekas but I'm afraid the problem still persists
+
+---------------------------------------------------------------------------
+
+by silverbackdan at 2023-01-25T17:01:00Z
+
+I've done some dumping in the function and I think the issue is that with either of the new updates, the function is called twice. I can confirm that reverting just this file back to the previous version causes no issues so it is related to this change.
+
+---------------------------------------------------------------------------
+
+by silverbackdan at 2023-01-25T17:08:30Z
+
+`doCollect` is called twice with `reset` as `true`
+It looks like it's being triggered from an event listener.
+
+---------------------------------------------------------------------------
+
+by silverbackdan at 2023-01-25T17:39:58Z
+
+Sorry for many messages and deleted ones. In the profiler listener `onKernelTerminate` there are 2 profiles on my test requests. This causes `saveProfile` to be called twice which seems to filter down and then make `doCollect` to be called twice too.
+
+In my case I seem to have requests for these.
+```
+_api_/dummy_components/{id}{._format}_delete
+_api_/page_data_with_components/{id}{._format}_get
+```
+
+So perhaps in my code somewhere I am performing a sub-request which means that the trace would be cleared?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-25T18:21:31Z
+
+No worries :)
+Can you try the updated patch please?
+
+---------------------------------------------------------------------------
+
+by silverbackdan at 2023-01-25T18:28:17Z
+
+Looks like it works :)

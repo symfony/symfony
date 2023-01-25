@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-25T14:23:40Z
+
+We can keep that logic forever, we don't really care IMHO.
+
+---------------------------------------------------------------------------
+
+by eexit at 2023-01-25T16:57:07Z
+
+Hi @nicolas-grekas,
+
+Thanks for the quick fix.
+I'm struggling with testing your PR. I use Symfony Flex and after adding this into my `composer.json`, it looks like I still can't install the forked bundled:
+
+```json
+"repositories": [
+    {
+        "_comment": "Testing: https://github.com/symfony/symfony/pull/49103",
+        "type": "git",
+        "url": "https://github.com/nicolas-grekas/symfony.git"
+    }
+]
+```
+
+Doing this command does not work: `composer require -W "symfony/security-bundle:dev-sec-http-legacy-persistent-token" --prefer-source`.
+
+```
+composer require -W "symfony/security-bundle:dev-sec-http-legacy-persistent-token" --prefer-source
+./composer.json has been updated
+Running composer update symfony/security-bundle --with-all-dependencies
+Loading composer repositories with package information
+Info from https://repo.packagist.org/: #StandWithUkraine
+Updating dependencies
+Your requirements could not be resolved to an installable set of packages.
+
+  Problem 1
+    - Root composer.json requires symfony/security-bundle dev-sec-http-legacy-persistent-token, found symfony/security-bundle[2.0.7, ..., 2.8.x-dev, v3.0.0-BETA1, ..., 3.4.x-dev, v4.0.0-BETA1, ..., 4.4.x-dev, v5.0.0-BETA1, ..., 5.4.x-dev, v6.0.0-BETA1, ..., 6.3.x-dev] but it does not match the constraint.
+  Problem 2
+    - easycorp/easyadmin-bundle is locked to version v*** and an update of this package was not requested.
+    - easycorp/easyadmin-bundle v*** requires symfony/security-bundle ^5.4|^6.0 -> found symfony/security-bundle[v5.4.0-BETA1, ..., 5.4.x-dev, v6.0.0-BETA1, ..., 6.3.x-dev] but it conflicts with your root composer.json require (dev-sec-http-legacy-persistent-token).
+
+Installation failed, reverting ./composer.json and ./composer.lock to their original content.
+```
+
+It looks like composer is ignoring your repo and I have no idea why.
+Would you mind giving some insights on how to test this?
+
+Thanks!

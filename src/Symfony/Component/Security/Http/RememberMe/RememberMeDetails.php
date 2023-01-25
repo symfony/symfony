@@ -36,6 +36,9 @@ class RememberMeDetails
 
     public static function fromRawCookie(string $rawCookie): self
     {
+        if (!str_contains($rawCookie, self::COOKIE_DELIMITER)) {
+            $rawCookie = base64_decode($rawCookie);
+        }
         $cookieParts = explode(self::COOKIE_DELIMITER, $rawCookie, 4);
         if (4 !== \count($cookieParts)) {
             throw new AuthenticationException('The cookie contains invalid data.');

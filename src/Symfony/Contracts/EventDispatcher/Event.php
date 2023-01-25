@@ -11,8 +11,6 @@
 
 namespace Symfony\Contracts\EventDispatcher;
 
-use Psr\EventDispatcher\StoppableEventInterface;
-
 /**
  * Event is the base class for classes containing event data.
  *

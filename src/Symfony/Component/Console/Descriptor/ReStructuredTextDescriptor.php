@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Descriptor;
 
-use Exception;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
@@ -77,11 +76,11 @@ class ReStructuredTextDescriptor extends Descriptor
             $name .= '|-'.str_replace('|', '|-', $option->getShortcut());
         }
 
-        $option_description = $option->getDescription() ? preg_replace('/\s*[\r\n]\s*/', "\n\n", $option->getDescription())."\n\n" : '';
-        $option_description = (new UnicodeString($option_description))->ascii();
+        $optionDescription = $option->getDescription() ? preg_replace('/\s*[\r\n]\s*/', "\n\n", $option->getDescription())."\n\n" : '';
+        $optionDescription = (new UnicodeString($optionDescription))->ascii();
         $this->write(
             $name."\n".str_repeat($this->paragraphsChar, Helper::width($name))."\n\n"
-            .$option_description
+            .$optionDescription
             .'- **Accept value**: '.($option->acceptValue() ? 'yes' : 'no')."\n"
             .'- **Is value required**: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'- **Is multiple**: '.($option->isArray() ? 'yes' : 'no')."\n"
@@ -92,7 +91,7 @@ class ReStructuredTextDescriptor extends Descriptor
 
     protected function describeInputDefinition(InputDefinition $definition, array $options = []): void
     {
-        if ($showArguments = (\count($definition->getArguments()) > 0)) {
+        if ($showArguments = ((bool) $definition->getArguments())) {
             $this->write("Arguments\n".str_repeat($this->subsubsectionChar, 9))."\n\n";
             foreach ($definition->getArguments() as $argument) {
                 $this->write("\n\n");
@@ -100,14 +99,13 @@ class ReStructuredTextDescriptor extends Descriptor
             }
         }
 
-        $non_default_options = $this->getNonDefaultOptions($definition);
-        if (\count($non_default_options) > 0) {
+        if ($nonDefaultOptions = $this->getNonDefaultOptions($definition)) {
             if ($showArguments) {
                 $this->write("\n\n");
             }
 
             $this->write("Options\n".str_repeat($this->subsubsectionChar, 7)."\n\n");
-            foreach ($non_default_options as $option) {
+            foreach ($nonDefaultOptions as $option) {
                 $this->describeInputOption($option);
                 $this->write("\n");
             }
@@ -122,9 +120,7 @@ class ReStructuredTextDescriptor extends Descriptor
                 .str_repeat($this->subsectionChar, Helper::width($command->getName()))."\n\n"
                 .($command->getDescription() ? $command->getDescription()."\n\n" : '')
                 ."Usage\n".str_repeat($this->paragraphsChar, 5)."\n\n"
-                .array_reduce($command->getAliases(), static function ($carry, $usage) {
-                    return $carry.'- ``'.$usage.'``'."\n";
-                })
+                .array_reduce($command->getAliases(), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n")
             );
 
             return;
@@ -140,9 +136,7 @@ class ReStructuredTextDescriptor extends Descriptor
             .str_repeat($this->subsectionChar, Helper::width($command->getName()))."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             ."Usage\n".str_repeat($this->subsubsectionChar, 5)."\n\n"
-            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), static function ($carry, $usage) {
-                return $carry.'- ``'.$usage.'``'."\n";
-            })
+            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), static fn ($carry, $usage) => $carry.'- ``'.$usage.'``'."\n")
         );
 
         if ($help = $command->getProcessedHelp()) {
@@ -159,8 +153,7 @@ class ReStructuredTextDescriptor extends Descriptor
 
     protected function describeApplication(Application $application, array $options = []): void
     {
-        $describedNamespace = $options['namespace'] ?? null;
-        $description = new ApplicationDescription($application, $describedNamespace);
+        $description = new ApplicationDescription($application, $options['namespace'] ?? null);
         $title = $this->getApplicationTitle($application);
 
         $this->write($title."\n".str_repeat($this->partChar, Helper::width($title)));
@@ -170,15 +163,14 @@ class ReStructuredTextDescriptor extends Descriptor
 
     private function getApplicationTitle(Application $application): string
     {
-        if ('UNKNOWN' !== $application->getName()) {
-            if ('UNKNOWN' !== $application->getVersion()) {
-                return sprintf('%s %s', $application->getName(), $application->getVersion());
-            }
-
-            return $application->getName();
+        if ('UNKNOWN' === $application->getName()) {
+            return 'Console Tool';
+        }
+        if ('UNKNOWN' !== $application->getVersion()) {
+            return sprintf('%s %s', $application->getName(), $application->getVersion());
         }
 
-        return 'Console Tool';
+        return $application->getName();
     }
 
     private function describeCommands($application, array $options): void
@@ -193,23 +185,19 @@ class ReStructuredTextDescriptor extends Descriptor
                 $commands = $application->all($namespace);
                 $this->write($namespace."\n".str_repeat($this->sectionChar, Helper::width($namespace))."\n\n");
             }
-            $commands = $this->removeAliasesAndHiddenCommands($commands);
 
-            foreach ($commands as $command) {
+            foreach ($this->removeAliasesAndHiddenCommands($commands) as $command) {
                 $this->describeCommand($command, $options);
                 $this->write("\n\n");
             }
         }
     }
 
-    /**
-     * @param \Symfony\Component\Console\Descriptor\ApplicationDescription $description
-     */
     private function createTableOfContents(ApplicationDescription $description, Application $application): void
     {
         $this->setVisibleNamespaces($description);
-        $chapter_title = 'Table of Contents';
-        $this->write("\n\n$chapter_title\n".str_repeat($this->chapterChar, Helper::width($chapter_title))."\n\n");
+        $chapterTitle = 'Table of Contents';
+        $this->write("\n\n$chapterTitle\n".str_repeat($this->chapterChar, Helper::width($chapterTitle))."\n\n");
         foreach ($this->visibleNamespaces as $namespace) {
             if ('_global' === $namespace) {
                 $commands = $application->all('');
@@ -221,15 +209,13 @@ class ReStructuredTextDescriptor extends Descriptor
             $commands = $this->removeAliasesAndHiddenCommands($commands);
 
             $this->write("\n\n");
-            $this->write(implode("\n", array_map(static function ($commandName) {
-                return sprintf('- `%s`_', $commandName);
-            }, array_keys($commands))));
+            $this->write(implode("\n", array_map(static fn ($commandName) => sprintf('- `%s`_', $commandName), array_keys($commands))));
         }
     }
 
     private function getNonDefaultOptions(InputDefinition $definition): array
     {
-        $global_options = [
+        $globalOptions = [
             'help',
             'quiet',
             'verbose',
@@ -237,41 +223,36 @@ class ReStructuredTextDescriptor extends Descriptor
             'ansi',
             'no-interaction',
         ];
-        $non_default_options = [];
+        $nonDefaultOptions = [];
         foreach ($definition->getOptions() as $option) {
             // Skip global options.
-            // @todo Show these once at the beginning.
-            if (!\in_array($option->getName(), $global_options)) {
-                $non_default_options[] = $option;
+            if (!\in_array($option->getName(), $globalOptions)) {
+                $nonDefaultOptions[] = $option;
             }
         }
 
-        return $non_default_options;
+        return $nonDefaultOptions;
     }
 
-    /**
-     * @param \Symfony\Component\Console\Descriptor\ApplicationDescription $description
-     */
     private function setVisibleNamespaces(ApplicationDescription $description): void
     {
         $commands = $description->getCommands();
         foreach ($description->getNamespaces() as $namespace) {
             try {
-                // Remove aliases.
-                $namespace_commands = $namespace['commands'];
-                foreach ($namespace_commands as $key => $command_name) {
-                    if (!\array_key_exists($command_name, $commands)) {
+                $namespaceCommands = $namespace['commands'];
+                foreach ($namespaceCommands as $key => $commandName) {
+                    if (!\array_key_exists($commandName, $commands)) {
                         // If the array key does not exist, then this is an alias.
-                        unset($namespace_commands[$key]);
-                    } elseif ($commands[$command_name]->isHidden()) {
-                        unset($namespace_commands[$key]);
+                        unset($namespaceCommands[$key]);
+                    } elseif ($commands[$commandName]->isHidden()) {
+                        unset($namespaceCommands[$key]);
                     }
                 }
-                if (!\count($namespace_commands)) {
+                if (!$namespaceCommands) {
                     // If the namespace contained only aliases or hidden commands, skip the namespace.
                     continue;
                 }
-            } catch (Exception) {
+            } catch (\Exception) {
             }
             $this->visibleNamespaces[] = $namespace['id'];
         }
@@ -279,7 +260,6 @@ class ReStructuredTextDescriptor extends Descriptor
 
     private function removeAliasesAndHiddenCommands(array $commands): array
     {
-        // Remove aliases.
         foreach ($commands as $key => $command) {
             if ($command->isHidden() || \in_array($key, $command->getAliases(), true)) {
                 unset($commands[$key]);

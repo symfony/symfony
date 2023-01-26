@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate `framework:exceptions` tag, unwrap it and replace `framework:exception` tags' `name` attribute by `class`
  * Deprecate the `notifier.logger_notification_listener` service, use the `notifier.notification_logger_listener` service instead
  * Allow setting private services with the test container
+ * Register alias for argument for workflow services with workflow name only
 
 6.2
 ---

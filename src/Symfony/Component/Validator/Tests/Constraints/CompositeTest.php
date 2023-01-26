@@ -155,11 +155,11 @@ class CompositeTest extends TestCase
         ]);
     }
 
-    public function testValidCantBeNested()
+    public function testValidCanBeNested()
     {
-        $this->expectException(ConstraintDefinitionException::class);
-        new ConcreteComposite([
-            new Valid(),
-        ]);
+        $nestedConstraint = new Valid();
+        $constraint = new ConcreteComposite($nestedConstraint);
+
+        $this->assertEquals([$nestedConstraint], $constraint->constraints);
     }
 }

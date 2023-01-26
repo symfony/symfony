@@ -249,4 +249,24 @@ class ResolveBindingsPassTest extends TestCase
 
         $this->assertSame('bar', (string) $container->getDefinition('with_target')->getArgument(0));
     }
+
+    public function testBindWithNamedArgs()
+    {
+        $container = new ContainerBuilder();
+
+        $bindings = [
+            '$apiKey' => new BoundArgument('K'),
+        ];
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArguments(['c' => 'C', 'hostName' => 'H']);
+        $definition->setBindings($bindings);
+
+        $container->register('foo', CaseSensitiveClass::class);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+
+        $this->assertEquals(['C', 'K', 'H'], $definition->getArguments());
+    }
 }

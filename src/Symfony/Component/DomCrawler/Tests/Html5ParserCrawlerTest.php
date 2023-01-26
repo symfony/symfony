@@ -46,6 +46,20 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
         self::assertEmpty($crawler->filterXPath('//h1')->text(), '->addHtmlContent failed as expected');
     }
 
+    public function testHtml5ParserNotSameAsNativeParserForSpecificHtml()
+    {
+        // Html who create a bug specific to the DOM extension (see https://github.com/symfony/symfony/issues/28596)
+        $html = $this->getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
+
+        $html5Crawler = $this->createCrawler(null, null, null, true);
+        $html5Crawler->add($html);
+
+        $nativeCrawler = $this->createCrawler(null, null, null, false);
+        $nativeCrawler->add($html);
+
+        $this->assertNotEquals($nativeCrawler->filterXPath('//h1')->text(), $html5Crawler->filterXPath('//h1')->text(), 'Native parser and Html5 parser must be different');
+    }
+
     public static function validHtml5Provider(): iterable
     {
         $html = self::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';

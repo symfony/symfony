@@ -37,6 +37,7 @@ abstract class AbstractBrowser
     protected $internalResponse;
     protected $response;
     protected $crawler;
+    protected bool $useHtml5Parser = true;
     protected $insulated = false;
     protected $redirect;
     protected $followRedirects = true;
@@ -205,6 +206,18 @@ abstract class AbstractBrowser
         }
 
         return $this->crawler;
+    }
+
+    /**
+     * Sets whether parsing should be done using "masterminds/html5".
+     *
+     * @return $this
+     */
+    public function useHtml5Parser(bool $useHtml5Parser): static
+    {
+        $this->useHtml5Parser = $useHtml5Parser;
+
+        return $this;
     }
 
     /**
@@ -497,7 +510,7 @@ abstract class AbstractBrowser
             return null;
         }
 
-        $crawler = new Crawler(null, $uri);
+        $crawler = new Crawler(null, $uri, null, $this->useHtml5Parser);
         $crawler->addContent($content, $type);
 
         return $crawler;

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-01-24T13:30:50Z
+
+The prefixed one is used in the Request object because `@return` still describes the native return type (as `resource` cannot be added as an actual native type). Otherwise, this would break our type patcher tool in the debug component.

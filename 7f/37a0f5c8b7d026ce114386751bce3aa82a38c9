@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-07-27T16:29:42Z
+
+Can you please give a more concrete use case? I don't understand the point for now. This would need test cases of course before being accepted.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2022-07-29T19:44:32Z
+
+### Use cases
+- A system that can be configured by static methods flagged as such by attributes
+- A generalized callable
+  - Autowire a bunch of attribute classes with methods flagged by attributes
+  - Convert the static method to simple closures
+  - Introspecting a static closure is really easy
+  - Convert the instance methods to a wrapper taking a `ServiceClosureArgument` and a method name
+  - Said wrapper may have metadata so we don't have to instantiate the whole service just to introspect it
+  - Have a generalized bunch of callable in a container (`tagged_iterable` or `tagged_locator`)
+
+### Tests
+I have not seen any tests for complex attributes in the compiler pass unit test. If you can point me at some classes that may have relevant tests, I'd be happy to test my changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-01T09:48:03Z
+
+The concept of "static" and "service" look orthogonal to me. Static is a kind of global state while a service is an instance, aka it has a local scope only. For methods, if they're purely functional, why not, but for properties, what's the use case?
+Also, can you really describe a real-world use case? All your examples are still generic.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2022-08-01T19:34:38Z
+
+I just removed checks for properties because it seemed purely arbitrary to support static methods and not static properties.
+
+Currently I'm implementing a workflow abstraction based on attributes. Configuring a single workflow is through a static method. Transition guards/actions are mere callable so anything that can be registered in the container (static or instance) can be used.
+
+Sure, everything could be forced to be instance methods, but the overhead of instantiating a service on something that can be a simple closure is kinda annoying.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-02T07:25:39Z
+
+So, you are using a static method as a factory for a closure and you're adding attributes on that factory to configure how it is wired?
+
+Works for me.
+
+But that's no-go for properties. There is nothing arbitrary there: a static property is global state. These don't belong to service configuration.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2022-08-02T12:14:24Z
+
+That's fine for me. I will fix the PR, just let me know where I could find relevant tests so I can add to them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-02T12:58:46Z
+
+There is only src/Symfony/Component/DependencyInjection/Tests/Compiler/AttributeAutoconfigurationPassTest.php :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-10-19T12:07:49Z
+
+Friendly ping @alex-dev
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2023-01-19T14:25:57Z
+
+Ok.... Work is always hectic around Christmas. I could secure time for Symfony work in the next few weeks... I plan to finish this PR, and work on a few other issues I've reported, will report or have already been reported that have been annoying my coworkers... Should see a bit more of me in the next few weeks.

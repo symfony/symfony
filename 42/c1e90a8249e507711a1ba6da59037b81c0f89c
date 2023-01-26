@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2023-01-19T12:21:05Z
+
+Could you illustrate what this brings to userland with e.g. a screenshot?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-19T12:59:36Z
+
+@chalasr done!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2023-01-26T10:11:14Z
+
+Can you add some test?  Also can you double check that there is no existing compiler pass that could be patched instead of adding a new one?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-26T10:47:58Z
+
+> Can you add some test
+
+[Done](https://github.com/symfony/symfony/pull/49021/commits/9c737cebb29e1bc4da6c813db9ec5dcbed578f4c)
+
+> can you double check that there is no existing compiler pass that could be patched instead of adding a new one
+
+Did not find anything related, which kind of surprised me because what I’m doing here feels like it could be generic :thinking:
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-26T10:55:30Z
+
+Damn I broke `low-deps` tests. Investigating.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-01-26T13:31:41Z
+
+Looks like https://github.com/symfony/symfony/pull/49021#discussion_r1087838248 was the cause of the failing test, which is weird? How could it register `debug.stopwatch` if `Stopwatch` does not exist :thinking:

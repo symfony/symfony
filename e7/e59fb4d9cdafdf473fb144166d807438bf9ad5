@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-09T10:43:34Z
+
+Let's go with a new property. Here is the implementation I propose:
+
+```diff
+--- a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
++++ b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
+@@ -51,6 +51,7 @@ class CliDumper extends AbstractDumper
+         "\r" => '\r',
+         "\033" => '\e',
+     ];
++    protected static $unicodeCharsRx = "/[\u{00A0}\u{00AD}\u{034F}\u{061C}\u{115F}\u{1160}\u{17B4}\u{17B5}\u{180E}\u{2000}-\u{200F}\u{202F}\u{205F}\u{2060}-\u{2064}\u{206A}-\u{206F}\u{3000}\u{2800}\u{3164}\u{FEFF}\u{FFA0}\u{1D159}\u{1D173}-\u{1D17A}]/u";
+
+     protected $collapseNextHash = false;
+     protected $expandNextHash = false;
+@@ -450,6 +451,13 @@ class CliDumper extends AbstractDumper
+             return $s.$endCchr;
+         }, $value, -1, $cchrCount);
+
++        if (!($attr['binary'] ?? false)) {
++            $value = preg_replace_callback(static::$unicodeCharsRx, function ($c) use (&$cchrCount, $startCchr, $endCchr) {
++                ++$cchrCount;
++
++                return $startCchr.'\u{'.strtoupper(dechex(mb_ord($c[0]))).'}'.$endCchr;
++            }, $value);
++        }
+         if ($this->colors) {
+             if ($cchrCount && "\033" === $value[0]) {
+                 $value = substr($value, \strlen($startCchr));
+```
+
+---------------------------------------------------------------------------
+
+by alamirault at 2023-01-09T19:26:18Z
+
+I applied patch but one HtmlDumperTest is broken and I don't understand why.
+
+Expected `#%d`, real value given (ex: `#1388`)

@@ -248,6 +248,19 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testLongProgressCharacters()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
+        $bar->setProgressCharacter('>>>>');
+        $bar->setProgress(9);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '  9/10 [=========================>>>]  90%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testDisplayWithoutStart()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 50, 0);

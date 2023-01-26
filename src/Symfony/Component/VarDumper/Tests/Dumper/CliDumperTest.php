@@ -51,7 +51,7 @@ class CliDumperTest extends TestCase
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
-array:24 [
+array:25 [
   "number" => 1
   0 => &1 null
   "const" => 1.1
@@ -66,6 +66,7 @@ array:24 [
     é\\x01test\\t\\n
     ing
     """
+  "bo\\u{FEFF}m" => "te\\u{FEFF}st"
   "[]" => []
   "res" => stream resource {@{$res}
 %A  wrapper_type: "plainfile"

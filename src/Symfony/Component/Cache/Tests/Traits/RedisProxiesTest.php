@@ -12,15 +12,15 @@
 namespace Symfony\Component\Cache\Tests\Traits;
 
 use PHPUnit\Framework\TestCase;
+use Relay\Relay;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
 
-/**
- * @requires extension redis
- */
 class RedisProxiesTest extends TestCase
 {
     /**
+     * @requires extension redis
+     *
      * @testWith ["Redis"]
      *           ["RedisCluster"]
      */
@@ -50,6 +50,36 @@ class RedisProxiesTest extends TestCase
     }
 
     /**
+     * @requires extension relay
+     */
+    public function testRelayProxy()
+    {
+        $proxy = file_get_contents(\dirname(__DIR__, 2).'/Traits/RelayProxy.php');
+        $proxy = substr($proxy, 0, 8 + strpos($proxy, "\n    ];"));
+        $methods = [];
+
+        foreach ((new \ReflectionClass(Relay::class))->getMethods() as $method) {
+            if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name) || $method->isStatic()) {
+                continue;
+            }
+            $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
+            $methods[] = "\n    ".ProxyHelper::exportSignature($method, false)."\n".<<<EOPHP
+                {
+                    {$return}\$this->lazyObjectReal->{$method->name}(...\\func_get_args());
+                }
+
+            EOPHP;
+        }
+
+        uksort($methods, 'strnatcmp');
+        $proxy .= implode('', $methods)."}\n";
+
+        $this->assertStringEqualsFile(\dirname(__DIR__, 2).'/Traits/RelayProxy.php', $proxy);
+    }
+
+    /**
+     * @requires extension redis
+     *
      * @testWith ["Redis", "redis"]
      *           ["RedisCluster", "redis_cluster"]
      */

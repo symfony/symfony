@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Doctrine\DBAL\DriverManager;
+use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 /**
@@ -32,6 +33,7 @@ class SessionHandlerFactory
 
         switch (true) {
             case $connection instanceof \Redis:
+            case $connection instanceof Relay:
             case $connection instanceof \RedisArray:
             case $connection instanceof \RedisCluster:
             case $connection instanceof \Predis\ClientInterface:

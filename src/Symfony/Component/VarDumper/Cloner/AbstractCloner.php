@@ -130,6 +130,7 @@ abstract class AbstractCloner implements ClonerInterface
         'WeakReference' => ['Symfony\Component\VarDumper\Caster\SplCaster', 'castWeakReference'],
 
         'Redis' => ['Symfony\Component\VarDumper\Caster\RedisCaster', 'castRedis'],
+        'Relay\Relay' => ['Symfony\Component\VarDumper\Caster\RedisCaster', 'castRedis'],
         'RedisArray' => ['Symfony\Component\VarDumper\Caster\RedisCaster', 'castRedisArray'],
         'RedisCluster' => ['Symfony\Component\VarDumper\Caster\RedisCaster', 'castRedisCluster'],
 

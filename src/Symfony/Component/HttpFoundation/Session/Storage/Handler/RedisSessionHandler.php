@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Predis\Response\ErrorInterface;
+use Relay\Relay;
 
 /**
  * Redis based session storage handler based on the Redis class
@@ -39,7 +40,7 @@ class RedisSessionHandler extends AbstractSessionHandler
      * @throws \InvalidArgumentException When unsupported client or options are passed
      */
     public function __construct(
-        private \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
+        private \Redis|Relay|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis,
         array $options = [],
     ) {
         if ($diff = array_diff(array_keys($options), ['prefix', 'ttl'])) {

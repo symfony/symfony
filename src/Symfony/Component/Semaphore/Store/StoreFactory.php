@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
+use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
@@ -26,6 +27,7 @@ class StoreFactory
     {
         switch (true) {
             case $connection instanceof \Redis:
+            case $connection instanceof Relay:
             case $connection instanceof \RedisArray:
             case $connection instanceof \RedisCluster:
             case $connection instanceof \Predis\ClientInterface:
@@ -33,7 +35,6 @@ class StoreFactory
 
             case !\is_string($connection):
                 throw new InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection::class));
-
             case str_starts_with($connection, 'redis://'):
             case str_starts_with($connection, 'rediss://'):
                 if (!class_exists(AbstractAdapter::class)) {

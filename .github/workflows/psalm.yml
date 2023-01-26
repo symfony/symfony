@@ -28,6 +28,14 @@ jobs:
           ini-values: "memory_limit=-1"
           coverage: none
 
+      - name: Install Relay
+        run: |
+          curl -L "https://builds.r2.relay.so/dev/relay-dev-php8.1-debian-x86-64.tar.gz" | tar xz
+          cd relay-dev-php8.1-debian-x86-64
+          sudo cp relay.ini $(php-config --ini-dir)
+          sudo cp relay-pkg.so $(php-config --extension-dir)/relay.so
+          sudo sed -i "s/00000000-0000-0000-0000-000000000000/$(cat /proc/sys/kernel/random/uuid)/" $(php-config --extension-dir)/relay.so
+
       - name: Checkout target branch
         uses: actions/checkout@v3
         with:

@@ -1,0 +1,177 @@
+---------------------------------------------------------------------------
+
+by tillkruss at 2023-01-09T19:56:25Z
+
+Ping @michael-grunder.
+
+---------------------------------------------------------------------------
+
+by tillkruss at 2023-01-11T16:39:26Z
+
+> What's the plan for cluser/array clients?
+
+We're actively working on Cluster support, it will go into the 1.0 release in a few weeks. I'm not sure about `RedisArray`, I'll talk to @michael-grunder on whether we want to port that over, since there are about 2 production installs AFAIK.
+
+---------------------------------------------------------------------------
+
+by michael-grunder at 2023-01-11T17:47:40Z
+
+My preference would be to not replicate `RedisArray`, as we kind of want to deprecate the functionality even in PhpRedis.  That said, we could implement the API if there is sufficient demand.  It's much simpler than Cluster.
+
+As @tillkruss said, we're working on Cluster support now.  Feel free to mention any quality-of-life features you'd like to see.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-11T17:50:39Z
+
+Thanks for the hints. Another thing I'm wondering about is ext-redis v6: I'm seeing active dev on it. What's the plan related to that + relay?
+
+---------------------------------------------------------------------------
+
+by michael-grunder at 2023-01-11T17:54:46Z
+
+For now, I'm just making sure that the two extensions remain compatible.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-01-12T23:45:32Z
+
+All feedback addressed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-13T09:02:30Z
+
+One thing I'm wondering is: did you consider keeping the same class names as phpredis?
+Because if there are no differences API-wise, why not?
+Couldn't relay be released as phpredis v5.4?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-01-13T10:44:34Z
+
+Feedback addressed. But we have to add the random uuid back, ok @nicolas-grekas ?
+```
+1) Symfony\Component\Cache\Tests\Adapter\PredisAdapterSentinelTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+2) Symfony\Component\Cache\Tests\Adapter\PredisAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+3) Symfony\Component\Cache\Tests\Adapter\PredisClusterAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+4) Symfony\Component\Cache\Tests\Adapter\PredisRedisClusterAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+5) Symfony\Component\Cache\Tests\Adapter\PredisTagAwareAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+6) Symfony\Component\Cache\Tests\Adapter\PredisTagAwareClusterAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+7) Symfony\Component\Cache\Tests\Adapter\ProxyAdapterAndRedisAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+8) Symfony\Component\Cache\Tests\Adapter\RedisAdapterSentinelTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+9) Symfony\Component\Cache\Tests\Adapter\RedisAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+10) Symfony\Component\Cache\Tests\Adapter\RedisArrayAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+11) Symfony\Component\Cache\Tests\Adapter\RedisClusterAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+12) Symfony\Component\Cache\Tests\Adapter\RedisTagAwareAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+13) Symfony\Component\Cache\Tests\Adapter\RedisTagAwareArrayAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+14) Symfony\Component\Cache\Tests\Adapter\RedisTagAwareClusterAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+15) Symfony\Component\Cache\Tests\Adapter\RelayAdapterSentinelTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+
+16) Symfony\Component\Cache\Tests\Adapter\RelayAdapterTest::testClearWithPrefix
+PHPUnit\Framework\Exception: PHP Warning:  PHP Startup: Relay is using the default binary ID in Unknown on line 0
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-13T10:48:37Z
+
+> But we have to add the random uuid back
+
+sure, let's just not forget to remove when possible
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-01-13T12:03:16Z
+
+done
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-01-21T09:37:58Z
+
+I've rebased the branch to solve the conflicts. Can we expect the merge soon? I promise I'll create a PR with migration to shivammathur/setup-php when they release the version ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-22T12:53:57Z
+
+@michael-grunder @tillkruss any hints about [my previous comment](https://github.com/symfony/symfony/pull/48930#issuecomment-1381505142)? Why a new set of symbols? Why not release as phpredis v5.4?
+
+---------------------------------------------------------------------------
+
+by tillkruss at 2023-01-22T16:33:01Z
+
+> One thing I'm wondering is: did you consider keeping the same class names as phpredis?
+
+We did, but that would mean PhpRedis no Relay can't be installed at the same time and easily switched between.
+
+> Because if there are no differences API-wise, why not?
+
+We did initially in 2020 consider this, but leveraging server-assisted client-side caching required starting from scratch, hence a separate name, new codebase, etc.
+
+PhpRedis has a lot of legacy junk that we didn't want to bring over.
+
+> Couldn't relay be released as phpredis v5.4?
+
+People don't like change, PhpRedis will remain FOSS and we'll suggest users to move to Relay once 1.0 is out.
+
+Predis and PhpRedis will remain maintained of course, but who doesn't want a more modern, faster client ✌️
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-23T14:51:01Z
+
+(rebase needed :pray: + don't miss https://github.com/symfony/symfony/pull/48930#discussion_r1083447837)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-01-23T21:45:50Z
+
+done
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2023-01-24T09:10:02Z
+
+Psalm found 1 relevant issue (missing \Relay\ in \Relay\Exception) so I fixed that. Not sure what is a desired fix for the other issues though. I think ideally, here
+```php
+if ($this->redis instanceof \Predis\ClientInterface) {
+   $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
+  $prefixLen = \strlen($prefix ?? '');
+}
+```
+before calling getPrefix, we should check if prefix is instanceof KeyPrefixProcessor.
+
+And for other issues, ProxyHelper should be fixed to account for missing magic methods in parent.
+
+I think none of these are related to this PR.

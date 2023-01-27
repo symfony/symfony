@@ -39,6 +39,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Exception\RuntimeException;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -1112,6 +1113,16 @@ class RecursiveValidatorTest extends TestCase
 
         /* @var ConstraintViolationInterface[] $violations */
         $this->assertCount(2, $violations);
+    }
+
+    public function testValidateMultipleGroupsNull()
+    {
+        $entity = new Entity();
+
+        $this->expectException(ValidatorException::class);
+        $this->expectExceptionMessage('Value in array of validation groups cannot be null.');
+
+        $this->validate($entity, null, ['Group 1', null]);
     }
 
     public function testReplaceDefaultGroupByGroupSequenceObject()

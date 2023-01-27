@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by msteltenpool at 2023-01-27T10:44:05Z
+
+Tried to see if this would fix the latest builds. The below issue popped up, need to dive a bit deeper to understand and isolate this new issue.
+
+```
+Invalid constructor argument 2 for service "[REMOVED]": argument 1 must be defined before. Check your
+  service definition.
+```
+
+---------------------------------------------------------------------------
+
+by msteltenpool at 2023-01-27T10:56:55Z
+
+`services.yaml`
+```
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        public: true
+        bind:
+            $a: 'A'
+
+    App\Controller\IndexController:
+        arguments:
+            $b: 'B'
+            $c: 'C'
+```
+`IndexController.php`
+```
+class IndexController
+{
+    public function __construct($b, $a, $c)
+    {
+    }
+}
+```
+Result:
+```
+!!  In DefinitionErrorExceptionPass.php line 54:
+!!
+!!    Invalid constructor argument 2 for service "App\Controller\IndexController"
+!!    : argument 1 must be defined before. Check your service definition.
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-27T10:58:38Z
+
+Thanks for checking. I'd need a reproducer to figure out what I missed. :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-27T11:08:31Z
+
+Got it thanks. PR updated.
+
+---------------------------------------------------------------------------
+
+by msteltenpool at 2023-01-27T11:29:46Z
+
+Confirmed. No issues any more on my end. Thanks!

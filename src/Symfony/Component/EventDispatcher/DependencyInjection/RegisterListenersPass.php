@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\Attribute\AsEventSubscriber;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -121,8 +122,16 @@ class RegisterListenersPass implements CompilerPassInterface
             if (!$r = $container->getReflectionClass($class)) {
                 throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
             }
-            if (!$r->isSubclassOf(EventSubscriberInterface::class)) {
-                throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, EventSubscriberInterface::class));
+
+            $attribute = $r->getAttributes(AsEventSubscriber::class);
+            $isSubClass = $r->isSubclassOf(EventSubscriberInterface::class);
+
+            if ($attribute && $isSubClass) {
+                throw new InvalidArgumentException(sprintf('Service "%s" must not implement interface "%s" and use the "%s" attribute at the same time.', $id, EventSubscriberInterface::class, AsEventSubscriber::class));
+            }
+
+            if (!$attribute && !$isSubClass) {
+                throw new InvalidArgumentException(sprintf('Service "%s" must either implement interface "%s" or use the "%s" attribute.', $id, EventSubscriberInterface::class, AsEventSubscriber::class));
             }
             $class = $r->name;
 
@@ -200,7 +209,19 @@ class ExtractingEventDispatcher extends EventDispatcher implements EventSubscrib
     {
         $events = [];
 
-        foreach ([self::$subscriber, 'getSubscribedEvents']() as $eventName => $params) {
+        $subscribedEvents = [];
+        $r = new \ReflectionClass(self::$subscriber);
+
+        if ($r->isSubclassOf(EventSubscriberInterface::class) && $r->hasMethod('getSubscribedEvents')) {
+            $subscribedEvents = [self::$subscriber, 'getSubscribedEvents']();
+        } elseif ($attribute = $r->getAttributes(AsEventSubscriber::class)) {
+            $attribute = $attribute[0];
+            $arguments = $attribute->getArguments();
+
+            $subscribedEvents = $arguments['subscribedEvents'] ?? $arguments[0];
+        }
+
+        foreach ($subscribedEvents as $eventName => $params) {
             $events[self::$aliases[$eventName] ?? $eventName] = $params;
         }
 

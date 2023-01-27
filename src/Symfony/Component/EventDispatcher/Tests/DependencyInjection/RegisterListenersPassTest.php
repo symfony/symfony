@@ -20,12 +20,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\EventDispatcher\Attribute\AsEventSubscriber;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\CustomEvent;
+use Symfony\Component\EventDispatcher\Tests\Fixtures\InvalidTaggedSubscriber;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedInvokableListener;
 use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedMultiListener;
+use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedSubscriber;
 
 class RegisterListenersPassTest extends TestCase
 {
@@ -101,6 +104,51 @@ class RegisterListenersPassTest extends TestCase
             ],
         ];
         $this->assertEquals($expectedCalls, $builder->getDefinition('event_dispatcher')->getMethodCalls());
+    }
+
+    public function testTaggedEventSubscriber()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(AsEventSubscriber::class, static function (ChildDefinition $definition, AsEventSubscriber $attribute): void {
+            $definition->addTag('kernel.event_subscriber', get_object_vars($attribute));
+        });
+        $container->register('foo', TaggedSubscriber::class)->setAutoconfigured(true);
+        $container->register('event_dispatcher', \stdClass::class);
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new RegisterListenersPass())->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onEvent'],
+                    0,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
+
+    public function testTaggedEventSubscriberUsingBothInterfaceAndAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(AsEventSubscriber::class, static function (ChildDefinition $definition, AsEventSubscriber $attribute): void {
+            $definition->addTag('kernel.event_subscriber', get_object_vars($attribute));
+        });
+        $container->register('foo', InvalidTaggedSubscriber::class)->setAutoconfigured(true);
+        $container->register('event_dispatcher', \stdClass::class);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Service "foo" must not implement interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" and use the "Symfony\Component\EventDispatcher\Attribute\AsEventSubscriber" attribute at the same time.');
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new RegisterListenersPass())->process($container);
     }
 
     public function testAbstractEventListener()

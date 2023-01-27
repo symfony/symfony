@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add `#[AsEventSubscriber]` attribute
+
 6.0
 ---
 

@@ -64,6 +64,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Dotenv\Command\DebugCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\EventDispatcher\Attribute\AsEventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
@@ -669,6 +670,12 @@ class FrameworkExtension extends Extension
             }
             $definition->addTag('kernel.event_listener', $tagAttributes);
         });
+
+        $container->registerAttributeForAutoconfiguration(AsEventSubscriber::class, static function (ChildDefinition $definition, AsEventSubscriber $attribute) {
+            $tagAttributes = get_object_vars($attribute);
+            $definition->addTag('kernel.event_subscriber', $tagAttributes);
+        });
+
         $container->registerAttributeForAutoconfiguration(AsController::class, static function (ChildDefinition $definition, AsController $attribute): void {
             $definition->addTag('controller.service_arguments');
         });

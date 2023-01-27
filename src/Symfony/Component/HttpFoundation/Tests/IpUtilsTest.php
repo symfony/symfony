@@ -164,4 +164,21 @@ class IpUtilsTest extends TestCase
             ['::123.234.235.236', '::123.234.235.0'], // deprecated IPv4-compatible IPv6 address
         ];
     }
+
+    /**
+     * @dataProvider getIp4SubnetMaskZeroData
+     */
+    public function testIp4SubnetMaskZero($matches, $remoteAddr, $cidr)
+    {
+        $this->assertSame($matches, IpUtils::checkIp4($remoteAddr, $cidr));
+    }
+
+    public function getIp4SubnetMaskZeroData()
+    {
+        return [
+            [true, '1.2.3.4', '0.0.0.0/0'],
+            [true, '1.2.3.4', '192.168.1.0/0'],
+            [false, '1.2.3.4', '256.256.256/0'], // invalid CIDR notation
+        ];
+    }
 }

@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueReso
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver;
@@ -60,6 +61,13 @@ return static function (ContainerConfigurator $container) {
                 service('clock')->nullOnInvalid(),
             ])
             ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => DateTimeValueResolver::class])
+
+        ->set('argument_resolver.request_payload', RequestPayloadValueResolver::class)
+            ->args([
+                service('serializer'),
+                service('validator')->nullOnInvalid(),
+            ])
+            ->tag('controller.targeted_value_resolver', ['name' => RequestPayloadValueResolver::class])
 
         ->set('argument_resolver.request_attribute', RequestAttributeValueResolver::class)
             ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => RequestAttributeValueResolver::class])

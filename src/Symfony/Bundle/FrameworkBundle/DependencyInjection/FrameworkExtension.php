@@ -157,6 +157,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
@@ -357,11 +358,19 @@ class FrameworkExtension extends Extension
         $container->getDefinition('exception_listener')->replaceArgument(3, $config['exceptions']);
 
         if ($this->readConfigEnabled('serializer', $container, $config['serializer'])) {
-            if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {
+            if (!class_exists(Serializer::class)) {
                 throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
             }
 
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
+        } else {
+            $container->register('.argument_resolver.request_payload.no_serializer', Serializer::class)
+                ->addError('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
+                    .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
+                );
+
+            $container->getDefinition('argument_resolver.request_payload')
+                ->replaceArgument(0, new Reference('.argument_resolver.request_payload.no_serializer', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE));
         }
 
         if ($propertyInfoEnabled) {

@@ -28,6 +28,7 @@ class BinaryFileResponse extends Response
     protected static bool $trustXSendfileTypeHeader = false;
 
     protected File $file;
+    protected ?\SplTempFileObject $tempFileObject = null;
     protected int $offset = 0;
     protected int $maxlen = -1;
     protected bool $deleteFileAfterSend = false;
@@ -62,15 +63,18 @@ class BinaryFileResponse extends Response
      */
     public function setFile(\SplFileInfo|string $file, ?string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true): static
     {
+        $isTemporaryFile = $file instanceof \SplTempFileObject;
+        $this->tempFileObject = $isTemporaryFile ? $file : null;
+
         if (!$file instanceof File) {
             if ($file instanceof \SplFileInfo) {
-                $file = new File($file->getPathname());
+                $file = new File($file->getPathname(), !$isTemporaryFile);
             } else {
                 $file = new File((string) $file);
             }
         }
 
-        if (!$file->isReadable()) {
+        if (!$file->isReadable() && !$isTemporaryFile) {
             throw new FileException('File must be readable.');
         }
 
@@ -80,7 +84,7 @@ class BinaryFileResponse extends Response
             $this->setAutoEtag();
         }
 
-        if ($autoLastModified) {
+        if ($autoLastModified && !$isTemporaryFile) {
             $this->setAutoLastModified();
         }
 
@@ -298,19 +302,25 @@ class BinaryFileResponse extends Response
             }
 
             $out = fopen('php://output', 'w');
-            $file = fopen($this->file->getPathname(), 'r');
+
+            if ($this->tempFileObject) {
+                $file = $this->tempFileObject;
+                $file->rewind();
+            } else {
+                $file = new \SplFileObject($this->file->getPathname(), 'r');
+            }
 
             ignore_user_abort(true);
 
             if (0 !== $this->offset) {
-                fseek($file, $this->offset);
+                $file->fseek($this->offset);
             }
 
             $length = $this->maxlen;
-            while ($length && !feof($file)) {
+            while ($length && !$file->eof()) {
                 $read = $length > $this->chunkSize || 0 > $length ? $this->chunkSize : $length;
 
-                if (false === $data = fread($file, $read)) {
+                if (false === $data = $file->fread($read)) {
                     break;
                 }
                 while ('' !== $data) {
@@ -326,9 +336,8 @@ class BinaryFileResponse extends Response
             }
 
             fclose($out);
-            fclose($file);
         } finally {
-            if ($this->deleteFileAfterSend && is_file($this->file->getPathname())) {
+            if (null === $this->tempFileObject && $this->deleteFileAfterSend && is_file($this->file->getPathname())) {
                 unlink($this->file->getPathname());
             }
         }

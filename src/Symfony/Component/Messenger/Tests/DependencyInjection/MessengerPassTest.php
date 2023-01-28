@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
@@ -917,6 +918,68 @@ class MessengerPassTest extends TestCase
 
         $removeDefinition = $container->getDefinition('console.command.messenger_failed_messages_remove');
         $this->assertNotNull($removeDefinition->getArgument(1));
+    }
+
+    public function testRegisterRoutedMessageWithEmptySenderLocator()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator', ServiceLocator::class)->setArgument(0, []);
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', ['alias' => 'amqp']);
+
+        $container->register(DummyMessage::class)
+            ->addTag('messenger.routed_message', [
+                'class' => DummyMessage::class,
+                'transports' => ['amqp'],
+            ])
+        ;
+
+        (new MessengerPass())->process($container);
+        $mapping = $container->getDefinition('messenger.senders_locator')->getArgument(0);
+
+        $this->assertArrayHasKey(DummyMessage::class, $mapping);
+        $this->assertSame($mapping[DummyMessage::class][0], 'amqp');
+    }
+
+    public function testRegisterRoutedMessageWithInvalidTransport()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator', ServiceLocator::class)->setArgument(0, []);
+
+        $container->register(DummyMessage::class)
+            ->addTag('messenger.routed_message', [
+                'class' => DummyMessage::class,
+                'transports' => ['amqp'],
+            ])
+        ;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" class is being routed to a sender called "amqp". This is not a valid transport or service id.');
+        (new MessengerPass())->process($container);
+    }
+
+    public function testRegisterRoutedMessageWithExistingSenders()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator', ServiceLocator::class)->setArgument(0, [
+            DummyMessage::class => ['amqp'],
+        ]);
+
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', ['alias' => 'amqp']);
+        $container->register(RedisReceiver::class, RedisReceiver::class)->addTag('messenger.receiver', ['alias' => 'redis']);
+
+        $container->register(DummyMessage::class)
+            ->addTag('messenger.routed_message', [
+                'class' => DummyMessage::class,
+                'transports' => ['redis'],
+            ])
+        ;
+
+        (new MessengerPass())->process($container);
+        $mapping = $container->getDefinition('messenger.senders_locator')->getArgument(0);
+
+        $this->assertArrayHasKey(DummyMessage::class, $mapping);
+        $this->assertSame($mapping[DummyMessage::class][0], 'amqp');
+        $this->assertSame($mapping[DummyMessage::class][1], 'redis');
     }
 }
 

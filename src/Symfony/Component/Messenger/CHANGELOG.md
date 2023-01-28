@@ -10,6 +10,7 @@ CHANGELOG
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
  * Allow passing a string instead of an array in `TransportNamesStamp`
+ * Add `#[AsRoutedMessage]` attribute
 
 6.2
 ---

@@ -110,6 +110,7 @@ use Symfony\Component\Mailer\EventListener\MessengerTransportListener;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Attribute\AsRoutedMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
@@ -686,6 +687,14 @@ class FrameworkExtension extends Extension
                 $tagAttributes['method'] = $reflector->getName();
             }
             $definition->addTag('messenger.message_handler', $tagAttributes);
+        });
+        $container->registerAttributeForAutoconfiguration(AsRoutedMessage::class, static function (ChildDefinition $definition, AsRoutedMessage $attribute, \ReflectionClass $reflector): void {
+            $tagAttributes = [
+                'class' => $reflector->getName(),
+                'transports' => $attribute->getTransports(),
+            ];
+
+            $definition->addTag('messenger.routed_message', $tagAttributes);
         });
 
         if (!$container->getParameter('kernel.debug')) {

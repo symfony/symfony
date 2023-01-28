@@ -56,6 +56,10 @@ class MessengerPass implements CompilerPassInterface
             $this->registerReceivers($container, $busIds);
         }
         $this->registerHandlers($container, $busIds);
+
+        if ($container->hasDefinition('messenger.senders_locator')) {
+            $this->registerRoutedMessages($container);
+        }
     }
 
     private function registerHandlers(ContainerBuilder $container, array $busIds): void
@@ -404,5 +408,31 @@ class MessengerPass implements CompilerPassInterface
 
             return $definition->getClass();
         }
+    }
+
+    private function registerRoutedMessages(ContainerBuilder $container): void
+    {
+        $mapping = $container->getDefinition('messenger.senders_locator')->getArgument(0) ?? [];
+        $receiverAliases = array_map(
+            static fn ($tagAttributes) => $tagAttributes[0]['alias'],
+            $container->findTaggedServiceIds('messenger.receiver')
+        );
+
+        foreach ($container->findTaggedServiceIds('messenger.routed_message') as [$routedMessage]) {
+            $messageClass = $routedMessage['class'];
+            $mapping[$routedMessage['class']] ??= [];
+
+            foreach ($routedMessage['transports'] as $transport) {
+                if (!\in_array($transport, $receiverAliases)) {
+                    throw new RuntimeException(sprintf('Invalid Messenger routing configuration: the "%s" class is being routed to a sender called "%s". This is not a valid transport or service id.', $messageClass, $transport));
+                }
+
+                $mapping[$messageClass][] = $transport;
+            }
+        }
+
+        $container->getDefinition('messenger.senders_locator')
+            ->setArgument(0, $mapping)
+        ;
     }
 }

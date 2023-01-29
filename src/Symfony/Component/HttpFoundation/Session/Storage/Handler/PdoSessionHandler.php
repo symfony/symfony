@@ -178,9 +178,12 @@ class PdoSessionHandler extends AbstractSessionHandler
         $this->ttl = $options['ttl'] ?? null;
     }
 
-    public function configureSchema(Schema $schema, \Closure $isSameDatabase): void
+    /**
+     * Adds the Table to the Schema if it doesn't exist.
+     */
+    public function configureSchema(Schema $schema, \Closure $isSameDatabase = null): void
     {
-        if ($schema->hasTable($this->table) || !$isSameDatabase($this->getConnection()->exec(...))) {
+        if ($schema->hasTable($this->table) || ($isSameDatabase && !$isSameDatabase($this->getConnection()->exec(...)))) {
             return;
         }
 

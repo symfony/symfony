@@ -277,11 +277,15 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     protected function normalizeGroups($groups)
     {
-        if (\is_array($groups)) {
-            return $groups;
+        if (!\is_array($groups)) {
+            $groups = [$groups];
         }
 
-        return [$groups];
+        if (\in_array(null, $groups, true)) {
+            throw new ValidatorException('Value in array of validation groups cannot be null.');
+        }
+
+        return $groups;
     }
 
     /**
@@ -419,10 +423,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         }
 
         foreach ($groups as $key => $group) {
-            if (null === $group) {
-                throw new ValidatorException('Value in array of validation groups cannot be null.');
-            }
-
             // If the "Default" group is replaced by a group sequence, remember
             // to cascade the "Default" group when traversing the group
             // sequence

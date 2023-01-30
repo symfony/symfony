@@ -34,7 +34,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {
     private TokenProviderInterface $tokenProvider;
     private ?TokenVerifierInterface $tokenVerifier;
-    private string $secret;
 
     public function __construct(TokenProviderInterface $tokenProvider, #[\SensitiveParameter] string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, LoggerInterface $logger = null, TokenVerifierInterface $tokenVerifier = null)
     {
@@ -45,7 +44,6 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         }
         $this->tokenProvider = $tokenProvider;
         $this->tokenVerifier = $tokenVerifier;
-        $this->secret = $secret;
     }
 
     public function createRememberMeCookie(UserInterface $user): void

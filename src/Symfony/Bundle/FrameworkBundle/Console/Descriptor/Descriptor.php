@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -296,9 +297,25 @@ abstract class Descriptor implements DescriptorInterface
             return [];
         }
 
-        $file = file_get_contents($container->getParameter('debug.container.dump'));
-        preg_match_all('{%env\(((?:\w++:)*+\w++)\)%}', $file, $envVars);
-        $envVars = array_unique($envVars[1]);
+        if(!$container->hasParameter('kernel.project_dir') || !$container->hasParameter('kernel.environment')) {
+            return [];
+        }
+
+        $envVarsFromContainer = [];
+        $containerFile = file_get_contents($container->getParameter('debug.container.dump'));
+        preg_match_all('{%env\(((?:\w++:)*+\w++)\)%}', $containerFile, $envVarsFromContainer);
+        $envVarsFromContainer = array_unique($envVarsFromContainer[1]);
+
+        $envFiles = $this->getEnvFiles($container->getParameter('kernel.project_dir'), $container->getParameter('kernel.environment'));
+        $availableFiles = array_filter($envFiles, static fn (string $file) => is_file($file));
+
+        $dotenv = new Dotenv();
+        $envVarsFromFiles = [];
+        foreach ($availableFiles as $file) {
+            $envs = $dotenv->parse(file_get_contents($file), $file);
+            $envVarsFromFiles += $envs;
+        }
+        $allEnvVars = array_unique(array_merge($envVarsFromContainer, array_keys($envVarsFromFiles)));
 
         $bag = $container->getParameterBag();
         $getDefaultParameter = fn (string $name) => parent::get($name);
@@ -308,7 +325,8 @@ abstract class Descriptor implements DescriptorInterface
 
         $envs = [];
 
-        foreach ($envVars as $env) {
+        foreach ($allEnvVars as $env) {
+
             $processor = 'string';
             if (false !== $i = strrpos($name = $env, ':')) {
                 $name = substr($env, $i + 1);
@@ -319,6 +337,10 @@ abstract class Descriptor implements DescriptorInterface
                 $runtimeValue = null;
             }
             $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $getEnvReflection->invoke($container, $env) : null;
+
+            preg_match_all('/'.preg_quote($env).'/', $containerFile, $matches);
+            $usageCounter = count($matches[0]);
+
             $envs["$name$processor"] = [
                 'name' => $name,
                 'processor' => $processor,
@@ -327,6 +349,7 @@ abstract class Descriptor implements DescriptorInterface
                 'runtime_available' => $hasRuntime,
                 'runtime_value' => $runtimeValue,
                 'processed_value' => $processedValue,
+                'usage_count' => $usageCounter,
             ];
         }
         ksort($envs);
@@ -342,4 +365,30 @@ abstract class Descriptor implements DescriptorInterface
             return [];
         }
     }
+
+    private function getEnvFiles(string $projectDir, string $kernelEnvironment): array
+    {
+        $files = [
+            '.env.local.php',
+            sprintf('.env.%s.local', $kernelEnvironment),
+            sprintf('.env.%s', $kernelEnvironment),
+        ];
+
+        if ('test' !== $kernelEnvironment) {
+            $files[] = $this->getFilePath($projectDir, '.env.local');
+        }
+
+        if (!is_file($this->getFilePath($projectDir, '.env')) && is_file($this->getFilePath($projectDir, '.env.dist'))) {
+            $files[] = $this->getFilePath($projectDir, '.env.dist');
+        } else {
+            $files[] = $this->getFilePath($projectDir, '.env');
+        }
+
+        return $files;
+    }
+    private function getFilePath(string $projectDir, string $file): string
+    {
+        return $projectDir.\DIRECTORY_SEPARATOR.$file;
+    }
+
 }

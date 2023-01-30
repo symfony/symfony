@@ -432,6 +432,7 @@ class TextDescriptor extends Descriptor
                         ['<info>Default value</>', $env['default_available'] ? $dump($env['default_value']) : 'n/a'],
                         ['<info>Real value</>', $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a'],
                         ['<info>Processed value</>', $env['default_available'] || $env['runtime_available'] ? $dump($env['processed_value']) : 'n/a'],
+                        ['<info>Usage count</>', $env['usage_count'] ? $dump($env['usage_count']) : 'n/a'],
                     ]);
                 }
             }
@@ -462,13 +463,14 @@ class TextDescriptor extends Descriptor
                 $env['name'],
                 $env['default_available'] ? $dump($env['default_value']) : 'n/a',
                 $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a',
+                $env['usage_count'] ? $dump($env['usage_count']) : 'n/a',
             ];
             if (!$env['default_available'] && !$env['runtime_available']) {
                 $missing[$env['name']] = true;
             }
         }
 
-        $options['output']->table(['Name', 'Default value', 'Real value'], $rows);
+        $options['output']->table(['Name', 'Default value', 'Real value', 'Usage count'], $rows);
         $options['output']->comment('Note real values might be different between web and CLI.');
 
         if ($missing) {

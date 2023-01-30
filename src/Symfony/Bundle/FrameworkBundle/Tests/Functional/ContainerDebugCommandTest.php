@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -125,6 +126,19 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
     public function testDescribeEnvVars()
     {
         putenv('REAL=value');
+
+        file_put_contents(__DIR__.'/app/.env', <<<EOF
+APP_EXAMPLE_ENV=example_value
+APP_EXAMPLE_ENV_TO_OVERRIDE=example_value
+EOF
+        );
+        file_put_contents(__DIR__.'/app/.env.local', <<<EOF
+APP_EXAMPLE_ENV_TO_OVERRIDE=example_overridden
+EOF
+        );
+
+        (new Dotenv())->bootEnv(__DIR__.'/app/.env');
+
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
         $application = new Application(static::$kernel);
@@ -140,13 +154,15 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 Symfony Container Environment Variables
 =======================================
 
- --------- ----------------- ------------%w
-  Name      Default value     Real value%w
- --------- ----------------- ------------%w
-  JSON      "[1, "2.5", 3]"   n/a%w
-  REAL      n/a               "value"%w
-  UNKNOWN   n/a               n/a%w
- --------- ----------------- ------------%w
+ ----------------------------- ----------------- ---------------------- -------------%w
+  Name                          Default value     Real value             Usage count%w
+ ----------------------------- ----------------- ---------------------- -------------%w
+  APP_EXAMPLE_ENV_TO_OVERRIDE   n/a               "example_overridden"   n/a%w
+  APP_EXAMPLE_ENV               n/a               "example_value"        n/a%w
+  JSON                          "[1, "2.5", 3]"   n/a                    1%w
+  REAL                          n/a               "value"                3%w
+  UNKNOWN                       n/a               n/a                    1%w
+ ----------------------------- ----------------- ---------------------- -------------%w
 
  // Note real values might be different between web and CLI.%w
 
@@ -158,6 +174,8 @@ TXT
             , $tester->getDisplay(true));
 
         putenv('REAL');
+        @unlink(__DIR__.'/app/.env');
+        @unlink(__DIR__.'/app/.env.local');
     }
 
     public function testDescribeEnvVar()
@@ -172,7 +190,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-var' => 'js'], ['decorated' => false]);
 
-        $this->assertStringContainsString(file_get_contents(__DIR__.'/Fixtures/describe_env_vars.txt'), $tester->getDisplay(true));
+        $this->assertStringEqualsFile(__DIR__.'/Fixtures/describe_env_vars.txt', $tester->getDisplay(true));
     }
 
     public function testGetDeprecation()

@@ -1,3 +1,9 @@
+
+Symfony Container Environment Variables
+=======================================
+
+ // Displaying detailed environment variable usage matching js                                                          
+
 %env(float:key:2:json:JSON)%
 ----------------------------
 
@@ -5,6 +11,7 @@
   Default value     "[1, "2.5", 3]"  
   Real value        n/a              
   Processed value   3.0              
+  Usage count       1                
  ----------------- ----------------- 
 
 %env(int:key:2:json:JSON)%
@@ -14,4 +21,8 @@
   Default value     "[1, "2.5", 3]"  
   Real value        n/a              
   Processed value   3                
+  Usage count       1                
  ----------------- ----------------- 
+
+ // Note real values might be different between web and CLI.                                                            
+

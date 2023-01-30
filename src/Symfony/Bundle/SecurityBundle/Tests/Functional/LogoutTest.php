@@ -24,9 +24,6 @@ class LogoutTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['enable_authenticator_manager' => true, 'test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
         $client->disableReboot();
-        $this->callInRequestContext($client, function () {
-            static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
-        });
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
@@ -34,8 +31,7 @@ class LogoutTest extends AbstractWebTestCase
         ]);
 
         $this->callInRequestContext($client, function () {
-            $this->assertTrue(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
-            $this->assertSame('bar', static::getContainer()->get('security.csrf.token_storage')->getToken('foo'));
+            static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
         });
 
         $client->request('GET', '/logout');
@@ -52,9 +48,6 @@ class LogoutTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['enable_authenticator_manager' => false, 'test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
         $client->disableReboot();
-        $this->callInRequestContext($client, function () {
-            static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
-        });
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
@@ -62,8 +55,7 @@ class LogoutTest extends AbstractWebTestCase
         ]);
 
         $this->callInRequestContext($client, function () {
-            $this->assertTrue(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
-            $this->assertSame('bar', static::getContainer()->get('security.csrf.token_storage')->getToken('foo'));
+            static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
         });
 
         $client->request('GET', '/logout');

@@ -29,7 +29,7 @@
         "symfony/security-core": "^5.4|^6.0",
         "symfony/security-csrf": "^4.4|^5.0|^6.0",
         "symfony/security-guard": "^5.3",
-        "symfony/security-http": "^5.4|^6.0"
+        "symfony/security-http": "^5.4.20|~6.0.20|~6.1.12|^6.2.6"
     },
     "require-dev": {
         "doctrine/annotations": "^1.10.4|^2",

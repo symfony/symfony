@@ -92,7 +92,10 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authentication.trust_resolver', AuthenticationTrustResolver::class)
 
         ->set('security.authentication.session_strategy', SessionAuthenticationStrategy::class)
-            ->args([param('security.authentication.session_strategy.strategy')])
+            ->args([
+                param('security.authentication.session_strategy.strategy'),
+                service('security.csrf.token_storage')->ignoreOnInvalid(),
+            ])
         ->alias(SessionAuthenticationStrategyInterface::class, 'security.authentication.session_strategy')
 
         ->set('security.authentication.session_strategy_noop', SessionAuthenticationStrategy::class)

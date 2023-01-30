@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+6.3
+---
+ * Change the method signature of `Finder::filter` to allow `callable` as opposed to purely Closures
+
 6.2
 ---
 

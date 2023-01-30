@@ -582,7 +582,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see CustomFilterIterator
      */
-    public function filter(\Closure $closure): static
+    public function filter(callable $closure): static
     {
         $this->filters[] = $closure;
 

@@ -1018,6 +1018,19 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(['test.php', 'test.py']), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testFilterAcceptsCallable()
+    {
+        $filter = new class() {
+            public function __invoke(\SplFileInfo $f)
+            {
+                return str_contains($f, 'test');
+            }
+        };
+        $finder = $this->buildFinder();
+        $this->assertSame($finder, $finder->filter($filter));
+        $this->assertIterator($this->toAbsolute(['test.php', 'test.py']), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testFollowLinks()
     {
         if ('\\' == \DIRECTORY_SEPARATOR) {

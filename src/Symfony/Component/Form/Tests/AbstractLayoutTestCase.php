@@ -1517,6 +1517,7 @@ abstract class AbstractLayoutTestCase extends FormIntegrationTestCase
             'widget' => 'single_text',
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
+            'with_seconds' => true,
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), [],

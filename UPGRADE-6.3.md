@@ -52,6 +52,11 @@ FrameworkBundle
    </framework:config>
    ```
 
+Form
+----
+
+ * Deprecate not honoring the `with_seconds` option when it's set to `false` for HTML5 datetime inputs in `DateTimeType`, set it to `true` before upgrading to 7.0
+
 FrameworkBundle
 ---------------
 

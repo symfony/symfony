@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 
 class DateTimeTypeTest extends BaseTypeTestCase
 {
+    use ExpectDeprecationTrait;
+
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
 
     private $defaultLocale;
@@ -243,6 +246,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
             'view_timezone' => 'Pacific/Tahiti',
             'widget' => 'single_text',
             'input' => 'datetime',
+            'with_seconds' => true,
         ]);
 
         $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
@@ -262,6 +266,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
             'view_timezone' => 'Pacific/Tahiti',
             'widget' => 'single_text',
             'input' => 'datetime_immutable',
+            'with_seconds' => true,
         ]);
 
         $outputTime = new \DateTimeImmutable('2010-06-02 03:04:00 Pacific/Tahiti');
@@ -282,6 +287,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
             'view_timezone' => 'UTC',
             'input' => 'string',
             'widget' => 'single_text',
+            'with_seconds' => true,
         ]);
 
         $form->submit('2010-06-02T03:04:00');
@@ -337,6 +343,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
+            'with_seconds' => true,
         ])
             ->createView();
 
@@ -462,6 +469,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
+            'with_seconds' => true,
         ])
             ->createView();
 
@@ -473,6 +481,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
             'html5' => false,
+            'with_seconds' => true,
         ])
             ->createView();
 
@@ -663,6 +672,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
+            'with_seconds' => true,
         ]);
         $form->submit(null);
 
@@ -695,6 +705,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => $widget,
             'empty_data' => $emptyData,
+            'with_seconds' => 'single_text' === $widget,
         ]);
         $form->submit(null);
 
@@ -729,10 +740,23 @@ class DateTimeTypeTest extends BaseTypeTestCase
             'input' => 'string',
             'widget' => 'single_text',
             'input_format' => 'd/m/Y H:i:s P',
+            'with_seconds' => true,
         ]);
 
         $form->submit('2018-01-14T21:29:00');
 
         $this->assertSame('14/01/2018 21:29:00 +00:00', $form->getData());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testHTML5DateTimeInputWithoutSecondsTriggersADeprecation()
+    {
+        $this->expectDeprecation('Since symfony/form 6.3: The "with_seconds" option for HTML5 datetime inputs in "Symfony\Component\Form\Extension\Core\Type\DateTimeType" will be honored in Symfony 7.0, set it to "true" to keep the current behavior and get rid of this deprecation.');
+
+        $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'single_text',
+        ]);
     }
 }

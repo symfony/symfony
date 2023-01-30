@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Add the `bool $withSeconds` optional argument to the constructor of `DateTimeToHtml5LocalDateTimeTransformer`
+ * Deprecate not honoring the `with_seconds` option when it's set to `false` for HTML5 datetime inputs in `DateTimeType`
+
 6.2
 ---
 

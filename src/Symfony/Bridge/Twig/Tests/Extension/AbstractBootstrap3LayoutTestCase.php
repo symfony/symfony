@@ -1746,6 +1746,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             'widget' => 'single_text',
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
+            'with_seconds' => true,
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],

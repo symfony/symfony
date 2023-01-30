@@ -77,10 +77,22 @@ class DateTimeType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             if (self::HTML5_FORMAT === $pattern) {
-                $builder->addViewTransformer(new DateTimeToHtml5LocalDateTimeTransformer(
-                    $options['model_timezone'],
-                    $options['view_timezone']
-                ));
+                // Keep only the code inside this if in Symfony 7.0
+                if ($options['with_seconds']) {
+                    $builder->addViewTransformer(new DateTimeToHtml5LocalDateTimeTransformer(
+                        $options['model_timezone'],
+                        $options['view_timezone'],
+                        $options['with_seconds'],
+                    ));
+                } else {
+                    trigger_deprecation('symfony/form', '6.3', 'The "with_seconds" option for HTML5 datetime inputs in "%s" will be honored in Symfony 7.0, set it to "true" to keep the current behavior and get rid of this deprecation.', self::class);
+
+                    $builder->addViewTransformer(new DateTimeToHtml5LocalDateTimeTransformer(
+                        $options['model_timezone'],
+                        $options['view_timezone'],
+                        true,
+                    ));
+                }
             } else {
                 $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
                     $options['model_timezone'],

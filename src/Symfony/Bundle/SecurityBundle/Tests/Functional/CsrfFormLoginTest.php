@@ -11,6 +11,12 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+
 class CsrfFormLoginTest extends AbstractWebTestCase
 {
     /**
@@ -19,6 +25,10 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     public function testFormLoginAndLogoutWithCsrfTokens($options)
     {
         $client = $this->createClient($options);
+
+        $this->callInRequestContext($client, function () {
+            static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
+        });
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
@@ -40,6 +50,10 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $client->click($logoutLinks[0]);
 
         $this->assertRedirect($client->getResponse(), '/');
+
+        $this->callInRequestContext($client, function () {
+            $this->assertFalse(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
+        });
     }
 
     /**
@@ -49,6 +63,10 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     {
         $client = $this->createClient($options);
 
+        $this->callInRequestContext($client, function () {
+            static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
+        });
+
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['user_login[_token]'] = '';
         $client->submit($form);
@@ -57,6 +75,10 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
         $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Invalid CSRF token.', $text);
+
+        $this->callInRequestContext($client, function () {
+            $this->assertTrue(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
+        });
     }
 
     /**
@@ -104,5 +126,23 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     {
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml']];
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml']];
+    }
+
+    private function callInRequestContext(KernelBrowser $client, callable $callable): void
+    {
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $wrappedCallable = function (RequestEvent $event) use (&$callable) {
+            $callable();
+            $event->setResponse(new Response(''));
+            $event->stopPropagation();
+        };
+
+        $eventDispatcher->addListener(KernelEvents::REQUEST, $wrappedCallable);
+        try {
+            $client->request('GET', '/'.uniqid('', true));
+        } finally {
+            $eventDispatcher->removeListener(KernelEvents::REQUEST, $wrappedCallable);
+        }
     }
 }

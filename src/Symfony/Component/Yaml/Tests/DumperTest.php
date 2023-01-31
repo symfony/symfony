@@ -922,6 +922,52 @@ YAML;
         ], 2));
     }
 
+    /**
+     * @dataProvider getDateTimeData
+     */
+    public function testDumpDateTime(array $input, string $expected)
+    {
+        $this->assertSame($expected, rtrim($this->dumper->dump($input, 1)));
+    }
+
+    public function getDateTimeData()
+    {
+        yield 'Date without subsecond precision' => [
+            ['date' => new \DateTimeImmutable('2023-01-24T01:02:03Z')],
+            'date: 2023-01-24T01:02:03+00:00',
+        ];
+
+        yield 'Date with one digit for milliseconds' => [
+            ['date' => new \DateTimeImmutable('2023-01-24T01:02:03.4Z')],
+            'date: 2023-01-24T01:02:03.400+00:00',
+        ];
+
+        yield 'Date with two digits for milliseconds' => [
+            ['date' => new \DateTimeImmutable('2023-01-24T01:02:03.45Z')],
+            'date: 2023-01-24T01:02:03.450+00:00',
+        ];
+
+        yield 'Date with full milliseconds' => [
+            ['date' => new \DateTimeImmutable('2023-01-24T01:02:03.456Z')],
+            'date: 2023-01-24T01:02:03.456+00:00',
+        ];
+
+        yield 'Date with four digits for microseconds' => [
+            ['date' => new \DateTimeImmutable('2023-01-24T01:02:03.4567Z')],
+            'date: 2023-01-24T01:02:03.456700+00:00',
+        ];
+
+        yield 'Date with five digits for microseconds' => [
+            ['date' => new \DateTimeImmutable('2023-01-24T01:02:03.45678Z')],
+            'date: 2023-01-24T01:02:03.456780+00:00',
+        ];
+
+        yield 'Date with full microseconds' => [
+            ['date' => new \DateTimeImmutable('2023-01-24T01:02:03.456789Z')],
+            'date: 2023-01-24T01:02:03.456789+00:00',
+        ];
+    }
+
     private function assertSameData($expected, $actual)
     {
         $this->assertEquals($expected, $actual);

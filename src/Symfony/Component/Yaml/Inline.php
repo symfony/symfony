@@ -110,7 +110,16 @@ class Inline
 
                 return self::dumpNull($flags);
             case $value instanceof \DateTimeInterface:
-                return $value->format('c');
+                $length = \strlen(rtrim($value->format('u'), '0'));
+                if (0 === $length) {
+                    $format = 'c';
+                } elseif ($length < 4) {
+                    $format = 'Y-m-d\TH:i:s.vP';
+                } else {
+                    $format = 'Y-m-d\TH:i:s.uP';
+                }
+
+                return $value->format($format);
             case $value instanceof \UnitEnum:
                 return sprintf('!php/const %s::%s', $value::class, $value->name);
             case \is_object($value):
@@ -712,15 +721,20 @@ class Inline
                             return $time;
                         }
 
-                        try {
-                            if (false !== $scalar = $time->getTimestamp()) {
-                                return $scalar;
+                        $length = \strlen(rtrim($time->format('u'), '0'));
+                        if (0 === $length) {
+                            try {
+                                if (false !== $scalar = $time->getTimestamp()) {
+                                    return $scalar;
+                                }
+                            } catch (\ValueError) {
+                                // no-op
                             }
-                        } catch (\ValueError) {
-                            // no-op
+
+                            return (int) $time->format('U');
                         }
 
-                        return $time->format('U');
+                        return (float) $time->format('U.u');
                 }
         }
 

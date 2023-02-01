@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by maxhelias at 2023-01-26T08:49:12Z
+
+@nicolas-grekas It would be nice for them to keep track of their sponsorship. For example a small note in the changelog : https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/HttpClient/CHANGELOG.md#61

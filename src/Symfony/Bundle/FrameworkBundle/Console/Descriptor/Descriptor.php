@@ -386,6 +386,7 @@ abstract class Descriptor implements DescriptorInterface
 
         return $files;
     }
+
     private function getFilePath(string $projectDir, string $file): string
     {
         return $projectDir.\DIRECTORY_SEPARATOR.$file;

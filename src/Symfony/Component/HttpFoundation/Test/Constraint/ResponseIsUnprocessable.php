@@ -16,6 +16,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ResponseIsUnprocessable extends Constraint
 {
+    /**
+     * @param bool $verbose If true, the entire response is printed on failure. If false, the response body is omitted.
+     */
+    public function __construct(private readonly bool $verbose = true)
+    {
+    }
+
     public function toString(): string
     {
         return 'is unprocessable';
@@ -37,11 +44,12 @@ final class ResponseIsUnprocessable extends Constraint
         return 'the Response '.$this->toString();
     }
 
-    /**
-     * @param Response $other
-     */
     protected function additionalFailureDescription($other): string
     {
-        return (string) $other;
+        if ($this->verbose || !($other instanceof Response)) {
+            return (string) $other;
+        } else {
+            return explode("\r\n\r\n", (string) $other)[0];
+        }
     }
 }

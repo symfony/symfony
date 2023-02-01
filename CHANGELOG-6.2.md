@@ -7,6 +7,48 @@ in 6.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v6.2.0...v6.2.1
 
+* 6.2.6 (2023-02-01)
+
+ * bug #49141 [HttpFoundation] Fix bad return type in IpUtils::checkIp4() (tristankretzer)
+ * bug #49126 [DependencyInjection] Fix order of arguments when mixing positional and named ones (nicolas-grekas)
+ * bug #49104 [HttpClient] Fix collecting data non-late for the profiler (nicolas-grekas)
+ * bug #49103 [Security/Http] Fix compat of persistent remember-me with legacy tokens (nicolas-grekas)
+ * security #cve-2022-24895 [Security/Http] Remove CSRF tokens from storage on successful login (nicolas-grekas)
+ * security #cve-2022-24894 [HttpKernel] Remove private headers before storing responses with HttpCache (nicolas-grekas)
+
+* 6.2.5 (2023-01-24)
+
+ * bug #49078 [Security/Http] Check tokens before loading users from providers (nicolas-grekas)
+ * bug #49077 [DependencyInjection] Fix named arguments when using ContainerBuilder before compilation (nicolas-grekas)
+ * bug #49031 [Cache] fix collecting cache stats when nesting computations (nicolas-grekas)
+ * bug #49046 Fix for Windows when projects are deployed on junctions/symlinks (nerdgod)
+ * bug #49025 [Notifier] [OvhCloud] handle invalid receiver (seferov)
+ * bug #49034 [Security] Return default value instead of deferring to lower prio resolvers when using #[CurrentUser] and no user is found (Seldaek)
+ * bug #48993 [VarDumper] Fix JS to expand / collapse (nicolas-grekas)
+ * bug #48983 Fix BC user_identifier support after deprecation username (vtsykun)
+ * bug #48986 [Validator] Fix Email validator logic (fabpot)
+ * bug #48969 [PropertyInfo] Fixes constructor extractor for mixed type (michael.kubovic)
+ * bug #48978 [Serializer] use method_exists() instead of catching reflection exceptions (xabbuh)
+ * bug #48958 [DependencyInjection] fixes validation of non-scalar attribute values (ju1ius)
+ * bug #48937 [SecurityBundle] Fix using same handler for multiple authenticators (RobertMe)
+ * bug #48971 [DependencyInjection] Fix dump order of inlined deps (nicolas-grekas)
+ * bug #48966 [HttpClient] Let curl handle content-length headers (nicolas-grekas)
+ * bug #48968 [VarExporter] Fix exporting enums (nicolas-grekas)
+ * bug #48933 [Validator] Fix bad handling of nulls when the 'fields' option of the Unique constraint is set (plfort)
+ * bug #48926 [DependencyInjection] Fix support for named arguments on non-autowired services (nicolas-grekas)
+ * bug #48943 [FrameworkBundle] Fix deprecation when accessing a "container.private" service from the test container (nicolas-grekas)
+ * bug #48939 [VarExporter] Fix signature of `Lazy*Trait::createLazy*()` (nicolas-grekas)
+ * bug #48931 [DependencyInjection] Fix dumping inlined withers (nicolas-grekas)
+ * bug #48898 [HttpClient] Move Http clients data collecting at a late level (pforesi)
+ * bug #48896 [DoctrineBridge] Fix detecting mapping with one line annotations (franmomu)
+ * bug #48916 [FrameworkBundle] restore call to addGlobalIgnoredName (alexislefebvre)
+ * bug #48917 [Config] Fix XML dump when node example is an array (alexandre-daubois)
+ * bug #48904 [Validator] Allow egulias/email-validator v4 (chalasr)
+ * bug #48830 [Translation] fix PhpAstExtractor also extracts messages if t() contains both unnamed and named arguments (gassan)
+ * bug #48846 [Translation] Fix for resolving Constraint Validator FQCN defined as foo.bar.class parameters (gassan)
+ * bug #48866 [Validator] fix: Case-insensitive extensions in File-Constraint (spackmat)
+ * bug #48831 [Uid] Fix validating nil and max uuid (fancyweb)
+
 * 6.2.4 (2022-12-29)
 
  * bug #48822 [WebProfilerBundle] Fix the usage of web fonts (javiereguiluz)

@@ -1202,6 +1202,21 @@ class AutowirePassTest extends TestCase
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorImpl::class));
     }
 
+    public function testAutowireWithNamedArgs()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', MultipleArgumentsOptionalScalar::class)
+            ->setArguments(['foo' => 'abc'])
+            ->setAutowired(true)
+            ->setPublic(true);
+        $container->register(A::class, A::class);
+
+        (new AutowirePass())->process($container);
+
+        $this->assertEquals([new TypedReference(A::class, A::class), 'abc'], $container->getDefinition('foo')->getArguments());
+    }
+
     public function testAutowireAttribute()
     {
         $container = new ContainerBuilder();

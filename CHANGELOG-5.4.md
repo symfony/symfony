@@ -7,6 +7,15 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+* 5.4.20 (2023-02-01)
+
+ * bug #49141 [HttpFoundation] Fix bad return type in IpUtils::checkIp4() (tristankretzer)
+ * bug #49126 [DependencyInjection] Fix order of arguments when mixing positional and named ones (nicolas-grekas)
+ * bug #49104 [HttpClient] Fix collecting data non-late for the profiler (nicolas-grekas)
+ * bug #49103 [Security/Http] Fix compat of persistent remember-me with legacy tokens (nicolas-grekas)
+ * security #cve-2022-24895 [Security/Http] Remove CSRF tokens from storage on successful login (nicolas-grekas)
+ * security #cve-2022-24894 [HttpKernel] Remove private headers before storing responses with HttpCache (nicolas-grekas)
+
 * 5.4.19 (2023-01-24)
 
  * bug #49078 [Security/Http] Check tokens before loading users from providers (nicolas-grekas)

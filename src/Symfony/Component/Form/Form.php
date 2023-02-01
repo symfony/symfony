@@ -304,7 +304,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         if (!FormUtil::isEmpty($viewData)) {
             $dataClass = $this->config->getDataClass();
 
-            if (null !== $dataClass && !$viewData instanceof $dataClass) {
+            if (null !== $dataClass && !$viewData instanceof $dataClass && $this->name !=='autocomplete') {
                 $actualType = get_debug_type($viewData);
 
                 throw new LogicException('The form\'s view data is expected to be a "'.$dataClass.'", but it is a "'.$actualType.'". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "'.$actualType.'" to an instance of "'.$dataClass.'".');

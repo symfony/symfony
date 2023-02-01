@@ -105,7 +105,6 @@ class MermaidDumper implements DumperInterface
                         $transitionOutput = $this->styleStatemachineTransition(
                             $from,
                             $to,
-                            $transitionId,
                             $transitionLabel,
                             $transitionMeta
                         );
@@ -211,7 +210,6 @@ class MermaidDumper implements DumperInterface
     private function styleStatemachineTransition(
         string $from,
         string $to,
-        int $transitionId,
         string $transitionLabel,
         array $transitionMeta
     ): array {

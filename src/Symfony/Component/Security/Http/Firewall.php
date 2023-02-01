@@ -58,38 +58,13 @@ class Firewall implements EventSubscriberInterface
 
         $authenticationListeners = $listeners[0];
         $exceptionListener = $listeners[1];
-        $logoutListener = $listeners[2];
 
         if (null !== $exceptionListener) {
             $this->exceptionListeners[$event->getRequest()] = $exceptionListener;
             $exceptionListener->register($this->dispatcher);
         }
 
-        // Authentication listeners are pre-sorted by SortFirewallListenersPass
-        $authenticationListeners = function () use ($authenticationListeners, $logoutListener) {
-            if (null !== $logoutListener) {
-                $logoutListenerPriority = $this->getListenerPriority($logoutListener);
-            }
-
-            foreach ($authenticationListeners as $listener) {
-                $listenerPriority = $this->getListenerPriority($listener);
-
-                // Yielding the LogoutListener at the correct position
-                if (null !== $logoutListener && $listenerPriority < $logoutListenerPriority) {
-                    yield $logoutListener;
-                    $logoutListener = null;
-                }
-
-                yield $listener;
-            }
-
-            // When LogoutListener has the lowest priority of all listeners
-            if (null !== $logoutListener) {
-                yield $logoutListener;
-            }
-        };
-
-        $this->callListeners($event, $authenticationListeners());
+        $this->callListeners($event, $authenticationListeners);
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event)

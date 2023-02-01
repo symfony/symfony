@@ -206,6 +206,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.channel_listener',
                 'security.firewall.authenticator.secure',
                 'security.authentication.switchuser_listener.secure',
+                'security.logout_listener.secure',
                 'security.access_listener',
             ],
             [

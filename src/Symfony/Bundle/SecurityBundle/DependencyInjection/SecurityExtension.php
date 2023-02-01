@@ -389,6 +389,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 'csrf_token_id' => $firewall['logout']['csrf_token_id'],
                 'logout_path' => $firewall['logout']['path'],
             ]);
+            $listeners[] = new Reference($logoutListenerId);
 
             $logoutSuccessListenerId = 'security.logout.listener.default.'.$id;
             $container->setDefinition($logoutSuccessListenerId, new ChildDefinition('security.logout.listener.default'))

@@ -33,7 +33,7 @@
     },
     "conflict": {
         "symfony/event-dispatcher": "<5.4",
-        "symfony/security-bundle": "<5.4",
+        "symfony/security-bundle": "<6.0",
         "symfony/security-csrf": "<5.4"
     },
     "suggest": {

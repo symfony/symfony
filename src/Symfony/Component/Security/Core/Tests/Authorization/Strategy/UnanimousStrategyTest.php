@@ -20,14 +20,14 @@ class UnanimousStrategyTest extends AccessDecisionStrategyTestCase
     {
         $strategy = new UnanimousStrategy();
 
-        yield [$strategy, $this->getVoters(1, 0, 0), true];
-        yield [$strategy, $this->getVoters(1, 0, 1), true];
-        yield [$strategy, $this->getVoters(1, 1, 0), false];
+        yield [$strategy, static::getVoters(1, 0, 0), true];
+        yield [$strategy, static::getVoters(1, 0, 1), true];
+        yield [$strategy, static::getVoters(1, 1, 0), false];
 
-        yield [$strategy, $this->getVoters(0, 0, 2), false];
+        yield [$strategy, static::getVoters(0, 0, 2), false];
 
         $strategy = new UnanimousStrategy(true);
 
-        yield [$strategy, $this->getVoters(0, 0, 2), true];
+        yield [$strategy, static::getVoters(0, 0, 2), true];
     }
 }

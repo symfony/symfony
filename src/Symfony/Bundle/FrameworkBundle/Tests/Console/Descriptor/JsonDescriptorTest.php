@@ -15,12 +15,12 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\JsonDescriptor;
 
 class JsonDescriptorTest extends AbstractDescriptorTest
 {
-    protected function getDescriptor()
+    protected static function getDescriptor()
     {
         return new JsonDescriptor();
     }
 
-    protected function getFormat()
+    protected static function getFormat()
     {
         return 'json';
     }

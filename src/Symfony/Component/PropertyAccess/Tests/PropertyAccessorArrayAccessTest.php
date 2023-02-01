@@ -28,21 +28,21 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    abstract protected function getContainer(array $array);
+    abstract protected static function getContainer(array $array);
 
-    public function getValidPropertyPaths()
+    public static function getValidPropertyPaths(): array
     {
         return [
-            [$this->getContainer(['firstName' => 'Bernhard']), '[firstName]', 'Bernhard'],
-            [$this->getContainer(['person' => $this->getContainer(['firstName' => 'Bernhard'])]), '[person][firstName]', 'Bernhard'],
+            [static::getContainer(['firstName' => 'Bernhard']), '[firstName]', 'Bernhard'],
+            [static::getContainer(['person' => static::getContainer(['firstName' => 'Bernhard'])]), '[person][firstName]', 'Bernhard'],
         ];
     }
 
-    public function getInvalidPropertyPaths()
+    public static function getInvalidPropertyPaths(): array
     {
         return [
-            [$this->getContainer(['firstName' => 'Bernhard']), 'firstName', 'Bernhard'],
-            [$this->getContainer(['person' => $this->getContainer(['firstName' => 'Bernhard'])]), 'person.firstName', 'Bernhard'],
+            [static::getContainer(['firstName' => 'Bernhard']), 'firstName', 'Bernhard'],
+            [static::getContainer(['person' => static::getContainer(['firstName' => 'Bernhard'])]), 'person.firstName', 'Bernhard'],
         ];
     }
 
@@ -61,7 +61,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
 
-        $object = $this->getContainer(['firstName' => 'Bernhard']);
+        $object = static::getContainer(['firstName' => 'Bernhard']);
 
         $this->propertyAccessor->getValue($object, '[lastName]');
     }

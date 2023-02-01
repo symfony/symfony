@@ -187,6 +187,9 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         $values = $entry->getAttribute($attribute);
+        if (!\in_array($attribute, [$this->uidKey, $this->passwordAttribute])) {
+            return $values;
+        }
 
         if (1 !== \count($values)) {
             throw new InvalidArgumentException(sprintf('Attribute "%s" has multiple values.', $attribute));

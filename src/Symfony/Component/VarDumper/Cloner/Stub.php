@@ -39,6 +39,7 @@ class Stub
     public $refCount = 0;
     public $position = 0;
     public $attr = [];
+    public bool $sensitive = false;
 
     private static array $defaultProperties = [];
 

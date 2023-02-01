@@ -16,6 +16,9 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\SensitiveClass;
+use Symfony\Component\VarDumper\Tests\Fixtures\SensitiveClassWithAllVisibilities;
+use Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -448,6 +451,63 @@ EOTXT
         $dumper->dump($cloner->cloneVar($value));
 
         $this->assertSame($expectedOut, $out);
+    }
+
+    public function testDumpSensitiveClass()
+    {
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar(new SensitiveClass());
+        $out = $dumper->dump($data, true);
+
+        $this->assertSame(<<<EOTXT
+Symfony\Component\VarDumper\Tests\Fixtures\SensitiveClass (🔒 Sensitive element)
+
+EOTXT, $out);
+    }
+
+    public function testDumpSensitiveProperties()
+    {
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar(new SensitiveProperties());
+        $out = $dumper->dump($data, true);
+
+        $this->assertStringMatchesFormat(<<<EOTXT
+Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties {#%d
+  -username: "root"
+  -password: ~ (🔒 Sensitive element)
+  #sensitiveFoo: Symfony\Component\VarDumper\Tests\Fixtures\SensitiveFoo (🔒 Sensitive element)
+  +sensitiveBarProperties: Symfony\Component\VarDumper\Tests\Fixtures\SensitiveBarProperties {#%d
+    -sensitiveInfo: ~ (🔒 Sensitive element)
+    -publicInfo: 123
+  }
+}
+
+EOTXT, $out);
+    }
+
+    public function testDumpSensitiveClassPropertiesWithAllVisibilities()
+    {
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar(new SensitiveClassWithAllVisibilities());
+        $out = $dumper->dump($data, true);
+
+        $this->assertStringMatchesFormat(<<<EOTXT
+Symfony\Component\VarDumper\Tests\Fixtures\SensitiveClassWithAllVisibilities {#%d
+  +foo: ~ (🔒 Sensitive element)
+  #bar: ~ (🔒 Sensitive element)
+  -qux: ~ (🔒 Sensitive element)
+}
+
+EOTXT, $out);
     }
 
     private function getSpecialVars()

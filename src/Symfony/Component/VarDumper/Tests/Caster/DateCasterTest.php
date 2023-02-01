@@ -84,6 +84,7 @@ Symfony\Component\VarDumper\Caster\ConstStub {
   +refCount: 0
   +position: 0
   +attr: []
+  +sensitive: false
 }
 EODUMP;
 
@@ -134,6 +135,7 @@ Symfony\Component\VarDumper\Caster\ConstStub {
   +refCount: 0
   +position: 0
   +attr: []
+  +sensitive: false
 }
 EODUMP;
 
@@ -204,6 +206,7 @@ Symfony\Component\VarDumper\Caster\ConstStub {
   +refCount: 0
   +position: 0
   +attr: []
+  +sensitive: false
 }
 EODUMP;
 
@@ -303,6 +306,7 @@ Symfony\Component\VarDumper\Caster\ConstStub {
   +refCount: 0
   +position: 0
   +attr: []
+  +sensitive: false
 }
 EODUMP;
 
@@ -380,6 +384,7 @@ Symfony\Component\VarDumper\Caster\ConstStub {
   +refCount: 0
   +position: 0
   +attr: []
+  +sensitive: false
 }
 EODUMP;
 

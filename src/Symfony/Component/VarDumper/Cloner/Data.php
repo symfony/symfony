@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Cloner;
 
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\SensitiveElementStub;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 
 /**
@@ -351,6 +352,12 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
                     $item->class = $item->value;
                     // no break
                 case Stub::TYPE_OBJECT:
+                    if ($item->sensitive) {
+                        $this->dumpItem($dumper, $cursor, $refs, new SensitiveElementStub($item->class));
+
+                        return;
+                    }
+                    // no break
                 case Stub::TYPE_RESOURCE:
                     $withChildren = $children && $cursor->depth !== $this->maxDepth && $this->maxItemsPerDepth;
                     $dumper->enterHash($cursor, $item->type, $item->class, $withChildren);

@@ -12,9 +12,12 @@
 namespace Symfony\Component\VarDumper\Tests\Cloner;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Cloner\AbstractCloner;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Tests\Fixtures\Php74;
 use Symfony\Component\VarDumper\Tests\Fixtures\Php81Enums;
+use Symfony\Component\VarDumper\Tests\Fixtures\SensitiveClass;
+use Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -91,6 +94,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                 (
                                 )
 
+                            [sensitive] => 
                         )
 
                 )
@@ -110,6 +114,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                 (
                                 )
 
+                            [sensitive] => 
                         )
 
                     [\000+\0002] => Symfony\Component\VarDumper\Cloner\Stub Object
@@ -125,6 +130,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                 (
                                 )
 
+                            [sensitive] => 
                         )
 
                 )
@@ -293,6 +299,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                 (
                                 )
 
+                            [sensitive] => 
                         )
 
                     [1] => SHORT
@@ -354,7 +361,7 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%d (7) {
     [1]=>
     array(1) {
       ["1"]=>
-      object(Symfony\Component\VarDumper\Cloner\Stub)#%i (8) {
+      object(Symfony\Component\VarDumper\Cloner\Stub)#%i (9) {
         ["type"]=>
         int(4)
         ["class"]=>
@@ -372,6 +379,8 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%d (7) {
         ["attr"]=>
         array(0) {
         }
+        ["sensitive"]=>
+        bool(false)
       }
     }
   }
@@ -427,9 +436,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [attr] => Array
                                 (
                                     [file] => %a%eVarClonerTest.php
-                                    [line] => 22
+                                    [line] => %d
                                 )
 
+                            [sensitive] => 
                         )
 
                 )
@@ -485,6 +495,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                     [line] => 5
                                 )
 
+                            [sensitive] => 
                         )
 
                 )
@@ -509,6 +520,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                         (
                                         )
 
+                                    [sensitive] => 
                                 )
 
                             [cut] => 0
@@ -519,6 +531,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                 (
                                 )
 
+                            [sensitive] => 
                         )
 
                     [p3] => Symfony\Component\VarDumper\Cloner\Stub Object
@@ -538,6 +551,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                         (
                                         )
 
+                                    [sensitive] => 
                                 )
 
                             [cut] => 0
@@ -548,6 +562,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                 (
                                 )
 
+                            [sensitive] => 
                         )
 
                 )
@@ -598,6 +613,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                     [line] => 5
                                 )
 
+                            [sensitive] => 
                         )
 
                 )
@@ -619,6 +635,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                     [line] => 5
                                 )
 
+                            [sensitive] => 
                         )
 
                     [e2] => Symfony\Component\VarDumper\Cloner\Stub Object
@@ -636,6 +653,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                                     [line] => 5
                                 )
 
+                            [sensitive] => 
                         )
 
                 )
@@ -649,6 +667,287 @@ Symfony\Component\VarDumper\Cloner\Data Object
                 (
                     [name] => Diamonds
                     [value] => D
+                )
+
+        )
+
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
+)
+
+EOTXT;
+        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+    }
+
+    public function testSensitiveClass()
+    {
+        $data = new SensitiveClass();
+
+        $cloner = new VarCloner();
+        $clone = $cloner->cloneVar($data);
+
+        $expected = <<<'EOTXT'
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\SensitiveClass
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %d
+                            [refCount] => 0
+                            [position] => 0
+                            [attr] => Array
+                                (
+                                    [file] => %s/symfony/src/Symfony/Component/VarDumper/Tests/Fixtures/SensitiveClass.php
+                                    [line] => %d
+                                )
+
+                            [sensitive] => 1
+                        )
+
+                )
+
+        )
+
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
+)
+
+EOTXT;
+        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+    }
+
+    public function testSensitiveProperties()
+    {
+        $data = new SensitiveProperties();
+
+        $cloner = new VarCloner();
+        $clone = $cloner->cloneVar($data);
+
+        $expected = <<<'EOTXT'
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %d
+                            [refCount] => 0
+                            [position] => 1
+                            [attr] => Array
+                                (
+                                    [file] => %s/symfony/src/Symfony/Component/VarDumper/Tests/Fixtures/SensitiveProperties.php
+                                    [line] => %d
+                                )
+
+                            [sensitive] => 
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [ Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties username] => root
+                    [ Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties password] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 1
+                            [class] => ~ (🔒 Sensitive element)
+                            [value] => ~ (🔒 Sensitive element)
+                            [cut] => 0
+                            [handle] => 0
+                            [refCount] => 0
+                            [position] => 0
+                            [attr] => Array
+                                (
+                                )
+
+                            [sensitive] => 
+                        )
+
+                    [ * sensitiveFoo] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\SensitiveFoo
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %d
+                            [refCount] => 0
+                            [position] => 0
+                            [attr] => Array
+                                (
+                                    [file] => %s/symfony/src/Symfony/Component/VarDumper/Tests/Fixtures/SensitiveProperties.php
+                                    [line] => %d
+                                )
+
+                            [sensitive] => 1
+                        )
+
+                    [sensitiveBarProperties] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\SensitiveBarProperties
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %d
+                            [refCount] => 0
+                            [position] => 2
+                            [attr] => Array
+                                (
+                                    [file] => %s/symfony/src/Symfony/Component/VarDumper/Tests/Fixtures/SensitiveProperties.php
+                                    [line] => %d
+                                )
+
+                            [sensitive] => 
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [ Symfony\Component\VarDumper\Tests\Fixtures\SensitiveBarProperties sensitiveInfo] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 1
+                            [class] => ~ (🔒 Sensitive element)
+                            [value] => ~ (🔒 Sensitive element)
+                            [cut] => 0
+                            [handle] => 0
+                            [refCount] => 0
+                            [position] => 0
+                            [attr] => Array
+                                (
+                                )
+
+                            [sensitive] => 
+                        )
+
+                    [ Symfony\Component\VarDumper\Tests\Fixtures\SensitiveBarProperties publicInfo] => 123
+                )
+
+        )
+
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
+)
+
+EOTXT;
+        file_put_contents('expected_zeub.php', print_r($clone, true));
+        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+    }
+    
+    public function testSensitivePropertiesWithDumpSensitiveElementsFlag()
+    {
+        $data = new SensitiveProperties();
+
+        $cloner = new VarCloner();
+        $cloner->setFlags(AbstractCloner::CLONER_WITH_SENSITIVE_ELEMENTS);
+        $clone = $cloner->cloneVar($data);
+
+        $expected = <<<'EOTXT'
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %d
+                            [refCount] => 0
+                            [position] => 1
+                            [attr] => Array
+                                (
+                                    [file] => %s/symfony/src/Symfony/Component/VarDumper/Tests/Fixtures/SensitiveProperties.php
+                                    [line] => %d
+                                )
+
+                            [sensitive] => 
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [ Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties username] => root
+                    [ Symfony\Component\VarDumper\Tests\Fixtures\SensitiveProperties password] => toor
+                    [ * sensitiveFoo] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\SensitiveFoo
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %d
+                            [refCount] => 0
+                            [position] => 0
+                            [attr] => Array
+                                (
+                                    [file] => %s/symfony/src/Symfony/Component/VarDumper/Tests/Fixtures/SensitiveProperties.php
+                                    [line] => %d
+                                )
+
+                            [sensitive] => 
+                        )
+
+                    [sensitiveBarProperties] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\SensitiveBarProperties
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %d
+                            [refCount] => 0
+                            [position] => 2
+                            [attr] => Array
+                                (
+                                    [file] => %s/symfony/src/Symfony/Component/VarDumper/Tests/Fixtures/SensitiveProperties.php
+                                    [line] => %d
+                                )
+
+                            [sensitive] => 
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [ Symfony\Component\VarDumper\Tests\Fixtures\SensitiveBarProperties sensitiveInfo] => password
+                    [ Symfony\Component\VarDumper\Tests\Fixtures\SensitiveBarProperties publicInfo] => 123
                 )
 
         )

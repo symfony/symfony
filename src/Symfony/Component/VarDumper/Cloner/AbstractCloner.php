@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
+use Symfony\Component\VarDumper\Attribute\AbstractAttribute;
+use Symfony\Component\VarDumper\Attribute\SensitiveElement;
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\SensitiveElementStub;
 use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 
 /**
@@ -21,6 +24,8 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  */
 abstract class AbstractCloner implements ClonerInterface
 {
+    public const CLONER_WITH_SENSITIVE_ELEMENTS = 1;
+
     public static $defaultCasters = [
         '__PHP_Incomplete_Class' => ['Symfony\Component\VarDumper\Caster\Caster', 'castPhpIncompleteClass'],
 
@@ -212,6 +217,7 @@ abstract class AbstractCloner implements ClonerInterface
 
     private array $classInfo = [];
     private int $filter = 0;
+    private int $flags = 0;
 
     /**
      * @param callable[]|null $casters A map of casters
@@ -263,6 +269,14 @@ abstract class AbstractCloner implements ClonerInterface
     public function setMinDepth(int $minDepth)
     {
         $this->minDepth = $minDepth;
+    }
+
+    /**
+     * @param int $flags A bit field of AbstractCloner::CLONER_* constants
+     */
+    public function setFlags(int $flags): void
+    {
+        $this->flags = $flags;
     }
 
     /**
@@ -319,7 +333,7 @@ abstract class AbstractCloner implements ClonerInterface
             $stub->class = get_debug_type($obj);
         }
         if (isset($this->classInfo[$class])) {
-            [$i, $parents, $hasDebugInfo, $fileInfo] = $this->classInfo[$class];
+            [$i, $parents, $hasDebugInfo, $fileInfo, $classAttributes, $properties] = $this->classInfo[$class];
         } else {
             $i = 2;
             $parents = [$class];
@@ -336,16 +350,47 @@ abstract class AbstractCloner implements ClonerInterface
             $parents[] = '*';
 
             $r = new \ReflectionClass($class);
+            $classAttributes = $r->getAttributes(AbstractAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
+
+            $properties = [];
+            foreach ($r->getProperties() as $property) {
+                $properties[$property->name] = [
+                    'value' => $property->getValue($obj),
+                    'visibility' => $property->isPublic() ? Visibility::Public : ($property->isProtected() ? Visibility::Protected : Visibility::Private),
+                ];
+            }
+
             $fileInfo = $r->isInternal() || $r->isSubclassOf(Stub::class) ? [] : [
                 'file' => $r->getFileName(),
                 'line' => $r->getStartLine(),
             ];
 
-            $this->classInfo[$class] = [$i, $parents, $hasDebugInfo, $fileInfo];
+            $this->classInfo[$class] = [$i, $parents, $hasDebugInfo, $fileInfo, $classAttributes, $properties];
         }
 
         $stub->attr += $fileInfo;
         $a = Caster::castObject($obj, $class, $hasDebugInfo, $stub->class);
+
+        foreach ($classAttributes as $attribute) {
+            $attribute = $attribute->newInstance();
+
+            if ($attribute instanceof SensitiveElement && !($this->flags & self::CLONER_WITH_SENSITIVE_ELEMENTS)) {
+                $attributeProperties = $attribute->getProperties();
+
+                if (0 !== \count($attributeProperties)) {
+                    foreach ($attributeProperties as $property) {
+                        $key = (match ($properties[$property]['visibility']) {
+                            Visibility::Public => '',
+                            Visibility::Protected => "\0*\0",
+                            Visibility::Private => "\0".$class."\0",
+                        }).$property;
+                        $a[$key] = new SensitiveElementStub('~');
+                    }
+                } else {
+                    $stub->sensitive = true;
+                }
+            }
+        }
 
         try {
             while ($i--) {

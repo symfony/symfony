@@ -42,10 +42,8 @@ use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
@@ -66,22 +64,13 @@ use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\UpcomingDenormalizerInterface as DenormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\UpcomingNormalizerInterface as NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 
 class SerializerTest extends TestCase
 {
-    public function testInterface()
-    {
-        $serializer = new Serializer();
-
-        $this->assertInstanceOf(SerializerInterface::class, $serializer);
-        $this->assertInstanceOf(NormalizerInterface::class, $serializer);
-        $this->assertInstanceOf(DenormalizerInterface::class, $serializer);
-        $this->assertInstanceOf(EncoderInterface::class, $serializer);
-        $this->assertInstanceOf(DecoderInterface::class, $serializer);
-    }
-
     public function testItThrowsExceptionOnInvalidNormalizer()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -153,11 +142,13 @@ class SerializerTest extends TestCase
     public function testNormalizeWithSupportOnData()
     {
         $normalizer1 = $this->createMock(NormalizerInterface::class);
+        $normalizer1->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer1->method('supportsNormalization')
             ->willReturnCallback(fn ($data, $format) => isset($data->test));
         $normalizer1->method('normalize')->willReturn('test1');
 
         $normalizer2 = $this->createMock(NormalizerInterface::class);
+        $normalizer2->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer2->method('supportsNormalization')
             ->willReturn(true);
         $normalizer2->method('normalize')->willReturn('test2');
@@ -174,11 +165,13 @@ class SerializerTest extends TestCase
     public function testDenormalizeWithSupportOnData()
     {
         $denormalizer1 = $this->createMock(DenormalizerInterface::class);
+        $denormalizer1->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer1->method('supportsDenormalization')
             ->willReturnCallback(fn ($data, $type, $format) => isset($data['test1']));
         $denormalizer1->method('denormalize')->willReturn('test1');
 
         $denormalizer2 = $this->createMock(DenormalizerInterface::class);
+        $denormalizer2->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer2->method('supportsDenormalization')
             ->willReturn(true);
         $denormalizer2->method('denormalize')->willReturn('test2');
@@ -370,8 +363,7 @@ class SerializerTest extends TestCase
     {
         $normalizerAware = $this->createMock(NormalizerAwareNormalizer::class);
         $normalizerAware->expects($this->once())
-            ->method('setNormalizer')
-            ->with($this->isInstanceOf(NormalizerInterface::class));
+            ->method('setNormalizer');
 
         new Serializer([$normalizerAware]);
     }
@@ -380,8 +372,7 @@ class SerializerTest extends TestCase
     {
         $denormalizerAware = $this->createMock(DenormalizerAwareDenormalizer::class);
         $denormalizerAware->expects($this->once())
-            ->method('setDenormalizer')
-            ->with($this->isInstanceOf(DenormalizerInterface::class));
+            ->method('setDenormalizer');
 
         new Serializer([$denormalizerAware]);
     }
@@ -1235,6 +1226,76 @@ class SerializerTest extends TestCase
             [new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))],
         ];
     }
+
+    public function testSerializerUsesSupportedTypesMethod()
+    {
+        $neverCalledNormalizer = $this->createMock(DummyNormalizer::class);
+        $neverCalledNormalizer
+            // once for normalization, once for denormalization
+            ->expects($this->exactly(2))
+            ->method('getSupportedTypes')
+            ->willReturn([
+                Foo::class => true,
+                Bar::class => false,
+            ]);
+
+        $supportedAndCachedNormalizer = $this->createMock(DummyNormalizer::class);
+        $supportedAndCachedNormalizer
+            // once for normalization, once for denormalization
+            ->expects($this->exactly(2))
+            ->method('getSupportedTypes')
+            ->willReturn([
+                Model::class => true,
+            ]);
+
+        $serializer = new Serializer(
+            [
+                $neverCalledNormalizer,
+                $supportedAndCachedNormalizer,
+                new ObjectNormalizer(),
+            ],
+            ['json' => new JsonEncoder()]
+        );
+
+        // Normalization process
+        $neverCalledNormalizer
+            ->expects($this->never())
+            ->method('supportsNormalization');
+        $neverCalledNormalizer
+            ->expects($this->never())
+            ->method('normalize');
+
+        $supportedAndCachedNormalizer
+            ->expects($this->once())
+            ->method('supportsNormalization')
+            ->willReturn(true);
+        $supportedAndCachedNormalizer
+            ->expects($this->exactly(2))
+            ->method('normalize')
+            ->willReturn(['foo' => 'bar']);
+
+        $serializer->normalize(new Model(), 'json');
+        $serializer->normalize(new Model(), 'json');
+
+        // Denormalization pass
+        $neverCalledNormalizer
+            ->expects($this->never())
+            ->method('supportsDenormalization');
+        $neverCalledNormalizer
+            ->expects($this->never())
+            ->method('denormalize');
+        $supportedAndCachedNormalizer
+            ->expects($this->once())
+            ->method('supportsDenormalization')
+            ->willReturn(true);
+        $supportedAndCachedNormalizer
+            ->expects($this->exactly(2))
+            ->method('denormalize')
+            ->willReturn(new Model());
+
+        $serializer->denormalize('foo', Model::class, 'json');
+        $serializer->denormalize('foo', Model::class, 'json');
+    }
 }
 
 class Model
@@ -1387,6 +1448,11 @@ class DummyList extends \ArrayObject
     {
         return new \ArrayIterator($this->list);
     }
+}
+
+abstract class DummyNormalizer implements NormalizerInterface, DenormalizerInterface
+{
+    abstract public function getSupportedTypes(?string $format): array;
 }
 
 interface NormalizerAwareNormalizer extends NormalizerInterface, NormalizerAwareInterface

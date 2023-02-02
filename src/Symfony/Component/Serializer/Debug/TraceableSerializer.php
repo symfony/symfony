@@ -128,6 +128,16 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
         return $result;
     }
 
+    public function getSupportedTypes(?string $format): ?array
+    {
+        // @deprecated remove condition in 7.0
+        if (!method_exists($this->serializer, 'getSupportedTypes')) {
+            return null;
+        }
+
+        return $this->serializer->getSupportedTypes($format);
+    }
+
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return $this->serializer->supportsNormalization($data, $format, $context);

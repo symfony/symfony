@@ -27,6 +27,13 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
      */
     public const ALLOW_INVALID_VALUES = 'allow_invalid_values';
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+           \BackedEnum::class => true,
+        ];
+    }
+
     public function normalize(mixed $object, string $format = null, array $context = []): int|string
     {
         if (!$object instanceof \BackedEnum) {
@@ -78,8 +85,13 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
         return is_subclass_of($type, \BackedEnum::class);
     }
 
+    /**
+     * @deprecated since Symfony 6.3, use "getSupportedTypes()" instead
+     */
     public function hasCacheableSupportsMethod(): bool
     {
+        trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, use "getSupportedTypes()" instead.', __METHOD__);
+
         return true;
     }
 }

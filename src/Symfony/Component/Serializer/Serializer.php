@@ -227,6 +227,11 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         return $normalizer->denormalize($data, $type, $format, $context);
     }
 
+    public function getSupportedTypes(?string $format): ?array
+    {
+        return null;
+    }
+
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
     {
         return null !== $this->getNormalizer($data, $format, $context);
@@ -256,11 +261,35 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                     continue;
                 }
 
-                if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
+                if (!method_exists($normalizer, 'getSupportedTypes')) {
+                    trigger_deprecation('symfony/serializer', '6.3', '"%s" should implement "NormalizerInterface::getSupportedTypes(?string $format): array".', $normalizer::class);
+
+                    if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
+                        $this->normalizerCache[$format][$type][$k] = false;
+                    } elseif ($normalizer->supportsNormalization($data, $format, $context)) {
+                        $this->normalizerCache[$format][$type][$k] = true;
+                        break;
+                    }
+
+                    continue;
+                }
+
+                if (null === $supportedTypes = $normalizer->getSupportedTypes($format)) {
                     $this->normalizerCache[$format][$type][$k] = false;
-                } elseif ($normalizer->supportsNormalization($data, $format, $context)) {
-                    $this->normalizerCache[$format][$type][$k] = true;
-                    break;
+                    continue;
+                }
+
+                foreach ($supportedTypes as $supportedType => $isCacheable) {
+                    if ($type !== $supportedType && !is_subclass_of($type, $supportedType, true)) {
+                        continue;
+                    }
+
+                    if ($isCacheable && $normalizer->supportsNormalization($data, $format, $context)) {
+                        $this->normalizerCache[$format][$type][$k] = true;
+                        break 2;
+                    }
+
+                    $this->normalizerCache[$format][$type][$k] = false;
                 }
             }
         }
@@ -293,11 +322,35 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                     continue;
                 }
 
-                if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
+                if (!method_exists($normalizer, 'getSupportedTypes')) {
+                    trigger_deprecation('symfony/serializer', '6.3', '"%s" should implement "DenormalizerInterface::getSupportedTypes(?string $format): array".', $normalizer::class);
+
+                    if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
+                        $this->denormalizerCache[$format][$class][$k] = false;
+                    } elseif ($normalizer->supportsDenormalization(null, $class, $format, $context)) {
+                        $this->denormalizerCache[$format][$class][$k] = true;
+                        break;
+                    }
+
+                    continue;
+                }
+
+                if (null === $supportedTypes = $normalizer->getSupportedTypes($format)) {
                     $this->denormalizerCache[$format][$class][$k] = false;
-                } elseif ($normalizer->supportsDenormalization(null, $class, $format, $context)) {
-                    $this->denormalizerCache[$format][$class][$k] = true;
-                    break;
+                    continue;
+                }
+
+                foreach ($supportedTypes as $supportedType => $isCacheable) {
+                    if ($class !== $supportedType && !is_subclass_of($class, $supportedType, true)) {
+                        continue;
+                    }
+
+                    if ($isCacheable && $normalizer->supportsDenormalization(null, $class, $format, $context)) {
+                        $this->denormalizerCache[$format][$class][$k] = true;
+                        break;
+                    }
+
+                    $this->denormalizerCache[$format][$class][$k] = false;
                 }
             }
         }

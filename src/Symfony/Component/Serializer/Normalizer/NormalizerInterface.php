@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\Exception\LogicException;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @method getSupportedTypes(?string $format): ?array
  */
 interface NormalizerInterface
 {
@@ -41,11 +43,31 @@ interface NormalizerInterface
     /**
      * Checks whether the given class is supported for normalization by this normalizer.
      *
+     * Since Symfony 6.3, this method will only be called if the $data type is
+     * included in the supported types returned by getSupportedTypes().
+     *
+     * @see getSupportedTypes()
+     *
      * @param mixed       $data    Data to normalize
-     * @param string|null $format The format being (de-)serialized from or into
+     * @param string|null $format  The format being (de-)serialized from or into
      * @param array       $context Context options for the normalizer
      *
      * @return bool
      */
     public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */);
+
+    /*
+     * Return the types supported for normalization by this normalizer for this
+     * format associated to a boolean value indicating if the result of
+     * supports*() methods can be cached or if the result can not be cached
+     * because it depends on the context.
+     * Returning null means this normalizer will be considered for
+     * every format/class.
+     * Return an empty array if no type is supported for this format.
+     *
+     * @param string $format The format being (de-)serialized from or into
+     *
+     * @return array<class-string|string, bool>|null
+     */
+    /* public function getSupportedTypes(?string $format): ?array; */
 }

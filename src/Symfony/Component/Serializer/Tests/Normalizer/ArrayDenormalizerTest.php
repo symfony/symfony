@@ -14,23 +14,16 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\UpcomingDenormalizerInterface as DenormalizerInterface;
 
 class ArrayDenormalizerTest extends TestCase
 {
-    /**
-     * @var ArrayDenormalizer
-     */
-    private $denormalizer;
-
-    /**
-     * @var MockObject&ContextAwareDenormalizerInterface
-     */
-    private $serializer;
+    private ArrayDenormalizer $denormalizer;
+    private MockObject&DenormalizerInterface $serializer;
 
     protected function setUp(): void
     {
-        $this->serializer = $this->createMock(ContextAwareDenormalizerInterface::class);
+        $this->serializer = $this->createMock(DenormalizerInterface::class);
         $this->denormalizer = new ArrayDenormalizer();
         $this->denormalizer->setDenormalizer($this->serializer);
     }

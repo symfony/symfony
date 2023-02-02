@@ -21,6 +21,8 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @method getSupportedTypes(?string $format): ?array
  */
 interface DenormalizerInterface
 {
@@ -49,12 +51,32 @@ interface DenormalizerInterface
     /**
      * Checks whether the given class is supported for denormalization by this normalizer.
      *
-     * @param mixed       $data   Data to denormalize from
-     * @param string      $type   The class to which the data should be denormalized
-     * @param string|null $format The format being deserialized from
+     * Since Symfony 6.3, this method will only be called if the type is
+     * included in the supported types returned by getSupportedTypes().
+     *
+     * @see getSupportedTypes()
+     *
+     * @param mixed       $data    Data to denormalize from
+     * @param string      $type    The class to which the data should be denormalized
+     * @param string|null $format  The format being deserialized from
      * @param array       $context Options available to the denormalizer
      *
      * @return bool
      */
     public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */);
+
+    /*
+     * Return the types supported for normalization by this denormalizer for
+     * this format associated to a boolean value indicating if the result of
+     * supports*() methods can be cached or if the result can not be cached
+     * because it depends on the context.
+     * Returning null means this denormalizer will be considered for
+     * every format/class.
+     * Return an empty array if no type is supported for this format.
+     *
+     * @param string $format The format being (de-)serialized from or into
+     *
+     * @return array<class-string|string, bool>|null
+     */
+    /* public function getSupportedTypes(?string $format): ?array; */
 }

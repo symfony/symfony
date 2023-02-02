@@ -205,7 +205,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
             }
             foreach ($paths as $locale => $path) {
                 if (preg_match(sprintf('/\{%s(?:<.*?>)?\}/', preg_quote($param->name)), $path)) {
-                    $defaults[$param->name] = $param->getDefaultValue();
+                    $defaultValue = $param->getDefaultValue();
+                    $defaults[$param->name] = $defaultValue instanceof \BackedEnum ? $defaultValue->value : $defaultValue;
                     break;
                 }
             }

@@ -127,7 +127,7 @@ class RequestDataCollectorTest extends TestCase
 
             [
                 'First-class callable closure',
-                $controller->regularCallable(...),
+                \PHP_VERSION_ID >= 80100 ? eval('return $controller->regularCallable(...);') : [$controller, 'regularCallable'],
                 [
                     'class' => DummyController::class,
                     'method' => 'regularCallable',

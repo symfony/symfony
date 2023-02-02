@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-01-30T10:11:57Z
+
+I wonder if this is going to pass. Looks like a close vote.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2023-01-30T10:33:02Z
+
+It looks like that the “Package / Verify” job on the CI needs a year number:
+
+> symfony/doctrine-bridge
+>  Verifying new package
+>  First line of the license file is wrong. Maybe it is the wrong year?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-30T11:33:30Z
+
+`.github/workflows/package-tests.yml` should be updated to change the check being done.

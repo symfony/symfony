@@ -377,6 +377,12 @@ abstract class AbstractCrawlerTestCase extends TestCase
                 '',
                 '  ',
             ],
+            [
+                '//*[@id="complex-elements"]/*[@class="six"]',
+                'console.log("Test JavaScript content");',
+                'console.log("Test JavaScript content");',
+                ' console.log("Test JavaScript content"); ',
+            ],
         ];
     }
 
@@ -1311,6 +1317,7 @@ HTML;
                         <div class="three"> Parent text <span>Child text</span> Parent text </div>
                         <div class="four">  <span>Child text</span>  </div>
                         <div class="five"><span>Child text</span>  <span>Another child</span></div>
+                        <script class="six" type="text/javascript"> console.log("Test JavaScript content"); </script>
                     </div>
                 </body>
             </html>

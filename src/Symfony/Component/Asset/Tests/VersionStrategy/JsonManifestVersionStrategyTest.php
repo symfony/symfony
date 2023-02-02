@@ -82,22 +82,22 @@ class JsonManifestVersionStrategyTest extends TestCase
         new JsonManifestVersionStrategy('https://cdn.example.com/manifest.json');
     }
 
-    public function provideValidStrategies()
+    public static function provideValidStrategies(): \Generator
     {
-        yield from $this->provideStrategies('manifest-valid.json');
+        yield from static::provideStrategies('manifest-valid.json');
     }
 
-    public function provideInvalidStrategies()
+    public static function provideInvalidStrategies(): \Generator
     {
-        yield from $this->provideStrategies('manifest-invalid.json');
+        yield from static::provideStrategies('manifest-invalid.json');
     }
 
-    public function provideMissingStrategies()
+    public static function provideMissingStrategies(): \Generator
     {
-        yield from $this->provideStrategies('non-existent-file.json');
+        yield from static::provideStrategies('non-existent-file.json');
     }
 
-    public function provideStrategies(string $manifestPath)
+    public static function provideStrategies(string $manifestPath): \Generator
     {
         $httpClient = new MockHttpClient(function ($method, $url, $options) {
             $filename = __DIR__.'/../fixtures/'.basename($url);
@@ -114,7 +114,7 @@ class JsonManifestVersionStrategyTest extends TestCase
         yield [new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestPath)];
     }
 
-    public function provideStrictStrategies()
+    public static function provideStrictStrategies(): \Generator
     {
         $strategy = new JsonManifestVersionStrategy(__DIR__.'/../fixtures/manifest-valid.json', null, true);
 

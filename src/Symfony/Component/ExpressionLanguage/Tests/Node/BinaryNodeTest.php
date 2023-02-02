@@ -23,7 +23,7 @@ class BinaryNodeTest extends AbstractNodeTest
 {
     use ExpectDeprecationTrait;
 
-    public function getEvaluateData()
+    public static function getEvaluateData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
@@ -78,7 +78,7 @@ class BinaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    public function getCompileData()
+    public static function getCompileData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
@@ -130,7 +130,7 @@ class BinaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    public function getDumpData()
+    public static function getDumpData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));

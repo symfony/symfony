@@ -20,21 +20,21 @@ class ConsensusStrategyTest extends AccessDecisionStrategyTestCase
     {
         $strategy = new ConsensusStrategy();
 
-        yield [$strategy, $this->getVoters(1, 0, 0), true];
-        yield [$strategy, $this->getVoters(1, 2, 0), false];
-        yield [$strategy, $this->getVoters(2, 1, 0), true];
-        yield [$strategy, $this->getVoters(0, 0, 1), false];
+        yield [$strategy, static::getVoters(1, 0, 0), true];
+        yield [$strategy, static::getVoters(1, 2, 0), false];
+        yield [$strategy, static::getVoters(2, 1, 0), true];
+        yield [$strategy, static::getVoters(0, 0, 1), false];
 
-        yield [$strategy, $this->getVoters(2, 2, 0), true];
-        yield [$strategy, $this->getVoters(2, 2, 1), true];
+        yield [$strategy, static::getVoters(2, 2, 0), true];
+        yield [$strategy, static::getVoters(2, 2, 1), true];
 
         $strategy = new ConsensusStrategy(true);
 
-        yield [$strategy, $this->getVoters(0, 0, 1), true];
+        yield [$strategy, static::getVoters(0, 0, 1), true];
 
         $strategy = new ConsensusStrategy(false, false);
 
-        yield [$strategy, $this->getVoters(2, 2, 0), false];
-        yield [$strategy, $this->getVoters(2, 2, 1), false];
+        yield [$strategy, static::getVoters(2, 2, 0), false];
+        yield [$strategy, static::getVoters(2, 2, 1), false];
     }
 }

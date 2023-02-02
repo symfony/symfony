@@ -157,6 +157,7 @@ Symfony Container Environment Variables
  ----------------------------- ----------------- ---------------------- -------------%w
   Name                          Default value     Real value             Usage count%w
  ----------------------------- ----------------- ---------------------- -------------%w
+  APP_ENV                       n/a               "dev"                  0%w
   APP_EXAMPLE_ENV_TO_OVERRIDE   n/a               "example_overridden"   0%w
   APP_EXAMPLE_ENV               n/a               "example_value"        0%w
   JSON                          "[1, "2.5", 3]"   n/a                    1%w

@@ -109,7 +109,7 @@ class RequestDataCollectorTest extends TestCase
                 [
                     'class' => DummyController::class,
                     'method' => 'regularCallable',
-                    'file' => $r3->getFileName(),
+                    'file' => $r1->getFileName(),
                     'line' => $r1->getStartLine(),
                 ],
             ],
@@ -127,11 +127,11 @@ class RequestDataCollectorTest extends TestCase
 
             [
                 'First-class callable closure',
-                $this->testControllerInspection(...),
+                $controller->regularCallable(...),
                 [
-                    'class' => self::class,
-                    'method' => 'testControllerInspection',
-                    'file' => __FILE__,
+                    'class' => DummyController::class,
+                    'method' => 'regularCallable',
+                    'file' => $r1->getFileName(),
                     'line' => $r1->getStartLine(),
                 ],
             ],
@@ -142,7 +142,7 @@ class RequestDataCollectorTest extends TestCase
                 [
                     'class' => DummyController::class,
                     'method' => 'staticControllerMethod',
-                    'file' => $r3->getFileName(),
+                    'file' => $r2->getFileName(),
                     'line' => $r2->getStartLine(),
                 ],
             ],
@@ -153,7 +153,7 @@ class RequestDataCollectorTest extends TestCase
                 [
                     'class' => DummyController::class,
                     'method' => 'staticControllerMethod',
-                    'file' => $r3->getFileName(),
+                    'file' => $r2->getFileName(),
                     'line' => $r2->getStartLine(),
                 ],
             ],
@@ -164,7 +164,7 @@ class RequestDataCollectorTest extends TestCase
                 [
                     'class' => DummyController::class,
                     'method' => 'staticControllerMethod',
-                    'file' => $r3->getFileName(),
+                    'file' => $r2->getFileName(),
                     'line' => $r2->getStartLine(),
                 ],
             ],

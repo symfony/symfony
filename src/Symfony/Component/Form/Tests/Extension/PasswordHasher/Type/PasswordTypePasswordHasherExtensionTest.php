@@ -77,6 +77,42 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         $this->assertSame($user->getPassword(), $hashedPassword);
     }
 
+    public function testPasswordHashSuccessWitnEmptyData()
+    {
+        $user = new User();
+
+        $plainPassword = 'PlainPassword';
+        $hashedPassword = 'HashedPassword';
+
+        $this->passwordHasher
+            ->expects($this->once())
+            ->method('hashPassword')
+            ->with($user, $plainPassword)
+            ->willReturn($hashedPassword)
+        ;
+
+        $this->assertNull($user->getPassword());
+
+        $form = $this->factory
+            ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+                'data_class' => User::class,
+                'empty_data' => function () use ($user) {
+                    return $user;
+                },
+            ])
+            ->add('plainPassword', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', [
+                'hash_property_path' => 'password',
+                'mapped' => false,
+            ])
+            ->getForm()
+        ;
+
+        $form->submit(['plainPassword' => $plainPassword]);
+
+        $this->assertTrue($form->isValid());
+        $this->assertSame($user->getPassword(), $hashedPassword);
+    }
+
     public function testPasswordHashOnInvalidForm()
     {
         $user = new User();

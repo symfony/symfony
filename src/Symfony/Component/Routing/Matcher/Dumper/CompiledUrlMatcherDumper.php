@@ -467,6 +467,9 @@ EOF;
         }
         if (!\is_array($value)) {
             if (\is_object($value)) {
+                if ($value instanceof \BackedEnum) {
+                    return "'$value->value'";
+                }
                 throw new \InvalidArgumentException('Symfony\Component\Routing\Route cannot contain objects.');
             }
 

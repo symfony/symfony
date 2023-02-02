@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-14T18:42:28Z
+
+I don't understand the Psalm failure. The error is `Uncaught Exception: InvalidArgumentException Could not get class storage for sessionhandlerinterface` which according to `--debug-by-line` comes from `/Users/dane.powell/src/symfony/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MigratingSessionHandler.php`. I don't see how it could be related to this PR.
+
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-20T20:58:27Z
+
+@fabpot mind reviewing this since you approved the last one?
+
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-23T17:38:14Z
+
+Thanks for the review, all feedback addressed, this is good to go.
+
+Tests are failing in HEAD, so probably not related to this PR. I think every PR I've opened has had failures of this nature.
+
+Have you thought about using branch protections to prevent PRs / commits with failing tests from being merged?
+
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-26T20:24:40Z
+
+Thanks for the feedback, all comments addressed.
+
+---------------------------------------------------------------------------
+
+by anavarre at 2023-02-01T13:52:54Z
+
+Is there anything else missing here?

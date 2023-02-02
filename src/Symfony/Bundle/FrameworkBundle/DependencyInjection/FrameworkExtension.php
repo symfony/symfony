@@ -49,6 +49,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -684,6 +685,10 @@ class FrameworkExtension extends Extension
                 $tagAttributes['method'] = $reflector->getName();
             }
             $definition->addTag('messenger.message_handler', $tagAttributes);
+        });
+
+        $container->registerAttributeForAutoconfiguration(AsAlias::class, static function (ChildDefinition $definition, AsAlias $attribute, \ReflectionClass $reflector): void {
+            $definition->addTag(AsAlias::class, ['alias' => $attribute->alias]);
         });
 
         if (!$container->getParameter('kernel.debug')) {

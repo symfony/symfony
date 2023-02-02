@@ -76,6 +76,7 @@ class PassConfig
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),
             new CheckArgumentsValidityPass(false),
+            new AliasPass(),
         ]];
 
         $this->removingPasses = [[

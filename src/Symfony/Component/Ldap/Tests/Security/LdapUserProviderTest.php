@@ -333,6 +333,52 @@ class LdapUserProviderTest extends TestCase
         $this->assertInstanceOf(LdapUser::class, $provider->loadUserByIdentifier('foo'));
     }
 
+    public function testLoadUserByIdentifierIsSuccessfulWithMultipleExtraAttributes()
+    {
+        $result = $this->createMock(CollectionInterface::class);
+        $query = $this->createMock(QueryInterface::class);
+        $query
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn($result)
+        ;
+        $ldap = $this->createMock(LdapInterface::class);
+        $memberOf = [
+            'cn=foo,ou=MyBusiness,dc=symfony,dc=com',
+            'cn=bar,ou=MyBusiness,dc=symfony,dc=com',
+        ];
+        $result
+            ->expects($this->once())
+            ->method('offsetGet')
+            ->with(0)
+            ->willReturn(new Entry('foo', [
+                'sAMAccountName' => ['foo'],
+                'userpassword' => ['bar'],
+                'memberOf' => $memberOf,
+            ]))
+        ;
+        $result
+            ->expects($this->once())
+            ->method('count')
+            ->willReturn(1)
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('escape')
+            ->willReturn('foo')
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('query')
+            ->willReturn($query)
+        ;
+
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword', ['memberOf']);
+        $user = $provider->loadUserByIdentifier('foo');
+        $this->assertInstanceOf(LdapUser::class, $user);
+        $this->assertSame(['memberOf' => $memberOf], $user->getExtraFields());
+    }
+
     public function testRefreshUserShouldReturnUserWithSameProperties()
     {
         $ldap = $this->createMock(LdapInterface::class);

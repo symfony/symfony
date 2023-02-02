@@ -15,12 +15,12 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\XmlDescriptor;
 
 class XmlDescriptorTest extends AbstractDescriptorTest
 {
-    protected function getDescriptor()
+    protected static function getDescriptor()
     {
         return new XmlDescriptor();
     }
 
-    protected function getFormat()
+    protected static function getFormat()
     {
         return 'xml';
     }

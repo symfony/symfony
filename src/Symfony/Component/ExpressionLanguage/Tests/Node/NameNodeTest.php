@@ -15,21 +15,21 @@ use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
 class NameNodeTest extends AbstractNodeTest
 {
-    public function getEvaluateData()
+    public static function getEvaluateData(): array
     {
         return [
             ['bar', new NameNode('foo'), ['foo' => 'bar']],
         ];
     }
 
-    public function getCompileData()
+    public static function getCompileData(): array
     {
         return [
             ['$foo', new NameNode('foo')],
         ];
     }
 
-    public function getDumpData()
+    public static function getDumpData(): array
     {
         return [
             ['foo', new NameNode('foo')],

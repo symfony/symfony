@@ -297,25 +297,12 @@ abstract class Descriptor implements DescriptorInterface
             return [];
         }
 
-        if(!$container->hasParameter('kernel.project_dir') || !$container->hasParameter('kernel.environment')) {
-            return [];
-        }
-
         $envVarsFromContainer = [];
         $containerFile = file_get_contents($container->getParameter('debug.container.dump'));
         preg_match_all('{%env\(((?:\w++:)*+\w++)\)%}', $containerFile, $envVarsFromContainer);
         $envVarsFromContainer = array_unique($envVarsFromContainer[1]);
 
-        $envFiles = $this->getEnvFiles($container->getParameter('kernel.project_dir'), $container->getParameter('kernel.environment'));
-        $availableFiles = array_filter($envFiles, static fn (string $file) => is_file($file));
-
-        $dotenv = new Dotenv();
-        $envVarsFromFiles = [];
-        foreach ($availableFiles as $file) {
-            $envs = $dotenv->parse(file_get_contents($file), $file);
-            $envVarsFromFiles += $envs;
-        }
-        $allEnvVars = array_unique(array_merge($envVarsFromContainer, array_keys($envVarsFromFiles)));
+        $allEnvVars = array_unique(array_merge($envVarsFromContainer, $this->getAvailableVars()));
 
         $bag = $container->getParameterBag();
         $getDefaultParameter = fn (string $name) => parent::get($name);
@@ -326,7 +313,6 @@ abstract class Descriptor implements DescriptorInterface
         $envs = [];
 
         foreach ($allEnvVars as $env) {
-
             $processor = 'string';
             if (false !== $i = strrpos($name = $env, ':')) {
                 $name = substr($env, $i + 1);
@@ -366,30 +352,11 @@ abstract class Descriptor implements DescriptorInterface
         }
     }
 
-    private function getEnvFiles(string $projectDir, string $kernelEnvironment): array
+    private function getAvailableVars(): array
     {
-        $files = [
-            '.env.local.php',
-            sprintf('.env.%s.local', $kernelEnvironment),
-            sprintf('.env.%s', $kernelEnvironment),
-        ];
+        $vars = explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? '');
+        sort($vars);
 
-        if ('test' !== $kernelEnvironment) {
-            $files[] = $this->getFilePath($projectDir, '.env.local');
-        }
-
-        if (!is_file($this->getFilePath($projectDir, '.env')) && is_file($this->getFilePath($projectDir, '.env.dist'))) {
-            $files[] = $this->getFilePath($projectDir, '.env.dist');
-        } else {
-            $files[] = $this->getFilePath($projectDir, '.env');
-        }
-
-        return $files;
+        return $vars;
     }
-
-    private function getFilePath(string $projectDir, string $file): string
-    {
-        return $projectDir.\DIRECTORY_SEPARATOR.$file;
-    }
-
 }

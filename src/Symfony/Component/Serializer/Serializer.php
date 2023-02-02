@@ -54,6 +54,11 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     public const EMPTY_ARRAY_AS_OBJECT = 'empty_array_as_object';
 
+    /**
+     * Can be used in custom normalizers to skip iteration on the result.
+     */
+    public const SKIP_ITERATION = 'skip_iteration';
+
     private const SCALAR_TYPES = [
         'int' => true,
         'bool' => true,
@@ -163,6 +168,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         if (is_iterable($data)) {
             if ($data instanceof \Countable && ($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && !\count($data)) {
                 return new \ArrayObject();
+            }
+
+            if ($context[self::SKIP_ITERATION] ?? false) {
+                return $data;
             }
 
             $normalized = [];

@@ -100,7 +100,7 @@ final class MailPaceApiTransportTest extends TestCase
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse(json_encode(['Message' => 'i\'m a teapot', 'ErrorCode' => 418]), [
+            return new MockResponse(json_encode(['error' => 'i\'m a teapot']), [
                 'http_code' => 418,
                 'response_headers' => [
                     'content-type' => 'application/json',

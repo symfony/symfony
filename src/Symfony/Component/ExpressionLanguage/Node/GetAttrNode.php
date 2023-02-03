@@ -85,7 +85,7 @@ class GetAttrNode extends Node
 
                 $property = $this->nodes['attribute']->attributes['value'];
 
-                if ($this->attributes['is_null_coalesce']) {
+                if ($this->attributes['is_null_coalesce'] || $this->nodes['attribute']->isNullSafe) {
                     return $obj->$property ?? null;
                 }
 
@@ -140,6 +140,10 @@ class GetAttrNode extends Node
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
+                if ($this->nodes['attribute']->isNullSafe ?? null) {
+                    return [$this->nodes['node'], '?.', $this->nodes['attribute']];
+                }
+
                 return [$this->nodes['node'], '.', $this->nodes['attribute']];
 
             case self::METHOD_CALL:
@@ -151,7 +155,7 @@ class GetAttrNode extends Node
     }
 
     /**
-     * Provides BC with instances serialized before v6.2
+     * Provides BC with instances serialized before v6.2.
      */
     public function __unserialize(array $data): void
     {

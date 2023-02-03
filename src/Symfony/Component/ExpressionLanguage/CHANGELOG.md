@@ -4,6 +4,7 @@ CHANGELOG
 6.2
 ---
 
+ * Fix null-coalescing support for undefined object properties
  * Add support for null-coalescing syntax
 
 6.1

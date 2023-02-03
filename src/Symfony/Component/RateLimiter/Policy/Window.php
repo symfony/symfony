@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
@@ -26,12 +27,12 @@ final class Window implements LimiterStateInterface
     private int $maxSize;
     private float $timer;
 
-    public function __construct(string $id, int $intervalInSeconds, int $windowSize, float $timer = null)
+    public function __construct(string $id, int $intervalInSeconds, int $windowSize, float $timer = null, private ?ClockInterface $clock = null)
     {
         $this->id = $id;
         $this->intervalInSeconds = $intervalInSeconds;
         $this->maxSize = $windowSize;
-        $this->timer = $timer ?? microtime(true);
+        $this->timer = $timer ?? $this->clock?->now()->format('U.u') ?? microtime(true);
     }
 
     public function getId(): string
@@ -46,7 +47,7 @@ final class Window implements LimiterStateInterface
 
     public function add(int $hits = 1, float $now = null)
     {
-        $now ??= microtime(true);
+        $now ??= $this->clock?->now()->format('U.u') ?? microtime(true);
         if (($now - $this->timer) > $this->intervalInSeconds) {
             // reset window
             $this->timer = $now;

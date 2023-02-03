@@ -1209,7 +1209,7 @@ class Application implements ResetInterface
         // additionally, array_slice() is not enough as some character has doubled width.
         // we need a function to split string not by character count but by string width
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
-            return str_split($string, $width);
+            return mb_str_split($string, $width);
         }
 
         $utf8String = mb_convert_encoding($string, 'utf8', $encoding);

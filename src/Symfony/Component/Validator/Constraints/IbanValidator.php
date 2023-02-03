@@ -224,7 +224,7 @@ class IbanValidator extends ConstraintValidator
 
     private static function toBigInt(string $string): string
     {
-        $chars = str_split($string);
+        $chars = mb_str_split($string);
         $bigInt = '';
 
         foreach ($chars as $char) {
@@ -244,7 +244,7 @@ class IbanValidator extends ConstraintValidator
 
     private static function bigModulo97(string $bigInt): int
     {
-        $parts = str_split($bigInt, 7);
+        $parts = mb_str_split($bigInt, 7);
         $rest = 0;
 
         foreach ($parts as $part) {

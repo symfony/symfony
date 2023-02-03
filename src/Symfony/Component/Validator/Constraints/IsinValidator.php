@@ -67,7 +67,7 @@ class IsinValidator extends ConstraintValidator
 
     private function isCorrectChecksum(string $input): bool
     {
-        $characters = str_split($input);
+        $characters = mb_str_split($input);
         foreach ($characters as $i => $char) {
             $characters[$i] = \intval($char, 36);
         }

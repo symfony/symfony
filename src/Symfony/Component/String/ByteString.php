@@ -124,7 +124,7 @@ class ByteString extends AbstractString
         $str = clone $this;
         $chunks = [];
 
-        foreach (str_split($this->string, $length) as $chunk) {
+        foreach (mb_str_split($this->string, $length) as $chunk) {
             $str->string = $chunk;
             $chunks[] = clone $str;
         }

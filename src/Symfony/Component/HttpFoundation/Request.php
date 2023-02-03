@@ -547,7 +547,7 @@ class Request
 
         $_REQUEST = [[]];
 
-        foreach (str_split($requestOrder) as $order) {
+        foreach (mb_str_split($requestOrder) as $order) {
             $_REQUEST[] = $request[$order];
         }
 

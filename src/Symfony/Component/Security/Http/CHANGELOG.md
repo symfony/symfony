@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `RememberMeBadge` to `JsonLoginAuthenticator` and enable reading parameter in JSON request body
  * Add argument `$exceptionCode` to `#[IsGranted]`
+ * Deprecate passing a secret as the 2nd argument to the constructor of `Symfony\Component\Security\Http\RememberMe\PersistentRememberMeHandler`
 
 6.2
 ---

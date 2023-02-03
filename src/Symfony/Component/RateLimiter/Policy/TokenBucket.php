@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\RateLimiter\ClockTrait;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
@@ -20,6 +22,8 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
+    use ClockTrait;
+
     private int $tokens;
     private int $burstSize;
     private float $timer;
@@ -28,22 +32,22 @@ final class TokenBucket implements LimiterStateInterface
      * @param string     $id            unique identifier for this bucket
      * @param int        $initialTokens the initial number of tokens in the bucket (i.e. the max burst size)
      * @param Rate       $rate          the fill rate and time of this bucket
-     * @param float|null $timer         the current timer of the bucket, defaulting to microtime(true)
+     * @param float|null $timer         the current timer of the bucket, defaulting to the current time in microseconds
      */
     public function __construct(
         private string $id,
         int $initialTokens,
         private Rate $rate,
+        ?ClockInterface $clock = null,
         ?float $timer = null,
     ) {
         if ($initialTokens < 1) {
             throw new \InvalidArgumentException(\sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', TokenBucketLimiter::class));
         }
 
-        $this->id = $id;
         $this->tokens = $this->burstSize = $initialTokens;
-        $this->rate = $rate;
-        $this->timer = $timer ?? microtime(true);
+        $this->setClock($clock);
+        $this->timer = $timer ?? $this->now();
     }
 
     public function getId(): string

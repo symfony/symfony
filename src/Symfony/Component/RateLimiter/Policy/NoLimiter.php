@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\RateLimiter\ClockTrait;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Reservation;
@@ -25,14 +27,21 @@ use Symfony\Component\RateLimiter\Reservation;
  */
 final class NoLimiter implements LimiterInterface
 {
+    use ClockTrait;
+
+    public function __construct(?ClockInterface $clock = null)
+    {
+        $this->setClock($clock);
+    }
+
     public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
-        return new Reservation(microtime(true), new RateLimit(\PHP_INT_MAX, new \DateTimeImmutable(), true, \PHP_INT_MAX));
+        return new Reservation($this->now(), new RateLimit(\PHP_INT_MAX, new \DateTimeImmutable(), true, \PHP_INT_MAX, $this->clock), $this->clock);
     }
 
     public function consume(int $tokens = 1): RateLimit
     {
-        return new RateLimit(\PHP_INT_MAX, new \DateTimeImmutable(), true, \PHP_INT_MAX);
+        return new RateLimit(\PHP_INT_MAX, new \DateTimeImmutable(), true, \PHP_INT_MAX, $this->clock);
     }
 
     public function reset(): void

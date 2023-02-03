@@ -11,18 +11,24 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Symfony\Component\Clock\ClockInterface;
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
 final class Reservation
 {
+    use ClockTrait;
+
     /**
      * @param float $timeToAct Unix timestamp in seconds when this reservation should act
      */
     public function __construct(
         private float $timeToAct,
         private RateLimit $rateLimit,
+        ?ClockInterface $clock = null,
     ) {
+        $this->setClock($clock);
     }
 
     public function getTimeToAct(): float
@@ -32,7 +38,7 @@ final class Reservation
 
     public function getWaitDuration(): float
     {
-        return max(0, (-microtime(true)) + $this->timeToAct);
+        return max(0, (-$this->now()) + $this->timeToAct);
     }
 
     public function getRateLimit(): RateLimit

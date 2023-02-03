@@ -103,11 +103,11 @@ class FixedWindowLimiterTest extends TestCase
     {
         $serverOneClock = microtime(true) - 1;
         $serverTwoClock = microtime(true) + 1;
-        $window = new Window('id', 300, 100, $serverTwoClock);
+        $window = new Window('id', 300, 100, null, $serverTwoClock);
         $this->assertSame(100, $window->getAvailableTokens($serverTwoClock));
         $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
 
-        $window = new Window('id', 300, 100, $serverOneClock);
+        $window = new Window('id', 300, 100, null, $serverOneClock);
         $this->assertSame(100, $window->getAvailableTokens($serverTwoClock));
         $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
     }

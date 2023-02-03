@@ -121,7 +121,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'no-cache, private');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that the Response has header "Cache-Control" with value "public".');
+        $this->expectExceptionMessage('Failed asserting that the Response has header "Cache-Control" with value "public", value of header "Cache-Control" is "no-cache, private".');
         $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'public');
     }
 

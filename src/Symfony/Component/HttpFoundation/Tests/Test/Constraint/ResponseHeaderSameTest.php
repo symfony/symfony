@@ -19,17 +19,48 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseHeaderSame;
 
 class ResponseHeaderSameTest extends TestCase
 {
-    public function testConstraint()
+    public function testResponseHeaderSameWithExpectedHeaderValueIsSame()
     {
-        $constraint = new ResponseHeaderSame('Cache-Control', 'no-cache, private');
-        $this->assertTrue($constraint->evaluate(new Response(), '', true));
-        $constraint = new ResponseHeaderSame('Cache-Control', 'public');
-        $this->assertFalse($constraint->evaluate(new Response(), '', true));
+        $constraint = new ResponseHeaderSame('X-Token', 'custom-token');
+
+        $response = new Response();
+        $response->headers->set('X-Token', 'custom-token');
+
+        $this->assertTrue($constraint->evaluate($response, '', true));
+    }
+
+    public function testResponseHeaderSameWithExpectedHeaderValueIsDifferent()
+    {
+        $constraint = new ResponseHeaderSame('X-Token', 'custom-token');
+
+        $response = new Response();
+        $response->headers->set('X-Token', 'default-token');
+
+        $this->assertFalse($constraint->evaluate($response, '', true));
 
         try {
-            $constraint->evaluate(new Response());
+            $constraint->evaluate($response);
         } catch (ExpectationFailedException $e) {
-            $this->assertEquals("Failed asserting that the Response has header \"Cache-Control\" with value \"public\".\n", TestFailure::exceptionToString($e));
+            $this->assertEquals("Failed asserting that the Response has header \"X-Token\" with value \"custom-token\", value of header \"X-Token\" is \"default-token\".\n", TestFailure::exceptionToString($e));
+
+            return;
+        }
+
+        $this->fail();
+    }
+
+    public function testResponseHeaderSameWithExpectedHeaderIsNotPresent()
+    {
+        $constraint = new ResponseHeaderSame('X-Token', 'custom-token');
+
+        $response = new Response();
+
+        $this->assertFalse($constraint->evaluate($response, '', true));
+
+        try {
+            $constraint->evaluate($response);
+        } catch (ExpectationFailedException $e) {
+            $this->assertEquals("Failed asserting that the Response has header \"X-Token\" with value \"custom-token\", header \"X-Token\" is not set.\n", TestFailure::exceptionToString($e));
 
             return;
         }

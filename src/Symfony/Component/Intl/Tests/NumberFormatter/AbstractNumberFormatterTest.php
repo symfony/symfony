@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
-use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
@@ -328,13 +327,17 @@ abstract class AbstractNumberFormatterTest extends TestCase
     {
         if (\PHP_VERSION_ID >= 80000) {
             $this->expectException(\ValueError::class);
-        } elseif (method_exists($this, 'expectWarning')) {
-            $this->expectWarning();
         } else {
-            $this->expectException(Warning::class);
+            $this->expectException(\ErrorException::class);
         }
 
-        $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
+        set_error_handler([self::class, 'throwOnWarning']);
+
+        try {
+            $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     /**
@@ -705,16 +708,21 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeDefault()
     {
+        $formatter = static::getNumberFormatter('en', NumberFormatter::DECIMAL);
+
         if (\PHP_VERSION_ID >= 80000) {
             $this->expectException(\ValueError::class);
-        } elseif (method_exists($this, 'expectWarning')) {
-            $this->expectWarning();
         } else {
-            $this->expectException(Warning::class);
+            $this->expectException(\ErrorException::class);
         }
 
-        $formatter = static::getNumberFormatter('en', NumberFormatter::DECIMAL);
-        $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
+        set_error_handler([self::class, 'throwOnWarning']);
+
+        try {
+            $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     /**
@@ -831,16 +839,21 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeCurrency()
     {
+        $formatter = static::getNumberFormatter('en', NumberFormatter::DECIMAL);
+
         if (\PHP_VERSION_ID >= 80000) {
             $this->expectException(\ValueError::class);
-        } elseif (method_exists($this, 'expectWarning')) {
-            $this->expectWarning();
         } else {
-            $this->expectException(Warning::class);
+            $this->expectException(\ErrorException::class);
         }
 
-        $formatter = static::getNumberFormatter('en', NumberFormatter::DECIMAL);
-        $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);
+        set_error_handler([self::class, 'throwOnWarning']);
+
+        try {
+            $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     public function testParseWithNotNullPositionValue()
@@ -864,4 +877,13 @@ abstract class AbstractNumberFormatterTest extends TestCase
      * @param int $errorCode
      */
     abstract protected function isIntlFailure($errorCode): bool;
+
+    public static function throwOnWarning(int $errno, string $errstr, string $errfile = null, int $errline = null): bool
+    {
+        if ($errno & (\E_WARNING | \E_USER_WARNING)) {
+            throw new \ErrorException($errstr, 0, $errno, $errfile ?? __FILE__, $errline ?? __LINE__);
+        }
+
+        return false;
+    }
 }

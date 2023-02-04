@@ -32,7 +32,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
 
     /**
      * @param string    $resource The fully-qualified class name
-     * @param bool|null $exists   Boolean when the existency check has already been done
+     * @param bool|null $exists   Boolean when the existence check has already been done
      */
     public function __construct(string $resource, bool $exists = null)
     {

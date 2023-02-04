@@ -297,7 +297,7 @@ trait AbstractAdapterTrait
      * When versioning is enabled, clearing the cache is atomic and doesn't require listing existing keys to proceed,
      * but old keys may need garbage collection and extra round-trips to the back-end are required.
      *
-     * Calling this method also clears the memoized namespace version and thus forces a resynchonization of it.
+     * Calling this method also clears the memoized namespace version and thus forces a resynchronization of it.
      *
      * @return bool the previous state of versioning
      */

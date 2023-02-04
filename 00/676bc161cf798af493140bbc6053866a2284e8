@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2023-02-03T14:29:59Z
+
+So `<p>` is not allowed but `<h4>` is ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-02-03T14:57:11Z
+
+@stof that's right:
+
+| Valid | Invalid
+| ----- | -------
+| <img width="722" alt="valid" src="https://user-images.githubusercontent.com/73419/216634767-354b65b3-e712-402e-8fdf-a6ce16fc8de9.png"> | <img width="748" alt="invalid" src="https://user-images.githubusercontent.com/73419/216634786-03a42a0e-08d9-44cf-8e4d-9b033c686925.png">
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2023-02-03T15:57:42Z
+
+For reference: https://html.spec.whatwg.org/multipage/interactive-elements.html#the-summary-element
+
+> [**Content model**](https://html.spec.whatwg.org/multipage/dom.html#concept-element-content-model):
+>     [Phrasing content](https://html.spec.whatwg.org/multipage/dom.html#phrasing-content-2), optionally intermixed with [heading content](https://html.spec.whatwg.org/multipage/dom.html#heading-content-2).

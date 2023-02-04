@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-31T04:37:15Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 6.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by dustinwilson at 2023-02-03T16:34:01Z
+
+@GromNaN The documentation mentions I need to squash before the pull request will be accepted do I still need to do this?
+
+---------------------------------------------------------------------------
+
+by stof at 2023-02-03T16:36:05Z
+
+@dustinwilson if you allow maintainers to edit your PR (which is the case for this PR), our tooling can manage the squashing automatically.
+
+---------------------------------------------------------------------------
+
+by dustinwilson at 2023-02-03T16:37:32Z
+
+@stof Okay. Thanks!

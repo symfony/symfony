@@ -48,6 +48,11 @@ HttpKernel
 
  * Deprecate parameters `container.dumper.inline_factories` and `container.dumper.inline_class_loader`, use `.container.dumper.inline_factories` and `.container.dumper.inline_class_loader` instead
 
+Lock
+----
+
+ * Deprecate the `gcProbablity` option to fix a typo in its name, use the `gcProbability` option instead
+
 Messenger
 ---------
 

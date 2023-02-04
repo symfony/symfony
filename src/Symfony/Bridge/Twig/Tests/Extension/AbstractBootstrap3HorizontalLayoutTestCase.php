@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
-abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3LayoutTest
+abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootstrap3LayoutTestCase
 {
     public function testLabelOnForm()
     {

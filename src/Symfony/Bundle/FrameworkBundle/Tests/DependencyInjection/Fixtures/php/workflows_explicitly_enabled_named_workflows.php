@@ -5,7 +5,7 @@ $container->loadFromExtension('framework', [
         'enabled' => true,
         'workflows' => [
             'type' => 'workflow',
-            'supports' => ['Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest'],
+            'supports' => ['Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase'],
             'initial_marking' => ['bar'],
             'places' => ['bar', 'baz'],
             'transitions' => [

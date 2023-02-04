@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Routing\Route;
 
-class TextDescriptorTest extends AbstractDescriptorTest
+class TextDescriptorTest extends AbstractDescriptorTestCase
 {
     private static $fileLinkFormatter = null;
 

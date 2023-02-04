@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 
-abstract class BaseDateTimeTransformerTest extends TestCase
+abstract class BaseDateTimeTransformerTestCase extends TestCase
 {
     public function testConstructFailsIfInputTimezoneIsInvalid()
     {

@@ -24,7 +24,7 @@ use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
  *
  * @group legacy
  */
-class NumberFormatterTest extends AbstractNumberFormatterTest
+class NumberFormatterTest extends AbstractNumberFormatterTestCase
 {
     public function testConstructorWithUnsupportedLocale()
     {

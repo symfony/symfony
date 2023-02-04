@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\UlidType;
 use Symfony\Component\Uid\Ulid;
 
-final class UlidTypeTest extends BaseTypeTest
+final class UlidTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = UlidType::class;
 

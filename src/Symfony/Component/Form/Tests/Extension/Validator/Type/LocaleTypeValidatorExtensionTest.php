@@ -15,7 +15,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class LocaleTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class LocaleTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;

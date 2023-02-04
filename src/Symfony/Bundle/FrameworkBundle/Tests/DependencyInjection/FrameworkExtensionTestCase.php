@@ -79,7 +79,7 @@ use Symfony\Component\Workflow\WorkflowEvents;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
-abstract class FrameworkExtensionTest extends TestCase
+abstract class FrameworkExtensionTestCase extends TestCase
 {
     use ExpectDeprecationTrait;
 

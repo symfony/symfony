@@ -18,12 +18,12 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
+use Symfony\Component\Form\Tests\AbstractDivLayoutTestCase;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
+class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 {
     use RuntimeLoaderProvider;
 

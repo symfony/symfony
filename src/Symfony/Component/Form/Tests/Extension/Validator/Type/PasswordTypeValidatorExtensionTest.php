@@ -15,7 +15,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class PasswordTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class PasswordTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;

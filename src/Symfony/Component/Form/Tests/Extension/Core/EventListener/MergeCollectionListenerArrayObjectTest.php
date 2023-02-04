@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
 
-class MergeCollectionListenerArrayObjectTest extends MergeCollectionListenerTest
+class MergeCollectionListenerArrayObjectTest extends MergeCollectionListenerTestCase
 {
     protected function getData(array $data)
     {

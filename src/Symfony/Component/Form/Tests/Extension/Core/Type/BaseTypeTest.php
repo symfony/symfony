@@ -17,7 +17,7 @@ use Symfony\Component\Form\Tests\VersionAwareTest;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class BaseTypeTest extends TypeTestCase
+abstract class BaseTypeTestCase extends TypeTestCase
 {
     use VersionAwareTest;
 

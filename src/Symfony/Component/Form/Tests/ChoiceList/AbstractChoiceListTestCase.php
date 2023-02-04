@@ -17,7 +17,7 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractChoiceListTest extends TestCase
+abstract class AbstractChoiceListTestCase extends TestCase
 {
     /**
      * @var ChoiceListInterface

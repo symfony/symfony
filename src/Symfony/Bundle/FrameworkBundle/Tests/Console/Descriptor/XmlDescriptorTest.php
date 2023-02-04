@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\XmlDescriptor;
 
-class XmlDescriptorTest extends AbstractDescriptorTest
+class XmlDescriptorTest extends AbstractDescriptorTestCase
 {
     protected static function getDescriptor()
     {

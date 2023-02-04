@@ -15,7 +15,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class TimezoneTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class TimezoneTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;

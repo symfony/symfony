@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
 /**
  * @group legacy
  */
-class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
+class IntlDateFormatterTest extends AbstractIntlDateFormatterTestCase
 {
     public function testConstructor()
     {

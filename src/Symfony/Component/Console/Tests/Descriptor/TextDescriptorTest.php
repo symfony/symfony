@@ -16,7 +16,7 @@ use Symfony\Component\Console\Tests\Fixtures\DescriptorApplication2;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorApplicationMbString;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommandMbString;
 
-class TextDescriptorTest extends AbstractDescriptorTest
+class TextDescriptorTest extends AbstractDescriptorTestCase
 {
     public function getDescribeCommandTestData()
     {

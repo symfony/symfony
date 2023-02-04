@@ -15,7 +15,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class CountryTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class CountryTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;

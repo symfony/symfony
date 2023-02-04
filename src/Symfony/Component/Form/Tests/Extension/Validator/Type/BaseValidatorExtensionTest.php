@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class BaseValidatorExtensionTest extends TypeTestCase
+abstract class BaseValidatorExtensionTestCase extends TypeTestCase
 {
     public function testValidationGroupNullByDefault()
     {

@@ -15,7 +15,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class CheckboxTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class CheckboxTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;

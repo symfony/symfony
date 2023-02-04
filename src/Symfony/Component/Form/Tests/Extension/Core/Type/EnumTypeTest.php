@@ -12,7 +12,7 @@
 namespace Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
-use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTest;
+use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\Answer;
 use Symfony\Component\Form\Tests\Fixtures\Number;
 use Symfony\Component\Form\Tests\Fixtures\Suit;
@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 /**
  * @requires PHP 8.1
  */
-final class EnumTypeTest extends BaseTypeTest
+final class EnumTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = EnumType::class;
 

@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-abstract class AbstractDescriptorTest extends TestCase
+abstract class AbstractDescriptorTestCase extends TestCase
 {
     private $colSize;
 

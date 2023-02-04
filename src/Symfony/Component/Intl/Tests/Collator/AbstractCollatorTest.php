@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Collator\Collator;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractCollatorTest extends TestCase
+abstract class AbstractCollatorTestCase extends TestCase
 {
     /**
      * @dataProvider asortProvider

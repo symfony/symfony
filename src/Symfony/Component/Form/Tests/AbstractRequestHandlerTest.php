@@ -27,7 +27,7 @@ use Symfony\Component\Form\Util\ServerParams;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractRequestHandlerTest extends TestCase
+abstract class AbstractRequestHandlerTestCase extends TestCase
 {
     /**
      * @var RequestHandlerInterface

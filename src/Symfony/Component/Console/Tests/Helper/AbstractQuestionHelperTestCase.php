@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 
-abstract class AbstractQuestionHelperTest extends TestCase
+abstract class AbstractQuestionHelperTestCase extends TestCase
 {
     protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
     {

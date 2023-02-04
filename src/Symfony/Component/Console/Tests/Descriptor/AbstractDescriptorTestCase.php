@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-abstract class AbstractDescriptorTest extends TestCase
+abstract class AbstractDescriptorTestCase extends TestCase
 {
     /** @dataProvider getDescribeInputArgumentTestData */
     public function testDescribeInputArgument(InputArgument $argument, $expectedDescription)

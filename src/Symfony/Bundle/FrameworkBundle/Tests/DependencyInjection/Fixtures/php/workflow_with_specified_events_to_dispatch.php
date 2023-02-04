@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase;
 
 $container->loadFromExtension('framework', [
     'workflows' => [
@@ -11,7 +11,7 @@ $container->loadFromExtension('framework', [
                 'property' => 'state',
             ],
             'supports' => [
-                FrameworkExtensionTest::class,
+                FrameworkExtensionTestCase::class,
             ],
             'events_to_dispatch' => [
                 'workflow.leave',

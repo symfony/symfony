@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\FormEvent;
 
-abstract class MergeCollectionListenerTest extends TestCase
+abstract class MergeCollectionListenerTestCase extends TestCase
 {
     protected $form;
 

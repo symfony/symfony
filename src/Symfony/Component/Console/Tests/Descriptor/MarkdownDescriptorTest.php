@@ -15,7 +15,7 @@ use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorApplicationMbString;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommandMbString;
 
-class MarkdownDescriptorTest extends AbstractDescriptorTest
+class MarkdownDescriptorTest extends AbstractDescriptorTestCase
 {
     public function getDescribeCommandTestData()
     {

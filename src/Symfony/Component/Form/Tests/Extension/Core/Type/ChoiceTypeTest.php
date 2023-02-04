@@ -21,7 +21,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
-class ChoiceTypeTest extends BaseTypeTest
+class ChoiceTypeTest extends BaseTypeTestCase
 {
     use ExpectDeprecationTrait;
 

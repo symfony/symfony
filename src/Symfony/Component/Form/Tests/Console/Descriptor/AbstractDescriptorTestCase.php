@@ -26,7 +26,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
-abstract class AbstractDescriptorTest extends TestCase
+abstract class AbstractDescriptorTestCase extends TestCase
 {
     private $colSize;
 

@@ -24,7 +24,7 @@ use Symfony\Component\Form\FormError;
  *
  * @author Romain Monteil <monteil.romain@gmail.com>
  */
-abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5LayoutTest
+abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootstrap5LayoutTestCase
 {
     public function testRow()
     {

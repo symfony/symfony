@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="<?= $this->charset; ?>" />
     <meta name="robots" content="noindex,nofollow,noarchive" />

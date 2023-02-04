@@ -131,8 +131,10 @@
             </colgroup>
 
             <thead>
-                <th>Time</th>
-                <th>Message</th>
+                <tr>
+                    <th>Time</th>
+                    <th>Message</th>
+                </tr>
             </thead>
 
             <tbody>
@@ -185,7 +187,7 @@
     <details class="container-compilation-logs">
         <summary>
             <h4>Container Compilation Logs <span class="text-muted">({{ compilerLogTotal }})</span></h4>
-            <p class="text-muted">Log messages generated during the compilation of the service container.</p>
+            <span class="text-muted">Log messages generated during the compilation of the service container.</span>
         </summary>
 
         {% if collector.compilerLogs is empty %}

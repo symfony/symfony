@@ -51,7 +51,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getTypes(OmittedParamTagTypeDocBlock::class, 'omittedType'));
     }
 
-    public function invalidTypesProvider()
+    public static function invalidTypesProvider()
     {
         return [
             'pub' => ['pub', null, null],
@@ -81,7 +81,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
-    public function typesProvider()
+    public static function typesProvider()
     {
         return [
             ['foo', null, 'Short description.', 'Long description.'],
@@ -139,7 +139,7 @@ class PhpDocExtractorTest extends TestCase
         $this->testExtract($property, $type, $shortDescription, $longDescription);
     }
 
-    public function provideCollectionTypes()
+    public static function provideCollectionTypes()
     {
         return [
             ['iteratorCollection', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Iterator', true, null, new Type(Type::BUILTIN_TYPE_STRING))], null, null],
@@ -203,7 +203,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
-    public function typesWithCustomPrefixesProvider()
+    public static function typesWithCustomPrefixesProvider()
     {
         return [
             ['foo', null, 'Short description.', 'Long description.'],
@@ -244,7 +244,7 @@ class PhpDocExtractorTest extends TestCase
         ];
     }
 
-    public function typesWithNoPrefixesProvider()
+    public static function typesWithNoPrefixesProvider()
     {
         return [
             ['foo', null, 'Short description.', 'Long description.'],
@@ -290,7 +290,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getShortDescription(EmptyDocBlock::class, 'foo'));
     }
 
-    public function dockBlockFallbackTypesProvider()
+    public static function dockBlockFallbackTypesProvider()
     {
         return [
             'pub' => [
@@ -321,7 +321,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
     }
 
-    public function propertiesDefinedByTraitsProvider(): array
+    public static function propertiesDefinedByTraitsProvider(): array
     {
         return [
             ['propertyInTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
@@ -341,7 +341,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
     }
 
-    public function methodsDefinedByTraitsProvider(): array
+    public static function methodsDefinedByTraitsProvider(): array
     {
         return [
             ['methodInTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
@@ -361,7 +361,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([$type], $this->extractor->getTypes($class, $property));
     }
 
-    public function propertiesStaticTypeProvider(): array
+    public static function propertiesStaticTypeProvider(): array
     {
         return [
             [ParentDummy::class, 'propertyTypeStatic', new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)],
@@ -377,7 +377,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals($types, $this->extractor->getTypes($class, $property));
     }
 
-    public function propertiesParentTypeProvider(): array
+    public static function propertiesParentTypeProvider(): array
     {
         return [
             [ParentDummy::class, 'parentAnnotationNoParent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'parent')]],
@@ -398,7 +398,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
     }
 
-    public function constructorTypesProvider()
+    public static function constructorTypesProvider()
     {
         return [
             ['date', [new Type(Type::BUILTIN_TYPE_INT)]],

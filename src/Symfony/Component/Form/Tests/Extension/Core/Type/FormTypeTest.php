@@ -809,7 +809,7 @@ class FormTypeTest extends BaseTypeTestCase
     public function testFormAttrAsBoolWithNoId()
     {
         $this->expectException(LogicException::class);
-        $this->expectErrorMessage('form_attr');
+        $this->expectExceptionMessage('form_attr');
         $this->factory
             ->createNamedBuilder('', self::TESTED_TYPE, null, [
                 'form_attr' => true,

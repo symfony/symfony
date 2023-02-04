@@ -737,7 +737,7 @@ EOF
             if (!$child instanceof \DOMElement || self::NS !== $child->namespaceURI) {
                 continue;
             }
-            if (!\in_array($child->localName, ['deprecated'], true)) {
+            if ('deprecated' !== $child->localName) {
                 throw new InvalidArgumentException(sprintf('Invalid child element "%s" defined for alias "%s" in "%s".', $child->localName, $alias->getAttribute('id'), $file));
             }
         }

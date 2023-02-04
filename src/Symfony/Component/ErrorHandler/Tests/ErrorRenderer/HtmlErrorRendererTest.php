@@ -37,7 +37,7 @@ HTML;
 
         $expectedNonDebug = <<<HTML
 <!DOCTYPE html>
-<html>
+<html lang="en">
 %A<title>An Error Occurred: Internal Server Error</title>
 %A<h2>The server returned a "500 Internal Server Error".</h2>%A
 HTML;

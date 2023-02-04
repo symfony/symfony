@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2023-01-05T11:07:14Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.3" but it seems your PR description refers to branch "5.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by pkruithof at 2023-01-05T11:10:46Z
+
+There is a failing test for `ResponseTest::testGetTtl()` where the TTL is asserted to be negative when the response's expiration is in the past. This uses the now changed `getMaxAge()`. However I'm not sure if I should change the test to assert `0` instead of a negative number, or if `getTtl()` should be changed to be compliant with the test.
+
+It seems to me that a negative TTL is illogical the same way as a negative `max-age`. Please advise what to do with this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-01-05T17:26:55Z
+
+> There is a failing test for `ResponseTest::testGetTtl()` where the TTL is asserted to be negative when the response's expiration is in the past. This uses the now changed `getMaxAge()`. However I'm not sure if I should change the test to assert `0` instead of a negative number, or if `getTtl()` should be changed to be compliant with the test.
+>
+> It seems to me that a negative TTL is illogical the same way as a negative `max-age`. Please advise what to do with this.
+
+I supposeI would expect `0`.
+
+---------------------------------------------------------------------------
+
+by pkruithof at 2023-01-09T09:55:41Z
+
+> > There is a failing test for `ResponseTest::testGetTtl()` where the TTL is asserted to be negative when the response's expiration is in the past. This uses the now changed `getMaxAge()`. However I'm not sure if I should change the test to assert `0` instead of a negative number, or if `getTtl()` should be changed to be compliant with the test.
+> > It seems to me that a negative TTL is illogical the same way as a negative `max-age`. Please advise what to do with this.
+>
+> I supposeI would expect `0`.
+
+Agreed, I've changed the `getTtl()` method accordingly.
+
+---------------------------------------------------------------------------
+
+by pkruithof at 2023-01-17T17:21:07Z
+
+Apologies for the review requests, they were done automatically when I made a rebase mistake.
+
+The tests for 8.0 and 8.1 fail, but I am having trouble finding out why. I did a composer install inside a docker container and ran the tests there but then I got a different (unrelated) failing test, while the test that is failing in the build did pass there. Any help here would be appreciated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-01-18T06:46:34Z
+
+Went too fast. This one seems relate (on low-deps):
+
+```
+1) Symfony\Component\HttpKernel\Tests\EventListener\SessionListenerTest::testPrivateResponseMaxAgeIsRespectedIfSessionStarted
+Failed asserting that -172800 is identical to 0.
+
+/home/runner/work/symfony/symfony/src/Symfony/Component/HttpKernel/Tests/EventListener/SessionListenerTest.php:609
+```
+
+---------------------------------------------------------------------------
+
+by pkruithof at 2023-01-18T09:09:06Z
+
+I noticed that too, the only way that should be possible is if the `s-maxage` or `max-age` directives are negative. I want to debug this but I cannot reproduce the failing test. Here's what I did:
+
+```
+docker run --rm -it -v $PWD:/symfony php:8.1-alpine sh
+# install xsl extension, composer and cd to `/symfony`
+/symfony # export COMPOSER_ROOT_VERSION=5.4.x-dev
+/symfony # export SYMFONY_VERSION=5.4
+/symfony # composer update --prefer-lowest
+```
+
+This gave the following problem:
+```
+    - Root composer.json requires symfony/runtime 5.4.x-dev, it is satisfiable by symfony/runtime[5.4.x-dev] from composer repo (https://repo.packagist.org) but symfony/runtime[dev-main] from path repo (src/Symfony/Component/Runtime) has higher repository priority. The packages from the higher priority repository do not match your constraint and are therefore not installable. That repository is canonical so the lower priority repo's packages are not installable. See https://getcomposer.org/repoprio for details and assistance.
+```
+
+To get around this I temporarily removed the custom repo path for the runtime component (it is not related in any way to this change). Then it did install the dependencies, and the test runs without issues:
+
+```
+/symfony # ./phpunit --filter SessionListenerTest
+
+PHPUnit 9.5.28 by Sebastian Bergmann and contributors.
+
+Warning:       Your XML configuration validates against a deprecated schema.
+Suggestion:    Migrate your XML configuration using "--migrate-configuration"!
+
+Testing
+................................................                  48 / 48 (100%)
+
+Time: 00:03.350, Memory: 295.00 MB
+
+OK (48 tests, 226 assertions)
+```
+
+So I'm not sure what to do now?
+
+---------------------------------------------------------------------------
+
+by pkruithof at 2023-01-31T08:23:49Z
+
+@fabpot could you point me in the right direction to move this PR forward?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-01-31T18:12:18Z
+
+Wohoo. Thanks @pkruithof I hit the very same bug (not so easy to find ; especially if you have a reverse proxy in front of it ([HTTP/1.0 vs HTTP/1.1](https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/HttpFoundation/Response.php#L310-L313)). Your bug report is excellent. I tested your PR and it fixes my issue too.
+
+Note: in our case, with nginx as a proxy, the max age was negative
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-02T06:51:06Z
+
+@pkruithof The problem is that your change impacts 2 components (which are independent). To fix the issue, you should bump the minimum version of HttpFoundation in the HttpKernel composer.json file. Right now, it's `^5.4|^6.0`, this should be bumped to the next patch versions of 5.4, 6.0, 6.1, and 6.2. That will fix the tests.

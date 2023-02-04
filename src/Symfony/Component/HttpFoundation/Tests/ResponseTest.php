@@ -51,24 +51,14 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response();
         $headers = $response->sendHeaders();
-        $this->assertObjectHasAttribute('headers', $headers);
-        $this->assertObjectHasAttribute('content', $headers);
-        $this->assertObjectHasAttribute('version', $headers);
-        $this->assertObjectHasAttribute('statusCode', $headers);
-        $this->assertObjectHasAttribute('statusText', $headers);
-        $this->assertObjectHasAttribute('charset', $headers);
+        $this->assertSame($response, $headers);
     }
 
     public function testSend()
     {
         $response = new Response();
         $responseSend = $response->send();
-        $this->assertObjectHasAttribute('headers', $responseSend);
-        $this->assertObjectHasAttribute('content', $responseSend);
-        $this->assertObjectHasAttribute('version', $responseSend);
-        $this->assertObjectHasAttribute('statusCode', $responseSend);
-        $this->assertObjectHasAttribute('statusText', $responseSend);
-        $this->assertObjectHasAttribute('charset', $responseSend);
+        $this->assertSame($response, $responseSend);
     }
 
     public function testGetCharset()
@@ -132,12 +122,7 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response('foo');
         $modified = $response->setNotModified();
-        $this->assertObjectHasAttribute('headers', $modified);
-        $this->assertObjectHasAttribute('content', $modified);
-        $this->assertObjectHasAttribute('version', $modified);
-        $this->assertObjectHasAttribute('statusCode', $modified);
-        $this->assertObjectHasAttribute('statusText', $modified);
-        $this->assertObjectHasAttribute('charset', $modified);
+        $this->assertSame($response, $modified);
         $this->assertEquals(304, $modified->getStatusCode());
 
         ob_start();

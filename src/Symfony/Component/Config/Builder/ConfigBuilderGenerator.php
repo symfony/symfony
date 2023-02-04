@@ -426,7 +426,7 @@ public function NAME($value): static
             }
 
             if ($node instanceof EnumNode) {
-                $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_unique(array_map(fn ($a) => var_export($a, true), $node->getValues()))))."\n";
+                $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_unique(array_map(fn ($a) => !$a instanceof \UnitEnum ? var_export($a, true) : '\\'.ltrim(var_export($a, true), '\\'), $node->getValues()))))."\n";
             } else {
                 $parameterTypes = $this->getParameterTypes($node);
                 $comment .= ' * @param ParamConfigurator|'.implode('|', $parameterTypes).' $value'."\n";

@@ -63,9 +63,9 @@ class Processor
      *
      * extensions: ['twig.extension.foo', 'twig.extension.bar']
      *
-     * @param array  $config A config array
-     * @param string $key    The key to normalize
-     * @param string $plural The plural form of the key if it is irregular
+     * @param array       $config A config array
+     * @param string      $key    The key to normalize
+     * @param string|null $plural The plural form of the key if it is irregular
      */
     public static function normalizeConfig(array $config, string $key, string $plural = null): array
     {

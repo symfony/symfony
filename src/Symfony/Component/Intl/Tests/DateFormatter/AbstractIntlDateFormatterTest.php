@@ -91,7 +91,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertIsIntlSuccess($formatter, $errorMessage, $errorCode);
     }
 
-    public function formatProvider()
+    public static function formatProvider()
     {
         $dateTime = new \DateTime('@0');
         $dateTimeImmutable = new \DateTimeImmutable('@0');
@@ -316,7 +316,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertIsIntlFailure($formatter, $errorMessage, $errorCode);
     }
 
-    public function formatErrorProvider()
+    public static function formatErrorProvider()
     {
         return [
             ['y-M-d', 'foobar', 'datefmt_format: string \'foobar\' is not numeric, which would be required for it to be a valid date: U_ILLEGAL_ARGUMENT_ERROR'],
@@ -333,7 +333,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
-    public function formatWithTimezoneProvider()
+    public static function formatWithTimezoneProvider()
     {
         $data = [
             [0, 'UTC', '1970-01-01 00:00:00'],
@@ -379,7 +379,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertEquals($expected, $formatter->format(0));
     }
 
-    public function formatTimezoneProvider()
+    public static function formatTimezoneProvider()
     {
         return [
             ['z', 'GMT', 'GMT'],
@@ -528,7 +528,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
-    public function dateAndTimeTypeProvider()
+    public static function dateAndTimeTypeProvider()
     {
         return [
             [0, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Thursday, January 1, 1970'],
@@ -585,7 +585,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertIsIntlSuccess($formatter, $errorMessage, $errorCode);
     }
 
-    public function parseProvider()
+    public static function parseProvider()
     {
         return array_merge(
             static::parseYearProvider(),
@@ -610,7 +610,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         );
     }
 
-    public function parseYearProvider()
+    public static function parseYearProvider()
     {
         return [
             ['y-M-d', '1970-1-1', 0],
@@ -618,7 +618,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseQuarterProvider()
+    public static function parseQuarterProvider()
     {
         return [
             ['Q', '1', 0],
@@ -641,7 +641,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseMonthProvider()
+    public static function parseMonthProvider()
     {
         return [
             ['y-M-d', '1970-1-1', 0],
@@ -651,7 +651,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseStandaloneMonthProvider()
+    public static function parseStandaloneMonthProvider()
     {
         return [
             ['y-L-d', '1970-1-1', 0],
@@ -660,7 +660,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseDayProvider()
+    public static function parseDayProvider()
     {
         return [
             ['y-M-d', '1970-1-1', 0],
@@ -670,7 +670,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseDayOfWeekProvider()
+    public static function parseDayOfWeekProvider()
     {
         return [
             ['E', 'Thu', 0],
@@ -682,7 +682,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseDayOfYearProvider()
+    public static function parseDayOfYearProvider()
     {
         return [
             ['D', '1', 0],
@@ -690,7 +690,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseHour12ClockOneBasedProvider()
+    public static function parseHour12ClockOneBasedProvider()
     {
         return [
             // 12 hours (1-12)
@@ -715,7 +715,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseHour12ClockZeroBasedProvider()
+    public static function parseHour12ClockZeroBasedProvider()
     {
         return [
             // 12 hours (0-11)
@@ -740,7 +740,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseHour24ClockOneBasedProvider()
+    public static function parseHour24ClockOneBasedProvider()
     {
         return [
             // 24 hours (1-24)
@@ -767,7 +767,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseHour24ClockZeroBasedProvider()
+    public static function parseHour24ClockZeroBasedProvider()
     {
         return [
             // 24 hours (0-23)
@@ -794,7 +794,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseMinuteProvider()
+    public static function parseMinuteProvider()
     {
         return [
             ['y-M-d HH:m', '1970-1-1 0:1', 60],
@@ -802,7 +802,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseSecondProvider()
+    public static function parseSecondProvider()
     {
         return [
             ['y-M-d HH:mm:s', '1970-1-1 00:01:1', 61],
@@ -810,7 +810,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseTimezoneProvider()
+    public static function parseTimezoneProvider()
     {
         if (80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) {
             return [['y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0]];
@@ -830,7 +830,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseAmPmProvider()
+    public static function parseAmPmProvider()
     {
         return [
             // AM/PM (already covered by hours tests)
@@ -839,7 +839,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseStandaloneAmPmProvider()
+    public static function parseStandaloneAmPmProvider()
     {
         return [
             ['a', 'AM', 0],
@@ -847,7 +847,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseRegexMetaCharsProvider()
+    public static function parseRegexMetaCharsProvider()
     {
         return [
             // regexp meta chars in the pattern string
@@ -856,7 +856,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseQuoteCharsProvider()
+    public static function parseQuoteCharsProvider()
     {
         return [
             ["'M'", 'M', 0],
@@ -867,7 +867,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         ];
     }
 
-    public function parseDashSlashProvider()
+    public static function parseDashSlashProvider()
     {
         return [
             ['y-M-d', '1970/1/1', 0],
@@ -890,7 +890,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertIsIntlFailure($formatter, $errorMessage, $errorCode);
     }
 
-    public function parseErrorProvider()
+    public static function parseErrorProvider()
     {
         return [
             // 1 char month
@@ -945,7 +945,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $this->assertEquals($expectedTimeZoneId, $formatter->getTimeZoneId());
     }
 
-    public function setTimeZoneIdProvider()
+    public static function setTimeZoneIdProvider()
     {
         return [
             ['UTC', 'UTC'],

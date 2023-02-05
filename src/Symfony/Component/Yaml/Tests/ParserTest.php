@@ -124,14 +124,14 @@ YAML;
         $this->assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
     }
 
-    public function getDataFormSpecifications()
+    public static function getDataFormSpecifications()
     {
-        return $this->loadTestsFromFixtureFiles('index.yml');
+        return self::loadTestsFromFixtureFiles('index.yml');
     }
 
-    public function getNonStringMappingKeysData()
+    public static function getNonStringMappingKeysData()
     {
-        return $this->loadTestsFromFixtureFiles('nonStringKeys.yml');
+        return self::loadTestsFromFixtureFiles('nonStringKeys.yml');
     }
 
     /**
@@ -2390,7 +2390,7 @@ INI;
         $this->parser->parse($ini);
     }
 
-    private function loadTestsFromFixtureFiles($testsFile)
+    private static function loadTestsFromFixtureFiles($testsFile)
     {
         $parser = new Parser();
 

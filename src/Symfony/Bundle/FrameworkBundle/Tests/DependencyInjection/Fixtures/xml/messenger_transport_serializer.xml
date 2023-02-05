@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony">
+    <!--xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd"-->
+
+
+    <framework:config http-method-override="false">
+        <framework:serializer enabled="true" />
+        <framework:messenger>
+            <framework:serializer>
+                <framework:symfony-serializer format="xml">
+                    <framework:context>
+                        <framework:default>context</framework:default>
+                    </framework:context>
+                </framework:symfony-serializer>
+            </framework:serializer>
+
+            <framework:transport name="default_serializer" dsn="null://" />
+
+            <framework:transport name="custom_serializer_short_notation" dsn="null://" serializer="messenger.transport.native_php_serializer" />
+
+            <framework:transport name="custom_serializer_long_notation" dsn="null://">
+                <framework:serializer service_id="messenger.transport.native_php_serializer" />
+            </framework:transport>
+
+            <framework:transport name="symfony_serializer_with_context" dsn="null://">
+                <framework:serializer format="json" serializer="my_fancy_serializer">
+                    <framework:context>
+                        <framework:some>context</framework:some>
+                    </framework:context>
+                </framework:serializer>
+            </framework:transport>
+
+            <framework:transport name="incoming_message_transport" dsn="null://">
+                <framework:incoming_message_serializer format="json" serializer="my_fancy_serializer" messageClass="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage">
+                    <framework:context>
+                        <framework:some>context</framework:some>
+                    </framework:context>
+                </framework:incoming_message_serializer>
+            </framework:transport>
+
+            <framework:transport name="incoming_message_transport_with_default_serializer" dsn="null://">
+                <framework:incoming_message_serializer messageClassResolver="some_message_class_resolver_id" />
+            </framework:transport>
+
+            <framework:transport name="outgoing_message_transport" dsn="null://">
+                <framework:outgoing_message_serializer format="json" serializer="my_fancy_serializer">
+                    <framework:context>
+                        <framework:some>context</framework:some>
+                    </framework:context>
+                </framework:outgoing_message_serializer>
+            </framework:transport>
+
+            <framework:transport name="outgoing_message_transport_with_default_serializer" dsn="null://">
+                <framework:outgoing_message_serializer />
+            </framework:transport>
+
+        </framework:messenger>
+    </framework:config>
+</container>

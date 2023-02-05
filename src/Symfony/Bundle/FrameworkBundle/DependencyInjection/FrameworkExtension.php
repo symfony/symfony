@@ -120,6 +120,9 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
+use Symfony\Component\Messenger\Transport\Serialization\IncomingMessageSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\OutgoingMessageSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -2086,7 +2089,47 @@ class FrameworkExtension extends Extension
         $transportRetryReferences = [];
         $transportRateLimiterReferences = [];
         foreach ($config['transports'] as $name => $transport) {
-            $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
+            if (isset($transport['serializer'])) {
+                $basicSerializerConf = $transport['serializer'];
+
+                $serializerId = $basicSerializerConf['service_id'] ?? "messenger.transport.{$name}.serializer";
+
+                if (($basicSerializerConf['serializer'] ?? null) || ($basicSerializerConf['format'] ?? null) || [] !== $basicSerializerConf['context']) {
+                    $serializerDefinition = (new Definition(Serializer::class))
+                        ->setArguments([
+                            new Reference($basicSerializerConf['serializer'] ?? 'serializer'),
+                            $basicSerializerConf['format'] ?? $config['serializer']['symfony_serializer']['format'],
+                            $basicSerializerConf['context'] ?: $config['serializer']['symfony_serializer']['context'],
+                        ]);
+
+                    $container->setDefinition($serializerId, $serializerDefinition);
+                }
+            } elseif (isset($transport['incoming_message_serializer'])) {
+                $incomingSerializerConf = $transport['incoming_message_serializer'];
+
+                $serializerDefinition = (new Definition(IncomingMessageSerializer::class))
+                    ->setArguments([
+                        $incomingSerializerConf['messageClass'] ?? new Reference($incomingSerializerConf['messageClassResolver']),
+                        new Reference($incomingSerializerConf['serializer'] ?? 'serializer'),
+                        $incomingSerializerConf['format'] ?? $config['serializer']['symfony_serializer']['format'],
+                        $incomingSerializerConf['context'] ?: $config['serializer']['symfony_serializer']['context'],
+                    ]);
+
+                $container->setDefinition($serializerId = "messenger.transport.{$name}.serializer", $serializerDefinition);
+            } elseif (isset($transport['outgoing_message_serializer'])) {
+                $outgoingSerializerConf = $transport['outgoing_message_serializer'];
+
+                $serializerDefinition = (new Definition(OutgoingMessageSerializer::class))
+                    ->setArguments([
+                        new Reference($outgoingSerializerConf['serializer'] ?? 'serializer'),
+                        $outgoingSerializerConf['format'] ?? $config['serializer']['symfony_serializer']['format'],
+                        $outgoingSerializerConf['context'] ?: $config['serializer']['symfony_serializer']['context'],
+                    ]);
+
+                $container->setDefinition($serializerId = "messenger.transport.{$name}.serializer", $serializerDefinition);
+            }
+
+            $serializerId ??= 'messenger.default_serializer';
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
                 ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])

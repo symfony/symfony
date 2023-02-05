@@ -23,7 +23,7 @@ class SodiumPasswordEncoderTest extends TestCase
     protected function setUp(): void
     {
         if (!SodiumPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+           self::markTestSkipped('Libsodium is not available.');
         }
     }
 

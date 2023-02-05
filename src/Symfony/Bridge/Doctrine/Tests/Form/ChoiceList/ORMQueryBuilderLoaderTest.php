@@ -227,7 +227,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     public function testEmbeddedIdentifierName()
     {
         if (Version::compare('2.5.0') > 0) {
-            $this->markTestSkipped('Applicable only for Doctrine >= 2.5.0');
+           self::markTestSkipped('Applicable only for Doctrine >= 2.5.0');
 
             return;
         }

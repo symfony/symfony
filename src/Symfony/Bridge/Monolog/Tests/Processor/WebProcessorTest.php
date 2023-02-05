@@ -58,7 +58,7 @@ class WebProcessorTest extends TestCase
     public function testCanBeConstructedWithExtraFields()
     {
         if (!$this->isExtraFieldsSupported()) {
-            $this->markTestSkipped('WebProcessor of the installed Monolog version does not support $extraFields parameter');
+           self::markTestSkipped('WebProcessor of the installed Monolog version does not support $extraFields parameter');
         }
 
         [$event, $server] = $this->createRequestEvent();

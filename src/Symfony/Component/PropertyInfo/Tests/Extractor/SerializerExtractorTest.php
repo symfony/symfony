@@ -47,7 +47,7 @@ class SerializerExtractorTest extends TestCase
     public function testGetPropertiesWithIgnoredProperties()
     {
         if (!class_exists(Ignore::class)) {
-            $this->markTestSkipped('Ignore annotation is not implemented in current symfony/serializer version');
+           self::markTestSkipped('Ignore annotation is not implemented in current symfony/serializer version');
         }
 
         $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['a']]));

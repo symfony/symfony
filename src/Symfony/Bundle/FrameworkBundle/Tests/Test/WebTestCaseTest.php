@@ -79,7 +79,7 @@ class WebTestCaseTest extends TestCase
     public function testAssertResponseFormat()
     {
         if (!class_exists(ResponseFormatSame::class)) {
-            $this->markTestSkipped('Too old version of HttpFoundation.');
+           self::markTestSkipped('Too old version of HttpFoundation.');
         }
 
         $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/vnd.myformat']))->assertResponseFormatSame('custom');

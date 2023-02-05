@@ -38,7 +38,7 @@ class GuardBridgeAuthenticatorTest extends TestCase
     protected function setUp(): void
     {
         if (!interface_exists(\Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface::class)) {
-            $this->markTestSkipped('Authenticator system not installed.');
+           self::markTestSkipped('Authenticator system not installed.');
         }
 
         $this->guardAuthenticator = $this->createMock(AuthenticatorInterface::class);

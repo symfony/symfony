@@ -311,7 +311,7 @@ class PropertyNormalizerTest extends TestCase
 
     public function testIgnoredAttributesContextDenormalizeInherit()
     {
-        $this->markTestSkipped('This has not been tested previously - did not manage to make the test work');
+       self::markTestSkipped('This has not been tested previously - did not manage to make the test work');
     }
 
     protected function getNormalizerForMaxDepth(): PropertyNormalizer

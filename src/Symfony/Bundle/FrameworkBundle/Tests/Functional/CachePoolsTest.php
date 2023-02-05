@@ -38,12 +38,12 @@ class CachePoolsTest extends AbstractWebTestCase
             if (!str_starts_with($e->getMessage(), 'unable to connect to')) {
                 throw $e;
             }
-            $this->markTestSkipped($e->getMessage());
+           self::markTestSkipped($e->getMessage());
         } catch (InvalidArgumentException $e) {
             if (!str_starts_with($e->getMessage(), 'Redis connection ')) {
                 throw $e;
             }
-            $this->markTestSkipped($e->getMessage());
+           self::markTestSkipped($e->getMessage());
         }
     }
 
@@ -61,7 +61,7 @@ class CachePoolsTest extends AbstractWebTestCase
             if (!str_starts_with($e->getMessage(), 'unable to connect to')) {
                 throw $e;
             }
-            $this->markTestSkipped($e->getMessage());
+           self::markTestSkipped($e->getMessage());
         }
     }
 

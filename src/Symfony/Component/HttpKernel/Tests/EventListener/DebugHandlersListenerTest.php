@@ -196,7 +196,7 @@ class DebugHandlersListenerTest extends TestCase
     public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, $levels, $expectedLoggerLevels, $expectedDeprecationLoggerLevels)
     {
         if (!class_exists(ErrorHandler::class)) {
-            $this->markTestSkipped('ErrorHandler component is required to run this test.');
+           self::markTestSkipped('ErrorHandler component is required to run this test.');
         }
 
         $handler = $this->createMock(ErrorHandler::class);

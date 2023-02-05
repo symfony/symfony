@@ -56,7 +56,7 @@ EOT;
     public function testCreateSendmailWithNoSendmailPath()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test cannot run on Windows.');
+           self::markTestSkipped('This test cannot run on Windows.');
         }
 
         $this->expectException(\Exception::class);
@@ -79,7 +79,7 @@ EOT;
     public function testCreateSendmailWithNoHostOrNoPort(string $dsn, string $sendmaiPath, string $smtp, string $smtpPort)
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test only run on Windows.');
+           self::markTestSkipped('This test only run on Windows.');
         }
 
         $this->expectException(\Exception::class);

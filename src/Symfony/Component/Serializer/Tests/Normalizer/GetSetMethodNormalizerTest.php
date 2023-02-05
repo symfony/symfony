@@ -354,7 +354,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     public function testRejectInvalidKey()
     {
-        $this->markTestSkipped('This test makes no sense with the GetSetMethodNormalizer');
+       self::markTestSkipped('This test makes no sense with the GetSetMethodNormalizer');
     }
 
     protected function getNormalizerForIgnoredAttributes(): GetSetMethodNormalizer

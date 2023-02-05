@@ -27,15 +27,15 @@ class ApcuAdapterTest extends AdapterTestCase
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         if (!\function_exists('apcu_fetch') || !filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN)) {
-            $this->markTestSkipped('APCu extension is required.');
+           self::markTestSkipped('APCu extension is required.');
         }
         if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
             if ('testWithCliSapi' !== $this->getName()) {
-                $this->markTestSkipped('apc.enable_cli=1 is required.');
+               self::markTestSkipped('apc.enable_cli=1 is required.');
             }
         }
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Fails transiently on Windows.');
+           self::markTestSkipped('Fails transiently on Windows.');
         }
 
         return new ApcuAdapter(str_replace('\\', '.', __CLASS__), $defaultLifetime);

@@ -18,7 +18,7 @@ class BarCovTest extends TestCase
     public function testBarCov()
     {
         if (!class_exists(\PhpUnitCoverageTest\FooCov::class)) {
-            $this->markTestSkipped('This test is not part of the main Symfony test suite. It\'s here to test the CoverageListener.');
+           self::markTestSkipped('This test is not part of the main Symfony test suite. It\'s here to test the CoverageListener.');
         }
 
         $foo = new \PhpUnitCoverageTest\FooCov();

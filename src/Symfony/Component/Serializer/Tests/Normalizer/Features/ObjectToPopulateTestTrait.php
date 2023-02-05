@@ -54,7 +54,7 @@ trait ObjectToPopulateTestTrait
 
     public function testObjectToPopulateNoMatch()
     {
-        $this->markTestSkipped('something broken here!');
+       self::markTestSkipped('something broken here!');
         $denormalizer = $this->getDenormalizerForObjectToPopulate();
 
         $objectToPopulate = new ObjectInner();

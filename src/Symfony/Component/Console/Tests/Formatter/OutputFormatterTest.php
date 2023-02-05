@@ -165,7 +165,7 @@ class OutputFormatterTest extends TestCase
     public function testInlineStyleOptions(string $tag, string $expected = null, string $input = null, bool $truecolor = false)
     {
         if ($truecolor && 'truecolor' !== getenv('COLORTERM')) {
-            $this->markTestSkipped('The terminal does not support true colors.');
+           self::markTestSkipped('The terminal does not support true colors.');
         }
 
         $styleString = substr($tag, 1, -1);

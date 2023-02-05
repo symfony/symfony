@@ -176,7 +176,7 @@ class RetryableHttpClientTest extends TestCase
         $client = HttpClient::create();
 
         if ($client instanceof NativeHttpClient) {
-            $this->markTestSkipped('NativeHttpClient cannot timeout before receiving headers');
+           self::markTestSkipped('NativeHttpClient cannot timeout before receiving headers');
         }
 
         $client = new RetryableHttpClient($client);

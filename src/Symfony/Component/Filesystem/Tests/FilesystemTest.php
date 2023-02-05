@@ -46,11 +46,11 @@ class FilesystemTest extends FilesystemTestCase
         $this->expectException(IOException::class);
         // skip test on Windows; PHP can't easily set file as unreadable on Windows
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test cannot run on Windows.');
+           self::markTestSkipped('This test cannot run on Windows.');
         }
 
         if (!getenv('USER') || 'root' === getenv('USER')) {
-            $this->markTestSkipped('This test will fail if run under superuser');
+           self::markTestSkipped('This test will fail if run under superuser');
         }
 
         $sourceFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_source_file';
@@ -122,11 +122,11 @@ class FilesystemTest extends FilesystemTestCase
         $this->expectException(IOException::class);
         // skip test on Windows; PHP can't easily set file as unwritable on Windows
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test cannot run on Windows.');
+           self::markTestSkipped('This test cannot run on Windows.');
         }
 
         if (!getenv('USER') || 'root' === getenv('USER')) {
-            $this->markTestSkipped('This test will fail if run under superuser');
+           self::markTestSkipped('This test will fail if run under superuser');
         }
 
         $sourceFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_source_file';
@@ -167,7 +167,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
     {
         if (!\in_array('https', stream_get_wrappers())) {
-            $this->markTestSkipped('"https" stream wrapper is not enabled.');
+           self::markTestSkipped('"https" stream wrapper is not enabled.');
         }
         $sourceFilePath = 'https://symfony.com/images/common/logo/logo_symfony_header.png';
         $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
@@ -399,7 +399,7 @@ class FilesystemTest extends FilesystemTestCase
     {
         $this->expectException(IOException::class);
         if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Long file names are an issue on Windows');
+           self::markTestSkipped('Long file names are an issue on Windows');
         }
         $basePath = $this->workspace.'\\directory\\';
         $maxPathLength = \PHP_MAXPATHLEN - 2;
@@ -860,7 +860,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testSymlink()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support creating "broken" symlinks');
+           self::markTestSkipped('Windows does not support creating "broken" symlinks');
         }
 
         $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';
@@ -1045,7 +1045,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->markAsSkippedIfSymlinkIsMissing();
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Relative symbolic links are not supported on Windows');
+           self::markTestSkipped('Relative symbolic links are not supported on Windows');
         }
 
         $file = $this->workspace.'/file';
@@ -1092,7 +1092,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->markAsSkippedIfSymlinkIsMissing();
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support creating "broken" symlinks');
+           self::markTestSkipped('Windows does not support creating "broken" symlinks');
         }
 
         $file = $this->workspace.'/file';
@@ -1507,7 +1507,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->expectException(IOException::class);
         // Skip test if Phar disabled phar.readonly must be 0 in php.ini
         if (!\Phar::canWrite()) {
-            $this->markTestSkipped('This test cannot run when phar.readonly is 1.');
+           self::markTestSkipped('This test cannot run when phar.readonly is 1.');
         }
 
         $scheme = 'phar://';
@@ -1769,7 +1769,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testDumpToProtectedDirectory()
     {
         if (\DIRECTORY_SEPARATOR !== '\\') {
-            $this->markTestSkipped('This test is specific to Windows.');
+           self::markTestSkipped('This test is specific to Windows.');
         }
 
         if (($userProfilePath = getenv('USERPROFILE')) === false || !is_dir($userProfilePath)) {

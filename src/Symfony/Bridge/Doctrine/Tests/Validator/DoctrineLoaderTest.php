@@ -41,7 +41,7 @@ class DoctrineLoaderTest extends TestCase
     protected function setUp(): void
     {
         if (!trait_exists(AutoMappingTrait::class)) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.4+');
+           self::markTestSkipped('Auto-mapping requires symfony/validation 4.4+');
         }
     }
 
@@ -157,7 +157,7 @@ class DoctrineLoaderTest extends TestCase
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {
-            $this->markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
+           self::markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
         }
 
         $validator = Validation::createValidatorBuilder()

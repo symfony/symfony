@@ -65,7 +65,7 @@ class PdoDbalStoreTest extends AbstractStoreTest
 
     public function testAbortAfterExpiration()
     {
-        $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
+       self::markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
     public function testConfigureSchema()

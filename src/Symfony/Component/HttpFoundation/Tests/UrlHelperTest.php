@@ -60,7 +60,7 @@ class UrlHelperTest extends TestCase
     public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
     {
         if (!class_exists(RequestContext::class)) {
-            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+           self::markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
         }
 
         $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
@@ -75,7 +75,7 @@ class UrlHelperTest extends TestCase
     public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path)
     {
         if (!class_exists(RequestContext::class)) {
-            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+           self::markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
         }
 
         $helper = new UrlHelper(new RequestStack());
@@ -118,7 +118,7 @@ class UrlHelperTest extends TestCase
     public function testGenerateRelativePath($expected, $path, $pathinfo)
     {
         if (!method_exists(Request::class, 'getRelativeUriForPath')) {
-            $this->markTestSkipped('Your version of Symfony HttpFoundation is too old.');
+           self::markTestSkipped('Your version of Symfony HttpFoundation is too old.');
         }
 
         $stack = new RequestStack();

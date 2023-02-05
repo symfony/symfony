@@ -68,7 +68,7 @@ class Psr16CacheTest extends SimpleCacheTest
     public function testDefaultLifeTime()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createSimpleCache(2);
@@ -88,7 +88,7 @@ class Psr16CacheTest extends SimpleCacheTest
     public function testNotUnserializable()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createSimpleCache();
@@ -110,7 +110,7 @@ class Psr16CacheTest extends SimpleCacheTest
     public function testPrune()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         /** @var PruneableInterface|CacheInterface $cache */

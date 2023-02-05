@@ -336,7 +336,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
     public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
     {
         if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
+           self::markTestSkipped('intl extension is not loaded');
         }
 
         $this->iniSet('intl.error_level', \E_WARNING);
@@ -349,7 +349,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
     public function testReverseTransformWrapsIntlErrorsWithExceptions()
     {
         if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
+           self::markTestSkipped('intl extension is not loaded');
         }
 
         $this->iniSet('intl.use_exceptions', 1);
@@ -362,7 +362,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
     public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
     {
         if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('intl extension is not loaded');
+           self::markTestSkipped('intl extension is not loaded');
         }
 
         $this->iniSet('intl.use_exceptions', 1);

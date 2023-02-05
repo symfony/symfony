@@ -61,7 +61,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
     public function testSetterInjectionWithAttribute()
     {
         if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+           self::markTestSkipped('symfony/service-contracts 2.2 required');
         }
 
         $container = new ContainerBuilder();
@@ -155,7 +155,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
     public function testWitherInjectionWithAttribute()
     {
         if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+           self::markTestSkipped('symfony/service-contracts 2.2 required');
         }
 
         $container = new ContainerBuilder();

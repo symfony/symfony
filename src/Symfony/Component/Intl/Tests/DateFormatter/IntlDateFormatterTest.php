@@ -176,7 +176,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     public function testParseThreeDigitsYears()
     {
         if (\PHP_INT_SIZE < 8) {
-            $this->markTestSkipped('Parsing three digits years requires a 64bit PHP.');
+           self::markTestSkipped('Parsing three digits years requires a 64bit PHP.');
         }
 
         $formatter = $this->getDefaultDateFormatter('yyyy-M-d');
@@ -187,7 +187,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
         if ((80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) && \is_string($timezone) && str_contains($timezone, 'GMT')) {
-            $this->markTestSkipped('Broken version of PHP');
+           self::markTestSkipped('Broken version of PHP');
         }
 
         return new class($locale, $datetype, $timetype, $timezone, $calendar, $pattern) extends IntlDateFormatter {

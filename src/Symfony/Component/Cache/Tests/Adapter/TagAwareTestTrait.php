@@ -113,7 +113,7 @@ trait TagAwareTestTrait
     public function testTagItemExpiry()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $pool = $this->createCachePool(10);

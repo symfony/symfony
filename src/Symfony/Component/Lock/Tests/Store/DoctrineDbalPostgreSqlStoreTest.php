@@ -34,7 +34,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
     public function createPostgreSqlConnection(): Connection
     {
         if (!getenv('POSTGRES_HOST')) {
-            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+           self::markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
         return DriverManager::getConnection(['url' => 'pgsql://postgres:password@'.getenv('POSTGRES_HOST')]);

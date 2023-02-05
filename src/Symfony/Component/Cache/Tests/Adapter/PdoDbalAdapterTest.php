@@ -59,7 +59,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
         $this->expectDeprecation('Since symfony/cache 5.4: Usage of a DBAL Connection with "Symfony\Component\Cache\Adapter\PdoAdapter" is deprecated and will be removed in symfony 6.0. Use "Symfony\Component\Cache\Adapter\DoctrineDbalAdapter" instead.');
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]);
         if (!interface_exists(Middleware::class)) {
-            $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
+           self::markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
         }
 
         $middleware = $this->createMock(Middleware::class);

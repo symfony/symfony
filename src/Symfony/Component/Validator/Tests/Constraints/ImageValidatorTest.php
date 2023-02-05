@@ -549,7 +549,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     public function testCorrupted(Image $constraint)
     {
         if (!\function_exists('imagecreatefromstring')) {
-            $this->markTestSkipped('This test require GD extension');
+           self::markTestSkipped('This test require GD extension');
         }
 
         $this->validator->validate($this->image, $constraint);

@@ -148,7 +148,7 @@ class PdoSessionHandlerTest extends TestCase
     public function testReadLockedConvertsStreamToString()
     {
         if (filter_var(\ini_get('session.use_strict_mode'), \FILTER_VALIDATE_BOOLEAN)) {
-            $this->markTestSkipped('Strict mode needs no locking for new sessions.');
+           self::markTestSkipped('Strict mode needs no locking for new sessions.');
         }
 
         $pdo = new MockPdo('pgsql');

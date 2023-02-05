@@ -108,7 +108,7 @@ class TimezoneTypeTest extends BaseTypeTest
         $tzDbVersion = isset($matches[1]) ? (int) trim($matches[1]) : 0;
 
         if (!$tzDbVersion || 2017 <= $tzDbVersion) {
-            $this->markTestSkipped('"Europe/Saratov" is expired until 2017, current version is '.$tzDbVersion);
+           self::markTestSkipped('"Europe/Saratov" is expired until 2017, current version is '.$tzDbVersion);
         }
 
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'intltimezone']);
@@ -131,7 +131,7 @@ class TimezoneTypeTest extends BaseTypeTest
         $tzDbVersion = isset($matches[1]) ? (int) trim($matches[1]) : 0;
 
         if (!$tzDbVersion || 2017 <= $tzDbVersion) {
-            $this->markTestSkipped('"Europe/Saratov" is expired until 2017, current version is '.$tzDbVersion);
+           self::markTestSkipped('"Europe/Saratov" is expired until 2017, current version is '.$tzDbVersion);
         }
 
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'intltimezone', 'intl' => true]);

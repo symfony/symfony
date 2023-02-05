@@ -32,7 +32,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
     protected function setUp(): void
     {
         if (!$host = getenv('POSTGRES_HOST')) {
-            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+           self::markTestSkipped('Missing POSTGRES_HOST env variable');
         }
 
         $this->driverConnection = DriverManager::getConnection(['url' => "pgsql://postgres:password@$host"]);

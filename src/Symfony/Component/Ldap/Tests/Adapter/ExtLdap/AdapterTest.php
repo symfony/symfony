@@ -160,7 +160,7 @@ class AdapterTest extends LdapTestCase
             $this->assertEquals($final_results->count(), 25);
             $this->assertEquals(\count($final_query->getResources()), 1);
         } catch (LdapException $exc) {
-            $this->markTestSkipped('Test LDAP server does not support pagination');
+           self::markTestSkipped('Test LDAP server does not support pagination');
         }
 
         $this->destroyEntries($ldap, $entries);
@@ -224,7 +224,7 @@ class AdapterTest extends LdapTestCase
             $this->assertEquals(\count($low_max_query->getResources()), 1);
             $this->assertEquals(\count($high_max_query->getResources()), 2);
         } catch (LdapException $exc) {
-            $this->markTestSkipped('Test LDAP server does not support pagination');
+           self::markTestSkipped('Test LDAP server does not support pagination');
         }
 
         $this->destroyEntries($ldap, $entries);

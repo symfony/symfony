@@ -77,7 +77,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
     public function testEncodePasswordArgon2i()
     {
         if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
+           self::markTestSkipped('Argon2i algorithm not available.');
         }
         $this->setupArgon2i();
         $this->passwordEncoderCommandTester->execute([
@@ -98,7 +98,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
     public function testEncodePasswordArgon2id()
     {
         if (!($sodium = (SodiumPasswordEncoder::isSupported() && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13'))) && !\defined('PASSWORD_ARGON2ID')) {
-            $this->markTestSkipped('Argon2id algorithm not available.');
+           self::markTestSkipped('Argon2id algorithm not available.');
         }
         $this->setupArgon2id();
         $this->passwordEncoderCommandTester->execute([
@@ -136,7 +136,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
     public function testEncodePasswordSodium()
     {
         if (!SodiumPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+           self::markTestSkipped('Libsodium is not available.');
         }
         $this->setupSodium();
         $this->passwordEncoderCommandTester->execute([
@@ -214,7 +214,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
     public function testEncodePasswordArgon2iOutput()
     {
         if (!(SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
+           self::markTestSkipped('Argon2i algorithm not available.');
         }
 
         $this->setupArgon2i();
@@ -230,7 +230,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
     public function testEncodePasswordArgon2idOutput()
     {
         if (!(SodiumPasswordEncoder::isSupported() && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2ID')) {
-            $this->markTestSkipped('Argon2id algorithm not available.');
+           self::markTestSkipped('Argon2id algorithm not available.');
         }
 
         $this->setupArgon2id();
@@ -246,7 +246,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
     public function testEncodePasswordSodiumOutput()
     {
         if (!SodiumPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+           self::markTestSkipped('Libsodium is not available.');
         }
 
         $this->setupSodium();

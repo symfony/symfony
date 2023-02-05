@@ -140,7 +140,7 @@ class DataPartTest extends TestCase
     public function testFromPathWithUrl()
     {
         if (!\in_array('https', stream_get_wrappers())) {
-            $this->markTestSkipped('"https" stream wrapper is not enabled.');
+           self::markTestSkipped('"https" stream wrapper is not enabled.');
         }
 
         $p = DataPart::fromPath($file = 'https://symfony.com/images/common/logo/logo_symfony_header.png');

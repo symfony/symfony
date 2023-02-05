@@ -228,7 +228,7 @@ class SendgridApiTransportTest extends TestCase
     public function testTagAndMetadataHeaders()
     {
         if (!class_exists(TagHeader::class)) {
-            $this->markTestSkipped('This test requires symfony/mailer 5.1 or higher.');
+           self::markTestSkipped('This test requires symfony/mailer 5.1 or higher.');
         }
 
         $email = new Email();

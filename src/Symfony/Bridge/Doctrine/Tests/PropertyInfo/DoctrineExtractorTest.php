@@ -90,7 +90,7 @@ class DoctrineExtractorTest extends TestCase
     public function testTestGetPropertiesWithEmbedded()
     {
         if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
-            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
+           self::markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
         $this->assertEquals(
@@ -113,7 +113,7 @@ class DoctrineExtractorTest extends TestCase
     public function testExtractWithEmbedded()
     {
         if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
-            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
+           self::markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
         $expectedTypes = [new Type(
@@ -137,7 +137,7 @@ class DoctrineExtractorTest extends TestCase
     public function testExtractEnum()
     {
         if (!property_exists(Column::class, 'enumType')) {
-            $this->markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
+           self::markTestSkipped('The "enumType" requires doctrine/orm 2.11.');
         }
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString', []));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt', []));

@@ -732,7 +732,7 @@ class ObjectNormalizerTest extends TestCase
     public function testDoesntHaveIssuesWithUnionConstTypes()
     {
         if (!class_exists(PhpStanExtractor::class) || !class_exists(PhpDocParser::class)) {
-            $this->markTestSkipped('phpstan/phpdoc-parser required for this test');
+           self::markTestSkipped('phpstan/phpdoc-parser required for this test');
         }
 
         $extractor = new PropertyInfoExtractor([], [new PhpStanExtractor(), new PhpDocExtractor(), new ReflectionExtractor()]);

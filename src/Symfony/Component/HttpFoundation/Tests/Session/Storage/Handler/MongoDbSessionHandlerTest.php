@@ -35,7 +35,7 @@ class MongoDbSessionHandlerTest extends TestCase
         parent::setUp();
 
         if (!class_exists(Client::class)) {
-            $this->markTestSkipped('The mongodb/mongodb package is required.');
+           self::markTestSkipped('The mongodb/mongodb package is required.');
         }
 
         $this->mongo = $this->getMockBuilder(Client::class)

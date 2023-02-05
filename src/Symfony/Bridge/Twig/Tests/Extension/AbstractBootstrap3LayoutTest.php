@@ -1764,7 +1764,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
     {
-        $this->markTestSkipped('Make tests pass with symfony/form 4.4');
+       self::markTestSkipped('Make tests pass with symfony/form 4.4');
     }
 
     public function testDateChoice()

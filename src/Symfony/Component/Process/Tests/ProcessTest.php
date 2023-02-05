@@ -69,7 +69,7 @@ class ProcessTest extends TestCase
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is transient on Windows');
+           self::markTestSkipped('This test is transient on Windows');
         }
         @trigger_error('Test Error', \E_USER_NOTICE);
         $process = $this->getProcessForCode('sleep(3)');
@@ -463,7 +463,7 @@ class ProcessTest extends TestCase
     public function testExitCodeCommandFailed()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX exit code');
+           self::markTestSkipped('Windows does not support POSIX exit code');
         }
 
         // such command run in bash return an exitcode 127
@@ -476,11 +476,11 @@ class ProcessTest extends TestCase
     public function testTTYCommand()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not have /dev/tty support');
+           self::markTestSkipped('Windows does not have /dev/tty support');
         }
 
         if (!Process::isTtySupported()) {
-            $this->markTestSkipped('There is no TTY support');
+           self::markTestSkipped('There is no TTY support');
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null && '.$this->getProcessForCode('usleep(100000);')->getCommandLine());
@@ -495,11 +495,11 @@ class ProcessTest extends TestCase
     public function testTTYCommandExitCode()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does have /dev/tty support');
+           self::markTestSkipped('Windows does have /dev/tty support');
         }
 
         if (!Process::isTtySupported()) {
-            $this->markTestSkipped('There is no TTY support');
+           self::markTestSkipped('There is no TTY support');
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null');
@@ -514,7 +514,7 @@ class ProcessTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('TTY mode is not supported on Windows platform.');
         if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is for Windows platform only');
+           self::markTestSkipped('This test is for Windows platform only');
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null');
@@ -531,7 +531,7 @@ class ProcessTest extends TestCase
     public function testPTYCommand()
     {
         if (!Process::isPtySupported()) {
-            $this->markTestSkipped('PTY is not supported on this operating system.');
+           self::markTestSkipped('PTY is not supported on this operating system.');
         }
 
         $process = $this->getProcess('echo "foo"');
@@ -676,7 +676,7 @@ class ProcessTest extends TestCase
     public function testProcessIsNotSignaled()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
+           self::markTestSkipped('Windows does not support POSIX signals');
         }
 
         $process = $this->getProcess('echo foo');
@@ -687,7 +687,7 @@ class ProcessTest extends TestCase
     public function testProcessWithoutTermSignal()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
+           self::markTestSkipped('Windows does not support POSIX signals');
         }
 
         $process = $this->getProcess('echo foo');
@@ -698,7 +698,7 @@ class ProcessTest extends TestCase
     public function testProcessIsSignaledIfStopped()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
+           self::markTestSkipped('Windows does not support POSIX signals');
         }
 
         $process = $this->getProcessForCode('sleep(32);');
@@ -713,11 +713,11 @@ class ProcessTest extends TestCase
         $this->expectException(ProcessSignaledException::class);
         $this->expectExceptionMessage('The process has been signaled with signal "9".');
         if (!\function_exists('posix_kill')) {
-            $this->markTestSkipped('Function posix_kill is required.');
+           self::markTestSkipped('Function posix_kill is required.');
         }
 
         if (self::$sigchild) {
-            $this->markTestSkipped('PHP is compiled with --enable-sigchild.');
+           self::markTestSkipped('PHP is compiled with --enable-sigchild.');
         }
 
         $process = $this->getProcessForCode('sleep(32.1);');
@@ -1001,7 +1001,7 @@ class ProcessTest extends TestCase
     public function testWrongSignal()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('POSIX signals do not work on Windows');
+           self::markTestSkipped('POSIX signals do not work on Windows');
         }
 
         $this->expectException(RuntimeException::class);

@@ -329,7 +329,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+           self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $application = new Application();

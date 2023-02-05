@@ -93,7 +93,7 @@ YAML;
     public function testLintAutodetectsGithubActionEnvironment()
     {
         if (!class_exists(GithubActionReporter::class)) {
-            $this->markTestSkipped('The "github" format is only available since "symfony/console" >= 5.3.');
+           self::markTestSkipped('The "github" format is only available since "symfony/console" >= 5.3.');
         }
 
         $prev = getenv('GITHUB_ACTIONS');
@@ -171,7 +171,7 @@ YAML;
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+           self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $tester = new CommandCompletionTester($this->createCommand());

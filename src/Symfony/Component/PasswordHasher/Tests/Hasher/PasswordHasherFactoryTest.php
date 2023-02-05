@@ -146,7 +146,7 @@ class PasswordHasherFactoryTest extends TestCase
     public function testMigrateFrom()
     {
         if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Sodium is not available');
+           self::markTestSkipped('Sodium is not available');
         }
 
         $factory = new PasswordHasherFactory([
@@ -169,7 +169,7 @@ class PasswordHasherFactoryTest extends TestCase
     public function testMigrateFromLegacy()
     {
         if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Sodium is not available');
+           self::markTestSkipped('Sodium is not available');
         }
 
         $factory = new PasswordHasherFactory([

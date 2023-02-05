@@ -60,7 +60,7 @@ class ChainAdapterTest extends AdapterTestCase
     public function testPrune()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = new ChainAdapter([
@@ -81,7 +81,7 @@ class ChainAdapterTest extends AdapterTestCase
     public function testMultipleCachesExpirationWhenCommonTtlIsNotSet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $adapter1 = new ArrayAdapter(4);
@@ -137,7 +137,7 @@ class ChainAdapterTest extends AdapterTestCase
     public function testMultipleCachesExpirationWhenCommonTtlIsSet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $adapter1 = new ArrayAdapter(4);
@@ -199,7 +199,7 @@ class ChainAdapterTest extends AdapterTestCase
     public function testExpirationOnAllAdapters()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $itemValidator = function (CacheItem $item) {

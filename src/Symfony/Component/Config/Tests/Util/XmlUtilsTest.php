@@ -37,7 +37,7 @@ class XmlUtilsTest extends TestCase
 
         try {
             if ('\\' === \DIRECTORY_SEPARATOR) {
-                $this->markTestSkipped('chmod is not supported on Windows');
+               self::markTestSkipped('chmod is not supported on Windows');
             }
             chmod($fixtures.'not_readable.xml', 000);
             XmlUtils::loadFile($fixtures.'not_readable.xml');

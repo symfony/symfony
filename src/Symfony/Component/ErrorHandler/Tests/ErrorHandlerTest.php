@@ -343,7 +343,7 @@ class ErrorHandlerTest extends TestCase
     public function testHandleUserError()
     {
         if (\PHP_VERSION_ID >= 70400) {
-            $this->markTestSkipped('PHP 7.4 allows __toString to throw exceptions');
+           self::markTestSkipped('PHP 7.4 allows __toString to throw exceptions');
         }
 
         try {
@@ -662,7 +662,7 @@ class ErrorHandlerTest extends TestCase
     public function testAssertQuietEval()
     {
         if ('-1' === \ini_get('zend.assertions')) {
-            $this->markTestSkipped('zend.assertions is forcibly disabled');
+           self::markTestSkipped('zend.assertions is forcibly disabled');
         }
 
         $ini = [

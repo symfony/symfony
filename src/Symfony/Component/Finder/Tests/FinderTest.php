@@ -97,7 +97,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testSymlinksNotResolved()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('symlinks are not supported on Windows');
+           self::markTestSkipped('symlinks are not supported on Windows');
         }
 
         $finder = $this->buildFinder();
@@ -871,7 +871,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testFollowLinks()
     {
         if ('\\' == \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('symlinks are not supported on Windows');
+           self::markTestSkipped('symlinks are not supported on Windows');
         }
 
         $finder = $this->buildFinder();
@@ -948,7 +948,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testInWithGlobBrace()
     {
         if (!\defined('GLOB_BRACE')) {
-            $this->markTestSkipped('Glob brace is not supported on this system.');
+           self::markTestSkipped('Glob brace is not supported on this system.');
         }
 
         $finder = $this->buildFinder();
@@ -1388,7 +1388,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testAccessDeniedException()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('chmod is not supported on Windows');
+           self::markTestSkipped('chmod is not supported on Windows');
         }
 
         $finder = $this->buildFinder();
@@ -1417,14 +1417,14 @@ class FinderTest extends Iterator\RealIteratorTestCase
         clearstatcache(true, $testDir);
 
         if ($couldRead) {
-            $this->markTestSkipped('could read test files while test requires unreadable');
+           self::markTestSkipped('could read test files while test requires unreadable');
         }
     }
 
     public function testIgnoredAccessDeniedException()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('chmod is not supported on Windows');
+           self::markTestSkipped('chmod is not supported on Windows');
         }
 
         $finder = $this->buildFinder();
@@ -1456,7 +1456,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         clearstatcache(true, $testDir);
 
         if ($couldRead) {
-            $this->markTestSkipped('could read test files while test requires unreadable');
+           self::markTestSkipped('could read test files while test requires unreadable');
         }
     }
 

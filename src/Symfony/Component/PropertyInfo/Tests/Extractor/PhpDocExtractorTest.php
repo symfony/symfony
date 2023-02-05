@@ -160,7 +160,7 @@ class PhpDocExtractorTest extends TestCase
     public function testExtractCollection($property, array $type = null, $shortDescription, $longDescription)
     {
         if (!class_exists(Collection::class)) {
-            $this->markTestSkipped('Collections are not implemented in current phpdocumentor/type-resolver version');
+           self::markTestSkipped('Collections are not implemented in current phpdocumentor/type-resolver version');
         }
 
         $this->testExtract($property, $type, $shortDescription, $longDescription);

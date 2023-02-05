@@ -147,7 +147,7 @@ class EncoderFactoryTest extends TestCase
     public function testMigrateFrom()
     {
         if (!SodiumPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Sodium is not available');
+           self::markTestSkipped('Sodium is not available');
         }
 
         $factory = new EncoderFactory([

@@ -24,7 +24,7 @@ class AmazonSqsIntegrationTest extends TestCase
     public function testConnectionSendToFifoQueueAndGet()
     {
         if (!getenv('MESSENGER_SQS_FIFO_QUEUE_DSN')) {
-            $this->markTestSkipped('The "MESSENGER_SQS_FIFO_QUEUE_DSN" environment variable is required.');
+           self::markTestSkipped('The "MESSENGER_SQS_FIFO_QUEUE_DSN" environment variable is required.');
         }
 
         $this->execute(getenv('MESSENGER_SQS_FIFO_QUEUE_DSN'));
@@ -33,7 +33,7 @@ class AmazonSqsIntegrationTest extends TestCase
     public function testConnectionSendAndGet()
     {
         if (!getenv('MESSENGER_SQS_DSN')) {
-            $this->markTestSkipped('The "MESSENGER_SQS_DSN" environment variable is required.');
+           self::markTestSkipped('The "MESSENGER_SQS_DSN" environment variable is required.');
         }
 
         $this->execute(getenv('MESSENGER_SQS_DSN'));

@@ -38,7 +38,7 @@ class FlockStoreTest extends AbstractStoreTest
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
-            $this->markTestSkipped('This test will fail if run under superuser');
+           self::markTestSkipped('This test will fail if run under superuser');
         }
 
         new FlockStore('/a/b/c/d/e');
@@ -49,7 +49,7 @@ class FlockStoreTest extends AbstractStoreTest
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The FlockStore directory "/" is not writable.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
-            $this->markTestSkipped('This test will fail if run under superuser');
+           self::markTestSkipped('This test will fail if run under superuser');
         }
 
         new FlockStore('/');

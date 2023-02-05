@@ -48,7 +48,7 @@ class SendmailTransportTest extends TestCase
     public function testToIsUsedWhenRecipientsAreNotSet()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
+           self::markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
         }
 
         $mail = new Email();
@@ -70,7 +70,7 @@ class SendmailTransportTest extends TestCase
     public function testRecipientsAreUsedWhenSet()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
+           self::markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');
         }
 
         $mail = new Email();

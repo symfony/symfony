@@ -21,7 +21,7 @@ class TranslationDataCollectorTest extends TestCase
     protected function setUp(): void
     {
         if (!class_exists(DataCollector::class)) {
-            $this->markTestSkipped('The "DataCollector" is not available');
+           self::markTestSkipped('The "DataCollector" is not available');
         }
     }
 

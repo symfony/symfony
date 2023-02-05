@@ -171,7 +171,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testFormsCsrfIsEnabledByDefault()
     {
         if (class_exists(FullStack::class)) {
-            $this->markTestSkipped('testing with the FullStack prevents verifying default values');
+           self::markTestSkipped('testing with the FullStack prevents verifying default values');
         }
         $container = $this->createContainerFromFile('form_default_csrf');
 
@@ -1215,7 +1215,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testFileLinkFormat()
     {
         if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
-            $this->markTestSkipped('A custom file_link_format is defined.');
+           self::markTestSkipped('A custom file_link_format is defined.');
         }
 
         $container = $this->createContainerFromFile('full');
@@ -1357,7 +1357,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testValidationAutoMapping()
     {
         if (!class_exists(PropertyInfoLoader::class)) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
+           self::markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
         }
 
         $container = $this->createContainerFromFile('validation_auto_mapping');
@@ -2054,7 +2054,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testIfNotifierTransportsAreKnownByFrameworkExtension()
     {
         if (!class_exists(FullStack::class)) {
-            $this->markTestSkipped('This test can only run in fullstack test suites');
+           self::markTestSkipped('This test can only run in fullstack test suites');
         }
 
         $container = $this->createContainerFromFile('notifier');

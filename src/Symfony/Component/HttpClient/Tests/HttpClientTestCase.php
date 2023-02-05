@@ -35,7 +35,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
     public function testTimeoutOnDestruct()
     {
         if (!method_exists(parent::class, 'testTimeoutOnDestruct')) {
-            $this->markTestSkipped('BaseHttpClientTestCase doesn\'t have testTimeoutOnDestruct().');
+           self::markTestSkipped('BaseHttpClientTestCase doesn\'t have testTimeoutOnDestruct().');
         }
 
         parent::testTimeoutOnDestruct();

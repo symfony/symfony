@@ -114,7 +114,7 @@ class FormLoginTest extends AbstractWebTestCase
     public function testLoginThrottling()
     {
         if (!class_exists(LoginThrottlingListener::class)) {
-            $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
+           self::markTestSkipped('Login throttling requires symfony/security-http:^5.2');
         }
 
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml', 'enable_authenticator_manager' => true]);
@@ -257,7 +257,7 @@ class FormLoginTest extends AbstractWebTestCase
     public function testLegacyLoginThrottling()
     {
         if (!class_exists(LoginThrottlingListener::class)) {
-            $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
+           self::markTestSkipped('Login throttling requires symfony/security-http:^5.2');
         }
 
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_login_throttling.yml', 'enable_authenticator_manager' => true]);

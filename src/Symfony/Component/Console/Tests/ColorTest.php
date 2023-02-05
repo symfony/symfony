@@ -34,7 +34,7 @@ class ColorTest extends TestCase
     public function testTrueColors()
     {
         if ('truecolor' !== getenv('COLORTERM')) {
-            $this->markTestSkipped('True color not supported.');
+           self::markTestSkipped('True color not supported.');
         }
 
         $color = new Color('#fff', '#000');

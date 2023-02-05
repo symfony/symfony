@@ -317,42 +317,42 @@ class MockHttpClientTest extends HttpClientTestCase
                 });
 
             case 'testUnsupportedOption':
-                $this->markTestSkipped('MockHttpClient accepts any options by default');
+               self::markTestSkipped('MockHttpClient accepts any options by default');
                 break;
 
             case 'testChunkedEncoding':
-                $this->markTestSkipped("MockHttpClient doesn't dechunk");
+               self::markTestSkipped("MockHttpClient doesn't dechunk");
                 break;
 
             case 'testGzipBroken':
-                $this->markTestSkipped("MockHttpClient doesn't unzip");
+               self::markTestSkipped("MockHttpClient doesn't unzip");
                 break;
 
             case 'testTimeoutWithActiveConcurrentStream':
-                $this->markTestSkipped('Real transport required');
+               self::markTestSkipped('Real transport required');
                 break;
 
             case 'testTimeoutOnInitialize':
             case 'testTimeoutOnDestruct':
-                $this->markTestSkipped('Real transport required');
+               self::markTestSkipped('Real transport required');
                 break;
 
             case 'testDestruct':
-                $this->markTestSkipped("MockHttpClient doesn't timeout on destruct");
+               self::markTestSkipped("MockHttpClient doesn't timeout on destruct");
                 break;
 
             case 'testHandleIsRemovedOnException':
-                $this->markTestSkipped("MockHttpClient doesn't cache handles");
+               self::markTestSkipped("MockHttpClient doesn't cache handles");
                 break;
 
             case 'testPause':
             case 'testPauseReplace':
             case 'testPauseDuringBody':
-                $this->markTestSkipped("MockHttpClient doesn't support pauses by default");
+               self::markTestSkipped("MockHttpClient doesn't support pauses by default");
                 break;
 
             case 'testDnsFailure':
-                $this->markTestSkipped("MockHttpClient doesn't use a DNS");
+               self::markTestSkipped("MockHttpClient doesn't use a DNS");
                 break;
 
             case 'testGetRequest':
@@ -457,12 +457,12 @@ class MockHttpClientTest extends HttpClientTestCase
 
     public function testHttp2PushVulcain()
     {
-        $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+       self::markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
     }
 
     public function testHttp2PushVulcainWithUnusedResponse()
     {
-        $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
+       self::markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
     }
 
     public function testChangeResponseFactory()

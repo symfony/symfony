@@ -114,6 +114,6 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 
     public function provideComparisonsToNullValueAtPropertyPath()
     {
-        $this->markTestSkipped('DivisibleByValidator rejects null values.');
+       self::markTestSkipped('DivisibleByValidator rejects null values.');
     }
 }

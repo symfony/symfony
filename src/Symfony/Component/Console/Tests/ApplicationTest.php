@@ -509,12 +509,12 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
         $this->assertSame('
-                                                          
-  There are no commands defined in the "foos" namespace.  
-                                                          
-  Did you mean this?                                      
-      foo                                                 
-                                                          
+
+  There are no commands defined in the "foos" namespace.
+
+  Did you mean this?
+      foo
+
 
 ', $tester->getDisplay(true));
     }
@@ -1946,7 +1946,7 @@ class ApplicationTest extends TestCase
     public function testSetSignalsToDispatchEvent()
     {
         if (!\defined('SIGUSR1')) {
-            $this->markTestSkipped('SIGUSR1 not available');
+           self::markTestSkipped('SIGUSR1 not available');
         }
 
         $command = new BaseSignableCommand();
@@ -1970,7 +1970,7 @@ class ApplicationTest extends TestCase
     public function testSignalableCommandInterfaceWithoutSignals()
     {
         if (!\defined('SIGUSR1')) {
-            $this->markTestSkipped('SIGUSR1 not available');
+           self::markTestSkipped('SIGUSR1 not available');
         }
 
         $command = new SignableCommand(false);
@@ -1986,7 +1986,7 @@ class ApplicationTest extends TestCase
     public function testSignalableCommandHandlerCalledAfterEventListener()
     {
         if (!\defined('SIGUSR1')) {
-            $this->markTestSkipped('SIGUSR1 not available');
+           self::markTestSkipped('SIGUSR1 not available');
         }
 
         $command = new SignableCommand();
@@ -2008,11 +2008,11 @@ class ApplicationTest extends TestCase
     public function testSignalableRestoresStty()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('stty not available');
+           self::markTestSkipped('stty not available');
         }
 
         if (!SignalRegistry::isSupported()) {
-            $this->markTestSkipped('pcntl signals not available');
+           self::markTestSkipped('pcntl signals not available');
         }
 
         $previousSttyMode = shell_exec('stty -g');

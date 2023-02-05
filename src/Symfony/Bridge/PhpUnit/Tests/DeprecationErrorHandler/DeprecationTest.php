@@ -59,7 +59,7 @@ class DeprecationTest extends TestCase
         $r = new \ReflectionClass(Deprecation::class);
 
         if (\dirname($r->getFileName(), 2) !== \dirname(__DIR__, 2)) {
-            $this->markTestSkipped('Test case is not compatible with having the bridge in vendor/');
+           self::markTestSkipped('Test case is not compatible with having the bridge in vendor/');
         }
 
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);

@@ -74,12 +74,12 @@ class TerminalTest extends TestCase
     public function testSttyOnWindows()
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Must be on windows');
+           self::markTestSkipped('Must be on windows');
         }
 
         $sttyString = exec('(stty -a | grep columns) 2>&1', $output, $exitcode);
         if (0 !== $exitcode) {
-            $this->markTestSkipped('Must have stty support');
+           self::markTestSkipped('Must have stty support');
         }
 
         $matches = [];

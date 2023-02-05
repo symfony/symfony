@@ -136,7 +136,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
     public function testReuseEnvPlaceholderGeneratedByPreviousExtension()
     {
         if (!property_exists(BaseNode::class, 'placeholderUniquePrefixes')) {
-            $this->markTestSkipped('This test requires symfony/config ^4.4.11|^5.0.11|^5.1.3');
+           self::markTestSkipped('This test requires symfony/config ^4.4.11|^5.0.11|^5.1.3');
         }
 
         $container = new ContainerBuilder();

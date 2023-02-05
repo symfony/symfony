@@ -23,7 +23,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         try {
             $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
         } catch (\UnexpectedValueException $e) {
-            $this->markTestSkipped('Unsupported stream "ftp".');
+           self::markTestSkipped('Unsupported stream "ftp".');
         }
 
         $i->rewind();
@@ -39,7 +39,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         try {
             $i = new RecursiveDirectoryIterator('ftp://speedtest:speedtest@ftp.otenet.gr/', \RecursiveDirectoryIterator::SKIP_DOTS);
         } catch (\UnexpectedValueException $e) {
-            $this->markTestSkipped('Unsupported stream "ftp".');
+           self::markTestSkipped('Unsupported stream "ftp".');
         }
 
         $contains = [

@@ -370,7 +370,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     public function testFormatTimezone($pattern, $timezone, $expected)
     {
         if ((80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) && str_contains($timezone, 'GMT')) {
-            $this->markTestSkipped('Broken version of PHP');
+           self::markTestSkipped('Broken version of PHP');
         }
 
         $formatter = $this->getDefaultDateFormatter($pattern);
@@ -432,7 +432,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     public function testFormatWithGmtTimezone()
     {
         if (80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) {
-            $this->markTestSkipped('Broken version of PHP');
+           self::markTestSkipped('Broken version of PHP');
         }
 
         $formatter = $this->getDefaultDateFormatter('zzzz');
@@ -445,7 +445,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     public function testFormatWithGmtTimeZoneAndMinutesOffset()
     {
         if (80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) {
-            $this->markTestSkipped('Broken version of PHP');
+           self::markTestSkipped('Broken version of PHP');
         }
 
         $formatter = $this->getDefaultDateFormatter('zzzz');
@@ -492,7 +492,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     public function testFormatWithIntlTimeZone()
     {
         if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('Extension intl is required.');
+           self::markTestSkipped('Extension intl is required.');
         }
 
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, \IntlTimeZone::createTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
@@ -935,7 +935,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     public function testSetTimeZoneId($timeZoneId, $expectedTimeZoneId)
     {
         if ((80114 === \PHP_VERSION_ID || 80201 === \PHP_VERSION_ID) && str_contains($timeZoneId ?? '', 'GMT')) {
-            $this->markTestSkipped('Broken version of PHP');
+           self::markTestSkipped('Broken version of PHP');
         }
 
         $formatter = $this->getDefaultDateFormatter();

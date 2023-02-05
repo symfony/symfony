@@ -59,7 +59,7 @@ class HttpKernelExtensionTest extends TestCase
     public function testGenerateFragmentUri()
     {
         if (!class_exists(FragmentUriGenerator::class)) {
-            $this->markTestSkipped('HttpKernel 5.3+ is required');
+           self::markTestSkipped('HttpKernel 5.3+ is required');
         }
 
         $requestStack = new RequestStack();

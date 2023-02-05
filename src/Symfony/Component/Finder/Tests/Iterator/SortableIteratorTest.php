@@ -60,7 +60,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             || SortableIterator::SORT_BY_MODIFIED_TIME === $mode
         ) {
             if ('\\' === \DIRECTORY_SEPARATOR && SortableIterator::SORT_BY_MODIFIED_TIME !== $mode) {
-                $this->markTestSkipped('Sorting by atime or ctime is not supported on Windows');
+               self::markTestSkipped('Sorting by atime or ctime is not supported on Windows');
             }
             $this->assertOrderedIteratorForGroups($expected, $iterator);
         } else {

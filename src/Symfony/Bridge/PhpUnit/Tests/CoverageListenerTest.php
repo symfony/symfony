@@ -18,7 +18,7 @@ class CoverageListenerTest extends TestCase
     public function test()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test cannot be run on Windows.');
+           self::markTestSkipped('This test cannot be run on Windows.');
         }
 
         exec('type phpdbg 2> /dev/null', $output, $returnCode);
@@ -28,7 +28,7 @@ class CoverageListenerTest extends TestCase
         } else {
             exec('php --ri xdebug -d zend_extension=xdebug.so 2> /dev/null', $output, $returnCode);
             if (0 !== $returnCode) {
-                $this->markTestSkipped('Xdebug is required to run this test.');
+               self::markTestSkipped('Xdebug is required to run this test.');
             }
             $php = 'php -d zend_extension=xdebug.so';
         }

@@ -90,7 +90,7 @@ class IntegerTypeTest extends BaseTypeTest
     public function testSubmittedLargeIntegersAreNotCastToFloat()
     {
         if (4 === \PHP_INT_SIZE) {
-            $this->markTestSkipped('This test requires a 64bit PHP.');
+           self::markTestSkipped('This test requires a 64bit PHP.');
         }
 
         $form = $this->factory->create(static::TESTED_TYPE);

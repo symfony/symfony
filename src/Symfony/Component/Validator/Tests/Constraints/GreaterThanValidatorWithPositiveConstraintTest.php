@@ -75,24 +75,24 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires either the "value" or "propertyPath" option to be set.');
-        $this->markTestSkipped('Value option always set for Positive constraint.');
+       self::markTestSkipped('Value option always set for Positive constraint.');
     }
 
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "value" or "propertyPath" options to be set, not both.');
-        $this->markTestSkipped('Value option is set for Positive constraint automatically');
+       self::markTestSkipped('Value option is set for Positive constraint automatically');
     }
 
     public function testNoViolationOnNullObjectWithPropertyPath()
     {
-        $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
+       self::markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
     public function testInvalidValuePath()
     {
-        $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
+       self::markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
     /**
@@ -100,7 +100,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
      */
     public function testValidComparisonToPropertyPath($comparedValue)
     {
-        $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
+       self::markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
     /**
@@ -108,11 +108,11 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
      */
     public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
     {
-        $this->markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
+       self::markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
     }
 
     public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
     {
-        $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
+       self::markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 }

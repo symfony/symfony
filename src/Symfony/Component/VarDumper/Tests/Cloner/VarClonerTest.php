@@ -82,7 +82,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => stdClass
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -101,7 +101,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => stdClass
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -116,7 +116,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => stdClass
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -331,7 +331,7 @@ EOTXT;
     public function testJsonCast()
     {
         if (2 == \ini_get('xdebug.overload_var_dump')) {
-            $this->markTestSkipped('xdebug is active');
+           self::markTestSkipped('xdebug is active');
         }
 
         $data = (array) json_decode('{"1":{}}');
@@ -421,7 +421,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => %s
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -479,7 +479,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => Symfony\Component\VarDumper\Tests\Fixtures\Php74
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -500,12 +500,12 @@ Symfony\Component\VarDumper\Cloner\Data Object
                     [p2] => Symfony\Component\VarDumper\Cloner\Stub Object
                         (
                             [type] => 1
-                            [class] => 
+                            [class] =>
                             [value] => Symfony\Component\VarDumper\Cloner\Stub Object
                                 (
                                     [type] => 4
                                     [class] => stdClass
-                                    [value] => 
+                                    [value] =>
                                     [cut] => 0
                                     [handle] => %i
                                     [refCount] => 1
@@ -529,12 +529,12 @@ Symfony\Component\VarDumper\Cloner\Data Object
                     [p3] => Symfony\Component\VarDumper\Cloner\Stub Object
                         (
                             [type] => 1
-                            [class] => 
+                            [class] =>
                             [value] => Symfony\Component\VarDumper\Cloner\Stub Object
                                 (
                                     [type] => 4
                                     [class] => stdClass
-                                    [value] => 
+                                    [value] =>
                                     [cut] => 0
                                     [handle] => %i
                                     [refCount] => 1
@@ -595,7 +595,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => Symfony\Component\VarDumper\Tests\Fixtures\Php81Enums
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -616,7 +616,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => Symfony\Component\VarDumper\Tests\Fixtures\UnitEnumFixture
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -633,7 +633,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => Symfony\Component\VarDumper\Tests\Fixtures\BackedEnumFixture
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0

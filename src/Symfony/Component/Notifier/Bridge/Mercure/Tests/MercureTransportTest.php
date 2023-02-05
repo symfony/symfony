@@ -62,17 +62,17 @@ final class MercureTransportTest extends TransportTestCase
 
     public function testCanSetCustomPort()
     {
-        $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
+       self::markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
     public function testCanSetCustomHost()
     {
-        $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
+       self::markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
     public function testCanSetCustomHostAndPort()
     {
-        $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
+       self::markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
     public function testConstructWithWrongTopicsThrows()

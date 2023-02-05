@@ -419,7 +419,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         try {
             $file->getMimeType();
         } catch (\LogicException $e) {
-            $this->markTestSkipped('Guessing the mime type is not possible');
+           self::markTestSkipped('Guessing the mime type is not possible');
         }
 
         $response = new BinaryFileResponse($file);

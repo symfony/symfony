@@ -32,7 +32,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     protected function setUp(): void
     {
         if (!\extension_loaded('intl')) {
-            $this->markTestSkipped('Extension intl is required.');
+           self::markTestSkipped('Extension intl is required.');
         }
 
         $this->defaultLocale = \Locale::getDefault();
@@ -125,7 +125,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function renderHelp(FormView $view)
     {
-        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', static::class));
+       self::markTestSkipped(sprintf('%s::renderHelp() is not implemented.', static::class));
     }
 
     abstract protected function renderErrors(FormView $view);

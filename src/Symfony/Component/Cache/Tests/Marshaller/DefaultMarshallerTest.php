@@ -44,7 +44,7 @@ class DefaultMarshallerTest extends TestCase
     public function testIgbinaryUnserialize()
     {
         if (\PHP_VERSION_ID >= 70400 && version_compare('3.1.6', phpversion('igbinary'), '>')) {
-            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.');
+           self::markTestSkipped('igbinary is not compatible with PHP 7.4.');
         }
 
         $marshaller = new DefaultMarshaller();
@@ -68,7 +68,7 @@ class DefaultMarshallerTest extends TestCase
     public function testIgbinaryUnserializeNotFoundClass()
     {
         if (\PHP_VERSION_ID >= 70400 && version_compare('3.1.6', phpversion('igbinary'), '>')) {
-            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.');
+           self::markTestSkipped('igbinary is not compatible with PHP 7.4.');
         }
 
         $this->expectException(\DomainException::class);
@@ -96,7 +96,7 @@ class DefaultMarshallerTest extends TestCase
     public function testIgbinaryUnserializeInvalid()
     {
         if (\PHP_VERSION_ID >= 70400 && version_compare('3.1.6', phpversion('igbinary'), '>')) {
-            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.');
+           self::markTestSkipped('igbinary is not compatible with PHP 7.4.');
         }
 
         $this->expectException(\DomainException::class);

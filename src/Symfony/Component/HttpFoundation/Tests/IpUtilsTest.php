@@ -52,7 +52,7 @@ class IpUtilsTest extends TestCase
     public function testIpv6($matches, $remoteAddr, $cidr)
     {
         if (!\defined('AF_INET6')) {
-            $this->markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
+           self::markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
         }
 
         $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
@@ -116,7 +116,7 @@ class IpUtilsTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         if (\defined('AF_INET6')) {
-            $this->markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
+           self::markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
         }
 
         IpUtils::checkIp('2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65');

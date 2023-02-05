@@ -632,7 +632,7 @@ class TimezonesTest extends ResourceBundleTestCase
             $this->addToAssertionCount(1);
         } catch (MissingResourceException $e) {
             if (\in_array($timezone, self::ZONES_NO_COUNTRY, true)) {
-                $this->markTestSkipped();
+               self::markTestSkipped();
             } else {
                 $this->fail();
             }

@@ -51,7 +51,7 @@ class AutowireRequiredPropertiesPassTest extends TestCase
     public function testAttribute()
     {
         if (!class_exists(Required::class)) {
-            $this->markTestSkipped('symfony/service-contracts 2.2 required');
+           self::markTestSkipped('symfony/service-contracts 2.2 required');
         }
 
         $container = new ContainerBuilder();

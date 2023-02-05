@@ -21,7 +21,7 @@ class SodiumPasswordHasherTest extends TestCase
     protected function setUp(): void
     {
         if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+           self::markTestSkipped('Libsodium is not available.');
         }
     }
 

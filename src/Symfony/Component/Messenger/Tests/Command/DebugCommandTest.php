@@ -71,33 +71,33 @@ command_bus
 
  The following messages can be dispatched:
 
- ----------------------------------------------------------------------------------------------------------- 
-  Symfony\Component\Messenger\Tests\Fixtures\DummyCommand                                                    
-      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler (when option1=1, option2=2)  
-                                                                                                             
-  Used whenever a test needs to show a message with a class description.                                     
-  Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithDescription                                     
-      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithDescriptionHandler               
-                 Used whenever a test needs to show a message handler with a class description.              
-                                                                                                             
-  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                                            
-      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler                      
-                                                                                                             
- ----------------------------------------------------------------------------------------------------------- 
+ -----------------------------------------------------------------------------------------------------------
+  Symfony\Component\Messenger\Tests\Fixtures\DummyCommand
+      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler (when option1=1, option2=2)
+
+  Used whenever a test needs to show a message with a class description.
+  Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithDescription
+      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithDescriptionHandler
+                 Used whenever a test needs to show a message handler with a class description.
+
+  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage
+      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler
+
+ -----------------------------------------------------------------------------------------------------------
 
 query_bus
 ---------
 
  The following messages can be dispatched:
 
- --------------------------------------------------------------------------------------- 
-  Symfony\Component\Messenger\Tests\Fixtures\DummyQuery                                  
-      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler            
-                                                                                         
-  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                        
-      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler  
-                                                                                         
- --------------------------------------------------------------------------------------- 
+ ---------------------------------------------------------------------------------------
+  Symfony\Component\Messenger\Tests\Fixtures\DummyQuery
+      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler
+
+  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage
+      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler
+
+ ---------------------------------------------------------------------------------------
 
 
 TXT
@@ -116,14 +116,14 @@ query_bus
 
  The following messages can be dispatched:
 
- --------------------------------------------------------------------------------------- 
-  Symfony\Component\Messenger\Tests\Fixtures\DummyQuery                                  
-      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler            
-                                                                                         
-  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                        
-      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler  
-                                                                                         
- --------------------------------------------------------------------------------------- 
+ ---------------------------------------------------------------------------------------
+  Symfony\Component\Messenger\Tests\Fixtures\DummyQuery
+      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler
+
+  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage
+      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler
+
+ ---------------------------------------------------------------------------------------
 
 
 TXT
@@ -146,12 +146,12 @@ Messenger
 command_bus
 -----------
 
- [WARNING] No handled message found in bus "command_bus".                                                               
+ [WARNING] No handled message found in bus "command_bus".
 
 query_bus
 ---------
 
- [WARNING] No handled message found in bus "query_bus".                                                                 
+ [WARNING] No handled message found in bus "query_bus".
 
 
 TXT
@@ -175,7 +175,7 @@ TXT
     public function testComplete(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+           self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);

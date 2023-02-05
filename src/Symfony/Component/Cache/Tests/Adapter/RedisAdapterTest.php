@@ -53,7 +53,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public function testCreateSocketConnection()
     {
         if (!getenv('REDIS_SOCKET') || !file_exists(getenv('REDIS_SOCKET'))) {
-            $this->markTestSkipped('Redis socket not found');
+           self::markTestSkipped('Redis socket not found');
         }
 
         $this->doTestCreateConnection(getenv('REDIS_SOCKET'));

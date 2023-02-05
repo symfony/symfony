@@ -49,7 +49,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     public function testBytesAt(array $expected, string $string, int $offset, int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
-            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+           self::markTestSkipped('Skipping due to issue ICU-21661.');
         }
 
         $instance = static::createFromString($string);
@@ -174,7 +174,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     public function testLength(int $length, string $string)
     {
         if (2 !== grapheme_strlen('च्छे') && 'अनुच्छेद' === $string) {
-            $this->markTestSkipped('Skipping due to issue ICU-21661.');
+           self::markTestSkipped('Skipping due to issue ICU-21661.');
         }
 
         $instance = static::createFromString($string);

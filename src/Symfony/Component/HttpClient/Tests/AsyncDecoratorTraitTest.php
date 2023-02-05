@@ -28,7 +28,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
     protected function getHttpClient(string $testCase, \Closure $chunkFilter = null, HttpClientInterface $decoratedClient = null): HttpClientInterface
     {
         if ('testHandleIsRemovedOnException' === $testCase) {
-            $this->markTestSkipped("AsyncDecoratorTrait doesn't cache handles");
+           self::markTestSkipped("AsyncDecoratorTrait doesn't cache handles");
         }
 
         if ('testTimeoutOnDestruct' === $testCase) {
@@ -58,7 +58,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
     public function testTimeoutOnDestruct()
     {
         if (HttpClient::create() instanceof NativeHttpClient) {
-            $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
+           self::markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
         }
 
         HttpClientTestCase::testTimeoutOnDestruct();

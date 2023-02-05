@@ -42,7 +42,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     protected function setUp(): void
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
+           self::markTestSkipped('This test requires symfony/security-http:^5.1');
         }
 
         $this->ldap = $this->createMock(LdapInterface::class);
@@ -62,7 +62,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     public function provideShouldNotCheckPassport()
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
+           self::markTestSkipped('This test requires symfony/security-http:^5.1');
         }
 
         // no LdapBadge
@@ -111,7 +111,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     public function provideWrongPassportData()
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-http:^5.1');
+           self::markTestSkipped('This test requires symfony/security-http:^5.1');
         }
 
         // no password credentials

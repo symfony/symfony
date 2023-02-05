@@ -509,7 +509,7 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testEncodersWithLibsodium()
     {
         if (!SodiumPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+           self::markTestSkipped('Libsodium is not available.');
         }
 
         $container = $this->getContainer('sodium_encoder');
@@ -565,7 +565,7 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testEncodersWithArgon2i()
     {
         if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm is not supported.');
+           self::markTestSkipped('Argon2i algorithm is not supported.');
         }
 
         $container = $this->getContainer('argon2i_encoder');
@@ -621,7 +621,7 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testMigratingEncoder()
     {
         if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm is not supported.');
+           self::markTestSkipped('Argon2i algorithm is not supported.');
         }
 
         $container = $this->getContainer('migrating_encoder');
@@ -791,7 +791,7 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testHashersWithLibsodium()
     {
         if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+           self::markTestSkipped('Libsodium is not available.');
         }
 
         $container = $this->getContainer('sodium_hasher');
@@ -844,7 +844,7 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testHashersWithArgon2i()
     {
         if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm is not supported.');
+           self::markTestSkipped('Argon2i algorithm is not supported.');
         }
 
         $container = $this->getContainer('argon2i_hasher');
@@ -897,7 +897,7 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testMigratingHasher()
     {
         if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm is not supported.');
+           self::markTestSkipped('Argon2i algorithm is not supported.');
         }
 
         $container = $this->getContainer('migrating_hasher');

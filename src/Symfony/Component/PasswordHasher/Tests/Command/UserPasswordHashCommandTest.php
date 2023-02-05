@@ -68,7 +68,7 @@ class UserPasswordHashCommandTest extends TestCase
     public function testEncodePasswordArgon2i()
     {
         if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
+           self::markTestSkipped('Argon2i algorithm not available.');
         }
         $this->setupArgon2i();
         $this->passwordHasherCommandTester->execute([
@@ -88,7 +88,7 @@ class UserPasswordHashCommandTest extends TestCase
     public function testEncodePasswordArgon2id()
     {
         if (!($sodium = (SodiumPasswordHasher::isSupported() && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13'))) && !\defined('PASSWORD_ARGON2ID')) {
-            $this->markTestSkipped('Argon2id algorithm not available.');
+           self::markTestSkipped('Argon2id algorithm not available.');
         }
         $this->setupArgon2id();
         $this->passwordHasherCommandTester->execute([
@@ -124,7 +124,7 @@ class UserPasswordHashCommandTest extends TestCase
     public function testEncodePasswordSodium()
     {
         if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+           self::markTestSkipped('Libsodium is not available.');
         }
         $this->setupSodium();
         $this->passwordHasherCommandTester->execute([
@@ -197,7 +197,7 @@ class UserPasswordHashCommandTest extends TestCase
     public function testEncodePasswordArgon2iOutput()
     {
         if (!(SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
+           self::markTestSkipped('Argon2i algorithm not available.');
         }
 
         $this->setupArgon2i();
@@ -212,7 +212,7 @@ class UserPasswordHashCommandTest extends TestCase
     public function testEncodePasswordArgon2idOutput()
     {
         if (!(SodiumPasswordHasher::isSupported() && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2ID')) {
-            $this->markTestSkipped('Argon2id algorithm not available.');
+           self::markTestSkipped('Argon2id algorithm not available.');
         }
 
         $this->setupArgon2id();
@@ -227,7 +227,7 @@ class UserPasswordHashCommandTest extends TestCase
     public function testEncodePasswordSodiumOutput()
     {
         if (!SodiumPasswordHasher::isSupported()) {
-            $this->markTestSkipped('Libsodium is not available.');
+           self::markTestSkipped('Libsodium is not available.');
         }
 
         $this->setupSodium();
@@ -293,7 +293,7 @@ EOTXT
     public function testCompletionSuggestions(array $input, array $expectedSuggestions)
     {
         if (!class_exists(CommandCompletionTester::class)) {
-            $this->markTestSkipped('Test command completion requires symfony/console 5.4+.');
+           self::markTestSkipped('Test command completion requires symfony/console 5.4+.');
         }
 
         $command = new UserPasswordHashCommand($this->createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);

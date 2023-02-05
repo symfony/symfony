@@ -121,7 +121,7 @@ trait CallbacksTestTrait
 
         $obj = new CallbacksObject();
 
-        $this->markTestSkipped('Callback validation for callbacks in the context has been forgotten. See https://github.com/symfony/symfony/pull/30950');
+       self::markTestSkipped('Callback validation for callbacks in the context has been forgotten. See https://github.com/symfony/symfony/pull/30950');
         $this->expectException(InvalidArgumentException::class);
         $normalizer->normalize($obj, null, ['callbacks' => $callbacks]);
     }

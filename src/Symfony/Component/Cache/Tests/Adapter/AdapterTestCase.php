@@ -43,7 +43,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testGet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool();
@@ -91,7 +91,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testRecursiveGet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -111,7 +111,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testDontSaveWhenAskedNotTo()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -137,7 +137,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testGetMetadata()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -162,7 +162,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testDefaultLifeTime()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(2);
@@ -183,7 +183,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testExpiration()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool();
@@ -203,7 +203,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testNotUnserializable()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool();
@@ -226,7 +226,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testPrune()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         if (!method_exists($this, 'isPruned')) {
@@ -292,7 +292,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testClearPrefix()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);
@@ -312,7 +312,7 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testWeirdDataMatchingMetadataWrappedValues()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
-            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+           self::markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
         $cache = $this->createCachePool(0, __FUNCTION__);

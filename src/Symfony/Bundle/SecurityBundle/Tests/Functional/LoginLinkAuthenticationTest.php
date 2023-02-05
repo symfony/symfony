@@ -25,7 +25,7 @@ class LoginLinkAuthenticationTest extends AbstractWebTestCase
     public function testLoginLinkSuccess()
     {
         if (!class_exists(LoginLinkHandler::class)) {
-            $this->markTestSkipped('Login link auth requires symfony/security-http:^5.2');
+           self::markTestSkipped('Login link auth requires symfony/security-http:^5.2');
         }
 
         $client = $this->createClient(['test_case' => 'LoginLink', 'root_config' => 'config.yml', 'debug' => true]);

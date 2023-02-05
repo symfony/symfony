@@ -189,7 +189,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskWithAutocomplete()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         // Acm<NEWLINE>
@@ -224,7 +224,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskWithAutocompleteTrimmable()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         // Acm<NEWLINE>
@@ -258,7 +258,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskWithAutocompleteCallback()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         // Po<TAB>Cr<TAB>P<DOWN ARROW><DOWN ARROW><NEWLINE>
@@ -301,7 +301,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskWithAutocompleteWithNonSequentialKeys()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         // <UP ARROW><UP ARROW><NEWLINE><DOWN ARROW><DOWN ARROW><NEWLINE>
@@ -320,7 +320,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskWithAutocompleteWithExactMatch()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         $inputStream = $this->getInputStream("b\n");
@@ -356,7 +356,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskWithAutocompleteWithMultiByteCharacter($character)
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         $inputStream = $this->getInputStream("$character\n");
@@ -380,7 +380,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAutocompleteWithTrailingBackslash()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         $inputStream = $this->getInputStream('E');
@@ -419,7 +419,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskHiddenResponse()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is not supported on Windows');
+           self::markTestSkipped('This test is not supported on Windows');
         }
 
         $dialog = new QuestionHelper();
@@ -433,7 +433,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskHiddenResponseTrimmed()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is not supported on Windows');
+           self::markTestSkipped('This test is not supported on Windows');
         }
 
         $dialog = new QuestionHelper();
@@ -818,7 +818,7 @@ EOD;
     public function testTraversableAutocomplete()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         // Acm<NEWLINE>
@@ -851,7 +851,7 @@ EOD;
     public function testDisableStty()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         $this->expectException(InvalidArgumentException::class);
@@ -880,7 +880,7 @@ EOD;
     public function testTraversableMultiselectAutocomplete()
     {
         if (!Terminal::hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+           self::markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
         // <NEWLINE>

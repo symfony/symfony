@@ -77,7 +77,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         $this->assertSame($user->getPassword(), $hashedPassword);
     }
 
-    public function testPasswordHashSuccessWitnEmptyData()
+    public function testPasswordHashSuccessWithEmptyData()
     {
         $user = new User();
 

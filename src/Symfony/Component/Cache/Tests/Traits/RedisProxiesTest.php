@@ -34,10 +34,15 @@ class RedisProxiesTest extends TestCase
             if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name)) {
                 continue;
             }
+            $args = [];
+            foreach ($method->getParameters() as $param) {
+                $args[] = ($param->isVariadic() ? '...' : '').'$'.$param->name;
+            }
+            $args = implode(', ', $args);
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
             $methods[] = "\n    ".ProxyHelper::exportSignature($method, false)."\n".<<<EOPHP
                 {
-                    {$return}\$this->lazyObjectReal->{$method->name}(...\\func_get_args());
+                    {$return}\$this->lazyObjectReal->{$method->name}({$args});
                 }
 
             EOPHP;
@@ -71,10 +76,15 @@ class RedisProxiesTest extends TestCase
             if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name)) {
                 continue;
             }
+            $args = [];
+            foreach ($method->getParameters() as $param) {
+                $args[] = ($param->isVariadic() ? '...' : '').'$'.$param->name;
+            }
+            $args = implode(', ', $args);
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
             $methods[] = "\n    ".ProxyHelper::exportSignature($method, false)."\n".<<<EOPHP
                 {
-                    {$return}\$this->lazyObjectReal->{$method->name}(...\\func_get_args());
+                    {$return}\$this->lazyObjectReal->{$method->name}({$args});
                 }
 
             EOPHP;

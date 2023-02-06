@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2023-02-05T16:30:07Z
+
+If you have more similar fixes, please consider gathering them in this PR :)
+
+---------------------------------------------------------------------------
+
+by alamirault at 2023-02-05T16:36:15Z
+
+I searched bad phpdoc for `...$` and found nothing else

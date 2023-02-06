@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-29T20:31:57Z
+
+Thanks, can you update the generated files in the same PR please?
+
+---------------------------------------------------------------------------
+
+by adnen-chouibi at 2023-01-30T11:15:25Z
+
+I suggest building a new file flag-emoji.php, to convert country codes to flags. This new feature could enhance the Intl component by adding a convenient method, such as Countries::getFlag('GB'), which would return 🇬🇧.
+
+---------------------------------------------------------------------------
+
+by stof at 2023-01-30T11:37:48Z
+
+@adnen-chouibi that feature does not depend on building a map. See https://github.com/thekelvinliu/country-code-emoji for the JS implementation of such a feature, which relies only on the knowledge of how emoji flags are encoded.
+This is not even a work for the symfony/intl component IMO.

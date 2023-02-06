@@ -125,19 +125,11 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
     public function testDescribeEnvVars()
     {
+        $_SERVER['SYMFONY_DOTENV_VARS']= 'APP_FOO,APP_BAR,APP_BAZ';
         putenv('REAL=value');
-
-        file_put_contents(__DIR__.'/app/.env', <<<EOF
-APP_EXAMPLE_ENV=example_value
-APP_EXAMPLE_ENV_TO_OVERRIDE=example_value
-EOF
-        );
-        file_put_contents(__DIR__.'/app/.env.local', <<<EOF
-APP_EXAMPLE_ENV_TO_OVERRIDE=example_overridden
-EOF
-        );
-
-        (new Dotenv())->bootEnv(__DIR__.'/app/.env');
+        putenv('APP_FOO=foo');
+        putenv('APP_BAR=bar');
+        putenv('APP_BAZ=baz');
 
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
@@ -154,16 +146,16 @@ EOF
 Symfony Container Environment Variables
 =======================================
 
- ----------------------------- ----------------- ---------------------- -------------%w
-  Name                          Default value     Real value             Usage count%w
- ----------------------------- ----------------- ---------------------- -------------%w
-  APP_ENV                       n/a               "dev"                  0%w
-  APP_EXAMPLE_ENV_TO_OVERRIDE   n/a               "example_overridden"   0%w
-  APP_EXAMPLE_ENV               n/a               "example_value"        0%w
-  JSON                          "[1, "2.5", 3]"   n/a                    1%w
-  REAL                          n/a               "value"                3%w
-  UNKNOWN                       n/a               n/a                    1%w
- ----------------------------- ----------------- ---------------------- -------------%w
+ --------- ----------------- ------------ -------------%w
+  Name      Default value     Real value   Usage count%w
+ --------- ----------------- ------------ -------------%w
+  APP_BAR   n/a               "bar"        0%w
+  APP_BAZ   n/a               "baz"        1%w
+  APP_FOO   "foo"             "foo"        1%w
+  JSON      "[1, "2.5", 3]"   n/a          2%w
+  REAL      n/a               "value"      3%w
+  UNKNOWN   n/a               n/a          1%w
+ --------- ----------------- ------------ -------------%w
 
  // Note real values might be different between web and CLI.%w
 
@@ -175,8 +167,9 @@ TXT
             , $tester->getDisplay(true));
 
         putenv('REAL');
-        @unlink(__DIR__.'/app/.env');
-        @unlink(__DIR__.'/app/.env.local');
+        putenv('APP_FOO');
+        putenv('APP_BAR');
+        putenv('APP_BAZ');
     }
 
     public function testDescribeEnvVar()

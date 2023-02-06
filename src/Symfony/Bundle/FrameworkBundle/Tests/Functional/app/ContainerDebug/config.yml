@@ -3,6 +3,7 @@ imports:
 
 parameters:
     env(JSON): '[1, "2.5", 3]'
+    env(APP_FOO): 'foo'
 
 services:
     _defaults: { public: true }
@@ -38,3 +39,4 @@ services:
         arguments:
             - '%env(REAL)%'
             - '%env(REAL)%'
+            - '%env(APP_BAZ)%'

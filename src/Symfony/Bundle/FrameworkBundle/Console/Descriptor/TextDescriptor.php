@@ -456,6 +456,7 @@ class TextDescriptor extends Descriptor
         $missing = [];
         foreach ($envs as $env) {
             if (isset($rows[$env['name']])) {
+                $rows[$env['name']][3] += $env['usage_count'];
                 continue;
             }
 
@@ -463,12 +464,17 @@ class TextDescriptor extends Descriptor
                 $env['name'],
                 $env['default_available'] ? $dump($env['default_value']) : 'n/a',
                 $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a',
-                $dump($env['usage_count']),
+                $env['usage_count'],
             ];
             if (!$env['default_available'] && !$env['runtime_available']) {
                 $missing[$env['name']] = true;
             }
         }
+
+        $rows = array_map(function ($row) use ($dump) {
+            $row[3] = $dump($row[3]);
+            return $row;
+        }, $rows);
 
         $options['output']->table(['Name', 'Default value', 'Real value', 'Usage count'], $rows);
         $options['output']->comment('Note real values might be different between web and CLI.');

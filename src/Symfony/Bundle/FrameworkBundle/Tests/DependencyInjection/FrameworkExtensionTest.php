@@ -18,6 +18,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -57,6 +58,9 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
+use Symfony\Component\Messenger\Transport\Serialization\IncomingMessageSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\OutgoingMessageSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer as MessengerTransportSerializer;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
@@ -1081,6 +1085,107 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->expectExceptionMessage('The "framework.messenger.reset_on_message" configuration option can be set to "true" only. To prevent services resetting after each message you can set the "--no-reset" option in "messenger:consume" command.');
 
         $this->createContainerFromFile('messenger_with_disabled_reset_on_message');
+    }
+
+    public function testMessengerTransportSerializerConfigurations()
+    {
+        $container = $this->createContainerFromFile('messenger_transport_serializer');
+
+        $transportDefinition = $container->getDefinition('messenger.transport.default_serializer');
+        $this->assertEquals(new Reference('messenger.default_serializer'), $transportDefinition->getArguments()[2]);
+
+        $transportDefinition = $container->getDefinition('messenger.transport.custom_serializer_short_notation');
+        $this->assertEquals(new Reference('messenger.transport.native_php_serializer'), $transportDefinition->getArguments()[2]);
+
+        $transportDefinition = $container->getDefinition('messenger.transport.custom_serializer_long_notation');
+        $this->assertEquals(new Reference('messenger.transport.native_php_serializer'), $transportDefinition->getArguments()[2]);
+
+        $transportDefinition = $container->getDefinition('messenger.transport.symfony_serializer_with_context');
+        $this->assertEquals(new Reference($serializerId = 'messenger.transport.symfony_serializer_with_context.serializer'), $transportDefinition->getArguments()[2]);
+        $serializerDefinition = $container->getDefinition($serializerId);
+        self::assertSame(MessengerTransportSerializer::class, $serializerDefinition->getClass());
+        self::assertEquals(
+            [
+                new Reference('my_fancy_serializer'),
+                'json',
+                ['some' => 'context'],
+            ],
+            $serializerDefinition->getArguments()
+        );
+
+        $transportDefinition = $container->getDefinition('messenger.transport.incoming_message_transport');
+        $this->assertEquals(new Reference($serializerId = 'messenger.transport.incoming_message_transport.serializer'), $transportDefinition->getArguments()[2]);
+        $serializerDefinition = $container->getDefinition($serializerId);
+        self::assertSame(IncomingMessageSerializer::class, $serializerDefinition->getClass());
+        self::assertEquals(
+            [
+                BarMessage::class,
+                new Reference('my_fancy_serializer'),
+                'json',
+                ['some' => 'context'],
+            ],
+            $serializerDefinition->getArguments()
+        );
+
+        $transportDefinition = $container->getDefinition('messenger.transport.incoming_message_transport_with_default_serializer');
+        $this->assertEquals(new Reference($serializerId = 'messenger.transport.incoming_message_transport_with_default_serializer.serializer'), $transportDefinition->getArguments()[2]);
+        $serializerDefinition = $container->getDefinition($serializerId);
+        self::assertSame(IncomingMessageSerializer::class, $serializerDefinition->getClass());
+        self::assertEquals(
+            [
+                new Reference('some_message_class_resolver_id'),
+                new Reference('serializer'),
+                'xml',
+                ['default' => 'context'],
+            ],
+            $serializerDefinition->getArguments()
+        );
+
+        $transportDefinition = $container->getDefinition('messenger.transport.outgoing_message_transport');
+        $this->assertEquals(new Reference($serializerId = 'messenger.transport.outgoing_message_transport.serializer'), $transportDefinition->getArguments()[2]);
+        $serializerDefinition = $container->getDefinition($serializerId);
+        self::assertSame(OutgoingMessageSerializer::class, $serializerDefinition->getClass());
+        self::assertEquals(
+            [
+                new Reference('my_fancy_serializer'),
+                'json',
+                ['some' => 'context'],
+            ],
+            $serializerDefinition->getArguments()
+        );
+
+        $transportDefinition = $container->getDefinition('messenger.transport.outgoing_message_transport_with_default_serializer');
+        $this->assertEquals(new Reference($serializerId = 'messenger.transport.outgoing_message_transport_with_default_serializer.serializer'), $transportDefinition->getArguments()[2]);
+        $serializerDefinition = $container->getDefinition($serializerId);
+        self::assertSame(OutgoingMessageSerializer::class, $serializerDefinition->getClass());
+        self::assertEquals(
+            [
+                new Reference('serializer'),
+                'xml',
+                ['default' => 'context'],
+            ],
+            $serializerDefinition->getArguments()
+        );
+    }
+
+    /**
+     * @dataProvider invalidMessengerTransportSerializerConfigurationsProvider
+     */
+    public function testInvalidMessengerTransportSerializerConfigurations(string $configFile, string $errorMessage)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($errorMessage);
+
+        $this->createContainerFromFile($configFile);
+    }
+
+    public function invalidMessengerTransportSerializerConfigurationsProvider(): iterable
+    {
+        yield ['messenger_transport_serializer_invalid_1', 'Only one of "serializer", "incoming_message_serializer" and "outgoing_message_serializer" could be used'];
+        yield ['messenger_transport_serializer_invalid_2', 'Either "service_id" OR at least one of "format" or "context" or "serializer" should be provided.'];
+        yield ['messenger_transport_serializer_invalid_3', 'Either "service_id" OR at least one of "format" or "context" or "serializer" should be provided.'];
+        yield ['messenger_transport_serializer_invalid_4', 'A message class OR a message class resolver should be provided.'];
+        yield ['messenger_transport_serializer_invalid_5', 'The "messageClass" should be a valid class.'];
     }
 
     public function testTranslator()

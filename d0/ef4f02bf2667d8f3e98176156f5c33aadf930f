@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-05T09:08:26Z
+
+Can you please update the screenshots to also include a `ChoiceType` with `expanded` set to `true`? Reason is that in this case the `ChoiceType` is also compound and I wonder if the layout would still look right then.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-02-05T09:39:35Z
+
+It looks like something for 6.3 instead.
+
+---------------------------------------------------------------------------
+
+by ttskch at 2023-02-05T09:51:02Z
+
+@xabbuh Thanks for your advice! You are right, there was a problem with my earlier code. I fixed it and re-pushed and also attached the complete usage code and screenshots to the description. Now I'm working on fixing some tests.
+
+> refs
+> https://github.com/symfony/symfony/blob/6.3/src/Symfony/Bridge/Twig/Resources/views/Form/bootstrap_4_layout.html.twig#L296
+
+---------------------------------------------------------------------------
+
+by ttskch at 2023-02-05T09:51:38Z
+
+@fabpot OK, I've just rebased.
+
+---------------------------------------------------------------------------
+
+by ttskch at 2023-02-05T23:04:59Z
+
+I've fixed some tests for this PR. `continuous-integration/appveyor/pr` was originally failed on the base 6.3 branch and is not fixed in this PR🤔

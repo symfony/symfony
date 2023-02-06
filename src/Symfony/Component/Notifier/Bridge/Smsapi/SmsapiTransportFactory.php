@@ -29,7 +29,7 @@ final class SmsapiTransportFactory extends AbstractTransportFactory
         }
 
         $authToken = $this->getUser($dsn);
-        $from = $dsn->getRequiredOption('from');
+        $from = $dsn->getOption('from', '');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $fast = filter_var($dsn->getOption('fast', false), \FILTER_VALIDATE_BOOL);
         $test = filter_var($dsn->getOption('test', false), \FILTER_VALIDATE_BOOL);

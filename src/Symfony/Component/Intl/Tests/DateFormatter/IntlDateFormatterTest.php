@@ -153,24 +153,24 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         parent::testFormatWithNonStandardTimezone();
     }
 
-    public function parseStandaloneAmPmProvider()
+    public static function parseStandaloneAmPmProvider()
     {
-        return $this->notImplemented(parent::parseStandaloneAmPmProvider());
+        return self::notImplemented(parent::parseStandaloneAmPmProvider());
     }
 
-    public function parseDayOfWeekProvider()
+    public static function parseDayOfWeekProvider()
     {
-        return $this->notImplemented(parent::parseDayOfWeekProvider());
+        return self::notImplemented(parent::parseDayOfWeekProvider());
     }
 
-    public function parseDayOfYearProvider()
+    public static function parseDayOfYearProvider()
     {
-        return $this->notImplemented(parent::parseDayOfYearProvider());
+        return self::notImplemented(parent::parseDayOfYearProvider());
     }
 
-    public function parseQuarterProvider()
+    public static function parseQuarterProvider()
     {
-        return $this->notImplemented(parent::parseQuarterProvider());
+        return self::notImplemented(parent::parseQuarterProvider());
     }
 
     public function testParseThreeDigitsYears()
@@ -221,7 +221,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
      * + 10 seconds) are added, then we have 86,400 seconds (24h * 60min * 60s)
      * + 10 seconds
      */
-    private function notImplemented(array $dataSets): array
+    private static function notImplemented(array $dataSets): array
     {
         return array_map(function (array $row) {
             return [$row[0], $row[1], 0];

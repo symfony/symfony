@@ -51,40 +51,40 @@ abstract class AbstractDescriptorTest extends TestCase
         $this->assertDescription($expectedDescription, $application);
     }
 
-    public function getDescribeInputArgumentTestData()
+    public static function getDescribeInputArgumentTestData()
     {
-        return $this->getDescriptionTestData(ObjectsProvider::getInputArguments());
+        return static::getDescriptionTestData(ObjectsProvider::getInputArguments());
     }
 
-    public function getDescribeInputOptionTestData()
+    public static function getDescribeInputOptionTestData()
     {
-        return $this->getDescriptionTestData(ObjectsProvider::getInputOptions());
+        return static::getDescriptionTestData(ObjectsProvider::getInputOptions());
     }
 
-    public function getDescribeInputDefinitionTestData()
+    public static function getDescribeInputDefinitionTestData()
     {
-        return $this->getDescriptionTestData(ObjectsProvider::getInputDefinitions());
+        return static::getDescriptionTestData(ObjectsProvider::getInputDefinitions());
     }
 
-    public function getDescribeCommandTestData()
+    public static function getDescribeCommandTestData()
     {
-        return $this->getDescriptionTestData(ObjectsProvider::getCommands());
+        return static::getDescriptionTestData(ObjectsProvider::getCommands());
     }
 
-    public function getDescribeApplicationTestData()
+    public static function getDescribeApplicationTestData()
     {
-        return $this->getDescriptionTestData(ObjectsProvider::getApplications());
+        return static::getDescriptionTestData(ObjectsProvider::getApplications());
     }
 
     abstract protected function getDescriptor();
 
-    abstract protected function getFormat();
+    abstract protected static function getFormat();
 
-    protected function getDescriptionTestData(array $objects)
+    protected static function getDescriptionTestData(array $objects)
     {
         $data = [];
         foreach ($objects as $name => $object) {
-            $description = file_get_contents(sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, $this->getFormat()));
+            $description = file_get_contents(sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, static::getFormat()));
             $data[] = [$object, $description];
         }
 

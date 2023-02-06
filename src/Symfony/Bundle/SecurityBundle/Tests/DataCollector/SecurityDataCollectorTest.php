@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
@@ -222,12 +223,17 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame(1, $listenerCalled);
     }
 
-    public function providerCollectDecisionLog(): \Generator
+    public static function providerCollectDecisionLog(): \Generator
     {
-        $voter1 = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
-        $voter2 = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+        $voter1 = new DummyVoter();
+        $voter2 = new DummyVoter();
 
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+        $eventDispatcher = new class() implements EventDispatcherInterface {
+            public function dispatch(object $event, string $eventName = null): object
+            {
+                return new \stdClass();
+            }
+        };
         $decoratedVoter1 = new TraceableVoter($voter1, $eventDispatcher);
 
         yield [
@@ -352,7 +358,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
-    public function provideRoles()
+    public static function provideRoles()
     {
         return [
             // Basic roles
@@ -381,5 +387,12 @@ class SecurityDataCollectorTest extends TestCase
             'ROLE_ADMIN' => ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
             'ROLE_OPERATOR' => ['ROLE_USER'],
         ]);
+    }
+}
+
+class DummyVoter implements VoterInterface
+{
+    public function vote(TokenInterface $token, $subject, array $attributes)
+    {
     }
 }

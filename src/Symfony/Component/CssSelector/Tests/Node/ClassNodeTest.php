@@ -16,14 +16,14 @@ use Symfony\Component\CssSelector\Node\ElementNode;
 
 class ClassNodeTest extends AbstractNodeTest
 {
-    public function getToStringConversionTestData()
+    public static function getToStringConversionTestData()
     {
         return [
             [new ClassNode(new ElementNode(), 'class'), 'Class[Element[*].class]'],
         ];
     }
 
-    public function getSpecificityValueTestData()
+    public static function getSpecificityValueTestData()
     {
         return [
             [new ClassNode(new ElementNode(), 'class'), 10],

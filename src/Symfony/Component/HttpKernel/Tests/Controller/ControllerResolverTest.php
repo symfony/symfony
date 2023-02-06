@@ -165,7 +165,7 @@ class ControllerResolverTest extends TestCase
         $resolver->getController($request);
     }
 
-    public function getUndefinedControllers()
+    public static function getUndefinedControllers()
     {
         $controller = new ControllerTest();
 

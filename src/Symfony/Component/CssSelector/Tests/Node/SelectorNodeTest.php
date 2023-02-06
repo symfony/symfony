@@ -14,7 +14,7 @@ namespace Symfony\Component\CssSelector\Tests\Node;
 use Symfony\Component\CssSelector\Node\ElementNode;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 
-class SelectorNodeTest extends AbstractNodeTest
+class SelectorNodeTest extends AbstractNodeTestCase
 {
     public function getToStringConversionTestData()
     {

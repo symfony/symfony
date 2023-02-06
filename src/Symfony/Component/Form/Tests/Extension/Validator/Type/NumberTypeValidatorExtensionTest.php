@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class NumberTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class NumberTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

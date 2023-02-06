@@ -15,7 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
 use Symfony\Component\Routing\Route;
 
-class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTest
+class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTestCase
 {
     protected function setUp(string $env = null): void
     {

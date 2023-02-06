@@ -16,7 +16,7 @@ use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\TokenStream;
 
-class CommentHandlerTest extends AbstractHandlerTest
+class CommentHandlerTest extends AbstractHandlerTestCase
 {
     /** @dataProvider getHandleValueTestData */
     public function testHandleValue($value, Token $unusedArgument, $remainingContent)

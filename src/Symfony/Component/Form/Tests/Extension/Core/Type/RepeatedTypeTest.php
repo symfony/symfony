@@ -15,7 +15,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\NotMappedType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
-class RepeatedTypeTest extends BaseTypeTest
+class RepeatedTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
 

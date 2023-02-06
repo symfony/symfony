@@ -30,7 +30,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 /**
  * @group tty
  */
-class QuestionHelperTest extends AbstractQuestionHelperTest
+class QuestionHelperTest extends AbstractQuestionHelperTestCase
 {
     public function testAskChoice()
     {

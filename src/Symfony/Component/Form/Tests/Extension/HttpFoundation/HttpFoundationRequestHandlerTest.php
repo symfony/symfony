@@ -13,14 +13,14 @@ namespace Symfony\Component\Form\Tests\Extension\HttpFoundation;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
-use Symfony\Component\Form\Tests\AbstractRequestHandlerTest;
+use Symfony\Component\Form\Tests\AbstractRequestHandlerTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
+class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTestCase
 {
     public function testRequestShouldNotBeNull()
     {

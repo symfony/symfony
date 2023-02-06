@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 /**
  * @group integration
  */
-class PredisAdapterSentinelTest extends AbstractRedisAdapterTest
+class PredisAdapterSentinelTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-class AnnotatedControllerTest extends AbstractAttributeRoutingTest
+class AnnotatedControllerTest extends AbstractAttributeRoutingTestCase
 {
     protected function getTestCaseApp(): string
     {

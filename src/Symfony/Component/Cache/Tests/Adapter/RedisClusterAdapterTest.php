@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Traits\RedisClusterProxy;
 /**
  * @group integration
  */
-class RedisClusterAdapterTest extends AbstractRedisAdapterTest
+class RedisClusterAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

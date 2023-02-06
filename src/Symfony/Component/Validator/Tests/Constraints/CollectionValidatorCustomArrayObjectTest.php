@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Tests\Fixtures\CustomArrayObject;
 
-class CollectionValidatorCustomArrayObjectTest extends CollectionValidatorTest
+class CollectionValidatorCustomArrayObjectTest extends CollectionValidatorTestCase
 {
     public function prepareTestData(array $contents)
     {

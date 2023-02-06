@@ -23,7 +23,7 @@ use Symfony\Component\Lock\Store\PdoStore;
  *
  * @group integration
  */
-class PdoStoreTest extends AbstractStoreTest
+class PdoStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 

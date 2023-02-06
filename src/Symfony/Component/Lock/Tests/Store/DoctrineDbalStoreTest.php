@@ -27,7 +27,7 @@ class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
  *
  * @requires extension pdo_sqlite
  */
-class DoctrineDbalStoreTest extends AbstractStoreTest
+class DoctrineDbalStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 

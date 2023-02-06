@@ -4,7 +4,7 @@ framework:
         my_workflow:
             type: workflow
             supports:
-                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
             support_strategy: foobar
             places:
                 - first

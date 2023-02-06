@@ -16,7 +16,7 @@ use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 
-class IdentifierHandlerTest extends AbstractHandlerTest
+class IdentifierHandlerTest extends AbstractHandlerTestCase
 {
     public function getHandleValueTestData()
     {

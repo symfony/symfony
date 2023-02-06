@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class RepeatedTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class RepeatedTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

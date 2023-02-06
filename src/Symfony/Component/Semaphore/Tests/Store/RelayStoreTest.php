@@ -17,7 +17,7 @@ use Relay\Relay;
 /**
  * @requires extension relay
  */
-class RelayStoreTest extends AbstractRedisStoreTest
+class RelayStoreTest extends AbstractRedisStoreTestCase
 {
     protected function setUp(): void
     {

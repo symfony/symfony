@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\LanguageType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class LanguageTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class LanguageTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

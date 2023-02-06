@@ -23,7 +23,7 @@ use Symfony\Component\Console\Question\Question;
 /**
  * @group tty
  */
-class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
+class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
 {
     public function testAskChoice()
     {

@@ -13,7 +13,7 @@ namespace Store;
 
 use PHPUnit\Framework\SkippedTestSuiteError;
 use Relay\Relay;
-use Symfony\Component\Lock\Tests\Store\AbstractRedisStoreTest;
+use Symfony\Component\Lock\Tests\Store\AbstractRedisStoreTestCase;
 use Symfony\Component\Lock\Tests\Store\SharedLockStoreTestTrait;
 
 /**
@@ -21,7 +21,7 @@ use Symfony\Component\Lock\Tests\Store\SharedLockStoreTestTrait;
  *
  * @group integration
  */
-class RelayStoreTest extends AbstractRedisStoreTest
+class RelayStoreTest extends AbstractRedisStoreTestCase
 {
     use SharedLockStoreTestTrait;
 

@@ -23,7 +23,7 @@ use Symfony\Component\Cache\Traits\RelayProxy;
  *
  * @group integration
  */
-class RelayAdapterTest extends AbstractRedisAdapterTest
+class RelayAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

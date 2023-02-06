@@ -9,6 +9,7 @@ CHANGELOG
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Allow passing a string instead of an array in `TransportNamesStamp`
 
 6.2
 ---

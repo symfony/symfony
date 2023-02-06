@@ -12,12 +12,14 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class VoterTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     protected $token;
 
     protected function setUp(): void
@@ -70,16 +72,60 @@ class VoterTest extends TestCase
         $voter = new TypeErrorVoterTest_Voter();
         $voter->vote($this->token, new \stdClass(), ['EDIT']);
     }
+
+    /**
+     * @group legacy
+     */
+    public function testSupportsAttrStringDeprecation()
+    {
+        $this->expectDeprecation('Since symfony/security-core 6.3: Using string as first parameter type in "Symfony\Component\Security\Core\Tests\Authorization\Voter\VoterTestSupportsString_Voter::supports()" class is deprecated, use "mixed" instead.');
+        new VoterTestSupportsString_Voter();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testVoteOnAttributeAttrStringDeprecation()
+    {
+        $this->expectDeprecation('Since symfony/security-core 6.3: Using string as first parameter type in "Symfony\Component\Security\Core\Tests\Authorization\Voter\VoterTestVoteOnAttributeString_Voter::voteOnAttribute()" class is deprecated, use "mixed" instead.');
+        new VoterTestVoteOnAttributeString_Voter();
+    }
+}
+
+class VoterTestSupportsString_Voter extends Voter
+{
+    protected function supports(string $attribute, mixed $subject): bool
+    {
+        return false;
+    }
+
+    protected function voteOnAttribute(mixed $attribute, mixed $subject, TokenInterface $token): bool
+    {
+        return false;
+    }
+}
+
+class VoterTestVoteOnAttributeString_Voter extends Voter
+{
+    protected function supports(mixed $attribute, mixed $subject): bool
+    {
+        return false;
+    }
+
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    {
+        return false;
+    }
 }
 
 class VoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute(string $attribute, $object, TokenInterface $token): bool
+    protected function voteOnAttribute(mixed $attribute, mixed $object, TokenInterface $token): bool
     {
-        return 'EDIT' === $attribute;
+        return 'EDIT' == $attribute;
     }
 
-    protected function supports(string $attribute, $object): bool
+    protected function supports(mixed $attribute, mixed $object): bool
     {
         return $object instanceof \stdClass && \in_array($attribute, ['EDIT', 'CREATE']);
     }
@@ -87,12 +133,12 @@ class VoterTest_Voter extends Voter
 
 class IntegerVoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute($attribute, $object, TokenInterface $token): bool
+    protected function voteOnAttribute(mixed $attribute, mixed $object, TokenInterface $token): bool
     {
         return 42 === $attribute;
     }
 
-    protected function supports($attribute, $object): bool
+    protected function supports(mixed $attribute, mixed $object): bool
     {
         return $object instanceof \stdClass && \is_int($attribute);
     }
@@ -100,12 +146,12 @@ class IntegerVoterTest_Voter extends Voter
 
 class TypeErrorVoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute($attribute, $object, TokenInterface $token): bool
+    protected function voteOnAttribute(mixed $attribute, mixed $object, TokenInterface $token): bool
     {
         return false;
     }
 
-    protected function supports($attribute, $object): bool
+    protected function supports(mixed $attribute, mixed $object): bool
     {
         throw new \TypeError('Should error');
     }

@@ -66,3 +66,8 @@ Validator
 ---------
 
  * Implementing the `ConstraintViolationInterface` without implementing the `getConstraint()` method is deprecated
+
+Security
+----------
+
+ * Using `string` as type for `$attribute` in `Voter::supports()` and `Voter::voteOnAttribute()` is deprecated, use `mixed` instead

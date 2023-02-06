@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Using `string` as type for `$attribute` in `Voter::supports()` and `Voter::voteOnAttribute()` is deprecated, use `mixed` instead
+
 6.2
 ---
 

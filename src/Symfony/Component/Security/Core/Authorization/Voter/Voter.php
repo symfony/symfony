@@ -19,11 +19,22 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @template TAttribute of string
+ * @template TAttribute of mixed
  * @template TSubject of mixed
  */
 abstract class Voter implements VoterInterface, CacheableVoterInterface
 {
+    public function __construct()
+    {
+        if ('string' === (string) (new \ReflectionMethod(static::class, 'supports'))->getParameters()[0]->getType()) {
+            trigger_deprecation('symfony/security-core', '6.3', 'Using string as first parameter type in "%s::supports()" class is deprecated, use "mixed" instead.', static::class);
+        }
+
+        if ('string' === (string) (new \ReflectionMethod(static::class, 'voteOnAttribute'))->getParameters()[0]->getType()) {
+            trigger_deprecation('symfony/security-core', '6.3', 'Using string as first parameter type in "%s::voteOnAttribute()" class is deprecated, use "mixed" instead.', static::class);
+        }
+    }
+
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         // abstain vote by default in case none of the attributes are supported
@@ -35,6 +46,7 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
                     continue;
                 }
             } catch (\TypeError $e) {
+                // @deprecated since Symfony 6.3, the try/catch should be removed in 7.0 https://github.com/symfony/symfony/pull/49254
                 if (str_contains($e->getMessage(), 'supports(): Argument #1')) {
                     continue;
                 }
@@ -87,6 +99,8 @@ abstract class Voter implements VoterInterface, CacheableVoterInterface
     /**
      * Perform a single access check operation on a given attribute, subject and token.
      * It is safe to assume that $attribute and $subject already passed the "supports()" method check.
+     *
+     * @phpstan-ignore-next-line string type will be fixed in Symfony 7.0
      *
      * @param TAttribute $attribute
      * @param TSubject   $subject

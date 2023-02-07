@@ -56,21 +56,27 @@ class RedisProxiesTest extends TestCase
 
     /**
      * @requires extension relay
+     * @requires PHP 8.2
      */
     public function testRelayProxy()
     {
         $proxy = file_get_contents(\dirname(__DIR__, 2).'/Traits/RelayProxy.php');
-        $proxy = substr($proxy, 0, 8 + strpos($proxy, "\n    ];"));
+        $proxy = substr($proxy, 0, 4 + strpos($proxy, '[];'));
         $methods = [];
 
         foreach ((new \ReflectionClass(Relay::class))->getMethods() as $method) {
             if ('reset' === $method->name || method_exists(LazyProxyTrait::class, $method->name) || $method->isStatic()) {
                 continue;
             }
+            $args = [];
+            foreach ($method->getParameters() as $param) {
+                $args[] = ($param->isVariadic() ? '...' : '').'$'.$param->name;
+            }
+            $args = implode(', ', $args);
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
             $methods[] = "\n    ".ProxyHelper::exportSignature($method, false)."\n".<<<EOPHP
                 {
-                    {$return}\$this->lazyObjectReal->{$method->name}(...\\func_get_args());
+                    {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
                 }
 
             EOPHP;

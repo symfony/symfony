@@ -204,7 +204,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $key1 = new Key(__METHOD__, 4, 2);
 
         $this->expectException(SemaphoreExpiredException::class);
-        $this->expectExceptionMessage('The semaphore "Symfony\Component\Semaphore\Tests\Store\AbstractStoreTest::testPutOffExpirationWhenSaveHasNotBeenCalled" has expired: the script returns a positive number.');
+        $this->expectExceptionMessage('The semaphore "Symfony\Component\Semaphore\Tests\Store\AbstractStoreTestCase::testPutOffExpirationWhenSaveHasNotBeenCalled" has expired: the script returns a positive number.');
 
         $store->putOffExpiration($key1, 20);
     }

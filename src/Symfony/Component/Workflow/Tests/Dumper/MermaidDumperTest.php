@@ -71,11 +71,11 @@ class MermaidDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    public function provideWorkflowDefinitionWithoutMarking(): array
+    public static function provideWorkflowDefinitionWithoutMarking(): array
     {
         return [
             [
-                $this->createComplexWorkflowDefinition(),
+                self::createComplexWorkflowDefinition(),
                 "graph LR\n"
                ."a0([\"a\"])\n"
                ."b1((\"b\"))\n"
@@ -108,7 +108,7 @@ class MermaidDumperTest extends TestCase
                .'transition5-->g6',
             ],
             [
-                $this->createWorkflowWithSameNameTransition(),
+                self::createWorkflowWithSameNameTransition(),
                 "graph LR\n"
                ."a0([\"a\"])\n"
                ."b1((\"b\"))\n"
@@ -128,7 +128,7 @@ class MermaidDumperTest extends TestCase
                .'transition3-->a0',
             ],
             [
-                $this->createSimpleWorkflowDefinition(),
+                self::createSimpleWorkflowDefinition(),
                 "graph LR\n"
                ."a0([\"a\"])\n"
                ."b1((\"b\"))\n"
@@ -146,7 +146,7 @@ class MermaidDumperTest extends TestCase
         ];
     }
 
-    public function provideWorkflowWithReservedWords()
+    public static function provideWorkflowWithReservedWords()
     {
         $builder = new DefinitionBuilder();
 
@@ -177,11 +177,11 @@ class MermaidDumperTest extends TestCase
         ];
     }
 
-    public function provideStatemachine(): array
+    public static function provideStatemachine(): array
     {
         return [
             [
-                $this->createComplexStateMachineDefinition(),
+                self::createComplexStateMachineDefinition(),
                 "graph LR\n"
                ."a0([\"a\"])\n"
                ."b1((\"b\"))\n"
@@ -196,7 +196,7 @@ class MermaidDumperTest extends TestCase
         ];
     }
 
-    public function provideWorkflowWithMarking(): array
+    public static function provideWorkflowWithMarking(): array
     {
         $marking = new Marking();
         $marking->mark('b');
@@ -204,7 +204,7 @@ class MermaidDumperTest extends TestCase
 
         return [
             [
-                $this->createSimpleWorkflowDefinition(),
+                self::createSimpleWorkflowDefinition(),
                 $marking,
                 "graph LR\n"
                 ."a0([\"a\"])\n"

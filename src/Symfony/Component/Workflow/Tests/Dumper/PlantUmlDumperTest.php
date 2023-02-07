@@ -36,14 +36,14 @@ class PlantUmlDumperTest extends TestCase
         $this->assertStringEqualsFile($file, $dump);
     }
 
-    public function provideWorkflowDefinitionWithoutMarking()
+    public static function provideWorkflowDefinitionWithoutMarking()
     {
-        yield [$this->createSimpleWorkflowDefinition(), null, 'simple-workflow-nomarking', 'SimpleDiagram'];
-        yield [$this->createComplexWorkflowDefinition(), null, 'complex-workflow-nomarking', 'ComplexDiagram'];
+        yield [self::createSimpleWorkflowDefinition(), null, 'simple-workflow-nomarking', 'SimpleDiagram'];
+        yield [self::createComplexWorkflowDefinition(), null, 'complex-workflow-nomarking', 'ComplexDiagram'];
         $marking = new Marking(['b' => 1]);
-        yield [$this->createSimpleWorkflowDefinition(), $marking, 'simple-workflow-marking', 'SimpleDiagram'];
+        yield [self::createSimpleWorkflowDefinition(), $marking, 'simple-workflow-marking', 'SimpleDiagram'];
         $marking = new Marking(['c' => 1, 'e' => 1]);
-        yield [$this->createComplexWorkflowDefinition(), $marking, 'complex-workflow-marking', 'ComplexDiagram'];
+        yield [self::createComplexWorkflowDefinition(), $marking, 'complex-workflow-marking', 'ComplexDiagram'];
     }
 
     /**
@@ -59,11 +59,11 @@ class PlantUmlDumperTest extends TestCase
         $this->assertStringEqualsFile($file, $dump);
     }
 
-    public function provideStateMachineDefinitionWithoutMarking()
+    public static function provideStateMachineDefinitionWithoutMarking()
     {
-        yield [$this->createComplexStateMachineDefinition(), null, 'complex-state-machine-nomarking', 'SimpleDiagram'];
+        yield [static::createComplexStateMachineDefinition(), null, 'complex-state-machine-nomarking', 'SimpleDiagram'];
         $marking = new Marking(['c' => 1, 'e' => 1]);
-        yield [$this->createComplexStateMachineDefinition(), $marking, 'complex-state-machine-marking', 'SimpleDiagram'];
+        yield [static::createComplexStateMachineDefinition(), $marking, 'complex-state-machine-marking', 'SimpleDiagram'];
     }
 
     public function testDumpWorkflowWithSpacesInTheStateNamesAndDescription()

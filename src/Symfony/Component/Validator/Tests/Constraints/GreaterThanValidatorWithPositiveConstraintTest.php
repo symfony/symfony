@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidatorTest
 {
-    protected function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(array $options = null): Constraint
     {
         return new Positive();
     }
@@ -29,7 +29,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [2, 0],
@@ -42,7 +42,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [0, '0', 0, '0', 'int'],

@@ -93,11 +93,11 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         return [
-            [0, 0, static::toAbsolute($lessThan1)],
-            [0, 1, static::toAbsolute($lessThanOrEqualTo1)],
+            [0, 0, self::toAbsolute($lessThan1)],
+            [0, 1, self::toAbsolute($lessThanOrEqualTo1)],
             [2, \PHP_INT_MAX, []],
-            [1, \PHP_INT_MAX, static::toAbsolute($graterThanOrEqualTo1)],
-            [1, 1, static::toAbsolute($equalTo1)],
+            [1, \PHP_INT_MAX, self::toAbsolute($graterThanOrEqualTo1)],
+            [1, 1, self::toAbsolute($equalTo1)],
         ];
     }
 }

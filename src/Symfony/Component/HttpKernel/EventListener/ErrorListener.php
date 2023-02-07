@@ -71,15 +71,17 @@ class ErrorListener implements EventSubscriberInterface
         // There's no specific status code defined in the configuration for this exception
         if (!$throwable instanceof HttpExceptionInterface) {
             $class = new \ReflectionClass($throwable);
-            $attributes = $class->getAttributes(WithHttpStatus::class, \ReflectionAttribute::IS_INSTANCEOF);
 
-            if ($attributes) {
-                /** @var WithHttpStatus $instance */
-                $instance = $attributes[0]->newInstance();
+            do {
+                if ($attributes = $class->getAttributes(WithHttpStatus::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+                    /** @var WithHttpStatus $instance */
+                    $instance = $attributes[0]->newInstance();
 
-                $throwable = new HttpException($instance->statusCode, $throwable->getMessage(), $throwable, $instance->headers);
-                $event->setThrowable($throwable);
-            }
+                    $throwable = new HttpException($instance->statusCode, $throwable->getMessage(), $throwable, $instance->headers);
+                    $event->setThrowable($throwable);
+                    break;
+                }
+            } while ($class = $class->getParentClass());
         }
 
         $e = FlattenException::createFromThrowable($throwable);
@@ -185,14 +187,16 @@ class ErrorListener implements EventSubscriberInterface
             }
         }
 
-        $attributes = (new \ReflectionClass($throwable))->getAttributes(WithLogLevel::class);
+        $class = new \ReflectionClass($throwable);
 
-        if ($attributes) {
-            /** @var WithLogLevel $instance */
-            $instance = $attributes[0]->newInstance();
+        do {
+            if ($attributes = $class->getAttributes(WithLogLevel::class)) {
+                /** @var WithLogLevel $instance */
+                $instance = $attributes[0]->newInstance();
 
-            return $instance->level;
-        }
+                return $instance->level;
+            }
+        } while ($class = $class->getParentClass());
 
         if (!$throwable instanceof HttpExceptionInterface || $throwable->getStatusCode() >= 500) {
             return LogLevel::CRITICAL;

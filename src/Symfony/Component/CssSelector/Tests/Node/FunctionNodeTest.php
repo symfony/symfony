@@ -17,7 +17,7 @@ use Symfony\Component\CssSelector\Parser\Token;
 
 class FunctionNodeTest extends AbstractNodeTestCase
 {
-    public function getToStringConversionTestData()
+    public static function getToStringConversionTestData()
     {
         return [
             [new FunctionNode(new ElementNode(), 'function'), 'Function[Element[*]:function()]'],
@@ -31,7 +31,7 @@ class FunctionNodeTest extends AbstractNodeTestCase
         ];
     }
 
-    public function getSpecificityValueTestData()
+    public static function getSpecificityValueTestData()
     {
         return [
             [new FunctionNode(new ElementNode(), 'function'), 10],

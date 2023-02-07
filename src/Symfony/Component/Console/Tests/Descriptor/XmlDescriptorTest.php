@@ -20,7 +20,7 @@ class XmlDescriptorTest extends AbstractDescriptorTestCase
         return new XmlDescriptor();
     }
 
-    protected function getFormat()
+    protected static function getFormat()
     {
         return 'xml';
     }

@@ -1687,10 +1687,7 @@ class RequestTest extends TestCase
         $request->setSession(new Session(new MockArraySessionStorage()));
         $this->assertTrue($request->hasSession());
 
-        $session = $request->getSession();
-        $this->assertObjectHasAttribute('storage', $session);
-        $this->assertObjectHasAttribute('flashName', $session);
-        $this->assertObjectHasAttribute('attributeName', $session);
+        $this->assertInstanceOf(Session::class, $request->getSession());
     }
 
     public function testHasPreviousSession()

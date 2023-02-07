@@ -20,7 +20,7 @@ class JsonDescriptorTest extends AbstractDescriptorTestCase
         return new JsonDescriptor();
     }
 
-    protected function getFormat()
+    protected static function getFormat()
     {
         return 'json';
     }

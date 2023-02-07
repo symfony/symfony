@@ -154,7 +154,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     $headerCount = array_fill(0, $nbCols, 1);
                 } else {
                     foreach ($cols as $col) {
-                        $header = explode($keySeparator, $col);
+                        $header = explode($keySeparator, $col ?? '');
                         $headers[] = $header;
                         $headerCount[] = \count($header);
                     }

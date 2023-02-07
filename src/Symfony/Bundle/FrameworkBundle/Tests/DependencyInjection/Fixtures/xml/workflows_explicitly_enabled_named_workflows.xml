@@ -8,7 +8,7 @@
     <framework:config http-method-override="false">
         <framework:workflow enabled="true" name="workflows" type="workflow">
             <framework:initial-marking>bar</framework:initial-marking>
-            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <framework:place>bar</framework:place>
             <framework:place>baz</framework:place>
             <framework:transition name="bar_baz">

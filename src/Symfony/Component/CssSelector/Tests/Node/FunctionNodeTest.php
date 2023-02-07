@@ -15,7 +15,7 @@ use Symfony\Component\CssSelector\Node\ElementNode;
 use Symfony\Component\CssSelector\Node\FunctionNode;
 use Symfony\Component\CssSelector\Parser\Token;
 
-class FunctionNodeTest extends AbstractNodeTest
+class FunctionNodeTest extends AbstractNodeTestCase
 {
     public function getToStringConversionTestData()
     {

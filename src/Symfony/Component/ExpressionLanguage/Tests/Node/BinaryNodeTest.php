@@ -19,7 +19,7 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
-class BinaryNodeTest extends AbstractNodeTest
+class BinaryNodeTest extends AbstractNodeTestCase
 {
     use ExpectDeprecationTrait;
 

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Translation\IdentityTranslator;
 
-class FileTypeTest extends BaseTypeTest
+class FileTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
 

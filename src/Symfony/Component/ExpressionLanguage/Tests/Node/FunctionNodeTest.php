@@ -15,7 +15,7 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\FunctionNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 
-class FunctionNodeTest extends AbstractNodeTest
+class FunctionNodeTest extends AbstractNodeTestCase
 {
     public static function getEvaluateData(): array
     {

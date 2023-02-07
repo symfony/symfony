@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class DateTimeTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class DateTimeTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

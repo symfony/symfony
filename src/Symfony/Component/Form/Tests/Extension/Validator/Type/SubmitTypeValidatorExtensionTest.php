@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class SubmitTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class SubmitTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

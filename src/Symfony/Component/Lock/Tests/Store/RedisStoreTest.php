@@ -21,7 +21,7 @@ use Symfony\Component\Lock\Store\RedisStore;
  * @requires extension redis
  * @group integration
  */
-class RedisStoreTest extends AbstractRedisStoreTest
+class RedisStoreTest extends AbstractRedisStoreTestCase
 {
     use SharedLockStoreTestTrait;
 

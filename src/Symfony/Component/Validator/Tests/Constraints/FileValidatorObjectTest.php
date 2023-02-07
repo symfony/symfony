@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\HttpFoundation\File\File;
 
-class FileValidatorObjectTest extends FileValidatorTest
+class FileValidatorObjectTest extends FileValidatorTestCase
 {
     protected function getFile($filename)
     {

@@ -8,7 +8,7 @@
 
     <framework:config http-method-override="false">
         <framework:workflow name="my_workflow" support-strategy="foobar" type="workflow">
-            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <framework:place name="first" />
             <framework:place name="last" />
             <framework:transition name="foobar">

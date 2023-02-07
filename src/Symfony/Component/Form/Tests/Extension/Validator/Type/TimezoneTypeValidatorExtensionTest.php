@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class TimezoneTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class TimezoneTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

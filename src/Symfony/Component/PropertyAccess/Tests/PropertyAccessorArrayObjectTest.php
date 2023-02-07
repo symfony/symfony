@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-class PropertyAccessorArrayObjectTest extends PropertyAccessorCollectionTest
+class PropertyAccessorArrayObjectTest extends PropertyAccessorCollectionTestCase
 {
     protected static function getContainer(array $array)
     {

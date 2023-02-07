@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class EmailTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class EmailTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

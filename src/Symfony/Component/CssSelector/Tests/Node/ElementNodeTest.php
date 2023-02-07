@@ -13,7 +13,7 @@ namespace Symfony\Component\CssSelector\Tests\Node;
 
 use Symfony\Component\CssSelector\Node\ElementNode;
 
-class ElementNodeTest extends AbstractNodeTest
+class ElementNodeTest extends AbstractNodeTestCase
 {
     public function getToStringConversionTestData()
     {

@@ -11,7 +11,7 @@
             <framework:audit-trail enabled="true"/>
             <framework:initial-marking>draft</framework:initial-marking>
             <framework:marking-store type="method" property="state" />
-            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <framework:place name="draft" />
             <framework:place name="wait_for_journalist" />
             <framework:place name="approved_by_journalist" />
@@ -45,7 +45,7 @@
         <framework:workflow name="pull_request">
             <framework:audit-trail enabled="false"/>
             <framework:initial-marking>start</framework:initial-marking>
-            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <framework:place name="start">
                 <framework:metadata>
                     <framework:title>place start title</framework:title>
@@ -96,7 +96,7 @@
 
         <framework:workflow name="service_marking_store_workflow" type="workflow">
             <framework:marking-store service="workflow_service"/>
-            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <!-- Simple format -->
             <framework:place>first</framework:place>
             <framework:place>last</framework:place>

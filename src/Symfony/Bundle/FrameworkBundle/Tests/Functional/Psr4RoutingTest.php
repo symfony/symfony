@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 /**
  * @requires function Symfony\Component\Routing\Loader\Psr4DirectoryLoader::__construct
  */
-final class Psr4RoutingTest extends AbstractAttributeRoutingTest
+final class Psr4RoutingTest extends AbstractAttributeRoutingTestCase
 {
     protected function getTestCaseApp(): string
     {

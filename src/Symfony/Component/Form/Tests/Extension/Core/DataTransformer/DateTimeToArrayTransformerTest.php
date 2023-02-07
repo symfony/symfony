@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 
-class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTest
+class DateTimeToArrayTransformerTest extends BaseDateTimeTransformerTestCase
 {
     public function testTransform()
     {

@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
-class DateTypeTest extends BaseTypeTest
+class DateTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 

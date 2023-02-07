@@ -27,8 +27,8 @@ final class ProxyHelper
      */
     public static function generateLazyGhost(\ReflectionClass $class): string
     {
-        if (\PHP_VERSION_ID >= 80200 && $class->isReadOnly()) {
-            throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" is read-only.', $class->name));
+        if (\PHP_VERSION_ID >= 80200 && \PHP_VERSION_ID < 80300 && $class->isReadOnly()) {
+            throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" is readonly.', $class->name));
         }
         if ($class->isFinal()) {
             throw new LogicException(sprintf('Cannot generate lazy ghost: class "%s" is final.', $class->name));
@@ -91,8 +91,8 @@ final class ProxyHelper
         if ($class?->isFinal()) {
             throw new LogicException(sprintf('Cannot generate lazy proxy: class "%s" is final.', $class->name));
         }
-        if (\PHP_VERSION_ID >= 80200 && $class?->isReadOnly()) {
-            throw new LogicException(sprintf('Cannot generate lazy proxy: class "%s" is read-only.', $class->name));
+        if (\PHP_VERSION_ID >= 80200 && \PHP_VERSION_ID < 80300 && $class?->isReadOnly()) {
+            throw new LogicException(sprintf('Cannot generate lazy proxy: class "%s" is readonly.', $class->name));
         }
 
         $methodReflectors = [$class?->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) ?? []];
@@ -149,8 +149,8 @@ final class ProxyHelper
                 $body = "        $parentCall;";
             } elseif (str_ends_with($signature, '): never') || str_ends_with($signature, '): void')) {
                 $body = <<<EOPHP
-                        if (isset(\$this->lazyObjectReal)) {
-                            \$this->lazyObjectReal->{$method->name}(...\\func_get_args());
+                        if (isset(\$this->lazyObjectState)) {
+                            (\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}(...\\func_get_args());
                         } else {
                             {$parentCall};
                         }
@@ -171,8 +171,8 @@ final class ProxyHelper
                 }
 
                 $body = <<<EOPHP
-                        if (isset(\$this->lazyObjectReal)) {
-                            return \$this->lazyObjectReal->{$method->name}(...\\func_get_args());
+                        if (isset(\$this->lazyObjectState)) {
+                            return (\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}(...\\func_get_args());
                         }
 
                         return {$parentCall};
@@ -195,17 +195,14 @@ final class ProxyHelper
             $methods = ['initializeLazyObject' => implode('', $body).'    }'] + $methods;
         }
         $body = $methods ? "\n".implode("\n\n", $methods)."\n" : '';
-        $propertyScopes = $class ? substr(self::exportPropertyScopes($class->name), 1, -6) : '';
+        $propertyScopes = $class ? self::exportPropertyScopes($class->name) : '[]';
 
         return <<<EOPHP
             {$parent} implements \\{$interfaces}
             {
                 use \Symfony\Component\VarExporter\LazyProxyTrait;
 
-                private const LAZY_OBJECT_PROPERTY_SCOPES = [
-                    'lazyObjectReal' => [self::class, 'lazyObjectReal', null],
-                    "\\0".self::class."\\0lazyObjectReal" => [self::class, 'lazyObjectReal', null],{$propertyScopes}
-                ];
+                private const LAZY_OBJECT_PROPERTY_SCOPES = {$propertyScopes};
             {$body}}
 
             // Help opcache.preload discover always-needed symbols

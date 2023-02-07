@@ -27,7 +27,7 @@ class RedisProxiesTest extends TestCase
     public function testRedis5Proxy($class)
     {
         $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}5Proxy.php");
-        $proxy = substr($proxy, 0, 8 + strpos($proxy, "\n    ];"));
+        $proxy = substr($proxy, 0, 4 + strpos($proxy, '[];'));
         $methods = [];
 
         foreach ((new \ReflectionClass($class))->getMethods() as $method) {
@@ -42,7 +42,7 @@ class RedisProxiesTest extends TestCase
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
             $methods[] = "\n    ".ProxyHelper::exportSignature($method, false)."\n".<<<EOPHP
                 {
-                    {$return}\$this->lazyObjectReal->{$method->name}({$args});
+                    {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
                 }
 
             EOPHP;
@@ -69,7 +69,7 @@ class RedisProxiesTest extends TestCase
         eval(substr($stub, 5));
 
         $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}6Proxy.php");
-        $proxy = substr($proxy, 0, 8 + strpos($proxy, "\n    ];"));
+        $proxy = substr($proxy, 0, 4 + strpos($proxy, '[];'));
         $methods = [];
 
         foreach ((new \ReflectionClass($class.'StubInterface'))->getMethods() as $method) {
@@ -84,7 +84,7 @@ class RedisProxiesTest extends TestCase
             $return = $method->getReturnType() instanceof \ReflectionNamedType && 'void' === (string) $method->getReturnType() ? '' : 'return ';
             $methods[] = "\n    ".ProxyHelper::exportSignature($method, false)."\n".<<<EOPHP
                 {
-                    {$return}\$this->lazyObjectReal->{$method->name}({$args});
+                    {$return}(\$this->lazyObjectState->realInstance ??= (\$this->lazyObjectState->initializer)())->{$method->name}({$args});
                 }
 
             EOPHP;

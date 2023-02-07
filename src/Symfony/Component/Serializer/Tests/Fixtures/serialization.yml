@@ -16,6 +16,10 @@
       serialized_name: 'baz'
     bar:
       serialized_name: 'qux'
+    quux:
+      serialized_name:
+        nameOne: ['groupA', 'groupB']
+        nameTwo: 'groupC'
 'Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedPathDummy':
   attributes:
     three:

@@ -82,7 +82,7 @@ class AnnotationLoader implements LoaderInterface
                     } elseif ($annotation instanceof MaxDepth) {
                         $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth());
                     } elseif ($annotation instanceof SerializedName) {
-                        $attributesMetadata[$property->name]->setSerializedName($annotation->getSerializedName());
+                        $attributesMetadata[$property->name]->setSerializedName($annotation->getSerializedName(), $annotation->getGroups());
                     } elseif ($annotation instanceof SerializedPath) {
                         $attributesMetadata[$property->name]->setSerializedPath($annotation->getSerializedPath());
                     } elseif ($annotation instanceof Ignore) {
@@ -137,7 +137,7 @@ class AnnotationLoader implements LoaderInterface
                         throw new MappingException(sprintf('SerializedName on "%s::%s()" cannot be added. SerializedName can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
 
-                    $attributeMetadata->setSerializedName($annotation->getSerializedName());
+                    $attributeMetadata->setSerializedName($annotation->getSerializedName(), $annotation->getGroups());
                 } elseif ($annotation instanceof SerializedPath) {
                     if (!$accessorOrMutator) {
                         throw new MappingException(sprintf('SerializedPath on "%s::%s()" cannot be added. SerializedPath can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));

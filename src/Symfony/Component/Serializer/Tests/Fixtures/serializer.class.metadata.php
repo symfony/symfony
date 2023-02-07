@@ -5,10 +5,10 @@
 return [
     'Symfony\Component\Serializer\Tests\Fixtures\Dummy' => [
         [
-            'foo' => [[], null, null],
-            'bar' => [[], null, null],
-            'baz' => [[], null, null],
-            'qux' => [[], null, null],
+            'foo' => [[], null, []],
+            'bar' => [[], null, []],
+            'baz' => [[], null, []],
+            'qux' => [[], null, []],
         ],
         null,
     ],

@@ -51,12 +51,64 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals(69, $attributeMetadata->getMaxDepth());
     }
 
-    public function testSerializedName()
+    public function testSerializedNames()
     {
         $attributeMetadata = new AttributeMetadata('name');
-        $attributeMetadata->setSerializedName('serialized_name');
 
-        $this->assertEquals('serialized_name', $attributeMetadata->getSerializedName());
+        $this->assertSame([], $attributeMetadata->getSerializedNames());
+
+        $attributeMetadata->setSerializedNames([
+            'foo-group' => 'foo',
+            'bar-group' => 'bar',
+        ]);
+
+        $this->assertEquals([
+            'foo-group' => 'foo',
+            'bar-group' => 'bar',
+        ], $attributeMetadata->getSerializedNames());
+
+        $attributeMetadata->setSerializedName('baz', ['baz-group']);
+        $this->assertEquals([
+            'foo-group' => 'foo',
+            'bar-group' => 'bar',
+            'baz-group' => 'baz',
+        ], $attributeMetadata->getSerializedNames());
+
+        $attributeMetadata->setSerializedName('bar', ['baz-group']);
+        $this->assertEquals([
+            'foo-group' => 'foo',
+            'bar-group' => 'bar',
+            'baz-group' => 'bar',
+        ], $attributeMetadata->getSerializedNames());
+
+        $this->assertNull($attributeMetadata->getSerializedName(['unknown']));
+        $this->assertSame('bar', $attributeMetadata->getSerializedName(['bar-group']));
+        $this->assertSame('foo', $attributeMetadata->getSerializedName(['foo-group', 'bar-group']));
+        $this->assertSame('bar', $attributeMetadata->getSerializedName(['bar-group', 'foo-group']));
+    }
+
+    public function testSerializedNamesWithoutSpecificGroup()
+    {
+        $attributeMetadata = new AttributeMetadata('name');
+
+        $attributeMetadata->setSerializedName('foo', []);
+        $this->assertSame('foo', $attributeMetadata->getSerializedName([]));
+        $this->assertSame('foo', $attributeMetadata->getSerializedName(['bar']));
+
+        $this->assertSame([
+            '*' => 'foo',
+        ], $attributeMetadata->getSerializedNames());
+    }
+
+    public function testNullSerializedNames()
+    {
+        $attributeMetadata = new AttributeMetadata('name');
+
+        $attributeMetadata->setSerializedName(null, []);
+
+        $this->assertSame([
+            '*' => null,
+        ], $attributeMetadata->getSerializedNames());
     }
 
     public function testSerializedPath()
@@ -133,6 +185,10 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata1 = new AttributeMetadata('a1');
         $attributeMetadata1->addGroup('a');
         $attributeMetadata1->addGroup('b');
+        $attributeMetadata1->setSerializedNames([
+            'group-a' => 'name-a',
+            'group-b' => 'name-b',
+        ]);
 
         $attributeMetadata2 = new AttributeMetadata('a2');
         $attributeMetadata2->addGroup('a');
@@ -149,7 +205,10 @@ class AttributeMetadataTest extends TestCase
 
         $this->assertEquals(['a', 'b', 'c'], $attributeMetadata1->getGroups());
         $this->assertEquals(2, $attributeMetadata1->getMaxDepth());
-        $this->assertEquals('a3', $attributeMetadata1->getSerializedName());
+        $this->assertEquals([
+            'group-a' => 'name-a',
+            'group-b' => 'name-b',
+        ], $attributeMetadata1->getSerializedNames());
         $this->assertEquals($serializedPath, $attributeMetadata1->getSerializedPath());
         $this->assertSame(['a' => ['foo' => 'bar']], $attributeMetadata1->getNormalizationContexts());
         $this->assertSame(['c' => ['baz' => 'qux']], $attributeMetadata1->getDenormalizationContexts());
@@ -157,6 +216,27 @@ class AttributeMetadataTest extends TestCase
     }
 
     public function testContextsNotMergedIfAlreadyDefined()
+    {
+        $attributeMetadata1 = new AttributeMetadata('a1');
+        $attributeMetadata1->setSerializedNames([
+            'group-a' => 'name-a',
+            'group-b' => 'name-b',
+        ]);
+
+        $attributeMetadata2 = new AttributeMetadata('a2');
+        $attributeMetadata2->setSerializedNames([
+            'group-b' => 'name-c',
+        ]);
+
+        $attributeMetadata1->merge($attributeMetadata2);
+
+        self::assertSame([
+            'group-a' => 'name-a',
+            'group-b' => 'name-b',
+        ], $attributeMetadata1->getSerializedNames());
+    }
+
+    public function testSerializedNamesNotMergedIfAlreadyDefined()
     {
         $attributeMetadata1 = new AttributeMetadata('a1');
         $attributeMetadata1->setNormalizationContextForGroups(['foo' => 'not overridden'], ['a']);
@@ -178,11 +258,39 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('b');
         $attributeMetadata->setMaxDepth(3);
-        $attributeMetadata->setSerializedName('serialized_name');
+        $attributeMetadata->setSerializedNames([
+            'group-a' => 'name-a',
+        ]);
         $serializedPath = new PropertyPath('[serialized][path]');
         $attributeMetadata->setSerializedPath($serializedPath);
 
         $serialized = serialize($attributeMetadata);
         $this->assertEquals($attributeMetadata, unserialize($serialized));
+    }
+
+    public function testSerializeSerializedNameNullCompatibility()
+    {
+        $attributeMetadata = new AttributeMetadata('attribute');
+        $attributeMetadata->serializedName = null;
+
+        $serialized = serialize($attributeMetadata);
+        $unserialized = unserialize($serialized);
+
+        $this->assertSame([], $unserialized->serializedName);
+        $this->assertNull($unserialized->getSerializedName());
+    }
+
+    public function testSerializeSerializedNameStringCompatibility()
+    {
+        $attributeMetadata = new AttributeMetadata('attribute');
+        $attributeMetadata->serializedName = 'foo';
+
+        $serialized = serialize($attributeMetadata);
+        $unserialized = unserialize($serialized);
+
+        $this->assertSame([
+            '*' => 'foo',
+        ], $unserialized->serializedName);
+        $this->assertSame('foo', $unserialized->getSerializedName());
     }
 }

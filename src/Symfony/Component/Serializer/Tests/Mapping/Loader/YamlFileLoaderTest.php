@@ -96,6 +96,10 @@ class YamlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+
+        $this->assertEquals('nameOne', $attributesMetadata['quux']->getSerializedName(['groupA']));
+        $this->assertEquals('nameOne', $attributesMetadata['quux']->getSerializedName(['groupB']));
+        $this->assertEquals('nameTwo', $attributesMetadata['quux']->getSerializedName(['groupC']));
     }
 
     public function testSerializedPath()

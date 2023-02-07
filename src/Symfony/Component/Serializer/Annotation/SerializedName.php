@@ -22,18 +22,35 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 final class SerializedName
 {
-    public function __construct(private string $serializedName)
+    /**
+     * @var string[]
+     */
+    private array $groups;
+
+    /**
+     * @param string|string[] $groups
+     */
+    public function __construct(private string $serializedName, string|array $groups = [])
     {
+        $this->groups = (array) $groups;
         if ('' === $serializedName) {
-            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', self::class));
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', static::class));
         }
     }
 
     public function getSerializedName(): string
     {
         return $this->serializedName;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getGroups(): array
+    {
+        return $this->groups;
     }
 }

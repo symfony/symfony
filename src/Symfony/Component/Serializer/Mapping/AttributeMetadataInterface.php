@@ -52,14 +52,32 @@ interface AttributeMetadataInterface
     public function getMaxDepth(): ?int;
 
     /**
-     * Sets the serialization name for this attribute.
+     * Sets the serialization names for given groups.
+     *
+     * @param array<string, string|null> $serializedNames
      */
-    public function setSerializedName(?string $serializedName);
+    public function setSerializedNames(array $serializedNames): void;
 
     /**
-     * Gets the serialization name for this attribute.
+     * Set a serialization name for given groups.
+     *
+     * @param string[] $groups
      */
-    public function getSerializedName(): ?string;
+    public function setSerializedName(?string $serializedName/* , array $groups = [] */);
+
+    /**
+     * Gets the serialization name for given groups.
+     *
+     * @param string[] $groups
+     */
+    public function getSerializedName(/* array $groups = [] */): ?string;
+
+    /**
+     * Gets all the serialization names per group ("*" being the default serialization name).
+     *
+     * @return array<string, string|null>
+     */
+    public function getSerializedNames(): array;
 
     public function setSerializedPath(?PropertyPath $serializedPath): void;
 

@@ -42,13 +42,13 @@ class AttributeMetadata implements AttributeMetadataInterface
     public $maxDepth;
 
     /**
-     * @var string|null
+     * @var array<string, string|null> An array of serialized names by group
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getSerializedName()} instead.
+     *           {@link getSerializedNames()} instead.
      */
-    public $serializedName;
+    public $serializedName = [];
 
     /**
      * @internal This property is public in order to reduce the size of the
@@ -116,18 +116,66 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->maxDepth;
     }
 
-    public function setSerializedName(string $serializedName = null)
+    public function setSerializedNames(array $serializedNames): void
+    {
+        $this->serializedName = $serializedNames;
+    }
+
+    /**
+     * Set a serialization name for given groups.
+     *
+     * @param string[] $groups
+     */
+    public function setSerializedName(string $serializedName = null/* , array $groups = [] */)
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/serializer', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
         }
+        
+        if (\func_num_args() < 2) {
+            $groups = [];
+        } else {
+            $groups = func_get_arg(1);
 
-        $this->serializedName = $serializedName;
+            if (!\is_array($groups)) {
+                throw new \TypeError(sprintf('Argument 2 passed to "%s()" must be array, "%s" given.', __METHOD__, get_debug_type($groups)));
+            }
+        }
+
+        foreach ($groups ?: ['*'] as $group) {
+            $this->serializedName[$group] = $serializedName;
+        }
     }
 
-    public function getSerializedName(): ?string
+    public function getSerializedNames(): array
     {
         return $this->serializedName;
+    }
+
+    /**
+     * Gets the serialization name for given groups.
+     *
+     * @param string[] $groups
+     */
+    public function getSerializedName(/* array $groups = [] */): ?string
+    {
+        if (\func_num_args() < 1) {
+            $groups = [];
+        } else {
+            $groups = func_get_arg(0);
+
+            if (!\is_array($groups)) {
+                throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be array, "%s" given.', __METHOD__, get_debug_type($groups)));
+            }
+        }
+
+        foreach ($groups as $group) {
+            if (isset($this->serializedName[$group])) {
+                return $this->serializedName[$group];
+            }
+        }
+
+        return $this->serializedName['*'] ?? null;
     }
 
     public function setSerializedPath(PropertyPath $serializedPath = null): void
@@ -210,7 +258,7 @@ class AttributeMetadata implements AttributeMetadataInterface
 
         // Overwrite only if not defined
         $this->maxDepth ??= $attributeMetadata->getMaxDepth();
-        $this->serializedName ??= $attributeMetadata->getSerializedName();
+        $this->serializedName ??= $attributeMetadata->getSerializedNames();
         $this->serializedPath ??= $attributeMetadata->getSerializedPath();
 
         // Overwrite only if both contexts are empty
@@ -232,5 +280,17 @@ class AttributeMetadata implements AttributeMetadataInterface
     public function __sleep(): array
     {
         return ['name', 'groups', 'maxDepth', 'serializedName', 'serializedPath', 'ignore', 'normalizationContexts', 'denormalizationContexts'];
+    }
+
+    public function __wakeup()
+    {
+        // Preserve compatibility with existing serialized payloads
+        if (null === $this->serializedName) {
+            $this->serializedName = [];
+        } elseif (\is_string($this->serializedName)) {
+            $this->serializedName = [
+                '*' => $this->serializedName,
+            ];
+        }
     }
 }

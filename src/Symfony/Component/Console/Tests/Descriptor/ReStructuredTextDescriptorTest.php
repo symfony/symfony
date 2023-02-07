@@ -19,7 +19,7 @@ class ReStructuredTextDescriptorTest extends AbstractDescriptorTestCase
 {
     public static function getDescribeCommandTestData()
     {
-        return $this->getDescriptionTestData(array_merge(
+        return self::getDescriptionTestData(array_merge(
             ObjectsProvider::getCommands(),
             ['command_mbstring' => new DescriptorCommandMbString()]
         ));
@@ -27,7 +27,7 @@ class ReStructuredTextDescriptorTest extends AbstractDescriptorTestCase
 
     public static function getDescribeApplicationTestData()
     {
-        return $this->getDescriptionTestData(array_merge(
+        return self::getDescriptionTestData(array_merge(
             ObjectsProvider::getApplications(),
             ['application_mbstring' => new DescriptorApplicationMbString()]
         ));

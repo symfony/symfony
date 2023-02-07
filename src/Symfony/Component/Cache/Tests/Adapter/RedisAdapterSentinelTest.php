@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @group integration
  */
-class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
+class RedisAdapterSentinelTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

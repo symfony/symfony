@@ -23,7 +23,7 @@ use Symfony\Component\Lock\Store\PostgreSqlStore;
  * @requires extension pdo_pgsql
  * @group integration
  */
-class PostgreSqlStoreTest extends AbstractStoreTest
+class PostgreSqlStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;
     use SharedLockStoreTestTrait;

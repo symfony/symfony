@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class UrlTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class UrlTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

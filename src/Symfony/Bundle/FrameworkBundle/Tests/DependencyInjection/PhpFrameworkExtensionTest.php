@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
-class PhpFrameworkExtensionTest extends FrameworkExtensionTest
+class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {

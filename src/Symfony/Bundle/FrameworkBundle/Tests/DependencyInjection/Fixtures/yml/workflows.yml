@@ -4,7 +4,7 @@ framework:
         article:
             type: workflow
             supports:
-                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
             initial_marking: [draft]
             metadata:
                 title: article workflow
@@ -32,7 +32,7 @@ framework:
                     to: [published]
         pull_request:
             supports:
-                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
             initial_marking: start
             metadata:
                 title: workflow title
@@ -75,7 +75,7 @@ framework:
             marking_store:
                 service: workflow_service
             supports:
-                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
             places:
                 - { name: first }
                 - { name: last }

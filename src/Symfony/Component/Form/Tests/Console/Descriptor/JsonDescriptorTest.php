@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Console\Descriptor;
 
 use Symfony\Component\Form\Console\Descriptor\JsonDescriptor;
 
-class JsonDescriptorTest extends AbstractDescriptorTest
+class JsonDescriptorTest extends AbstractDescriptorTestCase
 {
     protected function getDescriptor()
     {

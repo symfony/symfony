@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
-class NativeParserCrawlerTest extends AbstractCrawlerTest
+class NativeParserCrawlerTest extends AbstractCrawlerTestCase
 {
     public static function getDoctype(): string
     {

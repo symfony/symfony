@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class CheckboxTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class CheckboxTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

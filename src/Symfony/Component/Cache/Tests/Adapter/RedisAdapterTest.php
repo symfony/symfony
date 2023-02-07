@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Traits\RedisProxy;
 /**
  * @group integration
  */
-class RedisAdapterTest extends AbstractRedisAdapterTest
+class RedisAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

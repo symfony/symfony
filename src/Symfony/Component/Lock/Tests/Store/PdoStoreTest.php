@@ -22,7 +22,7 @@ use Symfony\Component\Lock\Store\PdoStore;
  * @requires extension pdo_sqlite
  * @group integration
  */
-class PdoStoreTest extends AbstractStoreTest
+class PdoStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 

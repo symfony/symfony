@@ -8,7 +8,7 @@
 
     <framework:config http-method-override="false">
         <framework:workflow name="my_workflow" type="state_machine">
-            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <framework:place name="first" />
             <framework:place name="middle" />
             <framework:place name="last" />

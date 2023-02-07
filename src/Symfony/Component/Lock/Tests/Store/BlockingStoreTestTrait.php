@@ -21,7 +21,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 trait BlockingStoreTestTrait
 {
     /**
-     * @see AbstractStoreTest::getStore()
+     * @see AbstractStoreTestCase::getStore()
      *
      * @return PersistingStoreInterface
      */

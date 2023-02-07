@@ -9,7 +9,7 @@
     <framework:config http-method-override="false">
         <framework:workflow name="article" type="workflow">
             <framework:initial-marking>draft</framework:initial-marking>
-            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase</framework:support>
             <framework:place name="draft" />
             <framework:place name="wait_for_journalist" />
             <framework:place name="approved_by_journalist" />

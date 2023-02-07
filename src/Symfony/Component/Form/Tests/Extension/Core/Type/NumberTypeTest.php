@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class NumberTypeTest extends BaseTypeTest
+class NumberTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
 

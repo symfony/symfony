@@ -47,13 +47,13 @@
         "phpunit/phpunit": "<5.4.3",
         "symfony/console": "<5.4",
         "symfony/dependency-injection": "<5.4",
-        "symfony/doctrine-bridge": "<5.4",
+        "symfony/doctrine-bridge": "<5.4.21|>=6,<6.2.7",
         "symfony/error-handler": "<5.4",
         "symfony/framework-bundle": "<5.4",
         "symfony/http-kernel": "<5.4",
         "symfony/translation": "<5.4",
         "symfony/translation-contracts": "<1.1.7",
-        "symfony/twig-bridge": "<5.4"
+        "symfony/twig-bridge": "<5.4.21|>=6,<6.2.7"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

@@ -13,7 +13,7 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
-class ConstantNodeTest extends AbstractNodeTest
+class ConstantNodeTest extends AbstractNodeTestCase
 {
     public static function getEvaluateData(): array
     {

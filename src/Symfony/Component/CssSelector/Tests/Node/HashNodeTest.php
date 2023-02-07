@@ -14,7 +14,7 @@ namespace Symfony\Component\CssSelector\Tests\Node;
 use Symfony\Component\CssSelector\Node\ElementNode;
 use Symfony\Component\CssSelector\Node\HashNode;
 
-class HashNodeTest extends AbstractNodeTest
+class HashNodeTest extends AbstractNodeTestCase
 {
     public static function getToStringConversionTestData()
     {

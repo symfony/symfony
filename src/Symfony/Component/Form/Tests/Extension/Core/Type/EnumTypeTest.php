@@ -12,14 +12,14 @@
 namespace Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
-use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTest;
+use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\Answer;
 use Symfony\Component\Form\Tests\Fixtures\Number;
 use Symfony\Component\Form\Tests\Fixtures\Suit;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
-class EnumTypeTest extends BaseTypeTest
+class EnumTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = EnumType::class;
 

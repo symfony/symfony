@@ -14,7 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 /**
  * @group integration
  */
-class PredisClusterAdapterTest extends AbstractRedisAdapterTest
+class PredisClusterAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

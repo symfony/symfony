@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ButtonTypeTest extends BaseTypeTest
+class ButtonTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ButtonType';
 

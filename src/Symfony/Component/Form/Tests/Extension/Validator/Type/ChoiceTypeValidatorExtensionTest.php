@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class ChoiceTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class ChoiceTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ValidatorExtensionTrait;
 

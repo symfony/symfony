@@ -37,6 +37,8 @@ class LazyObjectState
      */
     public int $status = 0;
 
+    public object $realInstance;
+
     public function __construct(public readonly \Closure|array $initializer, $skippedProperties = [])
     {
         $this->skippedProperties = $skippedProperties;

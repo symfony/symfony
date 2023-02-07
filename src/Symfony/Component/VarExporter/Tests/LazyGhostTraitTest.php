@@ -19,6 +19,7 @@ use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildStdClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ChildTestClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\LazyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\MagicClass;
+use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\ReadOnlyClass;
 use Symfony\Component\VarExporter\Tests\Fixtures\LazyGhost\TestClass;
 
 class LazyGhostTraitTest extends TestCase
@@ -399,6 +400,16 @@ class LazyGhostTraitTest extends TestCase
         $proxy->foo[] = 123;
 
         $this->assertSame([123], $proxy->foo);
+    }
+
+    /**
+     * @requires PHP 8.3
+     */
+    public function testReadOnlyClass()
+    {
+        $proxy = $this->createLazyGhost(ReadOnlyClass::class, fn ($proxy) => $proxy->__construct(123));
+
+        $this->assertSame(123, $proxy->foo);
     }
 
     /**

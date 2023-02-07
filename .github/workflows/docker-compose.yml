@@ -1,0 +1,80 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:9.6-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 'password'
+  ldap:
+    image: bitnami/openldap
+    ports:
+      - 3389:3389
+    environment:
+      LDAP_ADMIN_USERNAME: admin
+      LDAP_ADMIN_PASSWORD: symfony
+      LDAP_ROOT: dc=symfony,dc=com
+      LDAP_PORT_NUMBER: 3389
+      LDAP_USERS: a
+      LDAP_PASSWORDS: a
+  redis:
+    image: redis:6.0.0
+    ports:
+      - 16379:6379
+  redis-cluster:
+    image: grokzen/redis-cluster:5.0.4
+    ports:
+      - 7000:7000
+      - 7001:7001
+      - 7002:7002
+      - 7003:7003
+      - 7004:7004
+      - 7005:7005
+      - 7006:7006
+    environment:
+      STANDALONE: 1
+  redis-sentinel:
+    image: bitnami/redis-sentinel:6.0
+    ports:
+      - 26379:26379
+    environment:
+      REDIS_MASTER_HOST: redis
+      REDIS_MASTER_SET: redis_sentinel
+      REDIS_SENTINEL_QUORUM: 1
+  memcached:
+    image: memcached:1.6.5
+    ports:
+      - 11211:11211
+  rabbitmq:
+    image: rabbitmq:3.8.3
+    ports:
+      - 5672:5672
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+  couchbase:
+    image: couchbase:6.5.1
+    ports:
+      - 8091:8091
+      - 8092:8092
+      - 8093:8093
+      - 8094:8094
+      - 11210:11210
+  sqs:
+    image: asyncaws/testing-sqs
+    ports:
+      - 9494:9494
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+  kafka:
+    image: wurstmeister/kafka:2.12-2.0.1
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_CREATE_TOPICS: 'test-topic:1:1:compact'
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_PORT: 9092
+

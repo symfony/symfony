@@ -2396,10 +2396,6 @@ class FrameworkExtension extends Extension
 
     private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container)
     {
-        if (!class_exists(RetryableHttpClient::class)) {
-            throw new LogicException('Support for retrying failed requests requires symfony/http-client 5.2 or higher, try upgrading.');
-        }
-
         if (null !== $options['retry_strategy']) {
             $retryStrategy = new Reference($options['retry_strategy']);
         } else {

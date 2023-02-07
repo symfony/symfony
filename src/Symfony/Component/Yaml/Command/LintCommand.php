@@ -91,10 +91,6 @@ EOF
         $this->format = $input->getOption('format');
         $flags = $input->getOption('parse-tags');
 
-        if ('github' === $this->format && !class_exists(GithubActionReporter::class)) {
-            throw new \InvalidArgumentException('The "github" format is only available since "symfony/console" >= 5.3.');
-        }
-
         if (null === $this->format) {
             // Autodetect format according to CI environment
             $this->format = class_exists(GithubActionReporter::class) && GithubActionReporter::isGithubActionEnvironment() ? 'github' : 'txt';

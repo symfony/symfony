@@ -20,7 +20,7 @@ use Symfony\Component\Lock\Store\RetryTillSaveStore;
  *
  * @group legacy
  */
-class RetryTillSaveStoreTest extends AbstractStoreTest
+class RetryTillSaveStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;
 

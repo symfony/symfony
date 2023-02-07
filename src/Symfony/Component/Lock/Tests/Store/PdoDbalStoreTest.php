@@ -25,7 +25,7 @@ use Symfony\Component\Lock\Store\PdoStore;
  * @requires extension pdo_sqlite
  * @group legacy
  */
-class PdoDbalStoreTest extends AbstractStoreTest
+class PdoDbalStoreTest extends AbstractStoreTestCase
 {
     use ExpectDeprecationTrait;
     use ExpiringStoreTestTrait;

@@ -22,7 +22,7 @@ use Symfony\Component\Lock\Store\PostgreSqlStore;
  * @group integration
  * @group legacy
  */
-class PostgreSqlDbalStoreTest extends AbstractStoreTest
+class PostgreSqlDbalStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;
     use ExpectDeprecationTrait;

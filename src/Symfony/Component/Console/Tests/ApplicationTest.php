@@ -1787,34 +1787,39 @@ class ApplicationTest extends TestCase
         $this->assertArrayNotHasKey('disabled', $application->all());
     }
 
-    public function testGetShellVerbosity()
+    public function provideShellVerbosityData(): array
+    {
+        return [
+            [-1, ['--quiet']],
+            [-1, ['-q']],
+            [1, ['-v']],
+            [2, ['-vv']],
+            [3, ['-vvv']],
+            [1, ['--verbose']],
+            [1, ['--verbose' => 1]],
+            [2, ['--verbose' => 2]],
+            [3, ['--verbose' => 3]],
+            [1, ['--verbose' => 4]],
+            [0, []],
+            [
+                3,
+                function () {
+                    putenv('SHELL_VERBOSITY=3');
+
+                    return [];
+                },
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideShellVerbosityData
+     */
+    public function testGetShellVerbosity($expected, $input)
     {
         $application = new Application();
-        $this->assertSame(-1, $application->getShellVerbosity(new ArrayInput(['--quiet'])));
-        $this->assertSame(-1, $application->getShellVerbosity(new ArrayInput(['-q'])));
-        $this->assertSame(1, $application->getShellVerbosity(new ArrayInput(['-v'])));
-        $this->assertSame(2, $application->getShellVerbosity(new ArrayInput(['-vv'])));
-        $this->assertSame(3, $application->getShellVerbosity(new ArrayInput(['-vvv'])));
-        $this->assertSame(1, $application->getShellVerbosity(new ArrayInput(['--verbose'])));
-        $this->assertSame(1, $application->getShellVerbosity(new ArrayInput(['--verbose' => 1])));
-        $this->assertSame(2, $application->getShellVerbosity(new ArrayInput(['--verbose' => 2])));
-        $this->assertSame(3, $application->getShellVerbosity(new ArrayInput(['--verbose' => 3])));
-        $this->assertSame(
-            1,
-            $application->getShellVerbosity(new ArrayInput(['--verbose' => 4])),
-            'Function returns 1 (verbose) if unknown --verbose level is passed'
-        );
-        $this->assertSame(
-            0,
-            $application->getShellVerbosity(new ArrayInput([])),
-            'Function returns 0 if no shell verbosity is specified'
-        );
-        putenv('SHELL_VERBOSITY=3');
-        $this->assertSame(
-            3,
-            $application->getShellVerbosity(new ArrayInput([])),
-            'Function returns SHELL_VERBOSITY env when no other verbosity is specified'
-        );
+        $input = is_callable($input) ? $input() : $input;
+        $this->assertSame($expected, $application->getShellVerbosity(new ArrayInput($input)));
     }
 
     public function testFindAlternativesDoesNotLoadSameNamespaceCommandsOnExactMatch()

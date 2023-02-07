@@ -22,7 +22,7 @@ use Symfony\Component\Lock\Store\ZookeeperStore;
  * @requires extension zookeeper
  * @group integration
  */
-class ZookeeperStoreTest extends AbstractStoreTest
+class ZookeeperStoreTest extends AbstractStoreTestCase
 {
     use UnserializableTestTrait;
 

@@ -15,7 +15,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-class XmlCompleteConfigurationTest extends CompleteConfigurationTest
+class XmlCompleteConfigurationTest extends CompleteConfigurationTestCase
 {
     protected function getLoader(ContainerBuilder $container)
     {

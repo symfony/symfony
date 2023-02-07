@@ -16,7 +16,7 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\GetAttrNode;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
-class GetAttrNodeTest extends AbstractNodeTest
+class GetAttrNodeTest extends AbstractNodeTestCase
 {
     public static function getEvaluateData(): array
     {

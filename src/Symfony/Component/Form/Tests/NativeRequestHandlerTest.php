@@ -17,7 +17,7 @@ use Symfony\Component\Form\NativeRequestHandler;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NativeRequestHandlerTest extends AbstractRequestHandlerTest
+class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
 {
     private static $serverBackup;
 

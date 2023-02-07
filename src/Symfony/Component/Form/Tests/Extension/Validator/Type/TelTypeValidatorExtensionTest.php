@@ -15,7 +15,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
-class TelTypeValidatorExtensionTest extends BaseValidatorExtensionTest
+class TelTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
     use ExpectDeprecationTrait;
     use ValidatorExtensionTrait;

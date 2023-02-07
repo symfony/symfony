@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransforme
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
 
-class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTest
+class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
 {
     use DateTimeEqualsTrait;
 

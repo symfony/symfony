@@ -14,7 +14,7 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
-class ArrayNodeTest extends AbstractNodeTest
+class ArrayNodeTest extends AbstractNodeTestCase
 {
     public function testSerialization()
     {

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Route;
 /**
  * @requires PHP 8
  */
-class AnnotationClassLoaderWithAttributesTest extends AnnotationClassLoaderTest
+class AnnotationClassLoaderWithAttributesTest extends AnnotationClassLoaderTestCase
 {
     protected function setUp(string $env = null): void
     {

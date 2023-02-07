@@ -30,7 +30,7 @@ trait ExpiringStoreTestTrait
     abstract protected function getClockDelay();
 
     /**
-     * @see AbstractStoreTest::getStore()
+     * @see AbstractStoreTestCase::getStore()
      */
     abstract protected function getStore();
 

@@ -23,7 +23,7 @@ use Symfony\Component\Lock\Store\MemcachedStore;
  * @requires extension memcached
  * @group integration
  */
-class MemcachedStoreTest extends AbstractStoreTest
+class MemcachedStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 

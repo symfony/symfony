@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
-class Html5ParserCrawlerTest extends AbstractCrawlerTest
+class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
 {
     public static function getDoctype(): string
     {

@@ -26,7 +26,7 @@ use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
  * @requires extension pdo_pgsql
  * @group integration
  */
-class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTest
+class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;
     use SharedLockStoreTestTrait;

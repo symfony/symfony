@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 /**
  * @group integration
  */
-class PredisRedisClusterAdapterTest extends AbstractRedisAdapterTest
+class PredisRedisClusterAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
     {

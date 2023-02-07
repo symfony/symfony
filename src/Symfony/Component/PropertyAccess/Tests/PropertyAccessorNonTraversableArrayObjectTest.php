@@ -13,7 +13,7 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 use Symfony\Component\PropertyAccess\Tests\Fixtures\NonTraversableArrayObject;
 
-class PropertyAccessorNonTraversableArrayObjectTest extends PropertyAccessorArrayAccessTest
+class PropertyAccessorNonTraversableArrayObjectTest extends PropertyAccessorArrayAccessTestCase
 {
     protected static function getContainer(array $array)
     {

@@ -18,7 +18,7 @@ use Symfony\Component\Mime\MimeTypes;
 /**
  * @requires extension fileinfo
  */
-class MimeTypesTest extends AbstractMimeTypeGuesserTest
+class MimeTypesTest extends AbstractMimeTypeGuesserTestCase
 {
     protected function getGuesser(): MimeTypeGuesserInterface
     {

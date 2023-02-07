@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 /**
  * @requires PHP 8
  */
-class AnnotationLoaderWithAttributesTest extends AnnotationLoaderTest
+class AnnotationLoaderWithAttributesTest extends AnnotationLoaderTestCase
 {
     protected function createLoader(): AnnotationLoader
     {

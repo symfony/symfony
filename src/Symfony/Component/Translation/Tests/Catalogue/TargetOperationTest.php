@@ -15,7 +15,7 @@ use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
-class TargetOperationTest extends AbstractOperationTest
+class TargetOperationTest extends AbstractOperationTestCase
 {
     public function testGetMessagesFromSingleDomain()
     {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
-class AnnotationLoaderWithDoctrineAnnotationsTest extends AnnotationLoaderTest
+class AnnotationLoaderWithDoctrineAnnotationsTest extends AnnotationLoaderTestCase
 {
     protected function createLoader(): AnnotationLoader
     {

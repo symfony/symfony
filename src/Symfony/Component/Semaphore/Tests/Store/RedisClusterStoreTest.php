@@ -18,7 +18,7 @@ use PHPUnit\Framework\SkippedTestSuiteError;
  *
  * @requires extension redis
  */
-class RedisClusterStoreTest extends AbstractRedisStoreTest
+class RedisClusterStoreTest extends AbstractRedisStoreTestCase
 {
     public static function setUpBeforeClass(): void
     {

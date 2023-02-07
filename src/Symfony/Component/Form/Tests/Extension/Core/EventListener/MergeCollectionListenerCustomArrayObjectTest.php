@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\Tests\Fixtures\CustomArrayObject;
 
-class MergeCollectionListenerCustomArrayObjectTest extends MergeCollectionListenerTest
+class MergeCollectionListenerCustomArrayObjectTest extends MergeCollectionListenerTestCase
 {
     protected function getData(array $data)
     {

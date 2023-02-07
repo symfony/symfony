@@ -20,7 +20,7 @@ use Symfony\Component\Cache\CacheItem;
 /**
  * @group integration
  */
-class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTest
+class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
 {
     protected $skippedTests = [
         'testPrune' => 'RedisAdapter does not implement PruneableInterface.',

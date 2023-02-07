@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Loader\DirectoryLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 
-class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
+class DirectoryLoaderTest extends AbstractAnnotationLoaderTestCase
 {
     private $loader;
     private $reader;

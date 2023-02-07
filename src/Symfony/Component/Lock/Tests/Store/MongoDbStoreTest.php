@@ -25,7 +25,7 @@ use Symfony\Component\Lock\Store\MongoDbStore;
  * @requires extension mongodb
  * @group integration
  */
-class MongoDbStoreTest extends AbstractStoreTest
+class MongoDbStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
 

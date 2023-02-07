@@ -389,7 +389,7 @@ class SecurityDataCollectorTest extends TestCase
 
 class DummyVoter implements VoterInterface
 {
-    public function vote(TokenInterface $token, mixed $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
     }
 }

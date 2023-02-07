@@ -38,7 +38,7 @@ class ReStructuredTextDescriptorTest extends AbstractDescriptorTestCase
         return new ReStructuredTextDescriptor();
     }
 
-    protected function getFormat()
+    protected static function getFormat()
     {
         return 'rst';
     }

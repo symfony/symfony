@@ -292,7 +292,7 @@ class ReflectionCaster
         if ($c->isOptional()) {
             try {
                 $a[$prefix.'default'] = $v = $c->getDefaultValue();
-                if ($c->isDefaultValueConstant()) {
+                if ($c->isDefaultValueConstant() && !\is_object($v)) {
                     $a[$prefix.'default'] = new ConstStub($c->getDefaultValueConstantName(), $v);
                 }
                 if (null === $v) {

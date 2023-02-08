@@ -52,7 +52,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
      */
     public function testTestMode(int $expected, bool $testMode)
     {
-        $message = new SmsMessage('+37012345678', 'Hello World!');
+        $message = new SmsMessage('0037012345678', 'Hello World');
 
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->atLeast(1))

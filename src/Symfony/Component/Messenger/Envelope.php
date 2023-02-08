@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
@@ -126,5 +127,10 @@ final class Envelope
     public function getMessage(): object
     {
         return $this->message;
+    }
+
+    public function getResult(): mixed
+    {
+        return $this->last(HandledStamp::class)?->getResult();
     }
 }

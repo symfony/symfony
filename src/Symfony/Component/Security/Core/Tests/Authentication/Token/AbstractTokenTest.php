@@ -73,13 +73,14 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($username, $token->getUserIdentifier());
     }
 
-    public function provideUsers()
+    public static function provideUsers()
     {
         yield [new InMemoryUser('fabien', null), 'fabien'];
     }
 
     /**
      * @dataProvider provideLegacyUsers
+     *
      * @group legacy
      */
     public function testLegacyGetUserIdentifier($user, string $username)
@@ -89,7 +90,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($username, $token->getUserIdentifier());
     }
 
-    public function provideLegacyUsers()
+    public static function provideLegacyUsers()
     {
         return [
             [new TestUser('fabien'), 'fabien'],
@@ -174,6 +175,7 @@ class AbstractTokenTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider getUserChanges
      */
     public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser)
@@ -189,9 +191,9 @@ class AbstractTokenTest extends TestCase
         $this->assertFalse($token->isAuthenticated());
     }
 
-    public function getUserChanges()
+    public static function getUserChanges()
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = new DummyUser();
 
         return [
             ['foo', 'bar'],
@@ -207,6 +209,7 @@ class AbstractTokenTest extends TestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideUsers
      * @dataProvider provideLegacyUsers
      */
@@ -319,6 +322,36 @@ class SerializableUser implements UserInterface, \Serializable
     public function __unserialize(array $data): void
     {
         ['name' => $this->name] = $data;
+    }
+}
+
+class DummyUser implements UserInterface
+{
+    public function getRoles(): array
+    {
+        return [];
+    }
+
+    public function getPassword(): ?string
+    {
+        return null;
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    public function getUsername(): string
+    {
+    }
+
+    public function getUserIdentifier(): string
+    {
     }
 }
 

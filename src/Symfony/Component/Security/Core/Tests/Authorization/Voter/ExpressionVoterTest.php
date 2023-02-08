@@ -32,16 +32,16 @@ class ExpressionVoterTest extends TestCase
         $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles, $tokenExpectsGetRoles), null, $attributes));
     }
 
-    public function getVoteTests()
+    public static function getVoteTests()
     {
         return [
             [[], [], VoterInterface::ACCESS_ABSTAIN, false, false],
             [[], ['FOO'], VoterInterface::ACCESS_ABSTAIN, false, false],
 
-            [[], [$this->createExpression()], VoterInterface::ACCESS_DENIED, true, false],
+            [[], [self::createExpression()], VoterInterface::ACCESS_DENIED, true, false],
 
-            [['ROLE_FOO'], [$this->createExpression(), $this->createExpression()], VoterInterface::ACCESS_GRANTED],
-            [['ROLE_BAR', 'ROLE_FOO'], [$this->createExpression()], VoterInterface::ACCESS_GRANTED],
+            [['ROLE_FOO'], [self::createExpression(), self::createExpression()], VoterInterface::ACCESS_GRANTED],
+            [['ROLE_BAR', 'ROLE_FOO'], [self::createExpression()], VoterInterface::ACCESS_GRANTED],
         ];
     }
 
@@ -81,8 +81,8 @@ class ExpressionVoterTest extends TestCase
         return $this->createMock(AuthorizationCheckerInterface::class);
     }
 
-    protected function createExpression()
+    protected static function createExpression()
     {
-        return $this->createMock(Expression::class);
+        return new Expression('');
     }
 }

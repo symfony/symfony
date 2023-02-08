@@ -25,7 +25,7 @@ class VoterTest extends TestCase
         $this->token = $this->createMock(TokenInterface::class);
     }
 
-    public function getTests()
+    public static function getTests(): array
     {
         $voter = new VoterTest_Voter();
         $integerVoter = new IntegerVoterTest_Voter();
@@ -41,7 +41,7 @@ class VoterTest extends TestCase
 
             [$voter, ['DELETE'], VoterInterface::ACCESS_ABSTAIN, new \stdClass(), 'ACCESS_ABSTAIN if no attribute is supported'],
 
-            [$voter, ['EDIT'], VoterInterface::ACCESS_ABSTAIN, $this, 'ACCESS_ABSTAIN if class is not supported'],
+            [$voter, ['EDIT'], VoterInterface::ACCESS_ABSTAIN, new class() {}, 'ACCESS_ABSTAIN if class is not supported'],
 
             [$voter, ['EDIT'], VoterInterface::ACCESS_ABSTAIN, null, 'ACCESS_ABSTAIN if object is null'],
 

@@ -78,6 +78,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMinNamed($value)
@@ -101,6 +102,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMaxNamed($value)
@@ -124,6 +126,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMinMaxNamed($value)
@@ -155,6 +158,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getLessThanTen
      */
     public function testInvalidValuesMinNamed($value, $formattedValue)
@@ -191,6 +195,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getMoreThanTwenty
      */
     public function testInvalidValuesMaxNamed($value, $formattedValue)
@@ -229,6 +234,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getMoreThanTwenty
      */
     public function testInvalidValuesCombinedMaxNamed($value, $formattedValue)
@@ -268,6 +274,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getLessThanTen
      */
     public function testInvalidValuesCombinedMinNamed($value, $formattedValue)
@@ -284,11 +291,12 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getTenthToTwentiethMarch2014()
+    public static function getTenthToTwentiethMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 10, 2014')],
@@ -300,16 +308,17 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 15, 2014')];
         $tests[] = [new \DateTimeImmutable('March 20, 2014')];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }
 
-    public function getSoonerThanTenthMarch2014()
+    public static function getSoonerThanTenthMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'],
@@ -319,16 +328,17 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'];
         $tests[] = [new \DateTimeImmutable('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }
 
-    public function getLaterThanTwentiethMarch2014()
+    public static function getLaterThanTwentiethMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'],
@@ -338,7 +348,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'];
         $tests[] = [new \DateTimeImmutable('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }
@@ -639,6 +649,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMinPropertyPathNamed($value)
@@ -666,6 +677,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getTenToTwenty
      */
     public function testValidValuesMaxPropertyPathNamed($value)
@@ -763,6 +775,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getMoreThanTwenty
      */
     public function testInvalidValuesCombinedMaxPropertyPathNamed($value, $formattedValue)
@@ -814,6 +827,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @requires PHP 8
+     *
      * @dataProvider getLessThanTen
      */
     public function testInvalidValuesCombinedMinPropertyPathNamed($value, $formattedValue)
@@ -1074,6 +1088,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
+     *
      * @dataProvider provideMessageIfMinAndMaxSet
      */
     public function testMessageIfMinAndMaxSet(array $constraintExtraOptions, int $value, string $expectedMessage, string $expectedCode)

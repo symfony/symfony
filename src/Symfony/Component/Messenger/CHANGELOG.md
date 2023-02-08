@@ -9,6 +9,7 @@ CHANGELOG
    `Symfony\Component\Messenger\Transport\InMemoryTransportFactory` in favor of
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport` and
    `Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory`
+ * Add possibility to configure exchange to exchange bindings in AMQP transport
 
 6.2
 ---

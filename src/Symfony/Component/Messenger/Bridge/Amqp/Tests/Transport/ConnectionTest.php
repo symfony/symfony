@@ -356,7 +356,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testBindingArguments()
+    public function testQueueBindingArguments()
     {
         $amqpConnection = $this->createMock(\AMQPConnection::class);
         $amqpChannel = $this->createMock(\AMQPChannel::class);
@@ -378,6 +378,36 @@ class ConnectionTest extends TestCase
 
         $dsn = 'amqp://localhost?exchange[type]=headers'.
             '&queues[queue0][binding_arguments][x-match]=all';
+
+        $connection = Connection::fromDsn($dsn, [], $factory);
+        $connection->publish('body');
+    }
+
+    public function testExchangeBindingArguments()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->once())->method('declareExchange');
+        $amqpExchange->expects($this->exactly(4))->method('bind')->withConsecutive(
+            ['exchange0', 'binding_key0', ['x-match' => 'all']],
+            ['exchange0', 'binding_key1', ['x-match' => 'all']],
+            ['exchange1', 'binding_key2', ['x-match' => 'any']],
+            ['exchange1', 'binding_key3', ['x-match' => 'any']],
+        );
+        $amqpExchange->expects($this->once())->method('publish')->with('body', null, \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
+
+        $dsn = 'amqp://localhost?exchange[type]=headers'.
+            '&exchange[bindings][exchange0][binding_arguments][x-match]=all'.
+            '&exchange[bindings][exchange0][binding_keys][0]=binding_key0'.
+            '&exchange[bindings][exchange0][binding_keys][1]=binding_key1'.
+            '&exchange[bindings][exchange1][binding_arguments][x-match]=any'.
+            '&exchange[bindings][exchange1][binding_keys][0]=binding_key2'.
+            '&exchange[bindings][exchange1][binding_keys][1]=binding_key3';
 
         $connection = Connection::fromDsn($dsn, [], $factory);
         $connection->publish('body');

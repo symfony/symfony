@@ -18,6 +18,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -59,6 +60,26 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('multiplier'),
                 abstract_arg('max delay ms'),
                 abstract_arg('jitter'),
+            ])
+
+        ->set('http_client.uri_template', UriTemplateHttpClient::class)
+            ->decorate('http_client', null, 7) // Between TraceableHttpClient (5) and RetryableHttpClient (10)
+            ->args([
+                service('.inner'),
+                service('http_client.uri_template_expander')->nullOnInvalid(),
+                abstract_arg('default vars'),
+            ])
+
+        ->set('http_client.uri_template_expander.guzzle', \Closure::class)
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([
+                [\GuzzleHttp\UriTemplate\UriTemplate::class, 'expand'],
+            ])
+
+        ->set('http_client.uri_template_expander.rize', \Closure::class)
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([
+                [inline_service(\Rize\UriTemplate::class), 'expand'],
             ])
     ;
 };

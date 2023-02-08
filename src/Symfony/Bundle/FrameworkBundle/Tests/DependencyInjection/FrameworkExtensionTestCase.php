@@ -55,6 +55,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -2003,7 +2004,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_mock_response_factory');
 
-        $definition = $container->getDefinition('http_client.mock_client');
+        $definition = $container->getDefinition(($uriTemplateHttpClientExists = class_exists(UriTemplateHttpClient::class)) ? 'http_client.uri_template.inner.mock_client' : 'http_client.mock_client');
 
         $this->assertSame(MockHttpClient::class, $definition->getClass());
         $this->assertCount(1, $definition->getArguments());
@@ -2011,7 +2012,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $argument = $definition->getArgument(0);
 
         $this->assertInstanceOf(Reference::class, $argument);
-        $this->assertSame('http_client', current($definition->getDecoratedService()));
+        $this->assertSame($uriTemplateHttpClientExists ? 'http_client.uri_template.inner' : 'http_client', current($definition->getDecoratedService()));
         $this->assertSame('my_response_factory', (string) $argument);
     }
 

@@ -151,7 +151,7 @@ class SwitchUserListener extends AbstractListener
         }
 
         $currentUsername = $token->getUserIdentifier();
-        $nonExistentUsername = '_'.md5(random_bytes(8).$username);
+        $nonExistentUsername = '_'.hash('xxh128', random_bytes(8).$username);
 
         // To protect against user enumeration via timing measurements
         // we always load both successfully and unsuccessfully

@@ -142,6 +142,6 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             return $class.'-'.$context['cache_key'];
         }
 
-        return $class.md5(serialize($context[AbstractNormalizer::GROUPS] ?? []));
+        return $class.hash('xxh128', serialize($context[AbstractNormalizer::GROUPS] ?? []));
     }
 }

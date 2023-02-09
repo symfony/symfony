@@ -200,7 +200,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 
     private function computeHash(): string
     {
-        $hash = hash_init('md5');
+        $hash = hash_init('xxh128');
 
         foreach ($this->getIterator() as $path => $info) {
             hash_update($hash, $path."\n");

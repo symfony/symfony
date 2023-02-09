@@ -105,7 +105,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             // the class does not exist anymore
             return false;
         }
-        $hash = hash_init('md5');
+        $hash = hash_init('xxh128');
 
         foreach ($this->generateSignature($this->classReflector) as $info) {
             hash_update($hash, $info);

@@ -730,7 +730,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         unset($context['cache_key']); // avoid artificially different keys
 
         try {
-            return md5($format.serialize([
+            return hash('xxh128', $format.serialize([
                 'context' => $context,
                 'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));

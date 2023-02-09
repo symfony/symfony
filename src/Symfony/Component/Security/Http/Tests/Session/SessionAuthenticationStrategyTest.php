@@ -54,6 +54,18 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($this->getRequest($session), $this->getToken());
     }
 
+    public function testCsrfTokensAreCleared()
+    {
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
+
+        $csrfStorage = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface')->getMock();
+        $csrfStorage->expects($this->once())->method('clear');
+
+        $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE, $csrfStorage);
+        $strategy->onAuthentication($this->getRequest($session), $this->getToken());
+    }
+
     private function getRequest($session = null)
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();

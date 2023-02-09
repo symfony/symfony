@@ -251,7 +251,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             $line = substr($buffer, $upTo + 1).$line;
             fseek($file, max(0, $position), \SEEK_SET);
 
-            if ('' !== $line) {
+            if ($line === '') {
                 break;
             }
         }

@@ -171,6 +171,10 @@ class Connection implements ResetInterface
                 ->orderBy('available_at', 'ASC')
                 ->setMaxResults(1);
 
+            if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+                $query->select('m.id');
+            }
+
             // Append pessimistic write lock to FROM clause if db platform supports it
             $sql = $query->getSQL();
             if (($fromPart = $query->getQueryPart('from')) &&
@@ -187,18 +191,9 @@ class Connection implements ResetInterface
 
             // Wrap the rownum query in a sub-query to allow writelocks without ORA-02014 error
             if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
-                $sql = str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql);
-
-                $wrappedQuery = $this->driverConnection->createQueryBuilder()
-                    ->select(
-                        'w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", '.
-                        'w.created_at AS "created_at", w.available_at AS "available_at", '.
-                        'w.delivered_at AS "delivered_at"'
-                    )
-                    ->from($this->configuration['table_name'], 'w')
-                    ->where('w.id IN('.$sql.')');
-
-                $sql = $wrappedQuery->getSQL();
+                $sql = $this->createQueryBuilder('w')
+                    ->where('w.id IN ('.str_replace('SELECT a.* FROM', 'SELECT a.id FROM', $sql).')')
+                    ->getSQL();
             }
 
             // use SELECT ... FOR UPDATE to lock table
@@ -287,7 +282,7 @@ class Connection implements ResetInterface
     public function getMessageCount(): int
     {
         $queryBuilder = $this->createAvailableMessagesQueryBuilder()
-            ->select('COUNT(m.id) as message_count')
+            ->select('COUNT(m.id) AS message_count')
             ->setMaxResults(1);
 
         $stmt = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
@@ -298,6 +293,7 @@ class Connection implements ResetInterface
     public function findAll(int $limit = null): array
     {
         $queryBuilder = $this->createAvailableMessagesQueryBuilder();
+
         if (null !== $limit) {
             $queryBuilder->setMaxResults($limit);
         }
@@ -365,11 +361,25 @@ class Connection implements ResetInterface
             ]);
     }
 
-    private function createQueryBuilder(): QueryBuilder
+    private function createQueryBuilder(string $alias = 'm'): QueryBuilder
     {
-        return $this->driverConnection->createQueryBuilder()
-            ->select('m.*')
-            ->from($this->configuration['table_name'], 'm');
+        $queryBuilder = $this->driverConnection->createQueryBuilder()
+            ->from($this->configuration['table_name'], $alias);
+
+        $alias .= '.';
+
+        if (!$this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
+            return $queryBuilder->select($alias.'*');
+        }
+
+        // Oracle databases use UPPER CASE on tables and column identifiers.
+        // Column alias is added to force the result to be lowercase even when the actual field is all caps.
+
+        return $queryBuilder->select(str_replace(', ', ', '.$alias,
+            $alias.'id AS "id", body AS "body", headers AS "headers", queue_name AS "queue_name", '.
+            'created_at AS "created_at", available_at AS "available_at", '.
+            'delivered_at AS "delivered_at"'
+        ));
     }
 
     private function executeQuery(string $sql, array $parameters = [], array $types = [])

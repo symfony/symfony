@@ -1,6 +1,11 @@
 UPGRADE FROM 5.1 to 5.2
 =======================
 
+Console
+-------
+
+ * `Application` now runs `pcntl_async_signals(true)` when constucted; if the code of your CLI application depends on pcntl signals being synchronous, you should either call `pcntl_async_signals(false)` or implement `SignalableCommandInterface::handleSignal()`
+
 DependencyInjection
 -------------------
 

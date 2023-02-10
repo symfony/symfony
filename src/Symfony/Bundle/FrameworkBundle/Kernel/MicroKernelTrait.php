@@ -213,6 +213,10 @@ trait MicroKernelTrait
         if ($configuratorClass && !is_a(RoutingConfigurator::class, $configuratorClass, true)) {
             trigger_deprecation('symfony/framework-bundle', '5.1', 'Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class);
 
+            if (!class_exists(RouteCollectionBuilder::class)) {
+                throw new \InvalidArgumentException(sprintf('Using type "%s" for argument 1 of method "%s:configureRoutes()" is not compatible with the installed "symfony/routing" version. Use "%s" instead, or run "composer require symfony/routing:^5.4".', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class));
+            }
+
             $routes = new RouteCollectionBuilder($loader);
             $this->configureRoutes($routes);
 

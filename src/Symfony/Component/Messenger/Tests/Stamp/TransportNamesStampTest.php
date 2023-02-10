@@ -27,4 +27,13 @@ class TransportNamesStampTest extends TestCase
             $this->assertSame($sender, $stampSenders[$key]);
         }
     }
+
+    public function testGetIndividualSender()
+    {
+        $stamp = new TransportNamesStamp('first_transport');
+        $stampSenders = $stamp->getTransportNames();
+
+        $this->assertCount(1, $stampSenders);
+        $this->assertSame('first_transport', $stampSenders[0]);
+    }
 }

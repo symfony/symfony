@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.3
+---
+
+ * Changing the option `from` to optional to enable sending "eco" messages
+
 6.2
 ---
 

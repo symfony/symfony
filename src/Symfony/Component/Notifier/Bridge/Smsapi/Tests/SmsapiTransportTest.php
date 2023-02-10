@@ -23,17 +23,21 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SmsapiTransportTest extends TransportTestCase
 {
-    public function createTransport(HttpClientInterface $client = null, bool $fast = false, bool $test = false): SmsapiTransport
+    public function createTransport(HttpClientInterface $client = null, string $from = '', bool $fast = false, bool $test = false): SmsapiTransport
     {
-        return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host')->setFast($fast)->setTest($test);
+        return (new SmsapiTransport('testToken', $from, $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host')->setFast($fast)->setTest($test);
     }
 
     public function toStringProvider(): iterable
     {
-        yield ['smsapi://test.host?from=testFrom', $this->createTransport()];
-        yield ['smsapi://test.host?from=testFrom&fast=1', $this->createTransport(null, true)];
-        yield ['smsapi://test.host?from=testFrom&test=1', $this->createTransport(null, false, true)];
-        yield ['smsapi://test.host?from=testFrom&fast=1&test=1', $this->createTransport(null, true, true)];
+        yield ['smsapi://test.host', $this->createTransport()];
+        yield ['smsapi://test.host?fast=1', $this->createTransport(null, '', true)];
+        yield ['smsapi://test.host?test=1', $this->createTransport(null, '', false, true)];
+        yield ['smsapi://test.host?fast=1&test=1', $this->createTransport(null, '', true, true)];
+        yield ['smsapi://test.host?from=testFrom', $this->createTransport(null, 'testFrom')];
+        yield ['smsapi://test.host?from=testFrom&fast=1', $this->createTransport(null, 'testFrom', true)];
+        yield ['smsapi://test.host?from=testFrom&test=1', $this->createTransport(null, 'testFrom', false, true)];
+        yield ['smsapi://test.host?from=testFrom&fast=1&test=1', $this->createTransport(null, 'testFrom', true, true)];
     }
 
     public function supportedMessagesProvider(): iterable

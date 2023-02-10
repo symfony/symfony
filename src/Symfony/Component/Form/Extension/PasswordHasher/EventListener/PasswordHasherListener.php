@@ -71,11 +71,17 @@ class PasswordHasherListener
 
     private function getTargetForm(FormInterface $form): FormInterface
     {
-        $parent = $form->getParent();
-
-        if ($parent && $parent->getConfig()->getType()->getInnerType() instanceof RepeatedType) {
-            return $parent;
+        if (!$parentForm = $form->getParent()) {
+            return $form;
         }
+
+        $parentType = $parentForm->getConfig()->getType();
+
+        do {
+            if ($parentType->getInnerType() instanceof RepeatedType) {
+                return $parentForm;
+            }
+        } while ($parentType = $parentType->getParent());
 
         return $form;
     }

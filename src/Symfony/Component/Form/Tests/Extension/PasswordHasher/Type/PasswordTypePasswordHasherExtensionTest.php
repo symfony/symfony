@@ -13,9 +13,12 @@ namespace Symfony\Component\Form\Tests\Extension\PasswordHasher\Type;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\PasswordHasher\EventListener\PasswordHasherListener;
 use Symfony\Component\Form\Extension\PasswordHasher\PasswordHasherExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Form\Tests\Fixtures\RepeatedPasswordField;
 use Symfony\Component\Form\Tests\Fixtures\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -111,6 +114,53 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
 
         $this->assertTrue($form->isValid());
         $this->assertSame($user->getPassword(), $hashedPassword);
+    }
+
+    /**
+     * @dataProvider provideRepeatedPasswordField
+     */
+    public function testRepeatedPasswordField(string $type, array $options = [])
+    {
+        $user = new User();
+
+        $plainPassword = 'PlainPassword';
+        $hashedPassword = 'HashedPassword';
+
+        $this->passwordHasher
+            ->expects($this->once())
+            ->method('hashPassword')
+            ->with($user, $plainPassword)
+            ->willReturn($hashedPassword)
+        ;
+
+        $this->assertNull($user->getPassword());
+
+        $form = $this->factory
+            ->createBuilder(data: $user)
+            ->add('plainPassword', $type, $options)
+            ->getForm()
+        ;
+
+        $form->submit(['plainPassword' => ['first' => $plainPassword, 'second' => $plainPassword]]);
+
+        $this->assertTrue($form->isValid());
+        $this->assertSame($user->getPassword(), $hashedPassword);
+    }
+
+    public static function provideRepeatedPasswordField(): iterable
+    {
+        yield 'RepeatedType' => [
+            RepeatedType::class,
+            [
+                'type' => PasswordType::class,
+                'first_options' => [
+                    'hash_property_path' => 'password',
+                ],
+                'mapped' => false,
+            ],
+        ];
+
+        yield 'RepeatedType child' => [RepeatedPasswordField::class];
     }
 
     public function testPasswordHashOnInvalidForm()

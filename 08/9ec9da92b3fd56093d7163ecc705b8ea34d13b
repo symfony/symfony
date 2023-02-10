@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by alfredbez at 2023-02-08T08:53:23Z
+
+I'm pretty sure that you forgot to add the words "in dataproviders" in this paragraph:
+> [...] in my opinion, creating
+> * test doubles
+> * the system under test (not the case here, but I have observed it elsewhere)
+>
+> are anti-patterns.
+
+---------------------------------------------------------------------------
+
+by localheinz at 2023-02-08T08:54:33Z
+
+Thank you, @alfredbez - adjusted the description!

@@ -353,8 +353,8 @@ trait AbstractAdapterTrait
             return $this->namespace.$this->namespaceVersion.$key;
         }
         if (\strlen($id = $this->namespace.$this->namespaceVersion.$key) > $this->maxIdLength) {
-            // Use MD5 to favor speed over security, which is not an issue here
-            $this->ids[$key] = $id = substr_replace(base64_encode(hash('md5', $key, true)), static::NS_SEPARATOR, -(\strlen($this->namespaceVersion) + 2));
+            // Use xxh128 to favor speed over security, which is not an issue here
+            $this->ids[$key] = $id = substr_replace(base64_encode(hash('xxh128', $key, true)), static::NS_SEPARATOR, -(\strlen($this->namespaceVersion) + 2));
             $id = $this->namespace.$this->namespaceVersion.$id;
         }
 

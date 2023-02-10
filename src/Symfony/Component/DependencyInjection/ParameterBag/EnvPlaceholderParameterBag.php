@@ -48,7 +48,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 throw new RuntimeException(sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', get_debug_type($defaultValue), $name));
             }
 
-            $uniqueName = md5($name.'_'.self::$counter++);
+            $uniqueName = hash('xxh128', $name.'_'.self::$counter++);
             $placeholder = sprintf('%s_%s_%s', $this->getEnvPlaceholderUniquePrefix(), strtr($env, ':-.\\', '____'), $uniqueName);
             $this->envPlaceholders[$env][$placeholder] = $placeholder;
 
@@ -66,7 +66,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
         if (!isset($this->envPlaceholderUniquePrefix)) {
             $reproducibleEntropy = unserialize(serialize($this->parameters));
             array_walk_recursive($reproducibleEntropy, function (&$v) { $v = null; });
-            $this->envPlaceholderUniquePrefix = 'env_'.substr(md5(serialize($reproducibleEntropy)), -16);
+            $this->envPlaceholderUniquePrefix = 'env_'.substr(hash('xxh128', serialize($reproducibleEntropy)), -16);
         }
 
         return $this->envPlaceholderUniquePrefix;

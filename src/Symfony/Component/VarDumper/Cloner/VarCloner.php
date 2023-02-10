@@ -41,7 +41,7 @@ class VarCloner extends AbstractCloner
         $stub = null;                   // Stub capturing the main properties of an original item value
                                         // or null if the original value is used directly
 
-        $gid = self::$gid ??= md5(random_bytes(6)); // Unique string used to detect the special $GLOBALS variable
+        $gid = self::$gid ??= hash('xxh128', random_bytes(6)); // Unique string used to detect the special $GLOBALS variable
         $arrayStub = new Stub();
         $arrayStub->type = Stub::TYPE_ARRAY;
         $fromObjCast = false;

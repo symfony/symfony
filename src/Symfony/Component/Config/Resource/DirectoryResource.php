@@ -43,7 +43,7 @@ class DirectoryResource implements SelfCheckingResourceInterface
 
     public function __toString(): string
     {
-        return md5(serialize([$this->resource, $this->pattern]));
+        return hash('xxh128', serialize([$this->resource, $this->pattern]));
     }
 
     public function getResource(): string

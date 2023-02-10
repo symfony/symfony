@@ -259,7 +259,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                 continue;
             }
 
-            $errorId = md5("{$exception->getSeverity()}/{$exception->getLine()}/{$exception->getFile()}\0{$message}", true);
+            $errorId = hash('xxh128', "{$exception->getSeverity()}/{$exception->getLine()}/{$exception->getFile()}\0{$message}", true);
 
             if (isset($sanitizedLogs[$errorId])) {
                 ++$sanitizedLogs[$errorId]['errorCount'];

@@ -446,7 +446,7 @@ class ProfilerControllerTest extends WebTestCase
     }
 
     /**
-     * @return MockObject<DumpDataCollector>
+     * @return MockObject&DumpDataCollector
      */
     private function createDumpDataCollector(): MockObject
     {

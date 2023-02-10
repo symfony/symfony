@@ -78,6 +78,34 @@ class PropertyPathTest extends TestCase
         $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
     }
 
+    public function testGetElementsWithEscapedDot()
+    {
+        $propertyPath = new PropertyPath('grandpa\.parent.child');
+
+        $this->assertEquals(['grandpa.parent', 'child'], $propertyPath->getElements());
+    }
+
+    public function testGetElementsWithEscapedArray()
+    {
+        $propertyPath = new PropertyPath('grandpa\[parent][child]');
+
+        $this->assertEquals(['grandpa[parent]', 'child'], $propertyPath->getElements());
+    }
+
+    public function testGetElementsWithDoubleEscapedDot()
+    {
+        $propertyPath = new PropertyPath('grandpa\\\.par\ent.\\\child');
+
+        $this->assertEquals(['grandpa\\', 'par\ent', '\\\child'], $propertyPath->getElements());
+    }
+
+    public function testGetElementsWithDoubleEscapedArray()
+    {
+        $propertyPath = new PropertyPath('grandpa\\\[par\ent][\\\child]');
+
+        $this->assertEquals(['grandpa\\', 'par\ent', '\\\child'], $propertyPath->getElements());
+    }
+
     public function testGetParentWithIndex()
     {
         $propertyPath = new PropertyPath('grandpa.parent[child]');

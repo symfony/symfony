@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-02-03T10:18:30Z
+
+> This way it get's a little bit more performance.
+
+Do you have any numbers on that?
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-02-03T10:22:29Z
+
+@xabbuh yes, i did that.
+
+Examplecode :
+```
+$start = microtime(true);
+for ($i = 0; $i < 1000000; $i++)$this->validator->validate('42424242424242424242', new Luhn());
+$end = microtime(true);
+echo $end - $start;
+```
+old: 10.275 seconds
+new: 8.632 seconds
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-02-03T14:44:57Z
+
+Just for fun, I asked ChatGPT to _"write a PHP function that validates a given Luhn code in a string variable called $value. Optimize it for maximum performance"_. This is the result in case it's useful:
+
+```php
+function validateLuhn($value) {
+    $len = strlen($value);
+    $sum = 0;
+    $alt = false;
+    for ($i = $len - 1; $i >= 0; $i--) {
+        $num = (int) $value[$i];
+        if ($alt) {
+            $num *= 2;
+            if ($num > 9) {
+                $num = ($num % 10) + 1;
+            }
+        }
+        $sum += $num;
+        $alt = !$alt;
+    }
+    return ($sum % 10 == 0);
+}
+```
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-02-04T05:44:49Z
+
+Thanks @javiereguiluz, I'll try this on monday. It is a bit easier to understand and will be faster than my solution i guess.
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2023-02-06T06:29:47Z
+
+I now tested the solution @javiereguiluz posted and this is the result of today morning.
+1000000 checks in 8.184 seconds
+
+Then I removed the not needed `floor` of my solution and had 1000000 checks in 6.640 seconds.
+
+But thanks for the suggestion @javiereguiluz.

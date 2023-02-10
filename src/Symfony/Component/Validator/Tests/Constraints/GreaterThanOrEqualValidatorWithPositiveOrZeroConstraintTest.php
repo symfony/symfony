@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends GreaterThanOrEqualValidatorTest
 {
-    protected function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(array $options = null): Constraint
     {
         return new PositiveOrZero();
     }
@@ -29,7 +29,7 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [0, 0],
@@ -45,7 +45,7 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [-1, '-1', 0, '0', 'int'],

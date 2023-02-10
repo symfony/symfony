@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\Transition;
 
 trait WorkflowBuilderTrait
 {
-    private function createComplexWorkflowDefinition()
+    private static function createComplexWorkflowDefinition()
     {
         $places = range('a', 'g');
 
@@ -52,7 +52,7 @@ trait WorkflowBuilderTrait
         //           +----+                          +----+     +----+     +----+
     }
 
-    private function createSimpleWorkflowDefinition()
+    private static function createSimpleWorkflowDefinition()
     {
         $places = range('a', 'c');
 
@@ -87,7 +87,7 @@ trait WorkflowBuilderTrait
         // +---+     +----+     +---+     +----+     +---+
     }
 
-    private function createWorkflowWithSameNameTransition()
+    private static function createWorkflowWithSameNameTransition()
     {
         $places = range('a', 'c');
 
@@ -115,7 +115,7 @@ trait WorkflowBuilderTrait
         //   +--------------------------------------------------------------------+
     }
 
-    private function createComplexStateMachineDefinition()
+    private static function createComplexStateMachineDefinition()
     {
         $places = ['a', 'b', 'c', 'd'];
 

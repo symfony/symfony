@@ -53,27 +53,27 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     public static function getDescribeInputArgumentTestData()
     {
-        return static::getDescriptionTestData(ObjectsProvider::getInputArguments());
+        return self::getDescriptionTestData(ObjectsProvider::getInputArguments());
     }
 
     public static function getDescribeInputOptionTestData()
     {
-        return static::getDescriptionTestData(ObjectsProvider::getInputOptions());
+        return self::getDescriptionTestData(ObjectsProvider::getInputOptions());
     }
 
     public static function getDescribeInputDefinitionTestData()
     {
-        return static::getDescriptionTestData(ObjectsProvider::getInputDefinitions());
+        return self::getDescriptionTestData(ObjectsProvider::getInputDefinitions());
     }
 
     public static function getDescribeCommandTestData()
     {
-        return static::getDescriptionTestData(ObjectsProvider::getCommands());
+        return self::getDescriptionTestData(ObjectsProvider::getCommands());
     }
 
     public static function getDescribeApplicationTestData()
     {
-        return static::getDescriptionTestData(ObjectsProvider::getApplications());
+        return self::getDescriptionTestData(ObjectsProvider::getApplications());
     }
 
     abstract protected function getDescriptor();

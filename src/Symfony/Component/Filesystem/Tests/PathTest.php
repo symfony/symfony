@@ -462,7 +462,7 @@ class PathTest extends TestCase
 
     public function provideMakeAbsoluteTests(): \Generator
     {
-        yield from static::getPathTests();
+        yield from self::getPathTests();
 
         // collapse dots
         yield ['css/./style.css', '/webmozart/symfony', '/webmozart/symfony/css/style.css'];
@@ -589,7 +589,7 @@ class PathTest extends TestCase
 
     public function provideMakeRelativeTests(): \Generator
     {
-        foreach (static::getPathTests() as $set) {
+        foreach (self::getPathTests() as $set) {
             yield [$set[2], $set[1], $set[0]];
         }
 

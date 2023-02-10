@@ -20,13 +20,13 @@ class AffirmativeStrategyTest extends AccessDecisionStrategyTestCase
     {
         $strategy = new AffirmativeStrategy();
 
-        yield [$strategy, static::getVoters(1, 0, 0), true];
-        yield [$strategy, static::getVoters(1, 2, 0), true];
-        yield [$strategy, static::getVoters(0, 1, 0), false];
-        yield [$strategy, static::getVoters(0, 0, 1), false];
+        yield [$strategy, self::getVoters(1, 0, 0), true];
+        yield [$strategy, self::getVoters(1, 2, 0), true];
+        yield [$strategy, self::getVoters(0, 1, 0), false];
+        yield [$strategy, self::getVoters(0, 0, 1), false];
 
         $strategy = new AffirmativeStrategy(true);
 
-        yield [$strategy, static::getVoters(0, 0, 1), true];
+        yield [$strategy, self::getVoters(0, 0, 1), true];
     }
 }

@@ -15,13 +15,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
@@ -29,6 +27,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummyToken;
 
 class PasswordMigratingListenerTest extends TestCase
 {
@@ -58,13 +58,13 @@ class PasswordMigratingListenerTest extends TestCase
         $this->listener->onLoginSuccess($event);
     }
 
-    public function provideUnsupportedEvents()
+    public static function provideUnsupportedEvents()
     {
         // no password upgrade badge
-        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(UserInterface::class); })))];
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(UserInterface::class); })))];
 
         // blank password
-        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(TestPasswordAuthenticatedUser::class); }), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return new DummyTestPasswordAuthenticatedUser(); }), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];
     }
 
     /**
@@ -96,7 +96,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     public function testUpgradeWithUpgrader()
     {
-        $passwordUpgrader = $this->createPasswordUpgrader();
+        $passwordUpgrader = $this->getMockForAbstractClass(TestMigratingUserProvider::class);
         $passwordUpgrader->expects($this->once())
             ->method('upgradePassword')
             ->with($this->user, 'new-hash')
@@ -133,14 +133,14 @@ class PasswordMigratingListenerTest extends TestCase
         $this->listener->onLoginSuccess($event);
     }
 
-    private function createPasswordUpgrader()
+    private static function createPasswordUpgrader()
     {
-        return $this->getMockForAbstractClass(TestMigratingUserProvider::class);
+        return new DummyTestMigratingUserProvider();
     }
 
-    private function createEvent(PassportInterface $passport)
+    private static function createEvent(PassportInterface $passport)
     {
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), new Request(), null, 'main');
+        return new LoginSuccessEvent(new DummyAuthenticator(), $passport, new DummyToken(), new Request(), null, 'main');
     }
 }
 
@@ -151,9 +151,62 @@ abstract class TestMigratingUserProvider implements UserProviderInterface, Passw
     abstract public function loadUserByIdentifier(string $identifier): UserInterface;
 }
 
+class DummyTestMigratingUserProvider extends TestMigratingUserProvider
+{
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
+    {
+    }
+
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+    }
+
+    public function refreshUser(UserInterface $user)
+    {
+    }
+
+    public function supportsClass(string $class)
+    {
+    }
+
+    public function loadUserByUsername(string $username)
+    {
+    }
+}
+
 abstract class TestPasswordAuthenticatedUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
     abstract public function getPassword(): ?string;
 
     abstract public function getSalt(): ?string;
+}
+
+class DummyTestPasswordAuthenticatedUser extends TestPasswordAuthenticatedUser
+{
+    public function getPassword(): ?string
+    {
+        return null;
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function getRoles(): array
+    {
+        return [];
+    }
+
+    public function eraseCredentials()
+    {
+    }
+
+    public function getUsername()
+    {
+    }
+
+    public function getUserIdentifier(): string
+    {
+    }
 }

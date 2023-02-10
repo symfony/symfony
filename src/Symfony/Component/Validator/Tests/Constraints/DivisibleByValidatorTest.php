@@ -26,7 +26,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         return new DivisibleByValidator();
     }
 
-    protected function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(array $options = null): Constraint
     {
         return new DivisibleBy($options);
     }
@@ -39,7 +39,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [-7, 1],
@@ -68,7 +68,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath(): array
+    public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [25],
@@ -78,7 +78,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [1, '1', 2, '2', 'int'],
@@ -112,8 +112,8 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function provideComparisonsToNullValueAtPropertyPath()
+    public static function provideComparisonsToNullValueAtPropertyPath()
     {
-        $this->markTestSkipped('DivisibleByValidator rejects null values.');
+        self::markTestSkipped('DivisibleByValidator rejects null values.');
     }
 }

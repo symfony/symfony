@@ -319,7 +319,7 @@ class DateType extends AbstractType
         return 'date';
     }
 
-    private function formatTimestamps(\IntlDateFormatter $formatter, string $regex, array $timestamps)
+    private function formatTimestamps(\IntlDateFormatter $formatter, string $regex, array $timestamps): array
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimeZoneId();
@@ -344,7 +344,7 @@ class DateType extends AbstractType
         return $formattedTimestamps;
     }
 
-    private function listYears(array $years)
+    private function listYears(array $years): array
     {
         $result = [];
 
@@ -355,7 +355,7 @@ class DateType extends AbstractType
         return $result;
     }
 
-    private function listMonths(array $months)
+    private function listMonths(array $months): array
     {
         $result = [];
 
@@ -366,7 +366,7 @@ class DateType extends AbstractType
         return $result;
     }
 
-    private function listDays(array $days)
+    private function listDays(array $days): array
     {
         $result = [];
 

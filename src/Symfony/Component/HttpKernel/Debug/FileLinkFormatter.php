@@ -51,6 +51,8 @@ class FileLinkFormatter
 
     /**
      * @return string|false
+     *
+     * @psalm-return false|string
      */
     public function format(string $file, int $line)
     {

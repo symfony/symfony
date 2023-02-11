@@ -234,7 +234,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $logs;
     }
 
-    private function sanitizeLogs(array $logs)
+    private function sanitizeLogs(array $logs): array
     {
         $sanitizedLogs = [];
         $silencedLogs = [];

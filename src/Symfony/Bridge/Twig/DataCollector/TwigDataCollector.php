@@ -144,7 +144,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         return $this->computed[$index];
     }
 
-    private function computeData(Profile $profile)
+    private function computeData(Profile $profile): array
     {
         $data = [
             'template_count' => 0,

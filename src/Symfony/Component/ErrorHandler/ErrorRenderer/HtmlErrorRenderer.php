@@ -171,7 +171,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         return implode(', ', $result);
     }
 
-    private function formatArgsAsText(array $args)
+    private function formatArgsAsText(array $args): string
     {
         return strip_tags($this->formatArgs($args));
     }
@@ -273,7 +273,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         return '';
     }
 
-    private function fixCodeMarkup(string $line)
+    private function fixCodeMarkup(string $line): string
     {
         // </span> ending tag from previous line
         $opening = strpos($line, '<span');
@@ -292,12 +292,12 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         return trim($line);
     }
 
-    private function formatFileFromText(string $text)
+    private function formatFileFromText(string $text): string
     {
         return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', fn ($match) => 'in '.$this->formatFile($match[2], $match[3]), $text);
     }
 
-    private function formatLogMessage(string $message, array $context)
+    private function formatLogMessage(string $message, array $context): string
     {
         if ($context && str_contains($message, '{')) {
             $replacements = [];

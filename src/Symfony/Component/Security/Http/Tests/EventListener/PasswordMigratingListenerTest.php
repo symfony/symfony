@@ -133,7 +133,7 @@ class DummyTestMigratingUserProvider extends TestMigratingUserProvider
     {
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
     }
 

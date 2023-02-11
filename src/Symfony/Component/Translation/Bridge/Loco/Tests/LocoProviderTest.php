@@ -780,7 +780,7 @@ class LocoProviderTest extends ProviderTestCase
             foreach ($domains as $domain) {
                 $responses[] = function (string $method, string $url, array $options = []) use ($responseContents, $lastModifieds, $locale, $domain): ResponseInterface {
                     $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.rawurlencode($domain).'&status=translated%2Cblank-translation', $url);
+                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.$domain.'&status=translated,blank-translation', $url);
                     $this->assertSame(['filter' => $domain, 'status' => 'translated,blank-translation'], $options['query']);
                     $this->assertSame(['Accept: */*'], $options['headers']);
 
@@ -819,7 +819,7 @@ class LocoProviderTest extends ProviderTestCase
             foreach ($domains as $domain) {
                 $responses[] = function (string $method, string $url, array $options = []) use ($responseContents, $lastModifieds, $locale, $domain): ResponseInterface {
                     $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.rawurlencode($domain).'&status=translated%2Cblank-translation', $url);
+                    $this->assertSame('https://localise.biz/api/export/locale/'.$locale.'.xlf?filter='.$domain.'&status=translated,blank-translation', $url);
                     $this->assertSame(['filter' => $domain, 'status' => 'translated,blank-translation'], $options['query']);
                     $this->assertSame(['If-Modified-Since: '.$lastModifieds[$locale], 'Accept: */*'], $options['headers']);
 

@@ -32,7 +32,7 @@ class Token
     /**
      * @param string                $type   The type of the token (self::*_TYPE)
      * @param string|int|float|null $value  The token value
-     * @param int                   $cursor The cursor position in the source
+     * @param int|null              $cursor The cursor position in the source
      */
     public function __construct(string $type, $value, ?int $cursor)
     {

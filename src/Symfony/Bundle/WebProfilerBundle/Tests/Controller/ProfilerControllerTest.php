@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
@@ -367,6 +368,99 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testDefaultPanel(string $expectedPanel, Profile $profile)
     {
+        $this->assertDefaultPanel($expectedPanel, $profile);
+    }
+
+    public static function defaultPanelProvider(): \Generator
+    {
+        // Test default behavior
+        $profile = new Profile('xxxxxx');
+        $profile->addCollector($requestDataCollector = new RequestDataCollector());
+        yield [$requestDataCollector->getName(), $profile];
+
+        // Test exception
+        $profile = new Profile('xxxxxx');
+        $profile->addCollector($exceptionDataCollector = new ExceptionDataCollector());
+        $exceptionDataCollector->collect(new Request(), new Response(), new \DomainException());
+        yield [$exceptionDataCollector->getName(), $profile];
+    }
+
+    private function createController($profiler, $twig, $withCSP, array $templates = []): ProfilerController
+    {
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+
+        if ($withCSP) {
+            $nonceGenerator = $this->createMock(NonceGenerator::class);
+            $nonceGenerator->method('generate')->willReturn('dummy_nonce');
+
+            return new ProfilerController($urlGenerator, $profiler, $twig, $templates, new ContentSecurityPolicyHandler($nonceGenerator));
+        }
+
+        return new ProfilerController($urlGenerator, $profiler, $twig, $templates);
+    }
+
+    public function testDumpPanelExceptionPriority()
+    {
+        $exceptionDataCollector = new ExceptionDataCollector();
+        $exceptionDataCollector->collect(new Request(), new Response(), new \DomainException());
+
+        $dumpDataCollector = $this->createDumpDataCollector();
+
+        $profile = new Profile('xxxxxx');
+        $profile->setCollectors([$exceptionDataCollector, $dumpDataCollector]);
+
+        $this->assertDefaultPanel($exceptionDataCollector->getName(), $profile);
+    }
+
+    public function testDumpPanelWhenDefinedAfterwards()
+    {
+        $exceptionDataCollector = new ExceptionDataCollector();
+        $exceptionDataCollector->collect(new Request(), new Response(), new \DomainException());
+
+        $dumpDataCollector = $this->createDumpDataCollector();
+        $dumpDataCollector
+            ->expects($this->atLeastOnce())
+            ->method('getDumpsCount')
+            ->willReturn(1)
+        ;
+
+        $profile = new Profile('xxxxxx');
+        $profile->setCollectors([$dumpDataCollector, $exceptionDataCollector]);
+
+        $this->assertDefaultPanel($exceptionDataCollector->getName(), $profile);
+    }
+
+    public function testDumpPanel()
+    {
+        $dumpDataCollector = $this->createDumpDataCollector();
+        $dumpDataCollector
+            ->expects($this->atLeastOnce())
+            ->method('getDumpsCount')
+            ->willReturn(1)
+        ;
+
+        $profile = new Profile('xxxxxx');
+        $profile->addCollector($dumpDataCollector);
+
+        $this->assertDefaultPanel($dumpDataCollector->getName(), $profile);
+    }
+
+    /**
+     * @return MockObject&DumpDataCollector
+     */
+    private function createDumpDataCollector(): MockObject
+    {
+        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector
+            ->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn('dump');
+
+        return $dumpDataCollector;
+    }
+
+    private function assertDefaultPanel(string $expectedPanel, Profile $profile)
+    {
         $profiler = $this->createMock(Profiler::class);
         $profiler
             ->expects($this->atLeastOnce())
@@ -414,57 +508,5 @@ class ProfilerControllerTest extends WebTestCase
                 return [$collectorName, 'other_template.html.twig'];
             }, $collectorsNames))
             ->panelAction(new Request(), $profile->getToken());
-    }
-
-    public function defaultPanelProvider(): \Generator
-    {
-        // Test default behavior
-        $profile = new Profile('xxxxxx');
-        $profile->addCollector($requestDataCollector = new RequestDataCollector());
-        yield [$requestDataCollector->getName(), $profile];
-
-        // Test exception
-        $profile = new Profile('xxxxxx');
-        $profile->addCollector($exceptionDataCollector = new ExceptionDataCollector());
-        $exceptionDataCollector->collect(new Request(), new Response(), new \DomainException());
-        yield [$exceptionDataCollector->getName(), $profile];
-
-        // Test exception priority
-        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
-        $dumpDataCollector
-            ->expects($this->atLeastOnce())
-            ->method('getName')
-            ->willReturn('dump');
-        $dumpDataCollector
-            ->expects($this->atLeastOnce())
-            ->method('getDumpsCount')
-            ->willReturn(1);
-        $profile = new Profile('xxxxxx');
-        $profile->setCollectors([$exceptionDataCollector, $dumpDataCollector]);
-        yield [$exceptionDataCollector->getName(), $profile];
-
-        // Test exception priority when defined afterwards
-        $profile = new Profile('xxxxxx');
-        $profile->setCollectors([$dumpDataCollector, $exceptionDataCollector]);
-        yield [$exceptionDataCollector->getName(), $profile];
-
-        // Test dump
-        $profile = new Profile('xxxxxx');
-        $profile->addCollector($dumpDataCollector);
-        yield [$dumpDataCollector->getName(), $profile];
-    }
-
-    private function createController($profiler, $twig, $withCSP, array $templates = []): ProfilerController
-    {
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-
-        if ($withCSP) {
-            $nonceGenerator = $this->createMock(NonceGenerator::class);
-            $nonceGenerator->method('generate')->willReturn('dummy_nonce');
-
-            return new ProfilerController($urlGenerator, $profiler, $twig, $templates, new ContentSecurityPolicyHandler($nonceGenerator));
-        }
-
-        return new ProfilerController($urlGenerator, $profiler, $twig, $templates);
     }
 }

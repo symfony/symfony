@@ -22,23 +22,23 @@ class PriorityStrategyTest extends AccessDecisionStrategyTestCase
         $strategy = new PriorityStrategy();
 
         yield [$strategy, [
-            static::getVoter(VoterInterface::ACCESS_ABSTAIN),
-            static::getVoter(VoterInterface::ACCESS_GRANTED),
-            static::getVoter(VoterInterface::ACCESS_DENIED),
-            static::getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
         ], true];
 
         yield [$strategy, [
-            static::getVoter(VoterInterface::ACCESS_ABSTAIN),
-            static::getVoter(VoterInterface::ACCESS_DENIED),
-            static::getVoter(VoterInterface::ACCESS_GRANTED),
-            static::getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+            self::getVoter(VoterInterface::ACCESS_DENIED),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
+            self::getVoter(VoterInterface::ACCESS_GRANTED),
         ], false];
 
-        yield [$strategy, static::getVoters(0, 0, 2), false];
+        yield [$strategy, self::getVoters(0, 0, 2), false];
 
         $strategy = new PriorityStrategy(true);
 
-        yield [$strategy, static::getVoters(0, 0, 2), true];
+        yield [$strategy, self::getVoters(0, 0, 2), true];
     }
 }

@@ -21,39 +21,39 @@ class GetAttrNodeTest extends AbstractNodeTestCase
     public static function getEvaluateData(): array
     {
         return [
-            ['b', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), static::getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b']]],
-            ['a', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), static::getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b']]],
+            ['b', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), self::getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b']]],
+            ['a', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), self::getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b']]],
 
-            ['bar', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), static::getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
+            ['bar', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), self::getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
 
-            ['baz', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), static::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
-            ['a', new GetAttrNode(new NameNode('foo'), new NameNode('index'), static::getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b'], 'index' => 'b']],
+            ['baz', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), self::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
+            ['a', new GetAttrNode(new NameNode('foo'), new NameNode('index'), self::getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b'], 'index' => 'b']],
         ];
     }
 
     public static function getCompileData(): array
     {
         return [
-            ['$foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), static::getArrayNode(), GetAttrNode::ARRAY_CALL)],
-            ['$foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), static::getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['$foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['$foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
 
-            ['$foo->foo', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), static::getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
+            ['$foo->foo', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), self::getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
 
-            ['$foo->foo(["b" => "a", 0 => "b"])', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), static::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
-            ['$foo[$index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), static::getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['$foo->foo(["b" => "a", 0 => "b"])', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), self::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
+            ['$foo[$index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
         ];
     }
 
     public static function getDumpData(): array
     {
         return [
-            ['foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), static::getArrayNode(), GetAttrNode::ARRAY_CALL)],
-            ['foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), static::getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
 
-            ['foo.foo', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), static::getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
+            ['foo.foo', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), self::getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
 
-            ['foo.foo({"b": "a", 0: "b"})', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), static::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
-            ['foo[index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), static::getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['foo.foo({"b": "a", 0: "b"})', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), self::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
+            ['foo[index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
         ];
     }
 

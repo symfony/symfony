@@ -233,16 +233,18 @@ class WebTestCaseTest extends TestCase
     public function testAssertCheckboxChecked()
     {
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
+        $this->getCrawlerTester(new Crawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "input[name="rememberMe"]" and has a node matching selector "input[name="rememberMe"]" with attribute "checked" of value "checked".');
+        $this->expectExceptionMessage('matches selector "input[name="rememberMe"]:checked".');
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxChecked('rememberMe');
     }
 
     public function testAssertCheckboxNotChecked()
     {
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
+        $this->getCrawlerTester(new Crawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "input[name="rememberMe"]" and does not have a node matching selector "input[name="rememberMe"]" with attribute "checked" of value "checked".');
+        $this->expectExceptionMessage('does not match selector "input[name="rememberMe"]:checked".');
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxNotChecked('rememberMe');
     }
 

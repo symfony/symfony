@@ -23,6 +23,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\StoreInlinedEnvVarsCompilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -175,6 +176,7 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new EnableLoggerDebugModePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -33);
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
+            $container->addCompilerPass(new StoreInlinedEnvVarsCompilerPass(), PassConfig::TYPE_BEFORE_REMOVING, -254);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
         }

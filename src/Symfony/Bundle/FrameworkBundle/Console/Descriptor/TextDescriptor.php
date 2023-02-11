@@ -428,11 +428,17 @@ class TextDescriptor extends Descriptor
                 if ($name === $env['name'] || false !== stripos($env['name'], $name)) {
                     $matches = true;
                     $options['output']->section('%env('.$env['processor'].':'.$env['name'].')%');
-                    $options['output']->table([], [
-                        ['<info>Default value</>', $env['default_available'] ? $dump($env['default_value']) : 'n/a'],
-                        ['<info>Real value</>', $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a'],
-                        ['<info>Processed value</>', $env['default_available'] || $env['runtime_available'] ? $dump($env['processed_value']) : 'n/a'],
-                    ]);
+                    if (!$env['inlined']) {
+                        $options['output']->table([], [
+                            ['<info>Default value</>', $env['default_available'] ? $dump($env['default_value']) : 'n/a'],
+                            ['<info>Real value</>', $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a'],
+                            ['<info>Processed value</>', $env['default_available'] || $env['runtime_available'] ? $dump($env['processed_value']) : 'n/a'],
+                        ]);
+                    } else {
+                        $options['output']->table([], [
+                            ['<info>Inlined value</>', $dump($env['processed_value'])],
+                        ]);
+                    }
                 }
             }
 
@@ -454,12 +460,13 @@ class TextDescriptor extends Descriptor
         $rows = [];
         $missing = [];
         foreach ($envs as $env) {
-            if (isset($rows[$env['name']])) {
+            $name = !$env['inlined'] ? $env['name'] : "{$env['name']} (inlined)";
+            if (isset($rows[$name])) {
                 continue;
             }
 
-            $rows[$env['name']] = [
-                $env['name'],
+            $rows[$name] = [
+                $name,
                 $env['default_available'] ? $dump($env['default_value']) : 'n/a',
                 $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a',
             ];

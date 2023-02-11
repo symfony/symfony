@@ -308,6 +308,21 @@ abstract class Descriptor implements DescriptorInterface
 
         $envs = [];
 
+        if ($container->hasParameter('.debug.container.build_time_env_vars')) {
+            foreach ($container->getParameter('.debug.container.build_time_env_vars') as $name => $value) {
+                $envs["{$name}inline"] = [
+                    'name' => $name,
+                    'inlined' => true,
+                    'processor' => 'string',
+                    'default_available' => false,
+                    'default_value' => null,
+                    'runtime_available' => true,
+                    'runtime_value' => $value,
+                    'processed_value' => $value, // Env var processors are not supported at the moment
+                ];
+            }
+        }
+
         foreach ($envVars as $env) {
             $processor = 'string';
             if (false !== $i = strrpos($name = $env, ':')) {
@@ -321,6 +336,7 @@ abstract class Descriptor implements DescriptorInterface
             $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $getEnvReflection->invoke($container, $env) : null;
             $envs["$name$processor"] = [
                 'name' => $name,
+                'inlined' => false,
                 'processor' => $processor,
                 'default_available' => $hasDefault,
                 'default_value' => $defaultValue,

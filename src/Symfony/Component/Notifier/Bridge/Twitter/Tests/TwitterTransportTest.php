@@ -66,7 +66,7 @@ class TwitterTransportTest extends TransportTestCase
         $transport = $this->createTransport(new MockHttpClient((function () {
             yield function (string $method, string $url, array $options) {
                 $this->assertSame('POST', $method);
-                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image%2Fgif&media_category=tweet_image', $url);
+                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image/gif&media_category=tweet_image', $url);
                 $this->assertArrayHasKey('authorization', $options['normalized_headers']);
 
                 return new MockResponse('{"media_id_string":"gif123"}');
@@ -127,7 +127,7 @@ class TwitterTransportTest extends TransportTestCase
         $transport = $this->createTransport(new MockHttpClient((function () {
             yield function (string $method, string $url, array $options) {
                 $this->assertSame('POST', $method);
-                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image%2Fgif&media_category=tweet_video', $url);
+                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image/gif&media_category=tweet_video', $url);
                 $this->assertArrayHasKey('authorization', $options['normalized_headers']);
 
                 return new MockResponse('{"media_id_string":"gif123"}');
@@ -135,7 +135,7 @@ class TwitterTransportTest extends TransportTestCase
 
             yield function (string $method, string $url, array $options) {
                 $this->assertSame('POST', $method);
-                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image%2Fgif&media_category=subtitles', $url);
+                $this->assertSame('https://upload.twitter.com/1.1/media/upload.json?command=INIT&total_bytes=185&media_type=image/gif&media_category=subtitles', $url);
                 $this->assertArrayHasKey('authorization', $options['normalized_headers']);
 
                 return new MockResponse('{"media_id_string":"sub234"}');

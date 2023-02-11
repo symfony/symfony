@@ -23,6 +23,10 @@ class RedisProxyStoreFactoryTest extends TestCase
 {
     public function testCreateStore()
     {
+        if (!class_exists(RedisProxy::class)) {
+            $this->markTestSkipped();
+        }
+
         $store = StoreFactory::createStore($this->createMock(RedisProxy::class));
 
         $this->assertInstanceOf(RedisStore::class, $store);

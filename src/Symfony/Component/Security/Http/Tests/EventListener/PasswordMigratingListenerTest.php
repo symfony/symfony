@@ -137,11 +137,11 @@ class DummyTestMigratingUserProvider extends TestMigratingUserProvider
     {
     }
 
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
     }
 
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername(string $username): UserInterface
     {
     }
 }

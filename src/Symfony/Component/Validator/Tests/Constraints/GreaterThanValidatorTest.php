@@ -25,7 +25,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         return new GreaterThanValidator();
     }
 
-    protected function createConstraint(array $options = null): Constraint
+    protected static function createConstraint(array $options = null): Constraint
     {
         return new GreaterThan($options);
     }
@@ -35,7 +35,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         return GreaterThan::TOO_LOW_ERROR;
     }
 
-    public function provideValidComparisons(): array
+    public static function provideValidComparisons(): array
     {
         return [
             [2, 1],
@@ -48,14 +48,14 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function provideValidComparisonsToPropertyPath(): array
+    public static function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [6],
         ];
     }
 
-    public function provideInvalidComparisons(): array
+    public static function provideInvalidComparisons(): array
     {
         return [
             [1, '1', 2, '2', 'int'],
@@ -73,7 +73,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function provideComparisonsToNullValueAtPropertyPath()
+    public static function provideComparisonsToNullValueAtPropertyPath()
     {
         return [
             [5, '5', true],

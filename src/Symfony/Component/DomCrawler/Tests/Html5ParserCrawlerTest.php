@@ -48,7 +48,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
 
     public function validHtml5Provider(): iterable
     {
-        $html = static::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
+        $html = self::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
         $BOM = \chr(0xEF).\chr(0xBB).\chr(0xBF);
 
         yield 'BOM first' => [$BOM.$html];
@@ -61,7 +61,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTestCase
 
     public function invalidHtml5Provider(): iterable
     {
-        $html = static::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
+        $html = self::getDoctype().'<html><body><h1><p>Foo</p></h1></body></html>';
 
         yield 'Text' => ['hello world'.$html];
         yield 'Text between comments' => ['<!--c--> test <!--cc-->'.$html];

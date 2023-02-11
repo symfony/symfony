@@ -308,7 +308,7 @@ class HttpClientDataCollectorTest extends TestCase
                 'curl \\
   --compressed \\
   --request GET \\
-  --url %1$shttp://localhost:8057/?foo=fooval&bar=newbarval&foobar%%5Bbaz%%5D=bazval&foobar%%5Bqux%%5D=quxval&bazqux%%5B0%%5D=bazquxval1&bazqux%%5B1%%5D=bazquxval2%1$s \\
+  --url %1$shttp://localhost:8057/?foo=fooval&bar=newbarval&foobar[baz]=bazval&foobar[qux]=quxval&bazqux[0]=bazquxval1&bazqux[1]=bazquxval2%1$s \\
   --header %1$sAccept: */*%1$s \\
   --header %1$sAccept-Encoding: gzip%1$s \\
   --header %1$sUser-Agent: Symfony HttpClient/Native%1$s',

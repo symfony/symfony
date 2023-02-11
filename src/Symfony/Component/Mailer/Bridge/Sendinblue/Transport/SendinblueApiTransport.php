@@ -136,7 +136,7 @@ final class SendinblueApiTransport extends AbstractApiTransport
     private function prepareHeadersAndTags(Headers $headers): array
     {
         $headersAndTags = [];
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'reply-to', 'content-type', 'accept', 'api-key'];
+        $headersToBypass = ['from', 'sender', 'to', 'cc', 'bcc', 'subject', 'reply-to', 'content-type', 'accept', 'api-key'];
         foreach ($headers->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
                 continue;

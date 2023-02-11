@@ -262,6 +262,25 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
     }
 
+    public function testProcessLeavesProxyTagOnOriginalDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setTags(['proxy' => 'foo', 'bar' => ['attr' => 'baz']])
+        ;
+        $container
+            ->register('baz')
+            ->setTags(['foobar' => ['attr' => 'bar']])
+            ->setDecoratedService('foo')
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals(['proxy' => 'foo'], $container->getDefinition('baz.inner')->getTags());
+        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
+    }
+
     public function testCannotDecorateSyntheticService()
     {
         $container = new ContainerBuilder();

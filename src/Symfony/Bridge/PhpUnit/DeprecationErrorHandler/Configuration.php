@@ -268,6 +268,9 @@ class Configuration
         return $this->generateBaseline;
     }
 
+    /**
+     * @return string
+     */
     public function getBaselineFile()
     {
         return $this->baselineFile;
@@ -314,11 +317,17 @@ class Configuration
         return $this->verboseOutput[$group];
     }
 
+    /**
+     * @return bool
+     */
     public function shouldWriteToLogFile()
     {
         return null !== $this->logFile;
     }
 
+    /**
+     * @return string|null
+     */
     public function getLogFile()
     {
         return $this->logFile;

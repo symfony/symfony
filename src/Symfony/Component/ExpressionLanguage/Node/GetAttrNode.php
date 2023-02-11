@@ -136,6 +136,9 @@ class GetAttrNode extends Node
         return $this->attributes['is_short_circuited'] || ($this->nodes['node'] instanceof self && $this->nodes['node']->isShortCircuited());
     }
 
+    /**
+     * @return array|null
+     */
     public function toArray()
     {
         switch ($this->attributes['type']) {

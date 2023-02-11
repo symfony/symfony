@@ -42,6 +42,9 @@ class DnsMock
         self::$hosts = $hosts;
     }
 
+    /**
+     * @return bool
+     */
     public static function checkdnsrr($hostname, $type = 'MX')
     {
         if (!self::$hosts) {
@@ -63,6 +66,9 @@ class DnsMock
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public static function getmxrr($hostname, &$mxhosts, &$weight = null)
     {
         if (!self::$hosts) {

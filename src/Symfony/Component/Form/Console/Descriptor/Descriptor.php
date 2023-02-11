@@ -96,6 +96,9 @@ abstract class Descriptor implements DescriptorInterface
         $this->extensions = array_keys($this->extensions);
     }
 
+    /**
+     * @return array
+     */
     protected function getOptionDefinition(OptionsResolver $optionsResolver, string $option)
     {
         $definition = [];

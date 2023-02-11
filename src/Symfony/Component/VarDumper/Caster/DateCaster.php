@@ -24,6 +24,9 @@ class DateCaster
 {
     private const PERIOD_LIMIT = 3;
 
+    /**
+     * @return array
+     */
     public static function castDateTime(\DateTimeInterface $d, array $a, Stub $stub, bool $isNested, int $filter)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -47,6 +50,9 @@ class DateCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castInterval(\DateInterval $interval, array $a, Stub $stub, bool $isNested, int $filter)
     {
         $now = new \DateTimeImmutable('@0', new \DateTimeZone('UTC'));
@@ -76,6 +82,9 @@ class DateCaster
         return $i->format(rtrim($format));
     }
 
+    /**
+     * @return array
+     */
     public static function castTimeZone(\DateTimeZone $timeZone, array $a, Stub $stub, bool $isNested, int $filter)
     {
         $location = $timeZone->getLocation();
@@ -87,6 +96,9 @@ class DateCaster
         return $filter & Caster::EXCLUDE_VERBOSE ? $z : $z + $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, bool $isNested, int $filter)
     {
         $dates = [];

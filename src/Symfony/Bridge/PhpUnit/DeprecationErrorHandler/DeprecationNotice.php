@@ -37,6 +37,9 @@ final class DeprecationNotice
         ++$this->count;
     }
 
+    /**
+     * @return array
+     */
     public function getCountsByCaller()
     {
         return $this->countsByCaller;

@@ -211,6 +211,9 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         }
     }
 
+    /**
+     * @return array
+     */
     public function getCalls()
     {
         return $this->calls;
@@ -226,6 +229,9 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         return $this->pool;
     }
 
+    /**
+     * @return TraceableAdapterEvent
+     */
     protected function start(string $name)
     {
         $this->calls[] = $event = new TraceableAdapterEvent();

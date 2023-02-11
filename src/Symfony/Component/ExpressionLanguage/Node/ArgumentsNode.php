@@ -25,6 +25,9 @@ class ArgumentsNode extends ArrayNode
         $this->compileArguments($compiler, false);
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
         $array = [];

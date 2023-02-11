@@ -24,11 +24,17 @@ class GuardExpression
         $this->expression = $expression;
     }
 
+    /**
+     * @return Transition
+     */
     public function getTransition()
     {
         return $this->transition;
     }
 
+    /**
+     * @return string
+     */
     public function getExpression()
     {
         return $this->expression;

@@ -140,6 +140,9 @@ EOF
         return $filesInfo;
     }
 
+    /**
+     * @return iterable
+     */
     protected function findFiles(string $filename)
     {
         if (is_file($filename)) {

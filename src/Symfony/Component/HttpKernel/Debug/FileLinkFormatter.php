@@ -49,6 +49,9 @@ class FileLinkFormatter
         $this->urlFormat = $urlFormat;
     }
 
+    /**
+     * @return string|false
+     */
     public function format(string $file, int $line)
     {
         if ($fmt = $this->getFileLinkFormat()) {

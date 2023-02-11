@@ -214,6 +214,9 @@ abstract class Descriptor implements DescriptorInterface
         return $definitions;
     }
 
+    /**
+     * @return array
+     */
     protected function sortParameters(ParameterBag $parameters)
     {
         $parameters = $parameters->all();
@@ -222,6 +225,9 @@ abstract class Descriptor implements DescriptorInterface
         return $parameters;
     }
 
+    /**
+     * @return array
+     */
     protected function sortServiceIds(array $serviceIds)
     {
         asort($serviceIds);

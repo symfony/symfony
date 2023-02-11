@@ -87,6 +87,9 @@ class Connection
         // no-op
     }
 
+    /**
+     * @psalm-return false|resource
+     */
     private function createSocket()
     {
         set_error_handler([self::class, 'nullErrorHandler']);

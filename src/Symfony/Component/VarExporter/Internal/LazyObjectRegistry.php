@@ -47,6 +47,9 @@ class LazyObjectRegistry
 
     public static ?\Closure $noInitializerState = null;
 
+    /**
+     * @return array
+     */
     public static function getClassResetters($class)
     {
         $classProperties = [];
@@ -108,6 +111,9 @@ class LazyObjectRegistry
         ], null, \Closure::class === $class ? null : $class)();
     }
 
+    /**
+     * @return array
+     */
     public static function getParentMethods($class)
     {
         $parent = get_parent_class($class);

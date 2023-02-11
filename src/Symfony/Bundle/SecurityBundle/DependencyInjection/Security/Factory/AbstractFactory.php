@@ -73,6 +73,9 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
         }
     }
 
+    /**
+     * @return string
+     */
     protected function createAuthenticationSuccessHandler(ContainerBuilder $container, string $id, array $config)
     {
         $successHandlerId = $this->getSuccessHandlerId($id);
@@ -92,6 +95,9 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
         return $successHandlerId;
     }
 
+    /**
+     * @return string
+     */
     protected function createAuthenticationFailureHandler(ContainerBuilder $container, string $id, array $config)
     {
         $id = $this->getFailureHandlerId($id);
@@ -109,11 +115,17 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
         return $id;
     }
 
+    /**
+     * @return string
+     */
     protected function getSuccessHandlerId(string $id)
     {
         return 'security.authentication.success_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
     }
 
+    /**
+     * @return string
+     */
     protected function getFailureHandlerId(string $id)
     {
         return 'security.authentication.failure_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());

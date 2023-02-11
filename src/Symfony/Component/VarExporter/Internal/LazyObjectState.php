@@ -45,6 +45,9 @@ class LazyObjectState
         $this->status = \is_array($initializer) ? self::STATUS_UNINITIALIZED_PARTIAL : self::STATUS_UNINITIALIZED_FULL;
     }
 
+    /**
+     * @return int
+     */
     public function initialize($instance, $propertyName, $propertyScope)
     {
         if (self::STATUS_INITIALIZED_FULL === $this->status) {

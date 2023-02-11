@@ -564,6 +564,9 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         throw new \BadMethodCallException();
     }
 
+    /**
+     * @return ConstraintViolationListInterface
+     */
     public function doGetViolations()
     {
         return $this->context->getViolations();

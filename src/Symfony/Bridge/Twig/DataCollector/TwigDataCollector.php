@@ -108,6 +108,9 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         return $this->getComputedData('macro_count');
     }
 
+    /**
+     * @return Markup
+     */
     public function getHtmlCallGraph()
     {
         $dumper = new HtmlDumper();

@@ -488,6 +488,9 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function setFormFactory(FormFactoryInterface $formFactory)
     {
         if ($this->locked) {

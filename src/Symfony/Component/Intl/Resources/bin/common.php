@@ -24,6 +24,9 @@ function bailout(string $message)
     exit(1);
 }
 
+/**
+ * @return string
+ */
 function strip_minor_versions(string $version)
 {
     preg_match('/^(?P<version>[0-9]\.[0-9]|[0-9]{2,})/', $version, $matches);
@@ -31,6 +34,9 @@ function strip_minor_versions(string $version)
     return $matches['version'];
 }
 
+/**
+ * @return string
+ */
 function centered(string $text)
 {
     $padding = (int) ((LINE_WIDTH - strlen($text)) / 2);
@@ -57,6 +63,9 @@ function run(string $command)
     }
 }
 
+/**
+ * @return string|null
+ */
 function get_icu_version_from_genrb(string $genrb)
 {
     exec($genrb.' --version - 2>&1', $output, $status);

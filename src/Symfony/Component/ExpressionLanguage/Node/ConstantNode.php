@@ -38,11 +38,17 @@ class ConstantNode extends Node
         $compiler->repr($this->attributes['value']);
     }
 
+    /**
+     * @return mixed
+     */
     public function evaluate(array $functions, array $values)
     {
         return $this->attributes['value'];
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
         $array = [];

@@ -35,11 +35,17 @@ class RedisClusterNodeProxy
         return $this->redis->{$method}($this->host, ...$args);
     }
 
+    /**
+     * @return array|false
+     */
     public function scan(&$iIterator, $strPattern = null, $iCount = null)
     {
         return $this->redis->scan($iIterator, $this->host, $strPattern, $iCount);
     }
 
+    /**
+     * @return int
+     */
     public function getOption($name)
     {
         return $this->redis->getOption($name);

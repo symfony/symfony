@@ -43,6 +43,9 @@ class EntityFactory implements UserProviderFactoryInterface
         ;
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return $this->key;

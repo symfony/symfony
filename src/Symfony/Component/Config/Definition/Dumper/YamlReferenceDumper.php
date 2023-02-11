@@ -61,6 +61,9 @@ class YamlReferenceDumper
         return $this->dumpNode($node);
     }
 
+    /**
+     * @return string
+     */
     public function dumpNode(NodeInterface $node)
     {
         $this->reference = '';

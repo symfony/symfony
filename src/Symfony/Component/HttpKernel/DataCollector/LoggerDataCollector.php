@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -115,6 +116,9 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->processedLogs = $logs;
     }
 
+    /**
+     * @return array
+     */
     public function getFilters()
     {
         $filters = [
@@ -171,6 +175,9 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['scream_count'] ?? 0;
     }
 
+    /**
+     * @return Data
+     */
     public function getCompilerLogs()
     {
         return $this->cloneVar($this->getContainerCompilerLogs($this->data['compiler_logs_filepath'] ?? null));

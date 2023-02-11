@@ -56,6 +56,9 @@ class Registry
         return self::$prototypes[$class];
     }
 
+    /**
+     * @return \Closure
+     */
     public static function f($class)
     {
         $reflector = self::$reflectors[$class] ??= self::getClassReflector($class, true, false);

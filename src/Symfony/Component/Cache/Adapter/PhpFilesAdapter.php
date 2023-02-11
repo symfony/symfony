@@ -54,6 +54,9 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         };
     }
 
+    /**
+     * @return bool
+     */
     public static function isSupported()
     {
         self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
@@ -274,6 +277,9 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         return $this->doCommonDelete($ids);
     }
 
+    /**
+     * @return bool
+     */
     protected function doUnlink(string $file)
     {
         unset(self::$valuesCache[$file]);

@@ -44,6 +44,9 @@ class ArrayNode extends Node
         $compiler->raw(']');
     }
 
+    /**
+     * @return array
+     */
     public function evaluate(array $functions, array $values)
     {
         $result = [];
@@ -54,6 +57,9 @@ class ArrayNode extends Node
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
         $value = [];
@@ -84,6 +90,9 @@ class ArrayNode extends Node
         return $array;
     }
 
+    /**
+     * @return array
+     */
     protected function getKeyValuePairs()
     {
         $pairs = [];

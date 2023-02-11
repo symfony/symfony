@@ -55,6 +55,9 @@ class ResponseHeaderBag extends HeaderBag
         return $headers;
     }
 
+    /**
+     * @return array
+     */
     public function allPreserveCaseWithoutCookies()
     {
         $headers = $this->allPreserveCase();
@@ -224,6 +227,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * @see HeaderUtils::makeDisposition()
+     *
+     * @return string
      */
     public function makeDisposition(string $disposition, string $filename, string $filenameFallback = '')
     {

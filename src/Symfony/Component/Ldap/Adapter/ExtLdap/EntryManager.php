@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
+use LDAP\Connection as LDAPConnection;
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
@@ -30,6 +31,9 @@ class EntryManager implements EntryManagerInterface
         $this->connection = $connection;
     }
 
+    /**
+     * @return static
+     */
     public function add(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -116,6 +120,8 @@ class EntryManager implements EntryManagerInterface
 
     /**
      * Get the connection resource, but first check if the connection is bound.
+     *
+     * @return resource|LDAPConnection
      */
     private function getConnectionResource()
     {

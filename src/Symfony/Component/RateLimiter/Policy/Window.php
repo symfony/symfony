@@ -61,6 +61,9 @@ final class Window implements LimiterStateInterface
         return $this->hitCount;
     }
 
+    /**
+     * @return int
+     */
     public function getAvailableTokens(float $now)
     {
         // if now is more than the window interval in the past, all tokens are available

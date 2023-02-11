@@ -63,6 +63,9 @@ final class DeprecationGroup
         return $this->count;
     }
 
+    /**
+     * @return array
+     */
     public function notices()
     {
         return $this->deprecationNotices;

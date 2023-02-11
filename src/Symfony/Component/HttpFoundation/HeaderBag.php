@@ -254,6 +254,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
         return \count($this->headers);
     }
 
+    /**
+     * @return string
+     */
     protected function getCacheControlHeader()
     {
         ksort($this->cacheControl);

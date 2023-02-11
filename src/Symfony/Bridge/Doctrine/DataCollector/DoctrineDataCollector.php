@@ -107,6 +107,9 @@ class DoctrineDataCollector extends DataCollector
         return $this->data['connections'];
     }
 
+    /**
+     * @return int
+     */
     public function getQueryCount()
     {
         return array_sum(array_map('count', $this->data['queries']));

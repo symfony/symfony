@@ -21,6 +21,9 @@ final class HandlerArgumentsStamp implements NonSendableStampInterface
     ) {
     }
 
+    /**
+     * @return array
+     */
     public function getAdditionalArguments()
     {
         return $this->additionalArguments;

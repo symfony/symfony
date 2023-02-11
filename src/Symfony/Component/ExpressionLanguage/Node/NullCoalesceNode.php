@@ -45,6 +45,9 @@ class NullCoalesceNode extends Node
         return $this->nodes['expr1']->evaluate($functions, $values) ?? $this->nodes['expr2']->evaluate($functions, $values);
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
         return ['(', $this->nodes['expr1'], ') ?? (', $this->nodes['expr2'], ')'];

@@ -110,7 +110,7 @@ class PasswordMigratingListenerTest extends TestCase
         return new DummyTestMigratingUserProvider();
     }
 
-    private static function createEvent(PassportInterface $passport)
+    private static function createEvent(Passport $passport)
     {
         return new LoginSuccessEvent(new DummyAuthenticator(), $passport, new DummyToken(), new Request(), null, 'main');
     }

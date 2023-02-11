@@ -61,7 +61,7 @@ class PasswordMigratingListenerTest extends TestCase
     public static function provideUnsupportedEvents()
     {
         // no password upgrade badge
-        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(UserInterface::class); })))];
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return new DummyTestPasswordAuthenticatedUser(); })))];
 
         // blank password
         yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return new DummyTestPasswordAuthenticatedUser(); }), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];

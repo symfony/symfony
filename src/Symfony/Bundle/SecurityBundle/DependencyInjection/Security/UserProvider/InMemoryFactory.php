@@ -24,6 +24,9 @@ use Symfony\Component\DependencyInjection\Parameter;
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {
+    /**
+     * @return void
+     */
     public function create(ContainerBuilder $container, string $id, array $config)
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
@@ -45,6 +48,9 @@ class InMemoryFactory implements UserProviderFactoryInterface
         return 'memory';
     }
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $node

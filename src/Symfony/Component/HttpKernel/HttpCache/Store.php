@@ -55,6 +55,8 @@ class Store implements StoreInterface
 
     /**
      * Cleanups storage.
+     *
+     * @return void
      */
     public function cleanup()
     {
@@ -248,6 +250,8 @@ class Store implements StoreInterface
      * Invalidates all cache entries that match the request.
      *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     public function invalidate(Request $request)
     {

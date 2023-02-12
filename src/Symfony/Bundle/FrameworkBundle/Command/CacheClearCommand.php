@@ -48,7 +48,7 @@ class CacheClearCommand extends Command
         $this->filesystem = $filesystem ?? new Filesystem();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -219,7 +219,7 @@ EOF
         return false;
     }
 
-    private function warmup(string $warmupDir, string $realBuildDir, bool $enableOptionalWarmers = true)
+    private function warmup(string $warmupDir, string $realBuildDir, bool $enableOptionalWarmers = true): void
     {
         // create a temporary kernel
         $kernel = $this->getApplication()->getKernel();

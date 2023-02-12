@@ -74,7 +74,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
         return new Marking($marking);
     }
 
-    public function setMarking(object $subject, Marking $marking, array $context = [])
+    public function setMarking(object $subject, Marking $marking, array $context = []): void
     {
         $marking = $marking->getPlaces();
 

@@ -31,11 +31,17 @@ class Marking
         }
     }
 
+    /**
+     * @return void
+     */
     public function mark(string $place)
     {
         $this->places[$place] = 1;
     }
 
+    /**
+     * @return void
+     */
     public function unmark(string $place)
     {
         unset($this->places[$place]);

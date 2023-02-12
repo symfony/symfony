@@ -77,7 +77,7 @@ final class CurlClientState extends ClientState
         curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, static fn ($parent, $pushed, array $requestHeaders) => $multi->handlePush($parent, $pushed, $requestHeaders, $maxPendingPushes));
     }
 
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->pushedResponses as $url => $response) {
             $this->logger?->debug(sprintf('Unused pushed response: "%s"', $url));

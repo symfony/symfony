@@ -87,6 +87,8 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
      * Creates the remember-me cookie using the correct configuration.
      *
      * @param RememberMeDetails|null $rememberMeDetails The details for the cookie, or null to clear the remember-me cookie
+     *
+     * @return void
      */
     protected function createCookie(?RememberMeDetails $rememberMeDetails)
     {

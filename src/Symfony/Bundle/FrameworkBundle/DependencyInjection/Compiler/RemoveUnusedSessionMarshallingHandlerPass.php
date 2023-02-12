@@ -19,6 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RemoveUnusedSessionMarshallingHandlerPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('session.marshalling_handler')) {

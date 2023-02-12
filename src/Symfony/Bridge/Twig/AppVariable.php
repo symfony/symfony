@@ -30,21 +30,33 @@ class AppVariable
     private string $environment;
     private bool $debug;
 
+    /**
+     * @return void
+     */
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
     }
 
+    /**
+     * @return void
+     */
     public function setRequestStack(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
     }
 
+    /**
+     * @return void
+     */
     public function setEnvironment(string $environment)
     {
         $this->environment = $environment;
     }
 
+    /**
+     * @return void
+     */
     public function setDebug(bool $debug)
     {
         $this->debug = $debug;

@@ -22,6 +22,9 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
  */
 class MakeFirewallsEventDispatcherTraceablePass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->has('event_dispatcher') || !$container->hasParameter('security.firewalls')) {

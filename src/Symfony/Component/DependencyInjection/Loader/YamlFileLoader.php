@@ -146,7 +146,7 @@ class YamlFileLoader extends FileLoader
         return null;
     }
 
-    private function loadContent(array $content, string $path)
+    private function loadContent(array $content, string $path): void
     {
         // imports
         $this->parseImports($content, $path);
@@ -190,7 +190,7 @@ class YamlFileLoader extends FileLoader
         return \in_array($type, ['yaml', 'yml'], true);
     }
 
-    private function parseImports(array $content, string $file)
+    private function parseImports(array $content, string $file): void
     {
         if (!isset($content['imports'])) {
             return;
@@ -214,7 +214,7 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function parseDefinitions(array $content, string $file, bool $trackBindings = true)
+    private function parseDefinitions(array $content, string $file, bool $trackBindings = true): void
     {
         if (!isset($content['services'])) {
             return;
@@ -909,7 +909,7 @@ class YamlFileLoader extends FileLoader
         return $value;
     }
 
-    private function loadFromExtensions(array $content)
+    private function loadFromExtensions(array $content): void
     {
         foreach ($content as $namespace => $values) {
             if (\in_array($namespace, ['imports', 'parameters', 'services']) || str_starts_with($namespace, 'when@')) {
@@ -924,7 +924,7 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function checkDefinition(string $id, array $definition, string $file)
+    private function checkDefinition(string $id, array $definition, string $file): void
     {
         if ($this->isLoadingInstanceof) {
             $keywords = self::INSTANCEOF_KEYWORDS;

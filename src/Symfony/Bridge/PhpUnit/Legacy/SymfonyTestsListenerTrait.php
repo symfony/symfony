@@ -107,13 +107,13 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function globalListenerDisabled()
+    public function globalListenerDisabled(): void
     {
         self::$globallyEnabled = false;
         $this->state = -1;
     }
 
-    public function startTestSuite($suite)
+    public function startTestSuite($suite): void
     {
         $suiteName = $suite->getName();
 
@@ -188,14 +188,14 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function addSkippedTest($test, \Exception $e, $time)
+    public function addSkippedTest($test, \Exception $e, $time): void
     {
         if (0 < $this->state) {
             $this->isSkipped[\get_class($test)][$test->getName()] = 1;
         }
     }
 
-    public function startTest($test)
+    public function startTest($test): void
     {
         if (-2 < $this->state && $test instanceof TestCase) {
             // This event is triggered before the test is re-run in isolation
@@ -242,7 +242,7 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function endTest($test, $time)
+    public function endTest($test, $time): void
     {
         if ($file = getenv('SYMFONY_EXPECTED_DEPRECATIONS_SERIALIZE')) {
             putenv('SYMFONY_EXPECTED_DEPRECATIONS_SERIALIZE');
@@ -338,15 +338,10 @@ class SymfonyTestsListenerTrait
         }
         self::$gatheredDeprecations[] = $msg;
 
-        return null;
+        return true;
     }
 
-    /**
-     * @param TestCase $test
-     *
-     * @return bool
-     */
-    private function willBeIsolated($test)
+    private function willBeIsolated(TestCase $test): bool
     {
         if ($test->isInIsolation()) {
             return false;
@@ -355,6 +350,6 @@ class SymfonyTestsListenerTrait
         $r = new \ReflectionProperty($test, 'runTestInSeparateProcess');
         $r->setAccessible(true);
 
-        return $r->getValue($test);
+        return $r->getValue($test) ?? false;
     }
 }

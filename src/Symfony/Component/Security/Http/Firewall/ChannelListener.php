@@ -70,7 +70,7 @@ class ChannelListener extends AbstractListener
         return false;
     }
 
-    public function authenticate(RequestEvent $event)
+    public function authenticate(RequestEvent $event): void
     {
         $request = $event->getRequest();
 

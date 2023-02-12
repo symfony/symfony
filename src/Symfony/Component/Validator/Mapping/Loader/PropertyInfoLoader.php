@@ -144,7 +144,7 @@ final class PropertyInfoLoader implements LoaderInterface
         return new Type(['type' => $builtinType]);
     }
 
-    private function handleAllConstraint(string $property, ?All $allConstraint, PropertyInfoType $propertyInfoType, ClassMetadata $metadata)
+    private function handleAllConstraint(string $property, ?All $allConstraint, PropertyInfoType $propertyInfoType, ClassMetadata $metadata): void
     {
         $containsTypeConstraint = false;
         $containsNotNullConstraint = false;

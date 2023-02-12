@@ -68,6 +68,9 @@ class ResponseHeaderBag extends HeaderBag
         return $headers;
     }
 
+    /**
+     * @return void
+     */
     public function replace(array $headers = [])
     {
         $this->headerNames = [];
@@ -100,6 +103,9 @@ class ResponseHeaderBag extends HeaderBag
         return $headers;
     }
 
+    /**
+     * @return void
+     */
     public function set(string $key, string|array|null $values, bool $replace = true)
     {
         $uniqueKey = strtr($key, self::UPPER, self::LOWER);
@@ -128,6 +134,9 @@ class ResponseHeaderBag extends HeaderBag
         }
     }
 
+    /**
+     * @return void
+     */
     public function remove(string $key)
     {
         $uniqueKey = strtr($key, self::UPPER, self::LOWER);
@@ -160,6 +169,9 @@ class ResponseHeaderBag extends HeaderBag
         return $this->computedCacheControl[$key] ?? null;
     }
 
+    /**
+     * @return void
+     */
     public function setCookie(Cookie $cookie)
     {
         $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
@@ -168,6 +180,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Removes a cookie from the array, but does not unset it in the browser.
+     *
+     * @return void
      */
     public function removeCookie(string $name, ?string $path = '/', string $domain = null)
     {
@@ -219,6 +233,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Clears a cookie in the browser.
+     *
+     * @return void
      */
     public function clearCookie(string $name, ?string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true, string $sameSite = null)
     {

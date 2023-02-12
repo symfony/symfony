@@ -27,6 +27,9 @@ class FormTypePasswordHasherExtension extends AbstractTypeExtension
     ) {
     }
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this->passwordHasherListener, 'hashPasswords']);

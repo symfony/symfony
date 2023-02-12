@@ -41,6 +41,8 @@ class TokenStream
 
     /**
      * Sets the pointer to the next token and returns the old one.
+     *
+     * @return void
      */
     public function next()
     {
@@ -55,6 +57,8 @@ class TokenStream
 
     /**
      * @param string|null $message The syntax error message
+     *
+     * @return void
      */
     public function expect(string $type, string $value = null, string $message = null)
     {

@@ -46,7 +46,7 @@ class ResourceCaster
         return proc_get_status($process);
     }
 
-    public static function castStream($stream, array $a, Stub $stub, bool $isNested)
+    public static function castStream($stream, array $a, Stub $stub, bool $isNested): array
     {
         $a = stream_get_meta_data($stream) + static::castStreamContext($stream, $a, $stub, $isNested);
         if ($a['uri'] ?? false) {

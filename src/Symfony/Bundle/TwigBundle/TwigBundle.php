@@ -27,6 +27,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class TwigBundle extends Bundle
 {
+    /**
+     * @return void
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -38,6 +41,9 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
+    /**
+     * @return void
+     */
     public function registerCommands(Application $application)
     {
         // noop

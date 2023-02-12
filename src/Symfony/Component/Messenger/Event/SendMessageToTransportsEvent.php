@@ -42,7 +42,7 @@ final class SendMessageToTransportsEvent
         return $this->envelope;
     }
 
-    public function setEnvelope(Envelope $envelope)
+    public function setEnvelope(Envelope $envelope): void
     {
         $this->envelope = $envelope;
     }

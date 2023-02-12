@@ -91,6 +91,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $this->defaultLocale = $defaultLocale;
     }
 
+    /**
+     * @return void
+     */
     public function setContext(RequestContext $context)
     {
         $this->context = $context;
@@ -101,6 +104,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         return $this->context;
     }
 
+    /**
+     * @return void
+     */
     public function setStrictRequirements(?bool $enabled)
     {
         $this->strictRequirements = $enabled;

@@ -111,6 +111,9 @@ class EntryManager implements EntryManagerInterface
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true)
     {
         $con = $this->getConnectionResource();

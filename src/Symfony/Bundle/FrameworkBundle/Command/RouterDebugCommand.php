@@ -50,7 +50,7 @@ class RouterDebugCommand extends Command
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([

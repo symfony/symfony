@@ -40,12 +40,12 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         $this->requestStack = $requestStack;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->currentRequest = $this->requestStack && $this->requestStack->getMainRequest() !== $request ? $request : null;
     }
 
-    public function reset()
+    public function reset(): void
     {
         if (isset($this->logger)) {
             $this->logger->clear();
@@ -53,7 +53,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         $this->data = [];
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         if (isset($this->logger)) {
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();

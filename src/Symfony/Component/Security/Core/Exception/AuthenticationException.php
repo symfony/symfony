@@ -39,6 +39,9 @@ class AuthenticationException extends RuntimeException
         return $this->token;
     }
 
+    /**
+     * @return void
+     */
     public function setToken(TokenInterface $token)
     {
         $this->token = $token;

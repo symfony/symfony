@@ -116,6 +116,8 @@ class StopwatchEvent
 
     /**
      * Stops all non already stopped periods.
+     *
+     * @return void
      */
     public function ensureStopped()
     {

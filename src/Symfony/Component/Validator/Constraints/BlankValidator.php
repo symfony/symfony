@@ -20,6 +20,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class BlankValidator extends ConstraintValidator
 {
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Blank) {

@@ -20,6 +20,9 @@ use Symfony\Component\Security\Core\Exception\DisabledException;
  */
 class InMemoryUserChecker implements UserCheckerInterface
 {
+    /**
+     * @return void
+     */
     public function checkPreAuth(UserInterface $user)
     {
         if (!$user instanceof InMemoryUser) {
@@ -33,6 +36,9 @@ class InMemoryUserChecker implements UserCheckerInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function checkPostAuth(UserInterface $user)
     {
     }

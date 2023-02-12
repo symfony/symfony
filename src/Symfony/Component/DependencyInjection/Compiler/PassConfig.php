@@ -122,6 +122,8 @@ class PassConfig
      * Adds a pass.
      *
      * @throws InvalidArgumentException when a pass type doesn't exist
+     *
+     * @return void
      */
     public function addPass(CompilerPassInterface $pass, string $type = self::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
@@ -196,6 +198,9 @@ class PassConfig
         return $this->mergePass;
     }
 
+    /**
+     * @return void
+     */
     public function setMergePass(CompilerPassInterface $pass)
     {
         $this->mergePass = $pass;
@@ -205,6 +210,8 @@ class PassConfig
      * Sets the AfterRemoving passes.
      *
      * @param CompilerPassInterface[] $passes
+     *
+     * @return void
      */
     public function setAfterRemovingPasses(array $passes)
     {
@@ -215,6 +222,8 @@ class PassConfig
      * Sets the BeforeOptimization passes.
      *
      * @param CompilerPassInterface[] $passes
+     *
+     * @return void
      */
     public function setBeforeOptimizationPasses(array $passes)
     {
@@ -225,6 +234,8 @@ class PassConfig
      * Sets the BeforeRemoving passes.
      *
      * @param CompilerPassInterface[] $passes
+     *
+     * @return void
      */
     public function setBeforeRemovingPasses(array $passes)
     {
@@ -235,6 +246,8 @@ class PassConfig
      * Sets the Optimization passes.
      *
      * @param CompilerPassInterface[] $passes
+     *
+     * @return void
      */
     public function setOptimizationPasses(array $passes)
     {
@@ -245,6 +258,8 @@ class PassConfig
      * Sets the Removing passes.
      *
      * @param CompilerPassInterface[] $passes
+     *
+     * @return void
      */
     public function setRemovingPasses(array $passes)
     {

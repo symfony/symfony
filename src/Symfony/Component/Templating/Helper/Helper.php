@@ -25,6 +25,8 @@ abstract class Helper implements HelperInterface
 
     /**
      * Sets the default charset.
+     *
+     * @return void
      */
     public function setCharset(string $charset)
     {

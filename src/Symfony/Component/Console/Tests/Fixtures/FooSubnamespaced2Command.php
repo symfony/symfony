@@ -6,10 +6,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FooSubnamespaced2Command extends Command
 {
-    public $input;
-    public $output;
+    public InputInterface $input;
+    public OutputInterface $output;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('foo:go:bret')

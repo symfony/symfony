@@ -51,6 +51,9 @@ class EmailValidator extends ConstraintValidator
         $this->defaultMode = $defaultMode;
     }
 
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Email) {

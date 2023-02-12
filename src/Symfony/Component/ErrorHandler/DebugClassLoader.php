@@ -930,7 +930,7 @@ class DebugClassLoader
     /**
      * Utility method to add #[ReturnTypeWillChange] where php triggers deprecations.
      */
-    private function patchReturnTypeWillChange(\ReflectionMethod $method)
+    private function patchReturnTypeWillChange(\ReflectionMethod $method): void
     {
         if (\count($method->getAttributes(\ReturnTypeWillChange::class))) {
             return;
@@ -958,7 +958,7 @@ class DebugClassLoader
     /**
      * Utility method to add @return annotations to the Symfony code-base where it triggers self-deprecations.
      */
-    private function patchMethod(\ReflectionMethod $method, string $returnType, string $declaringFile, string $normalizedType)
+    private function patchMethod(\ReflectionMethod $method, string $returnType, string $declaringFile, string $normalizedType): void
     {
         static $patchedMethods = [];
         static $useStatements = [];
@@ -1097,7 +1097,7 @@ EOTXT;
         return [$namespace, $useOffset, $useMap];
     }
 
-    private function fixReturnStatements(\ReflectionMethod $method, string $returnType)
+    private function fixReturnStatements(\ReflectionMethod $method, string $returnType): void
     {
         if ('docblock' !== $this->patchTypes['force']) {
             if ('7.1' === $this->patchTypes['php'] && 'object' === ltrim($returnType, '?')) {

@@ -73,7 +73,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         return ['files', 'className', 'hash'];
     }
 
-    private function loadFiles(\ReflectionClass $class)
+    private function loadFiles(\ReflectionClass $class): void
     {
         foreach ($class->getInterfaces() as $v) {
             $this->loadFiles($v);

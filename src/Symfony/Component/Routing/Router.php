@@ -117,6 +117,8 @@ class Router implements RouterInterface, RequestMatcherInterface
      *                             implementing ConfigurableRequirementsInterface (default is true)
      *
      * @throws \InvalidArgumentException When unsupported option is provided
+     *
+     * @return void
      */
     public function setOptions(array $options)
     {
@@ -150,6 +152,8 @@ class Router implements RouterInterface, RequestMatcherInterface
      * Sets an option.
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function setOption(string $key, mixed $value)
     {
@@ -179,6 +183,9 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->collection ??= $this->loader->load($this->resource, $this->options['resource_type']);
     }
 
+    /**
+     * @return void
+     */
     public function setContext(RequestContext $context)
     {
         $this->context = $context;
@@ -198,6 +205,8 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     /**
      * Sets the ConfigCache factory to use.
+     *
+     * @return void
      */
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
     {
@@ -302,6 +311,9 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->generator;
     }
 
+    /**
+     * @return void
+     */
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
         $this->expressionLanguageProviders[] = $provider;

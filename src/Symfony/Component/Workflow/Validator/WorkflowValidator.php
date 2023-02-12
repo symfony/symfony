@@ -27,6 +27,9 @@ class WorkflowValidator implements DefinitionValidatorInterface
         $this->singlePlace = $singlePlace;
     }
 
+    /**
+     * @return void
+     */
     public function validate(Definition $definition, string $name)
     {
         // Make sure all transitions for one place has unique name.

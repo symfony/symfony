@@ -68,7 +68,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->clonesIndex = ++$this->clonesCount;
     }
 
-    public function dump(Data $data)
+    public function dump(Data $data): void
     {
         $this->stopwatch?->start('dump');
 
@@ -93,7 +93,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->stopwatch?->stop('dump');
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         if (!$this->dataCount) {
             $this->data = [];
@@ -128,7 +128,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->stopwatch?->reset();
         $this->data = [];
@@ -248,7 +248,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    private function doDump(DataDumperInterface $dumper, Data $data, string $name, string $file, int $line)
+    private function doDump(DataDumperInterface $dumper, Data $data, string $name, string $file, int $line): void
     {
         if ($dumper instanceof CliDumper) {
             $contextDumper = function ($name, $file, $line, $fmt) {

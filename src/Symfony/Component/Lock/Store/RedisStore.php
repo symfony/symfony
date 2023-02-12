@@ -44,6 +44,9 @@ class RedisStore implements SharedLockStoreInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $script = '
@@ -89,6 +92,9 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function saveRead(Key $key)
     {
         $script = '
@@ -129,6 +135,9 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         $script = '
@@ -169,6 +178,9 @@ class RedisStore implements SharedLockStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $script = '

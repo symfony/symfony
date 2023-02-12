@@ -192,6 +192,9 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         }
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         if ($this->pool instanceof ResetInterface) {
@@ -219,6 +222,9 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         return $this->calls;
     }
 
+    /**
+     * @return void
+     */
     public function clearCalls()
     {
         $this->calls = [];

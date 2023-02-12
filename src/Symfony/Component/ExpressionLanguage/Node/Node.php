@@ -57,6 +57,9 @@ class Node
         return implode("\n", $repr);
     }
 
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         foreach ($this->nodes as $node) {

@@ -38,6 +38,9 @@ class ViolationMapper implements ViolationMapperInterface
         $this->translator = $translator;
     }
 
+    /**
+     * @return void
+     */
     public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false)
     {
         $this->allowNonSynchronized = $allowNonSynchronized;

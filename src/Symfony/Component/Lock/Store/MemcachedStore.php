@@ -55,6 +55,9 @@ class MemcachedStore implements PersistingStoreInterface
         $this->initialTtl = $initialTtl;
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $token = $this->getUniqueToken($key);
@@ -67,6 +70,9 @@ class MemcachedStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         if ($ttl < 1) {
@@ -103,6 +109,9 @@ class MemcachedStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $token = $this->getUniqueToken($key);

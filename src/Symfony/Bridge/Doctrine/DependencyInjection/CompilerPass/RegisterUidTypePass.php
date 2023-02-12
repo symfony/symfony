@@ -19,7 +19,7 @@ use Symfony\Component\Uid\AbstractUid;
 
 final class RegisterUidTypePass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!class_exists(AbstractUid::class)) {
             return;

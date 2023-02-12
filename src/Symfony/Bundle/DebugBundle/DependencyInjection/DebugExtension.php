@@ -29,6 +29,9 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class DebugExtension extends Extension
 {
+    /**
+     * @return void
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();

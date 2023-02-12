@@ -44,14 +44,14 @@ function centered(string $text)
     return str_repeat(' ', $padding).$text;
 }
 
-function cd(string $dir)
+function cd(string $dir): void
 {
     if (false === chdir($dir)) {
         bailout("Could not switch to directory $dir.");
     }
 }
 
-function run(string $command)
+function run(string $command): void
 {
     exec($command, $output, $status);
 

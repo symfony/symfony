@@ -262,7 +262,7 @@ class Connection
         return $parsedUrl;
     }
 
-    private function claimOldPendingMessages()
+    private function claimOldPendingMessages(): void
     {
         try {
             // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or

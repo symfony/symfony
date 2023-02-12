@@ -27,6 +27,9 @@ class AuditTrailListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @return void
+     */
     public function onLeave(Event $event)
     {
         foreach ($event->getTransition()->getFroms() as $place) {
@@ -34,11 +37,17 @@ class AuditTrailListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function onTransition(Event $event)
     {
         $this->logger->info(sprintf('Transition "%s" for subject of class "%s" in workflow "%s".', $event->getTransition()->getName(), $event->getSubject()::class, $event->getWorkflowName()));
     }
 
+    /**
+     * @return void
+     */
     public function onEnter(Event $event)
     {
         foreach ($event->getTransition()->getTos() as $place) {

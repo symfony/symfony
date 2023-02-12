@@ -89,6 +89,9 @@ class_exists(Registry::class);
  */
 class FrameworkBundle extends Bundle
 {
+    /**
+     * @return void
+     */
     public function boot()
     {
         ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
@@ -102,6 +105,9 @@ class FrameworkBundle extends Bundle
         }
     }
 
+    /**
+     * @return void
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -174,7 +180,7 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    private function addCompilerPassIfExists(ContainerBuilder $container, string $class, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
+    private function addCompilerPassIfExists(ContainerBuilder $container, string $class, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): void
     {
         $container->addResource(new ClassExistenceResource($class));
 

@@ -25,7 +25,7 @@ final class Canary
         $this->canceller = $canceller;
     }
 
-    public function cancel()
+    public function cancel(): void
     {
         if (isset($this->canceller)) {
             $canceller = $this->canceller;

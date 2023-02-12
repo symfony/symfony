@@ -36,6 +36,8 @@ class DnsMock
      * Configures the mock values for DNS queries.
      *
      * @param array $hosts Mocked hosts as keys, arrays of DNS records as returned by dns_get_record() as values
+     *
+     * @return void
      */
     public static function withMockedHosts(array $hosts)
     {
@@ -167,6 +169,9 @@ class DnsMock
         return $records;
     }
 
+    /**
+     * @return void
+     */
     public static function register($class)
     {
         $self = static::class;

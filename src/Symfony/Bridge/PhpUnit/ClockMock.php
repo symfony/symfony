@@ -59,6 +59,9 @@ class ClockMock
         return 0;
     }
 
+    /**
+     * @return void
+     */
     public static function usleep($us)
     {
         if (null === self::$now) {
@@ -121,6 +124,9 @@ class ClockMock
         return [(int) self::$now, (int) $ns];
     }
 
+    /**
+     * @return void
+     */
     public static function register($class)
     {
         $self = static::class;

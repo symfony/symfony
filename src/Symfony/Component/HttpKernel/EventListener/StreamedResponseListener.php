@@ -33,7 +33,7 @@ class StreamedResponseListener implements EventSubscriberInterface
     /**
      * Filters the Response.
      */
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;

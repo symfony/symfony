@@ -28,7 +28,7 @@ class FunctionNode extends Node
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $arguments = [];
         foreach ($this->nodes['arguments']->nodes as $node) {

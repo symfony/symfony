@@ -123,7 +123,7 @@ EOF
         return 0;
     }
 
-    private function runInteractive(string $failureTransportName, SymfonyStyle $io, bool $shouldForce)
+    private function runInteractive(string $failureTransportName, SymfonyStyle $io, bool $shouldForce): void
     {
         $receiver = $this->failureTransports->get($failureTransportName);
         $count = 0;
@@ -203,7 +203,7 @@ EOF
         return $count;
     }
 
-    private function retrySpecificIds(string $failureTransportName, array $ids, SymfonyStyle $io, bool $shouldForce)
+    private function retrySpecificIds(string $failureTransportName, array $ids, SymfonyStyle $io, bool $shouldForce): void
     {
         $receiver = $this->getReceiver($failureTransportName);
 
@@ -227,7 +227,7 @@ EOF
         }
     }
 
-    private function retrySpecificEnvelopes(array $envelopes, string $failureTransportName, SymfonyStyle $io, bool $shouldForce)
+    private function retrySpecificEnvelopes(array $envelopes, string $failureTransportName, SymfonyStyle $io, bool $shouldForce): void
     {
         $receiver = $this->getReceiver($failureTransportName);
 

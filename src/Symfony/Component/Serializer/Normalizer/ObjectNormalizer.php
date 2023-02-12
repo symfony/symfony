@@ -129,6 +129,9 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         return $attribute === $this->discriminatorCache[$cacheKey] ? $this->classDiscriminatorResolver->getTypeForMappedObject($object) : $this->propertyAccessor->getValue($object, $attribute);
     }
 
+    /**
+     * @return void
+     */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, string $format = null, array $context = [])
     {
         try {

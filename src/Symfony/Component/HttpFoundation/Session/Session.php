@@ -69,6 +69,9 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->getAttributeBag()->get($name, $default);
     }
 
+    /**
+     * @return void
+     */
     public function set(string $name, mixed $value)
     {
         $this->getAttributeBag()->set($name, $value);
@@ -79,6 +82,9 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->getAttributeBag()->all();
     }
 
+    /**
+     * @return void
+     */
     public function replace(array $attributes)
     {
         $this->getAttributeBag()->replace($attributes);
@@ -89,6 +95,9 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->getAttributeBag()->remove($name);
     }
 
+    /**
+     * @return void
+     */
     public function clear()
     {
         $this->getAttributeBag()->clear();
@@ -154,6 +163,9 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->storage->regenerate($destroy, $lifetime);
     }
 
+    /**
+     * @return void
+     */
     public function save()
     {
         $this->storage->save();
@@ -164,6 +176,9 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->storage->getId();
     }
 
+    /**
+     * @return void
+     */
     public function setId(string $id)
     {
         if ($this->storage->getId() !== $id) {
@@ -176,6 +191,9 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->storage->getName();
     }
 
+    /**
+     * @return void
+     */
     public function setName(string $name)
     {
         $this->storage->setName($name);
@@ -191,6 +209,9 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         return $this->storage->getMetadataBag();
     }
 
+    /**
+     * @return void
+     */
     public function registerBag(SessionBagInterface $bag)
     {
         $this->storage->registerBag(new SessionBagProxy($bag, $this->data, $this->usageIndex, $this->usageReporter));

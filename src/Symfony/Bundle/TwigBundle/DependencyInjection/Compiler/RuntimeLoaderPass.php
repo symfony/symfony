@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RuntimeLoaderPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('twig.runtime_loader')) {

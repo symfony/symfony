@@ -127,7 +127,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         return $this->traces;
     }
 
-    private function addTraces(Response $response)
+    private function addTraces(Response $response): void
     {
         $traceString = null;
 
@@ -236,6 +236,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         return $response;
     }
 
+    /**
+     * @return void
+     */
     public function terminate(Request $request, Response $response)
     {
         // Do not call any listeners in case of a cache hit.
@@ -587,6 +590,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Writes the Response to the cache.
      *
      * @throws \Exception
+     *
+     * @return void
      */
     protected function store(Request $request, Response $response)
     {
@@ -611,7 +616,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Restores the Response body.
      */
-    private function restoreResponseBody(Request $request, Response $response)
+    private function restoreResponseBody(Request $request, Response $response): void
     {
         if ($response->headers->has('X-Body-Eval')) {
             ob_start();
@@ -640,6 +645,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $response->headers->remove('X-Body-File');
     }
 
+    /**
+     * @return void
+     */
     protected function processResponseBody(Request $request, Response $response)
     {
         if ($this->surrogate?->needsParsing($response)) {
@@ -671,7 +679,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Records that an event took place.
      */
-    private function record(Request $request, string $event)
+    private function record(Request $request, string $event): void
     {
         $this->traces[$this->getTraceKey($request)][] = $event;
     }

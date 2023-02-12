@@ -15,8 +15,6 @@ namespace Symfony\Component\HtmlSanitizer\Parser;
  * Transforms an untrusted HTML input string into a DOM tree.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental
  */
 interface ParserInterface
 {

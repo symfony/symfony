@@ -15,7 +15,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Symfony\Component\HtmlSanitizer\TextSanitizer\UrlSanitizer;
 
 /**
- * @experimental
+ * @author Titouan Galopin <galopintitouan@gmail.com>
  */
 final class UrlAttributeSanitizer implements AttributeSanitizerInterface
 {

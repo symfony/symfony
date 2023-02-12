@@ -30,6 +30,9 @@ class MemcachedStore implements PersistingStoreInterface
     private int $initialTtl;
     private bool $useExtendedReturn;
 
+    /**
+     * @return bool
+     */
     public static function isSupported()
     {
         return \extension_loaded('memcached');

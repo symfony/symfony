@@ -29,6 +29,9 @@ class TraceableUrlMatcher extends UrlMatcher
 
     protected $traces;
 
+    /**
+     * @return array
+     */
     public function getTraces(string $pathinfo)
     {
         $this->traces = [];

@@ -41,11 +41,17 @@ class Marking
         unset($this->places[$place]);
     }
 
+    /**
+     * @return bool
+     */
     public function has(string $place)
     {
         return isset($this->places[$place]);
     }
 
+    /**
+     * @return array
+     */
     public function getPlaces()
     {
         return $this->places;

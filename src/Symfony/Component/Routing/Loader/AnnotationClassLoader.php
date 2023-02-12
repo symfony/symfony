@@ -255,6 +255,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $name;
     }
 
+    /**
+     * @return array
+     */
     protected function getGlobals(\ReflectionClass $class)
     {
         $globals = $this->resetGlobals();
@@ -337,6 +340,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
         ];
     }
 
+    /**
+     * @return Route
+     */
     protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition)
     {
         return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);

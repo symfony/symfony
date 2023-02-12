@@ -46,6 +46,9 @@ class EnumNode extends ScalarNode
         $this->values = $values;
     }
 
+    /**
+     * @return array
+     */
     public function getValues()
     {
         return $this->values;

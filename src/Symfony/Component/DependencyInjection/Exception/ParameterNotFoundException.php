@@ -71,16 +71,25 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         }
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return $this->key;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSourceId()
     {
         return $this->sourceId;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSourceKey()
     {
         return $this->sourceKey;

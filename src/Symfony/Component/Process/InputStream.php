@@ -62,6 +62,8 @@ class InputStream implements \IteratorAggregate
 
     /**
      * Tells whether the write buffer is closed or not.
+     *
+     * @return bool
      */
     public function isClosed()
     {

@@ -47,6 +47,9 @@ class RedisCaster
         \RedisCluster::FAILOVER_DISTRIBUTE_SLAVES => 'DISTRIBUTE_SLAVES',
     ];
 
+    /**
+     * @return array
+     */
     public static function castRedis(\Redis|Relay $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -73,6 +76,9 @@ class RedisCaster
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function castRedisArray(\RedisArray $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -85,6 +91,9 @@ class RedisCaster
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function castRedisCluster(\RedisCluster $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;

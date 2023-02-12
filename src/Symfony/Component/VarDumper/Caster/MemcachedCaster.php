@@ -23,6 +23,9 @@ class MemcachedCaster
     private static array $optionConstants;
     private static array $defaultOptions;
 
+    /**
+     * @return array
+     */
     public static function castMemcached(\Memcached $c, array $a, Stub $stub, bool $isNested)
     {
         $a += [

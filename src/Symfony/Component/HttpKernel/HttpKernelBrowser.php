@@ -110,6 +110,9 @@ EOF;
         return $code.$this->getHandleScript();
     }
 
+    /**
+     * @return string
+     */
     protected function getHandleScript()
     {
         return <<<'EOF'

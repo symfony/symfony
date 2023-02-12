@@ -46,16 +46,25 @@ class ExceptionCaster
 
     private static array $framesCache = [];
 
+    /**
+     * @return array
+     */
     public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {
         return self::filterExceptionArray($stub->class, $a, "\0Error\0", $filter);
     }
 
+    /**
+     * @return array
+     */
     public static function castException(\Exception $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {
         return self::filterExceptionArray($stub->class, $a, "\0Exception\0", $filter);
     }
 
+    /**
+     * @return array
+     */
     public static function castErrorException(\ErrorException $e, array $a, Stub $stub, bool $isNested)
     {
         if (isset($a[$s = Caster::PREFIX_PROTECTED.'severity'], self::$errorTypes[$a[$s]])) {
@@ -65,6 +74,9 @@ class ExceptionCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, bool $isNested)
     {
         $trace = Caster::PREFIX_VIRTUAL.'trace';
@@ -83,6 +95,9 @@ class ExceptionCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, bool $isNested)
     {
         $sPrefix = "\0".SilencedErrorContext::class."\0";
@@ -110,6 +125,9 @@ class ExceptionCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, bool $isNested)
     {
         if (!$isNested) {
@@ -184,6 +202,9 @@ class ExceptionCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, bool $isNested)
     {
         if (!$isNested) {

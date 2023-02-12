@@ -37,7 +37,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         }
 
         try {
-            return parent::process($container);
+            parent::process($container);
         } finally {
             $this->serviceLocatorContextIds = [];
         }

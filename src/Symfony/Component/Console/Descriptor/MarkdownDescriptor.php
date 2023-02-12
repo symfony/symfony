@@ -96,9 +96,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write('### Arguments');
             foreach ($definition->getArguments() as $argument) {
                 $this->write("\n\n");
-                if (null !== $describeInputArgument = $this->describeInputArgument($argument)) {
-                    $this->write($describeInputArgument);
-                }
+                $this->describeInputArgument($argument);
             }
         }
 
@@ -110,9 +108,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write('### Options');
             foreach ($definition->getOptions() as $option) {
                 $this->write("\n\n");
-                if (null !== $describeInputOption = $this->describeInputOption($option)) {
-                    $this->write($describeInputOption);
-                }
+                $this->describeInputOption($option);
             }
         }
     }
@@ -179,9 +175,7 @@ class MarkdownDescriptor extends Descriptor
 
         foreach ($description->getCommands() as $command) {
             $this->write("\n\n");
-            if (null !== $describeCommand = $this->describeCommand($command, $options)) {
-                $this->write($describeCommand);
-            }
+            $this->describeCommand($command, $options);
         }
     }
 

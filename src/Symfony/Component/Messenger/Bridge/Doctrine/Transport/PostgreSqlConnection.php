@@ -54,40 +54,6 @@ final class PostgreSqlConnection extends Connection
         $this->unlisten();
     }
 
-    public function get(): ?array
-    {
-        if (null === $this->queueEmptiedAt) {
-            return parent::get();
-        }
-
-        // This is secure because the table name must be a valid identifier:
-        // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-        $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
-
-        if (method_exists($this->driverConnection, 'getNativeConnection')) {
-            $wrappedConnection = $this->driverConnection->getNativeConnection();
-        } else {
-            $wrappedConnection = $this->driverConnection;
-            while (method_exists($wrappedConnection, 'getWrappedConnection')) {
-                $wrappedConnection = $wrappedConnection->getWrappedConnection();
-            }
-        }
-
-        $notification = $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
-        if (
-            // no notifications, or for another table or queue
-            (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name']) &&
-            // delayed messages
-            (microtime(true) * 1000 - $this->queueEmptiedAt < $this->configuration['check_delayed_interval'])
-        ) {
-            usleep(1000);
-
-            return null;
-        }
-
-        return parent::get();
-    }
-
     public function setup(): void
     {
         parent::setup();
@@ -143,8 +109,47 @@ SQL
         return sprintf('%1$s.notify_%2$s', $tableConfig[0], $tableConfig[1]);
     }
 
+    /**
+     * @internal
+     */
+    public function registerPgNotifyListener(): void
+    {
+        // This is secure because the table name must be a valid identifier:
+        // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+        // Running "LISTEN" potentially multiple times is expected and desired, as discussed here:
+        // https://github.com/symfony/symfony/pull/47209
+        $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
+    }
+
     private function unlisten()
     {
         $this->executeStatement(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
+    }
+
+    /**
+     * @internal
+     *
+     * Note that this sleep will wake up on anything interesting happening on the observed db table. Wake ups
+     * with no new queue tasks should be expected and gracefully handled.
+     */
+    public function sleepUntilPgNotify(?int $preferredPgNotifyTimeout): void
+    {
+        $notifyTimeout = $preferredPgNotifyTimeout ?? $this->configuration['get_notify_timeout'];
+        if ($notifyTimeout < 1) {
+            return;
+        }
+
+        if (method_exists($this->driverConnection, 'getNativeConnection')) {
+            $wrappedConnection = $this->driverConnection->getNativeConnection();
+        } else {
+            $wrappedConnection = $this->driverConnection;
+            while (method_exists($wrappedConnection, 'getWrappedConnection')) {
+                $wrappedConnection = $wrappedConnection->getWrappedConnection();
+            }
+        }
+
+        $this->registerPgNotifyListener();
+
+        $wrappedConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $notifyTimeout);
     }
 }

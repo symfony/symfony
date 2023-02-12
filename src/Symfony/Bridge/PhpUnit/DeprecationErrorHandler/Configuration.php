@@ -276,6 +276,9 @@ class Configuration
         return $this->baselineFile;
     }
 
+    /**
+     * @return void
+     */
     public function writeBaseline()
     {
         $map = [];

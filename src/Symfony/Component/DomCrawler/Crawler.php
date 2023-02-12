@@ -91,6 +91,8 @@ class Crawler implements \Countable, \IteratorAggregate
 
     /**
      * Removes all the nodes.
+     *
+     * @return void
      */
     public function clear()
     {
@@ -108,6 +110,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A node
      *
      * @throws \InvalidArgumentException when node is not the expected type
+     *
+     * @return void
      */
     public function add(\DOMNodeList|\DOMNode|array|string|null $node)
     {
@@ -130,6 +134,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * If the charset is not set via the content type, it is assumed to be UTF-8,
      * or ISO-8859-1 as a fallback, which is the default charset defined by the
      * HTTP 1.1 specification.
+     *
+     * @return void
      */
     public function addContent(string $content, string $type = null)
     {
@@ -170,6 +176,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * internal errors via libxml_use_internal_errors(true)
      * and then, get the errors via libxml_get_errors(). Be
      * sure to clear errors with libxml_clear_errors() afterward.
+     *
+     * @return void
      */
     public function addHtmlContent(string $content, string $charset = 'UTF-8')
     {
@@ -204,6 +212,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * @param int $options Bitwise OR of the libxml option constants
      *                     LIBXML_PARSEHUGE is dangerous, see
      *                     http://symfony.com/blog/security-release-symfony-2-0-17-released
+     *
+     * @return void
      */
     public function addXmlContent(string $content, string $charset = 'UTF-8', int $options = \LIBXML_NONET)
     {
@@ -232,6 +242,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Adds a \DOMDocument to the list of nodes.
      *
      * @param \DOMDocument $dom A \DOMDocument instance
+     *
+     * @return void
      */
     public function addDocument(\DOMDocument $dom)
     {
@@ -244,6 +256,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Adds a \DOMNodeList to the list of nodes.
      *
      * @param \DOMNodeList $nodes A \DOMNodeList instance
+     *
+     * @return void
      */
     public function addNodeList(\DOMNodeList $nodes)
     {
@@ -258,6 +272,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Adds an array of \DOMNode instances to the list of nodes.
      *
      * @param \DOMNode[] $nodes An array of \DOMNode instances
+     *
+     * @return void
      */
     public function addNodes(array $nodes)
     {
@@ -270,6 +286,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Adds a \DOMNode instance to the list of nodes.
      *
      * @param \DOMNode $node A \DOMNode instance
+     *
+     * @return void
      */
     public function addNode(\DOMNode $node)
     {
@@ -862,12 +880,17 @@ class Crawler implements \Countable, \IteratorAggregate
 
     /**
      * Overloads a default namespace prefix to be used with XPath and CSS expressions.
+     *
+     * @return void
      */
     public function setDefaultNamespacePrefix(string $prefix)
     {
         $this->defaultNamespacePrefix = $prefix;
     }
 
+    /**
+     * @return void
+     */
     public function registerNamespace(string $prefix, string $namespace)
     {
         $this->namespaces[$prefix] = $namespace;

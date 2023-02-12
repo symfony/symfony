@@ -62,6 +62,9 @@ class ChoiceType extends AbstractType
         $this->translator = $translator;
     }
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $unknownValues = [];
@@ -214,6 +217,9 @@ class ChoiceType extends AbstractType
         }, 256);
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $choiceTranslationDomain = $options['choice_translation_domain'];
@@ -266,6 +272,9 @@ class ChoiceType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['expanded']) {
@@ -283,6 +292,9 @@ class ChoiceType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $emptyData = function (Options $options) {
@@ -378,7 +390,7 @@ class ChoiceType extends AbstractType
     /**
      * Adds the sub fields for an expanded choice field.
      */
-    private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options)
+    private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options): void
     {
         foreach ($choiceViews as $name => $choiceView) {
             // Flatten groups
@@ -396,7 +408,7 @@ class ChoiceType extends AbstractType
         }
     }
 
-    private function addSubForm(FormBuilderInterface $builder, string $name, ChoiceView $choiceView, array $options)
+    private function addSubForm(FormBuilderInterface $builder, string $name, ChoiceView $choiceView, array $options): void
     {
         $choiceOpts = [
             'value' => $choiceView->value,

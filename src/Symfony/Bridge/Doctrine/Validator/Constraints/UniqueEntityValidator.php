@@ -39,6 +39,8 @@ class UniqueEntityValidator extends ConstraintValidator
      *
      * @throws UnexpectedTypeException
      * @throws ConstraintDefinitionException
+     *
+     * @return void
      */
     public function validate(mixed $entity, Constraint $constraint)
     {

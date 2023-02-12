@@ -37,11 +37,17 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
         $this->violationMapper = new ViolationMapper($formRenderer, $translator);
     }
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new ValidationListener($this->validator, $this->violationMapper));
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);

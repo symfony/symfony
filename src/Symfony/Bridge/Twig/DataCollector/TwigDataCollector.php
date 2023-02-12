@@ -38,18 +38,18 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->twig = $twig;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->profile->reset();
         unset($this->computed);
         $this->data = [];
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data['profile'] = serialize($this->profile);
         $this->data['template_paths'] = [];

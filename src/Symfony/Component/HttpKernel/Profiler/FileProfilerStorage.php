@@ -87,6 +87,9 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return array_values($result);
     }
 
+    /**
+     * @return void
+     */
     public function purge()
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
@@ -295,7 +298,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return $this->createProfileFromData($token, $data, $profile);
     }
 
-    private function removeExpiredProfiles()
+    private function removeExpiredProfiles(): void
     {
         $minimalProfileTimestamp = time() - 2 * 86400;
         $file = $this->getIndexFilename();

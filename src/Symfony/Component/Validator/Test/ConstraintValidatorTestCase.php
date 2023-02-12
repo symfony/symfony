@@ -414,7 +414,7 @@ final class ConstraintViolationAssertion
         return new self($this->context, $message, $this->constraint, $assertions);
     }
 
-    public function assertRaised()
+    public function assertRaised(): void
     {
         $expected = [];
         foreach ($this->assertions as $assertion) {
@@ -572,11 +572,17 @@ class AssertingContextualValidator implements ContextualValidatorInterface
         return $this->context->getViolations();
     }
 
+    /**
+     * @return void
+     */
     public function expectNoValidate()
     {
         $this->expectNoValidate = true;
     }
 
+    /**
+     * @return void
+     */
     public function expectValidation(string $call, ?string $propertyPath, mixed $value, string|GroupSequence|array|null $group, callable $constraints, ConstraintViolationInterface $violation = null)
     {
         if (null !== $propertyPath) {

@@ -28,6 +28,9 @@ class NameNode extends Node
         );
     }
 
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         $compiler->raw('$'.$this->attributes['name']);

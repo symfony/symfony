@@ -29,6 +29,9 @@ class AddSecurityVotersPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('security.access.decision_manager')) {

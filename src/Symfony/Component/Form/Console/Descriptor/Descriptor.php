@@ -40,6 +40,9 @@ abstract class Descriptor implements DescriptorInterface
     protected $parents = [];
     protected $extensions = [];
 
+    /**
+     * @return void
+     */
     public function describe(OutputInterface $output, ?object $object, array $options = [])
     {
         $this->output = $output instanceof OutputStyle ? $output : new SymfonyStyle(new ArrayInput([]), $output);
@@ -58,6 +61,9 @@ abstract class Descriptor implements DescriptorInterface
 
     abstract protected function describeOption(OptionsResolver $optionsResolver, array $options);
 
+    /**
+     * @return void
+     */
     protected function collectOptions(ResolvedFormTypeInterface $type)
     {
         $this->parents = [];
@@ -142,6 +148,9 @@ abstract class Descriptor implements DescriptorInterface
         return $definition;
     }
 
+    /**
+     * @return void
+     */
     protected function filterOptionsByDeprecated(ResolvedFormTypeInterface $type)
     {
         $deprecatedOptions = [];
@@ -189,7 +198,7 @@ abstract class Descriptor implements DescriptorInterface
         return $optionsResolver;
     }
 
-    private function collectTypeExtensionsOptions(ResolvedFormTypeInterface $type, OptionsResolver $optionsResolver)
+    private function collectTypeExtensionsOptions(ResolvedFormTypeInterface $type, OptionsResolver $optionsResolver): void
     {
         foreach ($type->getTypeExtensions() as $extension) {
             $inheritedOptions = $optionsResolver->getDefinedOptions();

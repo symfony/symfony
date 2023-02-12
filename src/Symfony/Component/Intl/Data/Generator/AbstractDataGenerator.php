@@ -36,6 +36,9 @@ abstract class AbstractDataGenerator
         $this->dirName = $dirName;
     }
 
+    /**
+     * @return void
+     */
     public function generateData(GeneratorConfig $config)
     {
         $filesystem = new Filesystem();

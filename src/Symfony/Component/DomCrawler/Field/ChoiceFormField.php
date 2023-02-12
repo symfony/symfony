@@ -60,6 +60,8 @@ class ChoiceFormField extends FormField
 
     /**
      * Sets the value of the field.
+     *
+     * @return void
      */
     public function select(string|array|bool $value)
     {
@@ -70,6 +72,8 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \LogicException When the type provided is not correct
+     *
+     * @return void
      */
     public function tick()
     {
@@ -84,6 +88,8 @@ class ChoiceFormField extends FormField
      * Unticks a checkbox.
      *
      * @throws \LogicException When the type provided is not correct
+     *
+     * @return void
      */
     public function untick()
     {
@@ -98,6 +104,8 @@ class ChoiceFormField extends FormField
      * Sets the value of the field.
      *
      * @throws \InvalidArgumentException When value type provided is not correct
+     *
+     * @return void
      */
     public function setValue(string|array|bool|null $value)
     {
@@ -140,6 +148,8 @@ class ChoiceFormField extends FormField
      * @throws \LogicException When choice provided is not multiple nor radio
      *
      * @internal
+     *
+     * @return void
      */
     public function addChoice(\DOMElement $node)
     {
@@ -175,6 +185,8 @@ class ChoiceFormField extends FormField
      * Initializes the form field.
      *
      * @throws \LogicException When node type is incorrect
+     *
+     * @return void
      */
     protected function initialize()
     {

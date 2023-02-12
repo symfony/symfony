@@ -43,6 +43,9 @@ class NullToken implements TokenInterface
         return '';
     }
 
+    /**
+     * @return void
+     */
     public function eraseCredentials()
     {
     }

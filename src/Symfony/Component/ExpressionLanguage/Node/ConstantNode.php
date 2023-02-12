@@ -33,6 +33,9 @@ class ConstantNode extends Node
         );
     }
 
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         $compiler->repr($this->attributes['value']);

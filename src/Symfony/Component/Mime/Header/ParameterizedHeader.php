@@ -41,7 +41,7 @@ final class ParameterizedHeader extends UnstructuredHeader
         }
     }
 
-    public function setParameter(string $parameter, ?string $value)
+    public function setParameter(string $parameter, ?string $value): void
     {
         $this->setParameters(array_merge($this->getParameters(), [$parameter => $value]));
     }
@@ -54,7 +54,7 @@ final class ParameterizedHeader extends UnstructuredHeader
     /**
      * @param string[] $parameters
      */
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }

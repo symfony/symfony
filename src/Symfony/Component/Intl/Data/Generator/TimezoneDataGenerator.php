@@ -46,6 +46,9 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         return $scanner->scanLocales($sourceDir.'/zone');
     }
 
+    /**
+     * @return void
+     */
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
     {
         $filesystem = new Filesystem();
@@ -57,6 +60,9 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         $compiler->compile($sourceDir.'/misc/windowsZones.txt', $tempDir);
     }
 
+    /**
+     * @return void
+     */
     protected function preGenerate()
     {
         $this->zoneIds = [];

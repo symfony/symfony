@@ -57,6 +57,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         $this->sessionOptions = $sessionOptions;
     }
 
+    /**
+     * @return void
+     */
     public function onKernelRequest(RequestEvent $event)
     {
         if (!$event->isMainRequest()) {
@@ -88,6 +91,9 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
         }
     }
 
+    /**
+     * @return void
+     */
     public function onKernelResponse(ResponseEvent $event)
     {
         if (!$event->isMainRequest() || (!$this->container->has('initialized_session') && !$event->getRequest()->hasSession())) {

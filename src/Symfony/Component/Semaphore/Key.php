@@ -83,7 +83,7 @@ final class Key
         $this->expiringTime = null;
     }
 
-    public function reduceLifetime(float $ttlInSeconds)
+    public function reduceLifetime(float $ttlInSeconds): void
     {
         $newTime = microtime(true) + $ttlInSeconds;
 

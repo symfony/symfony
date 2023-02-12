@@ -31,17 +31,17 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
      */
     private array $clients = [];
 
-    public function registerClient(string $name, TraceableHttpClient $client)
+    public function registerClient(string $name, TraceableHttpClient $client): void
     {
         $this->clients[$name] = $client;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->lateCollect();
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data['request_count'] = $this->data['request_count'] ?? 0;
         $this->data['error_count'] = $this->data['error_count'] ?? 0;
@@ -86,7 +86,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         return 'http_client';
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [
             'clients' => [],

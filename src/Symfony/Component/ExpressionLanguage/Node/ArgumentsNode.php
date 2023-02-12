@@ -20,6 +20,9 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class ArgumentsNode extends ArrayNode
 {
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         $this->compileArguments($compiler, false);

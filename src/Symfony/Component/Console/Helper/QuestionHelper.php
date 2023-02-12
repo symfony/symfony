@@ -89,6 +89,8 @@ class QuestionHelper extends Helper
 
     /**
      * Prevents usage of stty.
+     *
+     * @return void
      */
     public static function disableStty()
     {
@@ -177,6 +179,8 @@ class QuestionHelper extends Helper
 
     /**
      * Outputs the question prompt.
+     *
+     * @return void
      */
     protected function writePrompt(OutputInterface $output, Question $question)
     {
@@ -213,6 +217,8 @@ class QuestionHelper extends Helper
 
     /**
      * Outputs an error message.
+     *
+     * @return void
      */
     protected function writeError(OutputInterface $output, \Exception $error)
     {

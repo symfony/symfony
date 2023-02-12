@@ -39,7 +39,7 @@ use Symfony\Component\Yaml\Yaml;
 #[AsCommand(name: 'debug:config', description: 'Dump the current configuration for an extension')]
 class ConfigDebugCommand extends AbstractConfigCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $commentedHelpFormats = array_map(static fn (string $format): string => sprintf('<comment>%s</comment>', $format), $this->getAvailableFormatOptions());
         $helpFormats = implode('", "', $commentedHelpFormats);

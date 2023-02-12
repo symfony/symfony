@@ -82,7 +82,7 @@ class Connection
         return false;
     }
 
-    private static function nullErrorHandler(int $t, string $m)
+    private static function nullErrorHandler(int $t, string $m): void
     {
         // no-op
     }

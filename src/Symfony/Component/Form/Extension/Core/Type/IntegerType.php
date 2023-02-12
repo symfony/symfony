@@ -20,11 +20,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegerType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addViewTransformer(new IntegerToLocalizedStringTransformer($options['grouping'], $options['rounding_mode'], !$options['grouping'] ? 'en' : null));
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['grouping']) {
@@ -32,6 +38,9 @@ class IntegerType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

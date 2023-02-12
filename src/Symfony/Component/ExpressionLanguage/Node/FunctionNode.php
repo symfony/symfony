@@ -28,6 +28,9 @@ class FunctionNode extends Node
         );
     }
 
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         $arguments = [];

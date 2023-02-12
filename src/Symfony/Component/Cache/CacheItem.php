@@ -147,7 +147,7 @@ final class CacheItem implements ItemInterface
      *
      * @internal
      */
-    public static function log(?LoggerInterface $logger, string $message, array $context = [])
+    public static function log(?LoggerInterface $logger, string $message, array $context = []): void
     {
         if ($logger) {
             $logger->warning($message, $context);

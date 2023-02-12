@@ -352,7 +352,7 @@ class ProfilerController
         return $this->templateManager ??= new TemplateManager($this->profiler, $this->twig, $this->templates);
     }
 
-    private function denyAccessIfProfilerDisabled()
+    private function denyAccessIfProfilerDisabled(): void
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');

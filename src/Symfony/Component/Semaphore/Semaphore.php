@@ -90,7 +90,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         }
     }
 
-    public function refresh(float $ttlInSecond = null)
+    public function refresh(float $ttlInSecond = null): void
     {
         if (!$ttlInSecond ??= $this->ttlInSecond) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
@@ -121,7 +121,7 @@ final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
         return $this->dirty = $this->store->exists($this->key);
     }
 
-    public function release()
+    public function release(): void
     {
         try {
             $this->store->delete($this->key);

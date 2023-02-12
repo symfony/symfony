@@ -191,7 +191,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
     }
 
-    public function reset()
+    public function reset(): void
     {
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();

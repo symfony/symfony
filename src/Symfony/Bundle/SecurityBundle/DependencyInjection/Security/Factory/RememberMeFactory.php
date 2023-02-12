@@ -133,6 +133,9 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         return 'remember-me';
     }
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $builder = $node
@@ -235,6 +238,9 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         return new Reference($tokenVerifierId, ContainerInterface::NULL_ON_INVALID_REFERENCE);
     }
 
+    /**
+     * @return void
+     */
     public function prepend(ContainerBuilder $container)
     {
         $rememberMeSecureDefault = false;

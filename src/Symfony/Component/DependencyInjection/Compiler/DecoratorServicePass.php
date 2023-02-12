@@ -27,6 +27,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DecoratorServicePass extends AbstractRecursivePass
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         $definitions = new \SplPriorityQueue();

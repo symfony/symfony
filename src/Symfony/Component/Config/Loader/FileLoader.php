@@ -39,6 +39,8 @@ abstract class FileLoader extends Loader
 
     /**
      * Sets the current directory.
+     *
+     * @return void
      */
     public function setCurrentDir(string $dir)
     {

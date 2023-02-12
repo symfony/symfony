@@ -34,6 +34,8 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface
 
     /**
      * @param ArrayNodeDefinition $builder
+     *
+     * @return void
      */
     public function addConfiguration(NodeDefinition $builder)
     {

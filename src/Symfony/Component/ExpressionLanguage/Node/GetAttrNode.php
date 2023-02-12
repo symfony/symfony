@@ -32,6 +32,9 @@ class GetAttrNode extends Node
         );
     }
 
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         $nullSafe = $this->nodes['attribute'] instanceof ConstantNode && $this->nodes['attribute']->isNullSafe;

@@ -47,6 +47,9 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         $this->updateRepr();
     }
 
+    /**
+     * @return void
+     */
     public function updateRepr()
     {
         if (null !== $this->sourceId) {
@@ -95,6 +98,9 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         return $this->sourceKey;
     }
 
+    /**
+     * @return void
+     */
     public function setSourceId(?string $sourceId)
     {
         $this->sourceId = $sourceId;
@@ -102,6 +108,9 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
         $this->updateRepr();
     }
 
+    /**
+     * @return void
+     */
     public function setSourceKey(?string $sourceKey)
     {
         $this->sourceKey = $sourceKey;

@@ -31,6 +31,9 @@ class TextDescriptor extends Descriptor
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
+    /**
+     * @return void
+     */
     protected function describeDefaults(array $options)
     {
         if ($options['core_types']) {
@@ -59,6 +62,9 @@ class TextDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = [])
     {
         $this->collectOptions($resolvedFormType);
@@ -99,6 +105,9 @@ class TextDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeOption(OptionsResolver $optionsResolver, array $options)
     {
         $definition = $this->getOptionDefinition($optionsResolver, $options['option']);

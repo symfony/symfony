@@ -90,12 +90,18 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
         return array_sum($this->errorCount);
     }
 
+    /**
+     * @return void
+     */
     public function clear()
     {
         $this->records = [];
         $this->errorCount = [];
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->clear();

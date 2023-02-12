@@ -70,6 +70,8 @@ class ContentSecurityPolicyHandler
      * Disables Content-Security-Policy.
      *
      * All related headers will be removed.
+     *
+     * @return void
      */
     public function disableCsp()
     {
@@ -96,13 +98,13 @@ class ContentSecurityPolicyHandler
         return $nonces;
     }
 
-    private function cleanHeaders(Response $response)
+    private function cleanHeaders(Response $response): void
     {
         $response->headers->remove('X-SymfonyProfiler-Script-Nonce');
         $response->headers->remove('X-SymfonyProfiler-Style-Nonce');
     }
 
-    private function removeCspHeaders(Response $response)
+    private function removeCspHeaders(Response $response): void
     {
         $response->headers->remove('X-Content-Security-Policy');
         $response->headers->remove('Content-Security-Policy');

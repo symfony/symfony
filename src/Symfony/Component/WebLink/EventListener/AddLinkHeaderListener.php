@@ -36,7 +36,7 @@ class AddLinkHeaderListener implements EventSubscriberInterface
         $this->serializer = new HttpHeaderSerializer();
     }
 
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;

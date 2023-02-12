@@ -62,6 +62,8 @@ class DeprecationErrorHandler
      * a deprecation message matches the given regular expression.
      *
      * @param int|string|false $mode The reporting mode, defaults to not allowing any deprecations
+     *
+     * @return void
      */
     public static function register($mode = 0)
     {
@@ -86,6 +88,9 @@ class DeprecationErrorHandler
         }
     }
 
+    /**
+     * @return void
+     */
     public static function collectDeprecations($outputFile)
     {
         $deprecations = [];
@@ -179,6 +184,8 @@ class DeprecationErrorHandler
 
     /**
      * @internal
+     *
+     * @return void
      */
     public function shutdown()
     {
@@ -228,7 +235,7 @@ class DeprecationErrorHandler
         });
     }
 
-    private function resetDeprecationGroups()
+    private function resetDeprecationGroups(): void
     {
         $this->deprecationGroups = [
             'unsilenced' => new DeprecationGroup(),
@@ -295,7 +302,7 @@ class DeprecationErrorHandler
      *
      * @throws \InvalidArgumentException
      */
-    private function displayDeprecations($groups, $configuration)
+    private function displayDeprecations($groups, $configuration): void
     {
         $cmp = function ($a, $b) {
             return $b->count() - $a->count();

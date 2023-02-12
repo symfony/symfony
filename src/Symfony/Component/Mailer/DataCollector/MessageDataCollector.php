@@ -29,7 +29,7 @@ final class MessageDataCollector extends DataCollector
         $this->events = $logger->getEvents();
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->data['events'] = $this->events;
     }
@@ -47,7 +47,7 @@ final class MessageDataCollector extends DataCollector
         return base64_encode($data);
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }

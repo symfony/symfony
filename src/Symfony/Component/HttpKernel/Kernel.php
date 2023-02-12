@@ -103,6 +103,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->resetServices = false;
     }
 
+    /**
+     * @return void
+     */
     public function boot()
     {
         if (true === $this->booted) {
@@ -131,6 +134,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->booted = true;
     }
 
+    /**
+     * @return void
+     */
     public function reboot(?string $warmupDir)
     {
         $this->shutdown();
@@ -138,6 +144,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->boot();
     }
 
+    /**
+     * @return void
+     */
     public function terminate(Request $request, Response $response)
     {
         if (false === $this->booted) {
@@ -149,6 +158,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
     }
 
+    /**
+     * @return void
+     */
     public function shutdown()
     {
         if (false === $this->booted) {
@@ -280,6 +292,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * @internal
+     *
+     * @return void
      */
     public function setAnnotatedClassCache(array $annotatedClasses)
     {
@@ -324,6 +338,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * Initializes bundles.
      *
      * @throws \LogicException if two bundles share a common name
+     *
+     * @return void
      */
     protected function initializeBundles()
     {
@@ -342,6 +358,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * The extension point similar to the Bundle::build() method.
      *
      * Use this method to register compiler passes and manipulate the container during the building process.
+     *
+     * @return void
      */
     protected function build(ContainerBuilder $container)
     {
@@ -380,6 +398,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * The built version of the service container is used when fresh, otherwise the
      * container is built.
+     *
+     * @return void
      */
     protected function initializeContainer()
     {
@@ -592,6 +612,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * Prepares the ContainerBuilder before it is compiled.
+     *
+     * @return void
      */
     protected function prepareContainer(ContainerBuilder $container)
     {
@@ -643,6 +665,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @param string $class     The name of the class to generate
      * @param string $baseClass The name of the container's base class
+     *
+     * @return void
      */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass)
     {

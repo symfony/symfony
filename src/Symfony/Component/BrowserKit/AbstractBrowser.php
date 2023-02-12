@@ -59,6 +59,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets whether to automatically follow redirects or not.
+     *
+     * @return void
      */
     public function followRedirects(bool $followRedirects = true)
     {
@@ -67,6 +69,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets whether to automatically follow meta refresh redirects or not.
+     *
+     * @return void
      */
     public function followMetaRefresh(bool $followMetaRefresh = true)
     {
@@ -83,6 +87,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets the maximum number of redirects that crawler can follow.
+     *
+     * @return void
      */
     public function setMaxRedirects(int $maxRedirects)
     {
@@ -102,6 +108,8 @@ abstract class AbstractBrowser
      * Sets the insulated flag.
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
+     *
+     * @return void
      */
     public function insulate(bool $insulated = true)
     {
@@ -114,6 +122,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets server parameters.
+     *
+     * @return void
      */
     public function setServerParameters(array $server)
     {
@@ -124,6 +134,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets single server parameter.
+     *
+     * @return void
      */
     public function setServerParameter(string $key, string $value)
     {
@@ -591,6 +603,8 @@ abstract class AbstractBrowser
      * Restarts the client.
      *
      * It flushes history and all cookies.
+     *
+     * @return void
      */
     public function restart()
     {

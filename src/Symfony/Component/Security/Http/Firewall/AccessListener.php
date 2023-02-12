@@ -65,7 +65,7 @@ class AccessListener extends AbstractListener
      *
      * @throws AccessDeniedException
      */
-    public function authenticate(RequestEvent $event)
+    public function authenticate(RequestEvent $event): void
     {
         $request = $event->getRequest();
 

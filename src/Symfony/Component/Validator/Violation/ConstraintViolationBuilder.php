@@ -108,6 +108,9 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function addViolation()
     {
         if (null === $this->plural) {

@@ -49,7 +49,7 @@ class UserPasswordHashCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to hash.')

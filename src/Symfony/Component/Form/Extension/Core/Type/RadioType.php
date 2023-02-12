@@ -16,6 +16,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RadioType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

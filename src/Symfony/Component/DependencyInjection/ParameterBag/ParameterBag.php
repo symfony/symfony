@@ -31,11 +31,17 @@ class ParameterBag implements ParameterBagInterface
         $this->add($parameters);
     }
 
+    /**
+     * @return void
+     */
     public function clear()
     {
         $this->parameters = [];
     }
 
+    /**
+     * @return void
+     */
     public function add(array $parameters)
     {
         foreach ($parameters as $key => $value) {
@@ -94,6 +100,9 @@ class ParameterBag implements ParameterBagInterface
         return $this->parameters[$name];
     }
 
+    /**
+     * @return void
+     */
     public function set(string $name, array|bool|string|int|float|\UnitEnum|null $value)
     {
         if (is_numeric($name)) {
@@ -109,6 +118,8 @@ class ParameterBag implements ParameterBagInterface
      * Deprecates a service container parameter.
      *
      * @throws ParameterNotFoundException if the parameter is not defined
+     *
+     * @return void
      */
     public function deprecate(string $name, string $package, string $version, string $message = 'The parameter "%s" is deprecated.')
     {
@@ -124,11 +135,17 @@ class ParameterBag implements ParameterBagInterface
         return \array_key_exists($name, $this->parameters);
     }
 
+    /**
+     * @return void
+     */
     public function remove(string $name)
     {
         unset($this->parameters[$name], $this->deprecatedParameters[$name]);
     }
 
+    /**
+     * @return void
+     */
     public function resolve()
     {
         if ($this->resolved) {

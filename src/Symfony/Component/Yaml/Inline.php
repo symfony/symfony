@@ -34,6 +34,9 @@ class Inline
     private static bool $objectForMap = false;
     private static bool $constantSupport = false;
 
+    /**
+     * @return void
+     */
     public static function initialize(int $flags, int $parsedLineNumber = null, string $parsedFilename = null)
     {
         self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);

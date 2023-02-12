@@ -43,7 +43,7 @@ final class InputBag extends ParameterBag
     /**
      * Replaces the current input values by a new set.
      */
-    public function replace(array $inputs = [])
+    public function replace(array $inputs = []): void
     {
         $this->parameters = [];
         $this->add($inputs);
@@ -52,7 +52,7 @@ final class InputBag extends ParameterBag
     /**
      * Adds input values.
      */
-    public function add(array $inputs = [])
+    public function add(array $inputs = []): void
     {
         foreach ($inputs as $input => $value) {
             $this->set($input, $value);
@@ -64,7 +64,7 @@ final class InputBag extends ParameterBag
      *
      * @param string|int|float|bool|array|null $value
      */
-    public function set(string $key, mixed $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value && !\is_scalar($value) && !\is_array($value) && !$value instanceof \Stringable) {
             throw new \InvalidArgumentException(sprintf('Expected a scalar, or an array as a 2nd argument to "%s()", "%s" given.', __METHOD__, get_debug_type($value)));

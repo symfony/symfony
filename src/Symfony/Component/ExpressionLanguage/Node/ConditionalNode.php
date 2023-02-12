@@ -27,6 +27,9 @@ class ConditionalNode extends Node
         );
     }
 
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         $compiler

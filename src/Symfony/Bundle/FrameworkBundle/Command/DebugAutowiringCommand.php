@@ -43,6 +43,9 @@ class DebugAutowiringCommand extends ContainerDebugCommand
         parent::__construct($name);
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this

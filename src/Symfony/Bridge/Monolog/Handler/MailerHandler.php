@@ -78,7 +78,7 @@ class MailerHandler extends AbstractProcessingHandler
      * @param string $content formatted email body to be sent
      * @param array  $records the array of log records that formed this content
      */
-    protected function send(string $content, array $records)
+    protected function send(string $content, array $records): void
     {
         $this->mailer->send($this->buildMessage($content, $records));
     }

@@ -40,7 +40,7 @@ class YamlLintCommand extends BaseLintCommand
         parent::__construct(null, $directoryIteratorProvider, $isReadableProvider);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

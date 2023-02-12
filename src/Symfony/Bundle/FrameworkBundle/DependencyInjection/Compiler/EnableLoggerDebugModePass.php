@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Log\Logger;
 
 final class EnableLoggerDebugModePass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('profiler') || !$container->hasDefinition('logger')) {
             return;

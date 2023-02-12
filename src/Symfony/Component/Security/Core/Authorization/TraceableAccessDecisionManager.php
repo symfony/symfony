@@ -71,6 +71,8 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      *
      * @param array $attributes attributes used for the vote
      * @param int   $vote       vote of the voter
+     *
+     * @return void
      */
     public function addVoterVote(VoterInterface $voter, array $attributes, int $vote)
     {

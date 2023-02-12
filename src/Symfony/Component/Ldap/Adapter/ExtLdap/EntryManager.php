@@ -45,6 +45,9 @@ class EntryManager implements EntryManagerInterface
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function update(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -54,6 +57,9 @@ class EntryManager implements EntryManagerInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function remove(Entry $entry)
     {
         $con = $this->getConnectionResource();
@@ -68,6 +74,8 @@ class EntryManager implements EntryManagerInterface
      *
      * @throws NotBoundException
      * @throws LdapException
+     *
+     * @return void
      */
     public function addAttributeValues(Entry $entry, string $attribute, array $values)
     {
@@ -83,6 +91,8 @@ class EntryManager implements EntryManagerInterface
      *
      * @throws NotBoundException
      * @throws LdapException
+     *
+     * @return void
      */
     public function removeAttributeValues(Entry $entry, string $attribute, array $values)
     {
@@ -93,6 +103,9 @@ class EntryManager implements EntryManagerInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true)
     {
         $con = $this->getConnectionResource();
@@ -107,6 +120,8 @@ class EntryManager implements EntryManagerInterface
      *
      * @throws NotBoundException if the connection has not been previously bound
      * @throws LdapException     if an error is thrown during the rename operation
+     *
+     * @return void
      */
     public function move(Entry $entry, string $newParent)
     {

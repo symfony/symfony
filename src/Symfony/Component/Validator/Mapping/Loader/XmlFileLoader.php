@@ -179,7 +179,7 @@ class XmlFileLoader extends FileLoader
         return simplexml_import_dom($dom);
     }
 
-    private function loadClassesFromXml()
+    private function loadClassesFromXml(): void
     {
         parent::__construct($this->file);
 
@@ -198,7 +198,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    private function loadClassMetadataFromXml(ClassMetadata $metadata, \SimpleXMLElement $classDescription)
+    private function loadClassMetadataFromXml(ClassMetadata $metadata, \SimpleXMLElement $classDescription): void
     {
         if (\count($classDescription->{'group-sequence-provider'}) > 0) {
             $metadata->setGroupSequenceProvider(true);

@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 final class AutowireAsDecoratorPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $definition) {
             if ($this->accept($definition) && $reflectionClass = $container->getReflectionClass($definition->getClass(), false)) {
@@ -35,7 +35,7 @@ final class AutowireAsDecoratorPass implements CompilerPassInterface
         return !$definition->hasTag('container.ignore_attributes') && $definition->isAutowired();
     }
 
-    private function processClass(Definition $definition, \ReflectionClass $reflectionClass)
+    private function processClass(Definition $definition, \ReflectionClass $reflectionClass): void
     {
         foreach ($reflectionClass->getAttributes(AsDecorator::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             $attribute = $attribute->newInstance();

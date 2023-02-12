@@ -29,6 +29,9 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class MarkdownDescriptor extends Descriptor
 {
+    /**
+     * @return void
+     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $first = true;
@@ -43,6 +46,9 @@ class MarkdownDescriptor extends Descriptor
         $this->write("\n");
     }
 
+    /**
+     * @return void
+     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $output = '- Path: '.$route->getPath()
@@ -66,6 +72,9 @@ class MarkdownDescriptor extends Descriptor
         $this->write("\n");
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $this->write("Container parameters\n====================\n");
@@ -74,6 +83,9 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
@@ -88,6 +100,9 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -132,6 +147,9 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
@@ -193,6 +211,9 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null)
     {
         $output = '';
@@ -263,6 +284,9 @@ class MarkdownDescriptor extends Descriptor
         $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         $output = '- Service: `'.$alias.'`'
@@ -284,6 +308,9 @@ class MarkdownDescriptor extends Descriptor
         $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $builder);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerParameter(mixed $parameter, array $options = [])
     {
         $this->write(isset($options['parameter']) ? sprintf("%s\n%s\n\n%s", $options['parameter'], str_repeat('=', \strlen($options['parameter'])), $this->formatParameter($parameter)) : $parameter);
@@ -294,6 +321,9 @@ class MarkdownDescriptor extends Descriptor
         throw new LogicException('Using the markdown format to debug environment variables is not supported.');
     }
 
+    /**
+     * @return void
+     */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $event = $options['event'] ?? null;

@@ -32,6 +32,9 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class JsonDescriptor extends Descriptor
 {
+    /**
+     * @return void
+     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $data = [];
@@ -42,16 +45,25 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $this->writeData($this->getRouteData($route), $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $this->writeData($this->sortParameters($parameters), $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
@@ -67,6 +79,9 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -82,6 +97,9 @@ class JsonDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $serviceIds = isset($options['tag']) && $options['tag']
@@ -115,11 +133,17 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null)
     {
         $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $builder, $options['id'] ?? null), $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         if (!$builder) {
@@ -134,16 +158,25 @@ class JsonDescriptor extends Descriptor
         );
     }
 
+    /**
+     * @return void
+     */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $this->writeData($this->getEventDispatcherListenersData($eventDispatcher, $options), $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeCallable(mixed $callable, array $options = [])
     {
         $this->writeData($this->getCallableData($callable), $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerParameter(mixed $parameter, array $options = [])
     {
         $key = $options['parameter'] ?? '';
@@ -180,7 +213,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData(['remainingCount' => $remainingCount, 'deprecations' => $formattedLogs], $options);
     }
 
-    private function writeData(array $data, array $options)
+    private function writeData(array $data, array $options): void
     {
         $flags = $options['json_encoding'] ?? 0;
 

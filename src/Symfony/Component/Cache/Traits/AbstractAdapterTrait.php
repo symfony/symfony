@@ -269,6 +269,9 @@ trait AbstractAdapterTrait
         return $wasEnabled;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         if ($this->deferred) {

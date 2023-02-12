@@ -82,7 +82,7 @@ final class TranslationPullCommand extends Command
         }
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $keys = $this->providerCollection->keys();
         $defaultProvider = 1 === \count($keys) ? $keys[0] : null;

@@ -53,6 +53,9 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         }
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         // prevent concurrency within the same connection
@@ -85,6 +88,9 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         throw new LockConflictedException();
     }
 
+    /**
+     * @return void
+     */
     public function saveRead(Key $key)
     {
         // prevent concurrency within the same connection
@@ -117,6 +123,9 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         throw new LockConflictedException();
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // postgresql locks forever.
@@ -126,6 +135,9 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         }
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         // Prevent deleting locks own by an other key in the same connection
@@ -163,6 +175,9 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         return false;
     }
 
+    /**
+     * @return void
+     */
     public function waitAndSave(Key $key)
     {
         // prevent concurrency within the same connection
@@ -186,6 +201,9 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         $this->unlockShared($key);
     }
 
+    /**
+     * @return void
+     */
     public function waitAndSaveRead(Key $key)
     {
         // prevent concurrency within the same connection

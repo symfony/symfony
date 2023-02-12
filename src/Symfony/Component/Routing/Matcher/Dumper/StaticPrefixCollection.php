@@ -60,6 +60,8 @@ class StaticPrefixCollection
 
     /**
      * Adds a route to a group.
+     *
+     * @return void
      */
     public function addRoute(string $prefix, array|StaticPrefixCollection $route)
     {

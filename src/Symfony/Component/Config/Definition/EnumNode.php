@@ -68,6 +68,9 @@ class EnumNode extends ScalarNode
         }, $this->values)));
     }
 
+    /**
+     * @return void
+     */
     protected function validateType(mixed $value)
     {
         if ($value instanceof \UnitEnum) {

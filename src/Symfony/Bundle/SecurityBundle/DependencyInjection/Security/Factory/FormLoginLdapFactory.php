@@ -25,6 +25,9 @@ class FormLoginLdapFactory extends FormLoginFactory
 {
     use LdapFactoryTrait;
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         parent::addConfiguration($node);

@@ -38,6 +38,8 @@ class GeneratorConfig
 
     /**
      * Adds a writer to be used during the data conversion.
+     *
+     * @return void
      */
     public function addBundleWriter(string $targetDir, BundleWriterInterface $writer)
     {

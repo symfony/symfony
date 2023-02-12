@@ -28,7 +28,7 @@ final class DeprecationGroup
      * @param string $class
      * @param string $method
      */
-    public function addNoticeFromObject($message, $class, $method)
+    public function addNoticeFromObject($message, $class, $method): void
     {
         $this->deprecationNotice($message)->addObjectOccurrence($class, $method);
         $this->addNotice();
@@ -37,13 +37,13 @@ final class DeprecationGroup
     /**
      * @param string $message
      */
-    public function addNoticeFromProceduralCode($message)
+    public function addNoticeFromProceduralCode($message): void
     {
         $this->deprecationNotice($message)->addProceduralOccurrence();
         $this->addNotice();
     }
 
-    public function addNotice()
+    public function addNotice(): void
     {
         ++$this->count;
     }

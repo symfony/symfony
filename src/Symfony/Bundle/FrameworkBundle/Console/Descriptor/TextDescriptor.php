@@ -44,6 +44,9 @@ class TextDescriptor extends Descriptor
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
+    /**
+     * @return void
+     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
@@ -81,6 +84,9 @@ class TextDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $defaults = $route->getDefaults();
@@ -112,6 +118,9 @@ class TextDescriptor extends Descriptor
         $table->render();
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $tableHeaders = ['Parameter', 'Value'];
@@ -125,6 +134,9 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
@@ -141,6 +153,9 @@ class TextDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -162,6 +177,9 @@ class TextDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
@@ -251,6 +269,9 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null)
     {
         if (isset($options['id'])) {
@@ -390,6 +411,9 @@ class TextDescriptor extends Descriptor
         $options['output']->listing($formattedLogs);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         if ($alias->isPublic() && !$alias->isPrivate()) {
@@ -405,6 +429,9 @@ class TextDescriptor extends Descriptor
         $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]), $builder);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerParameter(mixed $parameter, array $options = [])
     {
         $options['output']->table(
@@ -415,6 +442,9 @@ class TextDescriptor extends Descriptor
         ]);
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerEnvVars(array $envs, array $options = [])
     {
         $dump = new Dumper($this->output);
@@ -477,6 +507,9 @@ class TextDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $event = $options['event'] ?? null;
@@ -509,12 +542,15 @@ class TextDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeCallable(mixed $callable, array $options = [])
     {
         $this->writeText($this->formatCallable($callable), $options);
     }
 
-    private function renderEventListenerTable(EventDispatcherInterface $eventDispatcher, string $event, array $eventListeners, SymfonyStyle $io)
+    private function renderEventListenerTable(EventDispatcherInterface $eventDispatcher, string $event, array $eventListeners, SymfonyStyle $io): void
     {
         $tableHeaders = ['Order', 'Callable', 'Priority'];
         $tableRows = [];
@@ -629,7 +665,7 @@ class TextDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    private function writeText(string $content, array $options = [])
+    private function writeText(string $content, array $options = []): void
     {
         $this->write(
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,

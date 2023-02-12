@@ -41,6 +41,9 @@ class Valid extends Constraint
         return parent::__get($option);
     }
 
+    /**
+     * @return void
+     */
     public function addImplicitGroupName(string $group)
     {
         if (null !== $this->groups) {

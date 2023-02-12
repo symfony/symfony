@@ -84,7 +84,7 @@ class ReflectionCaster
         return $a;
     }
 
-    public static function castGenerator(\Generator $c, array $a, Stub $stub, bool $isNested)
+    public static function castGenerator(\Generator $c, array $a, Stub $stub, bool $isNested): array
     {
         // Cannot create ReflectionGenerator based on a terminated Generator
         try {
@@ -447,7 +447,7 @@ class ReflectionCaster
         return $signature;
     }
 
-    private static function addExtra(array &$a, \Reflector $c)
+    private static function addExtra(array &$a, \Reflector $c): void
     {
         $x = isset($a[Caster::PREFIX_VIRTUAL.'extra']) ? $a[Caster::PREFIX_VIRTUAL.'extra']->value : [];
 
@@ -463,7 +463,7 @@ class ReflectionCaster
         }
     }
 
-    private static function addMap(array &$a, object $c, array $map, string $prefix = Caster::PREFIX_VIRTUAL)
+    private static function addMap(array &$a, object $c, array $map, string $prefix = Caster::PREFIX_VIRTUAL): void
     {
         foreach ($map as $k => $m) {
             if ('isDisabled' === $k) {

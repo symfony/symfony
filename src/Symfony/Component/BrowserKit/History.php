@@ -23,6 +23,8 @@ class History
 
     /**
      * Clears the history.
+     *
+     * @return void
      */
     public function clear()
     {
@@ -32,6 +34,8 @@ class History
 
     /**
      * Adds a Request to the history.
+     *
+     * @return void
      */
     public function add(Request $request)
     {

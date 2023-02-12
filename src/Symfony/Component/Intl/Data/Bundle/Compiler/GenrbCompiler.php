@@ -43,6 +43,9 @@ class GenrbCompiler implements BundleCompilerInterface
         $this->genrb = ($envVars ? $envVars.' ' : '').$genrb;
     }
 
+    /**
+     * @return void
+     */
     public function compile(string $sourcePath, string $targetDir)
     {
         if (is_dir($sourcePath)) {

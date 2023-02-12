@@ -43,6 +43,9 @@ class DateIntervalType extends AbstractType
         'choice' => ChoiceType::class,
     ];
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['with_years'] && !$options['with_months'] && !$options['with_weeks'] && !$options['with_days'] && !$options['with_hours'] && !$options['with_minutes'] && !$options['with_seconds']) {
@@ -145,6 +148,9 @@ class DateIntervalType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $vars = [
@@ -157,6 +163,9 @@ class DateIntervalType extends AbstractType
         $view->vars = array_replace($view->vars, $vars);
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $compound = fn (Options $options) => 'single_text' !== $options['widget'];

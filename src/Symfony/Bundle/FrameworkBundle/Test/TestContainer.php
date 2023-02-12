@@ -36,6 +36,9 @@ class TestContainer extends Container
     ) {
     }
 
+    /**
+     * @return void
+     */
     public function compile()
     {
         $this->getPublicContainer()->compile();
@@ -61,11 +64,17 @@ class TestContainer extends Container
         return $this->getPublicContainer()->hasParameter($name);
     }
 
+    /**
+     * @return void
+     */
     public function setParameter(string $name, mixed $value)
     {
         $this->getPublicContainer()->setParameter($name, $value);
     }
 
+    /**
+     * @return void
+     */
     public function set(string $id, mixed $service)
     {
         $container = $this->getPublicContainer();
@@ -99,6 +108,9 @@ class TestContainer extends Container
         return $this->getPublicContainer()->initialized($id);
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         // ignore the call

@@ -28,6 +28,9 @@ trait ProxyTrait
         return $this->pool instanceof PruneableInterface && $this->pool->prune();
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         if ($this->pool instanceof ResetInterface) {

@@ -53,12 +53,18 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         return $scanner->scanLocales($sourceDir.'/curr');
     }
 
+    /**
+     * @return void
+     */
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
     {
         $compiler->compile($sourceDir.'/curr', $tempDir);
         $compiler->compile($sourceDir.'/misc/currencyNumericCodes.txt', $tempDir);
     }
 
+    /**
+     * @return void
+     */
     protected function preGenerate()
     {
         $this->currencyCodes = [];

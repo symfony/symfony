@@ -39,6 +39,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param array $objectManager A configured object manager
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
@@ -105,6 +107,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Register the alias for this mapping driver.
      *
      * Aliases can be used in the Query languages of all the Doctrine object managers to simplify writing tasks.
+     *
+     * @return void
      */
     protected function setMappingDriverAlias(array $mappingConfig, string $mappingName)
     {
@@ -119,6 +123,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Register the mapping driver configuration for later use with the object managers metadata driver chain.
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     protected function setMappingDriverConfig(array $mappingConfig, string $mappingName)
     {
@@ -172,6 +178,8 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
+     *
+     * @return void
      */
     protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container)
     {
@@ -228,6 +236,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Assertion if the specified mapping information is valid.
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName)
     {
@@ -316,6 +326,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Loads a configured object manager metadata, query or result cache driver.
      *
      * @throws \InvalidArgumentException in case of unknown driver type
+     *
+     * @return void
      */
     protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, string $cacheName)
     {

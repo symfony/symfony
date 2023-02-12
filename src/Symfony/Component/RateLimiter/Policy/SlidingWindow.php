@@ -68,7 +68,7 @@ final class SlidingWindow implements LimiterStateInterface
         return microtime(true) > $this->windowEndAt;
     }
 
-    public function add(int $hits = 1)
+    public function add(int $hits = 1): void
     {
         $this->hitCount += $hits;
     }

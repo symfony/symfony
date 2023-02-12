@@ -50,6 +50,9 @@ class XliffLintCommand extends Command
         $this->requireStrictFileNames = $requireStrictFileNames;
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this

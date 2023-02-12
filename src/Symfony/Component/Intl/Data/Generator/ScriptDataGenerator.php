@@ -40,11 +40,17 @@ class ScriptDataGenerator extends AbstractDataGenerator
         return $scanner->scanLocales($sourceDir.'/lang');
     }
 
+    /**
+     * @return void
+     */
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
     {
         $compiler->compile($sourceDir.'/lang', $tempDir);
     }
 
+    /**
+     * @return void
+     */
     protected function preGenerate()
     {
         $this->scriptCodes = [];

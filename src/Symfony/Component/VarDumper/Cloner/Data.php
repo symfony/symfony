@@ -262,6 +262,8 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 
     /**
      * Dumps data with a DumperInterface dumper.
+     *
+     * @return void
      */
     public function dump(DumperInterface $dumper)
     {
@@ -286,7 +288,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param mixed $item A Stub object or the original value being dumped
      */
-    private function dumpItem(DumperInterface $dumper, Cursor $cursor, array &$refs, mixed $item)
+    private function dumpItem(DumperInterface $dumper, Cursor $cursor, array &$refs, mixed $item): void
     {
         $cursor->refIndex = 0;
         $cursor->softRefTo = $cursor->softRefHandle = $cursor->softRefCount = 0;

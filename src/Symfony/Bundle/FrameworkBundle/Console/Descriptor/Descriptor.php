@@ -38,6 +38,9 @@ abstract class Descriptor implements DescriptorInterface
      */
     protected $output;
 
+    /**
+     * @return void
+     */
     public function describe(OutputInterface $output, mixed $object, array $options = [])
     {
         $this->output = $output;
@@ -73,6 +76,9 @@ abstract class Descriptor implements DescriptorInterface
         return $this->output;
     }
 
+    /**
+     * @return void
+     */
     protected function write(string $content, bool $decorated = false)
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);

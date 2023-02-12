@@ -178,6 +178,9 @@ class InputOption
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
     }
 
+    /**
+     * @return void
+     */
     public function setDefault(string|bool|int|float|array $default = null)
     {
         if (1 > \func_num_args()) {

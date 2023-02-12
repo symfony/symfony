@@ -107,7 +107,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         return $clone;
     }
 
-    public function reset()
+    public function reset(): void
     {
         if ($this->client instanceof ResetInterface) {
             $this->client->reset();

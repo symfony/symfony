@@ -28,6 +28,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MarkdownDescriptor extends Descriptor
 {
+    /**
+     * @return void
+     */
     public function describe(OutputInterface $output, object $object, array $options = [])
     {
         $decorated = $output->isDecorated();
@@ -38,11 +41,17 @@ class MarkdownDescriptor extends Descriptor
         $output->setDecorated($decorated);
     }
 
+    /**
+     * @return void
+     */
     protected function write(string $content, bool $decorated = true)
     {
         parent::write($content, $decorated);
     }
 
+    /**
+     * @return void
+     */
     protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
         $this->write(
@@ -54,6 +63,9 @@ class MarkdownDescriptor extends Descriptor
         );
     }
 
+    /**
+     * @return void
+     */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
         $name = '--'.$option->getName();
@@ -75,6 +87,9 @@ class MarkdownDescriptor extends Descriptor
         );
     }
 
+    /**
+     * @return void
+     */
     protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         if ($showArguments = \count($definition->getArguments()) > 0) {
@@ -102,6 +117,9 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeCommand(Command $command, array $options = [])
     {
         if ($options['short'] ?? false) {
@@ -138,6 +156,9 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeApplication(Application $application, array $options = [])
     {
         $describedNamespace = $options['namespace'] ?? null;

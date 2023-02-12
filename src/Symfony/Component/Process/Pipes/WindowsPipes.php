@@ -172,6 +172,9 @@ class WindowsPipes extends AbstractPipes
         return $this->pipes && $this->fileHandles;
     }
 
+    /**
+     * @return void
+     */
     public function close()
     {
         parent::close();

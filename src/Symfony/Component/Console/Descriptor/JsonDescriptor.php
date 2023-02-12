@@ -26,11 +26,17 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class JsonDescriptor extends Descriptor
 {
+    /**
+     * @return void
+     */
     protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
         $this->writeData($this->getInputArgumentData($argument), $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
         $this->writeData($this->getInputOptionData($option), $options);
@@ -39,16 +45,25 @@ class JsonDescriptor extends Descriptor
         }
     }
 
+    /**
+     * @return void
+     */
     protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         $this->writeData($this->getInputDefinitionData($definition), $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeCommand(Command $command, array $options = [])
     {
         $this->writeData($this->getCommandData($command, $options['short'] ?? false), $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeApplication(Application $application, array $options = [])
     {
         $describedNamespace = $options['namespace'] ?? null;
@@ -81,7 +96,7 @@ class JsonDescriptor extends Descriptor
     /**
      * Writes data as json.
      */
-    private function writeData(array $data, array $options)
+    private function writeData(array $data, array $options): void
     {
         $flags = $options['json_encoding'] ?? 0;
 

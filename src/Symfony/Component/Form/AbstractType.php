@@ -20,18 +20,30 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractType implements FormTypeInterface
 {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
     }
 
+    /**
+     * @return void
+     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
     }

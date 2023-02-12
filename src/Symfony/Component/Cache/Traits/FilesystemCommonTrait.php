@@ -23,7 +23,7 @@ trait FilesystemCommonTrait
     private string $directory;
     private string $tmpSuffix;
 
-    private function init(string $namespace, ?string $directory)
+    private function init(string $namespace, ?string $directory): void
     {
         if (!isset($directory[0])) {
             $directory = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'symfony-cache';

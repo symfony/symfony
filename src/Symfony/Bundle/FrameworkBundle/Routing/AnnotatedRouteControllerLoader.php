@@ -24,6 +24,8 @@ class AnnotatedRouteControllerLoader extends AnnotationClassLoader
 {
     /**
      * Configures the _controller default parameter of a given Route instance.
+     *
+     * @return void
      */
     protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot)
     {

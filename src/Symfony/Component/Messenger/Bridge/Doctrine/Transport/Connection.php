@@ -74,6 +74,9 @@ class Connection implements ResetInterface
         $this->autoSetup = $this->configuration['auto_setup'];
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->queueEmptiedAt = null;

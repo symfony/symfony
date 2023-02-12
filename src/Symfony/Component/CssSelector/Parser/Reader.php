@@ -74,11 +74,17 @@ class Reader
         return false;
     }
 
+    /**
+     * @return void
+     */
     public function moveForward(int $length)
     {
         $this->position += $length;
     }
 
+    /**
+     * @return void
+     */
     public function moveToEnd()
     {
         $this->position = $this->length;

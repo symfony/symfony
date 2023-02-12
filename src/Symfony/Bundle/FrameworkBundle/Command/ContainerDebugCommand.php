@@ -38,6 +38,9 @@ class ContainerDebugCommand extends Command
 {
     use BuildDebugContainerTrait;
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -242,6 +245,8 @@ EOF
      * Validates input arguments and options.
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     protected function validateInput(InputInterface $input)
     {

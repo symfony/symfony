@@ -161,6 +161,8 @@ class ArrayChoiceList implements ChoiceListInterface
      * @param array|null $structuredValues The values indexed by the original keys
      *
      * @internal
+     *
+     * @return void
      */
     protected function flatten(array $choices, callable $value, ?array &$choicesByValues, ?array &$keysByValues, ?array &$structuredValues)
     {

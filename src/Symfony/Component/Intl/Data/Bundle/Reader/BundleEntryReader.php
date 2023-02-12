@@ -52,6 +52,8 @@ class BundleEntryReader implements BundleEntryReaderInterface
      * can continue at the correct fallback locale ("ro").
      *
      * @param array $localeAliases A mapping of locale aliases to locales
+     *
+     * @return void
      */
     public function setLocaleAliases(array $localeAliases)
     {

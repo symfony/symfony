@@ -132,6 +132,9 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         ],
     ];
 
+    /**
+     * @return void
+     */
     public function extract(string|iterable $resource, MessageCatalogue $catalog)
     {
         $files = $this->extractFiles($resource);
@@ -142,6 +145,9 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;
@@ -162,7 +168,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * Seeks to a non-whitespace token.
      */
-    private function seekToNextRelevantToken(\Iterator $tokenIterator)
+    private function seekToNextRelevantToken(\Iterator $tokenIterator): void
     {
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
@@ -172,7 +178,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
-    private function skipMethodArgument(\Iterator $tokenIterator)
+    private function skipMethodArgument(\Iterator $tokenIterator): void
     {
         $openBraces = 0;
 
@@ -255,6 +261,8 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
     /**
      * Extracts trans message from PHP tokens.
+     *
+     * @return void
      */
     protected function parseTokens(array $tokens, MessageCatalogue $catalog, string $filename)
     {

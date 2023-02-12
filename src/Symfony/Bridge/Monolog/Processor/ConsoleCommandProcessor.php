@@ -47,12 +47,12 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
         return $record;
     }
 
-    public function reset()
+    public function reset(): void
     {
         unset($this->commandData);
     }
 
-    public function addCommandData(ConsoleEvent $event)
+    public function addCommandData(ConsoleEvent $event): void
     {
         $this->commandData = [
             'name' => $event->getCommand()->getName(),

@@ -85,6 +85,9 @@ class TraceableEncoder implements EncoderInterface, DecoderInterface, Serializer
         return $this->encoder->supportsDecoding($format, $context);
     }
 
+    /**
+     * @return void
+     */
     public function setSerializer(SerializerInterface $serializer)
     {
         if (!$this->encoder instanceof SerializerAwareInterface) {

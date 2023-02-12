@@ -53,6 +53,9 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         $this->tagPrefix = $tagPrefix;
     }
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasParameter($this->connectionsParameter)) {

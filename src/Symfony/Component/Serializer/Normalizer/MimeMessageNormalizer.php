@@ -42,7 +42,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         $this->headersProperty = new \ReflectionProperty(Headers::class, 'headers');
     }
 
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
         $this->normalizer->setSerializer($serializer);

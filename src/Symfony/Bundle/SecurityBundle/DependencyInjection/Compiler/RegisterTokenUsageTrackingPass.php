@@ -27,6 +27,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class RegisterTokenUsageTrackingPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->has('security.untracked_token_storage')) {

@@ -33,26 +33,41 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class XmlDescriptor extends Descriptor
 {
+    /**
+     * @return void
+     */
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {
         $this->writeDocument($this->getRouteCollectionDocument($routes));
     }
 
+    /**
+     * @return void
+     */
     protected function describeRoute(Route $route, array $options = [])
     {
         $this->writeDocument($this->getRouteDocument($route, $options['name'] ?? null));
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
     {
         $this->writeDocument($this->getContainerParametersDocument($parameters));
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
     {
         $this->writeDocument($this->getContainerTagsDocument($builder, isset($options['show_hidden']) && $options['show_hidden']));
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
@@ -62,16 +77,25 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getContainerServiceDocument($service, $options['id'], $builder, isset($options['show_arguments']) && $options['show_arguments']));
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $this->writeDocument($this->getContainerServicesDocument($builder, $options['tag'] ?? null, isset($options['show_hidden']) && $options['show_hidden'], isset($options['show_arguments']) && $options['show_arguments'], $options['filter'] ?? null, $options['id'] ?? null));
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null)
     {
         $this->writeDocument($this->getContainerDefinitionDocument($definition, $options['id'] ?? null, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $builder));
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
@@ -88,16 +112,25 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($dom);
     }
 
+    /**
+     * @return void
+     */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $this->writeDocument($this->getEventDispatcherListenersDocument($eventDispatcher, $options));
     }
 
+    /**
+     * @return void
+     */
     protected function describeCallable(mixed $callable, array $options = [])
     {
         $this->writeDocument($this->getCallableDocument($callable));
     }
 
+    /**
+     * @return void
+     */
     protected function describeContainerParameter(mixed $parameter, array $options = [])
     {
         $this->writeDocument($this->getContainerParameterDocument($parameter, $options));
@@ -136,7 +169,7 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($dom);
     }
 
-    private function writeDocument(\DOMDocument $dom)
+    private function writeDocument(\DOMDocument $dom): void
     {
         $dom->formatOutput = true;
         $this->write($dom->saveXML());
@@ -503,7 +536,7 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    private function appendEventListenerDocument(EventDispatcherInterface $eventDispatcher, string $event, \DOMElement $element, array $eventListeners)
+    private function appendEventListenerDocument(EventDispatcherInterface $eventDispatcher, string $event, \DOMElement $element, array $eventListeners): void
     {
         foreach ($eventListeners as $listener) {
             $callableXML = $this->getCallableDocument($listener);

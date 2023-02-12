@@ -41,6 +41,9 @@ abstract class AbstractPipes implements PipesInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function close()
     {
         foreach ($this->pipes as $pipe) {
@@ -65,6 +68,8 @@ abstract class AbstractPipes implements PipesInterface
 
     /**
      * Unblocks streams.
+     *
+     * @return void
      */
     protected function unblock()
     {
@@ -169,6 +174,8 @@ abstract class AbstractPipes implements PipesInterface
 
     /**
      * @internal
+     *
+     * @return void
      */
     public function handleError(int $type, string $msg)
     {

@@ -25,6 +25,8 @@ class FormFieldRegistry
 
     /**
      * Adds a field to the registry.
+     *
+     * @return void
      */
     public function add(FormField $field)
     {
@@ -47,6 +49,8 @@ class FormFieldRegistry
 
     /**
      * Removes a field based on the fully qualified name and its children from the registry.
+     *
+     * @return void
      */
     public function remove(string $name)
     {
@@ -102,6 +106,8 @@ class FormFieldRegistry
      * Set the value of a field based on the fully qualified name and its children.
      *
      * @throws \InvalidArgumentException if the field does not exist
+     *
+     * @return void
      */
     public function set(string $name, mixed $value)
     {

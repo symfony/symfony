@@ -38,6 +38,9 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
         return str_starts_with($dsn, 'in-memory://');
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         foreach ($this->createdTransports as $transport) {

@@ -33,6 +33,9 @@ class ColorType extends AbstractType
         $this->translator = $translator;
     }
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['html5']) {
@@ -59,6 +62,9 @@ class ColorType extends AbstractType
         });
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

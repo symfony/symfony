@@ -121,6 +121,9 @@ class ExecutionContext implements ExecutionContextInterface
         $this->cachedObjectsRefs = new \SplObjectStorage();
     }
 
+    /**
+     * @return void
+     */
     public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath)
     {
         $this->value = $value;
@@ -129,16 +132,25 @@ class ExecutionContext implements ExecutionContextInterface
         $this->propertyPath = $propertyPath;
     }
 
+    /**
+     * @return void
+     */
     public function setGroup(?string $group)
     {
         $this->group = $group;
     }
 
+    /**
+     * @return void
+     */
     public function setConstraint(Constraint $constraint)
     {
         $this->constraint = $constraint;
     }
 
+    /**
+     * @return void
+     */
     public function addViolation(string $message, array $parameters = [])
     {
         $this->violations->add(new ConstraintViolation(
@@ -228,6 +240,9 @@ class ExecutionContext implements ExecutionContextInterface
         return PropertyPath::append($this->propertyPath, $subPath);
     }
 
+    /**
+     * @return void
+     */
     public function markGroupAsValidated(string $cacheKey, string $groupHash)
     {
         if (!isset($this->validatedObjects[$cacheKey])) {
@@ -242,6 +257,9 @@ class ExecutionContext implements ExecutionContextInterface
         return isset($this->validatedObjects[$cacheKey][$groupHash]);
     }
 
+    /**
+     * @return void
+     */
     public function markConstraintAsValidated(string $cacheKey, string $constraintHash)
     {
         $this->validatedConstraints[$cacheKey.':'.$constraintHash] = true;
@@ -252,6 +270,9 @@ class ExecutionContext implements ExecutionContextInterface
         return isset($this->validatedConstraints[$cacheKey.':'.$constraintHash]);
     }
 
+    /**
+     * @return void
+     */
     public function markObjectAsInitialized(string $cacheKey)
     {
         $this->initializedObjects[$cacheKey] = true;

@@ -33,7 +33,7 @@ class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
         return $stack->next()->handle($envelope, $stack);
     }
 
-    private function pingConnection(EntityManagerInterface $entityManager)
+    private function pingConnection(EntityManagerInterface $entityManager): void
     {
         $connection = $entityManager->getConnection();
 

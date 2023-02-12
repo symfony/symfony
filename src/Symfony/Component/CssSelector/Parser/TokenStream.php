@@ -144,6 +144,8 @@ class TokenStream
 
     /**
      * Skips next whitespace if any.
+     *
+     * @return void
      */
     public function skipWhitespace()
     {

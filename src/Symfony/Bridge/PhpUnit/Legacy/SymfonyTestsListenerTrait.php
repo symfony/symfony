@@ -107,12 +107,18 @@ class SymfonyTestsListenerTrait
         }
     }
 
+    /**
+     * @return void
+     */
     public function globalListenerDisabled()
     {
         self::$globallyEnabled = false;
         $this->state = -1;
     }
 
+    /**
+     * @return void
+     */
     public function startTestSuite($suite)
     {
         $suiteName = $suite->getName();
@@ -188,6 +194,9 @@ class SymfonyTestsListenerTrait
         }
     }
 
+    /**
+     * @return void
+     */
     public function addSkippedTest($test, \Exception $e, $time)
     {
         if (0 < $this->state) {
@@ -195,6 +204,9 @@ class SymfonyTestsListenerTrait
         }
     }
 
+    /**
+     * @return void
+     */
     public function startTest($test)
     {
         if (-2 < $this->state && $test instanceof TestCase) {
@@ -242,6 +254,9 @@ class SymfonyTestsListenerTrait
         }
     }
 
+    /**
+     * @return void
+     */
     public function endTest($test, $time)
     {
         if ($file = getenv('SYMFONY_EXPECTED_DEPRECATIONS_SERIALIZE')) {

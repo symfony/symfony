@@ -33,6 +33,8 @@ class RouterDataCollector extends DataCollector
 
     /**
      * @final
+     *
+     * @return void
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
@@ -48,6 +50,9 @@ class RouterDataCollector extends DataCollector
         unset($this->controllers[$request]);
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->controllers = new \SplObjectStorage();
@@ -69,6 +74,8 @@ class RouterDataCollector extends DataCollector
 
     /**
      * Remembers the controller associated to each request.
+     *
+     * @return void
      */
     public function onKernelController(ControllerEvent $event)
     {

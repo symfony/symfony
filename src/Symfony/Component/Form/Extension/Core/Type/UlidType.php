@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UlidType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -28,6 +31,9 @@ class UlidType extends AbstractType
         ;
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

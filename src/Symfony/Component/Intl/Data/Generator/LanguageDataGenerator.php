@@ -103,12 +103,18 @@ class LanguageDataGenerator extends AbstractDataGenerator
         return $scanner->scanLocales($sourceDir.'/lang');
     }
 
+    /**
+     * @return void
+     */
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
     {
         $compiler->compile($sourceDir.'/lang', $tempDir);
         $compiler->compile($sourceDir.'/misc/metadata.txt', $tempDir);
     }
 
+    /**
+     * @return void
+     */
     protected function preGenerate()
     {
         $this->languageCodes = [];

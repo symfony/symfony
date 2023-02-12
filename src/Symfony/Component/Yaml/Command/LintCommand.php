@@ -50,6 +50,9 @@ class LintCommand extends Command
         $this->isReadableProvider = null === $isReadableProvider ? null : $isReadableProvider(...);
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this

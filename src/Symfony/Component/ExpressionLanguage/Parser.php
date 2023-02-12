@@ -208,6 +208,9 @@ class Parser
         return $expr;
     }
 
+    /**
+     * @return Node\Node
+     */
     public function parsePrimaryExpression()
     {
         $token = $this->stream->current;

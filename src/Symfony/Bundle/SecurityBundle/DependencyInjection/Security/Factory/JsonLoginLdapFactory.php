@@ -22,6 +22,9 @@ class JsonLoginLdapFactory extends JsonLoginFactory
 {
     use LdapFactoryTrait;
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         parent::addConfiguration($node);

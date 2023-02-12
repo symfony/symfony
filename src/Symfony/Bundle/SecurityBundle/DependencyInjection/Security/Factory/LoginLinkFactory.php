@@ -28,6 +28,9 @@ class LoginLinkFactory extends AbstractFactory
 {
     public const PRIORITY = -20;
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         /** @var NodeBuilder $builder */

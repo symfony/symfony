@@ -26,6 +26,9 @@ class Image extends AbstractUriElement
         return $this->node->getAttribute('src');
     }
 
+    /**
+     * @return void
+     */
     protected function setNode(\DOMElement $node)
     {
         if ('img' !== $node->nodeName) {

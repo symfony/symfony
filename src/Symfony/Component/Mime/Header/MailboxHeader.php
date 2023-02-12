@@ -35,7 +35,7 @@ final class MailboxHeader extends AbstractHeader
      *
      * @throws RfcComplianceException
      */
-    public function setBody(mixed $body)
+    public function setBody(mixed $body): void
     {
         $this->setAddress($body);
     }
@@ -51,7 +51,7 @@ final class MailboxHeader extends AbstractHeader
     /**
      * @throws RfcComplianceException
      */
-    public function setAddress(Address $address)
+    public function setAddress(Address $address): void
     {
         $this->address = $address;
     }

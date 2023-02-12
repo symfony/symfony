@@ -17,6 +17,9 @@ use Symfony\Component\Form\FormView;
 
 class TextareaType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['pattern'] = null;

@@ -38,6 +38,9 @@ class FileValidator extends ConstraintValidator
         self::MIB_BYTES => 'MiB',
     ];
 
+    /**
+     * @return void
+     */
     public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof File) {

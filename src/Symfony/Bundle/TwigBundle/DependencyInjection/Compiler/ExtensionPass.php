@@ -25,6 +25,9 @@ use Symfony\Component\Yaml\Yaml;
  */
 class ExtensionPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!class_exists(Packages::class)) {

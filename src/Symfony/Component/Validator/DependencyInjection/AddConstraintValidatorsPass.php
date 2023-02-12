@@ -22,6 +22,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddConstraintValidatorsPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('validator.validator_factory')) {

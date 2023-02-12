@@ -27,17 +27,17 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
 {
     private array $traceableBuses = [];
 
-    public function registerBus(string $name, TraceableMessageBus $bus)
+    public function registerBus(string $name, TraceableMessageBus $bus): void
     {
         $this->traceableBuses[$name] = $bus;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         // Noop. Everything is collected live by the traceable buses & cloned as late as possible.
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data = ['messages' => [], 'buses' => array_keys($this->traceableBuses)];
 
@@ -61,7 +61,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         return 'messenger';
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
         foreach ($this->traceableBuses as $traceableBus) {

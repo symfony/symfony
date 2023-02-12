@@ -23,6 +23,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class CallbackValidator extends ConstraintValidator
 {
+    /**
+     * @return void
+     */
     public function validate(mixed $object, Constraint $constraint)
     {
         if (!$constraint instanceof Callback) {

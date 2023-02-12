@@ -28,6 +28,9 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  */
 abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
+    /**
+     * @return void
+     */
     protected function listBundles(OutputInterface|StyleInterface $output)
     {
         $title = 'Available registered bundles with their extension alias if available';
@@ -118,6 +121,9 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         throw new LogicException($message);
     }
 
+    /**
+     * @return void
+     */
     public function validateConfiguration(ExtensionInterface $extension, mixed $configuration)
     {
         if (!$configuration) {

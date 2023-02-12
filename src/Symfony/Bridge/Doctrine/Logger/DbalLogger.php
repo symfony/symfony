@@ -48,6 +48,8 @@ class DbalLogger implements SQLLogger
 
     /**
      * Logs a message.
+     *
+     * @return void
      */
     protected function log(string $message, array $params)
     {

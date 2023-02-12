@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 #[AsCommand(name: 'about', description: 'Display information about the current project')]
 class AboutCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setHelp(<<<'EOT'

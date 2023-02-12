@@ -27,6 +27,9 @@ class ArrayNode extends Node
         $this->index = -1;
     }
 
+    /**
+     * @return void
+     */
     public function addElement(Node $value, Node $key = null)
     {
         $key ??= new ConstantNode(++$this->index);
@@ -36,6 +39,8 @@ class ArrayNode extends Node
 
     /**
      * Compiles the node to PHP.
+     *
+     * @return void
      */
     public function compile(Compiler $compiler)
     {
@@ -103,6 +108,9 @@ class ArrayNode extends Node
         return $pairs;
     }
 
+    /**
+     * @return void
+     */
     protected function compileArguments(Compiler $compiler, bool $withKeys = true)
     {
         $first = true;

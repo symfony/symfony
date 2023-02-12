@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class JsonDescriptor extends Descriptor
 {
+    /**
+     * @return void
+     */
     protected function describeDefaults(array $options)
     {
         $data['builtin_form_types'] = $options['core_types'];
@@ -33,6 +36,9 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = [])
     {
         $this->collectOptions($resolvedFormType);
@@ -61,6 +67,9 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
+    /**
+     * @return void
+     */
     protected function describeOption(OptionsResolver $optionsResolver, array $options)
     {
         $definition = $this->getOptionDefinition($optionsResolver, $options['option']);
@@ -93,14 +102,14 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    private function writeData(array $data, array $options)
+    private function writeData(array $data, array $options): void
     {
         $flags = $options['json_encoding'] ?? 0;
 
         $this->output->write(json_encode($data, $flags | \JSON_PRETTY_PRINT)."\n");
     }
 
-    private function sortOptions(array &$options)
+    private function sortOptions(array &$options): void
     {
         foreach ($options as &$opts) {
             $sorted = false;

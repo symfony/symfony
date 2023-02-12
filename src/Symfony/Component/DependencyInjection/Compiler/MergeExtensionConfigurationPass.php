@@ -29,6 +29,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class MergeExtensionConfigurationPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         $parameters = $container->getParameterBag()->all();
@@ -106,6 +109,9 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
         $this->mergeEnvPlaceholders($parameterBag);
     }
 
+    /**
+     * @return void
+     */
     public function freezeAfterProcessing(Extension $extension, ContainerBuilder $container)
     {
         if (!$config = $extension->getProcessedConfigs()) {

@@ -101,6 +101,9 @@ class UnusedTagsPass implements CompilerPassInterface
         'workflow',
     ];
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         $tags = array_unique(array_merge($container->findTags(), self::KNOWN_TAGS));

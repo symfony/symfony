@@ -43,6 +43,9 @@ class GuardListener
         $this->validator = $validator;
     }
 
+    /**
+     * @return void
+     */
     public function onTransition(GuardEvent $event, string $eventName)
     {
         if (!isset($this->configuration[$eventName])) {
@@ -62,7 +65,7 @@ class GuardListener
         }
     }
 
-    private function validateGuardExpression(GuardEvent $event, string $expression)
+    private function validateGuardExpression(GuardEvent $event, string $expression): void
     {
         if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
             $blocker = TransitionBlocker::createBlockedByExpressionGuardListener($expression);

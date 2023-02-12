@@ -29,7 +29,7 @@ final class Ldap implements LdapInterface
         $this->adapter = $adapter;
     }
 
-    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)
+    public function bind(string $dn = null, #[\SensitiveParameter] string $password = null): void
     {
         $this->adapter->getConnection()->bind($dn, $password);
     }

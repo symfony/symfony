@@ -338,7 +338,7 @@ EOF;
     /**
      * Load the cache file.
      */
-    private function initialize()
+    private function initialize(): void
     {
         if (isset(self::$valuesCache[$this->file])) {
             $values = self::$valuesCache[$this->file];

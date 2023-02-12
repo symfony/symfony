@@ -52,6 +52,9 @@ class Application extends BaseApplication
         return $this->kernel;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         if ($this->kernel->getContainer()->has('services_resetter')) {
@@ -137,6 +140,9 @@ class Application extends BaseApplication
         return parent::add($command);
     }
 
+    /**
+     * @return void
+     */
     protected function registerCommands()
     {
         if ($this->commandsRegistered) {
@@ -177,7 +183,7 @@ class Application extends BaseApplication
         }
     }
 
-    private function renderRegistrationErrors(InputInterface $input, OutputInterface $output)
+    private function renderRegistrationErrors(InputInterface $input, OutputInterface $output): void
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();

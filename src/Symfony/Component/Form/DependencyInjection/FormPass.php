@@ -30,6 +30,9 @@ class FormPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('form.extension')) {

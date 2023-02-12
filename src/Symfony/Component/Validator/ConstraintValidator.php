@@ -36,6 +36,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected $context;
 
+    /**
+     * @return void
+     */
     public function initialize(ExecutionContextInterface $context)
     {
         $this->context = $context;

@@ -53,6 +53,9 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
         $this->options[$name] = $default;
     }
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $builder = $node->children();

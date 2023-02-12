@@ -38,6 +38,9 @@ class ServerDumpPlaceholderCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this->setDefinition($this->replacedCommand->getDefinition());

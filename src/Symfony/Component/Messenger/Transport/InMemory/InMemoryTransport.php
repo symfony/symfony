@@ -91,6 +91,9 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         return $envelope;
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->sent = $this->queue = $this->rejected = $this->acknowledged = [];

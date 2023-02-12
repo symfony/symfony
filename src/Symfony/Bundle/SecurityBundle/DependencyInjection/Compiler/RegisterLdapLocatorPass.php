@@ -25,6 +25,9 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class RegisterLdapLocatorPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         $definition = $container->setDefinition('security.ldap_locator', new Definition(ServiceLocator::class));

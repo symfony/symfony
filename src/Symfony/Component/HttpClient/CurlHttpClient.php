@@ -324,7 +324,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         return new ResponseStream(CurlResponse::stream($responses, $timeout));
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->multi->reset();
     }

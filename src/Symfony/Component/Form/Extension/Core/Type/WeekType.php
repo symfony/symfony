@@ -28,6 +28,9 @@ class WeekType extends AbstractType
         'choice' => ChoiceType::class,
     ];
 
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ('string' === $options['input']) {
@@ -80,6 +83,9 @@ class WeekType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget'] = $options['widget'];
@@ -89,6 +95,9 @@ class WeekType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $compound = fn (Options $options) => 'single_text' !== $options['widget'];

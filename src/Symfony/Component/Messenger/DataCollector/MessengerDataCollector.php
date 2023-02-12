@@ -79,7 +79,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         return $casters;
     }
 
-    private function collectMessage(string $busName, array $tracedMessage)
+    private function collectMessage(string $busName, array $tracedMessage): array
     {
         $message = $tracedMessage['message'];
 

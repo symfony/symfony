@@ -33,17 +33,17 @@ class ConstantNode extends Node
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->repr($this->attributes['value']);
     }
 
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         return $this->attributes['value'];
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         $array = [];
         $value = $this->attributes['value'];

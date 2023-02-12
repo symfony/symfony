@@ -33,27 +33,27 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class XmlDescriptor extends Descriptor
 {
-    protected function describeRouteCollection(RouteCollection $routes, array $options = [])
+    protected function describeRouteCollection(RouteCollection $routes, array $options = []): void
     {
         $this->writeDocument($this->getRouteCollectionDocument($routes));
     }
 
-    protected function describeRoute(Route $route, array $options = [])
+    protected function describeRoute(Route $route, array $options = []): void
     {
         $this->writeDocument($this->getRouteDocument($route, $options['name'] ?? null));
     }
 
-    protected function describeContainerParameters(ParameterBag $parameters, array $options = [])
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = []): void
     {
         $this->writeDocument($this->getContainerParametersDocument($parameters));
     }
 
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = [])
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = []): void
     {
         $this->writeDocument($this->getContainerTagsDocument($builder, isset($options['show_hidden']) && $options['show_hidden']));
     }
 
-    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -62,17 +62,17 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($this->getContainerServiceDocument($service, $options['id'], $builder, isset($options['show_arguments']) && $options['show_arguments']));
     }
 
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = []): void
     {
         $this->writeDocument($this->getContainerServicesDocument($builder, $options['tag'] ?? null, isset($options['show_hidden']) && $options['show_hidden'], isset($options['show_arguments']) && $options['show_arguments'], $options['filter'] ?? null, $options['id'] ?? null));
     }
 
-    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null): void
     {
         $this->writeDocument($this->getContainerDefinitionDocument($definition, $options['id'] ?? null, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'], $builder));
     }
 
-    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null): void
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($dom->importNode($this->getContainerAliasDocument($alias, $options['id'] ?? null)->childNodes->item(0), true));
@@ -88,22 +88,22 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($dom);
     }
 
-    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = []): void
     {
         $this->writeDocument($this->getEventDispatcherListenersDocument($eventDispatcher, $options));
     }
 
-    protected function describeCallable(mixed $callable, array $options = [])
+    protected function describeCallable(mixed $callable, array $options = []): void
     {
         $this->writeDocument($this->getCallableDocument($callable));
     }
 
-    protected function describeContainerParameter(mixed $parameter, array $options = [])
+    protected function describeContainerParameter(mixed $parameter, array $options = []): void
     {
         $this->writeDocument($this->getContainerParameterDocument($parameter, $options));
     }
 
-    protected function describeContainerEnvVars(array $envs, array $options = [])
+    protected function describeContainerEnvVars(array $envs, array $options = []): void
     {
         throw new LogicException('Using the XML format to debug environment variables is not supported.');
     }
@@ -136,7 +136,7 @@ class XmlDescriptor extends Descriptor
         $this->writeDocument($dom);
     }
 
-    private function writeDocument(\DOMDocument $dom)
+    private function writeDocument(\DOMDocument $dom): void
     {
         $dom->formatOutput = true;
         $this->write($dom->saveXML());
@@ -503,7 +503,7 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    private function appendEventListenerDocument(EventDispatcherInterface $eventDispatcher, string $event, \DOMElement $element, array $eventListeners)
+    private function appendEventListenerDocument(EventDispatcherInterface $eventDispatcher, string $event, \DOMElement $element, array $eventListeners): void
     {
         foreach ($eventListeners as $listener) {
             $callableXML = $this->getCallableDocument($listener);

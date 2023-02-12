@@ -215,7 +215,7 @@ class CachePoolPass implements CompilerPassInterface
         }
     }
 
-    private function getNamespace(string $seed, string $id)
+    private function getNamespace(string $seed, string $id): string
     {
         return substr(str_replace('/', '-', base64_encode(hash('sha256', $id.$seed, true))), 0, 10);
     }
@@ -223,7 +223,7 @@ class CachePoolPass implements CompilerPassInterface
     /**
      * @internal
      */
-    public static function getServiceProvider(ContainerBuilder $container, string $name)
+    public static function getServiceProvider(ContainerBuilder $container, string $name): string
     {
         $container->resolveEnvPlaceholders($name, null, $usedEnvs);
 

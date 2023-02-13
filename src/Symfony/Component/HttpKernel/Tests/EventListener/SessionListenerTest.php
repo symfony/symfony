@@ -691,6 +691,27 @@ class SessionListenerTest extends TestCase
         $subRequest->getSession();
     }
 
+    public function testGetSessionSetsSessionOnMainRequest()
+    {
+        $mainRequest = new Request();
+        $listener = $this->createListener($mainRequest, new NativeSessionStorageFactory());
+
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $mainRequest, HttpKernelInterface::MAIN_REQUEST);
+        $listener->onKernelRequest($event);
+
+        $this->assertFalse($mainRequest->hasSession(true));
+
+        $subRequest = $mainRequest->duplicate();
+
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $listener->onKernelRequest($event);
+
+        $session = $subRequest->getSession();
+
+        $this->assertTrue($mainRequest->hasSession(true));
+        $this->assertSame($session, $mainRequest->getSession());
+    }
+
     public function testSessionUsageExceptionIfStatelessAndSessionUsed()
     {
         $session = $this->createMock(Session::class);

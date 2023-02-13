@@ -25,6 +25,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 interface SessionAuthenticationStrategyInterface
 {
     /**
+     * This attribute name can be used by the implementation if it needs to
+     * clear the CSRF token storage when there is no actual Response, yet.
+     */
+    public const CLEAR_CSRF_STORAGE_ATTR_NAME = '_security_clear_csrf_storage';
+
+    /**
      * This performs any necessary changes to the session.
      *
      * This method should be called before the TokenStorage is populated with a

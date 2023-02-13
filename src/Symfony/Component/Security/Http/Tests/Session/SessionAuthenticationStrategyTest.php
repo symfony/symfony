@@ -12,11 +12,12 @@
 namespace Symfony\Component\Security\Http\Tests\Session;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 class SessionAuthenticationStrategyTest extends TestCase
 {
@@ -58,21 +59,23 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($this->getRequest($session), $this->createMock(TokenInterface::class));
     }
 
-    public function testCsrfTokensAreCleared()
+    public function testCsrfTokensWillBeCleared()
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
 
-        $csrfStorage = $this->createMock(ClearableTokenStorageInterface::class);
-        $csrfStorage->expects($this->once())->method('clear');
+        $request = $this->getRequest($session);
 
-        $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE, $csrfStorage);
-        $strategy->onAuthentication($this->getRequest($session), $this->createMock(TokenInterface::class));
+        $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
+        $strategy->onAuthentication($request, $this->createMock(TokenInterface::class));
+
+        $this->assertTrue($request->attributes->get(SessionAuthenticationStrategyInterface::CLEAR_CSRF_STORAGE_ATTR_NAME));
     }
 
     private function getRequest($session = null)
     {
         $request = $this->createMock(Request::class);
+        $request->attributes = new ParameterBag();
 
         if (null !== $session) {
             $request->expects($this->any())->method('getSession')->willReturn($session);

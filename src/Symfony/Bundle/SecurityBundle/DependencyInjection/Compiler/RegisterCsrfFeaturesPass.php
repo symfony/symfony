@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
+use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLoginListener;
 use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListener;
 
 /**
@@ -29,6 +30,7 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
     {
         $this->registerCsrfProtectionListener($container);
         $this->registerLogoutHandler($container);
+        $this->registerLoginHandler($container);
     }
 
     private function registerCsrfProtectionListener(ContainerBuilder $container)
@@ -57,6 +59,25 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
         }
 
         $container->register('security.logout.listener.csrf_token_clearing', CsrfTokenClearingLogoutListener::class)
+            ->addArgument(new Reference('security.csrf.token_storage'))
+            ->addTag('kernel.event_subscriber')
+            ->setPublic(false);
+    }
+
+    protected function registerLoginHandler(ContainerBuilder $container)
+    {
+        if (!$container->has('security.authenticator.manager') || !$container->has('security.csrf.token_storage')) {
+            return;
+        }
+
+        $csrfTokenStorage = $container->findDefinition('security.csrf.token_storage');
+        $csrfTokenStorageClass = $container->getParameterBag()->resolveValue($csrfTokenStorage->getClass());
+
+        if (!is_subclass_of($csrfTokenStorageClass, 'Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface')) {
+            return;
+        }
+
+        $container->register('security.login.listener.csrf_token_clearing', CsrfTokenClearingLoginListener::class)
             ->addArgument(new Reference('security.csrf.token_storage'))
             ->addTag('kernel.event_subscriber')
             ->setPublic(false);

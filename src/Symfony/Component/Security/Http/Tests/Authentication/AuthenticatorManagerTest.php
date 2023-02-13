@@ -33,6 +33,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummySupportsAuthenticator;
 
 class AuthenticatorManagerTest extends TestCase
 {
@@ -64,15 +65,15 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertEquals($result, $manager->supports($this->request));
     }
 
-    public function provideSupportsData()
+    public static function provideSupportsData()
     {
-        yield [[$this->createAuthenticator(null), $this->createAuthenticator(null)], null];
-        yield [[$this->createAuthenticator(null), $this->createAuthenticator(false)], null];
+        yield [[self::createDummySupportsAuthenticator(null), self::createDummySupportsAuthenticator(null)], null];
+        yield [[self::createDummySupportsAuthenticator(null), self::createDummySupportsAuthenticator(false)], null];
 
-        yield [[$this->createAuthenticator(null), $this->createAuthenticator(true)], true];
-        yield [[$this->createAuthenticator(true), $this->createAuthenticator(false)], true];
+        yield [[self::createDummySupportsAuthenticator(null), self::createDummySupportsAuthenticator(true)], true];
+        yield [[self::createDummySupportsAuthenticator(true), self::createDummySupportsAuthenticator(false)], true];
 
-        yield [[$this->createAuthenticator(false), $this->createAuthenticator(false)], false];
+        yield [[self::createDummySupportsAuthenticator(false), self::createDummySupportsAuthenticator(false)], false];
         yield [[], false];
     }
 
@@ -347,12 +348,17 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertStringContainsString('Mock_TestInteractiveAuthenticator', $logger->logContexts[0]['authenticator']);
     }
 
-    private function createAuthenticator($supports = true)
+    private function createAuthenticator(?bool $supports = true)
     {
         $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
         $authenticator->expects($this->any())->method('supports')->willReturn($supports);
 
         return $authenticator;
+    }
+
+    private static function createDummySupportsAuthenticator(?bool $supports = true)
+    {
+        return new DummySupportsAuthenticator($supports);
     }
 
     private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [], LoggerInterface $logger = null)

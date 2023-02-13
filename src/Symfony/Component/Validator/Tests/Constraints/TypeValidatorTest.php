@@ -70,10 +70,10 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getValidValues()
+    public static function getValidValues()
     {
         $object = new \stdClass();
-        $file = $this->createFile();
+        $file = self::createFile();
 
         return [
             [true, 'Boolean'],
@@ -126,10 +126,10 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getInvalidValues()
+    public static function getInvalidValues()
     {
         $object = new \stdClass();
-        $file = $this->createFile();
+        $file = self::createFile();
 
         return [
             ['foobar', 'numeric', '"foobar"'],
@@ -206,20 +206,20 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         yield 'named arguments' => [new Type(type: ['boolean', 'array'], message: 'myMessage')];
     }
 
-    protected function createFile()
+    protected static function createFile()
     {
-        if (!static::$file) {
-            static::$file = fopen(__FILE__, 'r');
+        if (!self::$file) {
+            self::$file = fopen(__FILE__, 'r');
         }
 
-        return static::$file;
+        return self::$file;
     }
 
     public static function tearDownAfterClass(): void
     {
-        if (static::$file) {
-            fclose(static::$file);
-            static::$file = null;
+        if (self::$file) {
+            fclose(self::$file);
+            self::$file = null;
         }
     }
 }

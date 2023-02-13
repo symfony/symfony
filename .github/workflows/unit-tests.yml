@@ -1,4 +1,4 @@
-name: PHPUnit
+name: Unit Tests
 
 on:
   push:
@@ -18,7 +18,7 @@ permissions:
 jobs:
 
   tests:
-    name: Tests
+    name: Unit Tests
 
     env:
       extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis,relay

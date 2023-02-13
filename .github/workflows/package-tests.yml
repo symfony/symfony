@@ -1,4 +1,4 @@
-name: Package
+name: Verify Packages
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   verify:
-    name: Verify
+    name: Verify Packages
     runs-on: Ubuntu-20.04
     steps:
       - name: Checkout code

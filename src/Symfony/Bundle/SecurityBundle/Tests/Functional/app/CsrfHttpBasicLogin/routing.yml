@@ -1,0 +1,3 @@
+form_login_homepage:
+    path:     /
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfHttpBasicLoginBundle\Controller\IndexController::__invoke }

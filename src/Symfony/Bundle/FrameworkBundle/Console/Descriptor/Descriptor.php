@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -325,7 +324,7 @@ abstract class Descriptor implements DescriptorInterface
             $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $getEnvReflection->invoke($container, $env) : null;
 
             preg_match_all('/'.preg_quote($env).'/', $containerFile, $matches);
-            $usageCounter = count($matches[0]);
+            $usageCounter = \count($matches[0]);
 
             $envs["$name$processor"] = [
                 'name' => $name,

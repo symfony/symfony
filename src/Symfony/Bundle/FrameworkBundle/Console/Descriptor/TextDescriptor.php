@@ -473,6 +473,7 @@ class TextDescriptor extends Descriptor
 
         $rows = array_map(function ($row) use ($dump) {
             $row[3] = $dump($row[3]);
+
             return $row;
         }, $rows);
 

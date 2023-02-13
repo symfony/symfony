@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
-use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -125,7 +124,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
     public function testDescribeEnvVars()
     {
-        $_SERVER['SYMFONY_DOTENV_VARS']= 'APP_FOO,APP_BAR,APP_BAZ';
+        $_SERVER['SYMFONY_DOTENV_VARS'] = 'APP_FOO,APP_BAR,APP_BAZ';
         putenv('REAL=value');
         putenv('APP_FOO=foo');
         putenv('APP_BAR=bar');

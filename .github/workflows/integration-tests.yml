@@ -1,4 +1,4 @@
-name: Integration
+name: CI
 
 on:
   push:
@@ -18,12 +18,13 @@ permissions:
 jobs:
 
   tests:
-    name: Tests
+    name: Integration Tests
     runs-on: Ubuntu-20.04
 
     strategy:
       matrix:
         php: ['7.2', '8.0']
+      fail-fast: false
 
     services:
       postgres:

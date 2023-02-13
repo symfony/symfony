@@ -7,6 +7,7 @@ CHANGELOG
  * Add `ParameterBag::getEnum()`
  * Create migration for session table when pdo handler is used
  * Add support for Relay PHP extension for Redis
+ * Add `Cookie::createStringFromPairs()`
 
 6.2
 ---

@@ -79,6 +79,21 @@ class Cookie
         return new self($name, $value, $expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
 
+    public static function createStringFromPairs(array $pairs, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX): string
+    {
+        if (empty($pairs)) {
+            throw new \InvalidArgumentException('At least one pair must be provided.');
+        }
+
+        $cookie = (string) new self('__base', 'null', $expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+        $concatPairs = [];
+        foreach ($pairs as $k => $v) {
+            $concatPairs[] = $k.'='.$v;
+        }
+
+        return strtr($cookie, ['__base=null' => implode('; ', $concatPairs)]);
+    }
+
     /**
      * @param string                        $name     The name of the cookie
      * @param string|null                   $value    The value of the cookie

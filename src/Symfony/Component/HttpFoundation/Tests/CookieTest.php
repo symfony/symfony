@@ -387,4 +387,33 @@ class CookieTest extends TestCase
         $this->assertEquals(time(), $cookie->getExpiresTime());
         $this->assertEquals('foo=bar; expires='.gmdate('D, d M Y H:i:s T', $cookie->getExpiresTime()).'; Max-Age=0; path=/', $cookie->__toString());
     }
+
+    public function testStringFromPairsEmptyIterable()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('At least one pair must be provided.');
+
+        Cookie::createStringFromPairs([]);
+    }
+
+    public function testStringFromPairs()
+    {
+        $this->assertSame('flavor=chocolate; size=medium; path=/; httponly; samesite=lax', Cookie::createStringFromPairs(['flavor' => 'chocolate', 'size' => 'medium']));
+    }
+
+    public function testStringFromPairsWithOptions()
+    {
+        $cookie = Cookie::createStringFromPairs(
+            ['flavor' => 'chocolate', 'size' => 'medium'],
+            strtotime('+1 day'),
+            '/custom-path',
+            'cookie.example.com',
+            true,
+            false,
+            false,
+            Cookie::SAMESITE_STRICT
+        );
+
+        $this->assertStringMatchesFormat('flavor=chocolate; size=medium; expires=%s; Max-Age=86400; path=/custom-path; domain=cookie.example.com; secure; samesite=strict', $cookie);
+    }
 }

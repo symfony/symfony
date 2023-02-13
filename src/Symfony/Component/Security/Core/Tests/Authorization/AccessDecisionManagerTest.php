@@ -116,62 +116,62 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, ['ROLE_FOO']));
     }
 
-    public function getStrategyTests()
+    public static function getStrategyTests(): array
     {
         return [
             // affirmative
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(1, 0, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(1, 2, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(0, 1, 0), false, true, false],
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(0, 0, 1), false, true, false],
-            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(0, 0, 1), true, true, true],
+            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(1, 0, 0), false, true, true],
+            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(1, 2, 0), false, true, true],
+            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(0, 1, 0), false, true, false],
+            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(0, 0, 1), false, true, false],
+            [AccessDecisionManager::STRATEGY_AFFIRMATIVE, self::getVoters(0, 0, 1), true, true, true],
 
             // consensus
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(1, 0, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(1, 2, 0), false, true, false],
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 1, 0), false, true, true],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(1, 0, 0), false, true, true],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(1, 2, 0), false, true, false],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 1, 0), false, true, true],
 
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(0, 0, 1), false, true, false],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(0, 0, 1), false, true, false],
 
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(0, 0, 1), true, true, true],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(0, 0, 1), true, true, true],
 
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 2, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 2, 1), false, true, true],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 2, 0), false, true, true],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 2, 1), false, true, true],
 
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 2, 0), false, false, false],
-            [AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 2, 1), false, false, false],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 2, 0), false, false, false],
+            [AccessDecisionManager::STRATEGY_CONSENSUS, self::getVoters(2, 2, 1), false, false, false],
 
             // unanimous
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(1, 0, 0), false, true, true],
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(1, 0, 1), false, true, true],
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(1, 1, 0), false, true, false],
+            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(1, 0, 0), false, true, true],
+            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(1, 0, 1), false, true, true],
+            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(1, 1, 0), false, true, false],
 
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), false, true, false],
-            [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), true, true, true],
+            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(0, 0, 2), false, true, false],
+            [AccessDecisionManager::STRATEGY_UNANIMOUS, self::getVoters(0, 0, 2), true, true, true],
 
             // priority
             [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
+                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+                self::getVoter(VoterInterface::ACCESS_GRANTED),
+                self::getVoter(VoterInterface::ACCESS_DENIED),
+                self::getVoter(VoterInterface::ACCESS_DENIED),
             ], true, true, true],
 
             [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
+                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+                self::getVoter(VoterInterface::ACCESS_DENIED),
+                self::getVoter(VoterInterface::ACCESS_GRANTED),
+                self::getVoter(VoterInterface::ACCESS_GRANTED),
             ], true, true, false],
 
             [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
             ], false, true, false],
 
             [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
+                self::getVoter(VoterInterface::ACCESS_ABSTAIN),
             ], true, true, true],
         ];
     }
@@ -338,30 +338,37 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, ['foo', 1337], 'bar', true));
     }
 
-    protected function getVoters($grants, $denies, $abstains)
+    protected static function getVoters($grants, $denies, $abstains): array
     {
         $voters = [];
         for ($i = 0; $i < $grants; ++$i) {
-            $voters[] = $this->getVoter(VoterInterface::ACCESS_GRANTED);
+            $voters[] = self::getVoter(VoterInterface::ACCESS_GRANTED);
         }
         for ($i = 0; $i < $denies; ++$i) {
-            $voters[] = $this->getVoter(VoterInterface::ACCESS_DENIED);
+            $voters[] = self::getVoter(VoterInterface::ACCESS_DENIED);
         }
         for ($i = 0; $i < $abstains; ++$i) {
-            $voters[] = $this->getVoter(VoterInterface::ACCESS_ABSTAIN);
+            $voters[] = self::getVoter(VoterInterface::ACCESS_ABSTAIN);
         }
 
         return $voters;
     }
 
-    protected function getVoter($vote)
+    protected static function getVoter($vote)
     {
-        $voter = $this->createMock(VoterInterface::class);
-        $voter->expects($this->any())
-              ->method('vote')
-              ->willReturn($vote);
+        return new class($vote) implements VoterInterface {
+            private $vote;
 
-        return $voter;
+            public function __construct(int $vote)
+            {
+                $this->vote = $vote;
+            }
+
+            public function vote(TokenInterface $token, $subject, array $attributes)
+            {
+                return $this->vote;
+            }
+        };
     }
 
     private function getExpectedVoter(int $vote): VoterInterface

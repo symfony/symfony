@@ -186,7 +186,7 @@ class MermaidDumper implements DumperInterface
      * Replace double quotes with the mermaid escape syntax and
      * ensure all other characters are properly escaped.
      */
-    private function escape(string $label)
+    private function escape(string $label): string
     {
         $label = str_replace('"', '#quot;', $label);
 
@@ -207,12 +207,8 @@ class MermaidDumper implements DumperInterface
         }
     }
 
-    private function styleStatemachineTransition(
-        string $from,
-        string $to,
-        string $transitionLabel,
-        array $transitionMeta
-    ): array {
+    private function styleStatemachineTransition(string $from, string $to, string $transitionLabel, array $transitionMeta): array
+    {
         $transitionOutput = [sprintf('%s-->|%s|%s', $from, $this->escape($transitionLabel), $to)];
 
         $linkStyle = $this->styleLink($transitionMeta);
@@ -225,13 +221,8 @@ class MermaidDumper implements DumperInterface
         return $transitionOutput;
     }
 
-    private function styleWorkflowTransition(
-        string $from,
-        string $to,
-        int $transitionId,
-        string $transitionLabel,
-        array $transitionMeta
-    ) {
+    private function styleWorkflowTransition(string $from, string $to, int $transitionId, string $transitionLabel, array $transitionMeta): array
+    {
         $transitionOutput = [];
 
         $transitionLabel = $this->escape($transitionLabel);

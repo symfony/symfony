@@ -95,7 +95,7 @@ foreach ($config['original_files'] as $originalFilePath) {
 
 exit($totalTranslationMismatches > 0 ? 1 : 0);
 
-function findTranslationFiles($originalFilePath, $localeToAnalyze)
+function findTranslationFiles($originalFilePath, $localeToAnalyze): array
 {
     $translations = [];
 
@@ -118,7 +118,7 @@ function findTranslationFiles($originalFilePath, $localeToAnalyze)
     return $translations;
 }
 
-function calculateTranslationStatus($originalFilePath, $translationFilePaths)
+function calculateTranslationStatus($originalFilePath, $translationFilePaths): array
 {
     $translationStatus = [];
     $allTranslationKeys = extractTranslationKeys($originalFilePath);
@@ -159,7 +159,7 @@ function extractLocaleFromFilePath($filePath)
     return $parts[count($parts) - 2];
 }
 
-function extractTranslationKeys($filePath)
+function extractTranslationKeys($filePath): array
 {
     $translationKeys = [];
     $contents = new \SimpleXMLElement(file_get_contents($filePath));

@@ -67,7 +67,7 @@ class RegionDataGenerator extends AbstractDataGenerator
      */
     private array $regionCodes = [];
 
-    public static function isValidCountryCode(int|string|null $region)
+    public static function isValidCountryCode(int|string|null $region): bool
     {
         if (isset(self::DENYLIST[$region])) {
             return false;
@@ -86,13 +86,13 @@ class RegionDataGenerator extends AbstractDataGenerator
         return $scanner->scanLocales($sourceDir.'/region');
     }
 
-    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir)
+    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, string $sourceDir, string $tempDir): void
     {
         $compiler->compile($sourceDir.'/region', $tempDir);
         $compiler->compile($sourceDir.'/misc/metadata.txt', $tempDir);
     }
 
-    protected function preGenerate()
+    protected function preGenerate(): void
     {
         $this->regionCodes = [];
     }

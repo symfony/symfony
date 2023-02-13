@@ -31,7 +31,7 @@ class TextDescriptor extends Descriptor
         $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
-    protected function describeDefaults(array $options)
+    protected function describeDefaults(array $options): void
     {
         if ($options['core_types']) {
             $this->output->section('Built-in form types (Symfony\Component\Form\Extension\Core\Type)');
@@ -59,7 +59,7 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = [])
+    protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = []): void
     {
         $this->collectOptions($resolvedFormType);
 
@@ -99,7 +99,7 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    protected function describeOption(OptionsResolver $optionsResolver, array $options)
+    protected function describeOption(OptionsResolver $optionsResolver, array $options): void
     {
         $definition = $this->getOptionDefinition($optionsResolver, $options['option']);
 

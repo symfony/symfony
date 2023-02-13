@@ -77,12 +77,15 @@ trait FilesystemCommonTrait
         return $ok;
     }
 
+    /**
+     * @return bool
+     */
     protected function doUnlink(string $file)
     {
         return @unlink($file);
     }
 
-    private function write(string $file, string $data, int $expiresAt = null)
+    private function write(string $file, string $data, int $expiresAt = null): bool
     {
         set_error_handler(__CLASS__.'::throwError');
         try {
@@ -110,7 +113,7 @@ trait FilesystemCommonTrait
         }
     }
 
-    private function getFile(string $id, bool $mkdir = false, string $directory = null)
+    private function getFile(string $id, bool $mkdir = false, string $directory = null): string
     {
         // Use xxh128 to favor speed over security, which is not an issue here
         $hash = str_replace('/', '-', base64_encode(hash('xxh128', static::class.$id, true)));

@@ -68,7 +68,7 @@ class WebProfilerExtension extends ProfilerExtension
         ];
     }
 
-    public function dumpData(Environment $env, Data $data, int $maxDepth = 0)
+    public function dumpData(Environment $env, Data $data, int $maxDepth = 0): string
     {
         $this->dumper->setCharset($env->getCharset());
         $this->dumper->dump($data, null, [
@@ -82,7 +82,7 @@ class WebProfilerExtension extends ProfilerExtension
         return str_replace("\n</pre", '</pre', rtrim($dump));
     }
 
-    public function dumpLog(Environment $env, string $message, Data $context = null)
+    public function dumpLog(Environment $env, string $message, Data $context = null): string
     {
         $message = twig_escape_filter($env, $message);
         $message = preg_replace('/&quot;(.*?)&quot;/', '&quot;<b>$1</b>&quot;', $message);
@@ -106,7 +106,7 @@ class WebProfilerExtension extends ProfilerExtension
         return '<span class="dump-inline">'.strtr($message, $replacements).'</span>';
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'profiler';
     }

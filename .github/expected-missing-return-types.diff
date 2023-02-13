@@ -252,6 +252,17 @@ index 18f7ba0fb0..7f37cb6d9b 100644
 +    protected function start(string $name): TraceableAdapterEvent
      {
          $this->calls[] = $event = new TraceableAdapterEvent();
+diff --git a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php b/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
+index 2ee96e9b37..f49ed24f68 100644
+--- a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
++++ b/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php
+@@ -81,5 +81,5 @@ trait FilesystemCommonTrait
+      * @return bool
+      */
+-    protected function doUnlink(string $file)
++    protected function doUnlink(string $file): bool
+     {
+         return @unlink($file);
 diff --git a/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php b/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php
 index 7cda0bc7d8..b2311826f4 100644
 --- a/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php
@@ -350,7 +361,7 @@ index e3ca1d49c4..526d350484 100644
 +    public function locate(string $name, string $currentPath = null, bool $first = true): string|array;
  }
 diff --git a/src/Symfony/Component/Config/Loader/FileLoader.php b/src/Symfony/Component/Config/Loader/FileLoader.php
-index 30034e55a5..d6a57be190 100644
+index 3f06f0c38c..ce0fd1d76d 100644
 --- a/src/Symfony/Component/Config/Loader/FileLoader.php
 +++ b/src/Symfony/Component/Config/Loader/FileLoader.php
 @@ -67,5 +67,5 @@ abstract class FileLoader extends Loader
@@ -552,7 +563,7 @@ index 2762cdf05c..737334268a 100644
 +    public function getName(): string;
  }
 diff --git a/src/Symfony/Component/Console/Helper/Table.php b/src/Symfony/Component/Console/Helper/Table.php
-index 893b3192e9..94822ed191 100644
+index 7d31794be3..1c311aded2 100644
 --- a/src/Symfony/Component/Console/Helper/Table.php
 +++ b/src/Symfony/Component/Console/Helper/Table.php
 @@ -193,5 +193,5 @@ class Table
@@ -609,6 +620,17 @@ index 74d885d131..3de806a60e 100644
 +    protected function getErrorOutput(): OutputInterface
      {
          if (!$this->output instanceof ConsoleOutputInterface) {
+diff --git a/src/Symfony/Component/CssSelector/Parser/Reader.php b/src/Symfony/Component/CssSelector/Parser/Reader.php
+index 7f6ae7a600..d79db02567 100644
+--- a/src/Symfony/Component/CssSelector/Parser/Reader.php
++++ b/src/Symfony/Component/CssSelector/Parser/Reader.php
+@@ -57,5 +57,5 @@ class Reader
+      * @return int|false
+      */
+-    public function getOffset(string $string): int|bool
++    public function getOffset(string $string): int|false
+     {
+         $position = strpos($this->source, $string, $this->position);
 diff --git a/src/Symfony/Component/DependencyInjection/Argument/TaggedIteratorArgument.php b/src/Symfony/Component/DependencyInjection/Argument/TaggedIteratorArgument.php
 index b4e982c457..521a9531f8 100644
 --- a/src/Symfony/Component/DependencyInjection/Argument/TaggedIteratorArgument.php
@@ -853,30 +875,8 @@ index 479aeef880..272954c082 100644
 -    public function getFunctions();
 +    public function getFunctions(): array;
  }
-diff --git a/src/Symfony/Component/ExpressionLanguage/Node/ArrayNode.php b/src/Symfony/Component/ExpressionLanguage/Node/ArrayNode.php
-index e1a3169b00..e5dc5bfe21 100644
---- a/src/Symfony/Component/ExpressionLanguage/Node/ArrayNode.php
-+++ b/src/Symfony/Component/ExpressionLanguage/Node/ArrayNode.php
-@@ -45,5 +45,5 @@ class ArrayNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         $result = [];
-diff --git a/src/Symfony/Component/ExpressionLanguage/Node/BinaryNode.php b/src/Symfony/Component/ExpressionLanguage/Node/BinaryNode.php
-index 0b31c66ded..e798ef8f2f 100644
---- a/src/Symfony/Component/ExpressionLanguage/Node/BinaryNode.php
-+++ b/src/Symfony/Component/ExpressionLanguage/Node/BinaryNode.php
-@@ -93,5 +93,5 @@ class BinaryNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         $operator = $this->attributes['operator'];
 diff --git a/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php b/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
-index ba78a2848e..f805b5655e 100644
+index fec02abaae..7d02544275 100644
 --- a/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
 +++ b/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
 @@ -41,5 +41,5 @@ class ConditionalNode extends Node
@@ -886,17 +886,6 @@ index ba78a2848e..f805b5655e 100644
 +    public function evaluate(array $functions, array $values): mixed
      {
          if ($this->nodes['expr1']->evaluate($functions, $values)) {
-diff --git a/src/Symfony/Component/ExpressionLanguage/Node/ConstantNode.php b/src/Symfony/Component/ExpressionLanguage/Node/ConstantNode.php
-index 869e350dc9..f1c1ad5bd3 100644
---- a/src/Symfony/Component/ExpressionLanguage/Node/ConstantNode.php
-+++ b/src/Symfony/Component/ExpressionLanguage/Node/ConstantNode.php
-@@ -39,5 +39,5 @@ class ConstantNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         return $this->attributes['value'];
 diff --git a/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php b/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php
 index 06078da305..cc11697293 100644
 --- a/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php
@@ -915,28 +904,6 @@ index 06078da305..cc11697293 100644
 +    public function toArray(): array
      {
          $array = [];
-diff --git a/src/Symfony/Component/ExpressionLanguage/Node/GetAttrNode.php b/src/Symfony/Component/ExpressionLanguage/Node/GetAttrNode.php
-index e9b10c3295..7aefd9bb84 100644
---- a/src/Symfony/Component/ExpressionLanguage/Node/GetAttrNode.php
-+++ b/src/Symfony/Component/ExpressionLanguage/Node/GetAttrNode.php
-@@ -66,5 +66,5 @@ class GetAttrNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         switch ($this->attributes['type']) {
-diff --git a/src/Symfony/Component/ExpressionLanguage/Node/NameNode.php b/src/Symfony/Component/ExpressionLanguage/Node/NameNode.php
-index e017e967a1..8ea5bcf28c 100644
---- a/src/Symfony/Component/ExpressionLanguage/Node/NameNode.php
-+++ b/src/Symfony/Component/ExpressionLanguage/Node/NameNode.php
-@@ -34,5 +34,5 @@ class NameNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         return $values[$this->attributes['name']];
 diff --git a/src/Symfony/Component/ExpressionLanguage/Node/Node.php b/src/Symfony/Component/ExpressionLanguage/Node/Node.php
 index eb5046c9bf..ef142d3787 100644
 --- a/src/Symfony/Component/ExpressionLanguage/Node/Node.php
@@ -969,17 +936,6 @@ index eb5046c9bf..ef142d3787 100644
 +    protected function isHash(array $value): bool
      {
          $expectedKey = 0;
-diff --git a/src/Symfony/Component/ExpressionLanguage/Node/NullCoalesceNode.php b/src/Symfony/Component/ExpressionLanguage/Node/NullCoalesceNode.php
-index 3e59ef8676..b6371df241 100644
---- a/src/Symfony/Component/ExpressionLanguage/Node/NullCoalesceNode.php
-+++ b/src/Symfony/Component/ExpressionLanguage/Node/NullCoalesceNode.php
-@@ -37,5 +37,5 @@ class NullCoalesceNode extends Node
-     }
- 
--    public function evaluate(array $functions, array $values)
-+    public function evaluate(array $functions, array $values): mixed
-     {
-         if ($this->nodes['expr1'] instanceof GetAttrNode) {
 diff --git a/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php b/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php
 index 9e30d848eb..ee82938d8a 100644
 --- a/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php
@@ -1392,6 +1348,17 @@ index d894b7e74c..f0d6d32f0a 100644
 +    protected function guessRoute(Request $request, string|object|array $controller): string
      {
          return 'n/a';
+diff --git a/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php b/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php
+index fcb100859f..8bf3ef09d5 100644
+--- a/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php
++++ b/src/Symfony/Component/HttpKernel/Debug/FileLinkFormatter.php
+@@ -53,5 +53,5 @@ class FileLinkFormatter
+      * @return string|false
+      */
+-    public function format(string $file, int $line): string|bool
++    public function format(string $file, int $line): string|false
+     {
+         if ($fmt = $this->getFileLinkFormat()) {
 diff --git a/src/Symfony/Component/HttpKernel/Fragment/InlineFragmentRenderer.php b/src/Symfony/Component/HttpKernel/Fragment/InlineFragmentRenderer.php
 index 3650d1700d..055b57fc77 100644
 --- a/src/Symfony/Component/HttpKernel/Fragment/InlineFragmentRenderer.php
@@ -1978,6 +1945,17 @@ index 69ac3d6ec4..d96c7d038d 100644
 +    public function getMessageKey(): string
      {
          return 'An authentication exception occurred.';
+diff --git a/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php b/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
+index b4ffa1dcd4..dd3c58a6d0 100644
+--- a/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
++++ b/src/Symfony/Component/Security/Core/User/InMemoryUserProvider.php
+@@ -98,5 +98,5 @@ class InMemoryUserProvider implements UserProviderInterface
+      * @return InMemoryUser change return type on 7.0
+      */
+-    private function getUser(string $username): UserInterface
++    private function getUser(string $username): InMemoryUser
+     {
+         if (!isset($this->users[strtolower($username)])) {
 diff --git a/src/Symfony/Component/Security/Core/User/UserProviderInterface.php b/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
 index ec90d413fa..9f1401aa91 100644
 --- a/src/Symfony/Component/Security/Core/User/UserProviderInterface.php
@@ -2286,7 +2264,7 @@ index 1749dd78d2..250b46bdd3 100644
      {
          return $this->class;
 diff --git a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-index edac8395df..f3998dc4dd 100644
+index 1b2457707f..5811aa8106 100644
 --- a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 +++ b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 @@ -295,5 +295,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
@@ -3192,7 +3170,7 @@ index dba7c3dcfb..dce66ea6b9 100644
      {
          return $this->places;
 diff --git a/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php b/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php
-index cfe1c09b6e..de62f635f9 100644
+index 06340a61bb..2654d15b9a 100644
 --- a/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php
 +++ b/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php
 @@ -80,5 +80,5 @@ class ParentTestService

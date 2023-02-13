@@ -179,7 +179,7 @@ EOF
         };
     }
 
-    private function displayTxt(OutputInterface $output, SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false)
+    private function displayTxt(OutputInterface $output, SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false): int
     {
         $errors = 0;
         $githubReporter = $errorAsGithubAnnotations ? new GithubActionReporter($output) : null;
@@ -254,7 +254,7 @@ EOF
         }
     }
 
-    private function getContext(string $template, int $line, int $context = 3)
+    private function getContext(string $template, int $line, int $context = 3): array
     {
         $lines = explode("\n", $template);
 

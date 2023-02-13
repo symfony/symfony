@@ -527,7 +527,10 @@ class Email extends Message
         return $this;
     }
 
-    private function addListAddressHeaderBody(string $name, array $addresses)
+    /**
+     * @return $this
+     */
+    private function addListAddressHeaderBody(string $name, array $addresses): static
     {
         if (!$header = $this->getHeaders()->get($name)) {
             return $this->setListAddressHeaderBody($name, $addresses);

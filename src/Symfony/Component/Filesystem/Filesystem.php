@@ -218,7 +218,7 @@ class Filesystem
     public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false)
     {
         foreach ($this->toIterable($files) as $file) {
-            if (\is_int($mode) && !self::box('chmod', $file, $mode & ~$umask)) {
+            if (!self::box('chmod', $file, $mode & ~$umask)) {
                 throw new IOException(sprintf('Failed to chmod file "%s": ', $file).self::$lastError, 0, null, $file);
             }
             if ($recursive && is_dir($file) && !is_link($file)) {

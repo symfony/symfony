@@ -60,7 +60,7 @@
         "symfony/string": "^5.4|^6.0",
         "symfony/translation": "^5.4|^6.0",
         "symfony/twig-bundle": "^5.4|^6.0",
-        "symfony/validator": "^5.4|^6.0",
+        "symfony/validator": "^6.3",
         "symfony/workflow": "^5.4|^6.0",
         "symfony/yaml": "^5.4|^6.0",
         "symfony/property-info": "^5.4|^6.0",

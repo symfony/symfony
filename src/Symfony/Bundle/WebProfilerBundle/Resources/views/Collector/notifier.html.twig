@@ -17,7 +17,7 @@
 
             {% for transport in events.transports %}
                 <div class="sf-toolbar-info-piece">
-                    <b>{{ transport }}</b>
+                    <b>{{ transport ?: '<em>Empty Transport Name</em>' }}</b>
                     <span class="sf-toolbar-status">{{ events.messages(transport)|length }}</span>
                 </div>
             {% endfor %}
@@ -100,7 +100,7 @@
     </div>
 
     {% for transport in events.transports %}
-        <h3>{{ transport }}</h3>
+        <h3>{{ transport ?: '<em>Empty Transport Name</em>' }}</h3>
 
         <div class="card-block">
             <div class="sf-tabs sf-tabs-sm">

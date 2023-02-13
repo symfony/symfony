@@ -24,7 +24,7 @@ class NotificationEvents
     public function add(MessageEvent $event): void
     {
         $this->events[] = $event;
-        $this->transports[$event->getMessage()->getTransport()] = true;
+        $this->transports[(string) $event->getMessage()->getTransport()] = true;
     }
 
     public function getTransports(): array
@@ -43,7 +43,7 @@ class NotificationEvents
 
         $events = [];
         foreach ($this->events as $event) {
-            if ($name === $event->getMessage()->getTransport()) {
+            if ($name === (string) $event->getMessage()->getTransport()) {
                 $events[] = $event;
             }
         }

@@ -18,12 +18,13 @@ permissions:
 jobs:
 
   tests:
-    name: Tests
+    name: Integration
     runs-on: Ubuntu-20.04
 
     strategy:
       matrix:
         php: ['8.1']
+      fail-fast: false
 
     services:
       postgres:

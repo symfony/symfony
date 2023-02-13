@@ -36,8 +36,14 @@ class MessengerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $busIds = [];
+        $defaultBusIds = [];
         foreach ($container->findTaggedServiceIds('messenger.bus') as $busId => $tags) {
             $busIds[] = $busId;
+            $tag = reset($tags);
+            if ($tag['default_handlers'] ?? true) {
+                $defaultBusIds[] = $busId;
+            }
+
             if ($container->hasParameter($busMiddlewareParameter = $busId.'.middleware')) {
                 $this->registerBusMiddleware($container, $busId, $container->getParameter($busMiddlewareParameter));
 
@@ -52,10 +58,10 @@ class MessengerPass implements CompilerPassInterface
         if ($container->hasDefinition('messenger.receiver_locator')) {
             $this->registerReceivers($container, $busIds);
         }
-        $this->registerHandlers($container, $busIds);
+        $this->registerHandlers($container, $busIds, $defaultBusIds);
     }
 
-    private function registerHandlers(ContainerBuilder $container, array $busIds)
+    private function registerHandlers(ContainerBuilder $container, array $busIds, array $defaultBusIds)
     {
         $definitions = [];
         $handlersByBusAndMessage = [];
@@ -81,7 +87,7 @@ class MessengerPass implements CompilerPassInterface
                 }
 
                 $message = null;
-                $handlerBuses = (array) ($tag['bus'] ?? $busIds);
+                $handlerBuses = (array) ($tag['bus'] ?? $defaultBusIds);
 
                 foreach ($handles as $message => $options) {
                     $buses = $handlerBuses;

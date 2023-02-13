@@ -261,7 +261,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         return new ResponseStream(NativeResponse::stream($responses, $timeout));
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->multi->reset();
     }

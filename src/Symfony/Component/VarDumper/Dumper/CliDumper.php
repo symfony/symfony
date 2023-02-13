@@ -86,6 +86,8 @@ class CliDumper extends AbstractDumper
 
     /**
      * Enables/disables colored output.
+     *
+     * @return void
      */
     public function setColors(bool $colors)
     {
@@ -94,6 +96,8 @@ class CliDumper extends AbstractDumper
 
     /**
      * Sets the maximum number of characters per line for dumped strings.
+     *
+     * @return void
      */
     public function setMaxStringWidth(int $maxStringWidth)
     {
@@ -104,6 +108,8 @@ class CliDumper extends AbstractDumper
      * Configures styles.
      *
      * @param array $styles A map of style names to style definitions
+     *
+     * @return void
      */
     public function setStyles(array $styles)
     {
@@ -114,12 +120,17 @@ class CliDumper extends AbstractDumper
      * Configures display options.
      *
      * @param array $displayOptions A map of display options to customize the behavior
+     *
+     * @return void
      */
     public function setDisplayOptions(array $displayOptions)
     {
         $this->displayOptions = $displayOptions + $this->displayOptions;
     }
 
+    /**
+     * @return void
+     */
     public function dumpScalar(Cursor $cursor, string $type, string|int|float|bool|null $value)
     {
         $this->dumpKey($cursor);
@@ -175,6 +186,9 @@ class CliDumper extends AbstractDumper
         $this->endValue($cursor);
     }
 
+    /**
+     * @return void
+     */
     public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut)
     {
         $this->dumpKey($cursor);
@@ -260,6 +274,9 @@ class CliDumper extends AbstractDumper
         }
     }
 
+    /**
+     * @return void
+     */
     public function enterHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild)
     {
         $this->colors ??= $this->supportsColors();
@@ -296,6 +313,9 @@ class CliDumper extends AbstractDumper
         }
     }
 
+    /**
+     * @return void
+     */
     public function leaveHash(Cursor $cursor, int $type, string|int|null $class, bool $hasChild, int $cut)
     {
         if (empty($cursor->attr['cut_hash'])) {
@@ -311,6 +331,8 @@ class CliDumper extends AbstractDumper
      *
      * @param bool $hasChild When the dump of the hash has child item
      * @param int  $cut      The number of items the hash has been cut by
+     *
+     * @return void
      */
     protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut)
     {
@@ -327,6 +349,8 @@ class CliDumper extends AbstractDumper
 
     /**
      * Dumps a key in a hash structure.
+     *
+     * @return void
      */
     protected function dumpKey(Cursor $cursor)
     {
@@ -530,6 +554,9 @@ class CliDumper extends AbstractDumper
         return static::$defaultColors = $this->hasColorSupport($h);
     }
 
+    /**
+     * @return void
+     */
     protected function dumpLine(int $depth, bool $endOfValue = false)
     {
         if ($this->colors) {
@@ -538,6 +565,9 @@ class CliDumper extends AbstractDumper
         parent::dumpLine($depth);
     }
 
+    /**
+     * @return void
+     */
     protected function endValue(Cursor $cursor)
     {
         if (-1 === $cursor->hashType) {

@@ -63,6 +63,8 @@ class Connection extends AbstractConnection
 
     /**
      * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
+     *
+     * @return void
      */
     public function bind(string $dn = null, #[\SensitiveParameter] string $password = null)
     {
@@ -96,6 +98,9 @@ class Connection extends AbstractConnection
         return $this->connection;
     }
 
+    /**
+     * @return void
+     */
     public function setOption(string $name, array|string|int|bool $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
@@ -103,6 +108,9 @@ class Connection extends AbstractConnection
         }
     }
 
+    /**
+     * @return array|string|int|null
+     */
     public function getOption(string $name)
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
@@ -112,6 +120,9 @@ class Connection extends AbstractConnection
         return $ret;
     }
 
+    /**
+     * @return void
+     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -138,7 +149,7 @@ class Connection extends AbstractConnection
         });
     }
 
-    private function connect()
+    private function connect(): void
     {
         if ($this->connection) {
             return;
@@ -167,7 +178,7 @@ class Connection extends AbstractConnection
         }
     }
 
-    private function disconnect()
+    private function disconnect(): void
     {
         if ($this->connection) {
             ldap_unbind($this->connection);

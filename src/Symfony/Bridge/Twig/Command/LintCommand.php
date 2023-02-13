@@ -48,6 +48,9 @@ class LintCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this

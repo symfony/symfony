@@ -133,7 +133,7 @@ class Terminal
         return self::$stty = 0 === $exitcode;
     }
 
-    private static function initDimensions()
+    private static function initDimensions(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {
@@ -166,7 +166,7 @@ class Terminal
     /**
      * Initializes dimensions using the output of an stty columns line.
      */
-    private static function initDimensionsUsingStty()
+    private static function initDimensionsUsingStty(): void
     {
         if ($sttyString = self::getSttyColumns()) {
             if (preg_match('/rows.(\d+);.columns.(\d+);/is', $sttyString, $matches)) {

@@ -125,6 +125,9 @@ class Message extends RawMessage
         yield from $body->toIterable();
     }
 
+    /**
+     * @return void
+     */
     public function ensureValidity()
     {
         if (!$this->headers->has('To') && !$this->headers->has('Cc') && !$this->headers->has('Bcc')) {

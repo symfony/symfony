@@ -279,6 +279,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         return $this->pool instanceof PruneableInterface && $this->pool->prune();
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $this->commit();

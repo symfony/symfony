@@ -41,7 +41,7 @@ final class TraceableFirewallListener extends FirewallListener
         return $this->authenticatorsInfo;
     }
 
-    protected function callListeners(RequestEvent $event, iterable $listeners)
+    protected function callListeners(RequestEvent $event, iterable $listeners): void
     {
         $wrappedListeners = [];
         $wrappedLazyListeners = [];

@@ -80,6 +80,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $this->hasIntlFormatter = $formatter instanceof IntlFormatterInterface;
     }
 
+    /**
+     * @return void
+     */
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
     {
         $this->configCacheFactory = $configCacheFactory;
@@ -89,6 +92,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      * Adds a Loader.
      *
      * @param string $format The name of the loader (@see addResource())
+     *
+     * @return void
      */
     public function addLoader(string $format, LoaderInterface $loader)
     {
@@ -102,6 +107,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      * @param mixed  $resource The resource name
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
+     *
+     * @return void
      */
     public function addResource(string $format, mixed $resource, string $locale, string $domain = null)
     {
@@ -119,6 +126,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         }
     }
 
+    /**
+     * @return void
+     */
     public function setLocale(string $locale)
     {
         $this->assertValidLocale($locale);
@@ -136,6 +146,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      * @param string[] $locales
      *
      * @throws InvalidArgumentException If a locale contains invalid characters
+     *
+     * @return void
      */
     public function setFallbackLocales(array $locales)
     {
@@ -221,6 +233,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         return $this->loaders;
     }
 
+    /**
+     * @return void
+     */
     protected function loadCatalogue(string $locale)
     {
         if (null === $this->cacheDir) {
@@ -230,6 +245,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         }
     }
 
+    /**
+     * @return void
+     */
     protected function initializeCatalogue(string $locale)
     {
         $this->assertValidLocale($locale);
@@ -414,6 +432,8 @@ EOF
      * Asserts that the locale is valid, throws an Exception if not.
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
+     *
+     * @return void
      */
     protected function assertValidLocale(string $locale)
     {

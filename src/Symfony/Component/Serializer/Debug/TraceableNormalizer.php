@@ -87,7 +87,7 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $this->normalizer->supportsDenormalization($data, $type, $format, $context);
     }
 
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         if (!$this->normalizer instanceof SerializerAwareInterface) {
             return;
@@ -96,7 +96,7 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $this->normalizer->setSerializer($serializer);
     }
 
-    public function setNormalizer(NormalizerInterface $normalizer)
+    public function setNormalizer(NormalizerInterface $normalizer): void
     {
         if (!$this->normalizer instanceof NormalizerAwareInterface) {
             return;
@@ -105,7 +105,7 @@ class TraceableNormalizer implements NormalizerInterface, DenormalizerInterface,
         $this->normalizer->setNormalizer($normalizer);
     }
 
-    public function setDenormalizer(DenormalizerInterface $denormalizer)
+    public function setDenormalizer(DenormalizerInterface $denormalizer): void
     {
         if (!$this->normalizer instanceof DenormalizerAwareInterface) {
             return;

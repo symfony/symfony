@@ -105,14 +105,14 @@ class XmlFileLoader extends FileLoader
         return 'xml' === $type;
     }
 
-    private function parseParameters(\DOMDocument $xml, string $file, \DOMNode $root = null)
+    private function parseParameters(\DOMDocument $xml, string $file, \DOMNode $root = null): void
     {
         if ($parameters = $this->getChildren($root ?? $xml->documentElement, 'parameters')) {
             $this->container->getParameterBag()->add($this->getArgumentsAsPhp($parameters[0], 'parameter', $file));
         }
     }
 
-    private function parseImports(\DOMDocument $xml, string $file, \DOMNode $root = null)
+    private function parseImports(\DOMDocument $xml, string $file, \DOMNode $root = null): void
     {
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
@@ -128,7 +128,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    private function parseDefinitions(\DOMDocument $xml, string $file, Definition $defaults, \DOMNode $root = null)
+    private function parseDefinitions(\DOMDocument $xml, string $file, Definition $defaults, \DOMNode $root = null): void
     {
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
@@ -413,7 +413,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Processes anonymous services.
      */
-    private function processAnonymousServices(\DOMDocument $xml, string $file, \DOMNode $root = null)
+    private function processAnonymousServices(\DOMDocument $xml, string $file, \DOMNode $root = null): void
     {
         $definitions = [];
         $count = 0;
@@ -725,7 +725,7 @@ EOF
         return !@$dom->schemaValidateSource($schema);
     }
 
-    private function validateAlias(\DOMElement $alias, string $file)
+    private function validateAlias(\DOMElement $alias, string $file): void
     {
         foreach ($alias->attributes as $name => $node) {
             if (!\in_array($name, ['alias', 'id', 'public'])) {
@@ -748,7 +748,7 @@ EOF
      *
      * @throws InvalidArgumentException When no extension is found corresponding to a tag
      */
-    private function validateExtensions(\DOMDocument $dom, string $file)
+    private function validateExtensions(\DOMDocument $dom, string $file): void
     {
         foreach ($dom->documentElement->childNodes as $node) {
             if (!$node instanceof \DOMElement || 'http://symfony.com/schema/dic/services' === $node->namespaceURI) {
@@ -766,7 +766,7 @@ EOF
     /**
      * Loads from an extension.
      */
-    private function loadFromExtensions(\DOMDocument $xml)
+    private function loadFromExtensions(\DOMDocument $xml): void
     {
         foreach ($xml->documentElement->childNodes as $node) {
             if (!$node instanceof \DOMElement || self::NS === $node->namespaceURI) {

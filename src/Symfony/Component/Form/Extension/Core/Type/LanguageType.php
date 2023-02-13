@@ -23,6 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LanguageType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

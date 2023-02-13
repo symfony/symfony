@@ -36,12 +36,12 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         $this->deprecationLogsFilepath = $deprecationLogsFilepath;
     }
 
-    public function enableOptionalWarmers()
+    public function enableOptionalWarmers(): void
     {
         $this->optionalsEnabled = true;
     }
 
-    public function enableOnlyOptionalWarmers()
+    public function enableOnlyOptionalWarmers(): void
     {
         $this->onlyOptionalsEnabled = $this->optionalsEnabled = true;
     }

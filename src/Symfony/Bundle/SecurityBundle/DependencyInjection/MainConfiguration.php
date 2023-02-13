@@ -102,7 +102,7 @@ class MainConfiguration implements ConfigurationInterface
         return $tb;
     }
 
-    private function addRoleHierarchySection(ArrayNodeDefinition $rootNode)
+    private function addRoleHierarchySection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('role', 'role_hierarchy')
@@ -123,7 +123,7 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
-    private function addAccessControlSection(ArrayNodeDefinition $rootNode)
+    private function addAccessControlSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('rule', 'access_control')
@@ -175,7 +175,7 @@ class MainConfiguration implements ConfigurationInterface
     /**
      * @param array<array-key, AuthenticatorFactoryInterface> $factories
      */
-    private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories)
+    private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories): void
     {
         $firewallNodeBuilder = $rootNode
             ->fixXmlConfig('firewall')
@@ -342,7 +342,7 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
-    private function addProvidersSection(ArrayNodeDefinition $rootNode)
+    private function addProvidersSection(ArrayNodeDefinition $rootNode): void
     {
         $providerNodeBuilder = $rootNode
             ->fixXmlConfig('provider')
@@ -401,7 +401,7 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
-    private function addPasswordHashersSection(ArrayNodeDefinition $rootNode)
+    private function addPasswordHashersSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('password_hasher')

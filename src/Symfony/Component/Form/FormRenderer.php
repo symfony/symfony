@@ -42,6 +42,9 @@ class FormRenderer implements FormRendererInterface
         return $this->engine;
     }
 
+    /**
+     * @return void
+     */
     public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true)
     {
         $this->engine->setTheme($view, $themes, $useDefaultThemes);

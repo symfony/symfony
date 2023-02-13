@@ -49,6 +49,8 @@ abstract class AbstractLoader implements LoaderInterface
      *     $this->addNamespaceAlias('mynamespace', '\\Acme\\Package\\Constraints\\');
      *
      *     $constraint = $this->newConstraint('mynamespace:NotNull');
+     *
+     * @return void
      */
     protected function addNamespaceAlias(string $alias, string $namespace)
     {

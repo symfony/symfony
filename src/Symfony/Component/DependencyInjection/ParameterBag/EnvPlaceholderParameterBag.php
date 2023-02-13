@@ -87,6 +87,9 @@ class EnvPlaceholderParameterBag extends ParameterBag
         return $this->unusedEnvPlaceholders;
     }
 
+    /**
+     * @return void
+     */
     public function clearUnusedEnvPlaceholders()
     {
         $this->unusedEnvPlaceholders = [];
@@ -94,6 +97,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
     /**
      * Merges the env placeholders of another EnvPlaceholderParameterBag.
+     *
+     * @return void
      */
     public function mergeEnvPlaceholders(self $bag)
     {
@@ -116,6 +121,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
     /**
      * Maps env prefixes to their corresponding PHP types.
+     *
+     * @return void
      */
     public function setProvidedTypes(array $providedTypes)
     {
@@ -132,6 +139,9 @@ class EnvPlaceholderParameterBag extends ParameterBag
         return $this->providedTypes;
     }
 
+    /**
+     * @return void
+     */
     public function resolve()
     {
         if ($this->resolved) {

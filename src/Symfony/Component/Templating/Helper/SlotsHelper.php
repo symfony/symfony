@@ -28,6 +28,8 @@ class SlotsHelper extends Helper
      * closed when the stop() method is called.
      *
      * @throws \InvalidArgumentException if a slot with the same name is already started
+     *
+     * @return void
      */
     public function start(string $name)
     {
@@ -46,6 +48,8 @@ class SlotsHelper extends Helper
      * Stops a slot.
      *
      * @throws \LogicException if no slot has been started
+     *
+     * @return void
      */
     public function stop()
     {
@@ -76,6 +80,8 @@ class SlotsHelper extends Helper
 
     /**
      * Sets a slot value.
+     *
+     * @return void
      */
     public function set(string $name, string $content)
     {

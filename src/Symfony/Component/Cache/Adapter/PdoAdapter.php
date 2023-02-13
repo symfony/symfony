@@ -97,6 +97,8 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
      *
      * @throws \PDOException    When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
+     *
+     * @return void
      */
     public function createTable()
     {

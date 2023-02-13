@@ -22,6 +22,8 @@ class TextareaFormField extends FormField
      * Initializes the form field.
      *
      * @throws \LogicException When node type is incorrect
+     *
+     * @return void
      */
     protected function initialize()
     {

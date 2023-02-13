@@ -113,6 +113,8 @@ class ExpressionLanguage
      * @throws \LogicException when registering a function after calling evaluate(), compile() or parse()
      *
      * @see ExpressionFunction
+     *
+     * @return void
      */
     public function register(string $name, callable $compiler, callable $evaluator)
     {
@@ -123,11 +125,17 @@ class ExpressionLanguage
         $this->functions[$name] = ['compiler' => $compiler, 'evaluator' => $evaluator];
     }
 
+    /**
+     * @return void
+     */
     public function addFunction(ExpressionFunction $function)
     {
         $this->register($function->getName(), $function->getCompiler(), $function->getEvaluator());
     }
 
+    /**
+     * @return void
+     */
     public function registerProvider(ExpressionFunctionProviderInterface $provider)
     {
         foreach ($provider->getFunctions() as $function) {
@@ -135,6 +143,9 @@ class ExpressionLanguage
         }
     }
 
+    /**
+     * @return void
+     */
     protected function registerFunctions()
     {
         $this->addFunction(ExpressionFunction::fromPhp('constant'));

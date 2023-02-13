@@ -80,7 +80,7 @@ final class GitRepository
         return $this->getLastLine($tags);
     }
 
-    public function checkout(string $branch)
+    public function checkout(string $branch): void
     {
         $this->execInPath(sprintf('git checkout %s', escapeshellarg($branch)));
     }

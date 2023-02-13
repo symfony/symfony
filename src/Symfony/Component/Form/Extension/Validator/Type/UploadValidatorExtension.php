@@ -32,6 +32,9 @@ class UploadValidatorExtension extends AbstractTypeExtension
         $this->translationDomain = $translationDomain;
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $translator = $this->translator;

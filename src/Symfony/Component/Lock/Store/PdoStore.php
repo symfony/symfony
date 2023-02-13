@@ -83,6 +83,9 @@ class PdoStore implements PersistingStoreInterface
         $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $key->reduceLifetime($this->initialTtl);
@@ -112,6 +115,9 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         if ($ttl < 1) {
@@ -137,6 +143,9 @@ class PdoStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";

@@ -75,7 +75,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->identifier;
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         $this->password = null;
     }
@@ -85,7 +85,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return $this->extraFields;
     }
 
-    public function setPassword(#[\SensitiveParameter] string $password)
+    public function setPassword(#[\SensitiveParameter] string $password): void
     {
         $this->password = $password;
     }

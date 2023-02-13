@@ -52,7 +52,7 @@ class X509Factory implements AuthenticatorFactoryInterface
         return 'x509';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->children()

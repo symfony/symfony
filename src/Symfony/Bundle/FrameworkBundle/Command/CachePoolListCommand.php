@@ -37,7 +37,7 @@ final class CachePoolListCommand extends Command
         $this->poolNames = $poolNames;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setHelp(<<<'EOF'

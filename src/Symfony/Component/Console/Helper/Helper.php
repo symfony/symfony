@@ -23,6 +23,9 @@ abstract class Helper implements HelperInterface
 {
     protected $helperSet = null;
 
+    /**
+     * @return void
+     */
     public function setHelperSet(HelperSet $helperSet = null)
     {
         if (1 > \func_num_args()) {

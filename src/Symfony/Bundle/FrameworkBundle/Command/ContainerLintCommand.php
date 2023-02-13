@@ -33,7 +33,7 @@ final class ContainerLintCommand extends Command
 {
     private ContainerBuilder $containerBuilder;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setHelp('This command parses service definitions and ensures that injected values match the type declarations of each services\' class.')

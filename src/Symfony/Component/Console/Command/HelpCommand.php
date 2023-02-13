@@ -27,6 +27,9 @@ class HelpCommand extends Command
 {
     private Command $command;
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this->ignoreValidationErrors();
@@ -54,6 +57,9 @@ EOF
         ;
     }
 
+    /**
+     * @return void
+     */
     public function setCommand(Command $command)
     {
         $this->command = $command;

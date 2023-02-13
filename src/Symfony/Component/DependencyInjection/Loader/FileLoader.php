@@ -89,6 +89,8 @@ abstract class FileLoader extends BaseFileLoader
      * @param string               $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      * @param string|null          $source    The path to the file that defines the auto-discovery rule
+     *
+     * @return void
      */
     public function registerClasses(Definition $prototype, string $namespace, string $resource, string|array $exclude = null/* , string $source = null */)
     {
@@ -149,6 +151,9 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
+    /**
+     * @return void
+     */
     public function registerAliasesForSinglyImplementedInterfaces()
     {
         foreach ($this->interfaces as $interface) {
@@ -162,6 +167,8 @@ abstract class FileLoader extends BaseFileLoader
 
     /**
      * Registers a definition in the container with its instanceof-conditionals.
+     *
+     * @return void
      */
     protected function setDefinition(string $id, Definition $definition)
     {

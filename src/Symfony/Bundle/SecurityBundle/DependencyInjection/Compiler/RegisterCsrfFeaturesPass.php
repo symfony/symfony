@@ -26,13 +26,13 @@ use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListene
  */
 class RegisterCsrfFeaturesPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->registerCsrfProtectionListener($container);
         $this->registerLogoutHandler($container);
     }
 
-    private function registerCsrfProtectionListener(ContainerBuilder $container)
+    private function registerCsrfProtectionListener(ContainerBuilder $container): void
     {
         if (!$container->has('security.authenticator.manager') || !$container->has('security.csrf.token_manager')) {
             return;
@@ -44,7 +44,7 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
             ->setPublic(false);
     }
 
-    protected function registerLogoutHandler(ContainerBuilder $container)
+    protected function registerLogoutHandler(ContainerBuilder $container): void
     {
         if (!$container->has('security.logout_listener') || !$container->has('security.csrf.token_storage')) {
             return;

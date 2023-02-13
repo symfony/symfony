@@ -152,7 +152,7 @@ EOF
         );
     }
 
-    private function displaySwitchUser(FirewallContext $context, SymfonyStyle $io)
+    private function displaySwitchUser(FirewallContext $context, SymfonyStyle $io): void
     {
         if ((null === $config = $context->getConfig()) || (null === $switchUser = $config->getSwitchUser())) {
             return;

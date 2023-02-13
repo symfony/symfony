@@ -30,11 +30,17 @@ class YamlReferenceDumper
 {
     private ?string $reference = null;
 
+    /**
+     * @return string
+     */
     public function dump(ConfigurationInterface $configuration)
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree());
     }
 
+    /**
+     * @return string
+     */
     public function dumpAtPath(ConfigurationInterface $configuration, string $path)
     {
         $rootNode = $node = $configuration->getConfigTreeBuilder()->buildTree();
@@ -74,7 +80,7 @@ class YamlReferenceDumper
         return $ref;
     }
 
-    private function writeNode(NodeInterface $node, NodeInterface $parentNode = null, int $depth = 0, bool $prototypedArray = false)
+    private function writeNode(NodeInterface $node, NodeInterface $parentNode = null, int $depth = 0, bool $prototypedArray = false): void
     {
         $comments = [];
         $default = '';
@@ -186,7 +192,7 @@ class YamlReferenceDumper
     /**
      * Outputs a single config reference line.
      */
-    private function writeLine(string $text, int $indent = 0)
+    private function writeLine(string $text, int $indent = 0): void
     {
         $indent = \strlen($text) + $indent;
         $format = '%'.$indent.'s';
@@ -194,7 +200,7 @@ class YamlReferenceDumper
         $this->reference .= sprintf($format, $text)."\n";
     }
 
-    private function writeArray(array $array, int $depth)
+    private function writeArray(array $array, int $depth): void
     {
         $isIndexed = array_is_list($array);
 

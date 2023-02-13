@@ -48,6 +48,9 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
         $this->historySize = $historySize;
     }
 
+    /**
+     * @return void
+     */
     public function onMessageFailed(WorkerMessageFailedEvent $event)
     {
         $retryStrategy = $this->getRetryStrategyForTransport($event->getReceiverName());

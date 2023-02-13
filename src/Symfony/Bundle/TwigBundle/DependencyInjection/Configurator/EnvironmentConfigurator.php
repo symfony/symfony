@@ -42,6 +42,9 @@ class EnvironmentConfigurator
         $this->thousandsSeparator = $thousandsSeparator;
     }
 
+    /**
+     * @return void
+     */
     public function configure(Environment $environment)
     {
         $environment->getExtension(CoreExtension::class)->setDateFormat($this->dateFormat, $this->intervalFormat);

@@ -76,7 +76,7 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces(string|array $places = null)
+    private function setInitialPlaces(string|array $places = null): void
     {
         if (1 > \func_num_args()) {
             trigger_deprecation('symfony/workflow', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
@@ -96,7 +96,7 @@ final class Definition
         $this->initialPlaces = $places;
     }
 
-    private function addPlace(string $place)
+    private function addPlace(string $place): void
     {
         if (!\count($this->places)) {
             $this->initialPlaces = [$place];
@@ -105,7 +105,7 @@ final class Definition
         $this->places[$place] = $place;
     }
 
-    private function addTransition(Transition $transition)
+    private function addTransition(Transition $transition): void
     {
         $name = $transition->getName();
 

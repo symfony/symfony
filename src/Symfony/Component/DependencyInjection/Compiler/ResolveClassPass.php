@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class ResolveClassPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getDefinitions() as $id => $definition) {

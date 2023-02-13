@@ -172,6 +172,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * If you are not using the loaders and therefore don't want
      * to depend on the Config component, set this flag to false.
+     *
+     * @return void
      */
     public function setResourceTracking(bool $track)
     {
@@ -188,12 +190,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the instantiator to be used when fetching proxies.
+     *
+     * @return void
      */
     public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
     {
         $this->proxyInstantiator = $proxyInstantiator;
     }
 
+    /**
+     * @return void
+     */
     public function registerExtension(ExtensionInterface $extension)
     {
         $this->extensions[$extension->getAlias()] = $extension;
@@ -473,6 +480,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Sets a service.
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
+     *
+     * @return void
      */
     public function set(string $id, ?object $service)
     {
@@ -488,6 +497,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Removes a service definition.
+     *
+     * @return void
      */
     public function removeDefinition(string $id)
     {
@@ -598,6 +609,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * constructor.
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
+     *
+     * @return void
      */
     public function merge(self $container)
     {
@@ -688,6 +701,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Prepends a config array to the configs of the given extension.
      *
      * @param array<string, mixed> $config
+     *
+     * @return void
      */
     public function prependExtensionConfig(string $name, array $config)
     {
@@ -730,6 +745,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *                                     env vars or be replaced by uniquely identifiable placeholders.
      *                                     Set to "true" when you want to use the current ContainerBuilder
      *                                     directly, keep to "false" when the container is dumped instead.
+     *
+     * @return void
      */
     public function compile(bool $resolveEnvPlaceholders = false)
     {
@@ -792,6 +809,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Adds the service aliases.
      *
      * @param array<string, string|Alias> $aliases
+     *
+     * @return void
      */
     public function addAliases(array $aliases)
     {
@@ -804,6 +823,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Sets the service aliases.
      *
      * @param array<string, string|Alias> $aliases
+     *
+     * @return void
      */
     public function setAliases(array $aliases)
     {
@@ -836,6 +857,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->aliasDefinitions[$alias] = $id;
     }
 
+    /**
+     * @return void
+     */
     public function removeAlias(string $alias)
     {
         if (isset($this->aliasDefinitions[$alias])) {
@@ -895,6 +919,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Adds the service definitions.
      *
      * @param array<string, Definition> $definitions
+     *
+     * @return void
      */
     public function addDefinitions(array $definitions)
     {
@@ -907,6 +933,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Sets the service definitions.
      *
      * @param array<string, Definition> $definitions
+     *
+     * @return void
      */
     public function setDefinitions(array $definitions)
     {
@@ -1272,6 +1300,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return array_values(array_diff($this->findTags(), $this->usedTags));
     }
 
+    /**
+     * @return void
+     */
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
         $this->expressionLanguageProviders[] = $provider;
@@ -1442,7 +1473,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @final
      */
-    public function log(CompilerPassInterface $pass, string $message)
+    public function log(CompilerPassInterface $pass, string $message): void
     {
         $this->getCompiler()->log($pass, $this->resolveEnvPlaceholders($message));
     }
@@ -1503,7 +1534,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @internal
      */
-    public function removeBindings(string $id)
+    public function removeBindings(string $id): void
     {
         if ($this->hasDefinition($id)) {
             foreach ($this->getDefinition($id)->getBindings() as $key => $binding) {
@@ -1610,7 +1641,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return empty($call[2]) ? $service : $result;
     }
 
-    private function shareService(Definition $definition, mixed $service, ?string $id, array &$inlineServices)
+    private function shareService(Definition $definition, mixed $service, ?string $id, array &$inlineServices): void
     {
         $inlineServices[$id ?? spl_object_hash($definition)] = $service;
 

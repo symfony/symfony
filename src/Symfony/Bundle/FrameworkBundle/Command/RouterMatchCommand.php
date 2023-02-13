@@ -47,7 +47,7 @@ class RouterMatchCommand extends Command
         $this->expressionLanguageProviders = $expressionLanguageProviders;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([

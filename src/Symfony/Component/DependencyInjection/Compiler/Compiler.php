@@ -41,6 +41,9 @@ class Compiler
         return $this->serviceReferenceGraph;
     }
 
+    /**
+     * @return void
+     */
     public function addPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
         $this->passConfig->addPass($pass, $type, $priority);
@@ -48,6 +51,8 @@ class Compiler
 
     /**
      * @final
+     *
+     * @return void
      */
     public function log(CompilerPassInterface $pass, string $message)
     {
@@ -65,6 +70,8 @@ class Compiler
 
     /**
      * Run the Compiler and process all Passes.
+     *
+     * @return void
      */
     public function compile(ContainerBuilder $container)
     {

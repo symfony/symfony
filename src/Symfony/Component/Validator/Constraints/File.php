@@ -151,7 +151,7 @@ class File extends Constraint
         return parent::__isset($option);
     }
 
-    private function normalizeBinaryFormat(int|string $maxSize)
+    private function normalizeBinaryFormat(int|string $maxSize): void
     {
         $factors = [
             'k' => 1000,

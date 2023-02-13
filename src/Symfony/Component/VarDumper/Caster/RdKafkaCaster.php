@@ -31,6 +31,9 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class RdKafkaCaster
 {
+    /**
+     * @return array
+     */
     public static function castKafkaConsumer(KafkaConsumer $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -123,6 +126,9 @@ class RdKafkaCaster
         return $a;
     }
 
+    /**
+     * @return array
+     */
     public static function castRdKafka(\RdKafka $c, array $a, Stub $stub, bool $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;

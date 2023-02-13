@@ -269,7 +269,7 @@ trait AbstractAdapterTrait
         return $wasEnabled;
     }
 
-    public function reset()
+    public function reset(): void
     {
         if ($this->deferred) {
             $this->commit();

@@ -35,6 +35,9 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         $this->logger = $logger;
     }
 
+    /**
+     * @return void
+     */
     public function onMessageFailed(WorkerMessageFailedEvent $event)
     {
         if ($event->willRetry()) {

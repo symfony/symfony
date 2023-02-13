@@ -25,6 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
 {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ('datetimezone' === $options['input']) {
@@ -34,6 +37,9 @@ class TimezoneType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

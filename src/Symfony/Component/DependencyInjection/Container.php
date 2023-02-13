@@ -78,6 +78,8 @@ class Container implements ContainerInterface, ResetInterface
      *
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen.
+     *
+     * @return void
      */
     public function compile()
     {
@@ -124,6 +126,9 @@ class Container implements ContainerInterface, ResetInterface
         return $this->parameterBag->has($name);
     }
 
+    /**
+     * @return void
+     */
     public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value)
     {
         $this->parameterBag->set($name, $value);
@@ -134,6 +139,8 @@ class Container implements ContainerInterface, ResetInterface
      *
      * Setting a synthetic service to null resets it: has() returns false and get()
      * behaves in the same way as if the service was never created.
+     *
+     * @return void
      */
     public function set(string $id, ?object $service)
     {
@@ -275,6 +282,9 @@ class Container implements ContainerInterface, ResetInterface
         return isset($this->services[$id]);
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         $services = $this->services + $this->privates;

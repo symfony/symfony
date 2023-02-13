@@ -76,6 +76,9 @@ class Route
         }
     }
 
+    /**
+     * @return void
+     */
     public function setPath(string $path)
     {
         $this->path = $path;
@@ -89,6 +92,9 @@ class Route
         return $this->path;
     }
 
+    /**
+     * @return void
+     */
     public function setLocalizedPaths(array $localizedPaths)
     {
         $this->localizedPaths = $localizedPaths;
@@ -99,6 +105,9 @@ class Route
         return $this->localizedPaths;
     }
 
+    /**
+     * @return void
+     */
     public function setHost(string $pattern)
     {
         $this->host = $pattern;
@@ -112,6 +121,9 @@ class Route
         return $this->host;
     }
 
+    /**
+     * @return void
+     */
     public function setName(string $name)
     {
         $this->name = $name;
@@ -125,6 +137,9 @@ class Route
         return $this->name;
     }
 
+    /**
+     * @return void
+     */
     public function setRequirements(array $requirements)
     {
         $this->requirements = $requirements;
@@ -138,6 +153,9 @@ class Route
         return $this->requirements;
     }
 
+    /**
+     * @return void
+     */
     public function setOptions(array $options)
     {
         $this->options = $options;
@@ -151,6 +169,9 @@ class Route
         return $this->options;
     }
 
+    /**
+     * @return void
+     */
     public function setDefaults(array $defaults)
     {
         $this->defaults = $defaults;
@@ -164,6 +185,9 @@ class Route
         return $this->defaults;
     }
 
+    /**
+     * @return void
+     */
     public function setSchemes(array|string $schemes)
     {
         $this->schemes = (array) $schemes;
@@ -177,6 +201,9 @@ class Route
         return $this->schemes;
     }
 
+    /**
+     * @return void
+     */
     public function setMethods(array|string $methods)
     {
         $this->methods = (array) $methods;
@@ -190,6 +217,9 @@ class Route
         return $this->methods;
     }
 
+    /**
+     * @return void
+     */
     public function setCondition(?string $condition)
     {
         $this->condition = $condition;

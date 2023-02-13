@@ -145,7 +145,7 @@ class TokenStream
     /**
      * Skips next whitespace if any.
      */
-    public function skipWhitespace()
+    public function skipWhitespace(): void
     {
         $peek = $this->getPeek();
 

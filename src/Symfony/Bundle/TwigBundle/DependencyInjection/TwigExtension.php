@@ -35,6 +35,9 @@ use Twig\Loader\LoaderInterface;
  */
 class TwigExtension extends Extension
 {
+    /**
+     * @return void
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

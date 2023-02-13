@@ -106,6 +106,8 @@ class PhpDumper extends Dumper
 
     /**
      * Sets the dumper to be used when dumping proxies in the generated container.
+     *
+     * @return void
      */
     public function setProxyDumper(DumperInterface $proxyDumper)
     {
@@ -421,7 +423,7 @@ EOF;
         return $this->proxyDumper ??= new LazyServiceDumper($this->class);
     }
 
-    private function analyzeReferences()
+    private function analyzeReferences(): void
     {
         (new AnalyzeServiceReferencesPass(false, $this->hasProxyDumper))->process($this->container);
         $checkedNodes = [];
@@ -508,7 +510,7 @@ EOF;
         unset($path[$sourceId]);
     }
 
-    private function addCircularReferences(string $sourceId, array $currentPath, bool $byConstructor)
+    private function addCircularReferences(string $sourceId, array $currentPath, bool $byConstructor): void
     {
         $currentId = $sourceId;
         $currentPath = array_reverse($currentPath);
@@ -522,7 +524,7 @@ EOF;
         }
     }
 
-    private function collectLineage(string $class, array &$lineage)
+    private function collectLineage(string $class, array &$lineage): void
     {
         if (isset($lineage[$class])) {
             return;
@@ -2048,7 +2050,7 @@ EOF;
     /**
      * Initializes the method names map to avoid conflicts with the Container methods.
      */
-    private function initializeMethodNamesMap(string $class)
+    private function initializeMethodNamesMap(string $class): void
     {
         $this->serviceIdToMethodNameMap = [];
         $this->usedMethodNames = [];

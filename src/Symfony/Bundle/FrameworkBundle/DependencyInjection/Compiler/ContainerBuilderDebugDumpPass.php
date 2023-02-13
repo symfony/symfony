@@ -25,6 +25,9 @@ use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
  */
 class ContainerBuilderDebugDumpPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         $cache = new ConfigCache($container->getParameter('debug.container.dump'), true);

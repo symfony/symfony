@@ -99,7 +99,7 @@ class SwitchUserListener extends AbstractListener
      *
      * @throws \LogicException if switching to a user failed
      */
-    public function authenticate(RequestEvent $event)
+    public function authenticate(RequestEvent $event): void
     {
         $request = $event->getRequest();
 

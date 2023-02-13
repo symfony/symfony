@@ -43,6 +43,9 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
         }
     }
 
+    /**
+     * @return void
+     */
     public function onAuthentication(Request $request, TokenInterface $token)
     {
         switch ($this->strategy) {

@@ -72,6 +72,9 @@ class DoctrineDbalStore implements PersistingStoreInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         $key->reduceLifetime($this->initialTtl);
@@ -111,6 +114,9 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, $ttl)
     {
         if ($ttl < 1) {
@@ -142,6 +148,9 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $this->conn->delete($this->table, [

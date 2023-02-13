@@ -36,6 +36,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     private ExpressionLanguage $expressionLanguage;
     private bool $inExpression = false;
 
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
@@ -47,6 +50,9 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         }
     }
 
+    /**
+     * @return void
+     */
     protected function enableExpressionProcessing()
     {
         $this->processExpressions = true;

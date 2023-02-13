@@ -190,6 +190,8 @@ class MongoDbStore implements PersistingStoreInterface
      * @throws UnsupportedException          if options are not supported by the selected server
      * @throws MongoInvalidArgumentException for parameter/option parsing errors
      * @throws DriverRuntimeException        for other driver errors (e.g. connection errors)
+     *
+     * @return void
      */
     public function createTtlIndex(int $expireAfterSeconds = 0)
     {
@@ -205,6 +207,8 @@ class MongoDbStore implements PersistingStoreInterface
 
     /**
      * @throws LockExpiredException when save is called on an expired lock
+     *
+     * @return void
      */
     public function save(Key $key)
     {
@@ -229,6 +233,8 @@ class MongoDbStore implements PersistingStoreInterface
     /**
      * @throws LockStorageException
      * @throws LockExpiredException
+     *
+     * @return void
      */
     public function putOffExpiration(Key $key, float $ttl)
     {
@@ -246,6 +252,9 @@ class MongoDbStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         $this->getCollection()->deleteOne([ // filter
@@ -272,7 +281,7 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @param float $ttl Expiry in seconds from now
      */
-    private function upsert(Key $key, float $ttl)
+    private function upsert(Key $key, float $ttl): void
     {
         $now = microtime(true);
         $token = $this->getUniqueToken($key);

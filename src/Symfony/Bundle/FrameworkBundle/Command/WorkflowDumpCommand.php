@@ -66,7 +66,7 @@ class WorkflowDumpCommand extends Command
         }
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([

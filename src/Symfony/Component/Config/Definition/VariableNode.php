@@ -27,6 +27,9 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     protected $defaultValue;
     protected $allowEmptyValue = true;
 
+    /**
+     * @return void
+     */
     public function setDefaultValue(mixed $value)
     {
         $this->defaultValueSet = true;
@@ -49,17 +52,25 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      * Sets if this node is allowed to have an empty value.
      *
      * @param bool $boolean True if this entity will accept empty values
+     *
+     * @return void
      */
     public function setAllowEmptyValue(bool $boolean)
     {
         $this->allowEmptyValue = $boolean;
     }
 
+    /**
+     * @return void
+     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @return void
+     */
     protected function validateType(mixed $value)
     {
     }

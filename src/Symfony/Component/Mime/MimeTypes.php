@@ -58,7 +58,7 @@ final class MimeTypes implements MimeTypesInterface
         $this->registerGuesser(new FileinfoMimeTypeGuesser());
     }
 
-    public static function setDefault(self $default)
+    public static function setDefault(self $default): void
     {
         self::$default = $default;
     }
@@ -73,7 +73,7 @@ final class MimeTypes implements MimeTypesInterface
      *
      * The last registered guesser has precedence over the other ones.
      */
-    public function registerGuesser(MimeTypeGuesserInterface $guesser)
+    public function registerGuesser(MimeTypeGuesserInterface $guesser): void
     {
         array_unshift($this->guessers, $guesser);
     }

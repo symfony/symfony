@@ -120,7 +120,7 @@ abstract class AbstractTransport implements TransportInterface
         return $this->logger;
     }
 
-    private function checkThrottling()
+    private function checkThrottling(): void
     {
         if (0 == $this->rate) {
             return;

@@ -26,12 +26,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class Descriptor implements DescriptorInterface
 {
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
+    protected OutputInterface $output;
 
-    public function describe(OutputInterface $output, object $object, array $options = [])
+    public function describe(OutputInterface $output, object $object, array $options = []): void
     {
         $this->output = $output;
 
@@ -45,10 +42,7 @@ abstract class Descriptor implements DescriptorInterface
         };
     }
 
-    /**
-     * Writes content to output.
-     */
-    protected function write(string $content, bool $decorated = false)
+    protected function write(string $content, bool $decorated = false): void
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }

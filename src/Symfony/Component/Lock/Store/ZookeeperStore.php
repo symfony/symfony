@@ -56,6 +56,9 @@ class ZookeeperStore implements PersistingStoreInterface
         return new \Zookeeper(implode(',', $hosts));
     }
 
+    /**
+     * @return void
+     */
     public function save(Key $key)
     {
         if ($this->exists($key)) {
@@ -71,6 +74,9 @@ class ZookeeperStore implements PersistingStoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * @return void
+     */
     public function delete(Key $key)
     {
         if (!$this->exists($key)) {
@@ -96,6 +102,9 @@ class ZookeeperStore implements PersistingStoreInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, zookeeper locks forever.
@@ -110,7 +119,7 @@ class ZookeeperStore implements PersistingStoreInterface
      * @throws LockConflictedException
      * @throws LockAcquiringException
      */
-    private function createNewLock(string $node, string $value)
+    private function createNewLock(string $node, string $value): void
     {
         // Default Node Permissions
         $acl = [['perms' => \Zookeeper::PERM_ALL, 'scheme' => 'world', 'id' => 'anyone']];

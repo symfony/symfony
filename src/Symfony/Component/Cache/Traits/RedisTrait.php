@@ -148,9 +148,9 @@ trait RedisTrait
         }
 
         if (isset($params['host']) || isset($params['path'])) {
-            if (!isset($params['dbindex']) && isset($params['path']) && '/' !== $params['path']) {
-                if (preg_match('#/(\d+)$#', $params['path'], $m)) {
-                    $params['dbindex'] = $m[1];
+            if (!isset($params['dbindex']) && isset($params['path'])) {
+                if (preg_match('#/(\d+)?$#', $params['path'], $m)) {
+                    $params['dbindex'] = $m[1] ?? '0';
                     $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
                 } elseif (isset($params['host'])) {
                     throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s", the "dbindex" parameter must be a number.', $dsn));

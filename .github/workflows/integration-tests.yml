@@ -1,4 +1,4 @@
-name: CI
+name: Integration
 
 on:
   push:
@@ -18,7 +18,7 @@ permissions:
 jobs:
 
   tests:
-    name: Integration Tests
+    name: Integration
     runs-on: Ubuntu-20.04
 
     strategy:

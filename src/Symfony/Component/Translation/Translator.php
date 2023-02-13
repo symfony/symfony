@@ -366,6 +366,9 @@ EOF
         }
     }
 
+    /**
+     * @return array
+     */
     protected function computeFallbackLocales(string $locale)
     {
         $this->parentLocales ??= json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);

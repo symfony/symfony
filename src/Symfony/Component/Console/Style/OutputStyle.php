@@ -100,6 +100,9 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
         return $this->output->isDebug();
     }
 
+    /**
+     * @return OutputInterface
+     */
     protected function getErrorOutput()
     {
         if (!$this->output instanceof ConsoleOutputInterface) {

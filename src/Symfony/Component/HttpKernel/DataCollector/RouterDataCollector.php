@@ -59,6 +59,9 @@ class RouterDataCollector extends DataCollector
         ];
     }
 
+    /**
+     * @return string
+     */
     protected function guessRoute(Request $request, string|object|array $controller)
     {
         return 'n/a';

@@ -81,6 +81,9 @@ class Route
         $this->path = $path;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPath()
     {
         return $this->path;
@@ -101,6 +104,9 @@ class Route
         $this->host = $pattern;
     }
 
+    /**
+     * @return string|null
+     */
     public function getHost()
     {
         return $this->host;
@@ -111,6 +117,9 @@ class Route
         $this->name = $name;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName()
     {
         return $this->name;
@@ -121,6 +130,9 @@ class Route
         $this->requirements = $requirements;
     }
 
+    /**
+     * @return array
+     */
     public function getRequirements()
     {
         return $this->requirements;
@@ -131,6 +143,9 @@ class Route
         $this->options = $options;
     }
 
+    /**
+     * @return array
+     */
     public function getOptions()
     {
         return $this->options;
@@ -141,6 +156,9 @@ class Route
         $this->defaults = $defaults;
     }
 
+    /**
+     * @return array
+     */
     public function getDefaults()
     {
         return $this->defaults;
@@ -151,6 +169,9 @@ class Route
         $this->schemes = (array) $schemes;
     }
 
+    /**
+     * @return array
+     */
     public function getSchemes()
     {
         return $this->schemes;
@@ -161,6 +182,9 @@ class Route
         $this->methods = (array) $methods;
     }
 
+    /**
+     * @return array
+     */
     public function getMethods()
     {
         return $this->methods;
@@ -171,6 +195,9 @@ class Route
         $this->condition = $condition;
     }
 
+    /**
+     * @return string|null
+     */
     public function getCondition()
     {
         return $this->condition;

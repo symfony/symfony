@@ -41,6 +41,9 @@ class ClassExistsMock
         self::$classes += $enums;
     }
 
+    /**
+     * @return bool
+     */
     public static function class_exists($name, $autoload = true)
     {
         $name = ltrim($name, '\\');
@@ -48,6 +51,9 @@ class ClassExistsMock
         return isset(self::$classes[$name]) ? (bool) self::$classes[$name] : \class_exists($name, $autoload);
     }
 
+    /**
+     * @return bool
+     */
     public static function interface_exists($name, $autoload = true)
     {
         $name = ltrim($name, '\\');
@@ -55,6 +61,9 @@ class ClassExistsMock
         return isset(self::$classes[$name]) ? (bool) self::$classes[$name] : \interface_exists($name, $autoload);
     }
 
+    /**
+     * @return bool
+     */
     public static function trait_exists($name, $autoload = true)
     {
         $name = ltrim($name, '\\');
@@ -62,6 +71,9 @@ class ClassExistsMock
         return isset(self::$classes[$name]) ? (bool) self::$classes[$name] : \trait_exists($name, $autoload);
     }
 
+    /**
+     * @return bool
+     */
     public static function enum_exists($name, $autoload = true)
     {
         $name = ltrim($name, '\\');

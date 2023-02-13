@@ -6,6 +6,50 @@ head=$(sed '/^diff /Q' .github/expected-missing-return-types.diff)
 (echo "$head" && echo && git diff -U2 src/) > .github/expected-missing-return-types.diff
 git checkout composer.json src/
 
+diff --git a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php b/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
+index 96c346846c..57a229c4d4 100644
+--- a/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
++++ b/src/Symfony/Bridge/Doctrine/DataCollector/DoctrineDataCollector.php
+@@ -111,5 +111,5 @@ class DoctrineDataCollector extends DataCollector
+      * @return int
+      */
+-    public function getQueryCount()
++    public function getQueryCount(): int
+     {
+         return array_sum(array_map('count', $this->data['queries']));
+diff --git a/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php b/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
+index e3dcea3398..c72d24cc9d 100644
+--- a/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
++++ b/src/Symfony/Bridge/Doctrine/DependencyInjection/Security/UserProvider/EntityFactory.php
+@@ -47,5 +47,5 @@ class EntityFactory implements UserProviderFactoryInterface
+      * @return string
+      */
+-    public function getKey()
++    public function getKey(): string
+     {
+         return $this->key;
+diff --git a/src/Symfony/Bundle/FrameworkBundle/DataCollector/RouterDataCollector.php b/src/Symfony/Bundle/FrameworkBundle/DataCollector/RouterDataCollector.php
+index ccb61b1286..700d0f22d4 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/DataCollector/RouterDataCollector.php
++++ b/src/Symfony/Bundle/FrameworkBundle/DataCollector/RouterDataCollector.php
+@@ -23,5 +23,5 @@ use Symfony\Component\HttpKernel\DataCollector\RouterDataCollector as BaseRouter
+ class RouterDataCollector extends BaseRouterDataCollector
+ {
+-    public function guessRoute(Request $request, mixed $controller)
++    public function guessRoute(Request $request, mixed $controller): string
+     {
+         if (\is_array($controller)) {
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Secrets/AbstractVault.php b/src/Symfony/Bundle/FrameworkBundle/Secrets/AbstractVault.php
+index b3eb0c6bc3..c47152f219 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/Secrets/AbstractVault.php
++++ b/src/Symfony/Bundle/FrameworkBundle/Secrets/AbstractVault.php
+@@ -44,5 +44,5 @@ abstract class AbstractVault
+      * @return string
+      */
+-    protected function getPrettyPath(string $path)
++    protected function getPrettyPath(string $path): string
+     {
+         return str_replace(getcwd().\DIRECTORY_SEPARATOR, '', $path);
 diff --git a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php b/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
 index bb5560a7b5..be86cbf98e 100644
 --- a/src/Symfony/Bundle/FrameworkBundle/Test/KernelTestCase.php
@@ -17,6 +61,107 @@ index bb5560a7b5..be86cbf98e 100644
 +    protected static function getContainer(): Container
      {
          if (!static::$booted) {
+diff --git a/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php b/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
+index 0e40e39851..0c3b145111 100644
+--- a/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
++++ b/src/Symfony/Bundle/SecurityBundle/Debug/TraceableFirewallListener.php
+@@ -32,5 +32,5 @@ final class TraceableFirewallListener extends FirewallListener
+      * @return array
+      */
+-    public function getWrappedListeners()
++    public function getWrappedListeners(): array
+     {
+         return $this->wrappedListeners;
+diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
+index fd2b18bb50..91f223d29b 100644
+--- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
++++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/AbstractFactory.php
+@@ -76,5 +76,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+      * @return string
+      */
+-    protected function createAuthenticationSuccessHandler(ContainerBuilder $container, string $id, array $config)
++    protected function createAuthenticationSuccessHandler(ContainerBuilder $container, string $id, array $config): string
+     {
+         $successHandlerId = $this->getSuccessHandlerId($id);
+@@ -98,5 +98,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+      * @return string
+      */
+-    protected function createAuthenticationFailureHandler(ContainerBuilder $container, string $id, array $config)
++    protected function createAuthenticationFailureHandler(ContainerBuilder $container, string $id, array $config): string
+     {
+         $id = $this->getFailureHandlerId($id);
+@@ -118,5 +118,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+      * @return string
+      */
+-    protected function getSuccessHandlerId(string $id)
++    protected function getSuccessHandlerId(string $id): string
+     {
+         return 'security.authentication.success_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
+@@ -126,5 +126,5 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
+      * @return string
+      */
+-    protected function getFailureHandlerId(string $id)
++    protected function getFailureHandlerId(string $id): string
+     {
+         return 'security.authentication.failure_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
+diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/UserProvider/InMemoryFactory.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/UserProvider/InMemoryFactory.php
+index 32208a6e3b..3a9064dadf 100644
+--- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/UserProvider/InMemoryFactory.php
++++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/UserProvider/InMemoryFactory.php
+@@ -41,5 +41,5 @@ class InMemoryFactory implements UserProviderFactoryInterface
+      * @return string
+      */
+-    public function getKey()
++    public function getKey(): string
+     {
+         return 'memory';
+diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/UserProvider/LdapFactory.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/UserProvider/LdapFactory.php
+index d54ebf7738..f2a74ec902 100644
+--- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/UserProvider/LdapFactory.php
++++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/UserProvider/LdapFactory.php
+@@ -44,5 +44,5 @@ class LdapFactory implements UserProviderFactoryInterface
+      * @return string
+      */
+-    public function getKey()
++    public function getKey(): string
+     {
+         return 'ldap';
+diff --git a/src/Symfony/Bundle/SecurityBundle/Security/FirewallContext.php b/src/Symfony/Bundle/SecurityBundle/Security/FirewallContext.php
+index 5077c6768d..bd741840f4 100644
+--- a/src/Symfony/Bundle/SecurityBundle/Security/FirewallContext.php
++++ b/src/Symfony/Bundle/SecurityBundle/Security/FirewallContext.php
+@@ -42,5 +42,5 @@ class FirewallContext
+      * @return FirewallConfig|null
+      */
+-    public function getConfig()
++    public function getConfig(): ?FirewallConfig
+     {
+         return $this->config;
+@@ -58,5 +58,5 @@ class FirewallContext
+      * @return ExceptionListener|null
+      */
+-    public function getExceptionListener()
++    public function getExceptionListener(): ?ExceptionListener
+     {
+         return $this->exceptionListener;
+@@ -66,5 +66,5 @@ class FirewallContext
+      * @return LogoutListener|null
+      */
+-    public function getLogoutListener()
++    public function getLogoutListener(): ?LogoutListener
+     {
+         return $this->logoutListener;
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php b/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
+index 3b379f59d4..7bf45f08c2 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
++++ b/src/Symfony/Bundle/WebProfilerBundle/Tests/Controller/ProfilerControllerTest.php
+@@ -447,5 +447,5 @@ class ProfilerControllerTest extends WebTestCase
+      * @return MockObject&DumpDataCollector
+      */
+-    private function createDumpDataCollector(): MockObject
++    private function createDumpDataCollector(): MockObject&DumpDataCollector
+     {
+         $dumpDataCollector = $this->createMock(DumpDataCollector::class);
 diff --git a/src/Symfony/Component/BrowserKit/AbstractBrowser.php b/src/Symfony/Component/BrowserKit/AbstractBrowser.php
 index b27ca37529..5b80175850 100644
 --- a/src/Symfony/Component/BrowserKit/AbstractBrowser.php
@@ -49,6 +194,64 @@ index b27ca37529..5b80175850 100644
 +    protected function filterResponse(object $response): Response
      {
          return $response;
+diff --git a/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php b/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php
+index 3dc93fd541..8a7df7a19b 100644
+--- a/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php
++++ b/src/Symfony/Component/Cache/Adapter/ApcuAdapter.php
+@@ -51,5 +51,5 @@ class ApcuAdapter extends AbstractAdapter
+      * @return bool
+      */
+-    public static function isSupported()
++    public static function isSupported(): bool
+     {
+         return \function_exists('apcu_fetch') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL);
+diff --git a/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php b/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php
+index dc25a395a3..a56e1b74ce 100644
+--- a/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php
++++ b/src/Symfony/Component/Cache/Adapter/MemcachedAdapter.php
+@@ -78,5 +78,5 @@ class MemcachedAdapter extends AbstractAdapter
+      * @return bool
+      */
+-    public static function isSupported()
++    public static function isSupported(): bool
+     {
+         return \extension_loaded('memcached') && version_compare(phpversion('memcached'), '3.1.6', '>=');
+diff --git a/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php b/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php
+index d104530c0d..a1845d3ae9 100644
+--- a/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php
++++ b/src/Symfony/Component/Cache/Adapter/PhpFilesAdapter.php
+@@ -58,5 +58,5 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
+      * @return bool
+      */
+-    public static function isSupported()
++    public static function isSupported(): bool
+     {
+         self::$startTime ??= $_SERVER['REQUEST_TIME'] ?? time();
+@@ -281,5 +281,5 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
+      * @return bool
+      */
+-    protected function doUnlink(string $file)
++    protected function doUnlink(string $file): bool
+     {
+         unset(self::$valuesCache[$file]);
+diff --git a/src/Symfony/Component/Cache/Adapter/TraceableAdapter.php b/src/Symfony/Component/Cache/Adapter/TraceableAdapter.php
+index 18f7ba0fb0..7f37cb6d9b 100644
+--- a/src/Symfony/Component/Cache/Adapter/TraceableAdapter.php
++++ b/src/Symfony/Component/Cache/Adapter/TraceableAdapter.php
+@@ -215,5 +215,5 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
+      * @return array
+      */
+-    public function getCalls()
++    public function getCalls(): array
+     {
+         return $this->calls;
+@@ -233,5 +233,5 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
+      * @return TraceableAdapterEvent
+      */
+-    protected function start(string $name)
++    protected function start(string $name): TraceableAdapterEvent
+     {
+         $this->calls[] = $event = new TraceableAdapterEvent();
 diff --git a/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php b/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php
 index 7cda0bc7d8..b2311826f4 100644
 --- a/src/Symfony/Component/Config/Definition/Builder/NodeBuilder.php
@@ -70,6 +273,61 @@ index 7b5d443fe6..d64ae0d024 100644
 -    public function getConfigTreeBuilder();
 +    public function getConfigTreeBuilder(): TreeBuilder;
  }
+diff --git a/src/Symfony/Component/Config/Definition/Dumper/XmlReferenceDumper.php b/src/Symfony/Component/Config/Definition/Dumper/XmlReferenceDumper.php
+index 2f07f31d0a..17601dbec4 100644
+--- a/src/Symfony/Component/Config/Definition/Dumper/XmlReferenceDumper.php
++++ b/src/Symfony/Component/Config/Definition/Dumper/XmlReferenceDumper.php
+@@ -40,5 +40,5 @@ class XmlReferenceDumper
+      * @return string
+      */
+-    public function dumpNode(NodeInterface $node, string $namespace = null)
++    public function dumpNode(NodeInterface $node, string $namespace = null): string
+     {
+         $this->reference = '';
+diff --git a/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php b/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php
+index 4621e6b1dc..96316277b3 100644
+--- a/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php
++++ b/src/Symfony/Component/Config/Definition/Dumper/YamlReferenceDumper.php
+@@ -65,5 +65,5 @@ class YamlReferenceDumper
+      * @return string
+      */
+-    public function dumpNode(NodeInterface $node)
++    public function dumpNode(NodeInterface $node): string
+     {
+         $this->reference = '';
+diff --git a/src/Symfony/Component/Config/Definition/EnumNode.php b/src/Symfony/Component/Config/Definition/EnumNode.php
+index 683096949d..bce1cecc29 100644
+--- a/src/Symfony/Component/Config/Definition/EnumNode.php
++++ b/src/Symfony/Component/Config/Definition/EnumNode.php
+@@ -50,5 +50,5 @@ class EnumNode extends ScalarNode
+      * @return array
+      */
+-    public function getValues()
++    public function getValues(): array
+     {
+         return $this->values;
+diff --git a/src/Symfony/Component/Config/Exception/FileLocatorFileNotFoundException.php b/src/Symfony/Component/Config/Exception/FileLocatorFileNotFoundException.php
+index c5173ae580..1f5aa3616e 100644
+--- a/src/Symfony/Component/Config/Exception/FileLocatorFileNotFoundException.php
++++ b/src/Symfony/Component/Config/Exception/FileLocatorFileNotFoundException.php
+@@ -31,5 +31,5 @@ class FileLocatorFileNotFoundException extends \InvalidArgumentException
+      * @return array
+      */
+-    public function getPaths()
++    public function getPaths(): array
+     {
+         return $this->paths;
+diff --git a/src/Symfony/Component/Config/Exception/LoaderLoadException.php b/src/Symfony/Component/Config/Exception/LoaderLoadException.php
+index 57afd6a8db..3d662340ea 100644
+--- a/src/Symfony/Component/Config/Exception/LoaderLoadException.php
++++ b/src/Symfony/Component/Config/Exception/LoaderLoadException.php
+@@ -80,5 +80,5 @@ class LoaderLoadException extends \Exception
+      * @return string
+      */
+-    protected function varToString(mixed $var)
++    protected function varToString(mixed $var): string
+     {
+         if (\is_object($var)) {
 diff --git a/src/Symfony/Component/Config/FileLocator.php b/src/Symfony/Component/Config/FileLocator.php
 index ab18232db1..bc5af7f89c 100644
 --- a/src/Symfony/Component/Config/FileLocator.php
@@ -155,8 +413,19 @@ index 6b1c6c5fbe..bb80ed461e 100644
 -    public function isFresh(ResourceInterface $resource, int $timestamp);
 +    public function isFresh(ResourceInterface $resource, int $timestamp): bool;
  }
+diff --git a/src/Symfony/Component/Config/Util/XmlUtils.php b/src/Symfony/Component/Config/Util/XmlUtils.php
+index cc024da461..00b79e915f 100644
+--- a/src/Symfony/Component/Config/Util/XmlUtils.php
++++ b/src/Symfony/Component/Config/Util/XmlUtils.php
+@@ -242,5 +242,5 @@ class XmlUtils
+      * @return array
+      */
+-    protected static function getXmlErrors(bool $internalErrors)
++    protected static function getXmlErrors(bool $internalErrors): array
+     {
+         $errors = [];
 diff --git a/src/Symfony/Component/Console/Application.php b/src/Symfony/Component/Console/Application.php
-index 3a3d4da744..0a825fc1ee 100644
+index 40c7035af4..9b7cad07b8 100644
 --- a/src/Symfony/Component/Console/Application.php
 +++ b/src/Symfony/Component/Console/Application.php
 @@ -215,5 +215,5 @@ class Application implements ResetInterface
@@ -166,28 +435,28 @@ index 3a3d4da744..0a825fc1ee 100644
 +    public function doRun(InputInterface $input, OutputInterface $output): int
      {
          if (true === $input->hasParameterOption(['--version', '-V'], true)) {
-@@ -462,5 +462,5 @@ class Application implements ResetInterface
+@@ -464,5 +464,5 @@ class Application implements ResetInterface
       * @return string
       */
 -    public function getLongVersion()
 +    public function getLongVersion(): string
      {
          if ('UNKNOWN' !== $this->getName()) {
-@@ -505,5 +505,5 @@ class Application implements ResetInterface
+@@ -507,5 +507,5 @@ class Application implements ResetInterface
       * @return Command|null
       */
 -    public function add(Command $command)
 +    public function add(Command $command): ?Command
      {
          $this->init();
-@@ -542,5 +542,5 @@ class Application implements ResetInterface
+@@ -544,5 +544,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When given command name does not exist
       */
 -    public function get(string $name)
 +    public function get(string $name): Command
      {
          $this->init();
-@@ -649,5 +649,5 @@ class Application implements ResetInterface
+@@ -651,5 +651,5 @@ class Application implements ResetInterface
       * @throws CommandNotFoundException When command name is incorrect or ambiguous
       */
 -    public function find(string $name)
@@ -201,7 +470,7 @@ index 3a3d4da744..0a825fc1ee 100644
 +    public function all(string $namespace = null): array
      {
          $this->init();
-@@ -968,5 +968,5 @@ class Application implements ResetInterface
+@@ -966,5 +966,5 @@ class Application implements ResetInterface
       * @return int 0 if everything went fine, or an error code
       */
 -    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
@@ -254,6 +523,24 @@ index 746cd27e79..52c61429cf 100644
 -    public function formatAndWrap(?string $message, int $width);
 +    public function formatAndWrap(?string $message, int $width): string;
  }
+diff --git a/src/Symfony/Component/Console/Helper/Helper.php b/src/Symfony/Component/Console/Helper/Helper.php
+index 8e56f2b571..8a629f7565 100644
+--- a/src/Symfony/Component/Console/Helper/Helper.php
++++ b/src/Symfony/Component/Console/Helper/Helper.php
+@@ -121,5 +121,5 @@ abstract class Helper implements HelperInterface
+      * @return string
+      */
+-    public static function formatMemory(int $memory)
++    public static function formatMemory(int $memory): string
+     {
+         if ($memory >= 1024 * 1024 * 1024) {
+@@ -141,5 +141,5 @@ abstract class Helper implements HelperInterface
+      * @return string
+      */
+-    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
++    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string): string
+     {
+         $isDecorated = $formatter->isDecorated();
 diff --git a/src/Symfony/Component/Console/Helper/HelperInterface.php b/src/Symfony/Component/Console/Helper/HelperInterface.php
 index 2762cdf05c..737334268a 100644
 --- a/src/Symfony/Component/Console/Helper/HelperInterface.php
@@ -300,6 +587,39 @@ index 3af991a76f..742e2508f3 100644
 +    public function getOption(string $name): mixed;
  
      /**
+diff --git a/src/Symfony/Component/Console/Question/Question.php b/src/Symfony/Component/Console/Question/Question.php
+index e1f981bc1e..f701cb549d 100644
+--- a/src/Symfony/Component/Console/Question/Question.php
++++ b/src/Symfony/Component/Console/Question/Question.php
+@@ -269,5 +269,5 @@ class Question
+      * @return bool
+      */
+-    protected function isAssoc(array $array)
++    protected function isAssoc(array $array): bool
+     {
+         return (bool) \count(array_filter(array_keys($array), 'is_string'));
+diff --git a/src/Symfony/Component/Console/Style/OutputStyle.php b/src/Symfony/Component/Console/Style/OutputStyle.php
+index 74d885d131..3de806a60e 100644
+--- a/src/Symfony/Component/Console/Style/OutputStyle.php
++++ b/src/Symfony/Component/Console/Style/OutputStyle.php
+@@ -104,5 +104,5 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
+      * @return OutputInterface
+      */
+-    protected function getErrorOutput()
++    protected function getErrorOutput(): OutputInterface
+     {
+         if (!$this->output instanceof ConsoleOutputInterface) {
+diff --git a/src/Symfony/Component/DependencyInjection/Argument/TaggedIteratorArgument.php b/src/Symfony/Component/DependencyInjection/Argument/TaggedIteratorArgument.php
+index b4e982c457..521a9531f8 100644
+--- a/src/Symfony/Component/DependencyInjection/Argument/TaggedIteratorArgument.php
++++ b/src/Symfony/Component/DependencyInjection/Argument/TaggedIteratorArgument.php
+@@ -56,5 +56,5 @@ class TaggedIteratorArgument extends IteratorArgument
+      * @return string
+      */
+-    public function getTag()
++    public function getTag(): string
+     {
+         return $this->tag;
 diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
 index 08bab02ee4..1181f0795e 100644
 --- a/src/Symfony/Component/DependencyInjection/Compiler/AbstractRecursivePass.php
@@ -312,10 +632,10 @@ index 08bab02ee4..1181f0795e 100644
      {
          if (\is_array($value)) {
 diff --git a/src/Symfony/Component/DependencyInjection/Container.php b/src/Symfony/Component/DependencyInjection/Container.php
-index 9c830e77c8..e530cafb43 100644
+index ff10702229..d98f26f82b 100644
 --- a/src/Symfony/Component/DependencyInjection/Container.php
 +++ b/src/Symfony/Component/DependencyInjection/Container.php
-@@ -109,5 +109,5 @@ class Container implements ContainerInterface, ResetInterface
+@@ -115,5 +115,5 @@ class Container implements ContainerInterface, ResetInterface
       * @throws ParameterNotFoundException if the parameter is not defined
       */
 -    public function getParameter(string $name)
@@ -333,6 +653,96 @@ index 9e97fb71fc..1cda97c611 100644
 +    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null;
  
      public function hasParameter(string $name): bool;
+diff --git a/src/Symfony/Component/DependencyInjection/Exception/AutowiringFailedException.php b/src/Symfony/Component/DependencyInjection/Exception/AutowiringFailedException.php
+index 5f22fa53b6..2ebf0e385d 100644
+--- a/src/Symfony/Component/DependencyInjection/Exception/AutowiringFailedException.php
++++ b/src/Symfony/Component/DependencyInjection/Exception/AutowiringFailedException.php
+@@ -71,5 +71,5 @@ class AutowiringFailedException extends RuntimeException
+      * @return string
+      */
+-    public function getServiceId()
++    public function getServiceId(): string
+     {
+         return $this->serviceId;
+diff --git a/src/Symfony/Component/DependencyInjection/Exception/ParameterCircularReferenceException.php b/src/Symfony/Component/DependencyInjection/Exception/ParameterCircularReferenceException.php
+index 9fc3b50b62..a6c1469c2d 100644
+--- a/src/Symfony/Component/DependencyInjection/Exception/ParameterCircularReferenceException.php
++++ b/src/Symfony/Component/DependencyInjection/Exception/ParameterCircularReferenceException.php
+@@ -31,5 +31,5 @@ class ParameterCircularReferenceException extends RuntimeException
+      * @return array
+      */
+-    public function getParameters()
++    public function getParameters(): array
+     {
+         return $this->parameters;
+diff --git a/src/Symfony/Component/DependencyInjection/Exception/ParameterNotFoundException.php b/src/Symfony/Component/DependencyInjection/Exception/ParameterNotFoundException.php
+index 89966648f7..fa80eb75ee 100644
+--- a/src/Symfony/Component/DependencyInjection/Exception/ParameterNotFoundException.php
++++ b/src/Symfony/Component/DependencyInjection/Exception/ParameterNotFoundException.php
+@@ -75,5 +75,5 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
+      * @return string
+      */
+-    public function getKey()
++    public function getKey(): string
+     {
+         return $this->key;
+@@ -83,5 +83,5 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
+      * @return string|null
+      */
+-    public function getSourceId()
++    public function getSourceId(): ?string
+     {
+         return $this->sourceId;
+@@ -91,5 +91,5 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
+      * @return string|null
+      */
+-    public function getSourceKey()
++    public function getSourceKey(): ?string
+     {
+         return $this->sourceKey;
+diff --git a/src/Symfony/Component/DependencyInjection/Exception/ServiceCircularReferenceException.php b/src/Symfony/Component/DependencyInjection/Exception/ServiceCircularReferenceException.php
+index d62c22567b..085d5fa167 100644
+--- a/src/Symfony/Component/DependencyInjection/Exception/ServiceCircularReferenceException.php
++++ b/src/Symfony/Component/DependencyInjection/Exception/ServiceCircularReferenceException.php
+@@ -33,5 +33,5 @@ class ServiceCircularReferenceException extends RuntimeException
+      * @return string
+      */
+-    public function getServiceId()
++    public function getServiceId(): string
+     {
+         return $this->serviceId;
+@@ -41,5 +41,5 @@ class ServiceCircularReferenceException extends RuntimeException
+      * @return array
+      */
+-    public function getPath()
++    public function getPath(): array
+     {
+         return $this->path;
+diff --git a/src/Symfony/Component/DependencyInjection/Exception/ServiceNotFoundException.php b/src/Symfony/Component/DependencyInjection/Exception/ServiceNotFoundException.php
+index d56db7727f..90da421299 100644
+--- a/src/Symfony/Component/DependencyInjection/Exception/ServiceNotFoundException.php
++++ b/src/Symfony/Component/DependencyInjection/Exception/ServiceNotFoundException.php
+@@ -54,5 +54,5 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
+      * @return string
+      */
+-    public function getId()
++    public function getId(): string
+     {
+         return $this->id;
+@@ -62,5 +62,5 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
+      * @return string|null
+      */
+-    public function getSourceId()
++    public function getSourceId(): ?string
+     {
+         return $this->sourceId;
+@@ -70,5 +70,5 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
+      * @return array
+      */
+-    public function getAlternatives()
++    public function getAlternatives(): array
+     {
+         return $this->alternatives;
 diff --git a/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php b/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
 index a42967f4da..4e86e16f9d 100644
 --- a/src/Symfony/Component/DependencyInjection/Extension/ConfigurationExtensionInterface.php
@@ -401,6 +811,17 @@ index f4c6b29258..1402331f9e 100644
 -    public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator);
 +    public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object;
  }
+diff --git a/src/Symfony/Component/DependencyInjection/TypedReference.php b/src/Symfony/Component/DependencyInjection/TypedReference.php
+index 9b431cd65b..5fdb0643cd 100644
+--- a/src/Symfony/Component/DependencyInjection/TypedReference.php
++++ b/src/Symfony/Component/DependencyInjection/TypedReference.php
+@@ -41,5 +41,5 @@ class TypedReference extends Reference
+      * @return string
+      */
+-    public function getType()
++    public function getType(): string
+     {
+         return $this->type;
 diff --git a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php b/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
 index 2085e428e9..ca0d6964e5 100644
 --- a/src/Symfony/Component/EventDispatcher/EventSubscriberInterface.php
@@ -411,6 +832,17 @@ index 2085e428e9..ca0d6964e5 100644
 -    public static function getSubscribedEvents();
 +    public static function getSubscribedEvents(): array;
  }
+diff --git a/src/Symfony/Component/ExpressionLanguage/Compiler.php b/src/Symfony/Component/ExpressionLanguage/Compiler.php
+index 66471d29ff..98f2f1eab2 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Compiler.php
++++ b/src/Symfony/Component/ExpressionLanguage/Compiler.php
+@@ -67,5 +67,5 @@ class Compiler implements ResetInterface
+      * @return string
+      */
+-    public function subcompile(Node\Node $node)
++    public function subcompile(Node\Node $node): string
+     {
+         $current = $this->source;
 diff --git a/src/Symfony/Component/ExpressionLanguage/ExpressionFunctionProviderInterface.php b/src/Symfony/Component/ExpressionLanguage/ExpressionFunctionProviderInterface.php
 index 479aeef880..272954c082 100644
 --- a/src/Symfony/Component/ExpressionLanguage/ExpressionFunctionProviderInterface.php
@@ -421,6 +853,211 @@ index 479aeef880..272954c082 100644
 -    public function getFunctions();
 +    public function getFunctions(): array;
  }
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/ArrayNode.php b/src/Symfony/Component/ExpressionLanguage/Node/ArrayNode.php
+index e1a3169b00..e5dc5bfe21 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/ArrayNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/ArrayNode.php
+@@ -45,5 +45,5 @@ class ArrayNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         $result = [];
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/BinaryNode.php b/src/Symfony/Component/ExpressionLanguage/Node/BinaryNode.php
+index 0b31c66ded..e798ef8f2f 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/BinaryNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/BinaryNode.php
+@@ -93,5 +93,5 @@ class BinaryNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         $operator = $this->attributes['operator'];
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php b/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
+index ba78a2848e..f805b5655e 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/ConditionalNode.php
+@@ -41,5 +41,5 @@ class ConditionalNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         if ($this->nodes['expr1']->evaluate($functions, $values)) {
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/ConstantNode.php b/src/Symfony/Component/ExpressionLanguage/Node/ConstantNode.php
+index 869e350dc9..f1c1ad5bd3 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/ConstantNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/ConstantNode.php
+@@ -39,5 +39,5 @@ class ConstantNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         return $this->attributes['value'];
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php b/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php
+index 06078da305..cc11697293 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/FunctionNode.php
+@@ -41,5 +41,5 @@ class FunctionNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         $arguments = [$values];
+@@ -54,5 +54,5 @@ class FunctionNode extends Node
+      * @return array
+      */
+-    public function toArray()
++    public function toArray(): array
+     {
+         $array = [];
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/GetAttrNode.php b/src/Symfony/Component/ExpressionLanguage/Node/GetAttrNode.php
+index e9b10c3295..7aefd9bb84 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/GetAttrNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/GetAttrNode.php
+@@ -66,5 +66,5 @@ class GetAttrNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         switch ($this->attributes['type']) {
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/NameNode.php b/src/Symfony/Component/ExpressionLanguage/Node/NameNode.php
+index e017e967a1..8ea5bcf28c 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/NameNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/NameNode.php
+@@ -34,5 +34,5 @@ class NameNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         return $values[$this->attributes['name']];
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/Node.php b/src/Symfony/Component/ExpressionLanguage/Node/Node.php
+index eb5046c9bf..ef142d3787 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/Node.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/Node.php
+@@ -68,5 +68,5 @@ class Node
+      * @return mixed
+      */
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         $results = [];
+@@ -86,5 +86,5 @@ class Node
+      * @return string
+      */
+-    public function dump()
++    public function dump(): string
+     {
+         $dump = '';
+@@ -100,5 +100,5 @@ class Node
+      * @return string
+      */
+-    protected function dumpString(string $value)
++    protected function dumpString(string $value): string
+     {
+         return sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
+@@ -108,5 +108,5 @@ class Node
+      * @return bool
+      */
+-    protected function isHash(array $value)
++    protected function isHash(array $value): bool
+     {
+         $expectedKey = 0;
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/NullCoalesceNode.php b/src/Symfony/Component/ExpressionLanguage/Node/NullCoalesceNode.php
+index 3e59ef8676..b6371df241 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/NullCoalesceNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/NullCoalesceNode.php
+@@ -37,5 +37,5 @@ class NullCoalesceNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         if ($this->nodes['expr1'] instanceof GetAttrNode) {
+diff --git a/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php b/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php
+index 9e30d848eb..ee82938d8a 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php
++++ b/src/Symfony/Component/ExpressionLanguage/Node/UnaryNode.php
+@@ -46,5 +46,5 @@ class UnaryNode extends Node
+     }
+ 
+-    public function evaluate(array $functions, array $values)
++    public function evaluate(array $functions, array $values): mixed
+     {
+         $value = $this->nodes['node']->evaluate($functions, $values);
+diff --git a/src/Symfony/Component/ExpressionLanguage/ParsedExpression.php b/src/Symfony/Component/ExpressionLanguage/ParsedExpression.php
+index 239624ec2c..3b497d5ccf 100644
+--- a/src/Symfony/Component/ExpressionLanguage/ParsedExpression.php
++++ b/src/Symfony/Component/ExpressionLanguage/ParsedExpression.php
+@@ -33,5 +33,5 @@ class ParsedExpression extends Expression
+      * @return Node
+      */
+-    public function getNodes()
++    public function getNodes(): Node
+     {
+         return $this->nodes;
+diff --git a/src/Symfony/Component/ExpressionLanguage/Parser.php b/src/Symfony/Component/ExpressionLanguage/Parser.php
+index 92585a574c..96c62f8521 100644
+--- a/src/Symfony/Component/ExpressionLanguage/Parser.php
++++ b/src/Symfony/Component/ExpressionLanguage/Parser.php
+@@ -178,5 +178,5 @@ class Parser
+      * @return Node\Node
+      */
+-    protected function parseConditionalExpression(Node\Node $expr)
++    protected function parseConditionalExpression(Node\Node $expr): Node\Node
+     {
+         while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '??')) {
+@@ -277,5 +277,5 @@ class Parser
+      * @return Node\ArrayNode
+      */
+-    public function parseArrayExpression()
++    public function parseArrayExpression(): Node\ArrayNode
+     {
+         $this->stream->expect(Token::PUNCTUATION_TYPE, '[', 'An array element was expected');
+@@ -304,5 +304,5 @@ class Parser
+      * @return Node\ArrayNode
+      */
+-    public function parseHashExpression()
++    public function parseHashExpression(): Node\ArrayNode
+     {
+         $this->stream->expect(Token::PUNCTUATION_TYPE, '{', 'A hash element was expected');
+@@ -351,5 +351,5 @@ class Parser
+      * @return Node\GetAttrNode|Node\Node
+      */
+-    public function parsePostfixExpression(Node\Node $node)
++    public function parsePostfixExpression(Node\Node $node): Node\GetAttrNode|Node\Node
+     {
+         $token = $this->stream->current;
+@@ -414,5 +414,5 @@ class Parser
+      * @return Node\Node
+      */
+-    public function parseArguments()
++    public function parseArguments(): Node\Node
+     {
+         $args = [];
+diff --git a/src/Symfony/Component/ExpressionLanguage/SerializedParsedExpression.php b/src/Symfony/Component/ExpressionLanguage/SerializedParsedExpression.php
+index 56207b0985..133a3a1061 100644
+--- a/src/Symfony/Component/ExpressionLanguage/SerializedParsedExpression.php
++++ b/src/Symfony/Component/ExpressionLanguage/SerializedParsedExpression.php
+@@ -12,4 +12,5 @@
+ namespace Symfony\Component\ExpressionLanguage;
+ 
++use Symfony\Component\ExpressionLanguage\Node\Node;
+ /**
+  * Represents an already parsed expression.
+@@ -31,5 +32,5 @@ class SerializedParsedExpression extends ParsedExpression
+     }
+ 
+-    public function getNodes()
++    public function getNodes(): Node
+     {
+         return unserialize($this->nodes);
 diff --git a/src/Symfony/Component/Form/AbstractExtension.php b/src/Symfony/Component/Form/AbstractExtension.php
 index 5d3c1a8480..7eb6bba474 100644
 --- a/src/Symfony/Component/Form/AbstractExtension.php
@@ -467,6 +1104,17 @@ index da401930d7..15d6219259 100644
 +    public function getParent(): ?string
      {
          return FormType::class;
+diff --git a/src/Symfony/Component/Form/ButtonBuilder.php b/src/Symfony/Component/Form/ButtonBuilder.php
+index 9cc32888e1..0fa604ceec 100644
+--- a/src/Symfony/Component/Form/ButtonBuilder.php
++++ b/src/Symfony/Component/Form/ButtonBuilder.php
+@@ -327,5 +327,5 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+      * @throws BadMethodCallException
+      */
+-    public function setFormFactory(FormFactoryInterface $formFactory)
++    public function setFormFactory(FormFactoryInterface $formFactory): static
+     {
+         throw new BadMethodCallException('Buttons do not support form factories.');
 diff --git a/src/Symfony/Component/Form/DataTransformerInterface.php b/src/Symfony/Component/Form/DataTransformerInterface.php
 index 85fb99d218..6cc654f681 100644
 --- a/src/Symfony/Component/Form/DataTransformerInterface.php
@@ -484,6 +1132,28 @@ index 85fb99d218..6cc654f681 100644
 -    public function reverseTransform(mixed $value);
 +    public function reverseTransform(mixed $value): mixed;
  }
+diff --git a/src/Symfony/Component/Form/FormConfigBuilder.php b/src/Symfony/Component/Form/FormConfigBuilder.php
+index 0220399758..0839a42daf 100644
+--- a/src/Symfony/Component/Form/FormConfigBuilder.php
++++ b/src/Symfony/Component/Form/FormConfigBuilder.php
+@@ -537,5 +537,5 @@ class FormConfigBuilder implements FormConfigBuilderInterface
+      * @return $this
+      */
+-    public function setFormFactory(FormFactoryInterface $formFactory)
++    public function setFormFactory(FormFactoryInterface $formFactory): static
+     {
+         if ($this->locked) {
+diff --git a/src/Symfony/Component/Form/FormConfigBuilderInterface.php b/src/Symfony/Component/Form/FormConfigBuilderInterface.php
+index 09b9149801..6b22b9f9e8 100644
+--- a/src/Symfony/Component/Form/FormConfigBuilderInterface.php
++++ b/src/Symfony/Component/Form/FormConfigBuilderInterface.php
+@@ -209,5 +209,5 @@ interface FormConfigBuilderInterface extends FormConfigInterface
+      * @return $this
+      */
+-    public function setFormFactory(FormFactoryInterface $formFactory);
++    public function setFormFactory(FormFactoryInterface $formFactory): static;
+ 
+     /**
 diff --git a/src/Symfony/Component/Form/FormRendererEngineInterface.php b/src/Symfony/Component/Form/FormRendererEngineInterface.php
 index aa249270a0..3c9d04ff9a 100644
 --- a/src/Symfony/Component/Form/FormRendererEngineInterface.php
@@ -542,6 +1212,46 @@ index 2b9066a511..1c9e9f5a26 100644
 -    public function getParent();
 +    public function getParent(): ?string;
  }
+diff --git a/src/Symfony/Component/HttpClient/HttpClientTrait.php b/src/Symfony/Component/HttpClient/HttpClientTrait.php
+index 38c544b4b1..9945f480d2 100644
+--- a/src/Symfony/Component/HttpClient/HttpClientTrait.php
++++ b/src/Symfony/Component/HttpClient/HttpClientTrait.php
+@@ -558,5 +558,5 @@ trait HttpClientTrait
+      * @return string
+      */
+-    private static function removeDotSegments(string $path)
++    private static function removeDotSegments(string $path): string
+     {
+         $result = '';
+diff --git a/src/Symfony/Component/HttpFoundation/HeaderBag.php b/src/Symfony/Component/HttpFoundation/HeaderBag.php
+index b7be1b3827..c5f6098eea 100644
+--- a/src/Symfony/Component/HttpFoundation/HeaderBag.php
++++ b/src/Symfony/Component/HttpFoundation/HeaderBag.php
+@@ -258,5 +258,5 @@ class HeaderBag implements \IteratorAggregate, \Countable
+      * @return string
+      */
+-    protected function getCacheControlHeader()
++    protected function getCacheControlHeader(): string
+     {
+         ksort($this->cacheControl);
+diff --git a/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php b/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php
+index 203a8b278d..e26bb42b22 100644
+--- a/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php
++++ b/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php
+@@ -59,5 +59,5 @@ class ResponseHeaderBag extends HeaderBag
+      * @return array
+      */
+-    public function allPreserveCaseWithoutCookies()
++    public function allPreserveCaseWithoutCookies(): array
+     {
+         $headers = $this->allPreserveCase();
+@@ -231,5 +231,5 @@ class ResponseHeaderBag extends HeaderBag
+      * @return string
+      */
+-    public function makeDisposition(string $disposition, string $filename, string $filenameFallback = '')
++    public function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string
+     {
+         return HeaderUtils::makeDisposition($disposition, $filename, $filenameFallback);
 diff --git a/src/Symfony/Component/HttpKernel/CacheWarmer/CacheWarmerInterface.php b/src/Symfony/Component/HttpKernel/CacheWarmer/CacheWarmerInterface.php
 index 1f1740b7e2..22dc8ea26a 100644
 --- a/src/Symfony/Component/HttpKernel/CacheWarmer/CacheWarmerInterface.php
@@ -583,8 +1293,118 @@ index 1cb865fd66..f6f4efe7a7 100644
 -    public function getName();
 +    public function getName(): string;
  }
+diff --git a/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php b/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php
+index fa62bc7de4..ca8f57ac2f 100644
+--- a/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php
++++ b/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php
+@@ -199,5 +199,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getRequestRequest()
++    public function getRequestRequest(): ParameterBag
+     {
+         return new ParameterBag($this->data['request_request']->getValue());
+@@ -207,5 +207,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getRequestQuery()
++    public function getRequestQuery(): ParameterBag
+     {
+         return new ParameterBag($this->data['request_query']->getValue());
+@@ -215,5 +215,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getRequestFiles()
++    public function getRequestFiles(): ParameterBag
+     {
+         return new ParameterBag($this->data['request_files']->getValue());
+@@ -223,5 +223,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getRequestHeaders()
++    public function getRequestHeaders(): ParameterBag
+     {
+         return new ParameterBag($this->data['request_headers']->getValue());
+@@ -231,5 +231,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getRequestServer(bool $raw = false)
++    public function getRequestServer(bool $raw = false): ParameterBag
+     {
+         return new ParameterBag($this->data['request_server']->getValue($raw));
+@@ -239,5 +239,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getRequestCookies(bool $raw = false)
++    public function getRequestCookies(bool $raw = false): ParameterBag
+     {
+         return new ParameterBag($this->data['request_cookies']->getValue($raw));
+@@ -247,5 +247,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getRequestAttributes()
++    public function getRequestAttributes(): ParameterBag
+     {
+         return new ParameterBag($this->data['request_attributes']->getValue());
+@@ -255,5 +255,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getResponseHeaders()
++    public function getResponseHeaders(): ParameterBag
+     {
+         return new ParameterBag($this->data['response_headers']->getValue());
+@@ -263,5 +263,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getResponseCookies()
++    public function getResponseCookies(): ParameterBag
+     {
+         return new ParameterBag($this->data['response_cookies']->getValue());
+@@ -301,5 +301,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return bool
+      */
+-    public function isJsonRequest()
++    public function isJsonRequest(): bool
+     {
+         return 1 === preg_match('{^application/(?:\w+\++)*json$}i', $this->data['request_headers']['content-type']);
+@@ -309,5 +309,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return string|null
+      */
+-    public function getPrettyJson()
++    public function getPrettyJson(): ?string
+     {
+         $decoded = json_decode($this->getContent());
+@@ -344,5 +344,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
+      * @return ParameterBag
+      */
+-    public function getDotenvVars()
++    public function getDotenvVars(): ParameterBag
+     {
+         return new ParameterBag($this->data['dotenv_vars']->getValue());
+diff --git a/src/Symfony/Component/HttpKernel/DataCollector/RouterDataCollector.php b/src/Symfony/Component/HttpKernel/DataCollector/RouterDataCollector.php
+index d894b7e74c..f0d6d32f0a 100644
+--- a/src/Symfony/Component/HttpKernel/DataCollector/RouterDataCollector.php
++++ b/src/Symfony/Component/HttpKernel/DataCollector/RouterDataCollector.php
+@@ -63,5 +63,5 @@ class RouterDataCollector extends DataCollector
+      * @return string
+      */
+-    protected function guessRoute(Request $request, string|object|array $controller)
++    protected function guessRoute(Request $request, string|object|array $controller): string
+     {
+         return 'n/a';
+diff --git a/src/Symfony/Component/HttpKernel/Fragment/InlineFragmentRenderer.php b/src/Symfony/Component/HttpKernel/Fragment/InlineFragmentRenderer.php
+index 3650d1700d..055b57fc77 100644
+--- a/src/Symfony/Component/HttpKernel/Fragment/InlineFragmentRenderer.php
++++ b/src/Symfony/Component/HttpKernel/Fragment/InlineFragmentRenderer.php
+@@ -107,5 +107,5 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
+      * @return Request
+      */
+-    protected function createSubRequest(string $uri, Request $request)
++    protected function createSubRequest(string $uri, Request $request): Request
+     {
+         $cookies = $request->cookies->all();
 diff --git a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
-index bf2d6efb63..ae9c354971 100644
+index f77a99e0ff..a6829efa75 100644
 --- a/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 +++ b/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php
 @@ -457,5 +457,5 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
@@ -594,8 +1414,19 @@ index bf2d6efb63..ae9c354971 100644
 +    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
      {
          $this->surrogate?->addSurrogateCapability($request);
+diff --git a/src/Symfony/Component/HttpKernel/HttpCache/Store.php b/src/Symfony/Component/HttpKernel/HttpCache/Store.php
+index facd20b942..c7a3fefc59 100644
+--- a/src/Symfony/Component/HttpKernel/HttpCache/Store.php
++++ b/src/Symfony/Component/HttpKernel/HttpCache/Store.php
+@@ -417,5 +417,5 @@ class Store implements StoreInterface
+      * @return string
+      */
+-    public function getPath(string $key)
++    public function getPath(string $key): string
+     {
+         return $this->root.\DIRECTORY_SEPARATOR.substr($key, 0, 2).\DIRECTORY_SEPARATOR.substr($key, 2, 2).\DIRECTORY_SEPARATOR.substr($key, 4, 2).\DIRECTORY_SEPARATOR.substr($key, 6);
 diff --git a/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php b/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
-index 0938617169..f4b9c76218 100644
+index 3077ed0398..8b971d9196 100644
 --- a/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
 +++ b/src/Symfony/Component/HttpKernel/HttpKernelBrowser.php
 @@ -59,5 +59,5 @@ class HttpKernelBrowser extends AbstractBrowser
@@ -612,6 +1443,13 @@ index 0938617169..f4b9c76218 100644
 +    protected function getScript(object $request): string
      {
          $kernel = var_export(serialize($this->kernel), true);
+@@ -114,5 +114,5 @@ EOF;
+      * @return string
+      */
+-    protected function getHandleScript()
++    protected function getHandleScript(): string
+     {
+         return <<<'EOF'
 diff --git a/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php b/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php
 index 84452ae71f..f70165d25f 100644
 --- a/src/Symfony/Component/HttpKernel/Log/DebugLoggerInterface.php
@@ -630,6 +1468,115 @@ index 84452ae71f..f70165d25f 100644
 +    public function countErrors(Request $request = null): int;
  
      /**
+diff --git a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php b/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
+index 3add13d5e9..12880be7b0 100644
+--- a/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
++++ b/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php
+@@ -246,5 +246,5 @@ class FileProfilerStorage implements ProfilerStorageInterface
+      * @return Profile
+      */
+-    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
++    protected function createProfileFromData(string $token, array $data, Profile $parent = null): Profile
+     {
+         $profile = new Profile($token);
+diff --git a/src/Symfony/Component/Ldap/Adapter/EntryManagerInterface.php b/src/Symfony/Component/Ldap/Adapter/EntryManagerInterface.php
+index 9b356b10b2..68942b21dc 100644
+--- a/src/Symfony/Component/Ldap/Adapter/EntryManagerInterface.php
++++ b/src/Symfony/Component/Ldap/Adapter/EntryManagerInterface.php
+@@ -31,5 +31,5 @@ interface EntryManagerInterface
+      * @throws LdapException
+      */
+-    public function add(Entry $entry);
++    public function add(Entry $entry): static;
+ 
+     /**
+@@ -41,5 +41,5 @@ interface EntryManagerInterface
+      * @throws LdapException
+      */
+-    public function update(Entry $entry);
++    public function update(Entry $entry): static;
+ 
+     /**
+@@ -51,5 +51,5 @@ interface EntryManagerInterface
+      * @throws LdapException
+      */
+-    public function move(Entry $entry, string $newParent);
++    public function move(Entry $entry, string $newParent): static;
+ 
+     /**
+@@ -61,5 +61,5 @@ interface EntryManagerInterface
+      * @throws LdapException
+      */
+-    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true);
++    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true): static;
+ 
+     /**
+@@ -71,4 +71,4 @@ interface EntryManagerInterface
+      * @throws LdapException
+      */
+-    public function remove(Entry $entry);
++    public function remove(Entry $entry): static;
+ }
+diff --git a/src/Symfony/Component/Ldap/Adapter/ExtLdap/EntryManager.php b/src/Symfony/Component/Ldap/Adapter/ExtLdap/EntryManager.php
+index e919a1152a..7fa97f3be1 100644
+--- a/src/Symfony/Component/Ldap/Adapter/ExtLdap/EntryManager.php
++++ b/src/Symfony/Component/Ldap/Adapter/ExtLdap/EntryManager.php
+@@ -35,5 +35,5 @@ class EntryManager implements EntryManagerInterface
+      * @return $this
+      */
+-    public function add(Entry $entry)
++    public function add(Entry $entry): static
+     {
+         $con = $this->getConnectionResource();
+@@ -49,5 +49,5 @@ class EntryManager implements EntryManagerInterface
+      * @return $this
+      */
+-    public function update(Entry $entry)
++    public function update(Entry $entry): static
+     {
+         $con = $this->getConnectionResource();
+@@ -63,5 +63,5 @@ class EntryManager implements EntryManagerInterface
+      * @return $this
+      */
+-    public function remove(Entry $entry)
++    public function remove(Entry $entry): static
+     {
+         $con = $this->getConnectionResource();
+@@ -82,5 +82,5 @@ class EntryManager implements EntryManagerInterface
+      * @throws LdapException
+      */
+-    public function addAttributeValues(Entry $entry, string $attribute, array $values)
++    public function addAttributeValues(Entry $entry, string $attribute, array $values): static
+     {
+         $con = $this->getConnectionResource();
+@@ -101,5 +101,5 @@ class EntryManager implements EntryManagerInterface
+      * @throws LdapException
+      */
+-    public function removeAttributeValues(Entry $entry, string $attribute, array $values)
++    public function removeAttributeValues(Entry $entry, string $attribute, array $values): static
+     {
+         $con = $this->getConnectionResource();
+@@ -112,5 +112,5 @@ class EntryManager implements EntryManagerInterface
+     }
+ 
+-    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true)
++    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true): static
+     {
+         $con = $this->getConnectionResource();
+@@ -131,5 +131,5 @@ class EntryManager implements EntryManagerInterface
+      * @throws LdapException     if an error is thrown during the rename operation
+      */
+-    public function move(Entry $entry, string $newParent)
++    public function move(Entry $entry, string $newParent): static
+     {
+         $con = $this->getConnectionResource();
+@@ -165,5 +165,5 @@ class EntryManager implements EntryManagerInterface
+      * @throws UpdateOperationException in case of an error
+      */
+-    public function applyOperations(string $dn, iterable $operations)
++    public function applyOperations(string $dn, iterable $operations): static
+     {
+         $operationsMapped = [];
 diff --git a/src/Symfony/Component/Lock/LockFactory.php b/src/Symfony/Component/Lock/LockFactory.php
 index 125b6eae50..ac327e8981 100644
 --- a/src/Symfony/Component/Lock/LockFactory.php
@@ -648,6 +1595,17 @@ index 125b6eae50..ac327e8981 100644
 +    public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): SharedLockInterface
      {
          $lock = new Lock($key, $this->store, $ttl, $autoRelease);
+diff --git a/src/Symfony/Component/Lock/Store/MemcachedStore.php b/src/Symfony/Component/Lock/Store/MemcachedStore.php
+index c9b0fbde05..f9b08d008b 100644
+--- a/src/Symfony/Component/Lock/Store/MemcachedStore.php
++++ b/src/Symfony/Component/Lock/Store/MemcachedStore.php
+@@ -34,5 +34,5 @@ class MemcachedStore implements PersistingStoreInterface
+      * @return bool
+      */
+-    public static function isSupported()
++    public static function isSupported(): bool
+     {
+         return \extension_loaded('memcached');
 diff --git a/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSqsTransport.php b/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSqsTransport.php
 index c8ba7f9c73..f36408603d 100644
 --- a/src/Symfony/Component/Messenger/Bridge/AmazonSqs/Transport/AmazonSqsTransport.php
@@ -659,8 +1617,30 @@ index c8ba7f9c73..f36408603d 100644
 +    private function getReceiver(): MessageCountAwareInterface&ReceiverInterface
      {
          return $this->receiver ??= new AmazonSqsReceiver($this->connection, $this->serializer);
+diff --git a/src/Symfony/Component/Messenger/Exception/ValidationFailedException.php b/src/Symfony/Component/Messenger/Exception/ValidationFailedException.php
+index 0e91372f62..20a62a7e74 100644
+--- a/src/Symfony/Component/Messenger/Exception/ValidationFailedException.php
++++ b/src/Symfony/Component/Messenger/Exception/ValidationFailedException.php
+@@ -33,5 +33,5 @@ class ValidationFailedException extends RuntimeException
+      * @return object
+      */
+-    public function getViolatingMessage()
++    public function getViolatingMessage(): object
+     {
+         return $this->violatingMessage;
+diff --git a/src/Symfony/Component/Messenger/Stamp/HandlerArgumentsStamp.php b/src/Symfony/Component/Messenger/Stamp/HandlerArgumentsStamp.php
+index 3dcdacf88f..f12f6c9437 100644
+--- a/src/Symfony/Component/Messenger/Stamp/HandlerArgumentsStamp.php
++++ b/src/Symfony/Component/Messenger/Stamp/HandlerArgumentsStamp.php
+@@ -25,5 +25,5 @@ final class HandlerArgumentsStamp implements NonSendableStampInterface
+      * @return array
+      */
+-    public function getAdditionalArguments()
++    public function getAdditionalArguments(): array
+     {
+         return $this->additionalArguments;
 diff --git a/src/Symfony/Component/OptionsResolver/OptionsResolver.php b/src/Symfony/Component/OptionsResolver/OptionsResolver.php
-index e22265f1dc..af4856ca05 100644
+index b429812176..21aec2b9e8 100644
 --- a/src/Symfony/Component/OptionsResolver/OptionsResolver.php
 +++ b/src/Symfony/Component/OptionsResolver/OptionsResolver.php
 @@ -486,5 +486,5 @@ class OptionsResolver implements Options
@@ -698,6 +1678,35 @@ index e22265f1dc..af4856ca05 100644
 +    public function addAllowedTypes(string $option, string|array $allowedTypes): static
      {
          if ($this->locked) {
+diff --git a/src/Symfony/Component/Process/Exception/ProcessTimedOutException.php b/src/Symfony/Component/Process/Exception/ProcessTimedOutException.php
+index 27ce7fd430..708e611502 100644
+--- a/src/Symfony/Component/Process/Exception/ProcessTimedOutException.php
++++ b/src/Symfony/Component/Process/Exception/ProcessTimedOutException.php
+@@ -47,5 +47,5 @@ class ProcessTimedOutException extends RuntimeException
+      * @return bool
+      */
+-    public function isGeneralTimeout()
++    public function isGeneralTimeout(): bool
+     {
+         return self::TYPE_GENERAL === $this->timeoutType;
+@@ -55,5 +55,5 @@ class ProcessTimedOutException extends RuntimeException
+      * @return bool
+      */
+-    public function isIdleTimeout()
++    public function isIdleTimeout(): bool
+     {
+         return self::TYPE_IDLE === $this->timeoutType;
+diff --git a/src/Symfony/Component/Process/InputStream.php b/src/Symfony/Component/Process/InputStream.php
+index d703660868..c3e41ca00c 100644
+--- a/src/Symfony/Component/Process/InputStream.php
++++ b/src/Symfony/Component/Process/InputStream.php
+@@ -66,5 +66,5 @@ class InputStream implements \IteratorAggregate
+      * @return bool
+      */
+-    public function isClosed()
++    public function isClosed(): bool
+     {
+         return !$this->open;
 diff --git a/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php b/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
 index 11f6ed405b..53e7b33451 100644
 --- a/src/Symfony/Component/PropertyAccess/PropertyPathInterface.php
@@ -780,8 +1789,75 @@ index 6da0bcb4c8..16e9765b1d 100644
 -    public function getTypes(string $class, string $property, array $context = []);
 +    public function getTypes(string $class, string $property, array $context = []): ?array;
  }
+diff --git a/src/Symfony/Component/Routing/Annotation/Route.php b/src/Symfony/Component/Routing/Annotation/Route.php
+index 974215a097..1516d9df79 100644
+--- a/src/Symfony/Component/Routing/Annotation/Route.php
++++ b/src/Symfony/Component/Routing/Annotation/Route.php
+@@ -85,5 +85,5 @@ class Route
+      * @return string|null
+      */
+-    public function getPath()
++    public function getPath(): ?string
+     {
+         return $this->path;
+@@ -108,5 +108,5 @@ class Route
+      * @return string|null
+      */
+-    public function getHost()
++    public function getHost(): ?string
+     {
+         return $this->host;
+@@ -121,5 +121,5 @@ class Route
+      * @return string|null
+      */
+-    public function getName()
++    public function getName(): ?string
+     {
+         return $this->name;
+@@ -134,5 +134,5 @@ class Route
+      * @return array
+      */
+-    public function getRequirements()
++    public function getRequirements(): array
+     {
+         return $this->requirements;
+@@ -147,5 +147,5 @@ class Route
+      * @return array
+      */
+-    public function getOptions()
++    public function getOptions(): array
+     {
+         return $this->options;
+@@ -160,5 +160,5 @@ class Route
+      * @return array
+      */
+-    public function getDefaults()
++    public function getDefaults(): array
+     {
+         return $this->defaults;
+@@ -173,5 +173,5 @@ class Route
+      * @return array
+      */
+-    public function getSchemes()
++    public function getSchemes(): array
+     {
+         return $this->schemes;
+@@ -186,5 +186,5 @@ class Route
+      * @return array
+      */
+-    public function getMethods()
++    public function getMethods(): array
+     {
+         return $this->methods;
+@@ -199,5 +199,5 @@ class Route
+      * @return string|null
+      */
+-    public function getCondition()
++    public function getCondition(): ?string
+     {
+         return $this->condition;
 diff --git a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
-index b63dc5c85e..e53bb49369 100644
+index f390b2066c..6808e48778 100644
 --- a/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 +++ b/src/Symfony/Component/Routing/Loader/AnnotationClassLoader.php
 @@ -244,5 +244,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
@@ -791,6 +1867,31 @@ index b63dc5c85e..e53bb49369 100644
 +    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
      {
          $name = str_replace('\\', '_', $class->name).'_'.$method->name;
+@@ -259,5 +259,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+      * @return array
+      */
+-    protected function getGlobals(\ReflectionClass $class)
++    protected function getGlobals(\ReflectionClass $class): array
+     {
+         $globals = $this->resetGlobals();
+@@ -344,5 +344,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
+      * @return Route
+      */
+-    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition)
++    protected function createRoute(string $path, array $defaults, array $requirements, array $options, ?string $host, array $schemes, array $methods, ?string $condition): Route
+     {
+         return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+diff --git a/src/Symfony/Component/Routing/Matcher/TraceableUrlMatcher.php b/src/Symfony/Component/Routing/Matcher/TraceableUrlMatcher.php
+index b682040b5a..b054cb2daf 100644
+--- a/src/Symfony/Component/Routing/Matcher/TraceableUrlMatcher.php
++++ b/src/Symfony/Component/Routing/Matcher/TraceableUrlMatcher.php
+@@ -33,5 +33,5 @@ class TraceableUrlMatcher extends UrlMatcher
+      * @return array
+      */
+-    public function getTraces(string $pathinfo)
++    public function getTraces(string $pathinfo): array
+     {
+         $this->traces = [];
 diff --git a/src/Symfony/Component/Routing/Router.php b/src/Symfony/Component/Routing/Router.php
 index f7f2454062..73fbc8eb54 100644
 --- a/src/Symfony/Component/Routing/Router.php
@@ -823,6 +1924,28 @@ index 9b32fdce31..fbbd65d8b7 100644
 +    public function loadTokenBySeries(string $series): PersistentTokenInterface;
  
      /**
+diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/RoleHierarchyVoter.php b/src/Symfony/Component/Security/Core/Authorization/Voter/RoleHierarchyVoter.php
+index c8db1485e0..34bf5a5763 100644
+--- a/src/Symfony/Component/Security/Core/Authorization/Voter/RoleHierarchyVoter.php
++++ b/src/Symfony/Component/Security/Core/Authorization/Voter/RoleHierarchyVoter.php
+@@ -35,5 +35,5 @@ class RoleHierarchyVoter extends RoleVoter
+      * @return array
+      */
+-    protected function extractRoles(TokenInterface $token)
++    protected function extractRoles(TokenInterface $token): array
+     {
+         return $this->roleHierarchy->getReachableRoleNames($token->getRoleNames());
+diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/RoleVoter.php b/src/Symfony/Component/Security/Core/Authorization/Voter/RoleVoter.php
+index 70dddcfff9..15ac44eae8 100644
+--- a/src/Symfony/Component/Security/Core/Authorization/Voter/RoleVoter.php
++++ b/src/Symfony/Component/Security/Core/Authorization/Voter/RoleVoter.php
+@@ -62,5 +62,5 @@ class RoleVoter implements CacheableVoterInterface
+      * @return array
+      */
+-    protected function extractRoles(TokenInterface $token)
++    protected function extractRoles(TokenInterface $token): array
+     {
+         return $token->getRoleNames();
 diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php b/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
 index ba52c8ea65..e879a84982 100644
 --- a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
@@ -833,11 +1956,22 @@ index ba52c8ea65..e879a84982 100644
 -    public function vote(TokenInterface $token, mixed $subject, array $attributes);
 +    public function vote(TokenInterface $token, mixed $subject, array $attributes): int;
  }
+diff --git a/src/Symfony/Component/Security/Core/Event/AuthenticationEvent.php b/src/Symfony/Component/Security/Core/Event/AuthenticationEvent.php
+index 054dd95728..e6704119b2 100644
+--- a/src/Symfony/Component/Security/Core/Event/AuthenticationEvent.php
++++ b/src/Symfony/Component/Security/Core/Event/AuthenticationEvent.php
+@@ -32,5 +32,5 @@ class AuthenticationEvent extends Event
+      * @return TokenInterface
+      */
+-    public function getAuthenticationToken()
++    public function getAuthenticationToken(): TokenInterface
+     {
+         return $this->authenticationToken;
 diff --git a/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php b/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
-index 298bc78cd9..3ef4176dd8 100644
+index 69ac3d6ec4..d96c7d038d 100644
 --- a/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
 +++ b/src/Symfony/Component/Security/Core/Exception/AuthenticationException.php
-@@ -89,5 +89,5 @@ class AuthenticationException extends RuntimeException
+@@ -91,5 +91,5 @@ class AuthenticationException extends RuntimeException
       * @return string
       */
 -    public function getMessageKey()
@@ -893,6 +2027,17 @@ index 480ea8ad6b..fa43d6a6e9 100644
 -    public function getListeners(Request $request);
 +    public function getListeners(Request $request): array;
  }
+diff --git a/src/Symfony/Component/Serializer/Annotation/MaxDepth.php b/src/Symfony/Component/Serializer/Annotation/MaxDepth.php
+index 43785b292a..df3453cedb 100644
+--- a/src/Symfony/Component/Serializer/Annotation/MaxDepth.php
++++ b/src/Symfony/Component/Serializer/Annotation/MaxDepth.php
+@@ -36,5 +36,5 @@ class MaxDepth
+      * @return int
+      */
+-    public function getMaxDepth()
++    public function getMaxDepth(): int
+     {
+         return $this->maxDepth;
 diff --git a/src/Symfony/Component/Serializer/Encoder/DecoderInterface.php b/src/Symfony/Component/Serializer/Encoder/DecoderInterface.php
 index 84a84ad1f3..6f66b6d32a 100644
 --- a/src/Symfony/Component/Serializer/Encoder/DecoderInterface.php
@@ -911,7 +2056,7 @@ index 84a84ad1f3..6f66b6d32a 100644
 +    public function supportsDecoding(string $format): bool;
  }
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
-index 12c778cb80..4ad55fb3e1 100644
+index 829e178407..1ac8101771 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php
 @@ -210,5 +210,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
@@ -936,7 +2081,7 @@ index 12c778cb80..4ad55fb3e1 100644
      {
          if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
 diff --git a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
-index 7c4c5fb41b..840dd2bcdb 100644
+index e64cfc8802..112b74b07a 100644
 --- a/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 +++ b/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php
 @@ -139,10 +139,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
@@ -1046,6 +2191,17 @@ index 4c088b94f9..86107a636d 100644
 -    abstract protected function extractFromDirectory(string|array $resource);
 +    abstract protected function extractFromDirectory(string|array $resource): iterable;
  }
+diff --git a/src/Symfony/Component/Translation/Translator.php b/src/Symfony/Component/Translation/Translator.php
+index 54977283cc..ddcf594055 100644
+--- a/src/Symfony/Component/Translation/Translator.php
++++ b/src/Symfony/Component/Translation/Translator.php
+@@ -370,5 +370,5 @@ EOF
+      * @return array
+      */
+-    protected function computeFallbackLocales(string $locale)
++    protected function computeFallbackLocales(string $locale): array
+     {
+         $this->parentLocales ??= json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
 diff --git a/src/Symfony/Component/Validator/Constraint.php b/src/Symfony/Component/Validator/Constraint.php
 index ee1d68c78f..9baaabb04c 100644
 --- a/src/Symfony/Component/Validator/Constraint.php
@@ -1078,19 +2234,864 @@ index ee1d68c78f..9baaabb04c 100644
 +    public function getTargets(): string|array
      {
          return self::PROPERTY_CONSTRAINT;
+diff --git a/src/Symfony/Component/Validator/Constraints/IsbnValidator.php b/src/Symfony/Component/Validator/Constraints/IsbnValidator.php
+index da14aed66b..38a010dfcd 100644
+--- a/src/Symfony/Component/Validator/Constraints/IsbnValidator.php
++++ b/src/Symfony/Component/Validator/Constraints/IsbnValidator.php
+@@ -96,5 +96,5 @@ class IsbnValidator extends ConstraintValidator
+      * @return string|bool
+      */
+-    protected function validateIsbn10(string $isbn)
++    protected function validateIsbn10(string $isbn): string|bool
+     {
+         // Choose an algorithm so that ERROR_INVALID_CHARACTERS is preferred
+@@ -139,5 +139,5 @@ class IsbnValidator extends ConstraintValidator
+      * @return string|bool
+      */
+-    protected function validateIsbn13(string $isbn)
++    protected function validateIsbn13(string $isbn): string|bool
+     {
+         // Error priority:
+diff --git a/src/Symfony/Component/Validator/Exception/InvalidOptionsException.php b/src/Symfony/Component/Validator/Exception/InvalidOptionsException.php
+index 8a4fba25d0..6165250ee3 100644
+--- a/src/Symfony/Component/Validator/Exception/InvalidOptionsException.php
++++ b/src/Symfony/Component/Validator/Exception/InvalidOptionsException.php
+@@ -26,5 +26,5 @@ class InvalidOptionsException extends ValidatorException
+      * @return array
+      */
+-    public function getOptions()
++    public function getOptions(): array
+     {
+         return $this->options;
+diff --git a/src/Symfony/Component/Validator/Exception/MissingOptionsException.php b/src/Symfony/Component/Validator/Exception/MissingOptionsException.php
+index a7eda1457d..28630f205f 100644
+--- a/src/Symfony/Component/Validator/Exception/MissingOptionsException.php
++++ b/src/Symfony/Component/Validator/Exception/MissingOptionsException.php
+@@ -26,5 +26,5 @@ class MissingOptionsException extends ValidatorException
+      * @return array
+      */
+-    public function getOptions()
++    public function getOptions(): array
+     {
+         return $this->options;
+diff --git a/src/Symfony/Component/Validator/Mapping/MemberMetadata.php b/src/Symfony/Component/Validator/Mapping/MemberMetadata.php
+index 1749dd78d2..250b46bdd3 100644
+--- a/src/Symfony/Component/Validator/Mapping/MemberMetadata.php
++++ b/src/Symfony/Component/Validator/Mapping/MemberMetadata.php
+@@ -97,5 +97,5 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
+      * @return string
+      */
+-    public function getClassName()
++    public function getClassName(): string
+     {
+         return $this->class;
 diff --git a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-index d9bb9bd390..b981038042 100644
+index edac8395df..f3998dc4dd 100644
 --- a/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
 +++ b/src/Symfony/Component/Validator/Test/ConstraintValidatorTestCase.php
-@@ -301,5 +301,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
+@@ -295,5 +295,5 @@ abstract class ConstraintValidatorTestCase extends TestCase
       * @psalm-return T
       */
 -    abstract protected function createValidator();
 +    abstract protected function createValidator(): ConstraintValidatorInterface;
  }
  
+diff --git a/src/Symfony/Component/VarDumper/Caster/AmqpCaster.php b/src/Symfony/Component/VarDumper/Caster/AmqpCaster.php
+index 22026f46a7..52b1ef696b 100644
+--- a/src/Symfony/Component/VarDumper/Caster/AmqpCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/AmqpCaster.php
+@@ -50,5 +50,5 @@ class AmqpCaster
+      * @return array
+      */
+-    public static function castConnection(\AMQPConnection $c, array $a, Stub $stub, bool $isNested)
++    public static function castConnection(\AMQPConnection $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -86,5 +86,5 @@ class AmqpCaster
+      * @return array
+      */
+-    public static function castChannel(\AMQPChannel $c, array $a, Stub $stub, bool $isNested)
++    public static function castChannel(\AMQPChannel $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -112,5 +112,5 @@ class AmqpCaster
+      * @return array
+      */
+-    public static function castQueue(\AMQPQueue $c, array $a, Stub $stub, bool $isNested)
++    public static function castQueue(\AMQPQueue $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -138,5 +138,5 @@ class AmqpCaster
+      * @return array
+      */
+-    public static function castExchange(\AMQPExchange $c, array $a, Stub $stub, bool $isNested)
++    public static function castExchange(\AMQPExchange $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -169,5 +169,5 @@ class AmqpCaster
+      * @return array
+      */
+-    public static function castEnvelope(\AMQPEnvelope $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castEnvelope(\AMQPEnvelope $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+diff --git a/src/Symfony/Component/VarDumper/Caster/DOMCaster.php b/src/Symfony/Component/VarDumper/Caster/DOMCaster.php
+index d2d3fc1294..c28829f4e2 100644
+--- a/src/Symfony/Component/VarDumper/Caster/DOMCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/DOMCaster.php
+@@ -67,5 +67,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castException(\DOMException $e, array $a, Stub $stub, bool $isNested)
++    public static function castException(\DOMException $e, array $a, Stub $stub, bool $isNested): array
+     {
+         $k = Caster::PREFIX_PROTECTED.'code';
+@@ -80,5 +80,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castLength($dom, array $a, Stub $stub, bool $isNested)
++    public static function castLength($dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -92,5 +92,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castImplementation(\DOMImplementation $dom, array $a, Stub $stub, bool $isNested)
++    public static function castImplementation(\DOMImplementation $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -105,5 +105,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castNode(\DOMNode $dom, array $a, Stub $stub, bool $isNested)
++    public static function castNode(\DOMNode $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -132,5 +132,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castNameSpaceNode(\DOMNameSpaceNode $dom, array $a, Stub $stub, bool $isNested)
++    public static function castNameSpaceNode(\DOMNameSpaceNode $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -151,5 +151,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castDocument(\DOMDocument $dom, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castDocument(\DOMDocument $dom, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $a += [
+@@ -188,5 +188,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castCharacterData(\DOMCharacterData $dom, array $a, Stub $stub, bool $isNested)
++    public static function castCharacterData(\DOMCharacterData $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -201,5 +201,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castAttr(\DOMAttr $dom, array $a, Stub $stub, bool $isNested)
++    public static function castAttr(\DOMAttr $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -217,5 +217,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castElement(\DOMElement $dom, array $a, Stub $stub, bool $isNested)
++    public static function castElement(\DOMElement $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -230,5 +230,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castText(\DOMText $dom, array $a, Stub $stub, bool $isNested)
++    public static function castText(\DOMText $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -242,5 +242,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castDocumentType(\DOMDocumentType $dom, array $a, Stub $stub, bool $isNested)
++    public static function castDocumentType(\DOMDocumentType $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -259,5 +259,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castNotation(\DOMNotation $dom, array $a, Stub $stub, bool $isNested)
++    public static function castNotation(\DOMNotation $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -272,5 +272,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castEntity(\DOMEntity $dom, array $a, Stub $stub, bool $isNested)
++    public static function castEntity(\DOMEntity $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -289,5 +289,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castProcessingInstruction(\DOMProcessingInstruction $dom, array $a, Stub $stub, bool $isNested)
++    public static function castProcessingInstruction(\DOMProcessingInstruction $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -302,5 +302,5 @@ class DOMCaster
+      * @return array
+      */
+-    public static function castXPath(\DOMXPath $dom, array $a, Stub $stub, bool $isNested)
++    public static function castXPath(\DOMXPath $dom, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+diff --git a/src/Symfony/Component/VarDumper/Caster/DateCaster.php b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
+index 1394a78132..ee8471c88f 100644
+--- a/src/Symfony/Component/VarDumper/Caster/DateCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
+@@ -28,5 +28,5 @@ class DateCaster
+      * @return array
+      */
+-    public static function castDateTime(\DateTimeInterface $d, array $a, Stub $stub, bool $isNested, int $filter)
++    public static function castDateTime(\DateTimeInterface $d, array $a, Stub $stub, bool $isNested, int $filter): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -54,5 +54,5 @@ class DateCaster
+      * @return array
+      */
+-    public static function castInterval(\DateInterval $interval, array $a, Stub $stub, bool $isNested, int $filter)
++    public static function castInterval(\DateInterval $interval, array $a, Stub $stub, bool $isNested, int $filter): array
+     {
+         $now = new \DateTimeImmutable('@0', new \DateTimeZone('UTC'));
+@@ -86,5 +86,5 @@ class DateCaster
+      * @return array
+      */
+-    public static function castTimeZone(\DateTimeZone $timeZone, array $a, Stub $stub, bool $isNested, int $filter)
++    public static function castTimeZone(\DateTimeZone $timeZone, array $a, Stub $stub, bool $isNested, int $filter): array
+     {
+         $location = $timeZone->getLocation();
+@@ -100,5 +100,5 @@ class DateCaster
+      * @return array
+      */
+-    public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, bool $isNested, int $filter)
++    public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, bool $isNested, int $filter): array
+     {
+         $dates = [];
+diff --git a/src/Symfony/Component/VarDumper/Caster/DoctrineCaster.php b/src/Symfony/Component/VarDumper/Caster/DoctrineCaster.php
+index 3120c3d919..0ac928f2ca 100644
+--- a/src/Symfony/Component/VarDumper/Caster/DoctrineCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/DoctrineCaster.php
+@@ -29,5 +29,5 @@ class DoctrineCaster
+      * @return array
+      */
+-    public static function castCommonProxy(CommonProxy $proxy, array $a, Stub $stub, bool $isNested)
++    public static function castCommonProxy(CommonProxy $proxy, array $a, Stub $stub, bool $isNested): array
+     {
+         foreach (['__cloner__', '__initializer__'] as $k) {
+@@ -44,5 +44,5 @@ class DoctrineCaster
+      * @return array
+      */
+-    public static function castOrmProxy(OrmProxy $proxy, array $a, Stub $stub, bool $isNested)
++    public static function castOrmProxy(OrmProxy $proxy, array $a, Stub $stub, bool $isNested): array
+     {
+         foreach (['_entityPersister', '_identifier'] as $k) {
+@@ -59,5 +59,5 @@ class DoctrineCaster
+      * @return array
+      */
+-    public static function castPersistentCollection(PersistentCollection $coll, array $a, Stub $stub, bool $isNested)
++    public static function castPersistentCollection(PersistentCollection $coll, array $a, Stub $stub, bool $isNested): array
+     {
+         foreach (['snapshot', 'association', 'typeClass'] as $k) {
+diff --git a/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php b/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
+index c58e74a50a..dfd381cccf 100644
+--- a/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/ExceptionCaster.php
+@@ -50,5 +50,5 @@ class ExceptionCaster
+      * @return array
+      */
+-    public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         return self::filterExceptionArray($stub->class, $a, "\0Error\0", $filter);
+@@ -58,5 +58,5 @@ class ExceptionCaster
+      * @return array
+      */
+-    public static function castException(\Exception $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castException(\Exception $e, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         return self::filterExceptionArray($stub->class, $a, "\0Exception\0", $filter);
+@@ -66,5 +66,5 @@ class ExceptionCaster
+      * @return array
+      */
+-    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, bool $isNested)
++    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, bool $isNested): array
+     {
+         if (isset($a[$s = Caster::PREFIX_PROTECTED.'severity'], self::$errorTypes[$a[$s]])) {
+@@ -78,5 +78,5 @@ class ExceptionCaster
+      * @return array
+      */
+-    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, bool $isNested)
++    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, bool $isNested): array
+     {
+         $trace = Caster::PREFIX_VIRTUAL.'trace';
+@@ -99,5 +99,5 @@ class ExceptionCaster
+      * @return array
+      */
+-    public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, bool $isNested)
++    public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, bool $isNested): array
+     {
+         $sPrefix = "\0".SilencedErrorContext::class."\0";
+@@ -129,5 +129,5 @@ class ExceptionCaster
+      * @return array
+      */
+-    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, bool $isNested)
++    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, bool $isNested): array
+     {
+         if (!$isNested) {
+@@ -206,5 +206,5 @@ class ExceptionCaster
+      * @return array
+      */
+-    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, bool $isNested)
++    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, bool $isNested): array
+     {
+         if (!$isNested) {
+diff --git a/src/Symfony/Component/VarDumper/Caster/FiberCaster.php b/src/Symfony/Component/VarDumper/Caster/FiberCaster.php
+index b797dbd634..ce8deb48d5 100644
+--- a/src/Symfony/Component/VarDumper/Caster/FiberCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/FiberCaster.php
+@@ -24,5 +24,5 @@ final class FiberCaster
+      * @return array
+      */
+-    public static function castFiber(\Fiber $fiber, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castFiber(\Fiber $fiber, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+diff --git a/src/Symfony/Component/VarDumper/Caster/IntlCaster.php b/src/Symfony/Component/VarDumper/Caster/IntlCaster.php
+index a4590f4b5a..d2a22bfe38 100644
+--- a/src/Symfony/Component/VarDumper/Caster/IntlCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/IntlCaster.php
+@@ -25,5 +25,5 @@ class IntlCaster
+      * @return array
+      */
+-    public static function castMessageFormatter(\MessageFormatter $c, array $a, Stub $stub, bool $isNested)
++    public static function castMessageFormatter(\MessageFormatter $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -38,5 +38,5 @@ class IntlCaster
+      * @return array
+      */
+-    public static function castNumberFormatter(\NumberFormatter $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castNumberFormatter(\NumberFormatter $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $a += [
+@@ -118,5 +118,5 @@ class IntlCaster
+      * @return array
+      */
+-    public static function castIntlTimeZone(\IntlTimeZone $c, array $a, Stub $stub, bool $isNested)
++    public static function castIntlTimeZone(\IntlTimeZone $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -138,5 +138,5 @@ class IntlCaster
+      * @return array
+      */
+-    public static function castIntlCalendar(\IntlCalendar $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castIntlCalendar(\IntlCalendar $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $a += [
+@@ -158,5 +158,5 @@ class IntlCaster
+      * @return array
+      */
+-    public static function castIntlDateFormatter(\IntlDateFormatter $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castIntlDateFormatter(\IntlDateFormatter $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $a += [
+diff --git a/src/Symfony/Component/VarDumper/Caster/MemcachedCaster.php b/src/Symfony/Component/VarDumper/Caster/MemcachedCaster.php
+index 2f161e8cb3..cc99a62e95 100644
+--- a/src/Symfony/Component/VarDumper/Caster/MemcachedCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/MemcachedCaster.php
+@@ -27,5 +27,5 @@ class MemcachedCaster
+      * @return array
+      */
+-    public static function castMemcached(\Memcached $c, array $a, Stub $stub, bool $isNested)
++    public static function castMemcached(\Memcached $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+diff --git a/src/Symfony/Component/VarDumper/Caster/PdoCaster.php b/src/Symfony/Component/VarDumper/Caster/PdoCaster.php
+index d68eae2166..fab45ad4d8 100644
+--- a/src/Symfony/Component/VarDumper/Caster/PdoCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/PdoCaster.php
+@@ -63,5 +63,5 @@ class PdoCaster
+      * @return array
+      */
+-    public static function castPdo(\PDO $c, array $a, Stub $stub, bool $isNested)
++    public static function castPdo(\PDO $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $attr = [];
+@@ -115,5 +115,5 @@ class PdoCaster
+      * @return array
+      */
+-    public static function castPdoStatement(\PDOStatement $c, array $a, Stub $stub, bool $isNested)
++    public static function castPdoStatement(\PDOStatement $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+diff --git a/src/Symfony/Component/VarDumper/Caster/PgSqlCaster.php b/src/Symfony/Component/VarDumper/Caster/PgSqlCaster.php
+index 0d8b3d919b..0e5627631d 100644
+--- a/src/Symfony/Component/VarDumper/Caster/PgSqlCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/PgSqlCaster.php
+@@ -73,5 +73,5 @@ class PgSqlCaster
+      * @return array
+      */
+-    public static function castLargeObject($lo, array $a, Stub $stub, bool $isNested)
++    public static function castLargeObject($lo, array $a, Stub $stub, bool $isNested): array
+     {
+         $a['seek position'] = pg_lo_tell($lo);
+@@ -83,5 +83,5 @@ class PgSqlCaster
+      * @return array
+      */
+-    public static function castLink($link, array $a, Stub $stub, bool $isNested)
++    public static function castLink($link, array $a, Stub $stub, bool $isNested): array
+     {
+         $a['status'] = pg_connection_status($link);
+@@ -118,5 +118,5 @@ class PgSqlCaster
+      * @return array
+      */
+-    public static function castResult($result, array $a, Stub $stub, bool $isNested)
++    public static function castResult($result, array $a, Stub $stub, bool $isNested): array
+     {
+         $a['num rows'] = pg_num_rows($result);
+diff --git a/src/Symfony/Component/VarDumper/Caster/ProxyManagerCaster.php b/src/Symfony/Component/VarDumper/Caster/ProxyManagerCaster.php
+index eb6c88db6a..df608c2714 100644
+--- a/src/Symfony/Component/VarDumper/Caster/ProxyManagerCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/ProxyManagerCaster.php
+@@ -25,5 +25,5 @@ class ProxyManagerCaster
+      * @return array
+      */
+-    public static function castProxy(ProxyInterface $c, array $a, Stub $stub, bool $isNested)
++    public static function castProxy(ProxyInterface $c, array $a, Stub $stub, bool $isNested): array
+     {
+         if ($parent = get_parent_class($c)) {
+diff --git a/src/Symfony/Component/VarDumper/Caster/RdKafkaCaster.php b/src/Symfony/Component/VarDumper/Caster/RdKafkaCaster.php
+index 9e91592bd2..94cda7358f 100644
+--- a/src/Symfony/Component/VarDumper/Caster/RdKafkaCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/RdKafkaCaster.php
+@@ -55,5 +55,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castTopic(Topic $c, array $a, Stub $stub, bool $isNested)
++    public static function castTopic(Topic $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -69,5 +69,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castTopicPartition(TopicPartition $c, array $a)
++    public static function castTopicPartition(TopicPartition $c, array $a): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -85,5 +85,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castMessage(Message $c, array $a, Stub $stub, bool $isNested)
++    public static function castMessage(Message $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -99,5 +99,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castConf(Conf $c, array $a, Stub $stub, bool $isNested)
++    public static function castConf(Conf $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -113,5 +113,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castTopicConf(TopicConf $c, array $a, Stub $stub, bool $isNested)
++    public static function castTopicConf(TopicConf $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -140,5 +140,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castCollectionMetadata(CollectionMetadata $c, array $a, Stub $stub, bool $isNested)
++    public static function castCollectionMetadata(CollectionMetadata $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += iterator_to_array($c);
+@@ -150,5 +150,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castTopicMetadata(TopicMetadata $c, array $a, Stub $stub, bool $isNested)
++    public static function castTopicMetadata(TopicMetadata $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -165,5 +165,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castPartitionMetadata(PartitionMetadata $c, array $a, Stub $stub, bool $isNested)
++    public static function castPartitionMetadata(PartitionMetadata $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -181,5 +181,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    public static function castBrokerMetadata(BrokerMetadata $c, array $a, Stub $stub, bool $isNested)
++    public static function castBrokerMetadata(BrokerMetadata $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -197,5 +197,5 @@ class RdKafkaCaster
+      * @return array
+      */
+-    private static function extractMetadata(KafkaConsumer|\RdKafka $c)
++    private static function extractMetadata(KafkaConsumer|\RdKafka $c): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+diff --git a/src/Symfony/Component/VarDumper/Caster/RedisCaster.php b/src/Symfony/Component/VarDumper/Caster/RedisCaster.php
+index 6ff046754d..2b9382f1a7 100644
+--- a/src/Symfony/Component/VarDumper/Caster/RedisCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/RedisCaster.php
+@@ -51,5 +51,5 @@ class RedisCaster
+      * @return array
+      */
+-    public static function castRedis(\Redis|Relay $c, array $a, Stub $stub, bool $isNested)
++    public static function castRedis(\Redis|Relay $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -80,5 +80,5 @@ class RedisCaster
+      * @return array
+      */
+-    public static function castRedisArray(\RedisArray $c, array $a, Stub $stub, bool $isNested)
++    public static function castRedisArray(\RedisArray $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -95,5 +95,5 @@ class RedisCaster
+      * @return array
+      */
+-    public static function castRedisCluster(\RedisCluster $c, array $a, Stub $stub, bool $isNested)
++    public static function castRedisCluster(\RedisCluster $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+diff --git a/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php b/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php
+index 0569278cff..7314dc2825 100644
+--- a/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/ReflectionCaster.php
+@@ -39,5 +39,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castClosure(\Closure $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castClosure(\Closure $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -78,5 +78,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function unsetClosureFileInfo(\Closure $c, array $a)
++    public static function unsetClosureFileInfo(\Closure $c, array $a): array
+     {
+         unset($a[Caster::PREFIX_VIRTUAL.'file'], $a[Caster::PREFIX_VIRTUAL.'line']);
+@@ -102,5 +102,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castType(\ReflectionType $c, array $a, Stub $stub, bool $isNested)
++    public static function castType(\ReflectionType $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -127,5 +127,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castAttribute(\ReflectionAttribute $c, array $a, Stub $stub, bool $isNested)
++    public static function castAttribute(\ReflectionAttribute $c, array $a, Stub $stub, bool $isNested): array
+     {
+         self::addMap($a, $c, [
+@@ -140,5 +140,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castReflectionGenerator(\ReflectionGenerator $c, array $a, Stub $stub, bool $isNested)
++    public static function castReflectionGenerator(\ReflectionGenerator $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -178,5 +178,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castClass(\ReflectionClass $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castClass(\ReflectionClass $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -212,5 +212,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castFunctionAbstract(\ReflectionFunctionAbstract $c, array $a, Stub $stub, bool $isNested, int $filter = 0)
++    public static function castFunctionAbstract(\ReflectionFunctionAbstract $c, array $a, Stub $stub, bool $isNested, int $filter = 0): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -273,5 +273,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castClassConstant(\ReflectionClassConstant $c, array $a, Stub $stub, bool $isNested)
++    public static function castClassConstant(\ReflectionClassConstant $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a[Caster::PREFIX_VIRTUAL.'modifiers'] = implode(' ', \Reflection::getModifierNames($c->getModifiers()));
+@@ -286,5 +286,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castMethod(\ReflectionMethod $c, array $a, Stub $stub, bool $isNested)
++    public static function castMethod(\ReflectionMethod $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a[Caster::PREFIX_VIRTUAL.'modifiers'] = implode(' ', \Reflection::getModifierNames($c->getModifiers()));
+@@ -296,5 +296,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castParameter(\ReflectionParameter $c, array $a, Stub $stub, bool $isNested)
++    public static function castParameter(\ReflectionParameter $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -339,5 +339,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castProperty(\ReflectionProperty $c, array $a, Stub $stub, bool $isNested)
++    public static function castProperty(\ReflectionProperty $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a[Caster::PREFIX_VIRTUAL.'modifiers'] = implode(' ', \Reflection::getModifierNames($c->getModifiers()));
+@@ -352,5 +352,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castReference(\ReflectionReference $c, array $a, Stub $stub, bool $isNested)
++    public static function castReference(\ReflectionReference $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a[Caster::PREFIX_VIRTUAL.'id'] = $c->getId();
+@@ -362,5 +362,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castExtension(\ReflectionExtension $c, array $a, Stub $stub, bool $isNested)
++    public static function castExtension(\ReflectionExtension $c, array $a, Stub $stub, bool $isNested): array
+     {
+         self::addMap($a, $c, [
+@@ -381,5 +381,5 @@ class ReflectionCaster
+      * @return array
+      */
+-    public static function castZendExtension(\ReflectionZendExtension $c, array $a, Stub $stub, bool $isNested)
++    public static function castZendExtension(\ReflectionZendExtension $c, array $a, Stub $stub, bool $isNested): array
+     {
+         self::addMap($a, $c, [
+@@ -396,5 +396,5 @@ class ReflectionCaster
+      * @return string
+      */
+-    public static function getSignature(array $a)
++    public static function getSignature(array $a): string
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+diff --git a/src/Symfony/Component/VarDumper/Caster/ResourceCaster.php b/src/Symfony/Component/VarDumper/Caster/ResourceCaster.php
+index f8c5344617..adf3cf07c2 100644
+--- a/src/Symfony/Component/VarDumper/Caster/ResourceCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/ResourceCaster.php
+@@ -31,5 +31,5 @@ class ResourceCaster
+      * @return array
+      */
+-    public static function castDba($dba, array $a, Stub $stub, bool $isNested)
++    public static function castDba($dba, array $a, Stub $stub, bool $isNested): array
+     {
+         $list = dba_list();
+@@ -42,5 +42,5 @@ class ResourceCaster
+      * @return array
+      */
+-    public static function castProcess($process, array $a, Stub $stub, bool $isNested)
++    public static function castProcess($process, array $a, Stub $stub, bool $isNested): array
+     {
+         return proc_get_status($process);
+@@ -60,5 +60,5 @@ class ResourceCaster
+      * @return array
+      */
+-    public static function castStreamContext($stream, array $a, Stub $stub, bool $isNested)
++    public static function castStreamContext($stream, array $a, Stub $stub, bool $isNested): array
+     {
+         return @stream_context_get_params($stream) ?: $a;
+@@ -68,5 +68,5 @@ class ResourceCaster
+      * @return array
+      */
+-    public static function castGd($gd, array $a, Stub $stub, bool $isNested)
++    public static function castGd($gd, array $a, Stub $stub, bool $isNested): array
+     {
+         $a['size'] = imagesx($gd).'x'.imagesy($gd);
+@@ -79,5 +79,5 @@ class ResourceCaster
+      * @return array
+      */
+-    public static function castOpensslX509($h, array $a, Stub $stub, bool $isNested)
++    public static function castOpensslX509($h, array $a, Stub $stub, bool $isNested): array
+     {
+         $stub->cut = -1;
+diff --git a/src/Symfony/Component/VarDumper/Caster/SplCaster.php b/src/Symfony/Component/VarDumper/Caster/SplCaster.php
+index ea86cb4988..9b84f08439 100644
+--- a/src/Symfony/Component/VarDumper/Caster/SplCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/SplCaster.php
+@@ -33,5 +33,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castArrayObject(\ArrayObject $c, array $a, Stub $stub, bool $isNested)
++    public static function castArrayObject(\ArrayObject $c, array $a, Stub $stub, bool $isNested): array
+     {
+         return self::castSplArray($c, $a, $stub, $isNested);
+@@ -41,5 +41,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castArrayIterator(\ArrayIterator $c, array $a, Stub $stub, bool $isNested)
++    public static function castArrayIterator(\ArrayIterator $c, array $a, Stub $stub, bool $isNested): array
+     {
+         return self::castSplArray($c, $a, $stub, $isNested);
+@@ -49,5 +49,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castHeap(\Iterator $c, array $a, Stub $stub, bool $isNested)
++    public static function castHeap(\Iterator $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a += [
+@@ -61,5 +61,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castDoublyLinkedList(\SplDoublyLinkedList $c, array $a, Stub $stub, bool $isNested)
++    public static function castDoublyLinkedList(\SplDoublyLinkedList $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $prefix = Caster::PREFIX_VIRTUAL;
+@@ -79,5 +79,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castFileInfo(\SplFileInfo $c, array $a, Stub $stub, bool $isNested)
++    public static function castFileInfo(\SplFileInfo $c, array $a, Stub $stub, bool $isNested): array
+     {
+         static $map = [
+@@ -158,5 +158,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castFileObject(\SplFileObject $c, array $a, Stub $stub, bool $isNested)
++    public static function castFileObject(\SplFileObject $c, array $a, Stub $stub, bool $isNested): array
+     {
+         static $map = [
+@@ -198,5 +198,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castObjectStorage(\SplObjectStorage $c, array $a, Stub $stub, bool $isNested)
++    public static function castObjectStorage(\SplObjectStorage $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $storage = [];
+@@ -222,5 +222,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castOuterIterator(\OuterIterator $c, array $a, Stub $stub, bool $isNested)
++    public static function castOuterIterator(\OuterIterator $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a[Caster::PREFIX_VIRTUAL.'innerIterator'] = $c->getInnerIterator();
+@@ -232,5 +232,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castWeakReference(\WeakReference $c, array $a, Stub $stub, bool $isNested)
++    public static function castWeakReference(\WeakReference $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $a[Caster::PREFIX_VIRTUAL.'object'] = $c->get();
+@@ -242,5 +242,5 @@ class SplCaster
+      * @return array
+      */
+-    public static function castWeakMap(\WeakMap $c, array $a, Stub $stub, bool $isNested)
++    public static function castWeakMap(\WeakMap $c, array $a, Stub $stub, bool $isNested): array
+     {
+         $map = [];
+diff --git a/src/Symfony/Component/VarDumper/Caster/StubCaster.php b/src/Symfony/Component/VarDumper/Caster/StubCaster.php
+index 3fef05696f..2ed2fd10cb 100644
+--- a/src/Symfony/Component/VarDumper/Caster/StubCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/StubCaster.php
+@@ -26,5 +26,5 @@ class StubCaster
+      * @return array
+      */
+-    public static function castStub(Stub $c, array $a, Stub $stub, bool $isNested)
++    public static function castStub(Stub $c, array $a, Stub $stub, bool $isNested): array
+     {
+         if ($isNested) {
+@@ -55,5 +55,5 @@ class StubCaster
+      * @return array
+      */
+-    public static function cutInternals($obj, array $a, Stub $stub, bool $isNested)
++    public static function cutInternals($obj, array $a, Stub $stub, bool $isNested): array
+     {
+         if ($isNested) {
+@@ -69,5 +69,5 @@ class StubCaster
+      * @return array
+      */
+-    public static function castEnum(EnumStub $c, array $a, Stub $stub, bool $isNested)
++    public static function castEnum(EnumStub $c, array $a, Stub $stub, bool $isNested): array
+     {
+         if ($isNested) {
+@@ -95,5 +95,5 @@ class StubCaster
+      * @return array
+      */
+-    public static function castScalar(ScalarStub $scalarStub, array $a, Stub $stub)
++    public static function castScalar(ScalarStub $scalarStub, array $a, Stub $stub): array
+     {
+         $stub->type = Stub::TYPE_SCALAR;
+diff --git a/src/Symfony/Component/VarDumper/Caster/SymfonyCaster.php b/src/Symfony/Component/VarDumper/Caster/SymfonyCaster.php
+index ebc00f90ec..f8ba45a7f0 100644
+--- a/src/Symfony/Component/VarDumper/Caster/SymfonyCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/SymfonyCaster.php
+@@ -35,5 +35,5 @@ class SymfonyCaster
+      * @return array
+      */
+-    public static function castRequest(Request $request, array $a, Stub $stub, bool $isNested)
++    public static function castRequest(Request $request, array $a, Stub $stub, bool $isNested): array
+     {
+         $clone = null;
+@@ -53,5 +53,5 @@ class SymfonyCaster
+      * @return array
+      */
+-    public static function castHttpClient($client, array $a, Stub $stub, bool $isNested)
++    public static function castHttpClient($client, array $a, Stub $stub, bool $isNested): array
+     {
+         $multiKey = sprintf("\0%s\0multi", $client::class);
+@@ -66,5 +66,5 @@ class SymfonyCaster
+      * @return array
+      */
+-    public static function castHttpClientResponse($response, array $a, Stub $stub, bool $isNested)
++    public static function castHttpClientResponse($response, array $a, Stub $stub, bool $isNested): array
+     {
+         $stub->cut += \count($a);
+@@ -81,5 +81,5 @@ class SymfonyCaster
+      * @return array
+      */
+-    public static function castLazyObjectState($state, array $a, Stub $stub, bool $isNested)
++    public static function castLazyObjectState($state, array $a, Stub $stub, bool $isNested): array
+     {
+         if (!$isNested) {
+@@ -109,5 +109,5 @@ class SymfonyCaster
+      * @return array
+      */
+-    public static function castUuid(Uuid $uuid, array $a, Stub $stub, bool $isNested)
++    public static function castUuid(Uuid $uuid, array $a, Stub $stub, bool $isNested): array
+     {
+         $a[Caster::PREFIX_VIRTUAL.'toBase58'] = $uuid->toBase58();
+@@ -125,5 +125,5 @@ class SymfonyCaster
+      * @return array
+      */
+-    public static function castUlid(Ulid $ulid, array $a, Stub $stub, bool $isNested)
++    public static function castUlid(Ulid $ulid, array $a, Stub $stub, bool $isNested): array
+     {
+         $a[Caster::PREFIX_VIRTUAL.'toBase58'] = $ulid->toBase58();
+diff --git a/src/Symfony/Component/VarDumper/Caster/XmlReaderCaster.php b/src/Symfony/Component/VarDumper/Caster/XmlReaderCaster.php
+index d802bbf2a1..cdf0cc7474 100644
+--- a/src/Symfony/Component/VarDumper/Caster/XmlReaderCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/XmlReaderCaster.php
+@@ -47,5 +47,5 @@ class XmlReaderCaster
+      * @return array
+      */
+-    public static function castXmlReader(\XMLReader $reader, array $a, Stub $stub, bool $isNested)
++    public static function castXmlReader(\XMLReader $reader, array $a, Stub $stub, bool $isNested): array
+     {
+         try {
+diff --git a/src/Symfony/Component/VarDumper/Caster/XmlResourceCaster.php b/src/Symfony/Component/VarDumper/Caster/XmlResourceCaster.php
+index 0cf42584a0..e2807c7001 100644
+--- a/src/Symfony/Component/VarDumper/Caster/XmlResourceCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/XmlResourceCaster.php
+@@ -51,5 +51,5 @@ class XmlResourceCaster
+      * @return array
+      */
+-    public static function castXml($h, array $a, Stub $stub, bool $isNested)
++    public static function castXml($h, array $a, Stub $stub, bool $isNested): array
+     {
+         $a['current_byte_index'] = xml_get_current_byte_index($h);
 diff --git a/src/Symfony/Component/VarExporter/Internal/Exporter.php b/src/Symfony/Component/VarExporter/Internal/Exporter.php
-index 57c229eb14..b9aa92fcb7 100644
+index ae12ec414a..971280f868 100644
 --- a/src/Symfony/Component/VarExporter/Internal/Exporter.php
 +++ b/src/Symfony/Component/VarExporter/Internal/Exporter.php
 @@ -36,5 +36,5 @@ class Exporter
@@ -1100,6 +3101,17 @@ index 57c229eb14..b9aa92fcb7 100644
 +    public static function prepare($values, $objectsPool, &$refsPool, &$objectsCount, &$valuesAreStatic): array
      {
          $refs = $values;
+diff --git a/src/Symfony/Component/VarExporter/Internal/Hydrator.php b/src/Symfony/Component/VarExporter/Internal/Hydrator.php
+index f665f6ee15..429db33d19 100644
+--- a/src/Symfony/Component/VarExporter/Internal/Hydrator.php
++++ b/src/Symfony/Component/VarExporter/Internal/Hydrator.php
+@@ -258,5 +258,5 @@ class Hydrator
+      * @return array
+      */
+-    public static function getPropertyScopes($class)
++    public static function getPropertyScopes($class): array
+     {
+         $propertyScopes = [];
 diff --git a/src/Symfony/Component/Workflow/Event/Event.php b/src/Symfony/Component/Workflow/Event/Event.php
 index cd7fab7896..b340eba38e 100644
 --- a/src/Symfony/Component/Workflow/Event/Event.php
@@ -1132,3 +3144,61 @@ index cd7fab7896..b340eba38e 100644
 +    public function getWorkflowName(): string
      {
          return $this->workflow->getName();
+diff --git a/src/Symfony/Component/Workflow/EventListener/GuardExpression.php b/src/Symfony/Component/Workflow/EventListener/GuardExpression.php
+index 23e830cac4..2b119f2db8 100644
+--- a/src/Symfony/Component/Workflow/EventListener/GuardExpression.php
++++ b/src/Symfony/Component/Workflow/EventListener/GuardExpression.php
+@@ -28,5 +28,5 @@ class GuardExpression
+      * @return Transition
+      */
+-    public function getTransition()
++    public function getTransition(): Transition
+     {
+         return $this->transition;
+@@ -36,5 +36,5 @@ class GuardExpression
+      * @return string
+      */
+-    public function getExpression()
++    public function getExpression(): string
+     {
+         return $this->expression;
+diff --git a/src/Symfony/Component/Workflow/Exception/TransitionException.php b/src/Symfony/Component/Workflow/Exception/TransitionException.php
+index 890d8e244b..d074936253 100644
+--- a/src/Symfony/Component/Workflow/Exception/TransitionException.php
++++ b/src/Symfony/Component/Workflow/Exception/TransitionException.php
+@@ -38,5 +38,5 @@ class TransitionException extends LogicException
+      * @return object
+      */
+-    public function getSubject()
++    public function getSubject(): object
+     {
+         return $this->subject;
+diff --git a/src/Symfony/Component/Workflow/Marking.php b/src/Symfony/Component/Workflow/Marking.php
+index dba7c3dcfb..dce66ea6b9 100644
+--- a/src/Symfony/Component/Workflow/Marking.php
++++ b/src/Symfony/Component/Workflow/Marking.php
+@@ -45,5 +45,5 @@ class Marking
+      * @return bool
+      */
+-    public function has(string $place)
++    public function has(string $place): bool
+     {
+         return isset($this->places[$place]);
+@@ -53,5 +53,5 @@ class Marking
+      * @return array
+      */
+-    public function getPlaces()
++    public function getPlaces(): array
+     {
+         return $this->places;
+diff --git a/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php b/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php
+index cfe1c09b6e..de62f635f9 100644
+--- a/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php
++++ b/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php
+@@ -80,5 +80,5 @@ class ParentTestService
+      * @return ContainerInterface|null
+      */
+-    public function setContainer(ContainerInterface $container)
++    public function setContainer(ContainerInterface $container): ?ContainerInterface
+     {
+         return $container;

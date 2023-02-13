@@ -34,6 +34,9 @@ class TransitionException extends LogicException
         $this->context = $context;
     }
 
+    /**
+     * @return object
+     */
     public function getSubject()
     {
         return $this->subject;

@@ -40,6 +40,9 @@ class LdapFactory implements UserProviderFactoryInterface
         ;
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return 'ldap';

@@ -36,6 +36,9 @@ class XmlReferenceDumper
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree(), $namespace);
     }
 
+    /**
+     * @return string
+     */
     public function dumpNode(NodeInterface $node, string $namespace = null)
     {
         $this->reference = '';

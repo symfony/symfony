@@ -37,6 +37,9 @@ class InMemoryFactory implements UserProviderFactoryInterface
         $definition->addArgument($users);
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return 'memory';

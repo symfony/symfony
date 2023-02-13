@@ -554,6 +554,8 @@ trait HttpClientTrait
      * Removes dot-segments from a path.
      *
      * @see https://tools.ietf.org/html/rfc3986#section-5.2.4
+     *
+     * @return string
      */
     private static function removeDotSegments(string $path)
     {

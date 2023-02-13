@@ -66,6 +66,9 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertTrue($redis->isConnected());
         $this->assertSame(0, $redis->getDbNum());
 
+        $redis = RedisAdapter::createConnection('redis://'.$uri.'/');
+        $this->assertSame(0, $redis->getDbNum());
+
         $redis = RedisAdapter::createConnection('redis://'.$uri.'/2');
         $this->assertSame(2, $redis->getDbNum());
 

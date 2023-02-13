@@ -27,7 +27,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
         return new CountValidator();
     }
 
-    abstract protected function createCollection(array $content);
+    abstract protected static function createCollection(array $content);
 
     public function testNullIsValid()
     {
@@ -42,30 +42,30 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Count(5));
     }
 
-    public function getThreeOrLessElements()
+    public static function getThreeOrLessElements()
     {
         return [
-            [$this->createCollection([1])],
-            [$this->createCollection([1, 2])],
-            [$this->createCollection([1, 2, 3])],
-            [$this->createCollection(['a' => 1, 'b' => 2, 'c' => 3])],
+            [static::createCollection([1])],
+            [static::createCollection([1, 2])],
+            [static::createCollection([1, 2, 3])],
+            [static::createCollection(['a' => 1, 'b' => 2, 'c' => 3])],
         ];
     }
 
-    public function getFourElements()
+    public static function getFourElements()
     {
         return [
-            [$this->createCollection([1, 2, 3, 4])],
-            [$this->createCollection(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4])],
+            [static::createCollection([1, 2, 3, 4])],
+            [static::createCollection(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4])],
         ];
     }
 
-    public function getFiveOrMoreElements()
+    public static function getFiveOrMoreElements()
     {
         return [
-            [$this->createCollection([1, 2, 3, 4, 5])],
-            [$this->createCollection([1, 2, 3, 4, 5, 6])],
-            [$this->createCollection(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5])],
+            [static::createCollection([1, 2, 3, 4, 5])],
+            [static::createCollection([1, 2, 3, 4, 5, 6])],
+            [static::createCollection(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5])],
         ];
     }
 

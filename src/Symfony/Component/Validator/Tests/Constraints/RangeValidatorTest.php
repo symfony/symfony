@@ -277,11 +277,12 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getTenthToTwentiethMarch2014()
+    public static function getTenthToTwentiethMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 10, 2014')],
@@ -293,16 +294,17 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 15, 2014')];
         $tests[] = [new \DateTimeImmutable('March 20, 2014')];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }
 
-    public function getSoonerThanTenthMarch2014()
+    public static function getSoonerThanTenthMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'],
@@ -312,16 +314,17 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 20, 2013'), 'Mar 20, 2013, 12:00 AM'];
         $tests[] = [new \DateTimeImmutable('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }
 
-    public function getLaterThanTwentiethMarch2014()
+    public static function getLaterThanTwentiethMarch2014()
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
-        $this->setDefaultTimezone('UTC');
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
         $tests = [
             [new \DateTime('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'],
@@ -331,7 +334,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $tests[] = [new \DateTimeImmutable('March 21, 2014'), 'Mar 21, 2014, 12:00 AM'];
         $tests[] = [new \DateTimeImmutable('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'];
 
-        $this->restoreDefaultTimezone();
+        date_default_timezone_set($timezone);
 
         return $tests;
     }

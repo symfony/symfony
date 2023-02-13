@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-16T20:34:50Z
+
+Might not be able to actually see this working until #49000 is merged...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-01-23T14:48:21Z
+
+@danepowell #49000 has been merged, you may want to rebase. :)
+
+---------------------------------------------------------------------------
+
+by danepowell at 2023-01-23T16:05:22Z
+
+This sped up Psalm tests from [40 minutes](https://github.com/symfony/symfony/actions/runs/3987784479/jobs/6838063017) to [3 minutes](https://github.com/symfony/symfony/actions/runs/3988181712/jobs/6838991808)! 😂
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-01-26T13:28:35Z
+
+We should merge this on 5.4, isn't it?

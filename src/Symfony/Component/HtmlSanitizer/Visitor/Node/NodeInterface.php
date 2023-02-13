@@ -17,8 +17,6 @@ namespace Symfony\Component\HtmlSanitizer\Visitor\Node;
  * Once the sanitization is done, nodes are rendered into the final output string.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental
  */
 interface NodeInterface
 {

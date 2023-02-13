@@ -17,8 +17,6 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
  * Implements attribute-specific sanitization logic.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental
  */
 interface AttributeSanitizerInterface
 {

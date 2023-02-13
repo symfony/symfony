@@ -15,8 +15,6 @@ use Symfony\Component\HtmlSanitizer\TextSanitizer\StringSanitizer;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental
  */
 final class Node implements NodeInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\HtmlSanitizer\Visitor\Node;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @experimental
  */
 final class BlockedNode implements NodeInterface
 {

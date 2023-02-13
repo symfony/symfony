@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-13T08:50:13Z
+
+The reason the `void` return type was left out previously was that it would cause too much trouble downstream for too little gain. I think @nicolas-grekas had a strong case against it.
+
+However, I've been working with other codebases that used the `void` type consistently and I really like it. If we want to achieve 100% coverage with native return types as I proposed in https://github.com/symfony/symfony/issues/47551#issuecomment-1427554872, using the `void` return type on a larger scale becomes inevitable.
+
+👍🏻 from my side. I'll see if I can review the PR soon, but I'll probably do so in multiple sessions because my head will start to spin if I try to review it in one go. 🙈
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-13T09:30:55Z
+
+> We should particularly review if `@final` classes/methods didn't get real PHP void return types, as this is a BC break.
+
+The formatter/handler/processor classes from the Monolog bridge are flagged `@final`, but native return types have been added there. I believe that this is still okay, but since you mentioned that case explicitly, I wanted to point it out. 🙂
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-02-13T09:46:45Z
+
+> I believe that this is still okay, but since you mentioned that case explicitly, I wanted to point it out. slightly_smiling_face
+
+I think our policy is "when flagged with `@final`, it will be considered final on the next major". I.e. we should not treat them as final in the current major
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-13T09:50:36Z
+
+> I think our policy is "when flagged with `@final`, it will be considered final on the next major". I.e. we should not treat them as final in the current major
+
+No, that's the case for classes that we annotate with `@final since Symfony X.Y`. On the next major, we either just remove this the Symfony version from the annotation or actually `final`ize the class.
+
+With `@final` without a version, it's more like: "We consider this class to be final and if you extend it, you're on your own."
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-02-13T09:59:06Z
+
+You might be saying the same thing :)
+I verified the patch: no files with `@final since ...` are patched here, while some with `@final` are, which is fine since we don't consider this a BC break.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-13T10:02:52Z
+
+To elaborate a bit more on the `@final` case: I think that to some extend, we can be bold here. If someone knowingly extends a class that the framework considers to be final, they need to expect things to break in a minor release.
+
+For classes flagged as `@final since Symfony 6.X` the case is different because at the time the developer created a child class our class might not have been documented as final yet.
+
+That being said, we probably should be less reluctant with real `final` classes in 7.0. They allow us to move faster and force us to think about proper extension points. But that's off-topic for this PR.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2023-02-13T10:05:51Z
+
+In case you missed it, the patch failure in the 8.1 tests is fixed when #49346 is merged (and merged up into 6.3).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2023-02-13T11:55:19Z
+
+We review and patch methods on interfaces (like `Symfony\Component\Mime\Header\HeaderInterface::setBody()`) in a follow-up, don't we?

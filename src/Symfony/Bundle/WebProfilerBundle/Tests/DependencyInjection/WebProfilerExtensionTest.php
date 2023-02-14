@@ -22,6 +22,9 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -55,11 +58,15 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->kernel = $this->createMock(KernelInterface::class);
 
+        $profiler = $this->createMock(Profiler::class);
+        $profilerStorage = $this->createMock(ProfilerStorageInterface::class);
+        $router = $this->createMock(RouterInterface::class);
+
         $this->container = new ContainerBuilder();
         $this->container->register('data_collector.dump', DumpDataCollector::class)->setPublic(true);
         $this->container->register('error_handler.error_renderer.html', HtmlErrorRenderer::class)->setPublic(true);
         $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
-        $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'))->setPublic(true);
+        $this->container->register('router', $router::class)->setPublic(true);
         $this->container->register('twig', 'Twig\Environment')->setPublic(true);
         $this->container->register('twig_loader', 'Twig\Loader\ArrayLoader')->addArgument([])->setPublic(true);
         $this->container->register('twig', 'Twig\Environment')->addArgument(new Reference('twig_loader'))->setPublic(true);
@@ -71,9 +78,9 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('kernel.charset', 'UTF-8');
         $this->container->setParameter('debug.file_link_format', null);
         $this->container->setParameter('profiler.class', ['Symfony\\Component\\HttpKernel\\Profiler\\Profiler']);
-        $this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
+        $this->container->register('profiler', $profiler::class)
             ->setPublic(true)
-            ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
+            ->addArgument(new Definition($profilerStorage::class));
         $this->container->setParameter('data_collector.templates', []);
         $this->container->set('kernel', $this->kernel);
         $this->container->addCompilerPass(new RegisterListenersPass());

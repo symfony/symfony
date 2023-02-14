@@ -39,7 +39,7 @@ abstract class ProviderTestCase extends TestCase
     /**
      * @return iterable<array{0: ProviderInterface, 1: string}>
      */
-    abstract public function toStringProvider(): iterable;
+    abstract public static function toStringProvider(): iterable;
 
     /**
      * @dataProvider toStringProvider

@@ -24,7 +24,7 @@ class NullTransportFactoryTest extends TransportFactoryTestCase
         return new NullTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('null', ''),
@@ -32,7 +32,7 @@ class NullTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             new Dsn('null', 'null'),

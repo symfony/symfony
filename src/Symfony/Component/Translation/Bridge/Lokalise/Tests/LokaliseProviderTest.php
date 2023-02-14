@@ -33,7 +33,7 @@ class LokaliseProviderTest extends ProviderTestCase
         return new LokaliseProvider($client, $loader, $logger, $defaultLocale, $endpoint);
     }
 
-    public function toStringProvider(): iterable
+    public static function toStringProvider(): iterable
     {
         yield [
             $this->createProvider($this->getClient()->withOptions([
@@ -723,7 +723,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider->delete($translatorBag);
     }
 
-    public function getResponsesForOneLocaleAndOneDomain(): \Generator
+    public static function getResponsesForOneLocaleAndOneDomain(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 
@@ -788,7 +788,7 @@ XLIFF
         ];
     }
 
-    public function getResponsesForManyLocalesAndManyDomains(): \Generator
+    public static function getResponsesForManyLocalesAndManyDomains(): \Generator
     {
         $arrayLoader = new ArrayLoader();
 

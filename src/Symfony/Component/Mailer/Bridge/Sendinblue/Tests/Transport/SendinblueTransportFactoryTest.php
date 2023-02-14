@@ -25,7 +25,7 @@ class SendinblueTransportFactoryTest extends TransportFactoryTestCase
         return new SendinblueTransportFactory($this->getDispatcher(), $this->getClient(), $this->getLogger());
     }
 
-    public function supportsProvider(): iterable
+    public static function supportsProvider(): iterable
     {
         yield [
             new Dsn('sendinblue', 'default'),
@@ -48,7 +48,7 @@ class SendinblueTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function createProvider(): iterable
+    public static function createProvider(): iterable
     {
         yield [
             new Dsn('sendinblue', 'default', self::USER, self::PASSWORD),
@@ -71,7 +71,7 @@ class SendinblueTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('sendinblue+foo', 'default', self::USER, self::PASSWORD),
@@ -79,7 +79,7 @@ class SendinblueTransportFactoryTest extends TransportFactoryTestCase
         ];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         yield [new Dsn('sendinblue+smtp', 'default', self::USER)];
 

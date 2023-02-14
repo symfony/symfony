@@ -42,17 +42,17 @@ abstract class ProviderFactoryTestCase extends TestCase
     /**
      * @return iterable<array{0: bool, 1: string}>
      */
-    abstract public function supportsProvider(): iterable;
+    abstract public static function supportsProvider(): iterable;
 
     /**
-     * @return iterable<array{0: string, 1: string, 2: TransportInterface}>
+     * @return iterable<array{0: string, 1: string}>
      */
-    abstract public function createProvider(): iterable;
+    abstract public static function createProvider(): iterable;
 
     /**
      * @return iterable<array{0: string, 1: string|null}>
      */
-    public function unsupportedSchemeProvider(): iterable
+    public static function unsupportedSchemeProvider(): iterable
     {
         return [];
     }
@@ -60,7 +60,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     /**
      * @return iterable<array{0: string, 1: string|null}>
      */
-    public function incompleteDsnProvider(): iterable
+    public static function incompleteDsnProvider(): iterable
     {
         return [];
     }
